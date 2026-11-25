@@ -7,7 +7,7 @@
 // because they refute a first-round "no programme found"; scripts/check-data.mjs allow-lists them.
 
 import type { Condition, Programme } from '../types.ts';
-import { age, builtBy, fixed, flag, heavy, lightOrSmall, lowIncome, notPreviouslySubsidised, quota, residency, rocNational, scrap, scrapAge, t, twoStroke } from './helpers.ts';
+import { notSubsidisedBefore, age, builtBy, fixed, flag, heavy, lightOrSmall, lowIncome, notPreviouslySubsidised, quota, residency, rocNational, scrap, scrapAge, t, twoStroke } from './helpers.ts';
 
 const MEID = ['meid-lev-2026-subsidy-table'] as const;
 const NONE_2027 = t('未見116年方案。', 'No 2027 programme seen.');
@@ -91,7 +91,9 @@ const YL_TEXT = '設籍雲林縣，過去3年未領過同類縣府補助；車�
 const YL_TEXT_EN = 'Registered in Yunlin with no county subsidy of this type in the past 3 years; moving the registration out or transferring the scooter means repayment; each item closes when full.';
 const YL_2027 = t('115至117年計畫一併公告、金額逐年下降，116年金額未見。', 'The 2026–2028 plan was announced together with amounts falling each year; 2027 figures not seen.');
 
-const ilGeneral: Condition[] = [residency(), age(18), notPreviouslySubsidised];
+// yilan-swap-general-heavy-v3: none if received 環境部/county subsidy in 2023-2025.
+const ilNotSubsidised: Condition = notSubsidisedBefore(t('假設你2023至2025年沒有領過環境部或宜蘭縣的機車補助', 'Assumes you received no MOENV or Yilan County scooter subsidy in 2023–2025'));
+const ilGeneral: Condition[] = [residency(), age(18), ilNotSubsidised];
 const IL_TEXT = '年滿18歲、設籍宜蘭縣，車款在經濟部認可名單；2023至2025年領過環境部或縣府補助者不適用；1年內不得過戶；預算用罄即止，116年1月10日前送達環保局。';
 const IL_TEXT_EN = 'Aged 18+, registered in Yilan, an MOEA-listed model; anyone who received an MOENV or county subsidy in 2023–2025 is excluded; no transfer for a year; closes when the budget runs out; applications must reach the bureau by 10 January 2027.';
 const IL_OLD = '舊車為103年底以前出廠、114年底前設籍宜蘭縣並持有的燃油機車。';
@@ -156,12 +158,57 @@ export const countyR2Programmes: Programme[] = [
   // Nantou
   p({ id: 'nantou-swap', jurisdiction: 'nantou', payerName: NT, name: t('南投縣汰舊換購電動機車', 'Nantou scrap-and-replace'), amount: fixed(16000), conditions: [residency(), scrap, builtBy('2007-06-30')], conditionText: t('舊車為96年6月30日以前出廠的燃油機車；外籍人士可申請；申請期限與名額未查到。', 'The old scooter is a gasoline scooter built by 30 June 2007; foreign nationals may apply; deadline and quota not found.'), exclusiveGroups: ['nantou-base'], sources: [...MEID], research: [r('nantou-swap-v3')] }),
   p({ id: 'nantou-new', jurisdiction: 'nantou', payerName: NT, name: t('南投縣新購電動機車', 'Nantou new electric scooter'), amount: fixed(5000), conditions: [residency()], conditionText: t('設籍南投縣；申請期限與名額未查到。', 'Registered in Nantou; deadline and quota not found.'), exclusiveGroups: ['nantou-base'], research: [r('nantou-new-purchase-v3')] }),
+  {
+    // Listed, not counted: the MEID table gives the amount but no finding records the old-scooter
+    // age limit or other conditions (nantou-swap-v3's 2007-06-30 cut-off covers scrap-and-replace only).
+    ...p({
+      id: 'nantou-scrap-only',
+      jurisdiction: 'nantou',
+      payerName: NT,
+      name: t('南投縣純淘汰老舊機車', 'Nantou scrap an old scooter only'),
+      kind: 'scrap-only-bonus',
+      amount: fixed(2500),
+      conditions: [residency(), scrap],
+      conditionText: t('淘汰老舊機車、不換購電動機車；舊車車齡等條件未查到。', 'Scrap an old scooter without buying an electric one; the old-scooter age limit and other conditions were not found.'),
+      exclusiveGroups: ['county-scrap-only'],
+      research: [r('nantou-new-purchase-v3')],
+      calculator: {
+        excluded: t('經濟部產業發展署補助表列出南投縣純淘汰2,500元，但舊車車齡等條件未查到；請洽南投縣環保局049-2238573。', 'The MEID subsidy table lists a Nantou scrap-only payment of NT$2,500, but the old-scooter age limit and other conditions were not found; ask the Nantou EPB on 049-2238573.'),
+        reason: 'not-published',
+      },
+    }),
+    side: 'gasoline' as const,
+  },
 
   // Yunlin
   p({ id: 'yunlin-swap', jurisdiction: 'yunlin', payerName: YL, name: t('雲林縣一般民眾換購電動機車', 'Yunlin scrap-and-replace (general)'), amount: fixed(15000), conditions: [...ylGeneral, scrap, builtBy('2015-12-31')], conditionText: t(`${YL_TEXT}舊車為104年底以前出廠。`, `${YL_TEXT_EN} The old scooter was built by the end of 2015.`), quota: slots(350), status2027: YL_2027, exclusiveGroups: ['yunlin-base'], sources: ['yunlin-epb-2026-scooter-subsidy', ...MEID], research: [r('yunlin-swap-general-v3')] }),
   p({ id: 'yunlin-swap-lowincome', jurisdiction: 'yunlin', payerName: YL, name: t('雲林縣中低收入戶換購電動機車', 'Yunlin scrap-and-replace (low income)'), amount: fixed(25000), conditions: [...ylGeneral, scrap, builtBy('2015-12-31'), lowIncome(['low', 'middle-low'])], conditionText: t(`${YL_TEXT}中低收入戶換購25,000元。`, `${YL_TEXT_EN} NT$25,000 for low-income households replacing a scooter.`), status2027: YL_2027, exclusiveGroups: ['yunlin-base'], sources: ['yunlin-epb-2026-scooter-subsidy'], research: [r('yunlin-lowincome-v3')] }),
   p({ id: 'yunlin-new', jurisdiction: 'yunlin', payerName: YL, name: t('雲林縣一般民眾新購電動機車', 'Yunlin new electric scooter'), amount: fixed(10000), conditions: [...ylGeneral], conditionText: t(`${YL_TEXT}不必汰舊。`, `${YL_TEXT_EN} No scrapping needed.`), quota: slots(370), status2027: YL_2027, exclusiveGroups: ['yunlin-base'], sources: ['yunlin-epb-2026-scooter-subsidy', ...MEID], research: [r('yunlin-new-general-v3')] }),
-  { ...p({ id: 'yunlin-scrap-only-two-stroke', jurisdiction: 'yunlin', payerName: YL, name: t('雲林縣二行程機車回收報廢', 'Yunlin scrap a two-stroke only'), kind: 'scrap-only-bonus', amount: fixed(5000), conditions: [...ylGeneral, scrap, twoStroke, builtBy('2003-12-31')], conditionText: t('92年底以前出廠的二行程機車完成回收與報廢。', 'A two-stroke built by the end of 2003, recycled and scrapped.'), quota: slots(420), status2027: YL_2027, sources: ['yunlin-epb-2026-scooter-subsidy', ...MEID], research: [r('yunlin-micro-2stroke-v3')] }), side: 'gasoline' as const },
+  { ...p({ id: 'yunlin-scrap-only-two-stroke', jurisdiction: 'yunlin', payerName: YL, name: t('雲林縣二行程機車回收報廢', 'Yunlin scrap a two-stroke only'), kind: 'scrap-only-bonus', amount: fixed(5000), conditions: [...ylGeneral, scrap, twoStroke, builtBy('2003-12-31')], conditionText: t('92年底以前出廠的二行程機車完成回收與報廢。', 'A two-stroke built by the end of 2003, recycled and scrapped.'), quota: slots(420), status2027: YL_2027, exclusiveGroups: ['county-scrap-only'], sources: ['yunlin-epb-2026-scooter-subsidy', ...MEID], research: [r('yunlin-micro-2stroke-v3')] }), side: 'gasoline' as const },
+  {
+    // MEID table row: 2,000 (5,400 a year) for any gasoline scooter built by 2015-12-31. Matching
+    // the row to the scheme is the researcher's reading of the table layout, hence 'secondary'.
+    ...p({
+      id: 'yunlin-scrap-only-2015',
+      jurisdiction: 'yunlin',
+      payerName: YL,
+      name: t('雲林縣燃油機車回收報廢（104年底前出廠）', 'Yunlin scrap a gasoline scooter only (built by 2015)'),
+      kind: 'scrap-only-bonus',
+      amount: fixed(2000),
+      conditions: [...ylGeneral, scrap, builtBy('2015-12-31')],
+      conditionText: t(
+        '104年底以前出廠的燃油機車完成回收與報廢；每年5,400名。這一列與方案的對應是研究人員依經濟部表格版面判讀，縣府新聞稿沒有寫出。',
+        'A gasoline scooter built by the end of 2015, recycled and scrapped; 5,400 places a year. Matching this table row to the scheme is the researcher\'s reading of the MEID table layout; the county\'s press release does not state it.',
+      ),
+      quota: slots(5400),
+      status2027: YL_2027,
+      exclusiveGroups: ['county-scrap-only'],
+      sources: [...MEID],
+      confidence: 'secondary',
+      research: [r('yunlin-micro-2stroke-v3')],
+    }),
+    side: 'gasoline' as const,
+  },
 
   // Yilan
   il('yilan-swap-heavy', ['宜蘭縣汰舊換購電動機車（重型）', 'Yilan scrap-and-replace (heavy)'], 10000, [...ilOld, heavy], [IL_OLD, IL_OLD_EN], 'yilan-swap-general-heavy-v3'),

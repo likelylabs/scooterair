@@ -19,6 +19,8 @@ const OLD_TEXT_EN = 'The old scooter is a gasoline scooter at least 10 years old
 const TWO_TEXT = '舊車為民國92年12月31日以前出廠的二行程機車，設籍與報廢規定同上。';
 const TWO_TEXT_EN = 'The old scooter is a two-stroke built on or before 31 December 2003, with the same registration and scrapping rules.';
 const oldReg = { kind: 'scrap-registered-locally' as const, byDate: '2025-12-31' };
+const BUY_PLATE = t('購車與新車領牌須在這天以前完成，並在2027年1月10日前線上申請。', 'Buy and plate the new scooter by this date, and apply online by 10 January 2027.');
+const BUY_PLATE_SCRAP = t('購車、新車領牌與舊車報廢回收都須在這天以前完成，並在2027年1月10日前線上申請。', 'Buy and plate the new scooter, and scrap and recycle the old one, by this date; apply online by 10 January 2027.');
 
 const slots = (remaining: number, label: [string, string]) =>
   quota(
@@ -37,6 +39,7 @@ const base = (p: Partial<Programme> & Pick<Programme, 'id' | 'name' | 'amount' |
   cap: 'local-total-at-most-price',
   validFrom: '2026-01-01',
   validTo: '2026-12-31',
+  validToRule: BUY_PLATE,
   applicationDeadline: '2027-01-10',
   applicationNote: APPLY,
   status2027: STATUS_2027,
@@ -85,6 +88,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-replace-old-heavy',
+    validToRule: BUY_PLATE_SCRAP,
     name: t('臺北市汰購老舊機車換電動（重型）', 'Taipei scrap old scooter and buy electric (heavy)'),
     amount: fixed(19000),
     conditions: [...general, heavy, scrap, scrapAge(10), oldReg],
@@ -95,6 +99,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-replace-old-light',
+    validToRule: BUY_PLATE_SCRAP,
     name: t('臺北市汰購老舊機車換電動（輕型）', 'Taipei scrap old scooter and buy electric (light)'),
     amount: fixed(10000),
     conditions: [...general, light, scrap, scrapAge(10), oldReg],
@@ -105,6 +110,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-replace-2stroke-heavy',
+    validToRule: BUY_PLATE_SCRAP,
     name: t('臺北市汰購二行程機車換電動（重型）', 'Taipei scrap two-stroke and buy electric (heavy)'),
     amount: fixed(22000),
     conditions: [...general, heavy, scrap, twoStroke, builtBy('2003-12-31'), oldReg],
@@ -115,6 +121,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-replace-2stroke-light',
+    validToRule: BUY_PLATE_SCRAP,
     name: t('臺北市汰購二行程機車換電動（輕型）', 'Taipei scrap two-stroke and buy electric (light)'),
     amount: fixed(13000),
     conditions: [...general, light, scrap, twoStroke, builtBy('2003-12-31'), oldReg],
@@ -125,6 +132,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-replace-small',
+    validToRule: BUY_PLATE_SCRAP,
     name: t('臺北市汰購換電動（小型輕型）', 'Taipei scrap and buy electric (small-light)'),
     amount: fixed(0),
     conditions: [...general, small, scrap, scrapAge(10), oldReg],
@@ -136,6 +144,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-battery-topup',
+    exclusiveGroups: ['tpe-lowincome-stacking'],
     name: t('臺北市電池資費加碼', 'Taipei battery-fee top-up'),
     kind: 'battery-credit',
     amount: fixed(8000),
@@ -147,6 +156,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-kangaroo',
+    exclusiveGroups: ['tpe-lowincome-stacking'],
     name: t('臺北市袋鼠方案加碼（育有12歲以下幼童）', 'Taipei "kangaroo" top-up (child aged 12 or under)'),
     kind: 'top-up',
     amount: fixed(8000),
@@ -158,6 +168,7 @@ export const taipeiProgrammes: Programme[] = [
   }),
   base({
     id: 'tpe-lowincome-topup',
+    exclusiveGroups: ['tpe-lowincome-stacking'],
     name: t('臺北市中低及低收入戶加碼', 'Taipei low and middle-low income top-up'),
     kind: 'top-up',
     amount: fixed(10000),
@@ -171,6 +182,7 @@ export const taipeiProgrammes: Programme[] = [
   {
     ...base({
       id: 'tpe-scrap-only-bonus',
+      validToRule: t('舊車須在這天以前完成報廢回收，並在2027年1月10日前線上申請。', 'Scrap and recycle the old scooter by this date, and apply online by 10 January 2027.'),
       name: t('臺北市淘汰老舊機車汰舊獎勵金', 'Taipei scrap bonus (no electric purchase)'),
       kind: 'scrap-only-bonus',
       amount: fixed(3600),

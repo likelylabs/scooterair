@@ -35,7 +35,10 @@ const p = (x: Partial<Programme> & Pick<Programme, 'id' | 'name' | 'amount' | 'c
   cap: 'local-total-at-most-price',
   validFrom: '2026-01-01',
   validTo: '2026-12-31',
-  applicationDeadline: '2027-01-10',
+  validToRule: t('購車（以發票日為準）須在這天以前完成；第一階段線上申請也在這天截止，逾期不受理（第二階段補件至2027年1月10日）。', 'Buy by this date (the invoice date counts); stage 1 of the online application also closes that day and late applications are refused (stage 2 documents by 10 January 2027).'),
+  // ntpc-deadline: stage 1 online to 2026-12-31, stage 2 documents to 2027-01-10; late = refused.
+  applicationDeadline: '2026-12-31',
+  documentsDeadline: '2027-01-10',
   applicationNote: APPLY,
   status2027: STATUS_2027,
   sources: ['ntpc-motor-2026-plan', 'ntpc-motor-deadlines'],
@@ -53,7 +56,8 @@ const replaceRow = (id: string, cls: 'heavy' | 'light', phase: [string, string],
     conditionText: t(`${GENERAL}${OLD}`, `${GENERAL_EN} ${OLD_EN}`),
     exclusiveGroups: ['ntpc-base'],
     quota: replaceSlots,
-    research: [`new-taipei#${research}`, 'new-taipei#ntpc-old-scooter-age', 'new-taipei#ntpc-cap-purchase-price'],
+    validToRule: t('購車（以發票日為準）與舊車報廢回收須在這天以前完成；第一階段線上申請也在這天截止，逾期不受理（第二階段補件至2027年1月10日）。', 'Buy (the invoice date counts) and scrap and recycle the old scooter by this date; stage 1 of the online application also closes that day and late applications are refused (stage 2 documents by 10 January 2027).'),
+    research: [`new-taipei#${research}`, 'new-taipei#ntpc-old-scooter-age', 'new-taipei#ntpc-cap-purchase-price', 'new-taipei#ntpc-deadline'],
   });
 
 const P13: [string, string] = ['一至三期（92年12月31日前出廠）', 'phase 1–3 (built by 2003-12-31)'];
@@ -94,7 +98,7 @@ export const newTaipeiProgrammes: Programme[] = [
     amount: fixed(10000),
     conditions: [...general, lowIncome(['low', 'middle-low'])],
     conditionText: t('檢附區公所（中）低收入戶證明，發票日須在證明有效期間內；新購與換購都可加碼，不限名額。', 'With a district-office (middle-)low income certificate valid at the invoice date; for new purchase and replacement, no quota.'),
-    exclusiveGroups: ['ntpc-lowincome-vs-addons'],
+    exclusiveGroups: ['ntpc-lowincome-vs-earlybird', 'ntpc-lowincome-vs-double'],
     quota: quota('unlimited', '2026-11-25', t('不限名額。', 'No quota.')),
     research: ['new-taipei#ntpc-new-heavy-lowincome', 'new-taipei#ntpc-replace-lowincome-topup'],
     note: t('計畫表列的是含基本補助的中低收入戶金額（例如新購重型14,000元），與一般金額相差10,000元，試算以加碼10,000元呈現。', 'The plan prints low-income amounts including the base (e.g. NT$14,000 for a new heavy scooter), NT$10,000 above the general rows; we show it as a NT$10,000 top-up.'),
@@ -106,7 +110,7 @@ export const newTaipeiProgrammes: Programme[] = [
     amount: fixed(10000),
     conditions: [...general, ...oldScooter],
     conditionText: t('限換購電動機車，名額4,500名。', 'Replacement purchases only; 4,500 places.'),
-    exclusiveGroups: ['ntpc-lowincome-vs-addons'],
+    exclusiveGroups: ['ntpc-lowincome-vs-earlybird', 'ntpc-earlybird-vs-double'],
     quota: quota('exhausted', '2026-10-29', t('2026年10月29日已全數額滿，僅能列入備取。', 'Fully subscribed on 29 October 2026; waiting list only.'), {
       total: 4500,
       remaining: 0,
@@ -122,7 +126,7 @@ export const newTaipeiProgrammes: Programme[] = [
     amount: fixed(9000),
     conditions: [...general, ...oldScooter, { kind: 'scrap-second-scooter' }],
     conditionText: t('同一件換購申請再淘汰第二輛符合條件的新北市籍老舊機車；限量1,000名。', 'Scrap a second qualifying New Taipei-registered old scooter in the same replacement application; 1,000 places.'),
-    exclusiveGroups: ['ntpc-lowincome-vs-addons'],
+    exclusiveGroups: ['ntpc-lowincome-vs-double', 'ntpc-earlybird-vs-double'],
     quota: quota('nearly-exhausted', '2026-11-25', t('2026年11月25日首頁顯示剩餘187名（共1,000名）。', 'On 25 November 2026 the home page showed 187 of 1,000 places left.'), {
       total: 1000,
       remaining: 187,

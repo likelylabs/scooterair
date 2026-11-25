@@ -31,6 +31,8 @@ export const flag = (f: Extract<Condition, { kind: 'household' }>['flag'], value
 export const age = (min?: number, max?: number): Condition => ({ kind: 'age', min, max });
 export const residency = (minYears?: number, registeredBy?: ISODate): Condition => ({ kind: 'residency', minYears, registeredBy });
 export const notPreviouslySubsidised: Condition = { kind: 'household', flag: 'previousLocalSubsidy', value: false };
+/** The same, with an assumption that names every subsidy the rule excludes (e.g. MOENV's too). */
+export const notSubsidisedBefore = (assumption: L10n): Condition => ({ kind: 'household', flag: 'previousLocalSubsidy', value: false, assumption });
 export const rocNational: Condition = { kind: 'household', flag: 'foreignNational', value: false };
 
 export type Src = SourceId[];

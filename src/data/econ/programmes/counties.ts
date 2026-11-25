@@ -4,7 +4,7 @@
 // are listed with `calculator: { excluded }` so a reader sees why they are not counted.
 
 import type { Condition, Programme } from '../types.ts';
-import { age, builtBetween, builtBy, fixed, flag, heavyOrLight, lowIncome, notPreviouslySubsidised, quota, residency, scrap, small, t } from './helpers.ts';
+import { notSubsidisedBefore, age, builtBetween, builtBy, fixed, flag, heavyOrLight, lowIncome, notPreviouslySubsidised, quota, residency, scrap, small, t } from './helpers.ts';
 
 const MEID = ['meid-lev-subsidy-portal', 'meid-lev-2026-subsidy-table'] as const;
 const ANNUAL_2027 = t('年度方案，未見116年公告。', 'An annual programme; no 2027 announcement seen.');
@@ -12,7 +12,10 @@ const untilUsed = (asOf: string) => quota('unknown', asOf, t('依申請順序核
 
 // ---------------------------------------------------------------- Kinmen
 const KINMEN = t('金門縣環境保護局', 'Kinmen County Environmental Protection Bureau');
-const kinmenGeneral: Condition[] = [residency(), age(18), notPreviouslySubsidised];
+// kinmen-swap-heavy: 歷年未受環境部與本縣環保局電動二輪車補助者; kinmen-stacking: 曾向環境部或本縣環保局
+// 申請…相關補助者，不予補助. The assumption names MOENV as well as the county.
+const kinmenNotSubsidised: Condition = notSubsidisedBefore(t('假設你從未領過環境部或金門縣環保局的電動二輪車或汰舊換新補助', 'Assumes you have never received an MOENV or Kinmen EPB electric-scooter or scrap-and-replace subsidy'));
+const kinmenGeneral: Condition[] = [residency(), age(18), kinmenNotSubsidised];
 const KG = '年滿18歲、設籍金門縣（外籍人士須設籍滿1年），新車經濟部認證並登記於金門縣；每人限1輛；曾向環境部或金門縣環保局申請相關補助者不予補助。';
 const KG_EN = 'Aged 18+ and registered in Kinmen (foreign nationals for at least a year); the new scooter is MOEA-certified and registered in Kinmen; one per person; anyone who has applied to MOENV or the county for related subsidies is excluded.';
 const KOLD = '舊車為民國96年6月30日以前出廠、113年12月31日前設籍金門縣的燃油機車，於115年11月30日前報廢回收。';
@@ -28,6 +31,7 @@ const kinmen = (x: Partial<Programme> & Pick<Programme, 'id' | 'name' | 'amount'
   side: 'electric',
   validFrom: '2026-01-01',
   validTo: '2026-11-30',
+  validToRule: t('購車與舊車報廢回收都須在這天以前完成，2026年12月15日前送件。', 'Buy, and scrap and recycle the old scooter, by this date; submit by 15 December 2026.'),
   applicationDeadline: '2026-12-15',
   applicationNote: kinmenApply,
   status2027: ANNUAL_2027,
@@ -180,7 +184,12 @@ export const countyProgrammes: Programme[] = [
     calculator: { excluded: t('只見於媒體引述的縣府圖卡，偏鄉鄉鎮名單與文件不明，無法判斷誰符合資格。', 'Seen only in a media report of a county graphic; the list of remote townships and the documents required are unknown, so eligibility cannot be judged.'), reason: 'secondary-only' },
   }),
   {
-    ...table('pingtung', PT, 'pingtung-scrap-only', ['屏東縣單純淘汰老舊機車', 'Pingtung scrap old scooter (no electric purchase)'], 1500, [residency(), scrap, builtBy('2007-06-30')], ['舊車為民國96年6月30日以前出廠的1至4期燃油機車。', 'The old scooter is a phase 1–4 gasoline scooter built by 30 June 2007.'], 'pingtung-scrap'),
+    ...table('pingtung', PT, 'pingtung-scrap-only', ['屏東縣單純淘汰老舊機車', 'Pingtung scrap old scooter (no electric purchase)'], 1500, [residency(), scrap, builtBy('2007-06-30')], ['舊車為民國96年6月30日以前出廠的1至4期燃油機車。', 'The old scooter is a phase 1–4 gasoline scooter built by 30 June 2007.'], 'pingtung-scrap', {
+      note: t(
+        '經濟部縣市補助表列1,500元，ETtoday引述縣府為最高2,300元，差額800元原因不明；試算採較低的官方表列金額，請向環保局（08-7352068）確認。',
+        'The MOEA county table says NT$1,500; ETtoday, quoting the county, says up to NT$2,300, and the NT$800 gap is unexplained. We use the lower official figure; confirm with the bureau (08-7352068).',
+      ),
+    }),
     kind: 'scrap-only-bonus',
     side: 'gasoline',
   },

@@ -9,7 +9,17 @@ const PAYER = t('桃園市政府環境保護局', 'Taoyuan City Department of En
 const SRC = ['taoyuan-epb-2026-programme'] as const;
 const STATUS_2027 = t('市府以問卷研擬116年方案，尚未公布。', 'The city is drafting a 2027 programme from a survey; nothing announced.');
 const APPLY = t('補助期間至115年12月31日，最晚116年1月10日前申請。', 'Purchases to 31 December 2026; apply by 10 January 2027 at the latest.');
-const general: Condition[] = [residency(undefined, '2024-12-31'), age(18)];
+// ty-eligibility: ROC nationals registered by 2024-12-31, or residence-permit holders living in
+// Taoyuan who meet the spouse-registration condition. We cannot test the second route, so for a
+// foreign national the lines are excluded as ambiguous (and the amount reported), not as "no".
+const roc: Condition = {
+  kind: 'household',
+  flag: 'foreignNational',
+  value: false,
+  ambiguous: true,
+  why: t('外籍人士須持居留證、住在桃園市並符合配偶設籍條件才能申請，試算無法判斷，未計入；請向環保局確認', 'foreign nationals qualify only with a residence permit, living in Taoyuan and meeting the spouse-registration condition, which we cannot check, so it is not counted (ask the bureau)'),
+};
+const general: Condition[] = [residency(undefined, '2024-12-31'), age(18), roc];
 const GENERAL = '年滿18歲、113年12月31日前設籍桃園市（或持居留證並符合配偶設籍條件）。';
 const GENERAL_EN = 'Aged 18+ and registered in Taoyuan by 31 December 2024 (or a residence-permit holder meeting the spouse rule).';
 const STACK_NOTE = t('桃園市公告沒有說明能否與中央補助併領；試算照其他縣市的做法同時計入中央補助，請向環保局確認。', 'The Taoyuan notice does not say whether its money stacks with central subsidies; like other cities we count both, so confirm with the bureau.');
@@ -50,7 +60,7 @@ const topup = (id: string, name: [string, string], value: number, conds: Conditi
 export const taoyuanProgrammes: Programme[] = [
   p({
     id: 'ty-new',
-    name: t('桃園市新購電動機車（最高）', 'Taoyuan new electric scooter (maximum)'),
+    name: t('桃園市新購電動機車', 'Taoyuan new electric scooter'),
     kind: 'purchase-subsidy',
     amount: fixed(4000, true),
     conditions: [...general],
@@ -61,7 +71,7 @@ export const taoyuanProgrammes: Programme[] = [
   }),
   p({
     id: 'ty-scrap-phase1to5',
-    name: t('桃園市汰換1至5期機車換購電動（最高）', 'Taoyuan scrap a phase 1–5 scooter and buy electric (maximum)'),
+    name: t('桃園市汰換1至5期機車換購電動', 'Taoyuan scrap a phase 1–5 scooter and buy electric'),
     kind: 'purchase-subsidy',
     amount: fixed(12000, true),
     conditions: [...general, scrap, builtBy('2016-12-31')],
@@ -72,7 +82,7 @@ export const taoyuanProgrammes: Programme[] = [
   }),
   p({
     id: 'ty-scrap-two-stroke',
-    name: t('桃園市汰換二行程機車換購電動（最高）', 'Taoyuan scrap a two-stroke and buy electric (maximum)'),
+    name: t('桃園市汰換二行程機車換購電動', 'Taoyuan scrap a two-stroke and buy electric'),
     kind: 'purchase-subsidy',
     amount: fixed(15000, true),
     conditions: [...general, scrap, twoStroke],

@@ -102,7 +102,25 @@ export const kaohsiungProgrammes: Programme[] = [
       conditions: [...general, scrap, twoStroke, { kind: 'scrap-registered-locally', minYears: 1 }],
       conditionText: t('只限二行程機車；同一輛舊車只能申請純淘汰或汰舊換購擇一。', 'Two-strokes only; one old scooter can claim either scrap-only or scrap-and-replace.'),
       exclusiveGroups: ['khh-old-scooter-use'],
-      research: ['kaohsiung#khh-scrap-two-stroke-general'],
+      research: ['kaohsiung#khh-scrap-two-stroke-general', 'kaohsiung#khh-budget-exhausted'],
+    }),
+    side: 'gasoline',
+  },
+  {
+    // The same scrap-only payment at the low-income rate; one old scooter claims one of the two
+    // (both are in khh-old-scooter-use), so a low-income owner gets 2,000, not 3,000.
+    ...p({
+      id: 'khh-scrap-only-two-stroke-low',
+      name: t('高雄市純淘汰二行程機車（低收入戶）', 'Kaohsiung scrap a two-stroke, low income (no electric purchase)'),
+      kind: 'scrap-only-bonus',
+      amount: fixed(2000),
+      conditions: [...general, scrap, twoStroke, { kind: 'scrap-registered-locally', minYears: 1 }, lowIncome(['low'])],
+      conditionText: t(
+        '只限二行程機車，檢附區公所低收入戶證明（中低收入戶不適用）；同一輛舊車只能申請純淘汰或汰舊換購擇一。',
+        'Two-strokes only, with a district-office low-income certificate (middle-low income does not qualify); one old scooter can claim either scrap-only or scrap-and-replace.',
+      ),
+      exclusiveGroups: ['khh-old-scooter-use'],
+      research: ['kaohsiung#khh-scrap-two-stroke-lowincome', 'kaohsiung#khh-budget-exhausted'],
     }),
     side: 'gasoline',
   },
