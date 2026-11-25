@@ -27,7 +27,6 @@ export function renderGrouped(p: GroupedBarProps): ChartRender {
   const o: string[] = [];
   let y = unit ? 22 : 2;
   if (unit) o.push(text('c-tick', '100%', 12, unit, 'text-anchor="end"'));
-  const top = y;
 
   groups.forEach((g, gi) => {
     const lines = wrapLabel(g.label, MIN_W / 14);
@@ -52,7 +51,6 @@ export function renderGrouped(p: GroupedBarProps): ChartRender {
     y += 16;
   });
   const height = y - 16;
-  o.unshift(`<line class="c-axis" x1="0" x2="0" y1="${top}" y2="${height}"/>`);
 
   return {
     kind: 'grouped',

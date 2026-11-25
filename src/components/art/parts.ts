@@ -239,16 +239,16 @@ export function breath(x: number, y: number, r = 9): string {
  * What you can smell: fumes. Wavy horizontal ribbons, thick and many near the
  * ground, thinning with height (exponential, scale height ~45 cm).
  */
-export function fumes(o: { width: number; count: number; seed?: number; x0?: number; scale?: number; top?: number }): string {
-  const { width, count, seed = 1, x0 = 0, scale = 45, top = 190 } = o;
+export function fumes(o: { width: number; count: number; seed?: number; x0?: number; scale?: number; top?: number; len?: [number, number] }): string {
+  const { width, count, seed = 1, x0 = 0, scale = 45, top = 190, len: lenRange = [110, 410] } = o;
   const r = rng(seed);
   const out: string[] = [];
   for (let i = 0; i < count; i++) {
     const h = Math.min(top, -Math.log(1 - r() * 0.985) * scale + 3);
     const low = 1 - h / top; // 1 at the ground, 0 at the top
-    const len = 110 + r() * 300;
-    const x = x0 + r() * (width + 120) - 60 - len / 2;
-    const wl = 70 + r() * 80;
+    const len = lenRange[0] + r() * (lenRange[1] - lenRange[0]);
+    const x = x0 + r() * width - len / 2;
+    const wl = Math.min(70 + r() * 80, len / 1.5);
     const amp = 2.5 + r() * 5;
     const half = Math.max(2, Math.round(len / (wl / 2)));
     let d = `M${n(x)},${n(-h)} q${n(wl / 4)},${n(-amp)} ${n(wl / 2)},0`;

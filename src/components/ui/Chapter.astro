@@ -48,7 +48,7 @@ const toneClass = { street: '', sunken: 'tone-sunken', night: 'tone-inverse', cl
 const hazeH = Math.round(140 + haze * 120);
 ---
 
-<section id={id} class:list={['chapter', `chapter--${size}`, toneClass, haze > 0 && 'chapter--haze', cls]} aria-labelledby={`${id}-title`} style={`--haze-room:${haze > 0 ? Math.round(hazeH * 0.55) : 0}px`}>
+<section id={id} class:list={['chapter', `chapter--${size}`, toneClass, haze > 0 && 'chapter--haze', cls]} aria-labelledby={`${id}-title`} style={`--haze-room:${haze > 0 ? Math.round(hazeH * 0.8) : 0}px`}>
   <div class="container chapter__inner">
     <header class="chapter__head">
       {link ? (

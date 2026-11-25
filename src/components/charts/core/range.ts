@@ -69,7 +69,6 @@ export function renderRange(p: RangePlotProps): ChartRender {
     y += labelH + 13 + 26 + 16;
   });
   const height = y - 12;
-  o.push(`<line class="c-axis" x1="0" x2="0" y1="${head}" y2="${height}"/>`);
   if (reference) {
     const rp = pctN(reference.value, max);
     const left = rp >= 45;

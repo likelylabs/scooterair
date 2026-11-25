@@ -29,7 +29,7 @@ const items = Astro.props.items ?? [
   { kind: 'ufp' as Kind, title: ui.pollutant.ufpTitle[locale], body: ui.pollutant.ufpBody[locale] },
 ];
 const swatch: Record<Kind, string> = {
-  fumes: `<g class="a-fumes">${fumes({ width: 96, count: 11, seed: 14, scale: 16, top: 50 })}</g>`,
+  fumes: `<g class="a-fumes">${fumes({ width: 96, count: 11, seed: 14, scale: 16, top: 50, len: [50, 120] })}</g>`,
   co: `<g class="a-co">${coRings({ width: 96, count: 13, seed: 4, scale: 26, top: 52 })}</g>`,
   ufp: `<g class="a-ufp">${ufpDots({ width: 96, count: 90, seed: 8, scale: 40, top: 54 })}</g>`,
 };

@@ -1,0 +1,1195 @@
+---
+/**
+ * Styleguide — the reference for everyone building pages on this system.
+ * Every token, component, chart and illustration, in both languages, with
+ * usage notes. noindex; excluded from the sitemap in astro.config.mjs.
+ *
+ * ALL NUMBERS ON THIS PAGE ARE INVENTED SAMPLE DATA.
+ */
+import Base from '@/layouts/Base.astro';
+import { asset, localeFromParam, localeStaticPaths } from '@/i18n';
+import { site, ui, units } from '@/i18n/ui';
+
+import Block from '@/components/styleguide/Block.astro';
+import Swatch from '@/components/styleguide/Swatch.astro';
+
+import Button from '@/components/ui/Button.astro';
+import Callout from '@/components/ui/Callout.astro';
+import Card from '@/components/ui/Card.astro';
+import ChainMarker from '@/components/ui/ChainMarker.astro';
+import Chapter from '@/components/ui/Chapter.astro';
+import Cite from '@/components/ui/Cite.astro';
+import CompareTable from '@/components/ui/CompareTable.astro';
+import Details from '@/components/ui/Details.astro';
+import EvidenceChain from '@/components/ui/EvidenceChain.astro';
+import EvidenceLegend from '@/components/ui/EvidenceLegend.astro';
+import Figure from '@/components/ui/Figure.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Ledger from '@/components/ui/Ledger.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import PullQuote from '@/components/ui/PullQuote.astro';
+import RadioGroup from '@/components/ui/RadioGroup.astro';
+import Range from '@/components/ui/Range.astro';
+import ResultPanel from '@/components/ui/ResultPanel.astro';
+import Section from '@/components/ui/Section.astro';
+import Select from '@/components/ui/Select.astro';
+import Stat from '@/components/ui/Stat.astro';
+import TabPanel from '@/components/ui/TabPanel.astro';
+import Tabs from '@/components/ui/Tabs.astro';
+import Tag from '@/components/ui/Tag.astro';
+
+import BarChart from '@/components/charts/BarChart.astro';
+import BeforeAfterChart from '@/components/charts/BeforeAfterChart.astro';
+import BreakEvenChart from '@/components/charts/BreakEvenChart.astro';
+import GroupedBarChart from '@/components/charts/GroupedBarChart.astro';
+import LineChart from '@/components/charts/LineChart.astro';
+import PictogramRow from '@/components/charts/PictogramRow.astro';
+import RangePlot from '@/components/charts/RangePlot.astro';
+import StackedBar from '@/components/charts/StackedBar.astro';
+import WaffleChart from '@/components/charts/WaffleChart.astro';
+import WaterfallChart from '@/components/charts/WaterfallChart.astro';
+
+import Haze from '@/components/art/Haze.astro';
+import PollutantKey from '@/components/art/PollutantKey.astro';
+import SceneCompare from '@/components/art/SceneCompare.astro';
+import Scooter from '@/components/art/Scooter.astro';
+import ScrambleCrossing from '@/components/art/ScrambleCrossing.astro';
+import Signal from '@/components/art/Signal.astro';
+import Mark from '@/components/shell/Mark.astro';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const en = locale === 'en';
+/** Pick the string for this locale. */
+const L = (zh: string, enText: string) => (en ? enText : zh);
+const S = ui.sampleData[locale];
+
+const toc = [
+  ['concept', L('設計概念', 'Concept')],
+  ['start', L('快速上手', 'Quick start')],
+  ['colour', L('色彩', 'Colour')],
+  ['type', L('文字', 'Typography')],
+  ['layout', L('間距與版面', 'Space and layout')],
+  ['motifs', L('街道語彙', 'Street motifs')],
+  ['components', L('元件', 'Components')],
+  ['chain', L('證據鏈', 'Evidence chain')],
+  ['forms', L('表單與試算', 'Forms and calculator')],
+  ['charts', L('圖表', 'Charts')],
+  ['art', L('插畫', 'Illustration')],
+];
+
+// ---- sample data (invented) ------------------------------------------------
+const cat = ui.chart.category[locale];
+const val = ui.chart.value[locale];
+const barData = [
+  { label: L('騎機車通勤', 'Riding a scooter'), value: 62, highlight: true },
+  { label: L('走在騎樓與人行道', 'Walking under arcades and on sidewalks'), value: 44, highlight: true },
+  { label: L('騎自行車', 'Cycling'), value: 38 },
+  { label: L('搭公車', 'Taking the bus'), value: 27 },
+  { label: L('搭捷運', 'Taking the metro'), value: 16 },
+];
+const series2 = [
+  { label: L('燃油機車', 'Gasoline scooter'), tone: 'exhaust' as const },
+  { label: L('電動機車', 'Electric scooter'), tone: 'clean' as const },
+];
+const calc = {
+  list: 98000,
+  central: 7000,
+  scrap: 5000,
+  gas: 68000,
+  cities: [
+    { value: 'a', label: L('示意城市甲', 'Sample city A'), local: 12000 },
+    { value: 'b', label: L('示意城市乙', 'Sample city B'), local: 8000 },
+    { value: 'c', label: L('示意城市丙', 'Sample city C'), local: 3000 },
+  ],
+  km: 600,
+  gasPerKm: 2.2,
+  gasFixed: 250,
+  evPerKm: 0.5,
+  evFixed: 320,
+  text: {
+    list: L('建議售價', 'List price'),
+    central: L('中央補助', 'Central subsidy'),
+    local: L('地方補助', 'City subsidy'),
+    scrap: L('汰舊加碼', 'Scrappage bonus'),
+    net: L('實付價格', 'What you pay'),
+    gas: L('同級燃油機車', 'Comparable gasoline scooter'),
+    gap: L('和燃油機車的差距', 'Gap to the gasoline scooter'),
+    ev: L('電動機車', 'Electric scooter'),
+    gasShort: L('燃油機車', 'Gasoline scooter'),
+    purchase: L('購買時', 'Purchase'),
+    year: L('第 {n} 年', 'Year {n}'),
+    even: L('第 {n} 個月打平', 'Even at month {n}'),
+    never: L('五年內不會打平', 'No break-even within five years'),
+    ahead: L('買和騎都比較便宜', 'Cheaper to buy and to run'),
+    noteAhead: L('實付價格已經低於燃油機車，每個月的開銷也比較少。', 'The net price is already below the gasoline scooter, and it costs less to run each month.'),
+    monthsUnit: L('個月', 'months'),
+    noteEven: L('以每月 {km} 公里計算，省下的油錢與保養費約在這時補回價差。', 'At {km} km a month, running-cost savings make up the price gap at about this point.'),
+    noteNever: L('以每月 {km} 公里計算，五年內補不回價差。', 'At {km} km a month, savings do not make up the price gap within five years.'),
+    month: L('時間', 'Time'),
+  },
+};
+const local0 = calc.cities[0].local;
+const net0 = calc.list - calc.central - local0 - calc.scrap;
+const nf = (v: number) => new Intl.NumberFormat(en ? 'en-US' : 'zh-TW').format(v);
+const evLine = { label: calc.text.ev, tone: 'clean' as const, upfront: net0, monthly: calc.km * calc.evPerKm + calc.evFixed };
+const gasLine = { label: calc.text.gasShort, tone: 'exhaust' as const, upfront: calc.gas, monthly: calc.km * calc.gasPerKm + calc.gasFixed };
+const tickLabel = (m: number) => (m === 0 ? calc.text.purchase : calc.text.year.replace('{n}', String(m / 12)));
+
+const chainDemo = [
+  { strength: 'established' as const, body: L('示意文字：這一環說明排氣管排出哪些氣體。', 'Placeholder: this link says which gases leave the tailpipe.'), cites: [{ id: 'sample-a', n: 1 }] },
+  { strength: 'measured' as const, body: L('示意文字：排放的位置與情境。', 'Placeholder: where and when it is emitted.'), cites: [{ id: 'sample-b', n: 2 }] },
+  { strength: 'measured' as const, body: L('示意文字：行人與騎士實際量到的暴露量。', 'Placeholder: measured exposure of walkers and riders.'), cites: [{ id: 'sample-c', n: 3 }, { id: 'sample-d', n: 4 }] },
+  { strength: 'established' as const, body: L('示意文字：國際機構對這些物質的分類。', 'Placeholder: how international bodies classify these compounds.'), cites: [{ id: 'sample-e', n: 5 }] },
+  { strength: 'established' as const, body: L('示意文字：族群研究與文獻回顧。', 'Placeholder: cohort studies and reviews.'), cites: [{ id: 'sample-f', n: 6 }] },
+  { strength: 'inference' as const, body: L('示意文字：由前幾環推得，並標明尚待研究之處。', 'Placeholder: inferred from the earlier links, with the gaps named.'), cites: [{ id: 'sample-g', n: 7 }] },
+  { body: L('示意文字：拿掉排氣管，前面每一環都斷開。', 'Placeholder: remove the tailpipe and every link before this one comes apart.') },
+];
+---
+
+<Base locale={locale} title={L('設計系統', 'Design system')} description={L('行人呼吸網站的設計系統：色彩、文字、元件、圖表與插畫。', 'The ScooterAir design system: colour, type, components, charts and illustration.')} noindex>
+  <div class="sg-hero">
+    <div class="container">
+      <p class="eyebrow">{site.name[locale]} · {L('設計系統', 'Design system')}</p>
+      <h1 class="display"><Phrased text={L('貼著地面的|那一層', 'The low |layer')} /></h1>
+      <p class="lead">
+        {L(
+          '這一頁是所有頁面製作者的起點：每個色彩、文字樣式、元件、圖表與插畫都在這裡，附上用法。頁面上所有數字都是示意數據。',
+          'Start here if you are building a page. Every colour, type style, component, chart and illustration is on this page with its usage. Every number on it is invented sample data.',
+        )}
+      </p>
+      <p><Tag tone="sample">{ui.sampleDataLong[locale]}</Tag></p>
+      <nav class="sg-toc" aria-label={L('本頁目錄', 'On this page')}>
+        <ul>
+          {toc.map(([id, label]) => <li><a href={`#${id}`}>{label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ================================================================ CONCEPT -->
+  <Section id="concept" eyebrow="01" title={L('設計概念：|貼著地面的那一層', 'Concept: |the low layer')} rule>
+    <div class="sg-two">
+      <div class="prose">
+        <p>
+          {L(
+            '機車廢氣不是飄在天上的霧霾，而是排在膝蓋高度、等紅燈時堆在路口的那一層。整個網站的視覺都圍繞「高度」：頁面是陰天的街道，冷色的柏油灰代表乾淨的空氣；所有暖色（赭黃到煤褐）都是廢氣，而且永遠貼著畫面底部；行人號誌的綠是出口，紅燈的紅只用在「等紅燈的那一刻」。',
+            'Scooter exhaust is not smog in the sky. It leaves at knee height and pools at the crossing while the light is red. So the whole site is organised by height: the page is an overcast street, and its cool asphalt greys are clean air; everything warm (ochre to soot) is exhaust and always hugs the bottom of the frame; pedestrian-signal green is the way out; signal red is reserved for the red-light moment.',
+          )}
+        </p>
+        <p>
+          {L(
+            '邊緣像標線一樣銳利：小圓角、沒有陰影、沒有漸層卡片，只用細線和粗的「漆線」分隔。數字用又高又窄的字，像漆在路面上的字。說故事的順序由濃到清：前面的章節底部霧層厚，到解方時歸零。',
+            'Edges are crisp like road paint: small radii, no shadows, no gradient cards, only hairlines and thick painted rules. Numerals are tall and condensed, like figures painted on asphalt. The story runs from thick to clear: early chapters carry a dense band of fumes along the bottom, and it falls to nothing at the solution.',
+          )}
+        </p>
+        <ul>
+          <li>{L('語氣：急迫但就事論事。騎士不是壞人，他們吸到的最多。', 'Tone: urgent but factual. Riders are not villains: they breathe the most of it.')}</li>
+          <li>{L('這不是電動車廣告：不出現任何品牌或實際車款。', 'This is not an EV advert: no brands, no real models.')}</li>
+          <li>{L('每個數字都要有來源標記；沒有來源的只能是標示清楚的示意數據。', 'Every number carries a citation marker; anything without one must be visibly labelled sample data.')}</li>
+        </ul>
+      </div>
+      <div class="sg-marks">
+        <div class="sg-mark-row"><Mark size="4rem" /><span class="sg-wordmark">{site.name[locale]}</span></div>
+        <p class="meta">{L('標誌：一顆在乾淨空氣裡的綠點（也是行人綠燈），下面是愈近地面愈厚的三層廢氣。名稱只定義在 src/i18n/ui.ts。', 'The mark: a green dot in clear air (and the green pedestrian signal) above three exhaust strata that thicken toward the ground. Names are defined once, in src/i18n/ui.ts.')}</p>
+        <div class="cluster">
+          <img src={asset('/favicon.svg')} width="48" height="48" alt="favicon" />
+          <Signal state="red" count={18} size="4.5rem" label={ui.phaseRed[locale]} />
+          <Signal state="green" size="2.8rem" label={ui.phaseGreen[locale]} />
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ================================================================ QUICK START -->
+  <Section id="start" eyebrow="02" title={L('快速上手', 'Quick start')} tone="sunken">
+    <div class="sg-two">
+      <div class="prose">
+        <p>{L('每一頁只寫一次，放在 src/pages/[...lang]/，同時輸出中文（/）與英文（/en/）。', 'Each page is written once under src/pages/[...lang]/ and renders both Chinese (/) and English (/en/).')}</p>
+        <ol>
+          <li>{L('用 Base 包住頁面；內部連結一律經過 href()，/public 的檔案用 asset()。', 'Wrap the page in Base. Every internal link goes through href(); files in /public through asset().')}</li>
+          <li>{L('長篇敘事用 Chapter，一般區塊用 Section；文字放進 .prose。', 'Use Chapter for the scroll narrative and Section for ordinary blocks; put running text in .prose.')}</li>
+          <li>{L('每張圖表都放在 Figure 裡：標題寫「發現」，副標寫「畫了什麼、單位」。', 'Every chart sits in a Figure: the title states the finding, the subtitle says what is plotted and in what unit.')}</li>
+          <li>{L('只用語意色票（--ink、--exhaust、--clean…），不要直接寫色碼。', 'Use semantic tokens only (--ink, --exhaust, --clean…). Never write a hex value.')}</li>
+          <li>{L('中文一律用全形標點；中英文、數字之間打一個半形空格。', 'Chinese text uses full-width punctuation; put one normal space between Chinese and Latin letters or digits.')}</li>
+          <li>{L('示意數字必須加上 sample 屬性（Figure、Stat、ResultPanel 都有）。', 'Placeholder numbers must set the sample prop (Figure, Stat and ResultPanel all have it).')}</li>
+        </ol>
+      </div>
+      <pre class="sg-code" tabindex="0"><code>{`---
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import Figure from '@/components/ui/Figure.astro';
+import Cite from '@/components/ui/Cite.astro';
+import BarChart from '@/components/charts/BarChart.astro';
+import { asset, localeFromParam, localeStaticPaths } from '@/i18n';
+import { ui, units } from '@/i18n/ui';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+---
+<Base locale={locale} title="…" description="…">
+  <Section id="exposure" eyebrow="…" title="…|…" lead="…">
+    <Figure locale={locale} number={1} title="…" subtitle={units.ugm3}>
+      <BarChart locale={locale} title="…" data={rows} unit={units.ugm3}
+        categoryLabel={ui.chart.category[locale]}
+        valueLabel={ui.chart.value[locale]} />
+      <Cite slot="source" locale={locale} id="wu-2021" n={3} variant="chip" />
+    </Figure>
+  </Section>
+</Base>`}</code></pre>
+    </div>
+  </Section>
+
+  <!-- ================================================================ COLOUR -->
+  <Section id="colour" eyebrow="03" title={L('色彩', 'Colour')} lead={L('兩個主題同等重要：跟隨系統設定，右上角可手動切換並記住。所有文字與底色的組合都通過 WCAG AA。', 'Both themes are first-class: the site follows the system setting, and the toggle in the header overrides and remembers it. Every text and background pair passes WCAG AA.')}>
+    <h3 class="sg-h">{L('表面與文字', 'Surfaces and ink')}</h3>
+    <div class="sg-swatches">
+      <Swatch token="--bg" note={L('頁面：陰天', 'Page: overcast')} />
+      <Swatch token="--bg-sunken" note={L('凹陷區塊', 'Recessed bands')} />
+      <Swatch token="--surface" note={L('卡片、輸入框', 'Cards, inputs')} />
+      <Swatch token="--line" note={L('細線', 'Hairlines')} />
+      <Swatch token="--line-strong" note={L('控制項邊框 ≥3:1', 'Control borders ≥3:1')} />
+      <Swatch token="--ink" text note={L('主要文字', 'Primary text')} />
+      <Swatch token="--ink-2" text note={L('次要文字', 'Secondary text')} />
+      <Swatch token="--ink-3" text note={L('圖說、註記', 'Captions, meta')} />
+    </div>
+
+    <h3 class="sg-h">{L('語意色：廢氣、乾淨、紅燈', 'Semantic: exhaust, clean, red phase')}</h3>
+    <div class="sg-swatches">
+      <Swatch token="--exhaust" note={L('廢氣：標記、線條', 'Exhaust: marks, rules')} />
+      <Swatch token="--exhaust-ink" text note={L('廢氣：可當文字', 'Exhaust: text-safe')} />
+      <Swatch token="--exhaust-wash" note={L('廢氣：底色', 'Exhaust: wash')} />
+      <Swatch token="--clean" note={L('乾淨/電動：標記', 'Clean / electric: marks')} />
+      <Swatch token="--clean-ink" text note={L('乾淨：可當文字', 'Clean: text-safe')} />
+      <Swatch token="--clean-wash" note={L('乾淨：底色', 'Clean: wash')} />
+      <Swatch token="--accent" note={L('連結與主要按鈕（綠燈）', 'Links and primary action (go)')} />
+      <Swatch token="--signal-red" note={L('紅燈：只用在「等紅燈」', 'Red phase only')} />
+      <Swatch token="--signal-red-ink" text note={L('紅燈：可當文字', 'Red: text-safe')} />
+      <Swatch token="--paint-yellow" note={L('標線黃：插畫、示意標籤', 'Paint yellow: art, sample tag')} />
+    </div>
+
+    <h3 class="sg-h">{L('圖表：類別色（順序固定）', 'Charts: categorical set (fixed order)')}</h3>
+    <div class="sg-swatches">
+      <Swatch token="--chart-exhaust" note={L('1 燃油/廢氣', '1 gasoline / exhaust')} />
+      <Swatch token="--chart-clean" note={L('2 電動/乾淨', '2 electric / clean')} />
+      <Swatch token="--chart-blue" note="3 blue" />
+      <Swatch token="--chart-lime" note="4 lime" />
+      <Swatch token="--chart-magenta" note="5 magenta" />
+      <Swatch token="--chart-violet" note="6 violet" />
+      <Swatch token="--chart-neutral" note={L('其他/淡化', 'Other / de-emphasis')} />
+      <Swatch token="--chart-signal" note={L('保留：超過限值', 'Reserved: over a limit')} />
+    </div>
+    <div class="prose sg-note">
+      <p>
+        {L(
+          '六個類別色在兩個主題下都用 dataviz 驗證程式檢查過（紅綠色盲模擬下相鄰色差 ΔE 至少 11.8；一般視覺至少 16.4；對底色對比全部 ≥3:1）。前三色兩兩之間也通過，所以散佈圖與小倍數圖最多用三色。順序是安全機制的一部分：不要重排、不要循環、不要自己加第七色，超過就併成「其他」。',
+          'The six categorical colours were checked with the dataviz validator in both themes (adjacent ΔE at least 11.8 under red-green colour-blindness simulation, at least 16.4 for normal vision, all ≥3:1 against the surface). The first three also pass pairwise, so scatter plots and small multiples may use at most three. The order is part of the safety mechanism: never reorder, cycle, or add a seventh. Fold the tail into “other”.',
+        )}
+      </p>
+      <p>{L('顏色跟著「對象」走，不跟著排名走：燃油永遠是赭黃，電動永遠是綠。文字永遠用墨色，不用數列色。', 'Colour follows the entity, never its rank: gasoline is always ochre, electric always green. Text always wears ink, never a series colour.')}</p>
+    </div>
+
+    <h3 class="sg-h">{L('圖表：順序色階（少 → 多）', 'Charts: ordinal ramps (less → more)')}</h3>
+    <div class="sg-ramps">
+      <div class="sg-ramp">{[1, 2, 3, 4, 5].map((i) => <span style={`background:var(--exhaust-s${i})`}><code>--exhaust-s{i}</code></span>)}</div>
+      <div class="sg-ramp">{[1, 2, 3, 4, 5].map((i) => <span style={`background:var(--clean-s${i})`}><code>--clean-s{i}</code></span>)}</div>
+    </div>
+    <p class="meta sg-note">{L('深色主題下色階方向相反（愈多愈亮）。對比兩極時用廢氣 ↔ 乾淨，中點用 --chart-neutral。', 'In the dark theme the ramps run the other way (more is lighter). For diverging scales use exhaust ↔ clean with --chart-neutral at the midpoint.')}</p>
+
+    <h3 class="sg-h">{L('區塊色調', 'Tones')}</h3>
+    <div class="grid sg-tones">
+      {(['sunken', 'surface', 'exhaust', 'clean', 'inverse'] as const).map((tone) => (
+        <div class={`tone-${tone} sg-tone`}>
+          <code>tone="{tone}"</code>
+          <p>{L('文字在這個色調上的樣子。', 'How text reads on this tone.')} <a href="#colour">{L('連結', 'A link')}</a></p>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- ================================================================ TYPE -->
+  <Section id="type" eyebrow="04" title={L('文字', 'Typography')} tone="sunken" lead={L('中文用思源黑體（Noto Sans TC）可變字型，拉丁字母與數字用 Archivo。一套字、兩種寬度：英文標題與大數字用窄體，像路面上拉長的標字。', 'Chinese is set in Noto Sans TC (variable); Latin letters and figures in Archivo. One family, two widths: English headlines and big numbers are condensed, like elongated lettering on a road.')}>
+    <div class="sg-type">
+      {[
+        ['.display', 'display', L('紅燈亮起的那一刻', 'The moment the light turns red')],
+        ['h1', 'h1', L('廢氣排在膝蓋的高度', 'Exhaust leaves at knee height')],
+        ['h2', 'h2', L('孩子走在最濃的那一層', 'Children walk in the densest layer')],
+        ['h3', 'h3', L('誰在路口站得最久', 'Who stands at the crossing longest')],
+        ['h4', 'h4', L('怎麼讀這張圖', 'How to read this chart')],
+      ].map(([name, cls, sample]) => (
+        <div class="sg-type__row">
+          <code>{name}</code>
+          <p class={cls}>{sample}</p>
+        </div>
+      ))}
+      <div class="sg-type__row">
+        <code>.lead</code>
+        <p class="lead">{L('引言用來把一個章節的重點在兩三行內說完，字比內文大一級、顏色淡一級。', 'A lead says what the section is about in two or three lines, one step larger and one step quieter than body text.')}</p>
+      </div>
+      <div class="sg-type__row">
+        <code>p (.prose)</code>
+        <div class="prose">
+          <p set:html={L(
+              '內文行高 1.8、每行約 34 個字，標點用全形並採嚴格避頭尾。強調用<em>粗體</em>而不是斜體，因為中文沒有斜體；書名與報告名用《》。數字與英文像 PM2.5、CO、125 cc 前後各留一個半形空格，瀏覽器支援時也會自動補上間距。',
+              'Body text is set at a line-height of 1.6 and about 66 characters a line. Emphasis is a real <em>italic</em> in English and bold in Chinese, because Chinese has no italic. Units stay attached to their numbers, such as 125 cc, and dashes — like this one — come from the Latin font in English and from the CJK font in Chinese.',
+            )} />
+          <p>
+            {L('句子裡可以用', 'Inside a sentence you can use ')}<mark>{L('螢光標記', 'a highlight')}</mark>{L('、', ', ')}<a href="#type">{L('連結', 'a link')}</a>{L('、來源標記', ' and a citation marker')}<Cite locale={locale} id="sample-a" n={1} />{L('。單位請用', '. For units use ')}<code>units.ugm3</code>{L(':', ': ')}<span class="nowrap">35 {units.ugm3}</span>{L('。', '.')}
+          </p>
+        </div>
+      </div>
+      <div class="sg-type__row">
+        <code>.meta / .eyebrow</code>
+        <div class="stack">
+          <p class="eyebrow">{L('小標：一段車道線加一行字', 'Eyebrow: a lane dash, then a label')}</p>
+          <p class="meta">{L('註記與圖說用 13px，這是中文可讀的下限，不要再小。', 'Meta and captions are 13px, the floor for legible Chinese. Never go smaller.')}</p>
+        </div>
+      </div>
+      <div class="sg-type__row">
+        <code lang="en">{en ? 'lang="zh-Hant"' : 'lang="en"'}</code>
+        <div class="prose">
+          {en ? (
+            <p>A Chinese fragment inside English text carries its own lang attribute, so it gets Chinese punctuation and line-breaking: <span lang="zh-Hant-TW">機車待轉區——等紅燈的地方。</span></p>
+          ) : (
+            <p>中文頁面裡的英文片段要加上 lang 屬性，才會套用英文的標點與字距：<span lang="en">“Stop line — the place where the pack waits.”</span></p>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid sg-rules">
+      <Callout label={L('標題斷行', 'Headline wrapping')}>
+        <p>{L('中文沒有空格，瀏覽器可能把一個詞從中間切開。用 | 標出語意單位，<Phrased> 會讓標題只在單位之間換行。Section、Chapter、Figure 的 title 都直接支援。', 'Chinese has no spaces, so a browser may break a headline mid-word. Mark phrase units with | and <Phrased> only wraps between them. The title prop of Section, Chapter and Figure supports it directly.')}</p>
+        <p><code>{L('title="等紅燈的時候，|我們吸進了什麼"', 'title="What we breathe |at the red light"')}</code></p>
+      </Callout>
+      <Callout label={L('數字', 'Numbers')}>
+        <p>{L('內文與大數字用比例數字；表格、座標軸、試算結果用等寬數字（.tnum，table 與 output 已預設）。負號用「−」（U+2212），範圍用「–」。', 'Running text and big numbers use proportional figures; tables, axes and calculator output use tabular figures (.tnum; tables and <output> have it by default). Use a real minus “−” (U+2212) and an en dash for ranges.')}</p>
+        <table class="sg-nums"><tbody><tr><td>{L('比例', 'Proportional')}</td><td class="num" style="font-variant-numeric:proportional-nums">1,111.1</td></tr><tr><td>{L('等寬', 'Tabular')}</td><td class="num">1,111.1</td></tr><tr><td></td><td class="num">8,888.8</td></tr></tbody></table>
+      </Callout>
+      <Callout label={L('字型載入', 'Font loading')}>
+        <p>{L('中文字型切成約一百個 unicode-range 分片，瀏覽器只下載頁面用到的分片，並採 font-display: fallback：約三秒內沒到就沿用系統字型，不會晚到又跳動。拉丁字型只有一個檔案，預先載入並採 swap。', 'The Chinese font ships as about a hundred unicode-range slices; the browser downloads only the ones a page uses, with font-display: fallback, so a slice that has not arrived in about three seconds is skipped rather than popping in late. The Latin font is one preloaded file with swap.')}</p>
+      </Callout>
+    </div>
+  </Section>
+
+  <!-- ================================================================ LAYOUT -->
+  <Section id="layout" eyebrow="05" title={L('間距與版面', 'Space and layout')}>
+    <div class="sg-two">
+      <div>
+        <h3 class="sg-h">{L('間距', 'Space')}</h3>
+        <div class="sg-space">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+            <div><code>--sp-{i}</code><span style={`inline-size:var(--sp-${i})`} /></div>
+          ))}
+        </div>
+      </div>
+      <div class="stack" style="--stack: var(--sp-5)">
+        <div>
+          <h3 class="sg-h">{L('圓角與線', 'Radii and rules')}</h3>
+          <div class="cluster">
+            <span class="sg-radius" style="border-radius:var(--radius-1)">2</span>
+            <span class="sg-radius" style="border-radius:var(--radius-2)">4</span>
+            <span class="sg-radius" style="border-radius:var(--radius-3)">8</span>
+            <span class="sg-radius" style="border-radius:var(--radius-pill)">pill</span>
+          </div>
+          <p class="meta sg-note">{L('沒有陰影。分隔只用三種線：1px 細線、3px 漆線（--rule-paint）、8px 停止線（--rule-stop）。', 'No shadows. Separation uses three rules only: a 1px hairline, a 3px painted rule (--rule-paint) and the 8px stop line (--rule-stop).')}</p>
+        </div>
+        <div>
+          <h3 class="sg-h">{L('容器', 'Containers')}</h3>
+          <ul class="prose sg-list">
+            <li><code>.container</code> {L('最寬 76rem，兩側留白 --gutter（手機 16px）', 'max 76rem, side gutters --gutter (16px on phones)')}</li>
+            <li><code>.container--wide</code> 60rem</li>
+            <li><code>.container--prose</code> / <code>.prose</code> {L('一欄文字：中文 34 字、英文約 66 字元', 'one text column: 34 Chinese characters, about 66 Latin')}</li>
+            <li><code>.grid</code> {L('自動欄數，用 --min 設定每欄最小寬度', 'auto-fit columns; set --min for the column floor')}</li>
+            <li><code>.stack</code> / <code>.cluster</code> {L('垂直節奏與橫向群組', 'vertical rhythm and wrapping rows')}</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="sg-h">{L('動態', 'Motion')}</h3>
+          <p class="meta">{L('介面只有 120–240ms 的顏色與位移變化。插畫的飄移很慢（17–31 秒一個循環）。使用者要求減少動態時，全部停止，畫面仍然完整。', 'Interface motion is limited to 120–240ms colour and position changes. Illustration drift is slow (17–31s a cycle). Under prefers-reduced-motion everything stops and every picture is still complete.')}</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ================================================================ MOTIFS -->
+  <Section id="motifs" eyebrow="06" title={L('街道語彙', 'Street motifs')} tone="sunken" lead={L('讓網站看起來屬於台灣街頭的幾個小零件。都是裝飾，不帶資訊。', 'A handful of parts that make the site belong to a Taiwanese street. All decorative; none carries information.')}>
+    <div class="grid" style="--min: 17rem">
+      <div class="stack">
+        <div class="zebra" aria-hidden="true"></div>
+        <p class="meta"><code>.zebra</code> {L('斑馬線（枕木紋）：頁尾上緣、章節之間。', 'Zebra crossing: top of the footer, between chapters.')}</p>
+      </div>
+      <div class="stack">
+        <hr class="stopline" />
+        <p class="meta"><code>.stopline</code> {L('停止線：一個段落的開始。Section 的 rule 屬性、Stat 上緣都是它。', 'Stop line: where something begins. Used by Section rule and the top of a Stat.')}</p>
+      </div>
+      <div class="stack">
+        <div class="paintbox"><span class="meta">{L('待轉區', 'Waiting box')}</span></div>
+        <p class="meta"><code>.paintbox</code> {L('機車待轉區的白框：Callout 用它。', 'The painted waiting box: Callout is built on it.')}</p>
+      </div>
+      <div class="stack">
+        <div class="cluster">
+          <Signal state="red" count={42} size="4.5rem" />
+          <Signal state="green" count={9} size="4.5rem" />
+          <Signal state="red" size="2.8rem" />
+          <Signal state="green" size="2.8rem" />
+        </div>
+        <p class="meta"><code>&lt;Signal state count /&gt;</code> {L('行人號誌與倒數：紅代表問題（等紅燈的那一刻），綠代表出口。', 'Pedestrian signal and countdown: red marks the problem (the red-light moment), green the way out.')}</p>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ================================================================ COMPONENTS -->
+  <Section id="components" eyebrow="07" title={L('元件', 'Components')} lead={L('都在 src/components/ui/。每個檔案開頭的註解列出所有屬性。', 'All in src/components/ui/. The comment at the top of each file lists every prop.')}>
+    <Block name="Section" file="ui/Section.astro" code={`<Section id="who" eyebrow="…" title="誰吸得最多" lead="…" tone="sunken" width="wide" rule>
+  …
+</Section>`}>
+      <Fragment slot="note">
+        <p>{L('一般區塊：上下留白、容器、可選的小標、標題與引言。這一頁的每個大段落都是 Section。tone 換底色，width 換容器寬度，rule 在上緣畫一條停止線。', 'The standard block: vertical rhythm, a container, and an optional eyebrow, title and lead. Every major part of this page is a Section. tone repaints it, width changes the container, rule draws a stop line across the top.')}</p>
+      </Fragment>
+    </Block>
+
+    <Block name="Stat" file="ui/Stat.astro" wide code={`<Stat locale={locale} label="…" value="62" unit={units.ugm3} tone="exhaust" sample>
+  一句話說明這個數字。<Cite locale={locale} id="…" n={1} />
+</Stat>`}>
+      <Fragment slot="note"><p>{L('大數字。一個畫面最多三個；一定要有標籤、單位與一句脈絡。色調只改變上緣的線，數字永遠是墨色。', 'The big number. At most three per screen, always with a label, a unit and one line of context. The tone only colours the top rule; the numeral is always ink.')}</p></Fragment>
+      <div class="grid" style="--min: 14rem">
+        <Stat locale={locale} label={L('示意：路口行人', 'Sample: at the crossing')} value="62" unit={units.ugm3} tone="exhaust" sample>
+          {L('一句話交代這個數字量的是什麼、在哪裡量的。', 'One sentence on what was measured and where.')}<Cite locale={locale} id="sample-a" n={1} />
+        </Stat>
+        <Stat locale={locale} label={L('示意：電動機車', 'Sample: electric scooter')} value="0" unit={L('排氣管', 'tailpipes')} tone="clean" sample>
+          {L('乾淨色調用在解方。', 'The clean tone belongs to the solution.')}
+        </Stat>
+        <Stat locale={locale} label={L('示意：實付價格', 'Sample: net price')} prefix="NT$" value="58,000" size="md" sample>
+          {L('size="md" 用在較長的數字。', 'size="md" suits longer numbers.')}
+        </Stat>
+      </div>
+    </Block>
+
+    <Block name="Cite" file="ui/Cite.astro" code={`…顯著較高<Cite locale={locale} id="wu-2021" n={3} />。
+<Cite locale={locale} id="wu-2021" n={3} variant="chip" />`}>
+      <Fragment slot="note"><p>{L('來源標記，連到 /sources/#<id>。內文用上標；圖表註腳、卡片與證據鏈用 chip。同一個來源在全站用同一個編號。', 'A citation marker linking to /sources/#<id>. Superscript in running text; chip in figure footers, cards and chain links. A source keeps the same number across the site.')}</p></Fragment>
+      <p>
+        {L('街道上的濃度明顯高於測站', 'Street-level concentrations are well above the monitoring station')}<Cite locale={locale} id="sample-a" n={1} /><Cite locale={locale} id="sample-b" n={2} />{L('。', '.')}
+        <span style="margin-inline-start:1rem"><Cite locale={locale} id="sample-c" n={3} variant="chip" /></span>
+      </p>
+    </Block>
+
+    <Block name="Figure" file="ui/Figure.astro" code={`<Figure locale={locale} number={1} title="發現寫在這裡" subtitle="畫了什麼（單位）" caption="怎麼讀" sample>
+  <BarChart … />
+  <Cite slot="source" locale={locale} id="…" n={1} variant="chip" />
+</Figure>`}>
+      <Fragment slot="note"><p>{L('所有圖表、表格與資訊圖的外框：編號與標題 → 副標 → 內容 → 圖說 → 來源。沒有卡片，只有上緣一條漆線。下面「圖表」一節的每張圖都放在 Figure 裡。', 'The frame for every chart, table and infographic: number and title → subtitle → body → caption → source. No card, just a painted rule on top. Every chart in the Charts section below sits in one.')}</p></Fragment>
+    </Block>
+
+    <Block name="Callout / PullQuote" file="ui/Callout.astro · ui/PullQuote.astro" wide code={`<Callout tone="exhaust" label="注意" title="…"> … </Callout>
+<PullQuote tone="exhaust">「…」<Fragment slot="attribution">某某，職稱 <Cite … /></Fragment></PullQuote>`}>
+      <div class="grid" style="--min: 18rem">
+        <Callout label={ui.note[locale]} title={L('怎麼讀這張圖', 'How to read this chart')}>
+          <p>{L('說明框像待轉區的白框：粗線矩形，標籤嵌在上緣。', 'A callout is drawn like a painted waiting box: a thick rectangle with its label set into the top edge.')}</p>
+        </Callout>
+        <Callout tone="exhaust" label={L('注意', 'Caution')}>
+          <p>{L('廢氣色調：用在限制、警語、不確定性。', 'Exhaust tone: limitations, warnings, uncertainty.')}</p>
+        </Callout>
+        <Callout tone="clean" label={L('你可以做的', 'What you can do')}>
+          <p>{L('乾淨色調：用在行動與解方。', 'Clean tone: actions and solutions.')}</p>
+        </Callout>
+        <Callout tone="signal" label={L('紅燈', 'Red phase')}>
+          <p>{L('紅燈色調：只用在「等紅燈的那一刻」。', 'Signal tone: only for the red-light moment.')}</p>
+        </Callout>
+      </div>
+      <div style="margin-block-start: var(--sp-6)">
+        <PullQuote tone="exhaust">
+          {L('「示意引言：每天早上牽著孩子等紅燈，最前面永遠是一整排排氣管。」', '“Sample quote: every morning I wait at the light holding my child’s hand, and the front row is always a line of tailpipes.”')}
+          <Fragment slot="attribution">{L('受訪者，身分說明', 'Speaker, who they are')} <Cite locale={locale} id="sample-b" n={2} /></Fragment>
+        </PullQuote>
+      </div>
+    </Block>
+
+    <Block name="Card" file="ui/Card.astro" wide code={`<div class="grid">
+  <Card title="…" href={href('/problem/', locale)} eyebrow="…" tone="exhaust"> … </Card>
+</div>`}>
+      <div class="grid" style="--min: 15rem">
+        <Card title={L('問題：路口的那一層', 'The problem: the layer at the crossing')} href="#components" eyebrow={L('連結卡片', 'Link card')} tone="exhaust">
+          <p>{L('有 href 時整張卡片都是連結。', 'With href the whole card is one link.')}</p>
+        </Card>
+        <Card title={L('換電動要花多少', 'What going electric costs')} href="#components" eyebrow={L('連結卡片', 'Link card')} tone="clean">
+          <p>{L('上緣的漆線跟著色調變。', 'The painted top rule follows the tone.')}</p>
+          <Fragment slot="footer"><Tag tone="clean">{L('試算', 'Calculator')}</Tag></Fragment>
+        </Card>
+        <Card title={L('沒有連結的卡片', 'A card without a link')} eyebrow={L('靜態', 'Static')}>
+          <Fragment slot="media"><Scooter kind="electric" /></Fragment>
+          <p>{L('media 插槽放插畫。', 'The media slot takes an illustration.')}</p>
+        </Card>
+      </div>
+    </Block>
+
+    <Block name="Button / Tag / Icon" file="ui/Button.astro · ui/Tag.astro · ui/Icon.astro" code={`<Button href={href('/electric/#calculator', locale)} size="lg" arrow>試算</Button>
+<Button variant="secondary">…</Button>  <Button variant="ghost">…</Button>
+<Button href="https://…" external locale={locale}>官方補助頁</Button>`}>
+      <Fragment slot="note"><p>{L('主要按鈕是綠燈色，一個畫面只放一個。外部連結加 external，會開新分頁並向螢幕閱讀器說明。', 'The primary button is signal green: one per view. External links take external, which opens a new tab and says so to screen readers.')}</p></Fragment>
+      <div class="stack" style="--stack: var(--sp-4)">
+        <div class="cluster">
+          <Button size="lg" arrow>{L('看我的城市補助', 'Check my city’s subsidy')}</Button>
+          <Button variant="secondary">{L('看證據', 'See the evidence')}</Button>
+          <Button variant="ghost">{L('讀完整說明', 'Read the full note')}</Button>
+          <Button href="#components" external locale={locale} variant="secondary">{L('官方資料', 'Official data')}</Button>
+        </div>
+        <div class="cluster">
+          <Tag>{L('一般標籤', 'Neutral')}</Tag>
+          <Tag tone="sample">{S}</Tag>
+          <Tag tone="exhaust">{L('燃油', 'Gasoline')}</Tag>
+          <Tag tone="clean">{L('電動', 'Electric')}</Tag>
+          <Tag tone="signal">{ui.phaseRed[locale]}</Tag>
+        </div>
+        <div class="cluster sg-icons">
+          {(['arrow-right', 'arrow-up-right', 'arrow-down', 'chevron-down', 'check', 'plus', 'minus', 'close', 'menu', 'info', 'alert', 'table', 'sun', 'moon'] as const).map((name) => <Icon name={name} size="1.5rem" label={name} />)}
+        </div>
+      </div>
+    </Block>
+
+    <Block name="CompareTable" file="ui/CompareTable.astro" code={`<CompareTable caption="…" rowHeader="項目"
+  columns={[{ label: '燃油機車', tone: 'exhaust' }, { label: '電動機車', tone: 'clean' }]}
+  rows={[{ label: '每公里能源費', values: ['NT$ 2.2', 'NT$ 0.5'], note: '…' }]} />`}>
+      <Fragment slot="note"><p>{L('兩到四個選項逐列比較。真正的表格；在窄螢幕上每一列變成一小塊，欄名重複在每個數值上方，360px 不需要橫向捲動。', 'Two to four options compared row by row. A real table; on narrow screens each row becomes a small block with the column name repeated above each value, so nothing scrolls sideways at 360px.')}</p></Fragment>
+      <CompareTable
+        caption={L(`每月開銷比較（${S}）`, `Monthly costs compared (${S.toLowerCase()})`)}
+        rowHeader={L('項目', 'Item')}
+        columns={[{ label: series2[0].label, tone: 'exhaust' }, { label: series2[1].label, tone: 'clean' }]}
+        rows={[
+          { label: L('每公里能源費', 'Energy per km'), values: ['NT$ 2.2', 'NT$ 0.5'], note: L('汽油/電池資費', 'Fuel / battery plan') },
+          { label: L('每月固定支出', 'Fixed monthly cost'), values: ['NT$ 250', 'NT$ 320'] },
+          { label: L('定期保養', 'Routine servicing'), values: [L('每 1,000 公里', 'Every 1,000 km'), L('每 5,000 公里', 'Every 5,000 km')] },
+          { label: L('排氣管廢氣', 'Tailpipe exhaust'), values: [L('有', 'Yes'), L('無', 'None')] },
+        ]}
+      />
+    </Block>
+
+    <Block name="Details" file="ui/Details.astro" code={`<Details name="faq" summary="問題">答案</Details>`}>
+      <div>
+        <Details name="sg-faq" summary={L('這些數字是真的嗎？', 'Are these numbers real?')} open>
+          <p>{L('這一頁不是。正式頁面上每個數字都有來源標記。', 'Not on this page. On real pages every number carries a citation marker.')}</p>
+        </Details>
+        <Details name="sg-faq" summary={L('同一個 name 的項目一次只開一個', 'Items sharing a name open one at a time')}>
+          <p>{L('原生 details 元素，不需要 JavaScript。', 'Native details elements; no JavaScript needed.')}</p>
+        </Details>
+      </div>
+    </Block>
+
+    <Block name="Tabs" file="ui/Tabs.astro · ui/TabPanel.astro" code={`<Tabs label="城市">
+  <TabPanel id="city-a" label="示意城市甲"> … </TabPanel>
+  <TabPanel id="city-b" label="示意城市乙"> … </TabPanel>
+</Tabs>`}>
+      <Fragment slot="note"><p>{L('漸進增強：沒有 JavaScript 時，所有面板依序顯示，各有標題；有 JavaScript 時變成分頁（方向鍵、Home/End 可操作）。', 'Progressively enhanced: without JavaScript every panel shows in order under its own heading; with it they become tabs (arrow keys, Home/End).')}</p></Fragment>
+      <Tabs label={L('示意城市', 'Sample cities')}>
+        {calc.cities.map((c) => (
+          <TabPanel id={`sg-tab-${c.value}`} label={c.label}>
+            <p>{L(`這裡放 ${c.label} 的內容。地方補助（${S}）：NT$ ${nf(c.local)}。`, `Content for ${c.label} goes here. City subsidy (${S.toLowerCase()}): NT$ ${nf(c.local)}.`)}</p>
+          </TabPanel>
+        ))}
+      </Tabs>
+    </Block>
+  </Section>
+
+  <!-- ================================================================ CHAPTER -->
+  <div id="chapter-demo">
+    <Chapter locale={locale} id="sg-chapter-red" link={2} chainHref="#chain" title={L('排在膝蓋的高度，|就在斑馬線旁邊', 'At knee height, |right beside the crossing')} lead={L('這是 Chapter：長篇敘事的全幅章節。link 屬性顯示「證據鏈第幾環」；haze 設定底部霧層的濃度（這裡是 0.9）。', 'This is a Chapter: a full-bleed unit of the scroll narrative. The link prop shows the evidence-chain marker; haze sets how dense the band of air along the bottom is (0.9 here).')} haze={0.9} size="auto">
+      <div class="grid" style="--min: 15rem">
+        <Stat locale={locale} label={L('示意數字', 'Sample number')} value="35" unit={L('公分', 'cm')} tone="exhaust" sample size="md">{L('章節裡可以放 Stat、Figure、文字。', 'A chapter can hold Stats, Figures and prose.')}</Stat>
+        <div class="prose"><p>{L('敘事的順序由濃到清：問題章節的 haze 高，愈接近解方愈低，最後是 tone="clear"、haze 為 0。', 'The narrative runs from thick to clear: problem chapters set haze high, it falls as the story nears the solution, and the last chapters use tone="clear" with no haze.')}</p></div>
+      </div>
+    </Chapter>
+    <Chapter locale={locale} id="sg-chapter-night" tone="night" phase="red" kicker={L('紅燈 · 示意章節', 'Red phase · sample chapter')} title={L('夜間色調：|柏油與號誌', 'Night tone: |asphalt and signals')} lead={L('tone="night" 在兩個主題下都是深色。phase 會在小標旁放上行人號誌。', 'tone="night" is dark in both themes. phase puts the pedestrian signal beside the kicker.')} haze={0.5} hazeKind="fumes" size="auto" />
+    <Chapter locale={locale} id="sg-chapter-clear" tone="clear" link={7} chainHref="#chain" title={L('這一環，|可以切斷', 'This link |can be broken')} lead={L('最後一環用綠色與 tone="clear"：沒有霧層。', 'The final link uses green and tone="clear": no haze at all.')} size="auto">
+      <div class="cluster"><Button size="lg" arrow>{L('看怎麼換', 'See how to switch')}</Button></div>
+    </Chapter>
+  </div>
+
+  <!-- ================================================================ CHAIN -->
+  <Section id="chain" eyebrow="08" title={L('證據鏈', 'Evidence chain')} rule lead={L('網站的論證是一條七環的鏈，每一環都有自己的來源與證據強度。讀者要自己把環接起來，所以每個章節都要說清楚「現在是第幾環」。', 'The site’s argument is a chain of seven links, each with its own sources and its own evidence strength. Readers connect the links themselves, so every chapter says which link it is.')}>
+    <Block name="EvidenceChain / ChainLink" file="ui/EvidenceChain.astro · ui/ChainLink.astro" code={`<EvidenceChain locale={locale} current={3} links={[
+  { strength: 'established', body: '…', href: href('/problem/#tailpipe', locale), cites: [{ id: 'iarc-…', n: 1 }] },
+  …
+  { body: '…' },   // 最後一項自動成為「可以切斷的那一環」
+]}>
+  <Button slot="action" href={href('/electric/', locale)} arrow>…</Button>
+</EvidenceChain>`}>
+      <Fragment slot="note">
+        <p>{L('整條鏈的總覽：所有環一次可見，手機與桌機都是同一條直軌。標題預設取自 ui.ts 的 chain.links；最後一環脫離軌道、換成綠色並可放行動按鈕。需要更豐富的內容時，改在 slot 裡放 <ChainLink>。', 'The whole chain at a glance: every link visible at once on one vertical rail, the same on phone and desktop. Titles default to chain.links in ui.ts; the final link is detached from the rail, turns green and can hold a call to action. For richer content put <ChainLink> children in the slot instead.')}</p>
+      </Fragment>
+      <EvidenceChain locale={locale} current={3} links={chainDemo}>
+        <Button slot="action" arrow>{L('看怎麼換電動', 'See how to switch')}</Button>
+      </EvidenceChain>
+    </Block>
+
+    <Block name="ChainMarker" file="ui/ChainMarker.astro" code={`<Chapter locale={locale} id="…" link={3} chainHref={href('/#chain', locale)} title="…" />
+<ChainMarker locale={locale} n={3} sticky />   {/* 單獨使用 */}`}>
+      <Fragment slot="note"><p>{L('每個章節開頭的路標：「證據鏈 3/7」、七顆圓點（走過的實心、目前的放大、未到的空心，最後一顆與前面斷開）、以及這一環的名稱。sticky 會讓它在章節範圍內黏在頁首下方。', 'The signpost at the top of each chapter: “Evidence chain 3/7”, seven pips (done solid, current enlarged, to come hollow, the last set apart from the rest) and the link’s name. sticky pins it under the header while its chapter is on screen.')}</p></Fragment>
+      <div class="stack" style="--stack: var(--sp-3)">
+        {[1, 3, 6, 7].map((n) => <ChainMarker locale={locale} n={n} />)}
+      </div>
+    </Block>
+
+    <Block name="EvidenceBadge / EvidenceLegend" file="ui/EvidenceBadge.astro · ui/EvidenceLegend.astro" code={`<EvidenceBadge locale={locale} level="measured" />
+<EvidenceLegend locale={locale} />`}>
+      <Fragment slot="note"><p>{L('四個等級，不靠顏色也分得出來：文字、圖示、邊框各不相同（實心/實線/虛線/點線）。誠實標出「我們的推論」與「尚未證實」，是整個網站可信度的來源。', 'Four levels, distinguishable without colour: the words, the icon and the border all differ (solid fill / solid line / dashed / dotted). Marking “our inference” and “not yet shown” honestly is where the site’s credibility comes from.')}</p></Fragment>
+      <EvidenceLegend locale={locale} />
+    </Block>
+  </Section>
+
+  <!-- ================================================================ FORMS -->
+  <Section id="forms" eyebrow="09" title={L('表單與試算', 'Forms and calculator')} tone="sunken" lead={L('試算工具的零件：選城市、有沒有舊車可汰換、每月里程，然後看到價格怎麼一層層扣下來、和燃油車還差多少、多久打平。', 'The parts of the calculator: pick a city, say whether there is an old scooter to scrap, set monthly distance, then see the price come down line by line, the remaining gap to a gasoline scooter, and how long until it pays back.')}>
+    <p><Tag tone="sample">{ui.sampleDataLong[locale]}</Tag></p>
+    <div class="sg-calc" id="sg-calc">
+      <form class="sg-calc__form stack" style="--stack: var(--sp-5)" onsubmit="return false">
+        <Select id="sg-city" label={L('你住在哪個城市？', 'Which city do you live in?')} options={calc.cities.map((c) => ({ value: c.value, label: c.label }))} value="a" hint={L('地方補助每個城市不同。', 'The city subsidy differs by city.')} />
+        <RadioGroup name="sg-scrap" legend={L('有舊機車可以汰換嗎？', 'Do you have an old scooter to scrap?')} options={[{ value: 'yes', label: L('有', 'Yes') }, { value: 'no', label: L('沒有', 'No') }]} value="yes" />
+        <Range id="sg-km" label={L('每個月大約騎多遠？', 'How far do you ride each month?')} min={100} max={2000} step={50} value={calc.km} unit={L('公里/月', 'km / month')} />
+        <RadioGroup
+          name="sg-stack-demo"
+          variant="stack"
+          legend={L('另一種樣式：variant="stack"', 'The other variant: variant="stack"')}
+          options={[
+            { value: 'swap', label: L('換電池', 'Battery swap'), hint: L('每個選項可以有一行說明。', 'Each option can carry a line of help.') },
+            { value: 'charge', label: L('在家充電', 'Charge at home'), hint: L('適合選項需要解釋的時候。', 'Use it when options need explaining.') },
+          ]}
+          value="swap"
+        />
+      </form>
+
+      <div class="stack" style="--stack: var(--sp-5)">
+        <ResultPanel id="sg-result" locale={locale} title={calc.text.net} prefix="NT$" value={nf(net0)} tone="clean" sample note={calc.text.noteEven.replace('{km}', nf(calc.km))}>
+          <Ledger
+            caption={L('價格怎麼算出來的', 'How the price is worked out')}
+            hideCaption
+            rows={[
+              { id: 'list', label: calc.text.list, amount: `NT$ ${nf(calc.list)}` },
+              { id: 'central', label: calc.text.central, amount: `NT$ ${nf(calc.central)}`, kind: 'minus' },
+              { id: 'local', label: calc.text.local, amount: `NT$ ${nf(local0)}`, kind: 'minus' },
+              { id: 'scrap', label: calc.text.scrap, amount: `NT$ ${nf(calc.scrap)}`, kind: 'minus' },
+              { id: 'net', label: calc.text.net, amount: `NT$ ${nf(net0)}`, kind: 'total' },
+              { id: 'gas', label: calc.text.gas, amount: `NT$ ${nf(calc.gas)}`, kind: 'compare' },
+              { id: 'gap', label: calc.text.gap, amount: `${net0 - calc.gas < 0 ? '−' : '+'}NT$ ${nf(Math.abs(net0 - calc.gas))}`, kind: 'gap' },
+            ]}
+          />
+        </ResultPanel>
+      </div>
+    </div>
+
+    <div class="grid sg-calc-charts" style="--min: 20rem; --grid-gap: var(--sp-7)">
+      <Figure locale={locale} number="A" title={L('補助一層層扣下來之後，|還差多少', 'After each subsidy comes off, |how much is left')} subtitle={L('新台幣', 'New Taiwan dollars')} sample tone="clean">
+        <WaterfallChart
+          id="sg-waterfall"
+          locale={locale}
+          title={L('電動機車價格瀑布圖', 'Waterfall chart of the electric scooter price')}
+          start={{ label: calc.text.list, value: calc.list }}
+          steps={[
+            { label: calc.text.central, value: calc.central },
+            { label: calc.text.local, value: local0 },
+            { label: calc.text.scrap, value: calc.scrap },
+          ]}
+          totalLabel={calc.text.net}
+          compare={{ label: calc.text.gas, value: calc.gas }}
+          gapLabel={calc.text.gap}
+          categoryLabel={cat}
+          valueLabel={val}
+        />
+      </Figure>
+      <Figure locale={locale} number="B" title={L('兩條線在哪裡交叉，|就是哪時候打平', 'Where the lines cross |is where it pays back')} subtitle={L('累計花費（購車 + 每月開銷），新台幣', 'Cumulative cost (purchase + running costs), NT$')} sample tone="clean">
+        <BreakEvenChart
+          id="sg-breakeven"
+          locale={locale}
+          title={L('累計花費折線圖', 'Line chart of cumulative cost')}
+          a={evLine}
+          b={gasLine}
+          months={60}
+          tickLabel={tickLabel}
+          breakEvenLabel={(m) => calc.text.even.replace('{n}', String(m))}
+          noBreakEvenLabel={calc.text.never}
+          aheadLabel={calc.text.ahead}
+          xLabel={calc.text.month}
+        />
+      </Figure>
+    </div>
+    <script type="application/json" id="sg-calc-data" set:html={JSON.stringify({ ...calc, locale, cat, val })} />
+
+    <div class="prose sg-note">
+      <p>{L('這個示範的腳本就在本頁原始碼最下方，可以直接照抄：讀取三個輸入 → 計算 → 更新 Ledger 的 [data-amount]、ResultPanel 的 [data-part]，再用 updateChart() 重畫兩張圖（同一段繪圖程式，建置時與瀏覽器裡共用）。沒有 JavaScript 時，頁面顯示預設情境，表單仍可閱讀。', 'The script behind this demo is at the bottom of this page’s source and can be copied as is: read the three inputs → compute → update the Ledger’s [data-amount] and the ResultPanel’s [data-part], then redraw both charts with updateChart() (the same drawing code runs at build time and in the browser). Without JavaScript the page shows the default scenario and the form is still readable.')}</p>
+    </div>
+  </Section>
+
+  <!-- ================================================================ CHARTS -->
+  <Section id="charts" eyebrow="10" title={L('圖表', 'Charts')} rule lead={L('在 src/components/charts/。伺服器端產生的內嵌 SVG，沒有圖表函式庫；寬度用百分比、文字是固定大小的真文字，所以從 300px 到桌機都是同一張圖。每張圖都有 title、可展開的資料表，以及滑鼠或觸控的數值提示。', 'In src/components/charts/. Server-rendered inline SVG, no charting library. Widths are percentages and text is real fixed-size text, so one chart works from 300px to desktop. Every chart has a title, an expandable data table and a hover / touch readout.')}>
+    <Callout label={L('圖表規則', 'Chart rules')}>
+      <ul class="sg-list">
+        <li>{L('先選形式，最後才選顏色。一個數字用 Stat，不要畫一根長條。', 'Pick the form first and the colour last. One number is a Stat, not a one-bar chart.')}</li>
+        <li>{L('一張圖只有一個 y 軸。不同單位就畫兩張圖。', 'One y axis per chart. Two units means two charts.')}</li>
+        <li>{L('直接標示數值，少用圖例；兩個以上數列才需要圖例。', 'Label values directly and lean on legends as little as possible; a legend appears only for two or more series.')}</li>
+        <li>{L('不用圓餅圖與甜甜圈圖：占比用 StackedBar 或 WaffleChart。', 'No pies or donuts: use StackedBar or WaffleChart for shares.')}</li>
+        <li>{L('標籤請短：中文 30 字、英文 60 字元以內（會自動折成兩行）。', 'Keep labels short: under 30 Chinese characters or 60 Latin (they wrap to two lines).')}</li>
+      </ul>
+    </Callout>
+
+    <div class="sg-charts">
+      <Figure locale={locale} number={1} title={L('騎車與走路的人，|吸到的最多', 'People riding and walking |breathe the most')} subtitle={L(`各種通勤方式的平均暴露濃度（${units.ugm3}）`, `Average exposure by commuting mode (${units.ugm3})`)} caption={L('BarChart,emphasis 模式：故事裡的兩根用色，其他淡化。直線是參考值。', 'BarChart in emphasis mode: the two bars the story is about take the colour, the rest recede. The vertical line is a reference value.')} sample>
+        <BarChart locale={locale} title={L('各種通勤方式的暴露濃度長條圖', 'Bar chart of exposure by commuting mode')} desc={L('騎機車與步行最高，捷運最低。', 'Highest when riding a scooter or walking, lowest on the metro.')} data={barData} unit={units.ugm3} emphasis reference={{ value: 15, label: L('指引值（示意）', 'Guideline (sample)') }} categoryLabel={L('通勤方式', 'Mode')} valueLabel={L('濃度', 'Concentration')} />
+      </Figure>
+
+      <Figure locale={locale} number={2} title={L('同一條路，|兩種機車', 'Same street, |two kinds of scooter')} subtitle={L('每公里排放量（公克）', 'Emissions per kilometre (grams)')} caption={L('GroupedBarChart：每個類別裡比較同樣的兩到四個數列。', 'GroupedBarChart: the same two to four series compared inside each category.')} sample>
+        <GroupedBarChart locale={locale} title={L('燃油與電動機車排放量分組長條圖', 'Grouped bar chart of gasoline and electric scooter emissions')} series={series2} groups={[{ label: L('一氧化碳', 'Carbon monoxide'), values: [1.8, 0] }, { label: L('碳氫化合物', 'Hydrocarbons'), values: [0.6, 0] }, { label: L('氮氧化物', 'Nitrogen oxides'), values: [0.2, 0] }]} unit="g/km" decimals={1} categoryLabel={L('污染物', 'Pollutant')} />
+      </Figure>
+
+      <Figure locale={locale} number={3} title={L('平均值看不到的：|高低差可以很大', 'What an average hides: |the spread is wide')} subtitle={L(`個人暴露濃度的範圍與中位數（${units.ugm3}）`, `Range and median of personal exposure (${units.ugm3})`)} caption={L('RangePlot：圓點是中位數，橫條是最小到最大。', 'RangePlot: the dot is the median, the bar runs from minimum to maximum.')} sample>
+        <RangePlot locale={locale} title={L('個人暴露範圍圖', 'Range plot of personal exposure')} data={[{ label: L('走在人行道', 'Walking on the sidewalk'), min: 10, mid: 40, max: 180 }, { label: L('路口等紅燈', 'Waiting at the crossing'), min: 22, mid: 71, max: 240 }, { label: L('公園內', 'Inside a park'), min: 6, mid: 14, max: 21, tone: 'clean' }]} unit={units.ugm3} labels={{ min: ui.chart.min[locale], mid: ui.chart.median[locale], max: ui.chart.max[locale] }} categoryLabel={L('地點', 'Place')} />
+      </Figure>
+
+      <Figure locale={locale} number={4} title={L('機車在粉塵裡占得少，|在氣體裡占得多', 'Scooters are a small share of dust |and a large share of the gases')} subtitle={L('各類車輛占道路排放的比例', 'Share of road-transport emissions by vehicle type')} caption={L('StackedBar：比較幾個「整體」怎麼分。占比印在色塊下方，放不下的在資料表。', 'StackedBar: comparing how several wholes split. Shares are printed under the segments where they fit; the rest are in the data table.')} sample>
+        <StackedBar locale={locale} title={L('各污染物的車種占比堆疊長條圖', 'Stacked bar chart of vehicle shares by pollutant')} series={[{ label: L('機車', 'Scooters'), tone: 'exhaust' }, { label: L('汽車', 'Cars'), tone: 'blue' }, { label: L('貨車與公車', 'Trucks and buses'), tone: 'violet' }, { label: L('其他', 'Other'), tone: 'neutral' }]} rows={[{ label: 'PM2.5', values: [9, 31, 52, 8] }, { label: L('一氧化碳', 'Carbon monoxide'), values: [38, 47, 11, 4] }, { label: L('碳氫化合物', 'Hydrocarbons'), values: [46, 39, 9, 6] }]} categoryLabel={L('污染物', 'Pollutant')} />
+      </Figure>
+
+      <Figure locale={locale} number={5} title={L('電動機車變多了，|但還是少數', 'Electric scooters are growing, |but still few')} subtitle={L('每年新掛牌機車數（萬輛）', 'New scooter registrations per year (ten thousands)')} caption={L('LineChart：多個數列時線尾直接標數值，寬螢幕再加上名稱。滑鼠移過會出現十字線。', 'LineChart: with several series the line ends carry their values, and their names too on wide screens. Hover for a crosshair.')} sample>
+        <LineChart locale={locale} title={L('新掛牌機車數折線圖', 'Line chart of new scooter registrations')} x={[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]} series={[{ label: series2[0].label, tone: 'exhaust', values: [84, 96, 78, 73, 94, 72, 65, 78, 71, 69] }, { label: series2[1].label, tone: 'clean', values: [2, 4, 8, 17, 10, 9, 9, 8, 7, 9] }]} unit={L('萬輛', '×10k')} xLabel={L('年', 'Year')} />
+      </Figure>
+
+      <Figure locale={locale} number={6} title={L('單一數列：|加上淡淡的面積', 'A single series |gets a soft area')} subtitle={L(`路口年平均濃度（${units.ugm3}）`, `Annual mean at a crossing (${units.ugm3})`)} caption={L('LineChart，單一數列加參考線。', 'LineChart, one series with a reference line.')} sample>
+        <LineChart locale={locale} title={L('路口年平均濃度折線圖', 'Line chart of the annual mean at a crossing')} x={[2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]} series={[{ label: L('路口', 'Crossing'), tone: 'exhaust', values: [41, 38, 33, 35, 31, 29, 30, 27] }]} unit={units.ugm3} reference={{ value: 15, label: L('指引值（示意）', 'Guideline (sample)') }} xLabel={L('年', 'Year')} height={180} />
+      </Figure>
+
+      <Figure locale={locale} number={7} title={L('把人和車分開之後', 'After people and traffic are separated')} subtitle={L(`行人穿越時的暴露濃度（${units.ugm3}）`, `Exposure while crossing (${units.ugm3})`)} caption={L('BeforeAfterChart：每列兩個點，一條線連起來。', 'BeforeAfterChart: two dots per row joined by a line.')} sample>
+        <BeforeAfterChart locale={locale} title={L('行人專用時相前後比較圖', 'Before and after chart for the pedestrian scramble')} data={[{ label: L('示意路口甲', 'Sample crossing A'), before: 58, after: 21 }, { label: L('示意路口乙', 'Sample crossing B'), before: 44, after: 30 }, { label: L('示意路口丙', 'Sample crossing C'), before: 71, after: 12 }]} beforeLabel={L('一般時相', 'Conventional phase')} afterLabel={L('行人專用時相', 'Pedestrian scramble')} unit={units.ugm3} categoryLabel={L('路口', 'Crossing')} />
+      </Figure>
+
+      <Figure locale={locale} number={8} title={L('每 100 輛機車，|有幾輛是電動的', 'Of every 100 scooters, |how many are electric')} subtitle={L('每一格代表一輛', 'One cell is one scooter')} caption={L('WaffleChart：「每 100 個裡有幾個」。從最底下一排往上填。', 'WaffleChart: “N in 100”. Cells fill from the bottom row up.')} sample>
+        <WaffleChart locale={locale} title={L('電動機車占比方格圖', 'Waffle chart of the electric share')} parts={[{ value: 7, label: series2[1].label, tone: 'clean' }]} restLabel={series2[0].label} categoryLabel={L('車種', 'Type')} valueLabel={L('輛', 'Count')} />
+      </Figure>
+
+      <Figure locale={locale} number={9} title={L('十個等紅燈的人裡，|有三個是孩子或長者', 'Of ten people at the light, |three are children or elders')} subtitle={L('每個圖示代表一個人', 'One figure is one person')} caption={L('PictogramRow：用網站自己的人形與機車圖示。', 'PictogramRow: built from the site’s own figures and scooters.')} sample>
+        <div class="stack" style="--stack: var(--sp-6)">
+          <PictogramRow locale={locale} title={L('路口行人組成圖示', 'Pictogram of people at a crossing')} count={3} total={10} label={L('孩童與長者', 'Children and elders')} restLabel={L('其他行人', 'Other pedestrians')} tone="signal" categoryLabel={L('族群', 'Group')} valueLabel={L('人數', 'People')} />
+          <PictogramRow locale={locale} title={L('電動機車占比圖示', 'Pictogram of the electric share')} count={1} total={8} cols={4} icon="scooter-electric" tone="clean" label={series2[1].label} restLabel={series2[0].label} categoryLabel={L('車種', 'Type')} valueLabel={L('輛', 'Count')} />
+        </div>
+      </Figure>
+    </div>
+    <p class="meta sg-note">{L('WaterfallChart 與 BreakEvenChart 在上面的「表單與試算」一節。', 'WaterfallChart and BreakEvenChart are shown in the Forms and calculator section above.')}</p>
+  </Section>
+
+  <!-- ================================================================ ART -->
+  <Section id="art" eyebrow="11" title={L('插畫', 'Illustration')} tone="sunken" lead={L('在 src/components/art/。全部是手寫的內嵌 SVG，零件定義在 parts.ts，顏色只來自 --art-* 色票，所以兩個主題都能用。', 'In src/components/art/. All hand-built inline SVG. The parts live in parts.ts and take colour only from --art-* tokens, so everything works in both themes.')}>
+    <Block name="StreetScene / SceneCompare" file="art/StreetScene.astro · art/SceneCompare.astro" wide code={`<StreetScene locale={locale} />                  {/* 紅燈：燃油機車 */}
+<StreetScene locale={locale} state="clean" />    {/* 同一個路口：電動機車 */}
+<SceneCompare locale={locale} />                 {/* 兩者切換，不需要 JavaScript */}`}>
+      <Fragment slot="note">
+        <p>{L('招牌插畫：等紅燈的那一刻。一大群機車在停止線後怠速，行人從車陣前走過；紅圈標出每個人的口鼻高度，嬰兒與小學生在最濃的那一層。倒數在跑、霧層慢慢變厚；clean 狀態是同一個路口、同一個紅燈，只是沒有排氣管。窄螢幕自動換成精簡構圖。', 'The signature illustration: the red-light moment. A pack of scooters idles behind the stop line while people cross in front of it; a ring marks where each person breathes, with the baby and the schoolchild inside the densest layer. The countdown runs and the haze slowly thickens; the clean state is the same crossing and the same red light without tailpipes. Narrow containers switch to a compact composition automatically.')}</p>
+      </Fragment>
+      <div class="sg-bleed"><SceneCompare locale={locale} name="sg-scene" /></div>
+      <div style="margin-block-start: var(--sp-5)"><PollutantKey locale={locale} /></div>
+    </Block>
+
+    <Block name="PollutantKey + Haze" file="art/PollutantKey.astro · art/Haze.astro" wide code={`<PollutantKey locale={locale} />
+<Haze density={0.8} kind="fumes" />   {/* 放在 position: relative 的容器底部 */}
+<Chapter haze={0.8} … />             {/* 或讓 Chapter 處理 */}`}>
+      <Fragment slot="note">
+        <p>{L('空氣有三種畫法，對應「聞得到」與「聞不到」：暖色波浪帶是聞得到的油氣（主角）；空心圓圈是無色無味的一氧化碳；針尖細點是看不到的超細微粒，飄得最高。機車在粉塵裡占比小、在氣體裡占比大，所以畫面以氣體為主，不畫黑煙。', 'Air is drawn three ways, for what you can and cannot smell: warm wavy ribbons are the fumes you smell (the lead); hollow rings are carbon monoxide, colourless and odourless; pin-point stipple is the ultrafine particles you cannot see, drifting highest. Scooters are a small share of dust and a large share of the gases, so the pictures lead with gases and never show black smoke.')}</p>
+      </Fragment>
+      <div class="grid" style="--min: 15rem">
+        {([['fumes', 0.9], ['co', 0.9], ['ufp', 0.9], ['all', 0.35], ['all', 1]] as const).map(([kind, density]) => (
+          <div class="sg-haze">
+            <code>kind="{kind}" density={`{${density}}`}</code>
+            <Haze kind={kind} density={density} height={150} />
+          </div>
+        ))}
+      </div>
+    </Block>
+
+    <Block name="Scooter" file="art/Scooter.astro" wide code={`<Scooter kind="gas" label="燃油機車" />
+<Scooter kind="electric" rider label="電動機車" />`}>
+      <Fragment slot="note"><p>{L('一對側面機車：同樣的軸距與姿態，方便並排比較。差別只在重點：燃油車有消音器與排氣；電動車有輪轂馬達、一條綠色燈條，後輪後面什麼都沒有。通用造型，不是任何品牌的車款。', 'A matching pair in side view: same wheelbase and stance, so they sit side by side. They differ only where it matters: the gasoline one has a muffler and exhaust; the electric one has a hub motor, a green light strip and nothing behind the rear wheel. Generic designs, not any brand’s model.')}</p></Fragment>
+      <div class="grid" style="--min: 15rem">
+        <figure><Scooter kind="gas" label={series2[0].label} /><figcaption class="meta">kind="gas"</figcaption></figure>
+        <figure><Scooter kind="electric" label={series2[1].label} /><figcaption class="meta">kind="electric"</figcaption></figure>
+        <figure><Scooter kind="gas" rider label={series2[0].label} /><figcaption class="meta">kind="gas" rider</figcaption></figure>
+        <figure><Scooter kind="electric" rider flip label={series2[1].label} /><figcaption class="meta">kind="electric" rider flip</figcaption></figure>
+      </div>
+    </Block>
+
+    <Block name="ScrambleCrossing" file="art/ScrambleCrossing.astro" wide code={`<ScrambleCrossing kind="gas" label="行人專用時相的路口俯視圖…" />`}>
+      <Fragment slot="note"><p>{L('行人專用時相的路口俯視圖：四個方向全紅，行人可以斜向穿越。機車群停在四條停止線後。', 'A pedestrian-scramble junction from above: all four approaches are held at red and people cross in every direction, diagonals included. Scooter packs wait behind the four stop lines.')}</p></Fragment>
+      <div class="grid" style="--min: 15rem">
+        <figure><ScrambleCrossing kind="gas" label={L('行人專用時相路口俯視示意圖，燃油機車在停止線後怠速。', 'Illustrative top view of a pedestrian scramble with gasoline scooters idling behind the stop lines.')} /><figcaption class="meta">kind="gas"</figcaption></figure>
+        <figure><ScrambleCrossing kind="electric" label={L('同一個路口俯視示意圖，等待的是電動機車。', 'The same junction from above with electric scooters waiting.')} /><figcaption class="meta">kind="electric"</figcaption></figure>
+      </div>
+    </Block>
+
+    <Block name={L('插畫規則', 'Illustration rules')} file="art/parts.ts · styles/art.css">
+      <div class="prose">
+        <h4>{L('整體', 'Overall')}</h4>
+        <ul>
+          <li>{L('風格是「號誌人形 + 剖面圖」：平塗剪影，沒有外框線、沒有漸層陰影、沒有臉。', 'The style is “signal figure meets section drawing”: flat silhouettes, no outlines, no gradient shading, no faces.')}</li>
+          <li>{L('單位是公分：1 單位 = 1 公分，y = 0 是地面，往上為負。成人口鼻約在 −150，孩童 −97，嬰兒車 −71，排氣管 −33。新零件請照這個尺度畫。', 'Units are centimetres: 1 unit = 1 cm, y = 0 is the ground, up is negative. An adult’s mouth is near −150, a child’s −97, a stroller −71, the tailpipe −33. Draw new parts to this scale.')}</li>
+          <li>{L('所有東西都是正側面，站在同一條地面線上。不用透視；景深只靠「後排較淡、略高、略小」表現（.a-row-2、.a-row-3）。', 'Everything is in strict side view on one ground line. No perspective; depth is shown only by drawing back rows lighter, slightly higher and slightly smaller (.a-row-2, .a-row-3).')}</li>
+        </ul>
+        <h4>{L('線條粗細', 'Line weights')}</h4>
+        <ul>
+          <li>{L('人物四肢是圓頭粗線：成人腿 11、手臂 8.5、軀幹 23；孩童等比縮小。', 'Limbs are round-capped strokes: adult legs 11, arms 8.5, torso 23; children scaled down in proportion.')}</li>
+          <li>{L('建築與背景用 1.5 的細線（.a-line）加淡色塊面（.a-plane），永遠比前景淡。', 'Architecture and background use 1.5 hairlines (.a-line) over pale planes (.a-plane), always lighter than the foreground.')}</li>
+          <li>{L('量測線與尺規用 1.5（.a-rule）；指向口鼻的線是圓點虛線。', 'Measurement lines and the ruler are 1.5 (.a-rule); lines to a mouth are dotted.')}</li>
+        </ul>
+        <h4>{L('用色', 'Palette')}</h4>
+        <ul>
+          <li>{L('人與車只有墨色（--art-ink）與更深的輪胎、座墊（--art-deep）。深色主題下反過來變成淺色剪影。', 'People and vehicles use ink (--art-ink) with deeper tyres and seats (--art-deep) and nothing else. In the dark theme they invert to light silhouettes.')}</li>
+          <li>{L('每個物件最多一個重點色：燃油車是排氣口的赭黃，電動車是綠色燈條與輪轂，小學生是黃帽子，尾燈與紅燈是紅色。', 'One accent per object at most: the ochre tailpipe on a gasoline scooter, the green light strip and hub on an electric one, the schoolchild’s yellow cap, red for tail lamps and the red signal.')}</li>
+          <li>{L('暖色只屬於廢氣。不要把赭黃用在建築、衣服或裝飾上。', 'Warm colour belongs to exhaust alone. Never use ochre on buildings, clothes or decoration.')}</li>
+        </ul>
+        <h4>{L('怎麼畫空氣', 'How air is drawn')}</h4>
+        <ul>
+          <li>{L('聞得到的油氣：一層由下往上變淡的底色，加上水平波浪帶，愈近地面愈粗、愈密（指數遞減，尺度高約 40 公分）。它畫在人物「前面」，所以腿和輪子會被遮住一些。', 'Fumes you can smell: a wash that fades upward plus horizontal wavy ribbons, thicker and denser toward the ground (exponential, scale height about 40 cm). It is drawn in front of the figures, so legs and wheels are partly veiled.')}</li>
+          <li>{L('聞不到的一氧化碳：空心圓圈，冷色，分布比油氣高。', 'Carbon monoxide you cannot smell: hollow rings in a cool colour, spread higher than the fumes.')}</li>
+          <li>{L('看不到的超細微粒：針尖大小的點，分布最高。', 'Ultrafine particles you cannot see: pin-point dots, spread highest.')}</li>
+          <li>{L('不畫黑煙、不畫骷髏、不畫口罩。讓人不安的是高度，不是誇張。', 'No black smoke, no skulls, no masks. What unsettles is the height, not exaggeration.')}</li>
+        </ul>
+        <h4>{L('怎麼畫人', 'How people are drawn')}</h4>
+        <ul>
+          <li>{L('像行人號誌裡的人：圓頭、膠囊身體、圓頭四肢，沒有五官、膚色、性別特徵。', 'Like the figure in a pedestrian signal: round head, capsule torso, round-capped limbs; no facial features, skin colour or gender markers.')}</li>
+          <li>{L('用身高與道具區分：小學生（黃帽、書包）、推嬰兒車的家長、拄拐杖微駝的長者、戴安全帽的騎士。', 'Tell them apart by height and props: the schoolchild (yellow cap, school bag), the parent with a stroller, the elder slightly stooped with a cane, the rider in a helmet.')}</li>
+          <li>{L('騎士和行人畫法完全相同：他們不是反派，他們吸到的最多。', 'Riders are drawn exactly like pedestrians: they are not the villains, and they breathe the most.')}</li>
+          <li>{L('每個人的口鼻用一個圓圈標出（breath()）；紅色表示有廢氣，綠色表示乾淨。', 'Each mouth is marked with a ring (breath()); red where there is exhaust, green where the air is clean.')}</li>
+        </ul>
+      </div>
+    </Block>
+  </Section>
+</Base>
+
+<style>
+  .sg-hero {
+    padding-block: var(--sp-7) var(--sp-6);
+  }
+  .sg-hero .container {
+    display: grid;
+    gap: var(--sp-4);
+    justify-items: start;
+  }
+  .sg-toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    margin: var(--sp-3) 0 0;
+    padding: var(--sp-3) 0 0;
+    border-block-start: 1px solid var(--line-strong);
+    list-style: none;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+  .sg-toc a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.25rem;
+  }
+  .sg-two {
+    display: grid;
+    gap: var(--sp-6);
+    align-items: start;
+  }
+  @media (min-width: 56em) {
+    .sg-two {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: var(--sp-8);
+    }
+  }
+  .sg-marks {
+    display: grid;
+    gap: var(--sp-4);
+    justify-items: start;
+  }
+  .sg-mark-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+  .sg-wordmark {
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-black);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .sg-wordmark:lang(en) {
+    font-stretch: 76%;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+  .sg-code {
+    margin: 0;
+    padding: var(--sp-4);
+    overflow-x: auto;
+    background: var(--surface);
+    border-inline-start: 3px solid var(--ink);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    min-inline-size: 0;
+  }
+  .sg-code code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+  .sg-h {
+    margin-block: var(--sp-6) var(--sp-3);
+    font-size: var(--fs-md);
+    font-stretch: 100%;
+  }
+  .sg-h:first-child {
+    margin-block-start: 0;
+  }
+  .sg-note {
+    margin-block-start: var(--sp-4);
+  }
+  .sg-swatches {
+    display: grid;
+    gap: var(--sp-4) var(--sp-3);
+    grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
+  }
+  .sg-ramps {
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 40rem;
+  }
+  .sg-ramp {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .sg-ramp span {
+    display: flex;
+    align-items: flex-end;
+    block-size: 3.5rem;
+    padding: 0.3rem;
+  }
+  .sg-ramp code {
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 0.6875rem;
+    padding: 0 0.25em;
+    overflow-wrap: anywhere;
+  }
+  .sg-tones {
+    --min: 13rem;
+    --grid-gap: var(--sp-3);
+  }
+  .sg-tone {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-4);
+    border: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .sg-tone code {
+    background: none;
+    padding: 0;
+    color: var(--ink-2);
+  }
+  .sg-type {
+    display: grid;
+  }
+  .sg-type__row {
+    display: grid;
+    gap: var(--sp-2);
+    padding-block: var(--sp-4);
+    border-block-start: 1px solid var(--line);
+    min-inline-size: 0;
+  }
+  .sg-type__row > code {
+    justify-self: start;
+    background: none;
+    padding: 0;
+    color: var(--ink-3);
+    font-size: 0.75rem;
+  }
+  @media (min-width: 48em) {
+    .sg-type__row {
+      grid-template-columns: 9rem minmax(0, 1fr);
+      gap: var(--sp-5);
+      align-items: baseline;
+    }
+  }
+  .sg-rules {
+    --min: 17rem;
+    margin-block-start: var(--sp-6);
+    align-items: start;
+  }
+  .sg-nums {
+    inline-size: auto;
+    margin-block-start: var(--sp-2);
+    font-size: var(--fs-md);
+  }
+  .sg-nums td {
+    border: 0;
+    padding-block: 0;
+  }
+  .sg-space {
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .sg-space div {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    align-items: center;
+  }
+  .sg-space code {
+    background: none;
+    padding: 0;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+  .sg-space span {
+    display: block;
+    block-size: 0.75rem;
+    background: var(--ink);
+  }
+  .sg-radius {
+    display: grid;
+    place-items: center;
+    inline-size: 4rem;
+    block-size: 3rem;
+    border: 2px solid var(--ink);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+  }
+  .sg-list {
+    padding-inline-start: 1.2em;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .sg-list li + li {
+    margin-block-start: 0.4em;
+  }
+  .sg-icons {
+    color: var(--ink);
+  }
+  .sg-calc {
+    display: grid;
+    gap: var(--sp-6);
+    margin-block-start: var(--sp-5);
+    align-items: start;
+  }
+  @media (min-width: 56em) {
+    .sg-calc {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: var(--sp-8);
+    }
+  }
+  .sg-calc-charts {
+    margin-block-start: var(--sp-7);
+    align-items: start;
+  }
+  .sg-charts {
+    display: grid;
+    gap: var(--sp-8) var(--sp-7);
+    margin-block-start: var(--sp-7);
+    align-items: start;
+  }
+  @media (min-width: 62em) {
+    .sg-charts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .sg-bleed {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+  .sg-haze {
+    position: relative;
+    block-size: 11rem;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    --here: var(--bg);
+    overflow: hidden;
+  }
+  .sg-haze code {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    margin: var(--sp-2);
+    font-size: 0.75rem;
+  }
+  figure .meta {
+    margin-block-start: var(--sp-2);
+  }
+</style>
+
+<script>
+  // Reference calculator wiring. Copy this pattern for the real tool.
+  import { updateChart } from '@/components/charts/core/client';
+  import { renderWaterfall } from '@/components/charts/core/waterfall';
+  import { breakEvenMonth, renderBreakEven } from '@/components/charts/core/breakeven';
+
+  const dataEl = document.getElementById('sg-calc-data');
+  const root = document.getElementById('sg-calc');
+  if (dataEl && root) {
+    const d = JSON.parse(dataEl.textContent ?? '{}');
+    const T = d.text as Record<string, string>;
+    const nf = new Intl.NumberFormat(d.locale === 'en' ? 'en-US' : 'zh-TW');
+    const money = (v: number) => `NT$ ${nf.format(v)}`;
+    const $ = <E extends Element>(sel: string) => document.querySelector<E>(sel);
+    const setRow = (id: string, text: string) => {
+      const el = $(`[data-row="${id}"] [data-amount]`);
+      if (el) el.textContent = text;
+    };
+
+    const update = () => {
+      const city = d.cities.find((c: { value: string }) => c.value === $<HTMLSelectElement>('#sg-city')?.value) ?? d.cities[0];
+      const scrap = $<HTMLInputElement>('input[name="sg-scrap"]:checked')?.value === 'yes' ? d.scrap : 0;
+      const km = Math.max(0, Number($<HTMLInputElement>('#sg-km')?.value) || 0);
+      const net = d.list - d.central - city.local - scrap;
+      const gap = net - d.gas;
+      const ev = { label: T.ev, tone: 'clean' as const, upfront: net, monthly: km * d.evPerKm + d.evFixed };
+      const gas = { label: T.gasShort, tone: 'exhaust' as const, upfront: d.gas, monthly: km * d.gasPerKm + d.gasFixed };
+      const even = breakEvenMonth(ev, gas);
+
+      setRow('local', money(city.local));
+      setRow('scrap', money(scrap));
+      setRow('net', money(net));
+      setRow('gap', `${gap < 0 ? '−' : '+'}${money(Math.abs(gap))}`);
+      const value = $('#sg-result [data-part="value"]');
+      const note = $('#sg-result [data-part="note"]');
+      if (value) value.textContent = nf.format(net);
+      const ahead = ev.upfront <= gas.upfront && ev.monthly <= gas.monthly;
+      if (note) note.textContent = (ahead ? T.noteAhead : even !== null && even <= 60 ? T.noteEven : T.noteNever).replace('{km}', nf.format(km));
+
+      const wf = $('#sg-waterfall');
+      if (wf)
+        updateChart(
+          wf,
+          renderWaterfall({
+            locale: d.locale,
+            start: { label: T.list, value: d.list },
+            steps: [
+              { label: T.central, value: d.central },
+              { label: T.local, value: city.local },
+              ...(scrap ? [{ label: T.scrap, value: scrap }] : []),
+            ],
+            totalLabel: T.net,
+            compare: { label: T.gas, value: d.gas },
+            gapLabel: T.gap,
+            categoryLabel: d.cat,
+            valueLabel: d.val,
+          }),
+        );
+      const be = $('#sg-breakeven');
+      if (be)
+        updateChart(
+          be,
+          renderBreakEven({
+            locale: d.locale,
+            a: ev,
+            b: gas,
+            months: 60,
+            tickLabel: (m) => (m === 0 ? T.purchase : T.year.replace('{n}', String(m / 12))),
+            breakEvenLabel: (m) => T.even.replace('{n}', String(m)),
+            noBreakEvenLabel: T.never,
+            aheadLabel: T.ahead,
+            xLabel: T.month,
+          }),
+        );
+    };
+    root.addEventListener('input', update);
+    root.addEventListener('change', update);
+  }
+</script>

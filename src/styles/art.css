@@ -104,7 +104,7 @@
 .a-led-red { fill: var(--art-red); }
 .a-led-green { fill: var(--art-green); }
 .a-lamp-off { fill: var(--art-lamp-off); }
-.a-housing { fill: #0d1113; }
+.a-housing { fill: #0d1113; stroke: #3d474d; stroke-width: 1; }
 
 /* ---- Motion: slow, and only when welcome -------------------------------- */
 @media (prefers-reduced-motion: no-preference) {

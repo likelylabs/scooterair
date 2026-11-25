@@ -67,6 +67,12 @@ export function fmt(locale: Locale, v: number, decimals = 0): string {
   }).format(v);
 }
 
+/** 50,000 → "5萬" / "50K": for axis ticks only, never for values. */
+export function fmtCompact(locale: Locale, v: number): string {
+  if (Math.abs(v) < 10000) return fmt(locale, v);
+  return new Intl.NumberFormat(locale === 'zh-TW' ? 'zh-TW' : 'en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(v);
+}
+
 /** A typographic minus, not a hyphen. */
 export const MINUS = '−';
 export const signed = (locale: Locale, v: number, decimals = 0) => (v < 0 ? MINUS : v > 0 ? '+' : '') + fmt(locale, Math.abs(v), decimals);
@@ -132,12 +138,14 @@ export function text(cls: string, x: string | number, y: number, content: string
 
 /**
  * A horizontal bar growing from x = 0: rounded at the data end, square at the
- * baseline (a second 3px rect squares off the rounded start).
+ * baseline (a second 3px rect squares off the rounded start), with a short
+ * baseline tick so a zero-length bar still shows where zero is.
  */
 export function hbar(tone: Tone, widthPct: number, y: number, h: number, extraClass = ''): string {
-  if (widthPct <= 0) return '';
+  const base = `<line class="c-axis" x1="0" x2="0" y1="${y - 3}" y2="${y + h + 3}"/>`;
+  if (widthPct <= 0) return base;
   const cls = `c-fill-${tone}${extraClass ? ' ' + extraClass : ''}`;
-  return `<rect class="${cls}" x="0" y="${y}" width="${r2(widthPct)}%" height="${h}" rx="3"/>${widthPct > 1.2 ? `<rect class="${cls}" x="0" y="${y}" width="3" height="${h}"/>` : ''}`;
+  return `<rect class="${cls}" x="0" y="${y}" width="${r2(widthPct)}%" height="${h}" rx="3"/>${widthPct > 1.2 ? `<rect class="${cls}" x="0" y="${y}" width="3" height="${h}"/>` : ''}${base}`;
 }
 
 const TABLE_ICON =

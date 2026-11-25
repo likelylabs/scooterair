@@ -60,8 +60,7 @@ export function renderBar(p: BarChartProps): ChartRender {
   });
   const height = y - 6;
 
-  // baseline, then the reference line behind the rows
-  o.push(`<line class="c-axis" x1="0" x2="0" y1="${head}" y2="${height}"/>`);
+  // the reference line sits behind the rows
   let unitOnLeft = false;
   if (reference) {
     const rp = pctN(reference.value, max);

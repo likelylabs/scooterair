@@ -99,6 +99,7 @@ export const units = {
   'ug/km': { short: t('µg/km', 'µg/km'), long: t('微克／公里', 'micrograms per kilometre') },
   'per-100k': { short: t('人／每十萬人', 'per 100,000'), long: t('每十萬人口', 'per 100,000 population') },
   deaths: { short: t('人', 'deaths'), long: t('死亡人數', 'deaths') },
+  'million-deaths': { short: t('百萬人', 'million deaths'), long: t('百萬死亡人數', 'million deaths') },
   people: { short: t('人', 'people'), long: t('人', 'people') },
   count: { short: t('', ''), long: t('數量', 'count') },
   ratio: { short: t('倍', '×'), long: t('倍', 'times') },

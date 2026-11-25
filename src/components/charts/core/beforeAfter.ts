@@ -24,7 +24,6 @@ export function renderBeforeAfter(p: BeforeAfterProps): ChartRender {
   const o: string[] = [];
   let y = unit ? 24 : 2;
   if (unit) o.push(text('c-tick', '100%', 13, unit, 'text-anchor="end"'));
-  const top = y;
 
   data.forEach((d) => {
     const pair = `${f(d.before)} → ${f(d.after)}`;
@@ -45,7 +44,6 @@ export function renderBeforeAfter(p: BeforeAfterProps): ChartRender {
     y += labelH + 13 + 12 + 14;
   });
   const height = y - 10;
-  o.unshift(`<line class="c-axis" x1="0" x2="0" y1="${top}" y2="${height}"/>`);
 
   return {
     kind: 'before-after',

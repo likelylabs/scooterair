@@ -230,7 +230,7 @@ const fleet = {
     confidence: 'secondary',
     evidence: 'official-tw',
     caveat: t(
-      '出自工商時報報導，引用機車產業團體（台灣智慧型電動機車產業協會）整理的公路局資料；未能查核原始數據。',
+      '出自工商時報報導，引用機車產業團體（SMAT）整理的公路局資料；未能查核原始數據。',
       'From a Commercial Times report quoting an industry association (SMAT) citing Highway Bureau data; not checked against the original figures.',
     ),
     research: '01 §3',
@@ -553,6 +553,10 @@ const policy = {
     confidence: 'secondary',
     evidence: 'derived',
     derivedFrom: ['ev-share-2025', 'netzero-ev-sales-targets'],
+    caveat: t(
+      '實際市售比出自媒體轉述的統計，目標出自公視對淨零路徑的描述（國發會原始文件未能開啟）；差距為本站計算。',
+      'The actual share comes from media reports of statistics and the target from PTS\'s description of the net-zero pathway (the NDC original could not be opened); the gap is our calculation.',
+    ),
     research: '01 §8',
   },
   'scooter-emission-standard-phases': {
@@ -1305,7 +1309,7 @@ const exposure = {
       'In first-year field measurements, moving the pedestrian waiting area away from the scooter waiting box lowered average PM2.5 there during peak hours by 0.46 and 0.94 µg/m³: small absolute changes.',
     ),
     period: t('第一年（2023年）尖峰時段實測', 'Year-one (2023) peak-hour measurements'),
-    place: t('臺北市路口（如重慶北路／酒泉街）', 'Taipei intersections (e.g. Chongqing N. Rd / Jiuquan St)'),
+    place: t('量測路口（例如重慶北路／酒泉街路口）', 'Measured intersections (e.g. Chongqing N. Rd / Jiuquan St)'),
     sources: ['iot-2025-intersection-air-quality'],
     locator: 'p.1-6 / 附1-4: reductions 0.46 and 0.94 µg/m³ (重慶北路/酒泉街 0.94)',
     confidence: 'verified',
@@ -1597,44 +1601,6 @@ const standards = {
     ),
     research: '02 §8',
   },
-  'tw-pm25-standard-previous': {
-    data: { annual: v(15, 'ug/m3'), daily: v(35, 'ug/m3') },
-    display: t('舊標準 15／35 µg/m³', 'previous 15 / 35 µg/m³'),
-    statement: t(
-      '據新聞摘要，修正前的PM2.5標準為年平均15 µg/m³、24小時35 µg/m³。',
-      'According to news summaries, the PM2.5 standard before the amendment was 15 µg/m³ annual and 35 µg/m³ over 24 hours.',
-    ),
-    period: t('2024年修正前', 'Before the 2024 amendment'),
-    place: TW,
-    sources: ['moenv-air-quality-standards'],
-    confidence: 'secondary',
-    evidence: 'official-tw',
-    caveat: t(
-      '舊數值只見於新聞搜尋摘要，現行法規頁面並未列出；引用的出處為現行標準頁。',
-      'The old values appear only in news search summaries, not on the current regulation page (cited here as the nearest official source).',
-    ),
-    requiresCaveat: true,
-    research: '02 §8',
-  },
-  'tw-pm25-future-targets': {
-    data: { target2030: v(10, 'ug/m3', { bound: 'lte' }), target2035: v(8, 'ug/m3', { bound: 'lte' }) },
-    display: t('2030年 ≤10、2035年 ≤8', '≤10 by 2030, ≤8 by 2035'),
-    statement: t(
-      '據新聞摘要，環境部的目標是PM2.5年平均值在2030年降到10 µg/m³以下、2035年降到8 µg/m³以下。',
-      'According to news summaries, MOENV aims to bring annual mean PM2.5 to 10 µg/m³ or below by 2030 and 8 µg/m³ or below by 2035.',
-    ),
-    period: t('2030、2035年目標', 'Targets for 2030 and 2035'),
-    place: TW,
-    sources: ['moenv-air-quality-standards'],
-    confidence: 'secondary',
-    evidence: 'official-tw',
-    caveat: t(
-      '只見於新聞搜尋摘要，未查到環境部原始文件；引用的出處為現行標準頁。',
-      'Seen only in news search summaries; no MOENV document was found (the current standards page is cited as the nearest official source).',
-    ),
-    requiresCaveat: true,
-    research: '02 §8',
-  },
   'who-pm25-guideline': {
     data: { annual: v(5, 'ug/m3'), daily: v(15, 'ug/m3') },
     display: t('年平均 5、24小時 15 µg/m³', 'annual 5, 24-hour 15 µg/m³'),
@@ -1920,9 +1886,9 @@ const health = {
   },
   'who-7-million-deaths': {
     data: {
-      combined: v(7, 'deaths', { approx: true, note: 'million; ambient + household combined' }),
-      ambientLow: v(4, 'deaths', { note: 'million' }),
-      ambientHigh: v(9, 'deaths', { note: 'million' }),
+      combined: v(7, 'million-deaths', { approx: true, note: 'ambient + household combined' }),
+      ambientLow: v(4, 'million-deaths'),
+      ambientHigh: v(9, 'million-deaths'),
     },
     display: t('約 700 萬人', 'about 7 million'),
     statement: t(

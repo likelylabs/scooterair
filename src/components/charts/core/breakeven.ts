@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { type ChartRender, type Tone, fmt, niceMax, niceTicks, px, text } from './shared';
+import { type ChartRender, type Tone, fmt, fmtCompact, niceMax, niceTicks, px, text } from './shared';
 
 export interface CostLine {
   label: string;
@@ -23,15 +23,17 @@ export interface BreakEvenProps {
   tickLabel: (month: number) => string;
   /** label at the crossing, e.g. (m) => `第 ${m} 個月打平` */
   breakEvenLabel: (month: number) => string;
-  /** shown instead when the lines do not cross inside the horizon */
+  /** shown instead when `a` costs more and never catches up inside the horizon */
   noBreakEvenLabel: string;
+  /** shown instead when `a` is already cheaper to buy and to run: there is nothing to pay back */
+  aheadLabel: string;
   /** plot height in px (default 230) */
   height?: number;
   /** data-table header for the month column */
   xLabel: string;
 }
 
-const TOP = 26;
+const TOP = 34;
 const BOTTOM = 28;
 
 /** The month at which cumulative costs are equal, or null if never within reach. */
@@ -54,11 +56,15 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   const f = (v: number) => fmt(locale, Math.round(v));
   const o: string[] = [];
 
-  niceTicks(yMax, 4).forEach((t, i) => {
+  const ticks = niceTicks(yMax, 4);
+  const tickText = ticks.map((t) => fmtCompact(locale, t));
+  const padLeft = Math.ceil(Math.max(...tickText.map((t) => px(t, 12)), px(prefix, 12) - 4)) + 10;
+  ticks.forEach((t, i) => {
     const y = yp(t);
     o.push(`<line class="${i === 0 ? 'c-axis' : 'c-grid'}" x1="0" x2="100%" y1="${y}" y2="${y}"/>`);
-    if (i > 0) o.push(text('c-tick', 0, y - 5, `${prefix} ${f(t)}`));
+    o.push(text('c-tick', 0, y + 4, tickText[i], 'text-anchor="end" dx="-8"'));
   });
+  o.push(text('c-tick', 0, 9, prefix, `dx="${-padLeft}"`));
   for (let m = 0; m <= months; m += 12) {
     o.push(text('c-tick', `${xp(m)}%`, TOP + H + 18, p.tickLabel(m), `text-anchor="${m === 0 ? 'start' : m === months ? 'end' : 'middle'}"`));
     if (m > 0 && m < months) o.push(`<line class="c-axis" x1="${xp(m)}%" x2="${xp(m)}%" y1="${TOP + H}" y2="${TOP + H + 4}"/>`);
@@ -93,11 +99,12 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
     const x = xp(cross!);
     const y = yp(at(a, cross!));
     const label = p.breakEvenLabel(Math.ceil(cross!));
-    o.push(`<line class="c-ref-line" x1="${x}%" x2="${x}%" y1="${TOP - 6}" y2="${TOP + H}"/>`);
+    o.push(`<line class="c-ref-line" x1="${x}%" x2="${x}%" y1="${TOP - 8}" y2="${TOP + H}"/>`);
     o.push(`<circle class="c-dot c-fill-ink" cx="${x}%" cy="${y}" r="6"/>`);
-    o.push(text('c-ref', `${x}%`, TOP - 12, label, `text-anchor="${x < 30 ? 'start' : x > 70 ? 'end' : 'middle'}"`));
+    o.push(text('c-ref', `${x}%`, TOP - 13, label, `text-anchor="${x < 30 ? 'start' : x > 70 ? 'end' : 'middle'}"`));
   } else {
-    o.push(text('c-ref', '100%', TOP - 12, p.noBreakEvenLabel, 'text-anchor="end"'));
+    const ahead = a.upfront <= b.upfront && a.monthly <= b.monthly;
+    o.push(text('c-ref', '100%', TOP - 12, ahead ? p.aheadLabel : p.noBreakEvenLabel, 'text-anchor="end"'));
   }
   o.push(`<line class="c-cross" x1="0" x2="0" y1="${TOP}" y2="${TOP + H}" visibility="hidden"/>`);
 
@@ -114,6 +121,7 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
     kind: 'breakeven',
     body: o.join(''),
     height: TOP + H + BOTTOM,
+    padLeft,
     padRight: Math.ceil(padRight),
     legend: [a, b].map((c) => ({ label: c.label, tone: c.tone, shape: 'line' })),
     hover: { xs, rows },

@@ -38,8 +38,8 @@ const sc = height / 230; // vertical compression of the standard 230cm column
   <div class:list={['haze', animated && 'a-animated', cls]} style={`--haze-h:${height}px;--haze-d:${d}`} aria-hidden="true">
     {show('fumes') && <div class="haze__wash" />}
     <svg width={W} height={height} viewBox={`0 ${-height} ${W} ${height}`} focusable="false">
-      {show('ufp') && <g class="a-ufp a-drift-3" set:html={ufpDots({ width: W, count: Math.round(520 * d), seed: seed + 2, scale: 105 * sc, top: height - 6 })} />}
-      {show('co') && <g class="a-co a-drift-2" set:html={coRings({ width: W, count: Math.round(70 * d), seed: seed + 1, scale: 70 * sc, top: height - 10 })} />}
+      {show('ufp') && <g class="a-ufp a-drift-3" set:html={ufpDots({ width: W, count: Math.round(640 * d), seed: seed + 2, scale: 105 * sc, top: height - 6 })} />}
+      {show('co') && <g class="a-co a-drift-2" set:html={coRings({ width: W, count: Math.round(150 * d), seed: seed + 1, scale: 70 * sc, top: height - 10 })} />}
       {show('fumes') && <g class="a-fumes a-drift-1" set:html={fumes({ width: W, count: Math.round(64 * d), seed, scale: 34 * sc, top: height * 0.8 })} />}
     </svg>
   </div>

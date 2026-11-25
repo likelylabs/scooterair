@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { type ChartRender, type Tone, esc, fmt, niceMax, niceTicks, px, text } from './shared';
+import { type ChartRender, type Tone, esc, fmt, fmtCompact, niceMax, niceTicks, px, text } from './shared';
 
 export interface LineSeries {
   label: string;
@@ -28,7 +28,7 @@ export interface LineChartProps {
   xLabel: string;
 }
 
-const TOP = 18;
+const TOP = 24;
 const BOTTOM = 28;
 
 export function renderLine(p: LineChartProps): ChartRender {
@@ -44,13 +44,16 @@ export function renderLine(p: LineChartProps): ChartRender {
   const yp = (v: number) => TOP + H - ((v - yMin) / (yMax - yMin)) * H;
   const o: string[] = [];
 
-  // grid + y ticks: the label sits on its gridline, at the left edge
+  // grid + y ticks: labels hang in a gutter left of the plot, so a line can start at the edge
   const ticks = niceTicks(yMax - yMin, 4).map((t) => t + yMin);
+  const tickText = ticks.map((t) => (decimals ? f(t) : fmtCompact(locale, t)));
+  const padLeft = Math.ceil(Math.max(...tickText.map((t) => px(t, 12)), unit ? px(unit, 12) - 4 : 0)) + 10;
   ticks.forEach((t, i) => {
     const y = yp(t);
     o.push(`<line class="${i === 0 ? 'c-axis' : 'c-grid'}" x1="0" x2="100%" y1="${y}" y2="${y}"/>`);
-    if (i > 0) o.push(text('c-tick', 0, y - 5, i === ticks.length - 1 && unit ? `${f(t)} ${unit}` : f(t)));
+    o.push(text('c-tick', 0, y + 4, tickText[i], 'text-anchor="end" dx="-8"'));
   });
+  if (unit) o.push(text('c-tick', 0, 9, unit, `dx="${-padLeft}"`));
   // x labels: first, last, and up to three in between
   const step = Math.max(1, Math.ceil((n - 1) / 4));
   for (let i = 0; i < n - 1; i += step) {
@@ -113,6 +116,7 @@ export function renderLine(p: LineChartProps): ChartRender {
     kind: 'line',
     body: o.join(''),
     height: TOP + H + BOTTOM,
+    padLeft,
     padRight: Math.ceil(padRight),
     legend: series.length > 1 ? series.map((s) => ({ label: s.label, tone: s.tone, shape: 'line' })) : undefined,
     hover: {

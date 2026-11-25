@@ -38,7 +38,6 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
   const o: string[] = [];
   const table: string[][] = [];
   let y = 4;
-  const top = y;
 
   const row = (label: string, amount: string, strong: boolean, draw: (barY: number) => string, tip: string) => {
     const lines = wrapLabel(label, (MIN_W - px(amount, 15) - 14) / 14);
@@ -109,7 +108,6 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
     }
   }
   const height = y - 10;
-  o.unshift(`<line class="c-axis" x1="0" x2="0" y1="${top}" y2="${height}"/>`);
 
   return { kind: 'waterfall', body: o.join(''), height, table: { head: [p.categoryLabel, p.valueLabel], rows: table } };
 }
