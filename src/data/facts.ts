@@ -15,15 +15,26 @@
 // - `requiresCaveat: true` means a page must render the caveat next to the number, not in a footnote.
 // - `data` holds raw numbers for charts; `display` is the headline string a page shows.
 //
-// Extending (economics / idling sweeps): add a new group object below (or in a new
-// facts-<topic>.ts file that exports one), register it in `factGroups` and `topicLabels`,
-// and run `npm run check`. Ids must be unique across all groups.
+// - `chainLink` says which link of the site's chain of evidence the fact serves (1-7, see
+//   types.ts) or null for context outside the chain. Every fact sets it explicitly, except
+//   topics listed in `topicDefaultChainLink` (economics, owned elsewhere). `alsoLinks` lists
+//   further links where the same fact is needed; chain.ts uses both.
+// - `research` points at the research file, e.g. '02 §5' (research/02-*.md) or
+//   'papers/wu-2021-trd#route-C-lower' / 'redlight/idle-emissions#moenv-inspection-2025'
+//   (file#finding). scripts/check-data.mjs checks that each file#finding exists and has
+//   verdict CONFIRMED, CORRECTED or ADDED.
+//
+// Extending: add a new group object below (or in a new facts-<topic>.ts file that exports
+// one), register it in `factGroups` and `topicLabels`, and run `npm run check`. Ids must be
+// unique across all groups. When a fact's meaning changes, give it a new id and delete the old
+// one so stale references fail the type check.
 
-import type { Confidence, Datum, Evidence, L10n, Locale, ResearchRef } from './types.ts';
+import type { ChainLink, Confidence, Datum, Evidence, L10n, Locale, ResearchRef } from './types.ts';
 import { confidenceLabels, evidenceLabels, t, v } from './types.ts';
 import type { SourceId } from './sources.ts';
 import { formatCitation, shortCitation, sourceUrl } from './sources.ts';
 import { economics } from './facts-economics.ts';
+import { inspection, intersection, smell, acute, longterm, vulnerable, levers } from './facts-redlight.ts';
 
 export interface FactInput {
   /** Raw values for charts and calculations. May be empty for qualitative facts (e.g. an IARC group). */
@@ -48,6 +59,10 @@ export interface FactInput {
   /** For evidence 'derived': the facts whose numbers the arithmetic uses. */
   derivedFrom?: string[];
   research: ResearchRef;
+  /** Link of the chain of evidence (1-7) or null for context. Required unless the topic has a default. */
+  chainLink?: ChainLink | null;
+  /** Other links this fact is also needed for. */
+  alsoLinks?: ChainLink[];
 }
 
 // ---------------------------------------------------------------------------
@@ -106,6 +121,7 @@ const fleet = {
       '登記數涵蓋所有領有牌照的機車（含電動機車與大型重型機車），不只速克達。',
       'The count covers all licensed motorcycles (including electric and large heavy motorcycles), not only scooters.',
     ),
+    chainLink: 1,
     research: '01 §1',
   },
   'fleet-electric-registered-2024': {
@@ -121,6 +137,7 @@ const fleet = {
     locator: '「107 年設籍數超過 19 萬輛，113 年已成長至 77 萬輛」',
     confidence: 'verified',
     evidence: 'official-tw',
+    chainLink: 7,
     research: '01 §1',
   },
   'fleet-electric-share-of-stock-2024': {
@@ -136,6 +153,7 @@ const fleet = {
     confidence: 'verified',
     evidence: 'derived',
     derivedFrom: ['fleet-registered-2024', 'fleet-electric-registered-2024'],
+    chainLink: 7,
     research: '01 Corrections #2',
   },
   'fleet-fuel-mix-may-2026': {
@@ -152,6 +170,7 @@ const fleet = {
     confidence: 'secondary',
     evidence: 'official-tw',
     caveat: MEDIA_MOTC,
+    chainLink: 1,
     research: '01 §1',
   },
   'fleet-density-per-100': {
@@ -171,6 +190,7 @@ const fleet = {
       '出自TVBS轉述的交通部統計；我們未取得內政部人口數，無法獨立驗算。',
       'From a TVBS report of an MOTC statistic; we did not obtain the population denominator to check it independently.',
     ),
+    chainLink: 1,
     research: '01 §2',
   },
   'fleet-regional-ranking': {
@@ -191,6 +211,7 @@ const fleet = {
       'The ranking is Seasia Stats as cited by TVBS: unofficial and undated. The 3-point gap to Vietnam is within the uncertainty of mixing registered counts with estimates, so Taiwan cannot be called "the world\'s highest". The 60 differs from MOTC\'s 62.7 because of definition and date.',
     ),
     requiresCaveat: true,
+    chainLink: 1,
     research: '01 §2',
   },
   'fleet-taipei-power-source-2024': {
@@ -210,6 +231,7 @@ const fleet = {
       '數字來自交通部「機車及自用小客車使用狀況調查」，經臺北市主計處轉載，是調查結果而非登記數。',
       'From the MOTC motorcycle and private-car usage survey as relayed by the Taipei City statistics office: a survey result, not a registration count.',
     ),
+    chainLink: 1,
     research: '01 §3',
   },
   'fleet-six-cities-ev-2025': {
@@ -234,6 +256,7 @@ const fleet = {
       '出自工商時報報導，引用機車產業團體（SMAT）整理的公路局資料；未能查核原始數據。',
       'From a Commercial Times report quoting an industry association (SMAT) citing Highway Bureau data; not checked against the original figures.',
     ),
+    chainLink: 7,
     research: '01 §3',
   },
   'scooter-commuting-purpose-2024': {
@@ -257,6 +280,7 @@ const fleet = {
     locator: 'table 「全國 58.4 …臺北市 63.3 …新北市 61.2 …」',
     confidence: 'verified',
     evidence: 'official-tw',
+    chainLink: null,
     research: '01 §9',
   },
   'mode-share-national-2022': {
@@ -276,6 +300,7 @@ const fleet = {
       '出自TVBS轉述的交通部運具調查；我們找不到2024年的全國數字。',
       'From a TVBS report of the MOTC transport-mode survey; we found no 2024 national figure.',
     ),
+    chainLink: null,
     research: '01 §9',
   },
   'mode-share-taipei-2024': {
@@ -298,6 +323,7 @@ const fleet = {
     locator: 'row 「113 年 63.0 38.3 16.0 13.7 24.7 20.8 3.8 37.0 20.1 16.3 44.2…」',
     confidence: 'verified',
     evidence: 'official-tw',
+    chainLink: null,
     research: '01 §9',
   },
 } satisfies Record<string, FactInput>;
@@ -334,6 +360,7 @@ const electric = {
       '出自鉅亨網引述的交通部統計。2015至2018年與2020年的數字未能查證，因此只能說是「現有資料中」的高點。',
       'From an Anue (cnyes) report citing MOTC statistics. Figures for 2015–2018 and 2020 could not be verified, so this is the peak only among the years we have.',
     ),
+    chainLink: 7,
     research: '01 §7',
   },
   'ev-share-2021': {
@@ -358,6 +385,7 @@ const electric = {
       '總銷量與燃油機車銷量出自工商時報報導的Gogoro說明會（企業資料），電動機車數與比例為本站推算。',
       'Total and gasoline sales are from a Commercial Times report of a Gogoro press briefing (company figures); the electric count and share are our calculation.',
     ),
+    chainLink: 7,
     research: '01 §7',
   },
   'ev-share-2022': {
@@ -374,6 +402,7 @@ const electric = {
       '出自公視新聞網引述的產業團體數字；當年的總領牌數未能取得。',
       'From PTS News quoting an industry association figure; the total registrations for that year were not obtained.',
     ),
+    chainLink: 7,
     research: '01 §7',
   },
   'ev-share-2023': {
@@ -390,6 +419,7 @@ const electric = {
     confidence: 'secondary',
     evidence: 'official-tw',
     caveat: REGISTRATIONS_NOTE,
+    chainLink: 7,
     research: '01 §7',
   },
   'ev-share-2024': {
@@ -415,6 +445,7 @@ const electric = {
       'U-CAR報導的比例為10.38%，與TVBS相差0.08個百分點，來自分母定義不同。' + REGISTRATIONS_NOTE['zh-TW'],
       'U-CAR reports 10.38%, 0.08 points lower than TVBS, because of a different denominator. ' + REGISTRATIONS_NOTE.en,
     ),
+    chainLink: 7,
     research: '01 §7',
   },
   'ev-share-2025': {
@@ -439,6 +470,7 @@ const electric = {
       '總領牌數約70.8萬輛是本站由49,128輛與6.94%推算，未見於原始報導。' + REGISTRATIONS_NOTE['zh-TW'],
       'The total of about 708,000 is our back-calculation from 49,128 and 6.94%; it does not appear in the reports. ' + REGISTRATIONS_NOTE.en,
     ),
+    chainLink: 7,
     research: '01 §7',
   },
   'ev-registrations-decline-2019-2025': {
@@ -462,6 +494,7 @@ const electric = {
       '媒體將下滑歸因於2019年後補助減少、Gogoro於2022年取消電池吃到飽方案，以及2025年燃油機車貨物稅減徵等；這些原因未經本站查證。',
       'Media attribute the fall to subsidy cuts after 2019, Gogoro ending its unlimited battery plan in 2022 and the 2025 excise-tax cut on gasoline scooters; we have not verified these causes.',
     ),
+    chainLink: 7,
     research: '01 §7',
   },
   'ev-share-may-2026': {
@@ -485,6 +518,7 @@ const electric = {
       '單月數字，比例由本站計算；2026年其他月份未能查證，不可當作全年數字。',
       'A single month, with the share calculated by us; other 2026 months could not be verified, so do not treat it as an annual figure.',
     ),
+    chainLink: 7,
     research: '01 §7',
   },
   'gas-scooter-excise-cut-2025': {
@@ -503,6 +537,7 @@ const electric = {
       '出自TVBS報導；財政部稅務入口網寫的實施日期是2025年9月7日（至2030年底），另有汰舊換新最高4,000元的減徵（見「價格、補助與使用成本」）。媒體認為這是電動機車銷量疲弱的原因之一，但本站未查證其效果。',
       'From a TVBS report; the MOF tax portal gives the start date as 7 September 2025 (running to the end of 2030) and lists a further scrap-and-replace cut of up to NT$4,000 (see "Prices, subsidies and running costs"). Media cite it as one reason for weak electric sales, which we have not verified.',
     ),
+    chainLink: 7,
     research: '01 §7',
   },
 } satisfies Record<string, FactInput>;
@@ -534,6 +569,7 @@ const policy = {
       '出自公視新聞網對淨零路徑的描述；國家發展委員會原始文件未能開啟。市售比目標不等於禁售燃油機車，我們找不到任何正式的禁售規定。',
       'From PTS News describing the net-zero pathway; the National Development Council original could not be opened. A sales-share target is not a ban on gasoline scooters, and we found no formal ban.',
     ),
+    chainLink: 7,
     research: '01 §8',
   },
   'netzero-2025-gap': {
@@ -558,6 +594,7 @@ const policy = {
       '實際市售比出自媒體轉述的統計，目標出自公視對淨零路徑的描述（國發會原始文件未能開啟）；差距為本站計算。',
       'The actual share comes from media reports of statistics and the target from PTS\'s description of the net-zero pathway (the NDC original could not be opened); the gap is our calculation.',
     ),
+    chainLink: 7,
     research: '01 §8',
   },
   'scooter-emission-standard-phases': {
@@ -580,6 +617,7 @@ const policy = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t('第二、三期的實施日期未見於研究資料。', 'Start dates for Phases 2 and 3 are not in our research notes.'),
+    chainLink: 1,
     research: '01 §8',
   },
   'two-stroke-remaining': {
@@ -599,6 +637,7 @@ const policy = {
     locator: '「107 年已將機車數降至 100 萬輛以下，112 年進一步降至約 33 萬輛以下」「113 年進一步降至約 28 萬輛以下」',
     confidence: 'verified',
     evidence: 'official-tw',
+    chainLink: 1,
     research: '01 §6',
   },
   'old-scooters-retired-2020-2023': {
@@ -623,6 +662,8 @@ const policy = {
       '「老舊機車」指2007年6月30日以前出廠的機車；2024年以後的淘汰成果未能查證。',
       '"Old" means built before 30 June 2007. Retirement results after 2023 could not be verified.',
     ),
+    chainLink: 1,
+    alsoLinks: [7],
     research: '01 §6',
   },
   'old-scooters-remaining-2023': {
@@ -642,6 +683,7 @@ const policy = {
       '本站以2019年存量減去累計淘汰數推算，非官方數字，也未扣除其他原因的報廢。',
       'Our subtraction of cumulative retirements from the 2019 stock: not an official figure, and it ignores scrapping for other reasons.',
     ),
+    chainLink: 1,
     research: '01 §6',
   },
   'scrappage-subsidy-scope': {
@@ -658,6 +700,7 @@ const policy = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t('目前（2024年以後）的補助狀況未能查證。', 'The current (post-2023) subsidy status could not be verified.'),
+    chainLink: 7,
     research: '01 §6',
   },
 } satisfies Record<string, FactInput>;
@@ -684,6 +727,7 @@ const emissions = {
       '不同版本的清冊（如TEDS 11.0、12.0）不能直接比較，本站所有排放占比都只用13.0版。',
       'Different editions (e.g. TEDS 11.0, 12.0) are not directly comparable; every emissions share on this site uses TEDS 13.0 only.',
     ),
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-national-totals': {
@@ -705,6 +749,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: TEDS_SCOPE,
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-mc-pm25-share': {
@@ -726,6 +771,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'derived',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-mc-nmhc-share': {
@@ -747,6 +793,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'derived',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-mc-co-share': {
@@ -768,6 +815,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'derived',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-mc-thc-share': {
@@ -789,6 +837,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'derived',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-mc-nox-share': {
@@ -810,6 +859,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'derived',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-mc-pm10-share': {
@@ -831,6 +881,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'derived',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-mc-gas-vs-particle-contrast': {
@@ -857,6 +908,7 @@ const emissions = {
       'This compares each pollutant\'s share of its own national total; it is not a comparison of toxicity or tonnage. ' + TEDS_SCOPE.en,
     ),
     requiresCaveat: true,
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-four-stroke-dominates': {
@@ -877,6 +929,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: TEDS_SCOPE,
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-electric-mc-pm25': {
@@ -893,6 +946,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: TEDS_SCOPE,
+    chainLink: 7,
     research: '01 §4',
   },
   'teds13-road-vehicles-share': {
@@ -915,6 +969,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: TEDS_SCOPE,
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-road-vs-power': {
@@ -939,6 +994,7 @@ const emissions = {
       'Power-sector PM2.5 is combustion (791.0 t) plus unclassified (83.6 t). This compares emissions, not contributions to air concentrations, and MOENV explicitly rejects conflating the two.',
     ),
     requiresCaveat: true,
+    chainLink: 1,
     research: '01 §4, §5',
   },
   'teds13-dust-share': {
@@ -954,6 +1010,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: TEDS_SCOPE,
+    chainLink: 1,
     research: '01 §4',
   },
   'ambient-pm25-origin-2020-plan': {
@@ -976,6 +1033,7 @@ const emissions = {
       '這是使用舊版清冊（TEDS 9.0）的模式結果，年代較久；我們找不到2020年後的全國模式推估。',
       'A model result using an old inventory (TEDS 9.0); we found no national apportionment published after 2020.',
     ),
+    chainLink: 3,
     research: '01 §5',
   },
   'ambient-pm25-domestic-sources-2020-plan': {
@@ -1000,6 +1058,7 @@ const emissions = {
       'The denominator is domestic sources only, not all PM2.5; and it is a model result from an old inventory.',
     ),
     requiresCaveat: true,
+    chainLink: 3,
     research: '01 §5',
   },
   'ambient-pm25-power-share': {
@@ -1015,6 +1074,7 @@ const emissions = {
     locator: '「我國大氣中PM2.5約2.3%來自於電力業，這是指電力業對我國大氣中PM2.5年平均值約為13微克／立方公尺的貢獻比率」',
     confidence: 'verified',
     evidence: 'modelled-tw',
+    chainLink: 3,
     research: '01 §5',
   },
   'ambient-pm25-mobile-share-derived': {
@@ -1035,70 +1095,170 @@ const emissions = {
       'Our calculation, not an MOENV statement. The 18% rests on an older model run (TEDS 9.0) while the 2.3% is a newer statement; dates and methods differ, so treat it only as a rough comparison.',
     ),
     requiresCaveat: true,
+    chainLink: 3,
     research: '01 §5',
   },
   'ef-vehicle-class-ranking-tsai2023': {
     data: { motorcycleVktShare: v(32.6, 'percent'), gasolineCarVktShare: v(42.6, 'percent') },
-    display: t('苯：機車最高', 'benzene: motorcycles highest'),
+    display: t('苯：機車排序最高', 'benzene: motorcycles rank highest'),
     statement: t(
-      '依臺灣車輛排放係數推估，每行駛一公里，機車的PM2.5與氮氧化物排放都低於汽油車與柴油車，但碳氫化合物高於汽油車，苯的排放更是各車種中最高。',
-      'Per kilometre driven, Taiwanese emission-factor estimates put motorcycles below gasoline and diesel vehicles for PM2.5 and nitrogen oxides, but above gasoline cars for hydrocarbons and highest of all vehicle classes for benzene.',
+      '一項臺灣車輛排放的模式推估把每公里排放係數排序：機車的PM2.5與氮氧化物低於汽油車與柴油車，碳氫化合物高於汽油車，苯則排在各車種之首；論文只列出排序，沒有列出數值。',
+      'A modelled inventory of Taiwan\'s road vehicles ranks per-kilometre emission factors: motorcycles below gasoline and diesel vehicles for PM2.5 and nitrogen oxides, above gasoline cars for hydrocarbons, and first among vehicle classes for benzene; the paper prints only the ranking, not the values.',
     ),
-    period: t('2021年車輛行駛里程', '2021 vehicle-kilometres'),
+    period: t('排序未註明年份（研究涵蓋2013–2021年）', 'Year of the ranking not stated (study covers 2013–2021)'),
     place: TW,
     sources: ['tsai-2023-atmosphere'],
-    locator: 'Abstract: PM2.5 diesel > gasoline > motorcycle; NOx diesel > gasoline > motorcycle; HC motorcycle > gasoline; benzene motorcycle > gasoline >= diesel; four-stroke MC 32.6% of VKT (2021)',
+    locator: 'Abstract p.1 and Sec 4 p.18: PM2.5 and NOx diesel > gasoline > motorcycle; HC motorcycle > gasoline; benzene motorcycle > gasoline >= diesel. Fig 1 p.3 has an EF box with no values. VKT shares 42.6% / 32.6% in the abstract, year not stated.',
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '排放係數以模式（MOVES）推估，不是路邊實測。' + ABSTRACT_ONLY['zh-TW'] + '四行程機車占2021年道路車輛行駛里程的32.6%。',
-      'Emission factors are modelled (MOVES), not roadside measurements. ' + ABSTRACT_ONLY.en + ' Four-stroke motorcycles were 32.6% of road vehicle-kilometres in 2021.',
+      '排放係數來自美國模式（MOVES、MOBILE6.2）與底盤動力計資料，不是路邊實測；全文沒有任何每公里數值，因此不能算出機車是汽車的幾倍。這個苯的排序也很難與同一篇論文的年排放總量對上：2021年汽油車的苯總量（545公噸）約是機車（286公噸）的兩倍，論文沒有說明。PM2.5排放係數包含輪胎與煞車磨耗。四行程機車約占道路車輛行駛里程的32.6%（摘要未註明年份）。',
+      'The factors come from US models (MOVES, MOBILE6.2) and dynamometer data, not roadside measurements; the full text has no per-km values, so no motorcycle-to-car ratio can be computed. The benzene ranking is also hard to square with the same paper\'s annual totals: in 2021 gasoline vehicles emitted about twice as much benzene (545 t) as motorcycles (286 t), which the paper does not explain. The PM2.5 factor includes tyre and brake wear. Four-stroke motorcycles were about 32.6% of road vehicle-kilometres (year not stated in the abstract).',
     ),
-    research: '02 §5',
+    requiresCaveat: true,
+    chainLink: 1,
+    research: 'papers/tsai-2023-atmosphere#ef-order-benzene-formaldehyde; papers/tsai-2023-atmosphere#ef-order-hc-pm-nox; papers/tsai-2023-atmosphere#benzene-conclusion-mismatch; papers/tsai-2023-atmosphere#vkt-total-and-shares',
+  },
+  'hc-totals-by-class-tsai2023': {
+    data: {
+      motorcycles2013: v(68000, 'tonnes-per-year'),
+      motorcycles2021: v(37000, 'tonnes-per-year'),
+      gasoline2013: v(23000, 'tonnes-per-year'),
+      gasoline2021: v(39000, 'tonnes-per-year'),
+      diesel2021: v(9211, 'tonnes-per-year'),
+      motorcycleDrop: v(46, 'percent', { approx: true, derived: true, note: '(68,000 − 37,000) / 68,000 = 45.6%' }),
+    },
+    display: t('37,000 對 39,000 公噸', '37,000 t vs 39,000 t'),
+    statement: t(
+      '依一項模式推估的臺灣車輛排放清冊，2021年機車排放約37,000公噸碳氫化合物，略少於汽油小客車與輕型車合計的39,000公噸；機車的排放量自2013年的68,000公噸下降約46%。',
+      'In a modelled inventory of Taiwan\'s road vehicles, motorcycles emitted about 37,000 tonnes of hydrocarbons in 2021, slightly less than gasoline cars and light-duty vehicles combined (39,000 t); motorcycle emissions had fallen about 46% from 68,000 t in 2013.',
+    ),
+    period: t('2013–2021年（四個年度）', '2013–2021 (four years)'),
+    place: TW,
+    sources: ['tsai-2023-atmosphere'],
+    locator: 'Sec 3.1.1 (3) pp.9-10: motorcycles 68,000/48,000/38,000/37,000 t; gasoline 23,000/30,000/40,000/39,000 t; diesel 8,073/9,881/9,438/9,211 t (2013/2016/2019/2021)',
+    confidence: 'verified',
+    evidence: 'modelled-tw',
+    caveat: t(
+      '這是學術研究的模式推估，不是環境部的TEDS清冊，也不是空氣中的濃度。「碳氫化合物」是總碳氫化合物，包含模式推估的油氣蒸發排放。機車只在2013與2016年是最大類別；論文結論寫「多數碳氫化合物來自機車」，與其2019、2021年的數字不符。46%為本站依論文數字計算。',
+      'An academic modelled estimate, not the MOENV TEDS inventory, and not air concentrations. "Hydrocarbons" are total hydrocarbons including modelled evaporative emissions. Motorcycles were the largest class only in 2013 and 2016; the paper\'s conclusion that "most hydrocarbon emissions were from motorcycles" does not match its own 2019 and 2021 figures. The 46% is our arithmetic on the paper\'s totals.',
+    ),
+    requiresCaveat: true,
+    chainLink: 1,
+    research: 'papers/tsai-2023-atmosphere#hc-totals; papers/tsai-2023-atmosphere#conclusion-hc-vs-totals',
+  },
+  'benzene-totals-by-class-tsai2023': {
+    data: {
+      motorcycles2013: v(1048, 'tonnes-per-year'),
+      motorcycles2021: v(286, 'tonnes-per-year'),
+      gasoline2013: v(721, 'tonnes-per-year'),
+      gasoline2021: v(545, 'tonnes-per-year'),
+      diesel2021: v(113, 'tonnes-per-year'),
+      motorcycleDrop: v(73, 'percent', { approx: true, derived: true, note: '(1,048 − 286) / 1,048 = 72.7%' }),
+    },
+    display: t('286 對 545 公噸', '286 t vs 545 t'),
+    statement: t(
+      '依同一項模式推估，2021年機車排放約286公噸苯，汽油小客車與輕型車合計545公噸；機車的苯排放自2013年的1,048公噸下降約73%，作者歸因於二行程機車淘汰與排放標準加嚴。',
+      'In the same modelled inventory, motorcycles emitted about 286 tonnes of benzene in 2021 against 545 t from gasoline cars and light-duty vehicles; motorcycle benzene had fallen about 73% from 1,048 t in 2013, which the authors credit to the retirement of two-stroke machines and tighter standards.',
+    ),
+    period: t('2013–2021年（四個年度）', '2013–2021 (four years)'),
+    place: TW,
+    sources: ['tsai-2023-atmosphere'],
+    locator: 'Sec 3.2.1 (1) pp.12-13: motorcycles 1,048/571/344/286 t; gasoline 721/721/683/545 t; diesel 95/119/115/113 t',
+    confidence: 'verified',
+    evidence: 'modelled-tw',
+    caveat: t(
+      '機車只有在2013年是苯排放最大的類別；2016年起汽油車較多。因此不能說機車是交通苯排放的主要來源。這是模式推估的全國排放量，不是行人吸入的濃度。73%為本站依論文數字計算。',
+      'Motorcycles were the largest benzene class only in 2013; from 2016 gasoline vehicles emitted more. So scooters cannot be called the main source of traffic benzene. This is a modelled national emissions estimate, not what pedestrians breathe. The 73% is our arithmetic on the paper\'s totals.',
+    ),
+    requiresCaveat: true,
+    chainLink: 1,
+    research: 'papers/tsai-2023-atmosphere#benzene-totals; papers/tsai-2023-atmosphere#two-stroke-hc-benzene-decline',
   },
   'ef-older-phase-tsai2018': {
     data: {
       coPhase3VsPhase5: v(156, 'percent'),
       coPhase4VsPhase5: v(48, 'percent'),
       hcPhase3VsPhase5: v(84, 'percent'),
-      hcPhase4VsPhase5: v(9, 'percent'),
+      hcPhase4VsPhase5: v(9, 'percent', { note: 'phase IV vs V not statistically significant (p>0.05)' }),
+      noxPhase3VsPhase5: v(-30, 'percent'),
+      coPhase5: v(84.3, 'g/L-fuel', { sd: 40.9 }),
+      hcPhase5: v(29.4, 'g/L-fuel', { sd: 13.1 }),
     },
-    display: t('一氧化碳 +156%', 'CO +156%'),
+    display: t('一氧化碳 +156%（每公升燃油）', 'CO +156% (per litre of fuel)'),
     statement: t(
-      '實驗室測試顯示，第三期機車的一氧化碳排放比第五期高156%、碳氫化合物高84%；第四期分別高48%與9%。',
-      'In laboratory tests, Phase 3 motorcycles emitted 156% more carbon monoxide and 84% more hydrocarbons than Phase 5 models; Phase 4 models emitted 48% and 9% more.',
+      '臺灣43輛使用中四行程機車的實驗室測試顯示，以每公升燃油計，第三期機車的一氧化碳比第五期高156%、碳氫化合物高84%；第四期的一氧化碳高48%，碳氫化合物與第五期的差異不顯著；氮氧化物反而是舊車較低。',
+      'In laboratory tests of 43 in-use four-stroke motorcycles in Taiwan, Phase 3 machines emitted 156% more carbon monoxide and 84% more hydrocarbons per litre of fuel than Phase 5; Phase 4 emitted 48% more carbon monoxide, and its hydrocarbon difference from Phase 5 was not significant; nitrogen oxides were lower in the older machines.',
     ),
     period: t('2018年發表', 'Published 2018'),
     place: TW,
     sources: ['tsai-2018-aaqr'],
-    locator: 'Abstract: "vs phase V, phases III/IV: CO +156%/+48%, HC +84%/+9%"; phase V CO 84.3 ± 40.9, HC 29.4 ± 13.1 g/L fuel',
+    locator: 'Table 1 p.4 (journal 3059): CO 216/125/84.3, HC 54.0/32.1/29.4, NOx 5.57/6.64/7.96 g/L (III/IV/V); n = 7/16/20; IV vs V HC p>0.05',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '底盤動力計實驗室測試，樣本車輛有限。' + ABSTRACT_ONLY['zh-TW'],
-      'Chassis-dynamometer lab tests on a limited number of vehicles. ' + ABSTRACT_ONLY.en,
+      '數值以每公升燃油計，不是每公里；第三期只有7輛（平均15年、約45,600公里），第五期20輛（平均4年、約12,200公里），期別、車齡與里程互相混雜。底盤動力計測試，不是路上實測，也沒有單獨量測怠速。論文未說明受測車中速克達與打檔車的比例。',
+      'Values are per litre of fuel, not per km; Phase 3 had only 7 machines (mean 15 years, about 45,600 km) and Phase 5 had 20 (mean 4 years, about 12,200 km), so phase, age and mileage are confounded. Chassis-dynamometer tests, not on-road measurements, with no separate idle figure. The paper does not say how many of the machines were scooters.',
     ),
-    research: '02 §5',
+    requiresCaveat: true,
+    chainLink: 1,
+    research: 'papers/tsai-2018-aaqr#table1-co-by-phase; papers/tsai-2018-aaqr#table1-hc-by-phase; papers/tsai-2018-aaqr#table1-nox-co2; papers/tsai-2018-aaqr#design-fleet',
   },
   'ef-mileage-voc-tsai2018': {
     data: {
-      vocLowMileage: v(25.2, 'g/L-fuel', { note: 'at 5,231 km' }),
-      vocHighMileage: v(47.1, 'g/L-fuel', { note: 'at 47,617 km' }),
+      vocLowMileage: v(25.2, 'g/L-fuel', { sd: 8.0, note: 'at 5,231 km; abstract and Fig. 4; body text prints 19.1 ± 9.7' }),
+      vocHighMileage: v(47.1, 'g/L-fuel', { sd: 19.8, note: 'at 47,617 km; only the >40,000 km group differs significantly' }),
       aromaticsLow: v(38, 'percent'),
       aromaticsHigh: v(48, 'percent'),
     },
     display: t('25.2 → 47.1 克／公升', '25.2 → 47.1 g/L'),
     statement: t(
-      '同一研究中，機車的揮發性有機物排放係數從里程5,231公里時的每公升燃油25.2克增加到47,617公里時的47.1克；芳香烴占揮發性有機物的38%至48%，苯是主要成分之一。',
-      'In the same study, motorcycle VOC emissions rose from 25.2 g per litre of fuel at 5,231 km to 47.1 g at 47,617 km; aromatics made up 38–48% of the VOCs, with benzene among the main species.',
+      '同一研究中，揮發性有機物排放從低里程（約5,231公里）的每公升燃油25.2克，增加到最高里程組（約47,617公里）的47.1克，但只有4萬公里以上的組別與低里程組差異顯著；芳香烴（苯、甲苯、二甲苯等）占揮發性有機物重量的38%至48%。',
+      'In the same study, VOC emissions rose from 25.2 g per litre of fuel at low mileage (about 5,231 km) to 47.1 g in the highest-mileage group (about 47,617 km), but only the group above 40,000 km differed significantly from the lowest; aromatics (benzene, toluene, xylenes and others) made up 38–48% of the VOC mass.',
     ),
     period: t('2018年發表', 'Published 2018'),
     place: TW,
     sources: ['tsai-2018-aaqr'],
+    locator: 'Abstract; Fig. 4 p.7; text p.3061-3063; group composition text p.3061',
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: ABSTRACT_ONLY,
-    research: '02 §5',
+    caveat: t(
+      '論文內部數字不一致：摘要與圖4的低里程值為25.2，內文為19.1；本站採用與圖相符的25.2。4萬公里以下的上升並不顯著，且中間有一組反而較低。數值以每公升燃油計。百分比只涵蓋分析的67種物種，論文沒有列出苯的排放係數。',
+      'The paper is internally inconsistent: the abstract and Fig. 4 give 25.2 at low mileage, the text 19.1; we use 25.2, which matches the figure. The rise below 40,000 km was not significant, and one mid-mileage group was lower. Values are per litre of fuel. Percentages cover only the 67 species analysed, and the paper prints no benzene emission factor.',
+    ),
+    requiresCaveat: true,
+    chainLink: 1,
+    alsoLinks: [4],
+    research: 'papers/tsai-2018-aaqr#voc-total-vs-mileage; papers/tsai-2018-aaqr#voc-group-composition; papers/tsai-2018-aaqr#dominant-species',
+  },
+  'ef-mileage-co-tsai2018': {
+    data: {
+      coLow: v(61, 'g/L-fuel', { sd: 30, note: 'at 5,231 ± 4,353 km' }),
+      coHigh: v(203, 'g/L-fuel', { sd: 75, note: 'at 47,617 ± 8,568 km' }),
+      coFold: v(3.3, 'ratio'),
+      hcLow: v(27, 'g/L-fuel', { sd: 11 }),
+      hcHigh: v(47, 'g/L-fuel', { sd: 19 }),
+      noxLow: v(9.1, 'g/L-fuel', { sd: 2.5 }),
+      noxHigh: v(5.4, 'g/L-fuel', { sd: 1.2 }),
+    },
+    display: t('一氧化碳約 3.3 倍', 'CO about 3.3-fold'),
+    statement: t(
+      '同一研究比較最低與最高里程組，每公升燃油的一氧化碳從61克增加到203克（約3.3倍），碳氫化合物從27克增加到47克（3萬公里以上才顯著），氮氧化物則從9.1克降到5.4克。',
+      'Comparing the lowest- and highest-mileage groups in the same study, carbon monoxide rose from 61 to 203 g per litre of fuel (about 3.3-fold) and hydrocarbons from 27 to 47 g (significant only above 30,000 km), while nitrogen oxides fell from 9.1 to 5.4 g.',
+    ),
+    period: t('2018年發表', 'Published 2018'),
+    place: TW,
+    sources: ['tsai-2018-aaqr'],
+    locator: 'Text PDF p.5 (journal 3060); Fig. 3(a)-(c) PDF p.6',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '這是不同機車之間的橫斷面比較，不是同一輛車追蹤多年；里程、車齡與期別混雜。各組平均並非逐步上升，有一組中里程反而較低。數值以每公升燃油計，不是每公里。',
+      'A cross-sectional comparison of different machines, not the same vehicles tracked over time; mileage, age and phase are confounded. Group means do not rise steadily; one mid-mileage group was lower. Values are per litre of fuel, not per km.',
+    ),
+    requiresCaveat: true,
+    chainLink: 1,
+    research: 'papers/tsai-2018-aaqr#mileage-co; papers/tsai-2018-aaqr#mileage-hc; papers/tsai-2018-aaqr#mileage-nox; papers/tsai-2018-aaqr#fig3-group-means-nonmonotonic',
   },
   'ef-pah-mileage-lin2019': {
     data: {
@@ -1118,23 +1278,110 @@ const emissions = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t('只測試10輛機車。' + ABSTRACT_ONLY['zh-TW'], 'Only ten motorcycles were tested. ' + ABSTRACT_ONLY.en),
+    chainLink: 1,
     research: '02 §5',
   },
   'tunnel-motorcycles-co-ting2023': {
-    data: {},
-    display: t('機車影響一氧化碳', 'motorcycles drive CO'),
+    data: {
+      coVsMotorcycleFlow: v(0.96, 'ratio', { note: 'correlation coefficient r, p<0.01' }),
+      weekdayMotorcycleShare: v(51.8, 'percent'),
+      weekendMotorcycleShare: v(43.1, 'percent'),
+      rushHourMotorcycleShare: v(61.3, 'percent', { approx: true }),
+    },
+    display: t('一氧化碳與機車流量 r = 0.96', 'CO vs motorcycle flow r = 0.96'),
     statement: t(
-      '臺北市區隧道實測發現，大型柴油車主導PM2.5與黑碳濃度，而小客車與機車主要影響一氧化碳與二氧化碳；研究者認為一氧化碳排放係數偏高可能與機車比例增加有關。',
-      'Measurements in a Taipei road tunnel found heavy diesel vehicles dominated PM2.5 and black carbon, while cars and motorcycles drove carbon monoxide and CO₂; the authors suggest the higher-than-previously-reported CO emission factor is likely due to a larger share of motorcycles.',
+      '臺北自強隧道的實測中，平日約有一半車輛是機車（51.8%），隧道內的一氧化碳濃度隨機車流量起伏（相關係數0.96）；同一隧道的PM2.5與黑碳則主要隨大型車流量變化。',
+      'In measurements in Taipei\'s Ziqiang Tunnel, about half the weekday traffic was motorcycles (51.8%), and carbon monoxide rose and fell with motorcycle flow (correlation 0.96); PM2.5 and black carbon in the same tunnel tracked heavy-duty vehicles instead.',
     ),
-    period: t('2023年發表', 'Published 2023'),
-    place: TAIPEI,
+    period: t('2020年3月14–23日', '14–23 March 2020'),
+    place: t('臺北市自強隧道（819公尺）', 'Ziqiang Tunnel, Taipei (819 m)'),
     sources: ['ting-2023-envres'],
-    locator: 'Abstract: "HDVs dominated PM2.5 and eBC concentrations, while LDVs and MCs influenced CO and CO2 levels..."',
+    locator: 'Sec 3.1.1 p.4 (fleet shares); Sec 3.1.3 p.5 (MC vs CO r = 0.96; LDV vs CO2 r = 0.95); Sec 3.1.2 and 3.1.4 (PM2.5 and eBC with HDV)',
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('具體排放係數數值未見於摘要。' + ABSTRACT_ONLY['zh-TW'], 'Numeric emission factors are not in the abstract. ' + ABSTRACT_ONLY.en),
-    research: '02 §5',
+    caveat: t(
+      '相關不等於因果，機車與汽車的流量本身也互相連動；一氧化碳由自製低價感測器量測，正文未說明校正。這是隧道內的行車狀態，不是路口怠速或行人位置，也沒有區分電動、二行程或四行程機車。',
+      'Correlation is not causation, and motorcycle and car flows move together; CO came from custom low-cost sensors whose calibration the main text does not describe. This is steady tunnel driving, not idling at a junction or where pedestrians stand, and electric, two-stroke and four-stroke motorcycles are not separated.',
+    ),
+    chainLink: 1,
+    research: 'papers/ting-2023-envres#co-mc-correlation; papers/ting-2023-envres#fleet-composition-weekday; papers/ting-2023-envres#rush-hour-mc-share; papers/ting-2023-envres#pm25-hdv-correlation',
+  },
+  'tunnel-co-by-vehicle-class-ting2023': {
+    data: {
+      motorcyclePerFuel: v(0.209, 'kg/kg-fuel', { note: '± 0.018 as printed; ± undefined' }),
+      carPerFuel: v(0.022, 'kg/kg-fuel', { note: '± 0.019' }),
+      heavyPerFuel: v(0.014, 'kg/kg-fuel', { note: '± 0.127, indistinguishable from zero' }),
+      motorcyclePerKm: v(4.33, 'g/km', { note: '± 0.42' }),
+      carPerKm: v(2.06, 'g/km', { note: '± 0.47' }),
+      heavyPerKm: v(1.23, 'g/km', { note: '± 4.31' }),
+      perFuelRatio: v(9.5, 'ratio', { approx: true, derived: true, note: '0.209 / 0.022' }),
+      perKmRatio: v(2.1, 'ratio', { approx: true, derived: true, note: '4.33 / 2.06' }),
+    },
+    display: t('每公里約 2 倍、每公斤燃料約 10 倍', 'about 2× per km, about 10× per kg of fuel'),
+    statement: t(
+      '以同一隧道的迴歸估計，機車每燃燒一公斤燃料排放0.209公斤一氧化碳，小客車為0.022公斤；以每公里計則是4.33克對2.06克，約為兩倍。',
+      'Regression estimates from the same tunnel put motorcycle carbon monoxide at 0.209 kg per kg of fuel against 0.022 kg for cars; per kilometre it was 4.33 g against 2.06 g, about twice as much.',
+    ),
+    period: t('2020年3月14–23日', '14–23 March 2020'),
+    place: t('臺北市自強隧道', 'Ziqiang Tunnel, Taipei'),
+    sources: ['ting-2023-envres'],
+    locator: 'Table 3 (FCEF) and Table 4 (VKEF), Ziqiang CO rows, p.7',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '各車種數值是由車流比例迴歸推得，論文未說明「±」是標準差還是標準誤；小客車每公斤燃料的不確定範圍接近其數值本身，因此「約10倍」很不精確，倍數為本站計算。機車假設全部燒汽油，油耗採用2018年新車規格。同一表中較早的臺灣路上實測機車一氧化碳為每公里7.65克。',
+      'Vehicle-class values come from a regression on fleet shares, and the paper does not say whether "±" is a standard deviation or error; the car per-fuel uncertainty is nearly as large as the value, so "about 10 times" is imprecise, and the ratios are our arithmetic. All motorcycles were assumed gasoline, with fuel economy from 2018 new-vehicle specifications. An older Taiwanese on-road value in the same table is 7.65 g/km for motorcycle CO.',
+    ),
+    requiresCaveat: true,
+    chainLink: 1,
+    research: 'papers/ting-2023-envres#mc-ldv-hdv-co-fcef; papers/ting-2023-envres#mc-ldv-hdv-co-vkef; papers/ting-2023-envres#uncertainty-undefined',
+  },
+  'tunnel-particles-heavy-vehicles-ting2023': {
+    data: {
+      motorcyclePm25: v(0.46, 'mg/km', { note: '± 31.20, indistinguishable from zero' }),
+      carPm25: v(5.81, 'mg/km', { note: '± 12.30' }),
+      heavyPm25: v(32.09, 'mg/km', { note: '± 292.28' }),
+      motorcycleBc: v(0.16, 'mg/km', { note: '± 0.37' }),
+      heavyBc: v(13.05, 'mg/km', { note: '± 3.00' }),
+      pm25VsHeavyFlow: v(0.78, 'ratio', { note: 'r for the exit-minus-entrance PM2.5 increment vs HDV flow, p<0.01' }),
+    },
+    display: t('機車的微粒排放最低', 'motorcycles lowest for particles'),
+    statement: t(
+      '在同一隧道，機車每公里的PM2.5與黑碳排放估計是三類車輛中最低的，而且與零無法區分；PM2.5的增量主要與大型車流量相關（相關係數0.78）。這項研究不支持「燃油機車是主要微粒來源」。',
+      'In the same tunnel, motorcycles had the lowest per-kilometre PM2.5 and black-carbon estimates of the three vehicle classes, indistinguishable from zero; the PM2.5 increment tracked heavy-vehicle flow (correlation 0.78). This study does not support calling gasoline scooters a major particle source.',
+    ),
+    period: t('2020年3月14–23日', '14–23 March 2020'),
+    place: t('臺北市自強隧道', 'Ziqiang Tunnel, Taipei'),
+    sources: ['ting-2023-envres'],
+    locator: 'Table 4 p.7 (VKEF eBC and PM2.5 by class); Sec 3.1.2 p.4-5 (r = 0.78)',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '機車PM2.5估計的不確定範圍約為數值的70倍。「大型車」計數未區分輕型貨車，研究者推測其中約七成可能是輕型貨車。隧道排放係數也可能包含輪胎、煞車磨耗與揚塵。',
+      'The motorcycle PM2.5 uncertainty is about 70 times the estimate. The "heavy-duty" count did not separate light trucks, which the authors think may be about 70% of it. Tunnel factors may also include tyre, brake and road-dust particles.',
+    ),
+    chainLink: 1,
+    research: 'papers/ting-2023-envres#mc-pm-ebc-low; papers/ting-2023-envres#pm25-hdv-correlation; papers/ting-2023-envres#hdv-ratios; papers/ting-2023-envres#nonexhaust-note',
+  },
+  'tunnel-fresh-particles-op-ting2023': {
+    data: {},
+    display: t('新鮮微粒每微克氧化潛勢較低', 'fresh particles less potent per microgram'),
+    statement: t(
+      '同一研究以實驗室試劑（DTT）量測微粒的「氧化潛勢」：隧道出口新排放的微粒，每微克的氧化潛勢一般低於入口處較老化的空氣微粒；出口每立方公尺空氣的氧化潛勢較高，是因為微粒較多。',
+      'The same study measured the particles\' "oxidative potential" with a laboratory assay (DTT): per microgram, freshly emitted particles at the tunnel exit were generally less potent than the aged particles at the entrance; per cubic metre of air the exit was higher because there were more particles.',
+    ),
+    period: t('2020年3月14–23日', '14–23 March 2020'),
+    place: t('臺北市自強隧道', 'Ziqiang Tunnel, Taipei'),
+    sources: ['ting-2023-envres'],
+    locator: 'Sec 3.3 p.8; Fig. 5; Table 5 (OPv 0.15-0.46 nmol/min/m3)',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '氧化潛勢是實驗室替代指標，不是健康結果；作者對原因只是假設，沒有量測微粒成分，也沒有統計檢定。這項結果削弱「新鮮廢氣微粒每單位特別毒」的說法。',
+      'Oxidative potential is a laboratory proxy, not a health outcome; the authors\' explanation is a hypothesis with no composition data and no statistical test. It weakens any claim that fresh exhaust particles are especially toxic per unit mass.',
+    ),
+    chainLink: 4,
+    research: 'papers/ting-2023-envres#fresh-less-toxic; papers/ting-2023-envres#opv-range; papers/ting-2023-envres#op-meaning',
   },
   'downtown-taipei-vehicle-share-tsai2021': {
     data: {
@@ -1156,6 +1403,7 @@ const emissions = {
       '指所有車輛，並非只有機車；為模式（CMAQ）敏感度分析結果。' + ABSTRACT_ONLY['zh-TW'],
       'Refers to all vehicles, not scooters alone, and is a model (CMAQ) sensitivity result. ' + ABSTRACT_ONLY.en,
     ),
+    chainLink: 3,
     research: '02 §4',
   },
   'traffic-mix-new-taipei-tsai2024': {
@@ -1172,6 +1420,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t('相關性分析，清冊可能低估只是研究者的推論。' + ABSTRACT_ONLY['zh-TW'], 'Correlational; the possible underestimate is the authors\' inference. ' + ABSTRACT_ONLY.en),
+    chainLink: 2,
     research: '02 §4',
   },
   'ev-vs-gasoline-ef-hsieh2018': {
@@ -1197,6 +1446,7 @@ const emissions = {
       '研討會論文的模式推估，電動機車的排放算在發電廠（隨電力結構改變），並非街道上的排放；摘要未提供一氧化碳數字。',
       'A conference-paper model; electric-scooter emissions are counted at power plants (and change with the grid mix), not on the street. Tailpipe CO is not in the abstract.',
     ),
+    chainLink: 7,
     research: '02 §7',
   },
 } satisfies Record<string, FactInput>;
@@ -1225,6 +1475,7 @@ const exposure = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: IOT_CAVEAT,
+    chainLink: 3,
     research: '02 §1a',
   },
   'iot-scramble-typical-range': {
@@ -1245,6 +1496,7 @@ const exposure = {
       'This range excludes the outlier Day 2. At the Taipei and New Taipei intersections the reductions were smaller (about 4–10%), some simulated days showed increases, and modelled carbon monoxide often rose. ' + IOT_CAVEAT.en,
     ),
     requiresCaveat: true,
+    chainLink: 3,
     research: '02 §1a, Corrections #1',
   },
   'iot-scramble-outlier-day': {
@@ -1265,6 +1517,7 @@ const exposure = {
       'A modelled value, not a measurement; it compares scenarios with and without an exclusive phase at the waiting area and is not scooter-specific. The no-phase baseline that day was anomalously high, and the report does not explain why. Days 3 and 4 at the same site failed the model-performance check. Never write "scramble crossings cut exposure by 94%".',
     ),
     requiresCaveat: true,
+    chainLink: 3,
     research: '02 §1a, Corrections #1',
   },
   'iot-scramble-co-rise': {
@@ -1281,6 +1534,7 @@ const exposure = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: IOT_CAVEAT,
+    chainLink: 3,
     research: '02 §1a',
   },
   'iot-sidewalk-widening': {
@@ -1300,6 +1554,7 @@ const exposure = {
       '報告結論仍認為拓寬0.5公尺是各類路口中較佳的措施。' + IOT_CAVEAT['zh-TW'],
       'The report\'s conclusion still rates 0.5 m widening as the better measure across intersection types. ' + IOT_CAVEAT.en,
     ),
+    chainLink: 3,
     research: '02 §1a',
   },
   'iot-setback-measured': {
@@ -1320,6 +1575,7 @@ const exposure = {
       'The report also notes that at another pedestrian-setback site PM2.5 was "slightly higher" after the setback, and that field data were quite unstable around phase changes.',
     ),
     requiresCaveat: true,
+    chainLink: 3,
     research: '02 §1a',
   },
   'iot-summer-background-2024': {
@@ -1344,6 +1600,7 @@ const exposure = {
       '夏季濃度本來就低；感測器只量PM2.5與一氧化碳，沒有量測碳氫化合物或苯。',
       'Summer concentrations are low to begin with; the sensors measured only PM2.5 and CO, not hydrocarbons or benzene.',
     ),
+    chainLink: 3,
     research: '02 §1a',
   },
   'iot-exhaust-height-assumption': {
@@ -1359,134 +1616,343 @@ const exposure = {
     locator: '「高度參考汽車、機車排氣管的離地高度設定為 0.5m」',
     confidence: 'verified',
     evidence: 'modelled-tw',
+    chainLink: 2,
     research: '02 §1a, §6',
   },
   'commute-walking-wang2021': {
     data: {
-      walking: v(40, 'ug/m3', { low: 10, high: 275, note: 'median (range)' }),
-      bus: v(35, 'ug/m3', { low: 13, high: 65 }),
-      car: v(15, 'ug/m3', { low: 8, high: 80 }),
+      walking: v(40, 'ug/m3', { low: 10, high: 275, note: 'median (range), n = 216 readings' }),
+      bus: v(35, 'ug/m3', { low: 13, high: 65, note: 'n = 38, AC on' }),
+      car: v(15, 'ug/m3', { low: 8, high: 80, note: 'n = 111, 5 trips, AC, windows closed' }),
+      stationMedian: v(14, 'ug/m3', { low: 2, high: 38, note: 'government stations during the study' }),
     },
     display: t('步行 40 µg/m³', 'walking 40 µg/m³'),
     statement: t(
-      '一項大臺北通勤實測發現，沿街步行時的PM2.5暴露（中位數40 µg/m³）高於搭公車（35 µg/m³）與搭汽車（15 µg/m³）。',
-      'A Taipei-area commuting study found median PM2.5 exposure was higher when walking along streets (40 µg/m³) than riding buses (35 µg/m³) or cars (15 µg/m³).',
+      '一項大臺北研究由五位志願者攜帶手持式低價感測器量測，沿街步行時PM2.5的中位數為40 µg/m³（216筆讀數），高於開冷氣的公車（35）與關窗開冷氣的汽車（15）；同期政府測站的中位數為14。',
+      'In a Taipei-area study in which five volunteers carried a hand-held low-cost sensor, median PM2.5 while walking along streets was 40 µg/m³ (216 readings), above air-conditioned buses (35) and closed, air-conditioned cars (15); government stations read a median of 14 in the same period.',
     ),
-    period: t('2021年發表', 'Published 2021'),
+    period: t('2019年4–7月（北臺灣PM2.5最低的季節）', 'April–July 2019 (the lowest-PM2.5 season in northern Taiwan)'),
     place: TAIPEI_METRO,
     sources: ['wang-2021-atmosphere'],
-    locator: 'Abstract: "walking along the streets (40 (10-275) ug/m3) compared to riding the buses (35 (13-65) ug/m3) and the cars (15 (8-80) ug/m3)"',
+    locator: 'Results p.5, p.8-9; Fig. 8 p.10; station values p.4',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '志願者人數不多，使用攜帶式低價感測器；步行的數值也包含烹飪、焚香等非交通來源。' + ABSTRACT_ONLY['zh-TW'],
-      'A small volunteer sample using portable low-cost monitors; the walking value also includes non-traffic sources such as cooking and incense. ' + ABSTRACT_ONLY.en,
+      '感測器未經校正，作者依廠商測試推論讀數約偏高30%，但所有結果都未調整。步行與公車的差距不大；讀數是同一趟路線上的重複量測，不是獨立樣本。步行的數值包含所有來源，論文沒有把交通與其他來源分開。',
+      'The sensor was not calibrated; by the authors\' reasoning from a manufacturer test it reads about 30% high, but no result was adjusted. The walking-bus gap is small, and readings are repeated within trips, not independent samples. The walking value includes every source; the paper does not separate traffic from others.',
     ),
-    research: '02 §3a',
+    requiresCaveat: true,
+    chainLink: 3,
+    research: 'papers/wang-2021-atmosphere#walking-street-stats; papers/wang-2021-atmosphere#bus-stats; papers/wang-2021-atmosphere#car-stats; papers/wang-2021-atmosphere#ambient-station-range',
   },
-  'commute-motorcycle-wang2021': {
-    data: { motorcycle: v(75, 'ug/m3', { low: 60, high: 105, note: 'median (range); p<0.0001 vs walking' }) },
-    display: t('騎機車 75 µg/m³', 'riding 75 µg/m³'),
+  'idle-motorcycle-pm25-wang2021': {
+    data: {
+      motorcycleIdle: v(75, 'ug/m3', { low: 60, high: 105, note: 'median (range); 21 readings from 3 trips; p = 0.0011 vs walking (Results text; abstract says p<0.0001)' }),
+      walking: v(40, 'ug/m3'),
+    },
+    display: t('停等時 75 µg/m³（3趟）', '75 µg/m³ while stopped (3 trips)'),
     statement: t(
-      '同一研究中，騎機車時的PM2.5暴露中位數為75 µg/m³，明顯高於步行。',
-      'In the same study, median PM2.5 exposure while riding a motorcycle was 75 µg/m³, significantly higher than walking.',
+      '同一研究只在機車停止時（例如等紅燈）量測騎士的PM2.5，三趟共21筆讀數的中位數為75 µg/m³，約為步行中位數的兩倍；這是騎士停等時的數值，不是行進中，也不是行人。',
+      'The same study measured riders\' PM2.5 only while the motorcycle was stopped (for example at red lights): the median of 21 readings over three trips was 75 µg/m³, about twice the walking median; these are riders at a stop, not riding in motion, and not pedestrians.',
     ),
-    period: t('2021年發表', 'Published 2021'),
+    period: t('2019年4–7月', 'April–July 2019'),
     place: TAIPEI_METRO,
     sources: ['wang-2021-atmosphere'],
-    locator: 'Abstract: "Riding motorcycle also was associated with high PM2.5 exposure (75 (60-105 ug/m3), p < 0.0001 vs. walking)"',
+    locator: 'Methods 2.4 p.4 (idle only); Results p.8; Discussion p.11',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '這是騎士本身的暴露，不是行人；機車的數值範圍窄，樣本可能很少。不可與另一研究的53.6合併成「50至75」。',
-      'This is riders\' own exposure, not pedestrians\'; the narrow range suggests a small sample. Do not merge it with another study\'s 53.6 into "50–75".',
+      '只有三趟、21筆讀數，且同一趟內的讀數並不獨立；論文沒有說明機車是否燒汽油。感測器約偏高30%（未調整）。作者推測行進中的暴露「可能」較低，但沒有量測。不可與另一研究的53.6合併成「50至75」。',
+      'Only three trips and 21 readings, not independent within a trip; the paper does not say whether the motorcycle was gasoline. The sensor reads about 30% high (unadjusted). The authors think exposure while moving is "probably" lower but did not measure it. Do not merge with another study\'s 53.6 into "50–75".',
     ),
-    research: '02 §3a',
+    requiresCaveat: true,
+    chainLink: 3,
+    research: 'papers/wang-2021-atmosphere#motorcycle-stats; papers/wang-2021-atmosphere#motorcycle-idle-only; papers/wang-2021-atmosphere#added-fuel-silence',
   },
   'commute-mrt-underground-wang2021': {
     data: {
-      undergroundStation: v(80, 'ug/m3', { low: 30, high: 210 }),
-      undergroundCar: v(80, 'ug/m3', { low: 55, high: 185 }),
+      undergroundStation: v(75, 'ug/m3', { low: 30, high: 210, note: 'Results text; abstract says 80' }),
+      undergroundCar: v(80, 'ug/m3', { low: 53, high: 185, note: 'Results text; abstract range 55-185' }),
       elevatedStation: v(33, 'ug/m3', { low: 15, high: 35 }),
-      elevatedCar: v(28, 'ug/m3', { low: 13, high: 68 }),
+      elevatedCar: v(20, 'ug/m3', { low: 13, high: 68, note: 'Results text; abstract says 28' }),
     },
-    display: t('地下捷運 80 µg/m³', 'underground MRT 80 µg/m³'),
+    display: t('地下捷運 75～80 µg/m³', 'underground MRT 75–80 µg/m³'),
     statement: t(
-      '同一研究中，地下段捷運車站與車廂的PM2.5中位數也達80 µg/m³，高架段則為28至33 µg/m³：高暴露不只出現在街道上。',
-      'In the same study, underground MRT stations and carriages also had median PM2.5 of 80 µg/m³, against 28–33 µg/m³ on elevated sections: high exposure is not confined to the street.',
+      '同一研究中，地下段捷運車站與車廂的PM2.5中位數為75至80 µg/m³，與機車停等時相近；高架段則只有20至33：高暴露不只出現在街道上，地下段的微粒來自輪軌磨耗與通風不良，不是排氣管。',
+      'In the same study, underground MRT stations and carriages had median PM2.5 of 75–80 µg/m³, similar to motorcycles at a stop, against 20–33 on elevated sections: high exposure is not confined to the street, and the authors attribute underground particles to rail wear and poor ventilation, not tailpipes.',
     ),
-    period: t('2021年發表', 'Published 2021'),
+    period: t('2019年4–7月', 'April–July 2019'),
     place: TAIPEI_METRO,
     sources: ['wang-2021-atmosphere'],
+    locator: 'Results p.6 and p.8; Discussion p.10, p.12',
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('地下捷運的微粒來源與街道交通不同。' + ABSTRACT_ONLY['zh-TW'], 'Underground MRT particles come from different sources than street traffic. ' + ABSTRACT_ONLY.en),
-    research: '02 §3a',
+    caveat: t(
+      '摘要與內文的數字不一致（車站80對75、高架車廂28對20），本站採用內文。捷運是電動軌道運輸，這項結果與電動機車無關，不能用來支持或反對電動機車。',
+      'The abstract and Results disagree (stations 80 vs 75; elevated carriages 28 vs 20); we use the Results text. The MRT is electric rail; this result says nothing for or against electric scooters.',
+    ),
+    chainLink: 3,
+    research: 'papers/wang-2021-atmosphere#underground-mrt-stats; papers/wang-2021-atmosphere#elevated-mrt-stats; papers/wang-2021-atmosphere#mrt-ventilation-explanation',
+  },
+  'street-vs-station-wang2021': {
+    data: {
+      pairs: v(24, 'count'),
+      slope: v(0.958, 'ratio'),
+      intercept: v(23.353, 'ug/m3'),
+      rSquared: v(0.275, 'ratio'),
+    },
+    display: t('R² = 0.275', 'R² = 0.275'),
+    statement: t(
+      '同一研究在測站附近同時量測24次，街道上的讀數高於測站，但兩者的關係很弱（R² = 0.275）：測站數值無法準確代表行人在街上吸入的空氣。',
+      'In 24 simultaneous measurements near monitoring stations, the same study found street readings above station values, but only weakly related to them (R² = 0.275): station values cannot stand in for what a person on the street breathes.',
+    ),
+    period: t('2019年4–7月', 'April–July 2019'),
+    place: TAIPEI_METRO,
+    sources: ['wang-2021-atmosphere'],
+    locator: 'Fig. 2 p.5: S = 0.958 M + 23.353, R2 = 0.275, p = 0.006, 24 pairs, five stations',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '作者把差距歸因於測站高度、儀器原理不同與感測器偏高，並沒有量化交通的貢獻；同一研究的室內讀數也常高於測站，因此街道與測站的差距不全是交通造成。',
+      'The authors attribute the gap to station height, different instruments and sensor bias, without quantifying traffic; indoor readings in the same study were often above station values too, so the street-station gap is not all traffic.',
+    ),
+    chainLink: 3,
+    research: 'papers/wang-2021-atmosphere#street-vs-station-regression; papers/wang-2021-atmosphere#added-indoor-baseline',
+  },
+  'walking-peaks-incense-wang2021': {
+    data: {
+      temple: v(588, 'ug/m3', { sd: 271, note: 'mean ± SD near a temple' }),
+      foodCourt: v(405, 'ug/m3', { sd: 238, note: 'underground night-market food court' }),
+      walkingMax: v(275, 'ug/m3', { note: 'sidewalk maximum; source not stated' }),
+    },
+    display: t('最高值來自焚香與烹飪', 'highest peaks: incense and cooking'),
+    statement: t(
+      '同一研究中，有標明來源的最高讀數來自廟宇焚香（平均588 µg/m³）與地下美食街烹飪（405），不是交通；人行道最高的275則沒有說明來源。',
+      'In the same study, the highest readings with a named source came from temple incense (mean 588 µg/m³) and cooking in an underground food court (405), not traffic; the sidewalk maximum of 275 has no stated source.',
+    ),
+    period: t('2019年4–7月', 'April–July 2019'),
+    place: TAIPEI_METRO,
+    sources: ['wang-2021-atmosphere'],
+    locator: 'Section 3 p.6; Table 3; Discussion p.11; Fig. 8 outliers',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '這些數值與機車無關，因此不可把街上的極端高值歸因於機車，也不可把275歸因於廟宇或交通。',
+      'None of these is scooter-related, so extreme street peaks must not be attributed to scooters, and the 275 must not be attributed to temples or traffic.',
+    ),
+    chainLink: 3,
+    research: 'papers/wang-2021-atmosphere#walking-peak-temple-nightmarket; papers/wang-2021-atmosphere#walking-peak-275-unattributed',
   },
   'commute-scooter-vs-subway-chuang2020': {
     data: {
-      scooter: v(53.6, 'ug/m3', { sd: 26.1, note: 'mean ± SD' }),
-      subway: v(21.7, 'ug/m3', { sd: 5.8 }),
+      scooter: v(53.6, 'ug/m3', { sd: 26.1, low: 22.8, high: 92.3, note: 'mean ± SD (range); gasoline scooter riders' }),
+      walking: v(42.7, 'ug/m3', { sd: 22.6, low: 19.2, high: 78.2 }),
+      walkingMask: v(43.1, 'ug/m3', { sd: 20.7, low: 18.7, high: 81.4, note: 'monitor outside the mask' }),
+      bus: v(34.7, 'ug/m3', { sd: 15.1, low: 2.2, high: 61.9 }),
+      car: v(26.2, 'ug/m3', { sd: 12.5, low: 1.8, high: 56.2 }),
+      subway: v(21.7, 'ug/m3', { sd: 5.8, low: 8.6, high: 32.5 }),
     },
-    display: t('53.6 對 21.7 µg/m³', '53.6 vs 21.7 µg/m³'),
+    display: t('步行 42.7、騎機車 53.6 µg/m³', 'walking 42.7, scooter 53.6 µg/m³'),
     statement: t(
-      '在一項120位臺北健康成人的研究中，騎機車通勤者的個人PM2.5暴露平均為53.6 µg/m³，搭捷運者為21.7 µg/m³，分別是六種通勤方式中最高與最低。',
-      'In a study of 120 healthy adults in Taipei, scooter commuters had average personal PM2.5 exposure of 53.6 µg/m³ and subway commuters 21.7 µg/m³, the highest and lowest of six commuting modes.',
+      '在一項120位臺北健康年輕成人的研究中，早上通勤一小時的個人PM2.5平均值，步行為42.7 µg/m³、騎燃油機車為53.6，搭捷運只有21.7；步行與騎機車都顯著高於捷運與汽車，但兩者之間、以及與公車之間的差異並不顯著。',
+      'In a study of 120 healthy young adults in Taipei, mean personal PM2.5 over a morning commute hour was 42.7 µg/m³ walking and 53.6 riding a gasoline scooter, against 21.7 on the subway; walking and scooter were significantly higher than subway and car, but did not differ significantly from each other or from the bus.',
     ),
-    period: t('上午9至10點通勤時段；2020年發表', '09:00–10:00 commute; published 2020'),
+    period: t('上午9至10點；2017年2月至2019年12月', '09:00–10:00; February 2017 to December 2019'),
     place: TAIPEI,
     sources: ['chuang-2020-aeax'],
-    locator: 'Abstract: "The PM2.5 level (Mean ± SD) was the highest in the scooter mode (53.6 ± 26.1 μg/m3) but the lowest in the subway mode (21.7 ± 5.8 μg/m3)."',
+    locator: 'Table 1 p.3, PM2.5 rows; Scheffe pairs Sc/S, Sc/C, W/S, W/C, WM/S, WM/C',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '只量測早上一小時的通勤；騎士的數值包含自己身處車流中的暴露。其他通勤方式的平均值未見於摘要。不可與另一研究的75合併成「50至75」。',
-      'Only one morning commute hour was measured, and riders\' values include their own immersion in traffic. Other modes\' means are not in the abstract. Do not merge with another study\'s 75 into "50–75".',
+      '只量測早上一小時，路線與車流沒有描述；騎士的數值是騎士自己的暴露，不是站在機車旁的行人。只量PM2.5，沒有一氧化碳或苯。表1列出每種方式20人，與「每人六種方式各量一次」的說法不一致，論文沒有說明。不可與另一研究的75合併成「50至75」。',
+      'Only one morning hour, with route and traffic not described; riders\' values are their own exposure, not a pedestrian standing beside scooters. Only PM2.5 was measured, no CO or benzene. Table 1 lists 20 people per mode, which the paper does not reconcile with "six measurements per participant". Do not merge with another study\'s 75 into "50–75".',
     ),
-    research: '02 §3b; 03 §4',
+    chainLink: 3,
+    research: 'papers/chuang-2020-aex#pm-scooter; papers/chuang-2020-aex#pm-walking; papers/chuang-2020-aex#pm-subway; papers/chuang-2020-aex#pm-bus-car; papers/chuang-2020-aex#add-pairwise-not-significant',
   },
-  'rider-exposure-wu2021': {
+  'moenv-2017-taipei-commute': {
     data: {
-      motorcyclistPm25: v(27.65, 'ug/m3'),
-      cyclistPm25: v(23.27, 'ug/m3'),
-      motorcyclistBtex: v(33.96, 'ppb'),
-      cyclistBtex: v(20.07, 'ppb'),
+      car: v(7.6, 'ug/m3'),
+      mrt: v(21.9, 'ug/m3'),
+      bus: v(23.5, 'ug/m3'),
+      motorcycle: v(32.1, 'ug/m3'),
     },
-    display: t('BTEX 33.96 對 20.07 ppb', 'BTEX 33.96 vs 20.07 ppb'),
+    display: t('機車 32.1 對 汽車 7.6 µg/m³', 'motorcycle 32.1 vs car 7.6 µg/m³'),
     statement: t(
-      '在臺北四條路線的實測中，機車騎士的苯系物（BTEX）平均暴露為33.96 ppb、PM2.5為27.65 µg/m³，自行車騎士則為20.07 ppb與23.27 µg/m³。',
-      'Along four Taipei routes, motorcyclists\' average exposure was 33.96 ppb of BTEX (benzene, toluene, ethylbenzene, xylenes) and 27.65 µg/m³ of PM2.5, against 20.07 ppb and 23.27 µg/m³ for cyclists.',
+      '環保署2017年的臺北通勤調查以微型感測器量測，騎機車的PM2.5平均最高（32.1 µg/m³），開冷氣的汽車最低（7.6），並建議民眾避開需要長時間等候的路口。',
+      'The EPA\'s 2017 Taipei commuter survey, using micro-sensors, found the highest mean PM2.5 on motorcycles (32.1 µg/m³) and the lowest in air-conditioned cars (7.6), and advised people to avoid intersections with long waits.',
     ),
-    period: t('尖峰與離峰時段；2021年發表', 'Rush and non-rush hours; published 2021'),
-    place: TAIPEI,
-    sources: ['wu-2021-trd'],
-    locator: 'Abstract: total BTEX / PM2.5 = 20.07 ppb / 23.27 µg/m3 (cyclists); 33.96 ppb / 27.65 µg/m3 (motorcyclists)',
+    period: t('2017年4月10、12、13、14日與5月4日；2018年5月31日發布', '10, 12, 13, 14 April and 4 May 2017; released 31 May 2018'),
+    place: TAIPEI_METRO,
+    sources: ['moenv-2018-taipei-commute-press'],
+    locator: 'Press release: car 7.6, MRT 21.9, bus 23.5, motorcycle 32.1 µg/m3; 機動車輛近距離排氣加成',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '這是騎士在車流中的路線平均暴露，不是行人暴露。兩組的PM2.5只差約4.4 µg/m³，差異主要在苯系物。' + ABSTRACT_ONLY['zh-TW'],
-      'These are riders\' route-average exposures in traffic, not pedestrian exposures. PM2.5 differed by only about 4.4 µg/m³; the larger gap is in BTEX. ' + ABSTRACT_ONLY.en,
+      '量測對象是騎士與乘客，不是路口的行人；新聞稿沒有樣本數，也沒有路口層級的資料。',
+      'It measured riders and passengers, not pedestrians at a crossing; the release gives no sample size and no intersection-level data.',
     ),
-    research: '02 §2',
+    chainLink: 3,
+    research: 'redlight/intersection-peaks#moenv-2018-taipei-commute',
   },
-  'rider-scooter-contribution-wu2021': {
-    data: {},
-    display: t('機車貢獻較大', 'scooters contribute more'),
+  'scooter-lane-btex-wu2021': {
+    data: {
+      scooterLaneBtex: v(33.96, 'ppb', { note: 'unadjusted mean; Fig. 2 mean marker reads about 28.5' }),
+      cyclistBtex: v(20.07, 'ppb'),
+      scooterLanePm25: v(27.65, 'ug/m3', { note: 'unadjusted mean; Fig. 2 marker about 26.5' }),
+      cyclistPm25: v(23.27, 'ug/m3'),
+    },
+    display: t('苯系物 33.96 對 20.07 ppb', 'BTEX 33.96 vs 20.07 ppb'),
     statement: t(
-      '同一研究認為，機車對騎乘者PM2.5暴露的貢獻可能大於公車、貨車與小客車，並建議減少燃油機車數量、鼓勵改騎自行車。',
-      'The same study concluded that scooters could contribute more to commuters\' PM2.5 exposure than buses, trucks and passenger cars, and recommended reducing gasoline scooter numbers and encouraging a shift to bicycles.',
+      '在臺北四條路線上，研究助理騎租來的電動機車在機車道上行駛（因此吸入的是周圍車流的廢氣，不是自己的），苯系物（BTEX）平均為33.96 ppb；在同一路線騎自行車者為20.07 ppb。PM2.5則是27.65對23.27 µg/m³。',
+      'On four Taipei routes, research assistants riding rented electric scooters in the traffic lane (so breathing surrounding traffic\'s exhaust, not their own) averaged 33.96 ppb of BTEX (benzene, toluene, ethylbenzene, xylenes); cyclists on the same routes averaged 20.07 ppb. PM2.5 was 27.65 against 23.27 µg/m³.',
     ),
-    period: t('2021年發表', 'Published 2021'),
+    period: t('2017年11月至2018年4月，尖峰與離峰時段', 'November 2017 to April 2018, rush and non-rush hours'),
     place: TAIPEI,
     sources: ['wu-2021-trd'],
-    locator: 'Abstract: "Scooters could contribute more to PM2.5 exposure than buses/trucks and passenger cars." / "...shift from gasoline scooters to bicycles..."',
+    locator: 'Abstract; Section 3.1 p.5; design p.3 (WeMo electric scooters "to prevent self-pollution"); Fig. 2 p.4',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '原文是「可能大於」公車、貨車與小客車，不是「最主要來源」。論文標題中的「electric scooter」是臺灣英文對機車的稱呼，結論針對燃油機車。',
-      'The paper says scooters "could contribute more" than buses, trucks and cars, not that they are the main source. "Electric scooter" in the paper\'s title is Taiwanese English for a scooter; the conclusion is about gasoline scooters.',
+      '這是騎士在車流中的暴露，不是行人；騎士騎的是電動機車，研究沒有量測燃油機車騎士，也沒有比較燃油與電動機車。數值是未調整的平均，圖2的平均標記看起來較低（BTEX約28.5），論文沒有解釋；各組樣本數未列出。',
+      'These are riders in traffic, not pedestrians; the riders used electric scooters, no gasoline-scooter rider was measured, and gasoline and electric were not compared. The values are unadjusted means; the paper\'s own Fig. 2 mean markers look lower (BTEX about 28.5), unexplained, and group sample sizes are not given.',
     ),
-    research: '02 §2',
+    requiresCaveat: true,
+    chainLink: 3,
+    research: 'papers/wu-2021-trd#mean-exposure-bike-vs-scooter; papers/wu-2021-trd#scooter-is-electric; papers/wu-2021-trd#fig2-mean-markers-vs-text',
+  },
+  'cyclist-vs-scooter-lane-benzene-wu2021': {
+    data: {
+      benzeneRush: v(-39.99, 'percent', { note: 'cyclists vs electric-scooter riders, adjusted, P<0.001' }),
+      btexRush: v(-33.33, 'percent', { note: 'P<0.001' }),
+      pm25Rush: v(-18.3, 'percent', { note: 'not significant, P = 0.07' }),
+      btexNonRush: v(-13.35, 'percent', { note: 'P<0.05' }),
+      benzeneNonRush: v(-10.93, 'percent', { note: 'not significant' }),
+    },
+    display: t('苯低 40%（尖峰）', 'benzene 40% lower (rush hour)'),
+    statement: t(
+      '在調整背景濃度與風速後，尖峰時段自行車騎士的苯暴露比在機車道上的電動機車騎士低約40%（−39.99%），總苯系物低33%；PM2.5的差異則不顯著。',
+      'After adjusting for background levels and wind, cyclists\' rush-hour benzene exposure was about 40% lower (−39.99%) than that of electric-scooter riders in the traffic lane, and total BTEX 33% lower; the PM2.5 difference was not significant.',
+    ),
+    period: t('2017年11月至2018年4月', 'November 2017 to April 2018'),
+    place: TAIPEI,
+    sources: ['wu-2021-trd'],
+    locator: 'Table 1 p.6, commuting-tool rows; Section 3.5 p.8',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '比較的是騎士在行進中的暴露，沒有量測在路口等候的人。作者把差異歸因於自行車可以走人行道或自行車道、在人行道上等燈，機車只能夾在車陣中，但沒有驗證；兩種車速不同（每小時10–15對25–30公里），也沒有隨機分配。研究沒有把苯歸因於機車。',
+      'It compares riders on the move; nobody waiting at a crossing was measured. The authors attribute the gap to cyclists being able to use sidewalks or bike lanes and wait on the pavement while scooter riders are enclosed in traffic, but did not test it; speeds differed (10–15 vs 25–30 km/h) and modes were not randomised. The study does not attribute the benzene to scooters.',
+    ),
+    requiresCaveat: true,
+    chainLink: 3,
+    research: 'papers/wu-2021-trd#bike-vs-scooter-btex; papers/wu-2021-trd#pm25-mode-diff-not-significant; papers/wu-2021-trd#no-btex-source-attribution',
+  },
+  'station-btex-correlation-wu2021': {
+    data: {
+      pm25RLow: v(0.67, 'ratio', { note: 'correlation r, on-road vs station' }),
+      pm25RHigh: v(0.86, 'ratio'),
+      btexRLow: v(-0.01, 'ratio'),
+      btexRHigh: v(0.38, 'ratio'),
+    },
+    display: t('苯系物 r = −0.01～0.38', 'BTEX r = −0.01 to 0.38'),
+    statement: t(
+      '同一研究中，騎士的PM2.5與附近測站相當一致（相關係數0.67至0.86），但苯系物幾乎不相關（−0.01至0.38）；作者警告用測站資料評估通勤者的苯系物暴露「可能造成偏差」。',
+      'In the same study riders\' PM2.5 tracked nearby stations well (correlation 0.67–0.86) but their BTEX barely correlated with the station (−0.01 to 0.38); the authors warn that using station data for commuters\' BTEX exposure "might result in biased results".',
+    ),
+    period: t('2017年11月至2018年4月', 'November 2017 to April 2018'),
+    place: TAIPEI,
+    sources: ['wu-2021-trd'],
+    locator: 'Section 3.2, p.5 and p.7',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '苯系物的比較只有萬華一座光化測站，PM2.5有四座一般測站；論文沒有列出測站的濃度，因此無法說街上的苯比測站高多少。',
+      'BTEX was compared with a single photochemical station (Wanhua) and PM2.5 with four stations; the paper prints no station concentrations, so it cannot say how much higher street benzene is than at the station.',
+    ),
+    chainLink: 3,
+    research: 'papers/wu-2021-trd#no-ambient-numbers',
+  },
+  'rush-hour-ratio-wu2021': {
+    data: {
+      ratioLow: v(1.26, 'ratio', { note: 'printed range of mean rush/non-rush ratios, 26 same-day pairs' }),
+      ratioHigh: v(1.87, 'ratio'),
+      benzene: v(1.87, 'ratio', { approx: true, note: 'Fig. 3 chart reading, 95% CI about 1.2-2.55' }),
+      pm25: v(1.26, 'ratio', { approx: true, note: 'Fig. 3 chart reading, CI about 1.0-1.5' }),
+    },
+    display: t('苯約 1.9 倍（尖峰對離峰）', 'benzene about 1.9× (rush vs non-rush)'),
+    statement: t(
+      '同一研究中，同一天早上尖峰的污染暴露都顯著高於下午離峰，比值在1.26至1.87之間；從圖上讀取，苯約為1.9倍、PM2.5約1.3倍。',
+      'In the same study, morning rush-hour exposure was significantly higher than afternoon non-rush exposure on the same day for every pollutant, with ratios of 1.26 to 1.87; read from the figure, benzene was about 1.9 times and PM2.5 about 1.3 times.',
+    ),
+    period: t('2017年11月至2018年4月（26組同日配對）', 'November 2017 to April 2018 (26 same-day pairs)'),
+    place: TAIPEI,
+    sources: ['wu-2021-trd'],
+    locator: 'Section 3.3 p.7; Fig. 3 p.5',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '苯與PM2.5的個別倍數是從圖上讀取，不是論文印出的數字；比值是暴露的比值，自行車與電動機車騎士合併計算。',
+      'The pollutant-specific ratios are read from the figure, not printed values; they are ratios of exposure, with cyclists and electric-scooter riders pooled.',
+    ),
+    chainLink: 3,
+    research: 'papers/wu-2021-trd#rush-vs-nonrush',
+  },
+  'quiet-route-wu2021': {
+    data: {
+      benzene: v(-33.2, 'percent', { note: 'Route C vs Route P, rush hour, adjusted, P<0.05' }),
+      btex: v(-24.27, 'percent', { note: 'P<0.05' }),
+      pm25: v(-27.7, 'percent', { note: 'P<0.05' }),
+      pm25OneMinute: v(-28.1, 'percent', { note: 'P<0.001' }),
+    },
+    display: t('小巷路線苯少 33%', 'side-street route: 33% less benzene'),
+    statement: t(
+      '同一研究中，走車流較少的巷弄路線，尖峰時段的苯暴露比主要幹道路線低33%（−33.20%）、PM2.5低28%（−27.7%），已調整背景濃度與風速。',
+      'In the same study, a quieter route along minor roads and alleys gave 33% less benzene (−33.20%) and 28% less PM2.5 (−27.7%) than the main-road route in rush hour, adjusted for background levels and wind.',
+    ),
+    period: t('2017年11月至2018年4月，尖峰時段', 'November 2017 to April 2018, rush hour'),
+    place: TAIPEI,
+    sources: ['wu-2021-trd'],
+    locator: 'Table 1 p.6, Route C rush hour; Section 3.4 p.8',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '離峰時段的苯與PM2.5差異不顯著。另一條街道狹窄、有高架橋的路線雖然車流較少，部分指標反而較高，作者認為街谷形狀也有影響。量測的是騎士，不是行人。',
+      'Off-peak differences in benzene and PM2.5 were not significant. Another route with narrow streets and a viaduct had less traffic but higher readings on some measures, which the authors put down to street-canyon shape. Riders were measured, not pedestrians.',
+    ),
+    chainLink: 2,
+    research: 'papers/wu-2021-trd#route-C-lower; papers/wu-2021-trd#route-B-A',
+  },
+  'traffic-count-pm25-contribution-wu2021': {
+    data: {
+      busTruckPerVehicle: v(0.29, 'ug/m3', { note: 'per vehicle per minute, joint model' }),
+      carPerVehicle: v(0.01, 'ug/m3'),
+      scooterPerVehicle: v(0.03, 'ug/m3'),
+      busTruckContribution: v(0.1, 'ug/m3'),
+      carContribution: v(0.1, 'ug/m3'),
+      scooterContribution: v(0.28, 'ug/m3'),
+      scootersPerMinute: v(8.56, 'count'),
+      busTrucksPerMinute: v(0.35, 'count'),
+    },
+    display: t('每輛公車貨車的影響約為機車的 10 倍', 'per vehicle, buses and trucks about 10× scooters'),
+    statement: t(
+      '同一研究以錄影計算車流後發現，每多一輛公車或貨車經過，騎士的PM2.5增加量約為每多一輛機車的8至10倍；但機車數量多（每分鐘約8.56輛對0.35輛），在模型中合計貢獻最大，約0.28 µg/m³，相對於約25 µg/m³的平均暴露很小。',
+      'Using video traffic counts, the same study found that each additional bus or truck raised riders\' PM2.5 roughly 8–10 times as much as each additional scooter; but scooters were far more numerous (about 8.56 against 0.35 per minute), so in the model they made the largest combined contribution, about 0.28 µg/m³, small against average exposure of about 25 µg/m³.',
+    ),
+    period: t('2017年11月至2018年4月', 'November 2017 to April 2018'),
+    place: TAIPEI,
+    sources: ['wu-2021-trd'],
+    locator: 'Section 3.6 p.9: separate models 0.41/0.04/0.05, joint 0.29/0.01/0.03 µg/m3 per vehicle per minute; counts 0.35/7.2/8.56; contributions 0.10/0.10/0.28',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '這項車種歸因只做了PM2.5，沒有苯或苯系物，因此不能說研究把苯歸因於機車。計數中的機車沒有區分燃油或電動。摘要說機車「可能」比公車貨車與小客車貢獻更多，是因為數量多，不是每輛排放較多。',
+      'The vehicle-type attribution covers PM2.5 only, not benzene or BTEX, so the study does not attribute benzene to scooters. Counted scooters were not split into gasoline and electric. The abstract\'s "scooters could contribute more" than buses, trucks and cars is a matter of numbers, not of each scooter emitting more.',
+    ),
+    requiresCaveat: true,
+    chainLink: 3,
+    alsoLinks: [1],
+    research: 'papers/wu-2021-trd#per-vehicle-pm-increment; papers/wu-2021-trd#vehicle-contribution; papers/wu-2021-trd#no-btex-source-attribution',
   },
   'taipei-traffic-station-gap': {
     data: {
@@ -1512,6 +1978,7 @@ const exposure = {
       '一般測站9站、交通測站3站，數據未扣除境外傳輸或特殊天氣影響。年報內文的2024年數字（13.2／16.5）誤植為2021年數值，本站採用表3-2-7。',
       'Nine general and three traffic stations; data not adjusted for transboundary pollution or unusual weather. The report\'s own text gives 13.2/16.5 for 2024, which repeats the 2021 values; we use its Table 3-2-7.',
     ),
+    chainLink: 3,
     research: '02 §4, Corrections #8',
   },
   'ufp-near-road-bands-chang2026': {
@@ -1531,6 +1998,7 @@ const exposure = {
       '純模式研究，未單獨模擬機車來源。研究另估算的終身致癌風險是模式指標，本站不引用其數值。' + ABSTRACT_ONLY['zh-TW'],
       'A pure modelling study with no scooter-specific source. It also estimates lifetime cancer risk, a modelled index whose numbers we do not quote. ' + ABSTRACT_ONLY.en,
     ),
+    chainLink: 2,
     research: '02 §4',
   },
   'national-pm25-trend': {
@@ -1550,6 +2018,7 @@ const exposure = {
       'Seen only in a search summary of a United Daily News report and not checked against MOENV data; another summary gave 12.6 for 2025 (data to 3 December).',
     ),
     requiresCaveat: true,
+    chainLink: 3,
     research: '02 §8',
   },
 } satisfies Record<string, FactInput>;
@@ -1571,6 +2040,7 @@ const standards = {
     sources: ['moenv-air-quality-standards'],
     confidence: 'verified',
     evidence: 'official-tw',
+    chainLink: 3,
     research: '02 §8',
   },
   'tw-air-quality-standards-other': {
@@ -1600,6 +2070,7 @@ const standards = {
       '臺灣標準的氣體以ppm表示，WHO以µg/m³或mg/m³表示，單位不同，不能直接比大小。',
       'Taiwan states gas standards in ppm while WHO uses µg/m³ or mg/m³; the units differ, so the numbers cannot be compared directly.',
     ),
+    chainLink: 3,
     research: '02 §8',
   },
   'who-pm25-guideline': {
@@ -1619,6 +2090,7 @@ const standards = {
       'WHO指引是建議值，不具法律效力；24小時值是第99百分位數（每年可超過3至4天）。',
       'WHO guidelines are recommendations, not legal limits; the 24-hour value is a 99th percentile (3–4 exceedance days a year).',
     ),
+    chainLink: 3,
     research: '03 §2',
   },
   'who-pm25-interim-targets': {
@@ -1643,6 +2115,7 @@ const standards = {
     locator: 'Table 0.1, interim targets 1–4',
     confidence: 'verified',
     evidence: 'international',
+    chainLink: 3,
     research: '03 §2',
   },
   'who-no2-co-guideline': {
@@ -1669,6 +2142,7 @@ const standards = {
       '一氧化碳的8小時、1小時與15分鐘值（10、35、100 mg/m³）沿用舊版，2021年未重新評估。',
       'The 8-hour, 1-hour and 15-minute CO values (10, 35 and 100 mg/m³) carry over from earlier guidelines and were not re-evaluated in 2021.',
     ),
+    chainLink: 3,
     research: '03 §2',
   },
   'who-ufp-good-practice': {
@@ -1684,6 +2158,7 @@ const standards = {
     locator: '"Low PNC can be considered < 1 000 particles/cm3 (24-hour mean). High PNC can be considered > 10 000 particles/cm3 (24-hour mean)"',
     confidence: 'verified',
     evidence: 'international',
+    chainLink: 4,
     research: '03 §1b, §2',
   },
   'who-road-noise-guideline': {
@@ -1702,6 +2177,7 @@ const standards = {
       '這是以歐洲研究為主的區域指引，針對所有道路交通而非機車；臺灣一項幼兒研究中，道路噪音與氣喘盛行率沒有顯著關聯。',
       'A European guideline built mostly on European studies, covering all road traffic rather than scooters; in one Taiwanese kindergarten study road noise was not significantly associated with asthma prevalence.',
     ),
+    chainLink: null,
     research: '03 §9',
   },
 } satisfies Record<string, FactInput>;
@@ -1729,6 +2205,7 @@ const hazard = {
       'Group 2B is weaker than diesel exhaust\'s Group 1; diesel\'s classification must not be applied to scooters. IARC classifies hazard, not the risk at everyday doses.',
     ),
     requiresCaveat: true,
+    chainLink: 4,
     research: '03 §1a',
   },
   'iarc-diesel-exhaust-group1': {
@@ -1748,6 +2225,7 @@ const hazard = {
       'For contrast only: Taiwan\'s scooters are almost all gasoline-engined, so the diesel classification does not apply to scooter exhaust.',
     ),
     requiresCaveat: true,
+    chainLink: 4,
     research: '03 §1a',
   },
   'iarc-outdoor-air-pollution-group1': {
@@ -1767,6 +2245,7 @@ const hazard = {
       '這是IARC對一般室外空氣污染的結論；機車廢氣是其中一部分來源，但IARC沒有量化機車的比例。',
       'This is IARC\'s conclusion about outdoor air pollution in general; scooter exhaust is one contributing source, but IARC does not quantify its share.',
     ),
+    chainLink: 4,
     research: '03 §1a',
   },
   'iarc-benzene-group1': {
@@ -1786,6 +2265,7 @@ const hazard = {
       'IARC分類的是危害，不是日常暴露量下的風險；也沒有量化機車廢氣中苯造成的風險。',
       'IARC classifies hazard, not the risk at everyday doses, and does not quantify the risk from benzene in scooter exhaust.',
     ),
+    chainLink: 4,
     research: '03 §1a; 03 safe claim #2',
   },
   'who-pm25-bloodstream': {
@@ -1801,6 +2281,7 @@ const hazard = {
     locator: '"PM2.5 and PM10 are capable of penetrating deep into the lungs and PM2.5 can even enter the bloodstream, primarily resulting in cardiovascular and respiratory impacts."',
     confidence: 'verified',
     evidence: 'international',
+    chainLink: 4,
     research: '03 §1b',
   },
 } satisfies Record<string, FactInput>;
@@ -1827,6 +2308,7 @@ const health = {
       '這是對「關聯」的信心評估，HEI明言未評估因果；研究多在歐美（亞洲只有41篇），且多在暴露水準比現今高的年代進行；肺功能不在評估結果之列。',
       'This rates confidence in association; HEI states it did not assess causality. Most studies were European or North American (41 from Asia), many from times of higher exposure than today, and lung function was not among the outcomes.',
     ),
+    chainLink: 5,
     research: '03 §6',
   },
   'hei-sr17-asthma-exacerbation': {
@@ -1846,6 +2328,8 @@ const health = {
       '依HEI在第23號報告中的轉述，未直接查閱第17號報告原文。',
       'Based on HEI\'s own description in Special Report 23; Special Report 17 itself was not opened.',
     ),
+    chainLink: 5,
+    alsoLinks: [6],
     research: '03 §6',
   },
   'ats-2020-childhood-asthma': {
@@ -1865,6 +2349,8 @@ const health = {
       '這是一般空氣污染（特別是二氧化氮與黑碳等交通相關指標）的結論，並非針對機車；不能據此說某個孩子的氣喘是機車造成的。',
       'A conclusion about air pollution in general (especially traffic-related markers such as NO₂ and black carbon), not scooters; it does not mean any particular child\'s asthma was caused by scooters.',
     ),
+    chainLink: 5,
+    alsoLinks: [6],
     research: '03 §6',
   },
   'aha-2010-pm25-cardiovascular': {
@@ -1883,6 +2369,7 @@ const health = {
       '指一般環境PM2.5，不針對機車廢氣，也不涵蓋幾分鐘的短暫高峰；「數小時至數週」是聲明涵蓋的最短時間尺度。',
       'Refers to ambient PM2.5 in general, not scooter exhaust, and not to minutes-long peaks; "hours to weeks" is the shortest window the statement addresses.',
     ),
+    chainLink: 5,
     research: '03 §7',
   },
   'who-7-million-deaths': {
@@ -1907,6 +2394,7 @@ const health = {
       'The 7 million combines outdoor and household air pollution; it is not outdoor air alone.',
     ),
     requiresCaveat: true,
+    chainLink: 5,
     research: '03 §2',
   },
   'chuang2020-cardiovascular-association': {
@@ -1927,6 +2415,7 @@ const health = {
       'These are small, transient physiological changes in healthy adults during a one-hour commute, not evidence of illness. The abstract does not state the PM2.5 increment behind its percentages, so we do not quote effect sizes. No significant association was seen when walking with a facemask. ' + ASSOCIATION_TW.en,
     ),
     requiresCaveat: true,
+    chainLink: 5,
     research: '03 §4; 03 safe claim #10',
   },
   'guo2019-lung-function': {
@@ -1952,6 +2441,7 @@ const health = {
       '摘要未說明是否屬於「臺灣兒童健康研究（TCHS）」世代，請勿如此稱呼。' + ASSOCIATION_TW['zh-TW'],
       'The abstract does not say this is the Taiwan Children Health Study cohort, so do not call it that. ' + ASSOCIATION_TW.en,
     ),
+    chainLink: 6,
     research: '03 §3a',
   },
   'tsai2025-asthma-feno': {
@@ -1976,6 +2466,7 @@ const health = {
       'Cross-sectional, in an industrial and coal-power setting rather than a scooter one; the abstract does not state the PM2.5 increment behind the odds ratio of 1.595, so never present it as "per 1 µg/m³". ' + ASSOCIATION_TW.en,
     ),
     requiresCaveat: true,
+    chainLink: 6,
     research: '03 §3a',
   },
   'hwang2005-asthma-co': {
@@ -2002,6 +2493,7 @@ const health = {
       'Cross-sectional, using monitoring-station data at 2000–2001 exposure levels; the authors\' conclusion is stronger than their data (NOx was not significant), so quote the numbers, not the headline. ' + ASSOCIATION_TW.en,
     ),
     requiresCaveat: true,
+    chainLink: 6,
     research: '03 §3a',
   },
   'cho2023-kindergarten-asthma': {
@@ -2025,6 +2517,7 @@ const health = {
       '橫斷面的「盛行率」研究；摘要用了「caused」一詞，但研究設計只能顯示關聯。' + ASSOCIATION_TW['zh-TW'],
       'A cross-sectional prevalence study; the abstract says "caused", but the design can only show association. ' + ASSOCIATION_TW.en,
     ),
+    chainLink: 6,
     research: '03 §3a',
   },
   'lin2024-asthma-lung-function': {
@@ -2040,6 +2533,7 @@ const health = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t('單一醫學中心的成人患者橫斷面研究。' + ASSOCIATION_TW['zh-TW'], 'Cross-sectional, adult patients at one medical centre. ' + ASSOCIATION_TW.en),
+    chainLink: 5,
     research: '03 §3a',
   },
   'yang2003-preterm-freeway': {
@@ -2060,6 +2554,7 @@ const health = {
       'An old study of one freeway, with exposure measured only by distance and no pollutant measurements; the international HEI review rates confidence for preterm birth as low.',
     ),
     requiresCaveat: true,
+    chainLink: 6,
     research: '03 §3e',
   },
   'mohw-lung-cancer-2025': {
@@ -2085,6 +2580,7 @@ const health = {
       '肺癌是「癌症」死因的首位，不是所有死因的首位（癌症整體已連續44年居死因首位）。這項統計不涉及空氣污染或機車。',
       'Lung cancer is the leading cause of cancer death, not of all deaths (cancer as a whole has been the top cause of death for 44 years). These statistics say nothing about air pollution or scooters.',
     ),
+    chainLink: 5,
     research: '03 §3d',
   },
   'tseng2019-never-smokers': {
@@ -2114,6 +2610,7 @@ const health = {
       'An ecological (regional) analysis using visibility as a proxy for air quality; it cannot show that PM2.5 caused individual cancers and does not rule out other factors. Do not say air pollution is "the cause" of never-smokers\' lung cancer, or any share of it.',
     ),
     requiresCaveat: true,
+    chainLink: 5,
     research: '03 §3c',
   },
   'hill2023-egfr-ecological': {
@@ -2134,6 +2631,7 @@ const health = {
       'The human analyses are ecological (county-average PM2.5), and the paper notes it could not account for migration; the mechanism evidence comes from mice and small tissue samples; PM2.5 is from all sources, not scooters.',
     ),
     requiresCaveat: true,
+    chainLink: 5,
     research: '03 §3c',
   },
   'lo2017-pm25-deaths-2014': {
@@ -2161,6 +2659,7 @@ const health = {
       'A modelled estimate from 2014 monitoring data; PM2.5 in Taiwan has fallen since. PM2.5 is from all sources, so these are not "deaths from scooters". We found no newer Taiwanese estimate.',
     ),
     requiresCaveat: true,
+    chainLink: 5,
     research: '03 §3d',
   },
 } satisfies Record<string, FactInput>;
@@ -2183,6 +2682,7 @@ const children = {
     locator: '"They breathe faster than adults, taking in more air and, with it, more pollutants. Children live closer to the ground, where some pollutants reach peak concentrations."',
     confidence: 'verified',
     evidence: 'international',
+    chainLink: 6,
     research: '03 §5',
   },
   'pram-height-sharma2020': {
@@ -2203,6 +2703,7 @@ const children = {
       '"Up to 44%" is the maximum across conditions, not an average, and only for fine particles; never say "children breathe 44% more pollution". No child-height measurements exist for Taiwan.',
     ),
     requiresCaveat: true,
+    chainLink: 6,
     research: '03 §5',
   },
   'child-height-harr2022': {
@@ -2223,6 +2724,7 @@ const children = {
       'A single study abroad using low-cost sensors over eight days; no child-height measurements exist for Taiwan.',
     ),
     requiresCaveat: true,
+    chainLink: 6,
     research: '02 §6',
   },
 } satisfies Record<string, FactInput>;
@@ -2231,8 +2733,31 @@ const children = {
 // Registry assembly
 // ---------------------------------------------------------------------------
 
-export const factGroups = { fleet, electric, policy, emissions, exposure, standards, hazard, health, children, economics };
+export const factGroups = {
+  fleet,
+  electric,
+  policy,
+  emissions,
+  exposure,
+  standards,
+  hazard,
+  health,
+  children,
+  economics,
+  inspection,
+  intersection,
+  smell,
+  acute,
+  longterm,
+  vulnerable,
+  levers,
+};
 export type Topic = keyof typeof factGroups;
+
+/** Topics whose facts may omit `chainLink`; they take this value instead. */
+export const topicDefaultChainLink: Partial<Record<Topic, ChainLink | null>> = {
+  economics: 7,
+};
 
 export const topicLabels: Record<Topic, L10n> = {
   fleet: t('機車數量與使用', 'Scooter numbers and use'),
@@ -2245,18 +2770,44 @@ export const topicLabels: Record<Topic, L10n> = {
   health: t('健康證據', 'Health evidence'),
   children: t('兒童', 'Children'),
   economics: t('價格、補助與使用成本', 'Prices, subsidies and running costs'),
+  inspection: t('怠速檢驗與排放標準', 'Idle tests and emission standards'),
+  intersection: t('路口與街道配置', 'Intersections and street layout'),
+  smell: t('氣味與廢氣成分', 'Smell and what exhaust contains'),
+  acute: t('短期暴露與健康', 'Short-term exposure and health'),
+  longterm: t('長期暴露與健康', 'Long-term exposure and health'),
+  vulnerable: t('高暴露與易感族群', 'Most-exposed and susceptible groups'),
+  levers: t('政策工具', 'Policy levers'),
 };
 
-const merged = { ...fleet, ...electric, ...policy, ...emissions, ...exposure, ...standards, ...hazard, ...health, ...children, ...economics };
+const merged = {
+  ...fleet,
+  ...electric,
+  ...policy,
+  ...emissions,
+  ...exposure,
+  ...standards,
+  ...hazard,
+  ...health,
+  ...children,
+  ...economics,
+  ...inspection,
+  ...intersection,
+  ...smell,
+  ...acute,
+  ...longterm,
+  ...vulnerable,
+  ...levers,
+};
 export type FactId = keyof typeof merged;
-export type Fact = FactInput & { id: FactId; topic: Topic };
+export type Fact = Omit<FactInput, 'chainLink'> & { id: FactId; topic: Topic; chainLink: ChainLink | null };
 
 function assemble(): Record<FactId, Fact> {
   const out: Record<string, Fact> = {};
   for (const [topic, group] of Object.entries(factGroups) as [Topic, Record<string, FactInput>][]) {
     for (const [id, f] of Object.entries(group)) {
       if (out[id]) throw new Error(`[data] Duplicate fact id "${id}" in topics "${out[id].topic}" and "${topic}"`);
-      out[id] = { ...f, id: id as FactId, topic };
+      const chainLink = f.chainLink !== undefined ? f.chainLink : (topicDefaultChainLink[topic] ?? null);
+      out[id] = { ...f, id: id as FactId, topic, chainLink };
     }
   }
   return out as Record<FactId, Fact>;
@@ -2286,6 +2837,8 @@ export interface LocalizedCitation {
 export interface LocalizedFact {
   id: FactId;
   topic: Topic;
+  chainLink: ChainLink | null;
+  alsoLinks: ChainLink[];
   display: string;
   statement: string;
   period: string;
@@ -2305,6 +2858,8 @@ export function localizeFact(idOrFact: FactId | Fact, locale: Locale): Localized
   return {
     id: f.id,
     topic: f.topic,
+    chainLink: f.chainLink,
+    alsoLinks: f.alsoLinks ?? [],
     display: f.display[locale],
     statement: f.statement[locale],
     period: f.period[locale],
