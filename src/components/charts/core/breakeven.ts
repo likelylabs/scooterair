@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { type ChartRender, type Tone, esc, fmt, niceMax, niceTicks, px, text } from './shared';
+import { type ChartRender, type Tone, fmt, niceMax, niceTicks, px, text } from './shared';
 
 export interface CostLine {
   label: string;
@@ -117,6 +117,6 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
     padRight: Math.ceil(padRight),
     legend: [a, b].map((c) => ({ label: c.label, tone: c.tone, shape: 'line' })),
     hover: { xs, rows },
-    table: { head: [p.xLabel, `${a.label} (${prefix})`, `${b.label} (${prefix})`], rows: table.map((r) => r.map((c) => esc(c))) },
+    table: { head: [p.xLabel, `${a.label} (${prefix})`, `${b.label} (${prefix})`], rows: table },
   };
 }

@@ -1,0 +1,36 @@
+---
+/**
+ * WaterfallChart — a price built up like a receipt: the list price, each
+ * subsidy taken off, the net price, and (optionally) a comparison price with
+ * the remaining gap. Horizontal, so every row keeps its label and amount.
+ * Pairs with <Ledger>; redraw it from a calculator with updateChart().
+ *
+ * Props (plus title, desc, id, class)
+ *   locale       Locale
+ *   start        { label, value }            — e.g. list price
+ *   steps        { label, value }[]          — deductions as positive numbers (negative adds)
+ *   totalLabel   name of the result row      — e.g. "實付價格"
+ *   compare      { label, value }            — e.g. a comparable gasoline scooter
+ *   gapLabel     name of the difference row (shown only with compare)
+ *   prefix       currency prefix (default 'NT$')
+ *   startTone / stepTone / totalTone / compareTone   (neutral / clean / ink / exhaust)
+ *   categoryLabel, valueLabel   data-table headers
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderWaterfall, type WaterfallProps } from './core/waterfall';
+
+type Props = WaterfallProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderWaterfall(props as WaterfallProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

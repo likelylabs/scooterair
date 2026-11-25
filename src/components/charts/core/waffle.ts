@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { type ChartRender, type Tone, esc, fmt } from './shared';
+import { type ChartRender, type Tone, fmt } from './shared';
 
 export interface WaffleProps {
   locale: Locale;
@@ -50,7 +50,7 @@ export function renderWaffle(p: WaffleProps): ChartRender {
     ],
     table: {
       head: [p.categoryLabel, p.valueLabel],
-      rows: [...parts.map((part) => [part.label, f(part.value)]), [p.restLabel, f(total - counted)], ['', `/ ${esc(f(total))}`]],
+      rows: [...parts.map((part) => [part.label, f(part.value)]), [p.restLabel, f(total - counted)]],
     },
   };
 }

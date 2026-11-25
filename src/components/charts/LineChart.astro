@@ -1,0 +1,36 @@
+---
+/**
+ * LineChart — one or a few series over evenly spaced time steps. A single
+ * series gets a soft area fill. One y axis, starting at zero unless yMin is
+ * set. Hover / touch shows a crosshair with every series' value.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale     Locale
+ *   x          (string | number)[]  — the time steps, e.g. years
+ *   series     { label: string; tone: Tone; values: (number | null)[] }[]  — ≤ 4
+ *   unit       printed on the top gridline and in the table
+ *   yMax, yMin axis range
+ *   area       fill under the line (default: only for a single series)
+ *   reference  { value, label } horizontal reference line
+ *   height     plot height in px (default 220)
+ *   decimals
+ *   xLabel     data-table header for the x column ("年" / "Year")
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderLine, type LineChartProps } from './core/line';
+
+type Props = LineChartProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderLine(props as LineChartProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

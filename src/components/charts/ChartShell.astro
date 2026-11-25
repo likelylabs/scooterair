@@ -1,0 +1,47 @@
+---
+/**
+ * ChartShell — internal wrapper used by every chart component. Page builders
+ * should not need it directly: use BarChart, LineChart, … instead, and put
+ * them inside a <Figure>.
+ *
+ * It takes a ChartRender (from core/*.ts) and outputs the legend, the SVG
+ * with <title>/<desc>, the hover data and the "view data table" toggle.
+ *
+ * Props
+ *   render   ChartRender
+ *   title    accessible name of the graphic (required on every chart)
+ *   desc     the takeaway in a sentence, for screen readers
+ *   locale   Locale
+ *   id       optional id on the wrapper (needed to update it from a script)
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import { chartHtml, type ChartRender } from './core/shared';
+
+interface Props {
+  render: ChartRender;
+  title: string;
+  desc?: string;
+  locale: Locale;
+  id?: string;
+  class?: string;
+}
+const { render, title, desc, locale, id, class: cls } = Astro.props;
+const uid = id ?? `chart-${Math.random().toString(36).slice(2, 8)}`;
+const tableLabel = ui.dataTable[locale];
+---
+
+<div
+  id={id}
+  class:list={['chart', `chart--${render.kind}`, cls]}
+  data-id={uid}
+  data-title={title}
+  data-desc={desc}
+  data-table-label={tableLabel}
+  set:html={chartHtml(render, { id: uid, title, desc, tableLabel })}
+/>
+
+<script>
+  import './core/enhance';
+</script>

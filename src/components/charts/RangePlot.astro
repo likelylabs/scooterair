@@ -1,0 +1,32 @@
+---
+/**
+ * RangePlot — a dot for the central value on a bar from minimum to maximum.
+ * For measurements that vary a lot (personal exposure, prices): it shows the
+ * spread honestly instead of one average.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale         Locale
+ *   data           { label: string; min: number; mid: number; max: number; tone?: Tone }[]
+ *   labels         { min, mid, max } words for the three numbers (say whether mid is a median or a mean)
+ *   unit, max, tone, decimals
+ *   reference      { value, label } vertical reference line
+ *   categoryLabel  data-table header for the label column
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderRange, type RangePlotProps } from './core/range';
+
+type Props = RangePlotProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderRange(props as RangePlotProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

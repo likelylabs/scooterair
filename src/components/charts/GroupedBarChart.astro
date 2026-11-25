@@ -1,0 +1,32 @@
+---
+/**
+ * GroupedBarChart — paired / grouped horizontal bars: the same 2–4 series
+ * compared within each category (e.g. gasoline vs electric, per pollutant).
+ * Values sit at the bar tips; a legend names the series and the first group
+ * is labelled directly where there is room.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale         Locale
+ *   series         { label: string; tone: Tone }[]   — fixed order, 2–4
+ *   groups         { label: string; values: number[] }[]  — values in series order
+ *   unit, max, decimals
+ *   categoryLabel  data-table header for the group column
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderGrouped, type GroupedBarProps } from './core/grouped';
+
+type Props = GroupedBarProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderGrouped(props as GroupedBarProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

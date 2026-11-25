@@ -1,0 +1,39 @@
+---
+/**
+ * BarChart — horizontal bars for comparing magnitudes across categories.
+ * Each row is: label + value on one line, the bar beneath it. No axis to
+ * decode, no label ever truncated, same layout from 300px to desktop.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale         Locale
+ *   data           { label: string; value: number; tone?: Tone; highlight?: boolean }[]
+ *   unit           unit text, e.g. units.ugm3
+ *   tone           colour for all bars: 'exhaust' (default) | 'clean' | 'neutral' | …
+ *   emphasis       true = grey every bar except those with highlight: true
+ *   reference      { value, label } vertical reference line (e.g. a WHO guideline)
+ *   max            axis end (default: a clean number above the largest value)
+ *   decimals       decimals for values (default 0)
+ *   categoryLabel  data-table header for the label column
+ *   valueLabel     data-table header for the value column
+ *
+ * Colour: one series = one tone. Do not colour bars by their value.
+ * Keep labels under ~30 Chinese characters / 60 Latin (they wrap to two lines).
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderBar, type BarChartProps } from './core/bar';
+
+type Props = BarChartProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderBar(props as BarChartProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

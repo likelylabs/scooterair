@@ -1,0 +1,32 @@
+---
+/**
+ * PictogramRow — "N of these M people / scooters", drawn with the site's own
+ * figures. Highlighted icons take the tone; the rest recede.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale     Locale
+ *   count      how many are highlighted
+ *   total      how many in all (≤ 30; default 10)
+ *   icon       'adult' (default) | 'child' | 'scooter-gas' | 'scooter-electric'
+ *   tone       'exhaust' (default) | 'clean' | 'ink' | 'signal' | 'blue'
+ *   cols       icons per row (default min(total, 10))
+ *   label      legend text for the highlighted icons
+ *   restLabel  legend text for the others
+ *   categoryLabel, valueLabel   data-table headers
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderPictogram, type PictogramProps } from './core/pictogram';
+
+type Props = PictogramProps & {
+  title: string;
+  desc?: string;
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderPictogram(props as PictogramProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

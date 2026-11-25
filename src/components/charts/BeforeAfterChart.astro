@@ -1,0 +1,34 @@
+---
+/**
+ * BeforeAfterChart — a dumbbell per row: where each item was, where it is
+ * now, and the distance between. Use it for interventions (conventional
+ * signal phase → pedestrian scramble) and for gasoline → electric.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale        Locale
+ *   data          { label: string; before: number; after: number }[]
+ *   beforeLabel   name of the first state (legend + table)
+ *   afterLabel    name of the second state
+ *   beforeTone    default 'exhaust'
+ *   afterTone     default 'clean'
+ *   unit, max, decimals
+ *   categoryLabel data-table header for the label column
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderBeforeAfter, type BeforeAfterProps } from './core/beforeAfter';
+
+type Props = BeforeAfterProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderBeforeAfter(props as BeforeAfterProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

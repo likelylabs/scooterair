@@ -1,0 +1,253 @@
+/*
+ * Chart styles. Charts are built by src/components/charts/core/*.ts as SVG
+ * strings, so these classes are global. Colour comes only from --chart-*
+ * tokens; `--here` is the surface behind the chart (gaps and rings use it).
+ */
+.chart {
+  display: grid;
+  gap: var(--sp-3);
+  min-inline-size: 0;
+  container-type: inline-size;
+}
+.chart__plot {
+  position: relative;
+  min-inline-size: 0;
+}
+.chart__svg {
+  display: block;
+  overflow: visible;
+  font-family: var(--font-body);
+}
+.chart__svg--picture {
+  inline-size: 100%;
+  block-size: auto;
+}
+
+/* ---- text: always ink, never a series colour ------------------------------ */
+.chart__svg text {
+  fill: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  /* halo so labels stay legible where a rule passes behind them */
+  paint-order: stroke;
+  stroke: var(--here);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.chart__svg .c-value {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.chart__svg .c-value--sm {
+  font-size: 13px;
+}
+.chart__svg .c-strong {
+  font-weight: 900;
+}
+.chart__svg .c-note {
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--ink-2);
+}
+.chart__svg .c-tick {
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--ink-3);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.chart__svg .c-tick--strong {
+  fill: var(--ink-2);
+  font-weight: 700;
+}
+.chart__svg .c-ref {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+.chart__svg .c-dim {
+  fill: var(--ink-3);
+  font-weight: 500;
+}
+/* series names beside line ends: only when the chart is wide enough */
+.chart__svg .c-endname {
+  display: none;
+}
+@container (min-width: 40rem) {
+  .chart__svg .c-endname {
+    display: inline;
+  }
+  .chart--line .chart__plot {
+    padding-inline-end: 8.5rem !important;
+  }
+}
+
+/* ---- marks ------------------------------------------------------------------ */
+.c-fill-exhaust { fill: var(--chart-exhaust); }
+.c-fill-clean { fill: var(--chart-clean); }
+.c-fill-blue { fill: var(--chart-blue); }
+.c-fill-lime { fill: var(--chart-lime); }
+.c-fill-magenta { fill: var(--chart-magenta); }
+.c-fill-violet { fill: var(--chart-violet); }
+.c-fill-neutral { fill: var(--chart-neutral); }
+.c-fill-ink { fill: var(--chart-ink); }
+.c-fill-signal { fill: var(--chart-signal); }
+.c-stroke-exhaust { stroke: var(--chart-exhaust); }
+.c-stroke-clean { stroke: var(--chart-clean); }
+.c-stroke-blue { stroke: var(--chart-blue); }
+.c-stroke-lime { stroke: var(--chart-lime); }
+.c-stroke-magenta { stroke: var(--chart-magenta); }
+.c-stroke-violet { stroke: var(--chart-violet); }
+.c-stroke-neutral { stroke: var(--chart-neutral); }
+.c-stroke-ink { stroke: var(--chart-ink); }
+.c-stroke-signal { stroke: var(--chart-signal); }
+
+.c-track { fill: var(--chart-track); }
+.c-light { fill-opacity: 0.38; }
+.c-hit { fill: transparent; }
+.c-axis { stroke: var(--chart-axis); stroke-width: 1; }
+.c-grid { stroke: var(--chart-grid); stroke-width: 1; }
+.c-rule { stroke: var(--ink); stroke-width: 2; }
+.c-ref-line { stroke: var(--chart-ink); stroke-width: 1.5; }
+.c-connector { stroke: var(--chart-axis); stroke-width: 1; }
+.c-bracket { stroke: var(--chart-ink); stroke-width: 2; stroke-linecap: round; }
+.c-cross { stroke: var(--ink-3); stroke-width: 1; pointer-events: none; }
+.c-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.c-area { fill-opacity: 0.12; stroke: none; }
+.c-stretch { overflow: visible; pointer-events: none; }
+/* dots carry a ring in the surface colour so they survive overlaps */
+.c-dot { stroke: var(--here); stroke-width: 2; }
+/* stacked segments are separated by a surface-coloured gap, not an outline */
+.c-seg { stroke: var(--here); stroke-width: 2; }
+.c-span { stroke-width: 6; stroke-linecap: round; opacity: 0.35; }
+.c-cap { stroke-width: 2; stroke-linecap: round; }
+.c-link { stroke: var(--chart-neutral); stroke-width: 3; }
+.c-row:hover .c-mark { filter: brightness(1.12); }
+
+/* pictogram icons reuse the illustration parts, recoloured per state */
+.c-picto--off { --art-ink: var(--chart-track); --art-deep: var(--chart-track); --art-far: var(--chart-track); --art-metal: var(--chart-track); }
+.c-picto--off :is(.a-yellow, .a-exh, .a-clean, .a-clean-s) { fill: var(--chart-track); stroke: var(--chart-track); }
+.c-picto--off .a-clean-s { fill: none; }
+.c-picto-exhaust { --art-ink: var(--chart-exhaust); --art-deep: var(--chart-exhaust); --art-far: var(--chart-exhaust); --art-metal: var(--chart-exhaust); }
+.c-picto-clean { --art-ink: var(--chart-clean); --art-deep: var(--chart-clean); --art-far: var(--chart-clean); --art-metal: var(--chart-clean); }
+.c-picto-ink { --art-ink: var(--chart-ink); --art-deep: var(--chart-ink); --art-far: var(--chart-ink); --art-metal: var(--chart-ink); }
+.c-picto-signal { --art-ink: var(--chart-signal); --art-deep: var(--chart-signal); --art-far: var(--chart-signal); --art-metal: var(--chart-signal); }
+.c-picto-blue { --art-ink: var(--chart-blue); --art-deep: var(--chart-blue); --art-far: var(--chart-blue); --art-metal: var(--chart-blue); }
+
+/* ---- legend ------------------------------------------------------------------ */
+.chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
+  color: var(--ink-2);
+}
+.chart__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.chart__key {
+  flex: none;
+  inline-size: 0.8em;
+  block-size: 0.8em;
+  background: var(--k);
+}
+.chart__key--line {
+  block-size: 3px;
+  inline-size: 1.2em;
+  border-radius: 2px;
+}
+.chart__key--dot {
+  border-radius: 50%;
+}
+.chart__key--light {
+  background: var(--chart-track);
+}
+.c-key-exhaust { --k: var(--chart-exhaust); }
+.c-key-clean { --k: var(--chart-clean); }
+.c-key-blue { --k: var(--chart-blue); }
+.c-key-lime { --k: var(--chart-lime); }
+.c-key-magenta { --k: var(--chart-magenta); }
+.c-key-violet { --k: var(--chart-violet); }
+.c-key-neutral { --k: var(--chart-neutral); }
+.c-key-ink { --k: var(--chart-ink); }
+.c-key-signal { --k: var(--chart-signal); }
+
+/* ---- data table (the accessible twin of every chart) ------------------------ */
+.chart__data {
+  font-size: var(--fs-xs);
+}
+.chart__data > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-block-size: 2rem;
+  color: var(--ink-2);
+  font-weight: var(--fw-bold);
+  list-style: none;
+  cursor: pointer;
+}
+.chart__data > summary::-webkit-details-marker {
+  display: none;
+}
+.chart__data > summary span {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.22em;
+}
+.chart__data > summary:hover {
+  color: var(--ink);
+}
+.chart__table {
+  margin-block-start: var(--sp-2);
+  overflow-x: auto;
+}
+.chart__table table {
+  font-size: var(--fs-xs);
+  min-inline-size: min(100%, 18rem);
+  inline-size: auto;
+}
+.chart__table th[scope='row'] {
+  font-weight: var(--fw-medium);
+  padding-inline-end: var(--sp-5);
+}
+
+/* ---- tooltip ----------------------------------------------------------------- */
+.chart-tip {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 80;
+  display: grid;
+  gap: 0.1em;
+  max-inline-size: min(18rem, calc(100vw - 16px));
+  padding: 0.45em 0.7em;
+  border-radius: var(--radius-2);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+  pointer-events: none;
+}
+.chart-tip[hidden] {
+  display: none;
+}
+.chart-tip strong {
+  font-weight: var(--fw-bold);
+  opacity: 0.75;
+}
+
+@media (forced-colors: active) {
+  .c-seg,
+  .c-dot {
+    stroke: Canvas;
+  }
+}

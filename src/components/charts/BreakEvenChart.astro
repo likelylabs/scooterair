@@ -1,0 +1,39 @@
+---
+/**
+ * BreakEvenChart — cumulative cost over time for two options: two straight
+ * lines that start at their purchase prices and climb at their monthly
+ * running costs. The crossing (if any) is marked and labelled.
+ * Redraw it from a calculator with updateChart().
+ *
+ * Props (plus title, desc, id, class)
+ *   locale            Locale
+ *   a, b              { label: string; tone: Tone; upfront: number; monthly: number }
+ *                     (a = the option with the higher purchase price)
+ *   months            horizon (default 60)
+ *   prefix            currency prefix (default 'NT$')
+ *   tickLabel         (month) => string, x-axis text every 12 months
+ *   breakEvenLabel    (month) => string, label at the crossing
+ *   noBreakEvenLabel  shown when the lines do not cross within the horizon
+ *   height            plot height in px (default 230)
+ *   xLabel            data-table header for the time column
+ *
+ * breakEvenMonth(a, b) is exported from core/breakeven for use in result panels.
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderBreakEven, type BreakEvenProps } from './core/breakeven';
+
+type Props = BreakEvenProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderBreakEven(props as BreakEvenProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />
