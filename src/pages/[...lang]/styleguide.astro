@@ -7,8 +7,11 @@
  * ALL NUMBERS ON THIS PAGE ARE INVENTED SAMPLE DATA.
  */
 import Base from '@/layouts/Base.astro';
-import { asset, localeFromParam, localeStaticPaths } from '@/i18n';
-import { site, ui, units } from '@/i18n/ui';
+import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { chain, evidenceKinds, questions, site, ui, units } from '@/i18n/ui';
+import { jurisdictionIds } from '@/data/econ/types';
+import { formatDate, snapshot } from '@/lib/site-state.data';
+import { shareCard } from '@/lib/share-cards';
 
 import Block from '@/components/styleguide/Block.astro';
 import Swatch from '@/components/styleguide/Swatch.astro';
@@ -17,7 +20,18 @@ import Button from '@/components/ui/Button.astro';
 import Callout from '@/components/ui/Callout.astro';
 import Card from '@/components/ui/Card.astro';
 import ChainMarker from '@/components/ui/ChainMarker.astro';
+import ChainStrip from '@/components/ui/ChainStrip.astro';
 import Chapter from '@/components/ui/Chapter.astro';
+import CountdownRail from '@/components/ui/CountdownRail.astro';
+import DecisionStrip from '@/components/ui/DecisionStrip.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import MoneyBanner from '@/components/ui/MoneyBanner.astro';
+import NotClaimedList from '@/components/ui/NotClaimedList.astro';
+import QuestionChips from '@/components/ui/QuestionChips.astro';
+import StanceBox from '@/components/ui/StanceBox.astro';
+import SubsidyTimeline from '@/components/ui/SubsidyTimeline.astro';
+import TileMap from '@/components/ui/TileMap.astro';
+import TimeLadder from '@/components/ui/TimeLadder.astro';
 import Cite from '@/components/ui/Cite.astro';
 import CompareTable from '@/components/ui/CompareTable.astro';
 import Details from '@/components/ui/Details.astro';
@@ -41,6 +55,7 @@ import Tag from '@/components/ui/Tag.astro';
 import BarChart from '@/components/charts/BarChart.astro';
 import BeforeAfterChart from '@/components/charts/BeforeAfterChart.astro';
 import BreakEvenChart from '@/components/charts/BreakEvenChart.astro';
+import EmptyChart from '@/components/charts/EmptyChart.astro';
 import GroupedBarChart from '@/components/charts/GroupedBarChart.astro';
 import LineChart from '@/components/charts/LineChart.astro';
 import PictogramRow from '@/components/charts/PictogramRow.astro';
@@ -55,6 +70,7 @@ import SceneCompare from '@/components/art/SceneCompare.astro';
 import Scooter from '@/components/art/Scooter.astro';
 import ScrambleCrossing from '@/components/art/ScrambleCrossing.astro';
 import Signal from '@/components/art/Signal.astro';
+import StreetScene from '@/components/art/StreetScene.astro';
 import Mark from '@/components/shell/Mark.astro';
 
 export const getStaticPaths = localeStaticPaths;
@@ -72,10 +88,14 @@ const toc = [
   ['layout', L('間距與版面', 'Space and layout')],
   ['motifs', L('街道語彙', 'Street motifs')],
   ['components', L('元件', 'Components')],
-  ['chain', L('證據鏈', 'Evidence chain')],
+  ['recipe', L('怎麼做一個章節', 'How to build a chapter')],
+  ['redlight', L('紅燈示範與倒數軌', 'The red light and the rail')],
+  ['chain', L('證據與證據鏈', 'Evidence and the chain')],
   ['forms', L('表單與試算', 'Forms and calculator')],
+  ['money', L('日期狀態與補助', 'Date state and subsidies')],
   ['charts', L('圖表', 'Charts')],
   ['art', L('插畫', 'Illustration')],
+  ['copy', L('文案與分享圖', 'Copy and share cards')],
 ];
 
 // ---- sample data (invented) ------------------------------------------------
@@ -136,18 +156,49 @@ const evLine = { label: calc.text.ev, tone: 'clean' as const, upfront: net0, mon
 const gasLine = { label: calc.text.gasShort, tone: 'exhaust' as const, upfront: calc.gas, monthly: calc.km * calc.gasPerKm + calc.gasFixed };
 const tickLabel = (m: number) => (m === 0 ? calc.text.purchase : calc.text.year.replace('{n}', String(m / 12)));
 
-const chainDemo = [
-  { strength: 'established' as const, body: L('示意文字：這一環說明排氣管排出哪些氣體。', 'Placeholder: this link says which gases leave the tailpipe.'), cites: [{ id: 'sample-a', n: 1 }] },
-  { strength: 'measured' as const, body: L('示意文字：排放的位置與情境。', 'Placeholder: where and when it is emitted.'), cites: [{ id: 'sample-b', n: 2 }] },
-  { strength: 'measured' as const, body: L('示意文字：行人與騎士實際量到的暴露量。', 'Placeholder: measured exposure of walkers and riders.'), cites: [{ id: 'sample-c', n: 3 }, { id: 'sample-d', n: 4 }] },
-  { strength: 'established' as const, body: L('示意文字：國際機構對這些物質的分類。', 'Placeholder: how international bodies classify these compounds.'), cites: [{ id: 'sample-e', n: 5 }] },
-  { strength: 'established' as const, body: L('示意文字：族群研究與文獻回顧。', 'Placeholder: cohort studies and reviews.'), cites: [{ id: 'sample-f', n: 6 }] },
-  { strength: 'inference' as const, body: L('示意文字：由前幾環推得，並標明尚待研究之處。', 'Placeholder: inferred from the earlier links, with the gaps named.'), cites: [{ id: 'sample-g', n: 7 }] },
-  { body: L('示意文字：拿掉排氣管，前面每一環都斷開。', 'Placeholder: remove the tailpipe and every link before this one comes apart.') },
+// Sample content for the chain board. Placeholders, not findings.
+const boardDemo = [
+  { strength: 'official-tw' as const, body: L('示意文字：這一環說明排氣管排出哪些氣體。', 'Placeholder: this link says which gases leave the tailpipe.'), cites: [{ id: 'sample-a', n: 1 }] },
+  { strength: ['international', 'official-tw'] as ('international' | 'official-tw')[], body: L('示意文字：排放的位置與情境。', 'Placeholder: where and when it is emitted.'), cites: [{ id: 'sample-b', n: 2 }] },
+  { strength: 'measured-tw' as const, body: L('示意文字：測站的數字跟得上什麼、跟不上什麼。', 'Placeholder: what a station does and does not track.'), cites: [{ id: 'sample-c', n: 3 }, { id: 'sample-d', n: 4 }] },
+  { strength: 'international' as const, body: L('示意文字：國際機構對這些物質的分類。', 'Placeholder: how international bodies classify these compounds.'), cites: [{ id: 'sample-e', n: 5 }] },
+  { strength: 'modelled-tw' as const, secondary: true, body: L('示意文字：模式推估，來源是次級來源。', 'Placeholder: a modelled figure resting on a secondary source.'), cites: [{ id: 'sample-f', n: 6 }] },
+  { strength: 'derived' as const, body: L('示意文字：本站根據引用數字做的計算。', 'Placeholder: our own arithmetic on cited figures.'), cites: [{ id: 'sample-g', n: 7 }] },
 ];
+const classicDemo = [
+  { strength: 'official-tw' as const, body: L('示意文字。', 'Placeholder.') },
+  { strength: 'international' as const, body: L('示意文字。', 'Placeholder.') },
+  { strength: 'gap' as const, body: L('示意文字：沒人量過的一環，軌道在這裡用虛線以外的方式標出。', 'Placeholder: the link nobody has measured.') },
+  { strength: 'international' as const },
+  { strength: 'international' as const },
+  { strength: 'measured-tw' as const },
+  { body: L('示意文字：拿掉排氣管。', 'Placeholder: remove the tailpipe.') },
+];
+const ladderDemo = [
+  { time: L('90 秒', '90 seconds'), empty: true },
+  { time: L('1 小時', '1 hour'), body: L('示意文字：一項研究、多少人、量了什麼、看到什麼關聯。', 'Placeholder: one study, how many people, what was measured, what moved with it.'), badge: 'measured-tw' as const, scope: 'all-sources' },
+  { time: L('2 小時', '2 hours'), body: L('示意文字：另一項研究的一句話結果。', 'Placeholder: one line from another study.'), badge: 'international' as const, scope: 'traffic' },
+  { time: L('很多年', 'Many years'), body: L('示意文字：長期世代研究的一句話結果。', 'Placeholder: one line from a long-term cohort.'), badge: 'measured-tw' as const, scope: 'all-sources' },
+];
+const decisionDemo = {
+  steps: [
+    { id: 'charge', legend: L('停車的地方能不能充電？', 'Can you charge where you park?'), options: [{ value: 'yes', label: L('可以', 'Yes') }, { value: 'no', label: L('不行', 'No') }] },
+    { id: 'km', legend: L('一個月大概騎多少？', 'How far do you ride a month?'), options: [{ value: 'low', label: L('示意：少', 'Sample: little') }, { value: 'high', label: L('示意：多', 'Sample: a lot') }] },
+    { id: 'plate', legend: L('一定要白牌嗎？', 'Must it be a white plate?'), options: [{ value: 'yes', label: L('要', 'Yes') }, { value: 'no', label: L('綠牌也行', 'Green is fine') }] },
+  ],
+  outcomes: [
+    { when: { charge: 'yes' }, title: L('示意結果甲：在家充電', 'Sample result A: charge at home'), body: L('示意說明：一句話講為什麼。', 'Placeholder: one line on why.'), value: 'sample-home' },
+    { when: { charge: 'no', km: 'low' }, title: L('示意結果乙：用多少付多少', 'Sample result B: pay as you go'), body: L('示意說明。', 'Placeholder.'), value: 'sample-payg' },
+    { when: {}, title: L('示意結果丙：月租', 'Sample result C: a monthly plan'), body: L('示意說明。', 'Placeholder.'), value: 'sample-monthly' },
+  ],
+};
+const cityOptions = [{ value: '', label: L('還沒選', 'Not chosen') }, ...jurisdictionIds.map((id) => ({ value: id, label: snapshot.cities[id].name[locale] }))];
+const cardZh = shareCard('smell', 'zh-TW');
+const cardEn = shareCard('smell', 'en');
 ---
 
-<Base locale={locale} title={L('設計系統', 'Design system')} description={L('行人呼吸網站的設計系統：色彩、文字、元件、圖表與插畫。', 'The ScooterAir design system: colour, type, components, charts and illustration.')} noindex>
+<Base locale={locale} title={L('設計系統', 'Design system')} description={L('行人呼吸網站的設計系統：色彩、文字、元件、圖表與插畫。', 'The ScooterAir design system: colour, type, components, charts and illustration.')} noindex money>
+  <CountdownRail slot="rail" locale={locale} page="/styleguide/" items={[{ href: '#connect', label: L('接起來', 'Joining it up') }, { href: '#money', label: L('算錢（日期狀態）', 'The money (date state)') }, { href: '#recipe', label: L('章節做法', 'Chapter recipe') }]} />
   <div class="sg-hero">
     <div class="container">
       <p class="eyebrow">{site.name[locale]} · {L('設計系統', 'Design system')}</p>
@@ -173,18 +224,18 @@ const chainDemo = [
       <div class="prose">
         <p>
           {L(
-            '機車廢氣不是飄在天上的霧霾，而是排在膝蓋高度、等紅燈時堆在路口的那一層。整個網站的視覺都圍繞「高度」：頁面是陰天的街道，冷色的柏油灰代表乾淨的空氣；所有暖色（赭黃到煤褐）都是廢氣，而且永遠貼著畫面底部；行人號誌的綠是出口，紅燈的紅只用在「等紅燈的那一刻」。',
-            'Scooter exhaust is not smog in the sky. It leaves at knee height and pools at the crossing while the light is red. So the whole site is organised by height: the page is an overcast street, and its cool asphalt greys are clean air; everything warm (ochre to soot) is exhaust and always hugs the bottom of the frame; pedestrian-signal green is the way out; signal red is reserved for the red-light moment.',
+            '機車的排氣管離地不到一公尺，就在斑馬線旁邊；站在旁邊的人吸進多少，台灣還沒有人量過。整個網站的視覺都圍繞「高度」和這一格空白：頁面是陰天的街道，冷色的柏油灰代表乾淨的空氣；所有暖色（赭黃到煤褐）都是廢氣，而且永遠貼著畫面底部；行人號誌的綠是出口，紅燈的紅只用在「等紅燈的那一刻」。沒量過的東西畫成斜線，不畫成濃度。',
+            'A scooter’s tailpipe sits under a metre off the ground, beside the crosswalk, and nobody in Taiwan has measured what the person standing next to it breathes. So the whole site is organised by height, and around that blank: the page is an overcast street, and its cool asphalt greys are clean air; everything warm (ochre to soot) is exhaust and always hugs the bottom of the frame; pedestrian-signal green is the way out; signal red is reserved for the red-light moment. What has not been measured is drawn as hatching, never as a density.',
           )}
         </p>
         <p>
           {L(
-            '邊緣像標線一樣銳利：小圓角、沒有陰影、沒有漸層卡片，只用細線和粗的「漆線」分隔。數字用又高又窄的字，像漆在路面上的字。說故事的順序由濃到清：前面的章節底部霧層厚，到解方時歸零。',
-            'Edges are crisp like road paint: small radii, no shadows, no gradient cards, only hairlines and thick painted rules. Numerals are tall and condensed, like figures painted on asphalt. The story runs from thick to clear: early chapters carry a dense band of fumes along the bottom, and it falls to nothing at the solution.',
+            '邊緣像標線一樣銳利：小圓角、沒有陰影、沒有漸層卡片，只用細線和粗的「漆線」分隔。數字用又高又窄的字，像漆在路面上的字。整個首頁是一個紅燈：倒數從 90 走到 00，底部的斜線帶濃度固定，不跟著倒數變。',
+            'Edges are crisp like road paint: small radii, no shadows, no gradient cards, only hairlines and thick painted rules. Numerals are tall and condensed, like figures painted on asphalt. The home page is one red light: the countdown runs from 90 to 00, and the hatched band along the bottom has one fixed density that never follows the clock.',
           )}
         </p>
         <ul>
-          <li>{L('語氣：急迫但就事論事。騎士不是壞人，他們吸到的最多。', 'Tone: urgent but factual. Riders are not villains: they breathe the most of it.')}</li>
+          <li>{L('語氣：站在同一個路口、讀過論文的鄰居。騎士不是反派，是在車陣裡待最久的人。', 'Tone: a neighbour at the same crossing who has read the papers. Riders are not the villains; they are the people who spend longest in the pack.')}</li>
           <li>{L('這不是電動車廣告：不出現任何品牌或實際車款。', 'This is not an EV advert: no brands, no real models.')}</li>
           <li>{L('每個數字都要有來源標記；沒有來源的只能是標示清楚的示意數據。', 'Every number carries a citation marker; anything without one must be visibly labelled sample data.')}</li>
         </ul>
@@ -213,6 +264,8 @@ const chainDemo = [
           <li>{L('只用語意色票（--ink、--exhaust、--clean…），不要直接寫色碼。', 'Use semantic tokens only (--ink, --exhaust, --clean…). Never write a hex value.')}</li>
           <li>{L('中文一律用全形標點；中英文、數字之間打一個半形空格。', 'Chinese text uses full-width punctuation; put one normal space between Chinese and Latin letters or digits.')}</li>
           <li>{L('示意數字必須加上 sample 屬性（Figure、Stat、ResultPanel 都有）。', 'Placeholder numbers must set the sample prop (Figure, Stat and ResultPanel all have it).')}</li>
+          <li>{L('頁面文案不寫在 .astro 裡：放在 src/i18n/pages/<頁面>.ts，每個字串中英都要有。npm run check 會逐句檢查（見「文案與分享圖」）。', 'Page copy is not written in the .astro file: it lives in src/i18n/pages/<page>.ts, every string in both languages. npm run check reads every one (see Copy and share cards).')}</li>
+          <li>{L('每個說法都帶證據標記（EvidenceBadge）；沒人量過的就說沒人量過，並且接著說誰量得出來。', 'Every claim wears its evidence badge; what nobody has measured is said to be unmeasured, followed by who could measure it.')}</li>
         </ol>
       </div>
       <pre class="sg-code" tabindex="0"><code>{`---
@@ -312,8 +365,8 @@ const locale = localeFromParam(Astro.params.lang);
     <div class="sg-type">
       {[
         ['.display', 'display', L('紅燈亮起的那一刻', 'The moment the light turns red')],
-        ['h1', 'h1', L('廢氣排在膝蓋的高度', 'Exhaust leaves at knee height')],
-        ['h2', 'h2', L('孩子走在最濃的那一層', 'Children walk in the densest layer')],
+        ['h1', 'h1', L('排氣管離地不到一公尺', 'The tailpipe is under a metre up')],
+        ['h2', 'h2', L('這一格，沒有人量過', 'Nobody has measured this')],
         ['h3', 'h3', L('誰在路口站得最久', 'Who stands at the crossing longest')],
         ['h4', 'h4', L('怎麼讀這張圖', 'How to read this chart')],
       ].map(([name, cls, sample]) => (

@@ -28,7 +28,8 @@ export default defineConfig({
   integrations: [
     sitemap({
       i18n: { defaultLocale: 'zh-TW', locales: { 'zh-TW': 'zh-TW', en: 'en' } },
-      filter: (page) => !/\/styleguide\/$/.test(page),
+      // utility pages and the /problem/ → /questions/ redirect stay out of the sitemap
+      filter: (page) => !/\/(styleguide(-[a-z]+)?|problem)\/$/.test(page),
     }),
   ],
   vite: { plugins: [woff2Only] },

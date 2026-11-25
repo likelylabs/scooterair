@@ -176,7 +176,7 @@ function street(v: 'wide' | 'compact') {
     const cx = wide ? 505 : 240;
     const lift = wide ? 52 : 46;
     world.push(
-      `<g class="a-row-3 scene-car" transform="translate(${cx} ${-lift}) scale(${cs})">${car()}<g class="L-fumes" transform="translate(${CAR_TAILPIPE.x} ${CAR_TAILPIPE.y})">${ribbon()}</g></g>`,
+      `<g class="a-row-3 scene-car" transform="translate(${cx} ${-lift}) scale(${cs})">${car()}<g class="L-fumes" transform="translate(${CAR_TAILPIPE.x} ${CAR_TAILPIPE.y}) scale(-1 1)">${ribbon()}</g></g>`,
     );
   }
 

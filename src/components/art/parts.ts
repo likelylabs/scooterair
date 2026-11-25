@@ -528,9 +528,10 @@ export function car(): string {
  * (with three ribbons arriving); hollow and dashed = cannot.
  */
 export function nose(filled: boolean): string {
-  const shape = 'M30,5 L30,22 C30,29 16,31 16,38 C16,42 20,43.5 25,43.5 L34,43.5 C38.5,43.5 38.5,38.5 35,37.5';
+  // narrow bridge at the top, bulb and nostril wing at the bottom, tip to the left
+  const shape = 'M27,5 C26,16 15,25 13,33 C12,38 15,41 20,41 C24,41 26,39 28,39.5 C32,40.5 37,39 37,34 C37,30 34,28 33,24 C32,17 33,10 33,5 Z';
   return filled
-    ? `<path class="a-ink" d="${shape} L43,37.5 L43,5 Z"/><g class="a-ribbon"><path d="M3,30 q3,-3 6,0 t6,0" stroke-width="2.6"/><path d="M2,37 q3,-3 6,0 t6,0" stroke-width="2.6" opacity="0.8"/><path d="M5,23 q3,-3 6,0 t5,0" stroke-width="2.2" opacity="0.7"/></g>`
+    ? `<path class="a-ink" d="${shape}"/><ellipse class="a-bg" cx="21.5" cy="37.6" rx="3.4" ry="1.5"/><g class="a-ribbon"><path d="M0,31 q2.5,-3 5,0 t5,0" stroke-width="2.6"/><path d="M-1,38 q2.5,-3 5,0 t5,0" stroke-width="2.6" opacity="0.8"/><path d="M2,24 q2.5,-3 5,0 t4,0" stroke-width="2.2" opacity="0.7"/></g>`
     : `<path class="a-ink-s" stroke-width="2.4" stroke-dasharray="4 3.2" d="${shape}"/>`;
 }
 

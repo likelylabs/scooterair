@@ -1,0 +1,14 @@
+---
+/**
+ * /problem/ moved to /questions/ (blueprint 4.1). Kept as a redirect in both
+ * locales so old links and shares still land.
+ */
+import Redirect from '@/layouts/Redirect.astro';
+import { localeFromParam, localeStaticPaths } from '@/i18n';
+import { nav } from '@/i18n/ui';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+---
+
+<Redirect locale={locale} to="/questions/" label={nav[0].label[locale]} />

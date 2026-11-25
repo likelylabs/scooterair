@@ -117,9 +117,6 @@
   .a-animated .a-drift-2 { animation: a-drift 23s ease-in-out infinite alternate-reverse; }
   .a-animated .a-drift-3 { animation: a-drift 31s ease-in-out infinite alternate; }
   .a-animated .a-breath { animation: a-breathe 4.2s ease-in-out infinite; }
-  .a-animated .a-build { animation: a-build 30s linear infinite; }
-  .a-animated .a-count-units { animation: a-count-units 10s steps(10) infinite; }
-  .a-animated .a-count-tens { animation: a-count-tens 30s steps(3) infinite; }
 }
 @keyframes a-puff {
   0% { opacity: 0; transform: translate(0, 0) scale(0.35); }
@@ -134,20 +131,9 @@
   0%, 100% { transform: scale(0.85); opacity: 0.75; }
   45% { transform: scale(1.18); opacity: 1; }
 }
-/* Haze thickens while the light is red, then the pack pulls away. */
-@keyframes a-build {
-  0% { opacity: 0.5; }
-  90% { opacity: 1; }
-  100% { opacity: 0.5; }
-}
-@keyframes a-count-units {
-  from { transform: translateY(0); }
-  to { transform: translateY(var(--count-units-span)); }
-}
-@keyframes a-count-tens {
-  from { transform: translateY(0); }
-  to { transform: translateY(var(--count-tens-span)); }
-}
+/* There is deliberately no animation that changes how much air pollution is drawn
+   (blueprint R11). The drift and puff keyframes above serve only the deprecated
+   Haze kinds and are not used by StreetScene, Scooter or any red-light frame. */
 
 /* ==== Second air vocabulary (see parts.ts) =================================
  * Nothing here encodes an amount. The hatch has one pitch, the rings one

@@ -1,9 +1,10 @@
 ---
 /**
  * Home — placeholder shell.
- * The real long-form narrative is written by the page builders; this file
- * only proves the shell: Base, the hero headline slot and the signature scene.
- * Replace the copy, keep the structure if it helps.
+ * The real long-form narrative is written by the home workstream (blueprint
+ * Part 3); this file only proves the shell: Base, the rail slot, the prologue
+ * from its copy module and the signature scene. Copy lives in
+ * src/i18n/pages/home.ts, never inline here (see src/i18n/pages/_copy.ts).
  */
 import Base from '@/layouts/Base.astro';
 import Button from '@/components/ui/Button.astro';
@@ -12,38 +13,34 @@ import PollutantKey from '@/components/art/PollutantKey.astro';
 import Signal from '@/components/art/Signal.astro';
 import StreetScene from '@/components/art/StreetScene.astro';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { site, ui } from '@/i18n/ui';
+import { nav, questions, site, ui } from '@/i18n/ui';
+import home from '@/i18n/pages/home';
+import { localize } from '@/i18n/pages/_copy';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
-const en = locale === 'en';
-
-const t = {
-  headline: en ? 'What we breathe |at the red light' : '等紅燈的時候，|我們吸進了什麼',
-  primary: en ? 'See the problem' : '看問題在哪裡',
-  secondary: en ? 'What going electric costs' : '換電動要花多少',
-};
+const t = localize(home, locale).prologue;
 ---
 
 <Base locale={locale} title={site.name[locale]} home>
   <section class="hero" aria-labelledby="hero-title">
     <div class="container hero__text">
       <p class="eyebrow hero__kicker">
-        <Signal state="red" size="2rem" />
-        <span>{ui.phaseRed[locale]}</span>
+        <Signal state="red" size="2rem" label={ui.phaseRed[locale]} />
+        <span>{t.kicker}</span>
       </p>
-      <h1 id="hero-title" class="display"><Phrased text={t.headline} /></h1>
-      <p class="lead">{site.description[locale]}</p>
+      <h1 id="hero-title" class="display"><Phrased text={t.title} /></h1>
+      <p class="lead">{t.deck}</p>
       <div class="cluster">
-        <Button href={href('/problem/', locale)} size="lg" arrow>{t.primary}</Button>
-        <Button href={href('/electric/', locale)} size="lg" variant="secondary">{t.secondary}</Button>
+        <Button href={href(nav[0].path, locale)} size="lg" arrow>{questions.all[locale]}</Button>
+        <Button href={href('/electric/', locale)} size="lg" variant="secondary">{questions.chips[5].label[locale]}</Button>
       </div>
     </div>
     <div class="hero__scene">
-      <StreetScene locale={locale} frame="empty" count={90} />
+      <StreetScene locale={locale} />
     </div>
     <div class="container hero__key">
-      <p class="meta">{ui.illustrative[locale]}</p>
+      <p class="meta">{t.disclosure}</p>
       <PollutantKey locale={locale} />
     </div>
   </section>

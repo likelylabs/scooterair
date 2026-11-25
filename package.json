@@ -7,8 +7,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "node scripts/check-data.mjs && npm run test:calc && astro check",
-    "test:calc": "node --test 'src/lib/calc/__tests__/*.test.ts'"
+    "check": "node scripts/check-data.mjs && node scripts/check-copy.mjs && npm run test:calc && npm run test:lib && node scripts/build-share-cards.mjs --check && astro check",
+    "test:calc": "node --test 'src/lib/calc/__tests__/*.test.ts'",
+    "check:copy": "node scripts/check-copy.mjs",
+    "test:lib": "node --test 'src/lib/__tests__/*.test.ts'",
+    "share-cards": "node scripts/build-share-cards.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

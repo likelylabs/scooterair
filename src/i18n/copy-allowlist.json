@@ -1,0 +1,65 @@
+{
+  "//": [
+    "Reviewed exceptions for scripts/check-copy.mjs. One entry per (string id, rule id) pair.",
+    "Add an entry only after reading the rule that fired. `reason` must say why THIS string is right despite the match.",
+    "`locale` is optional (omit to cover both languages). An entry that stops matching fails the check: remove it.",
+    "Entries marked reviewedBy 'system (blueprint text)' were seeded from strings the editorial blueprint supplies verbatim; an editor should countersign them by replacing reviewedBy with a name."
+  ],
+  "entries": [
+    {
+      "id": "ui.chain.summary.3.text",
+      "rule": "benzene-not-the-smell",
+      "locale": "en",
+      "reason": "Line 4 of the seven lines says the reader CANNOT smell the benzene, which is what the rule requires; it does not name benzene as the smell.",
+      "reviewedBy": "system (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "ui.ui.scene.altRed",
+      "rule": "no-arcade-or-idling-measurements",
+      "locale": "zh-TW",
+      "reason": "Alt text from blueprint 4.10: 怠速 describes what the drawn scooters are doing. No idle emission figure is cited, and the same sentence says the layer's density has not been measured.",
+      "reviewedBy": "system (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "questions.items.one-red-light.caveat",
+      "rule": "associations-not-causes-tw",
+      "reason": "The caveat denies causation (「有關」，不是「造成」 / association, not cause): it is the rule's own point, and the word appears only to be ruled out.",
+      "reviewedBy": "system (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "questions.items.electric.caveat",
+      "rule": "ev-emissions-not-zero",
+      "reason": "Says 這不是零污染 / this is NOT zero pollution, then limits zero to this scooter's exhaust at the crossing, exactly as the rule asks (blueprint 3.11).",
+      "reviewedBy": "system (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "questions.items.electric.caveat",
+      "rule": "r8-zero-only-own-exhaust",
+      "reason": "Zero is applied only to the scooter's own exhaust and the sentence states the crossing is not zero pollution (R8).",
+      "reviewedBy": "system (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "art.art.cycle.idle",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Label of the signal-cycle strip (blueprint V14, verbatim): 怠速 / Idling names the red phase as time spent standing beside the pack. No idle emission figure is given; the strip's own tag says scooters in Taiwan have not been measured.",
+      "reviewedBy": "system (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.prologue.deck",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Prologue deck (blueprint 3.1, verbatim): 怠速 / idles describes the scene the reader knows. It cites no measurement and the sentence goes on to ask what has and has not been measured.",
+      "reviewedBy": "system (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    }
+  ],
+  "inlineCopyAllowed": [
+    "src/pages/[...lang]/styleguide.astro",
+    "src/pages/[...lang]/styleguide-art.astro"
+  ]
+}
