@@ -17,7 +17,8 @@ import Phrased from '@/components/ui/Phrased.astro';
 import Tag from '@/components/ui/Tag.astro';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
 import Mixed from '@/components/pages/evidence/Mixed.astro';
-import { citeN, dataAnchor, lf, lg, ls, readLabel, sourceUses } from '@/components/pages/evidence/ev';
+import { citeN, dataAnchor, lf, lg, ls, readLabel, sourceUses, withheld } from '@/components/pages/evidence/ev';
+import evidenceCopy from '@/i18n/pages/evidence';
 import { href, htmlLang, localeFromParam, localeStaticPaths } from '@/i18n';
 import { readerText, ui } from '@/i18n/ui';
 import sourcesCopy from '@/i18n/pages/sources';
@@ -155,6 +156,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
                       <ul>
                         {e.u.facts.map((f) => {
                           const x = lf(f, locale);
+                          if (withheld.includes(f)) return <li><a href={href(`/evidence/#${f}`, locale)}>{evidenceCopy.row.withheldLabel[locale]}</a> <span class="sx-src__st">{evidenceCopy.row.withheld[locale]}</span></li>;
                           return <li><a href={href(`/evidence/#${f}`, locale)}>{x.display}</a> <EvidenceBadge locale={locale} kind={x.evidence} variant="icon" /> <span class="sx-src__st"><Mixed text={x.statement} locale={locale} /></span></li>;
                         })}
                       </ul>

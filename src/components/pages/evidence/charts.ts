@@ -8,11 +8,18 @@
 // one design from 300px up. Values come from the registry via figures.ts; nothing is typed here.
 
 import type { Locale } from '@/i18n';
-import { type ChartRender, type LegendItem, type Tone, MIN_W, esc, fmt, niceMax, px, text, wrapLabel } from '@/components/charts/core/shared';
+import { type ChartRender, type LegendItem, type Tone, MIN_W, esc, fmt, fmtCompact, niceMax, px, text, wrapLabel } from '@/components/charts/core/shared';
 
 const r2 = (v: number) => +v.toFixed(2);
 const LINE = 19;
 const MINUS = '−';
+
+/** A text line with a block of the surface colour behind it, so a reference line never runs through it. */
+function bgText(cls: string, x: '0' | '100%', y: number, content: string, size = 14): string {
+  const w = Math.ceil(px(content, size + 0.5)) + 8;
+  const rx = x === '0' ? `x="-2"` : `x="100%" transform="translate(${-w + 2} 0)"`;
+  return `<rect class="evc-bg" ${rx} y="${r2(y - size)}" width="${w}" height="${size + 6}"/>` + text(cls, x, y, content, x === '100%' ? 'text-anchor="end"' : '');
+}
 
 /** Signed number with a typographic minus. */
 export function sgn(locale: Locale, v: number, d = 1): string {
@@ -94,7 +101,7 @@ export function renderSigned(p: SignedProps): ChartRender {
   groups.forEach((g, gi) => {
     if (g.label) {
       const lines = wrapLabel(g.label, MIN_W / 14);
-      lines.forEach((ln, k) => body.push(text('c-label c-strong', 0, y + 14 + k * LINE, ln)));
+      lines.forEach((ln, k) => body.push(bgText('c-label c-strong', '0', y + 14 + k * LINE, ln)));
       y += lines.length * LINE + 6;
     }
     g.rows.forEach((r) => {
@@ -104,8 +111,8 @@ export function renderSigned(p: SignedProps): ChartRender {
       const tone = r.tone ?? p.tone ?? 'exhaust';
       let row = `<g class="c-row" data-tip="${esc(`${g.label ? g.label + ' · ' : ''}${r.label}: ${vt}`)}">`;
       row += `<rect class="c-hit" x="0" y="${y}" width="100%" height="${lines.length * LINE + 26}"/>`;
-      lines.forEach((ln, k) => (row += text('c-label', 0, y + 14 + k * LINE, ln)));
-      row += text('c-value', '100%', y + 14, vt, 'text-anchor="end"');
+      lines.forEach((ln, k) => (row += bgText('c-label', '0', y + 14 + k * LINE, ln)));
+      row += bgText('c-value', '100%', y + 14, vt, 15);
       if (r.value === null) {
         row += `<line class="c-emptykey" x1="0" x2="100%" y1="${by + 6}" y2="${by + 6}"/>`;
       } else {
@@ -185,6 +192,7 @@ export interface IntervalProps {
   midLabel: string;
   lowLabel: string;
   highLabel: string;
+  legend?: LegendItem[];
 }
 
 export function renderIntervals(p: IntervalProps): ChartRender {
@@ -195,15 +203,15 @@ export function renderIntervals(p: IntervalProps): ChartRender {
   const min = Math.floor(Math.min(...vals, reference.value) / s) * s;
   const max = Math.ceil(Math.max(...vals, reference.value) / s) * s;
   const xp = (v: number) => r2(((v - min) / (max - min || 1)) * 100);
-  const f = (v: number) => fmt(locale, v, decimals);
-  const vt = (r: IntervalRow) => `${f(r.mid)}${unit} (${f(r.low)}–${f(r.high)})`;
+  const f = (v: number) => (v < 0 ? MINUS : '') + nf(locale, Math.abs(v), decimals);
+  const vt = (r: IntervalRow) => `${f(r.mid)}${unit} (${f(r.low)} – ${f(r.high)})`;
   const valW = Math.max(...groups.flatMap((g) => g.rows.map((r) => px(vt(r), 14)))) + 10;
   const o: string[] = [];
   const body: string[] = [];
   let y = 26;
   groups.forEach((g) => {
     const lines = wrapLabel(g.label, MIN_W / 14);
-    lines.forEach((ln, k) => body.push(text('c-label c-strong', 0, y + 14 + k * LINE, ln)));
+    lines.forEach((ln, k) => body.push(bgText('c-label c-strong', '0', y + 14 + k * LINE, ln)));
     y += lines.length * LINE + 6;
     g.rows.forEach((r) => {
       const labLines = wrapLabel(r.label, (MIN_W - valW - 8) / 14);
@@ -212,8 +220,8 @@ export function renderIntervals(p: IntervalProps): ChartRender {
       const dim = r.strong === false;
       let row = `<g class="c-row" data-tip="${esc(`${g.label} · ${r.label}: ${vt(r)}`)}">`;
       row += `<rect class="c-hit" x="0" y="${y}" width="100%" height="${labLines.length * LINE + 24}"/>`;
-      labLines.forEach((ln, k) => (row += text(dim ? 'c-label c-dim' : 'c-label', 0, y + 14 + k * LINE, ln)));
-      row += text(dim ? 'c-value c-dim' : 'c-value', '100%', y + 14, vt(r), 'text-anchor="end"');
+      labLines.forEach((ln, k) => (row += bgText(dim ? 'c-label c-dim' : 'c-label', '0', y + 14 + k * LINE, ln)));
+      row += bgText(dim ? 'c-value c-dim' : 'c-value', '100%', y + 14, vt(r), 15);
       row += `<line class="c-span c-stroke-${dim ? 'neutral' : tone}" x1="${xp(r.low)}%" x2="${xp(r.high)}%" y1="${cy}" y2="${cy}"/>`;
       row += `<line class="c-cap c-stroke-${dim ? 'neutral' : tone}" x1="${xp(r.low)}%" x2="${xp(r.low)}%" y1="${cy - 5}" y2="${cy + 5}"/><line class="c-cap c-stroke-${dim ? 'neutral' : tone}" x1="${xp(r.high)}%" x2="${xp(r.high)}%" y1="${cy - 5}" y2="${cy + 5}"/>`;
       row += dim
@@ -238,6 +246,7 @@ export function renderIntervals(p: IntervalProps): ChartRender {
     kind: 'evc-interval',
     body: o.join(''),
     height: axisY + 26,
+    legend: p.legend,
     table: {
       head: [p.categoryLabel, p.midLabel, p.lowLabel, p.highLabel],
       rows: groups.flatMap((g) => g.rows.map((r) => [`${g.label} · ${r.label}`, `${f(r.mid)}${unit}`, `${f(r.low)}${unit}`, `${f(r.high)}${unit}`])),
@@ -289,8 +298,8 @@ export function renderSpans(p: SpanProps): ChartRender {
     const tone = r.tone ?? 'exhaust';
     let g = `<g class="c-row" data-tip="${esc(`${r.label}: ${vt(r)}`)}">`;
     g += `<rect class="c-hit" x="0" y="${y}" width="100%" height="${lines.length * LINE + 28}"/>`;
-    lines.forEach((ln, k) => (g += text('c-label', 0, y + 14 + k * LINE, ln)));
-    g += text('c-value', '100%', y + 14, vt(r), 'text-anchor="end"');
+    lines.forEach((ln, k) => (g += bgText('c-label', '0', y + 14 + k * LINE, ln)));
+    g += bgText('c-value', '100%', y + 14, vt(r), 15);
     g += `<rect class="c-track" x="0" y="${cy - 4}" width="100%" height="8" rx="4"/>`;
     if (r.value !== undefined) {
       g += `<circle class="c-dot c-fill-${tone} c-mark" cx="${xp(r.value)}%" cy="${cy}" r="7"/>`;
@@ -357,25 +366,32 @@ export function renderTime(p: TimeProps): ChartRender {
   const x0 = xs[0];
   const x1 = xs[xs.length - 1];
   const ys = series.flatMap((s) => s.points.map((q) => q.y)).filter((v): v is number => v !== null);
-  const yMax = p.yMax ?? niceMax(Math.max(...ys));
+  const yMax = p.yMax ?? niceMax(Math.max(...ys) * 1.08);
   const xp = (x: number) => r2(((x - x0) / (x1 - x0 || 1)) * 100);
   const yp = (v: number) => TOP + H - (v / yMax) * H;
-  const f = (v: number) => fmt(locale, v, decimals);
+  const f = (v: number) => nf(locale, v, decimals);
+  const tickF = (v: number) => (v >= 10000 ? fmtCompact(locale, v) : nf(locale, v, 1));
   const o: string[] = [];
   ticks(0, yMax, 4).forEach((t, i) => {
     o.push(`<line class="${i === 0 ? 'c-axis' : 'c-grid'}" x1="0" x2="100%" y1="${yp(t)}" y2="${yp(t)}"/>`);
-    o.push(text('c-tick', 0, yp(t) - 4, f(t)));
+    o.push(text('c-tick', 0, yp(t) + 4, tickF(t), 'text-anchor="end" dx="-8"'));
   });
   o.push(text('c-tick', '100%', 12, unit, 'text-anchor="end"'));
   // x ticks: every year that has a point, thinned to fit a phone
-  const minGap = 34 / MIN_W * 100;
-  let last = -Infinity;
-  xs.forEach((x, i) => {
+  // x ticks: the ends of the axis and of each series first, then any year that still fits.
+  // A label needs about its own width between centres; the start- and end-anchored ones need more.
+  const labelW = ((px('2000', 12) + 8) / (MIN_W - 46)) * 100;
+  const ends = series.flatMap((sr) => {
+    const shown = sr.points.filter((q) => q.y !== null).map((q) => q.x);
+    return shown.length ? [shown[0], shown[shown.length - 1]] : [];
+  });
+  const order = [...new Set([x0, x1, ...ends, ...xs])];
+  const kept: number[] = [];
+  const need = (a: number, b: number) => labelW * ([a, b].some((v) => v === x0 || v === x1) ? 1.5 : 1);
+  for (const x of order) if (kept.every((k) => Math.abs(xp(k) - xp(x)) >= need(k, x))) kept.push(x);
+  kept.sort((a, b) => a - b).forEach((x) => {
     const pos = xp(x);
-    if (i !== xs.length - 1 && pos - last < minGap) return;
-    if (i === xs.length - 1 && pos - last < minGap) o.pop();
-    o.push(text('c-tick', `${pos}%`, TOP + H + 18, String(x), `text-anchor="${i === 0 ? 'start' : i === xs.length - 1 ? 'end' : 'middle'}"`));
-    last = pos;
+    o.push(text('c-tick', `${pos}%`, TOP + H + 18, String(x), `text-anchor="${x === x0 ? 'start' : x === x1 ? 'end' : 'middle'}"`));
   });
   const paths: string[] = [];
   series.forEach((s) => {
@@ -390,7 +406,7 @@ export function renderTime(p: TimeProps): ChartRender {
   });
   o.push(`<svg class="c-stretch" x="0" y="0" width="100%" height="${TOP + H}" viewBox="0 0 1000 ${TOP + H}" preserveAspectRatio="none">${paths.join('')}</svg>`);
   // points and end labels (pushed apart so they never collide)
-  const ends: { y: number; text: string; x: number; anchor: string }[] = [];
+  const endLabels: { y: number; text: string; x: number; anchor: string }[] = [];
   series.forEach((s) => {
     const shown = s.points.filter((q): q is { x: number; y: number } => q.y !== null);
     shown.forEach((q) => {
@@ -405,13 +421,13 @@ export function renderTime(p: TimeProps): ChartRender {
     } else if (shown.length) {
       const a = shown[0];
       const b = shown[shown.length - 1];
-      ends.push({ y: yp(a.y), text: f(a.y), x: xp(a.x), anchor: 'start' });
-      ends.push({ y: yp(b.y), text: f(b.y), x: xp(b.x), anchor: b.x === x1 ? 'end' : 'middle' });
+      endLabels.push({ y: yp(a.y), text: f(a.y), x: xp(a.x), anchor: 'start' });
+      endLabels.push({ y: yp(b.y), text: f(b.y), x: xp(b.x), anchor: b.x === x1 ? 'end' : 'middle' });
     }
   });
   // de-collide labels that share an x
-  const groupsByX = new Map<string, typeof ends>();
-  ends.forEach((e) => groupsByX.set(`${e.x}|${e.anchor}`, [...(groupsByX.get(`${e.x}|${e.anchor}`) ?? []), e]));
+  const groupsByX = new Map<string, typeof endLabels>();
+  endLabels.forEach((e) => groupsByX.set(`${e.x}|${e.anchor}`, [...(groupsByX.get(`${e.x}|${e.anchor}`) ?? []), e]));
   for (const g of groupsByX.values()) {
     g.sort((a, b) => a.y - b.y);
     g.forEach((e, i) => {
@@ -419,7 +435,7 @@ export function renderTime(p: TimeProps): ChartRender {
       if (i > 0 && e.y - g[i - 1].y < 15) e.y = g[i - 1].y + 15;
     });
   }
-  ends.forEach((e) => o.push(text('c-value c-value--sm', `${e.x}%`, e.y, e.text, `text-anchor="${e.anchor}" dx="${e.anchor === 'start' ? 2 : e.anchor === 'end' ? -2 : 0}"`)));
+  endLabels.forEach((e) => o.push(text('c-value c-value--sm', `${e.x}%`, e.y, e.text, `text-anchor="${e.anchor}" dx="${e.anchor === 'start' ? 2 : e.anchor === 'end' ? -2 : 0}"`)));
   const head = [p.xLabel, ...series.map((s) => s.label)];
   const rows = xs.map((x) => [String(x), ...series.map((s) => {
     const v = s.points.find((q) => q.x === x)?.y;
@@ -429,6 +445,8 @@ export function renderTime(p: TimeProps): ChartRender {
     kind: 'evc-time',
     body: o.join(''),
     height: TOP + H + 28,
+    padLeft: 40,
+    padRight: 6,
     legend: series.map((s) => ({ label: s.label, tone: s.tone, shape: s.target ? 'dot' : 'line' })),
     table: { head: head.map((h, i) => (i ? `${h} (${unit})` : h)), rows },
   };

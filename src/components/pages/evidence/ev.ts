@@ -134,6 +134,13 @@ export const notUsedSeries: SeriesId[] = ['iot-scramble-summary', 'iot-scramble-
 export const casePanelFacts: FactId[] = ['tsai2026-three-scooter-case'];
 export const casePanelSeries: SeriesId[] = ['tsai2026-three-scooter-case'];
 
+/**
+ * Rows not printed as they stand because their wording breaks a binding correction (2027 is
+ * "nothing confirmed", never "nothing announced"). /evidence/ keeps the anchor with a note, so
+ * links from other pages still land; /sources/ shows the same note instead of the statement.
+ */
+export const withheld: FactId[] = ['econ-no-2027-programme'];
+
 /** Where a fact's full row is: '#not-used', or link n. */
 export function homeOf(id: FactId): 'not-used' | ChainLink | null {
   if (notUsedFacts.includes(id)) return 'not-used';

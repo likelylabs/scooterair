@@ -34,4 +34,9 @@ const { render, title, desc, locale } = Astro.props;
   .tone-sunken .chart .evc-hollow {
     fill: var(--bg-sunken);
   }
+  /* a block of the surface behind labels, so a reference line never runs through them */
+  .chart .evc-bg {
+    fill: var(--here, var(--bg));
+    stroke: none;
+  }
 </style>

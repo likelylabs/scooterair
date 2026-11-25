@@ -44,7 +44,14 @@ const { locale, view, title, subtitle, caption, level = 4, tone = 'ink', anchor 
 const T = localize(evidenceCopy, locale);
 const { s, panels, table, notes } = view;
 /** Registry titles have no phrase marks: break after the first colon so a headline never splits mid-word. */
-const phrased = (t: string) => (t.includes('|') ? t : t.replace(/^([^：:]{2,24}[：:]\s?)(?=.)/, '$1|'));
+const phrased = (t: string) => {
+  if (t.includes('|')) return t;
+  let out = t.replace(/^([^：:]{2,24}[：:]\s?)(?=.)/, '$1|');
+  if (!out.includes('|')) out = out.replace(/^([^，]{2,24}，)(?=.)/, '$1|');
+  // a closing parenthetical stays whole: "…的關聯|（HEI，2022）"
+  out = out.replace(/(.)(（[^（）]{1,16}）)$/, '$1|$2').replace(/(\S) (\([^()]{1,24}\))$/, '$1 |$2');
+  return out;
+};
 const end = (x: string) => (/[。.!?？）)」]$/.test(x) ? x : x + (locale === 'en' ? '.' : '。'));
 const badge = evidenceBadge(s.evidence, s.confidence);
 const kinds = [...new Set([badge.kind, ...s.datasets.map((d) => evidenceBadge(d.evidence).kind)])];

@@ -70,14 +70,19 @@ export default copy({
       derived: { 'zh-TW': '這是本站用引用的數字算出來的，不是新的量測。', en: 'This is our arithmetic on cited figures, not a new measurement.' },
       'market-tw': { 'zh-TW': '這是業者公布的價格或條件，會變動；下單前請再看一次。', en: 'These are published prices or terms, and they change; check again before you buy.' },
     },
-    more: { 'zh-TW': '再看第 {n} 環其餘 {count} 項證據', en: 'Show the other {count} items for link {n}' },
-    moreData: { 'zh-TW': '第 {n} 環的其他 {count} 組圖表資料', en: 'The other {count} chart datasets for link {n}' },
+    more: { 'zh-TW': '再看第 {n} 環其餘 {count} 項證據', en: 'Show the rest of link {n} ({count})' },
+    moreData: { 'zh-TW': '第 {n} 環的其他 {count} 組圖表資料', en: 'More chart data for link {n} ({count})' },
     alsoTitle: { 'zh-TW': '也用在這一環的證據', en: 'Also used in this link' },
     alsoLead: { 'zh-TW': '這幾項的完整一列放在別的地方。', en: 'The full row for each of these is elsewhere on the page.' },
     alsoIn: { 'zh-TW': '完整的一列在第 {n} 環', en: 'Full row in link {n}' },
     alsoNotUsed: { 'zh-TW': '完整的一列在「我們不這樣用的數字」', en: 'Full row under “figures we do not use that way”' },
     alsoCase: { 'zh-TW': '完整的一列在下面「三台車的個案」框裡', en: 'Full row in the “three-scooter case study” panel below' },
-    rows: { 'zh-TW': '{count} 項', en: '{count} items' },
+    rows: { 'zh-TW': '{count} 項', en: '{count}' },
+    withheld: {
+      'zh-TW': '這一列暫時撤下。登錄表寫的是「2027 年未公布」，但環境部已經預告一項草案；正確的說法是「2027 年還沒有一項定案」。資料更正之後會放回來。',
+      en: 'This row is withdrawn for now. The registry says nothing has been announced for 2027, but the environment ministry has pre-announced a draft; the accurate wording is that nothing is confirmed for 2027. It will return once the entry is corrected.',
+    },
+    withheldLabel: { 'zh-TW': '撤下更正中', en: 'Withdrawn for correction' },
   },
 
   chain: {
@@ -86,7 +91,7 @@ export default copy({
       'zh-TW': '網站的論證是一條七環的鏈。下面每一環寫的是首頁懶人包的那一句，標記是那一環主要證據的類型。第 3 環是斷開的：沒有人量過。',
       en: 'The site’s argument is a chain of seven links. Each line below is the sentence from the home page’s 30-second version, with the kind of evidence behind it. Link 3 is broken: nobody has measured it.',
     },
-    counts: { 'zh-TW': '{facts} 項事實 · {series} 組圖表資料 · {gaps} 個空白', en: '{facts} facts · {series} datasets · {gaps} gaps' },
+    counts: { 'zh-TW': '{facts} 項事實 · {series} 組圖表資料 · {gaps} 個空白', en: 'Facts: {facts} · Chart datasets: {series} · Gaps: {gaps}' },
     see: { 'zh-TW': '看第 {n} 環的證據', en: 'See the evidence for link {n}' },
   },
 
@@ -114,13 +119,17 @@ export default copy({
     { title: { 'zh-TW': '這一格，|沒有人量過', en: 'This box is empty. |Nobody has measured it.' } },
     { title: { 'zh-TW': '鼻子是警報器，|不是測量儀', en: 'Your nose is an alarm, |not a gauge.' } },
     { title: { 'zh-TW': '沒有人能說，|一個紅燈會讓你生病', en: 'Nobody can say |one red light makes you ill.' } },
-    { title: { 'zh-TW': '同一個紅燈，|不一樣的位置', en: 'Same red light. |Different places in it.' } },
+    {
+      title: { 'zh-TW': '同一個紅燈，|不一樣的位置', en: 'Same red light. |Different places in it.' },
+      // the registry still phrases link 6 as a question of dose; dose is what nobody has measured (blueprint 3.8)
+      question: { 'zh-TW': '誰離排氣管最近？誰最容易受影響？', en: 'Who is closest to the tailpipes, and who is most susceptible?' },
+    },
     { title: { 'zh-TW': '同一個路口，|沒有排氣管', en: 'Same crossing. |No tailpipes.' } },
   ],
 
   link: {
     question: { 'zh-TW': '這一環問的是：', en: 'This link asks:' },
-    counts: { 'zh-TW': '這一環：{facts} 項事實、{series} 組圖表資料、{gaps} 個沒人量過的空白。', en: 'In this link: {facts} facts, {series} chart datasets, {gaps} recorded gaps.' },
+    counts: { 'zh-TW': '這一環：{facts} 項事實、{series} 組圖表資料、{gaps} 個沒人量過的空白。', en: 'In this link — facts: {facts}; chart datasets: {series}; recorded gaps: {gaps}.' },
     visuals: { 'zh-TW': '圖表', en: 'Charts' },
     table: { 'zh-TW': '證據表，比較強的放前面', en: 'The evidence, strongest first' },
     gaps: { 'zh-TW': '這一環沒有人量過的事', en: 'What nobody has measured in this link' },
@@ -303,6 +312,8 @@ export default copy({
     hollowModel: { 'zh-TW': '外框：未通過模式效能檢核', en: 'Outline: failed the model-performance check' },
     filled: { 'zh-TW': '實心：研究報告的數值', en: 'Filled: the value as reported' },
     significant: { 'zh-TW': '＊ 統計顯著', en: '* statistically significant' },
+    sigFilled: { 'zh-TW': '實心：統計顯著', en: 'Filled: statistically significant' },
+    sigHollow: { 'zh-TW': '空心：統計上不顯著', en: 'Hollow: not statistically significant' },
     ppb: { 'zh-TW': '十億分之幾就聞得到', en: 'smelled at parts per billion' },
     ppm: { 'zh-TW': '要到百萬分之幾', en: 'needs parts per million' },
     noSmell: { 'zh-TW': '沒有味道', en: 'no smell' },
@@ -437,7 +448,7 @@ export default copy({
       'zh-TW': '這幾篇論文，我們讀了全文，並且逐頁核對了網站用到的每一個數字。其他來源讀到哪裡，資料來源頁上每一筆都有寫。',
       en: 'For these papers we read the full text and checked every figure the site uses against the page. How far we got into every other source is stated on its entry on the sources page.',
     },
-    uses: { 'zh-TW': '網站用到的 {n} 項', en: '{n} items the site uses' },
+    uses: { 'zh-TW': '網站用到的 {n} 項', en: 'Used on the site ({n})' },
     entry: { 'zh-TW': '資料來源頁的這一筆', en: 'Its entry on the sources page' },
   },
 

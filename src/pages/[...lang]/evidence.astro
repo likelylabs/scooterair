@@ -47,6 +47,7 @@ import {
   sourceShort,
   sourceUses,
   totals,
+  withheld,
 } from '@/components/pages/evidence/ev';
 import { href, localeFromParam, localeStaticPaths, htmlLang } from '@/i18n';
 import { chain, readerText } from '@/i18n/ui';
@@ -110,11 +111,11 @@ const keyFacts: Record<ChainLink, FactId[]> = {
 
 const links = chainLinks.map((n) => {
   const all = factsForLink(n);
-  let own = all.filter((f) => f.chainLink === n && homeOf(f.id) === n && !casePanelFacts.includes(f.id)).map((f) => f.id);
+  let own = all.filter((f) => f.chainLink === n && homeOf(f.id) === n && !casePanelFacts.includes(f.id) && !withheld.includes(f.id)).map((f) => f.id);
   // Link 5 leads with the international review (blueprint 3.7, 4.5)
   if (n === 5) own = ['hei-sr23-trap-associations' as FactId, ...own.filter((id) => id !== 'hei-sr23-trap-associations')];
   const pointers = all
-    .filter((f) => !own.includes(f.id) && !(n === 1 && casePanelFacts.includes(f.id)))
+    .filter((f) => !own.includes(f.id) && !withheld.includes(f.id) && !(n === 1 && casePanelFacts.includes(f.id)))
     .map((f) => {
       const home = homeOf(f.id);
       return {
@@ -128,7 +129,7 @@ const links = chainLinks.map((n) => {
   return {
     n,
     title: fill(T.links[n - 1].title, n === 2 ? { cm: nf(D('marking-rules-turn-box', 'turnBoxGap') * 100) } : {}),
-    question: readerText(chainLinkLabels[n].question[locale]),
+    question: 'question' in T.links[n - 1] ? (T.links[n - 1] as { question: string }).question : readerText(chainLinkLabels[n].question[locale]),
     own,
     pointers,
     others,
@@ -398,6 +399,12 @@ const toc = [
 
         <h3 class="ev-sub">{T.link.table}</h3>
         <FactList locale={locale} ids={l.own} link={l.n} />
+        {withheld.filter((id) => facts[id].chainLink === l.n).map((id) => (
+          <p class="ev-withheld" id={id}>
+            <b>{T.row.withheldLabel}</b> {T.row.withheld}
+            {cites(facts[id].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}
+          </p>
+        ))}
 
         {l.pointers.length > 0 && (
           <div class="ev-also">
@@ -866,6 +873,19 @@ const toc = [
       grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
     }
   }
+  .ev-withheld {
+    margin-block-start: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    border: 2px dashed var(--line-strong);
+    border-radius: var(--radius-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+  }
+  .ev-withheld b {
+    color: var(--ink);
+    margin-inline-end: 0.3em;
+  }
   .ev-also {
     margin-block-start: var(--sp-6);
     padding: var(--sp-4);
@@ -1001,6 +1021,9 @@ const toc = [
   }
   .ev-nu__quote s {
     text-decoration-thickness: 2px;
+  }
+  .ev-nu__item > p {
+    max-inline-size: 48rem;
   }
   .ev-nu__item > p b {
     margin-inline-end: 0.2em;

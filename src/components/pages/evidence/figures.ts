@@ -60,13 +60,15 @@ const paren = (locale: Locale, x: string) => (locale === 'en' ? ` (${x})` : `（
 const keys = (s: LS) => (s.categories.length ? s.categories.map((c) => c.key) : [...new Set(s.datasets.flatMap((d) => d.points.map((p) => String(p.x))))]);
 
 /** All flag labels and notes on a series' points, as reader lines. */
+/** Flags the charts draw themselves (outline, asterisk, "up to", "more than", "or fewer"): not repeated as notes. */
+const DRAWN = new Set(['significant', 'not-significant', 'model-check-failed', 'maximum', 'lower-bound', 'upper-bound']);
 function pointNotes(s: LS, locale: Locale): string[] {
   const sep = locale === 'en' ? ': ' : '：';
   const and = locale === 'en' ? '; ' : '；';
   const out: string[] = [];
   for (const d of s.datasets) {
     for (const p of d.points) {
-      const bits = [...p.flagLabels, ...(p.note ? [p.note] : [])];
+      const bits = [...(p.flags ?? []).filter((f) => !DRAWN.has(f)).map((f) => p.flagLabels[(p.flags ?? []).indexOf(f)]), ...(p.note ? [p.note] : [])];
       if (!bits.length) continue;
       const where = [s.datasets.length > 1 ? d.label : '', cat(s, p.x)].filter(Boolean).join(' · ');
       out.push(`${where}${sep}${bits.join(and)}`);
@@ -159,6 +161,13 @@ function intervalsFromSeries(s: LS, locale: Locale, T: T, reference: { value: nu
     reference,
     unit,
     decimals: 2,
+    legend:
+      s.id === 'chuang2020-effects-per-iqr'
+        ? [
+            { label: T.chart.sigFilled, tone: 'exhaust', shape: 'dot' },
+            { label: T.chart.sigHollow, tone: 'neutral', shape: 'dot' },
+          ]
+        : undefined,
     categoryLabel: T.chart.category,
     midLabel: T.chart.estimate,
     lowLabel: T.chart.ciLow,
