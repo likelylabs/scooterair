@@ -1,0 +1,6 @@
+---
+import { localeFromParam, localeStaticPaths } from '@/i18n';
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+---
+<html lang={locale}><body><h1>{locale === 'en' ? 'ScooterAir' : '行人呼吸'}</h1></body></html>

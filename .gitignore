@@ -10,3 +10,5 @@ xcuserdata/
 local.properties
 .idea/
 .claude/settings.local.json
+dist/
+.astro/
