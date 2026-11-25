@@ -494,7 +494,7 @@ const locale = localeFromParam(Astro.params.lang);
 
   <!-- ================================================================ COMPONENTS -->
   <Section id="components" eyebrow="07" title={L('元件', 'Components')} lead={L('都在 src/components/ui/。每個檔案開頭的註解列出所有屬性。', 'All in src/components/ui/. The comment at the top of each file lists every prop.')}>
-    <Block name="Section" file="ui/Section.astro" code={`<Section id="who" eyebrow="…" title="誰吸得最多" lead="…" tone="sunken" width="wide" rule>
+    <Block name="Section" file="ui/Section.astro" code={`<Section id="who" eyebrow="…" title="誰離得最近" lead="…" tone="sunken" width="wide" rule>
   …
 </Section>`}>
       <Fragment slot="note">
@@ -560,7 +560,7 @@ const locale = localeFromParam(Astro.params.lang);
     </Block>
 
     <Block name="Card" file="ui/Card.astro" wide code={`<div class="grid">
-  <Card title="…" href={href('/problem/', locale)} eyebrow="…" tone="exhaust"> … </Card>
+  <Card title="…" href={href('/questions/', locale)} eyebrow="…" tone="exhaust"> … </Card>
 </div>`}>
       <div class="grid" style="--min: 15rem">
         <Card title={L('問題：路口的那一層', 'The problem: the layer at the crossing')} href="#components" eyebrow={L('連結卡片', 'Link card')} tone="exhaust">
@@ -577,7 +577,7 @@ const locale = localeFromParam(Astro.params.lang);
       </div>
     </Block>
 
-    <Block name="Button / Tag / Icon" file="ui/Button.astro · ui/Tag.astro · ui/Icon.astro" code={`<Button href={href('/electric/#calculator', locale)} size="lg" arrow>試算</Button>
+    <Block name="Button / Tag / Icon" file="ui/Button.astro · ui/Tag.astro · ui/Icon.astro" code={`<Button href={href('/electric/#calc', locale)} size="lg" arrow>用我的條件算</Button>
 <Button variant="secondary">…</Button>  <Button variant="ghost">…</Button>
 <Button href="https://…" external locale={locale}>官方補助頁</Button>`}>
       <Fragment slot="note"><p>{L('主要按鈕是綠燈色，一個畫面只放一個。外部連結加 external，會開新分頁並向螢幕閱讀器說明。', 'The primary button is signal green: one per view. External links take external, which opens a new tab and says so to screen readers.')}</p></Fragment>
@@ -644,54 +644,240 @@ const locale = localeFromParam(Astro.params.lang);
     </Block>
   </Section>
 
-  <!-- ================================================================ CHAPTER -->
-  <div id="chapter-demo">
-    <Chapter locale={locale} id="sg-chapter-red" link={2} chainHref="#chain" title={L('排在膝蓋的高度，|就在斑馬線旁邊', 'At knee height, |right beside the crossing')} lead={L('這是 Chapter：長篇敘事的全幅章節。link 屬性顯示「證據鏈第幾環」；haze 設定底部霧層的濃度（這裡是 0.9）。', 'This is a Chapter: a full-bleed unit of the scroll narrative. The link prop shows the evidence-chain marker; haze sets how dense the band of air along the bottom is (0.9 here).')} haze={0.9} size="auto">
-      <div class="grid" style="--min: 15rem">
-        <Stat locale={locale} label={L('示意數字', 'Sample number')} value="35" unit={L('公分', 'cm')} tone="exhaust" sample size="md">{L('章節裡可以放 Stat、Figure、文字。', 'A chapter can hold Stats, Figures and prose.')}</Stat>
-        <div class="prose"><p>{L('敘事的順序由濃到清：問題章節的 haze 高，愈接近解方愈低，最後是 tone="clear"、haze 為 0。', 'The narrative runs from thick to clear: problem chapters set haze high, it falls as the story nears the solution, and the last chapters use tone="clear" with no haze.')}</p></div>
+  <!-- ================================================================ RECIPE -->
+  <Section id="recipe" eyebrow="08" title={L('怎麼做一個章節', 'How to build a chapter')} rule lead={L('首頁是一個紅燈，每個章節是這 90 秒裡的一拍。手機上一個章節的預算是固定的；超過的東西放到「看這一環的全部證據」後面。', 'The home page is one red light, and each chapter is one beat of its ninety seconds. A chapter has a fixed budget on a phone; anything beyond it goes behind “see all the evidence for this link”.')}>
+    <div class="sg-two">
+      <div class="prose">
+        <ol>
+          <li>{L('文案先寫進 src/i18n/pages/home.ts（每個字串中英各一），頁面只負責排版。', 'Write the copy into src/i18n/pages/home.ts first (each string in both languages); the page only lays it out.')}</li>
+          <li><b>{L('畫面', 'Frame')}</b>{L('：art 插槽放這一章的那一格靜態畫面，在最上面。手機上沒有東西是釘住的，只有倒數軌。', ': the art slot takes the chapter’s one static frame, at the top. Nothing is pinned on a phone except the rail.')}</li>
+          <li><b>{L('小標', 'Kicker')}</b>{L('：把倒數寫成文字（「紅燈 · 剩 64 秒」），沒有 JavaScript 也讀得到。不寫的話會依 count 自動產生。', ': print the count as text (“Red light · 64 seconds left”) so it reads without JavaScript. Leave it out and it is generated from the count.')}</li>
+          <li><b>{L('標題', 'Headline')}</b>{L('，再來是', ', then the ')}<b>{L('導言', 'deck')}</b>{L('：最多約 100 個中文字。', ': about 100 Chinese characters at most.')}</li>
+          <li><b>{L('一張主圖', 'One lead visual')}</b>{L('：visual 插槽，緊接在導言後面，放在 Figure 裡，附來源和證據標記。', ': the visual slot, right after the deck, inside a Figure with its source and badge.')}</li>
+          <li><b>{L('內文', 'Body')}</b>{L('：最多三段、每段約 100 字（第 7 環四段），用 paragraphs 屬性傳字串。', ': at most three paragraphs of about 100 characters (four for link 7), passed as strings in paragraphs.')}</li>
+          <li><b>{L('一個但書', 'One caveat')}</b>{L('（這一段沒有說的事）、', ' (what this does not say), ')}<b>{L('一個行動', 'one action')}</b>{L('（你現在可以做的，附上它背後的證據標記）。', ' (what you can do now, with the badge of the evidence behind it).')}</li>
+          <li><b>{L('一行交棒', 'One hand-off line')}</b>{L('，把讀者交給下一章。', ' that hands the reader to the next chapter.')}</li>
+          <li>{L('haze 只在第 1–4、6 環和綠燈那一拍打開；它只有一種濃度，不會跟著倒數變。第 5 環沒有畫面色彩，也沒有霧。', 'haze is on only for links 1–4 and 6 and the green beat; it has one density and never follows the countdown. Link 5 carries no scene colour and no haze.')}</li>
+          <li>{L('健康章節（第 1–6 環、綠燈、接起來）不放價格和購買按鈕。', 'No price and no purchase button in links 1–6, the green beat or the chain board.')}</li>
+        </ol>
+        <p class="meta">{L('建置時 Chapter 會對超出預算的導言和段落印出警告（[chapter budget]）；算錢那一章可以用 budget={false} 關掉。', 'At build time Chapter prints a warning ([chapter budget]) for a deck or paragraph over budget; the money chapter can switch it off with budget={false}.')}</p>
       </div>
+      <pre class="sg-code" tabindex="0"><code>{`---
+import home from '@/i18n/pages/home';
+import { localize } from '@/i18n/pages/_copy';
+const t = localize(home, locale);
+---
+<Base locale={locale} title="…" home money>
+  <CountdownRail slot="rail" locale={locale} />
+
+  <Chapter locale={locale} id="link-3" link={3} tone="night"
+    kicker={t.link3.kicker}            {/* 紅燈 · 剩 64 秒 */}
+    title={t.link3.title}
+    lead={t.link3.deck}
+    paragraphs={t.link3.body}
+    caveat={t.link3.caveat}
+    handoff={t.link3.handoff}
+    moreHref={href('/evidence/#link-3', locale)}
+    haze>
+    <StreetScene slot="art" locale={locale} frame="paused" />
+    <Figure slot="visual" locale={locale} empty
+      title={t.link3.figure} who={t.link3.who}>
+      <EmptyChart locale={locale} title={t.link3.chartTitle} />
+    </Figure>
+    <Fragment slot="action">
+      <p>{t.link3.action}
+        <a href={href('/unmeasured/#ask', locale)}>…</a></p>
+    </Fragment>
+  </Chapter>
+</Base>`}</code></pre>
+    </div>
+    <div class="sg-budget">
+      <table>
+        <caption class="vh">{L('各章的倒數、畫面與霧', 'Count, frame and haze by chapter')}</caption>
+        <thead><tr><th>{L('章節', 'Chapter')}</th><th>id</th><th>{L('屬性', 'Props')}</th><th>{L('倒數', 'Count')}</th><th>{L('畫面', 'Frame')}</th><th>haze</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">{L('序', 'Prologue')}</th><td><code>top</code></td><td><code>count={'{90}'}</code></td><td>90</td><td>K0 empty</td><td>–</td></tr>
+          <tr><th scope="row">{L('懶人包', 'The 30-second version')}</th><td><code>brief</code></td><td><code>Section tone="sunken"</code></td><td>–</td><td>–</td><td>–</td></tr>
+          <tr><th scope="row">{L('第 1 環', 'Link 1')}</th><td><code>link-1</code></td><td><code>link={'{1}'}</code></td><td>90 → 78</td><td>K1 pack</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 2 環', 'Link 2')}</th><td><code>link-2</code></td><td><code>link={'{2}'}</code></td><td>78 → 64</td><td>K2 kerb</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 3 環', 'Link 3')}</th><td><code>link-3</code></td><td><code>link={'{3}'} tone="night"</code></td><td>64 → 50</td><td>K3 paused</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 4 環', 'Link 4')}</th><td><code>link-4</code></td><td><code>link={'{4}'}</code></td><td>50 → 38</td><td>K2 kerb</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 5 環', 'Link 5')}</th><td><code>link-5</code></td><td><code>link={'{5}'} tone="sunken"</code></td><td>{L('停在 38', 'held at 38')}</td><td>K3 paused</td><td>–</td></tr>
+          <tr><th scope="row">{L('第 6 環', 'Link 6')}</th><td><code>link-6</code></td><td><code>link={'{6}'}</code></td><td>38 → 05</td><td>K2 kerb</td><td>✓</td></tr>
+          <tr><th scope="row">{L('綠燈', 'Green')}</th><td><code>green</code></td><td><code>phase="green" size="auto"</code></td><td>05 → 00</td><td>K4 green</td><td>✓</td></tr>
+          <tr><th scope="row">{L('接起來', 'Joining it up')}</th><td><code>connect</code></td><td><code>count={'{0}'} tone="sunken"</code></td><td>00</td><td>–</td><td>–</td></tr>
+          <tr><th scope="row">{L('第 7 環', 'Link 7')}</th><td><code>link-7</code></td><td><code>link={'{7}'} tone="clear"</code></td><td>{L('回到 90', 'back to 90')}</td><td>K5 clean</td><td>–</td></tr>
+          <tr><th scope="row">{L('算錢', 'The money')}</th><td><code>money</code></td><td><code>budget={'{false}'}</code></td><td>–</td><td>–</td><td>–</td></tr>
+          <tr><th scope="row">{L('下一個紅燈', 'The next red light')}</th><td><code>next</code></td><td><code>size="auto"</code></td><td>–</td><td>K0 empty</td><td>–</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <!-- ================================================================ RED LIGHT DEMO -->
+  <Section id="redlight" eyebrow="09" title={L('紅燈示範與倒數軌', 'The red light and the rail')} tone="sunken" lead={L('下面是縮小版的首頁：每一環一個 Chapter。往下捲，頁首下方那條 44px 的倒數軌會跟著走；點它會打開跳轉選單。章節裡的文字是示意，數字都不是真的。', 'Below is the home page in miniature: one Chapter per link. Scroll, and the 44px rail under the header follows; tap it for the jump menu. The copy in these chapters is placeholder and none of the numbers are real.')} pad="tight">
+    <p><Tag tone="sample">{ui.sampleDataLong[locale]}</Tag></p>
+    <Block name="CountdownRail" file="ui/CountdownRail.astro" code={`<Base locale={locale} …>
+  <CountdownRail slot="rail" locale={locale} />            {/* 首頁 */}
+  <CountdownRail slot="rail" locale={locale} page="/evidence/" />
+  …
+</Base>`}>
+      <Fragment slot="note">
+        <p>{L('全站唯一釘住的東西。LED 倒數、七顆圓點、目前這一環的名稱；整條是一顆按鈕，打開跳轉選單（七環、接起來、算錢、行動）。放在 Base 的 rail 插槽，一頁一個。', 'The only pinned element on the site. LED count, seven pips, the current link’s name; the whole strip is one button that opens the jump menu (the seven links, joining it up, the money, take action). It goes in Base’s rail slot, one per page.')}</p>
+        <ul>
+          <li>{L('倒數依捲動進度在每個章節裡內插（分配表在 ui.ts 的 chain.countdown）。第 5 環暫停，第 7 環回到 90，算錢之後不顯示數字。', 'The count interpolates with scroll progress inside each chapter (the allocation is chain.countdown in ui.ts). Link 5 is paused, link 7 resets to 90, and no number is shown after the money chapter.')}</li>
+          <li>{L('圓點的畫法就是證據：實心是台灣的資料，空心是推估或國際證據，第 3 環斷開、兩端空心，最後一顆是綠的。紅圈是「你在這裡」。', 'A pip’s style is its evidence: filled for Taiwan data, a ring for modelled or international, a break with hollow ends at link 3, the last in green. The red ring is “you are here”.')}</li>
+          <li>{L('沒有 JavaScript：LED 不會出現（停在 90 的數字是錯的），軌道是一個原生的 details 選單，每個章節的小標用文字印出倒數。', 'Without JavaScript the LED is not rendered (a frozen 90 would be wrong); the rail is a native details menu, and each chapter’s kicker prints its count as text.')}</li>
+          <li>{L('LED 是 aria-hidden，整條不是 live region。高度固定 44px、單行、名稱過長會截斷，不會推動版面。沒有動畫。', 'The LED is aria-hidden and nothing is a live region. Fixed 44px, one line, the name truncates: it cannot shift the layout. There is no animation.')}</li>
+          <li>{L('窄於 360px 時圓點列會收起來，把位置留給名稱；選單裡仍然有七顆。', 'Below 360px the row of pips is dropped to leave room for the name; the menu still shows all seven.')}</li>
+        </ul>
+      </Fragment>
+      <div class="stack" style="--stack: var(--sp-3)">
+        <p class="meta">{L('ChainMarker：章節裡的路標（Chapter 的 link 屬性會自動放一個）。count 會把秒數印成文字。', 'ChainMarker: the signpost inside a chapter (Chapter’s link prop places one). count prints the seconds as text.')}</p>
+        {[1, 3, 5, 7].map((n) => <ChainMarker locale={locale} n={n} count={n === 3 ? 64 : undefined} />)}
+      </div>
+    </Block>
+  </Section>
+
+  <div id="chapter-demo">
+    <Chapter locale={locale} id="link-1" link={1} haze title={L('示意標題：|粉塵很少，油氣很多', 'Sample headline: |little dust, a lot of fumes')} lead={L('示意導言：這是 Chapter。這一章示範完整的預算：畫面、小標、標題、導言、一張主圖、內文、一個但書、一個行動、一行交棒。', 'Sample deck: this is a Chapter. This one shows the whole budget: frame, kicker, headline, deck, one lead visual, body, one caveat, one action and one hand-off line.')} paragraphs={[L('示意內文第一段：每段大約一百個字，一段只講一件事，一句話只放一個數字，並且說清楚量的是誰。', 'Sample body, paragraph one: about a hundred characters each, one idea per paragraph, one number per sentence, and say who was measured.'), L('示意內文第二段：超過三段的東西，放到「看這一環的全部證據」後面。', 'Sample body, paragraph two: anything beyond three paragraphs goes behind “see all the evidence for this link”.')]} caveat={L('示意但書：這裡寫這一段「沒有」說的事，例如這是排放量的占比，不是你吸進去的比例。', 'Sample caveat: say what this passage does not claim, for example that these are shares of emissions, not of what you breathe.')} action={L('示意行動：一件讀者現在做得到的事。', 'Sample action: one thing the reader can do now.')} actionBadge="official-tw" moreHref="#chain" handoff={L('示意交棒：排什麼知道了。下一題：排在哪裡？', 'Sample hand-off: that is what comes out. Next: where?')}>
+      <StreetScene slot="art" locale={locale} frame="pack" />
+      <Figure slot="visual" locale={locale} number={1} title={L('示意主圖：|占比畫在 0 到 100% 上', 'Sample lead visual: |shares drawn on 0 to 100%')} subtitle={L('機車占全國排放量的比例（示意）', 'Scooters’ share of national emissions (sample)')} badge="official-tw" source={L('示意來源', 'Sample source')} sample>
+        <StackedBar locale={locale} title={L('示意堆疊長條圖', 'Sample stacked bar chart')} series={[{ label: L('機車', 'Scooters'), tone: 'exhaust' }, { label: L('其他來源', 'Everything else'), tone: 'neutral' }]} rows={[{ label: L('粉塵（示意）', 'Dust (sample)'), values: [2, 98] }, { label: L('油氣（示意）', 'Fumes (sample)'), values: [12, 88] }]} categoryLabel={L('污染物', 'Pollutant')} />
+      </Figure>
     </Chapter>
-    <Chapter locale={locale} id="sg-chapter-night" tone="night" phase="red" kicker={L('紅燈 · 示意章節', 'Red phase · sample chapter')} title={L('夜間色調：|柏油與號誌', 'Night tone: |asphalt and signals')} lead={L('tone="night" 在兩個主題下都是深色。phase 會在小標旁放上行人號誌。', 'tone="night" is dark in both themes. phase puts the pedestrian signal beside the kicker.')} haze={0.5} hazeKind="fumes" size="auto" />
-    <Chapter locale={locale} id="sg-chapter-clear" tone="clear" link={7} chainHref="#chain" title={L('這一環，|可以切斷', 'This link |can be broken')} lead={L('最後一環用綠色與 tone="clear"：沒有霧層。', 'The final link uses green and tone="clear": no haze at all.')} size="auto">
-      <div class="cluster"><Button size="lg" arrow>{L('看怎麼換', 'See how to switch')}</Button></div>
+
+    <Chapter locale={locale} id="link-2" link={2} haze size="auto" title={L('示意：第 2 環', 'Sample: link 2')} lead={L('短的章節用 size="auto"。倒數從 78 走到 64。', 'A short chapter uses size="auto". The count runs from 78 to 64.')} handoff={L('示意交棒：那站在旁邊的人，吸進了多少？', 'Sample hand-off: so how much does the person beside it breathe?')} />
+
+    <Chapter locale={locale} id="link-3" link={3} tone="night" haze title={L('這一格，|沒有人量過', 'This box is empty. |Nobody has measured it.')} lead={L('tone="night" 在兩個主題下都是深色。這一章的主圖是空白的圖：整個網站的招牌圖。', 'tone="night" is dark in both themes. The lead visual here is the empty chart, the site’s signature graphic.')} handoff={L('示意交棒：儀器還沒到。但你身上有一個偵測器，一直開著。', 'Sample hand-off: no instrument has been here yet. But you carry a detector that is always switched on.')}>
+      <Figure slot="visual" locale={locale} empty title={L('紅燈旁邊的行人吸進多少？|這張圖是空的', 'What does a pedestrian breathe beside a red light? |This chart is empty')} subtitle={L('紅燈 90 秒裡，嬰兒車高度與成人高度的一氧化碳、苯、超細微粒', 'Carbon monoxide, benzene and ultrafine particles at stroller and adult height through a 90-second red light')}>
+        <EmptyChart locale={locale} title={L('空白的圖：紅燈倒數期間路口行人高度的三種污染物', 'Empty chart: three pollutants at pedestrian height through the red-light countdown')} desc={L('三個面板分別是一氧化碳、苯和超細微粒，橫軸是紅燈倒數 90 到 0 秒，接著是綠燈。', 'Three panels for carbon monoxide, benzene and ultrafine particles; the x axis is the red-light countdown from 90 to 0 seconds, then green.')} />
+        <Fragment slot="who">{L('各縣市環保局、環境部、大學都量得出來。', 'A city environmental bureau, the environment ministry or a university could.')} <a href={href('/unmeasured/#ask', locale)}>{L('請來量我家路口', 'Ask them to measure my crossing')}</a></Fragment>
+      </Figure>
+    </Chapter>
+
+    <Chapter locale={locale} id="link-4" link={4} haze size="auto" title={L('示意：第 4 環', 'Sample: link 4')} lead={L('倒數從 50 走到 38。', 'The count runs from 50 to 38.')} />
+
+    <Chapter locale={locale} id="link-5" link={5} tone="sunken" title={L('示意：倒數暫停，|鏡頭拉遠', 'Sample: the countdown pauses, |the camera pulls back')} lead={L('第 5 環的 phase 預設是 paused，倒數停在 38。這一章沒有畫面、沒有霧：健康數字不和示意畫面放在同一格。', 'Link 5 defaults to phase="paused" and the count holds at 38. No frame and no haze here: health figures never share a frame with the scene.')}>
+      <TimeLadder slot="visual" locale={locale} stops={ladderDemo} />
+    </Chapter>
+
+    <Chapter locale={locale} id="link-6" link={6} haze size="auto" title={L('示意：第 6 環', 'Sample: link 6')} lead={L('倒數從 38 走到 05，是整個紅燈裡最長的一段。', 'The count runs from 38 to 05, the longest stretch of the red light.')} handoff={L('剩 5 秒。', 'Five seconds.')} />
+
+    <Chapter locale={locale} id="green" phase="green" haze size="auto" title={L('綠燈亮的|那一秒', 'The second |it turns green')} lead={L('phase="green"：小標旁是綠色的行人號誌，倒數從 05 走到 00，軌道上的 LED 變成綠色。', 'phase="green": the green walking signal beside the kicker, the count running from 05 to 00, and the rail’s LED turning green.')} handoff={L('90 秒過了。把剛才看到的接起來。', 'The ninety seconds are up. Now put together what you saw.')} />
+
+    <Chapter locale={locale} id="connect" count={0} tone="sunken" size="auto" title={L('每一環都有出處。|接起來的那一步，你自己看', 'Every link has a source. |The step that joins them is yours to judge.')} lead={L('證據板：六件有出處的事，一格沒有人量過的空白。本站自己的推論預設是關起來的。', 'The chain board: six sourced facts and one blank that nobody has measured. The site’s own inference is closed by default.')}>
+      <EvidenceChain locale={locale} links={boardDemo} question={L('所以，這 90 秒裡，站在旁邊的人吸進了什麼？', 'So what did the person standing beside it breathe in these ninety seconds?')} collapseSources>
+        <Fragment slot="reveal">
+          <p>{L('我們的推論：示意文字。這裡放本站自己接起來的那一步，開頭一定是「我們的推論：」，只講方向，不講健康影響有多大。', 'Our inference: placeholder. This is where the site’s own joining step goes. It always opens with “Our inference:”, claims a direction, and says nothing about the size of any health effect.')}</p>
+        </Fragment>
+        <Fragment slot="boxes">
+          <StanceBox locale={locale} kind="not-saying" items={[L('示意：等一個紅燈會生病。', 'Sample: that one red light makes you ill.'), L('示意：味道愈重，傷害愈大。', 'Sample: that a stronger smell means more harm.')]} />
+          <StanceBox locale={locale} kind="change-mind"><p>{L('示意文字：如果有人量出來，結果和附近的背景值差不多，這一環就不成立。我們會改寫這一頁，並且寫明為什麼改。', 'Placeholder: if someone measures it and finds it close to the nearby background, this link fails. We will rewrite this page and say why.')}</p></StanceBox>
+        </Fragment>
+      </EvidenceChain>
+    </Chapter>
+
+    <Chapter locale={locale} id="link-7" link={7} tone="clear" size="auto" title={L('同一個路口，|沒有排氣管', 'Same crossing. |No tailpipes.')} lead={L('最後一環用 tone="clear"：沒有霧，倒數回到 90。', 'The last link uses tone="clear": no haze, and the count goes back to 90.')}>
+      <div class="cluster"><Button size="lg" arrow>{L('示意按鈕', 'Sample button')}</Button></div>
     </Chapter>
   </div>
 
   <!-- ================================================================ CHAIN -->
-  <Section id="chain" eyebrow="08" title={L('證據鏈', 'Evidence chain')} rule lead={L('網站的論證是一條七環的鏈，每一環都有自己的來源與證據強度。讀者要自己把環接起來，所以每個章節都要說清楚「現在是第幾環」。', 'The site’s argument is a chain of seven links, each with its own sources and its own evidence strength. Readers connect the links themselves, so every chapter says which link it is.')}>
-    <Block name="EvidenceChain / ChainLink" file="ui/EvidenceChain.astro · ui/ChainLink.astro" code={`<EvidenceChain locale={locale} current={3} links={[
-  { strength: 'established', body: '…', href: href('/problem/#tailpipe', locale), cites: [{ id: 'iarc-…', n: 1 }] },
-  …
-  { body: '…' },   // 最後一項自動成為「可以切斷的那一環」
-]}>
-  <Button slot="action" href={href('/electric/', locale)} arrow>…</Button>
-</EvidenceChain>`}>
+  <Section id="chain" eyebrow="10" title={L('證據與證據鏈', 'Evidence and the chain')} rule lead={L('網站的論證是一條七環的鏈。每個說法都帶著它是哪一種證據；本站自己的推論戴最弱的標記；沒人量過的地方畫成斷開的線。', 'The site’s argument is a chain of seven links. Every claim says what kind of evidence it is; the site’s own inference wears the weakest badge; where nobody has measured, the line is drawn broken.')}>
+    <Block name="EvidenceBadge / EvidenceLegend" file="ui/EvidenceBadge.astro · ui/EvidenceLegend.astro" wide code={`<EvidenceBadge locale={locale} kind="measured-tw" />
+<EvidenceBadge locale={locale} kind="official-tw" secondary />      {/* + 次級來源 */}
+<EvidenceBadge locale={locale} {...evidenceBadge(fact.evidence, fact.confidence)} />
+<EvidenceBadge locale={locale} kind="gap" variant="icon" />         {/* 只有圖示 */}
+<EvidenceLegend locale={locale} lines />`}>
       <Fragment slot="note">
-        <p>{L('整條鏈的總覽：所有環一次可見，手機與桌機都是同一條直軌。標題預設取自 ui.ts 的 chain.links；最後一環脫離軌道、換成綠色並可放行動按鈕。需要更豐富的內容時，改在 slot 裡放 <ChainLink>。', 'The whole chain at a glance: every link visible at once on one vertical rail, the same on phone and desktop. Titles default to chain.links in ui.ts; the final link is detached from the rail, turns green and can hold a call to action. For richer content put <ChainLink> children in the slot instead.')}</p>
+        <p>{L('八種標記：資料庫的六種證據類型（文字直接取自 src/data/types.ts 的 evidenceLabels），加上本站自己的兩種：「我們的推論」和「沒人量過」。不靠顏色也分得出來：文字、圖示、邊框各不相同（實心／實線／細線底色／虛線／兩端開口）。資料庫裡 confidence 是 secondary 的事實，加上 secondary 屬性，會多一個「次級來源」小標。', 'Eight badges: the registry’s six evidence types (their words come straight from evidenceLabels in src/data/types.ts) plus two for the site’s own voice, “our inference” and “nobody has measured this”. They are told apart without colour: the words, the icon and the edge all differ (filled / solid / thin on a tint / dashed / open at both ends). A fact whose registry confidence is secondary takes the secondary prop and gains the small “Secondary” tag.')}</p>
+        <p>{L('同一種證據在鏈上用同一種線：實線實心、實線空心、虛線、斷開。「市場公開價格」不會畫在鏈上。舊的 level="measured" / "established" 仍然可以用，會對應到台灣實測與國際證據。', 'Each kind has one line style wherever the chain is a line: solid filled, solid outline, dashed, broken. “Published prices” is never drawn on the chain. The old level="measured" / "established" still work and map to Measured in Taiwan and International evidence.')}</p>
       </Fragment>
-      <EvidenceChain locale={locale} current={3} links={chainDemo}>
-        <Button slot="action" arrow>{L('看怎麼換電動', 'See how to switch')}</Button>
-      </EvidenceChain>
-    </Block>
-
-    <Block name="ChainMarker" file="ui/ChainMarker.astro" code={`<Chapter locale={locale} id="…" link={3} chainHref={href('/#chain', locale)} title="…" />
-<ChainMarker locale={locale} n={3} sticky />   {/* 單獨使用 */}`}>
-      <Fragment slot="note"><p>{L('每個章節開頭的路標：「證據鏈 3/7」、七顆圓點（走過的實心、目前的放大、未到的空心，最後一顆與前面斷開）、以及這一環的名稱。sticky 會讓它在章節範圍內黏在頁首下方。', 'The signpost at the top of each chapter: “Evidence chain 3/7”, seven pips (done solid, current enlarged, to come hollow, the last set apart from the rest) and the link’s name. sticky pins it under the header while its chapter is on screen.')}</p></Fragment>
-      <div class="stack" style="--stack: var(--sp-3)">
-        {[1, 3, 6, 7].map((n) => <ChainMarker locale={locale} n={n} />)}
+      <EvidenceLegend locale={locale} lines />
+      <div class="stack sg-badges" style="--stack: var(--sp-3)">
+        <p class="meta">{L('並排、小尺寸（13px），含次級來源與只有圖示的版本：', 'Side by side at the small size (13px), with the secondary tag and the icon-only variant:')}</p>
+        <p class="cluster" style="--cluster: var(--sp-2)">{evidenceKinds.map((k) => <EvidenceBadge kind={k} locale={locale} />)}</p>
+        <p class="cluster" style="--cluster: var(--sp-2)"><EvidenceBadge kind="official-tw" locale={locale} secondary /> <EvidenceBadge kind="modelled-tw" locale={locale} secondary /></p>
+        <p class="cluster" style="--cluster: var(--sp-2)">{evidenceKinds.map((k) => <EvidenceBadge kind={k} locale={locale} variant="icon" />)}</p>
+        <div class="tone-inverse sg-onink"><p class="cluster" style="--cluster: var(--sp-2)">{evidenceKinds.map((k) => <EvidenceBadge kind={k} locale={locale} />)}</p></div>
       </div>
     </Block>
 
-    <Block name="EvidenceBadge / EvidenceLegend" file="ui/EvidenceBadge.astro · ui/EvidenceLegend.astro" code={`<EvidenceBadge locale={locale} level="measured" />
-<EvidenceLegend locale={locale} />`}>
-      <Fragment slot="note"><p>{L('四個等級，不靠顏色也分得出來：文字、圖示、邊框各不相同（實心/實線/虛線/點線）。誠實標出「我們的推論」與「尚未證實」，是整個網站可信度的來源。', 'Four levels, distinguishable without colour: the words, the icon and the border all differ (solid fill / solid line / dashed / dotted). Marking “our inference” and “not yet shown” honestly is where the site’s credibility comes from.')}</p></Fragment>
-      <EvidenceLegend locale={locale} />
+    <Block name="ChainStrip" file="ui/ChainStrip.astro" wide code={`<ChainStrip locale={locale} />                                  {/* 首頁：完整七行 */}
+<ChainStrip locale={locale} variant="collapsed" current={3} />  {/* 問題頁：亮著這一頁的那一行 */}`}>
+      <Fragment slot="note"><p>{L('30 秒懶人包的七句話。每一句單獨讀都成立，各自帶著證據標記，連到它的章節。文字只有一個來源：ui.ts 的 chain.summary，問題頁、分享圖和影片都用同一份，不要在頁面裡重打。每一行上緣的線就是那一環的證據線型；第 3 行的線是斷開的。collapsed 是原生 details：沒有 JavaScript 也能展開，底下一行把讀者帶到證據板。', 'The seven sentences of the 30-second version. Each is true read alone, carries its badge and links to its chapter. The text has one source, chain.summary in ui.ts, shared with question pages, share cards and the film: never retype a line in a page. The rule above each line is that link’s evidence line; line 3’s is broken. The collapsed form is a native details element, so it opens without JavaScript, and its footer hands on to the chain board.')}</p></Fragment>
+      <div class="grid" style="--min: 20rem; --grid-gap: var(--sp-7)">
+        <div class="stack"><p class="meta">variant="full"</p><ChainStrip locale={locale} page="/styleguide/" /></div>
+        <div class="stack"><p class="meta">variant="collapsed" current={'{3}'}</p><ChainStrip locale={locale} variant="collapsed" current={3} page="/styleguide/" /></div>
+      </div>
+    </Block>
+
+    <Block name="QuestionChips" file="ui/QuestionChips.astro" code={`<QuestionChips locale={locale}>
+  <a slot="after" href={href(questions.askMeasurePath, locale)}>{questions.askMeasure[locale]} →</a>
+</QuestionChips>`}>
+      <Fragment slot="note"><p>{L('用讀者自己的話問的問題，畫成行人觸動按鈕。每一顆都是普通連結；360px 時兩欄。預設是首頁的六題（ui.ts 的 questions.chips），最後一題「我換得起嗎？」連到 /electric/，不是問題頁。', 'Questions in the reader’s own words, drawn as pedestrian push-buttons. Each is an ordinary link; two columns at 360px. The default set is the home page’s six (questions.chips in ui.ts); the last, “Can I afford to switch?”, goes to /electric/, not to a question page.')}</p></Fragment>
+      <QuestionChips locale={locale}>
+        <a slot="after" href={href(questions.askMeasurePath, locale)}>{questions.askMeasure[locale]}<Icon name="arrow-right" size="1.05em" /></a>
+      </QuestionChips>
+    </Block>
+
+    <Block name="EvidenceChain / ChainLink" file="ui/EvidenceChain.astro · ui/ChainLink.astro" code={`{/* 證據板（V15）：六件事 + 一格空白 + 關著的推論 */}
+<EvidenceChain locale={locale} links={sixFacts} collapseSources
+  question="所以，這 90 秒裡，站在旁邊的人吸進了什麼？">
+  <Fragment slot="reveal"><p>我們的推論：…</p></Fragment>
+  <Fragment slot="boxes">
+    <StanceBox locale={locale} kind="not-saying" items={[…]} />
+    <StanceBox locale={locale} kind="change-mind"><p>…</p></StanceBox>
+  </Fragment>
+</EvidenceChain>
+
+{/* 傳統的七環：最後一環是「可以切斷的那一環」 */}
+<EvidenceChain locale={locale} current={3} links={sevenLinks}>
+  <Button slot="action" href={href('/electric/', locale)} arrow>…</Button>
+</EvidenceChain>`}>
+      <Fragment slot="note">
+        <p>{L('上面「接起來」那一章就是證據板：傳入 question，鏈的最後就是一個沒有接上的環（軌道斷開、節點是空心的問號、戴「沒人量過」），接著是 reveal 插槽。reveal 是原生 details，預設關著，按鈕旁邊就先掛著「我們的推論」；讀者先看到六件事和那個問題，才看到結論。collapseSources 把每一環的來源收在「看來源」後面；/evidence/ 不要用它，並且可以設 revealOpen。', 'The “joining it up” chapter above is the chain board: pass question and the chain ends in an open link (the rail breaks, the node is a hollow question mark, it wears “nobody has measured this”), followed by the reveal slot. The reveal is a native details element, closed by default, with “our inference” shown beside its button; the reader meets the six facts and the question before any conclusion. collapseSources puts each link’s citations behind “see sources”; leave it off on /evidence/, where revealOpen may also be set.')}</p>
+        <p>{L('不傳 question 時是傳統的七環：最後一環脫離軌道、換成綠色並可放行動按鈕。每一環的節點和它往下的軌道，依證據線型畫。', 'Without question it is the classic chain of seven: the last link is detached from the rail, turns green and can hold a call to action. Each node and the rail below it are drawn in the line style of that link’s evidence.')}</p>
+      </Fragment>
+      <EvidenceChain locale={locale} current={3} links={classicDemo}>
+        <Button slot="action" arrow>{L('示意按鈕', 'Sample button')}</Button>
+      </EvidenceChain>
+    </Block>
+
+    <Block name="StanceBox / NotClaimedList" file="ui/StanceBox.astro · ui/NotClaimedList.astro" wide code={`<StanceBox locale={locale} kind="not-saying" items={['等一個紅燈會生病。', …]} />
+<StanceBox locale={locale} kind="change-mind"><p>…</p></StanceBox>
+
+{/* /evidence/#not-claimed：由 claims-policy 產生 */}
+<NotClaimedList locale={locale} items={claimRuleList
+  .filter((r) => r.kind === 'do-not-claim')
+  .map((r) => ({ claim: r.rule[locale], why: r.why[locale], instead: r.instead?.[locale] }))} />`}>
+      <Fragment slot="note"><p>{L('StanceBox 是放在推論旁邊、永遠打開的兩個框：「我們沒有說」（實線）和「什麼會讓我們改口」（虛線，因為它是關於一個推論的承諾）。NotClaimedList 是「我們不會說的話」：每一句劃掉，後面一行說為什麼。刪除線用 s 元素，每一項前面有給螢幕閱讀器的「我們不會說：」，因為多數閱讀器不會唸出刪除線。', 'StanceBox is the pair of always-open boxes beside the inference: “what we are not saying” (solid) and “what would change our mind” (dashed, because it is a promise about an inference). NotClaimedList is “what we will not say”: each sentence struck through, followed by one line of why. The strike uses the s element, and every item carries a screen-reader prefix “We will not say:”, because most readers do not announce a strike-through.')}</p></Fragment>
+      <div class="grid" style="--min: 18rem; --grid-gap: var(--sp-6)">
+        <NotClaimedList locale={locale} items={[
+          { claim: L('示意：機車廢氣是第 1 級致癌物。', 'Sample: scooter exhaust is a Group 1 carcinogen.'), why: L('示意理由：分級講的是整體汽油引擎廢氣，等級不同。', 'Sample reason: the classification covers gasoline engine exhaust as a whole, at a different grade.'), instead: L('示意：照實寫分級。', 'Sample: state the classification as it is.') },
+          { claim: L('示意：等一個紅燈會生病。', 'Sample: one red light makes you ill.'), why: L('示意理由：沒有研究看過這麼短的時間。', 'Sample reason: no study has looked at so short a time.') },
+        ]} />
+        <div class="stack" style="--stack: var(--sp-5)">
+          <StanceBox locale={locale} kind="not-saying" items={[L('示意：機車是 PM2.5 的主要來源。', 'Sample: that scooters are a main source of PM2.5.'), L('示意：味道愈重，傷害愈大。', 'Sample: that a stronger smell means more harm.')]} />
+          <StanceBox locale={locale} kind="change-mind"><p>{L('示意文字：寫出哪一種量測結果會讓這一環不成立，以及我們會怎麼改。', 'Placeholder: say which measurement would make this link fail, and what we would then change.')}</p></StanceBox>
+        </div>
+      </div>
+    </Block>
+
+    <Block name="TimeLadder" file="ui/TimeLadder.astro" wide code={`<TimeLadder locale={locale} stops={[
+  { time: '90 秒', empty: true },                                       // 沒有研究：虛線空卡
+  { time: '1 小時', body: '…', badge: 'measured-tw', scope: 'all-sources' },
+  { time: '2 小時', body: '…', badge: 'international', scope: 'traffic' },
+  { time: '很多年', body: '…', badge: 'measured-tw', scope: 'all-sources' },
+]} />`}>
+      <Fragment slot="note"><p>{L('時間的尺（V11）：四個一樣大的站，不管研究的樣本多大。第一站是紅燈本身，是一張虛線的空卡。scope 會印出「整體車流」或「所有來源的 PM2.5」，因為每一個 PM2.5 的健康結果都要在同一句或下一句說清楚（R2）。手機上直排。上面第 5 環的示範章節裡有一個。', 'The ruler of time (V11): four stops of equal size, whatever the study’s sample. The first is the red light itself, an empty dashed card. scope prints “traffic as a whole” or “PM2.5 from all sources”, because every PM2.5 health result has to say so in the same sentence or the next (R2). Stacked on phones. There is one in the link 5 demo chapter above.')}</p></Fragment>
+      <TimeLadder locale={locale} stops={ladderDemo} />
     </Block>
   </Section>
 
   <!-- ================================================================ FORMS -->
-  <Section id="forms" eyebrow="09" title={L('表單與試算', 'Forms and calculator')} tone="sunken" lead={L('試算工具的零件：選城市、有沒有舊車可汰換、每月里程，然後看到價格怎麼一層層扣下來、和燃油車還差多少、多久打平。', 'The parts of the calculator: pick a city, say whether there is an old scooter to scrap, set monthly distance, then see the price come down line by line, the remaining gap to a gasoline scooter, and how long until it pays back.')}>
+  <Section id="forms" eyebrow="11" title={L('表單與試算', 'Forms and calculator')} tone="sunken" lead={L('試算工具的零件：選城市、有沒有舊車可汰換、每月里程，然後看到價格怎麼一層層扣下來、和燃油車還差多少、多久打平。', 'The parts of the calculator: pick a city, say whether there is an old scooter to scrap, set monthly distance, then see the price come down line by line, the remaining gap to a gasoline scooter, and how long until it pays back.')}>
     <p><Tag tone="sample">{ui.sampleDataLong[locale]}</Tag></p>
     <div class="sg-calc" id="sg-calc">
       <form class="sg-calc__form stack" style="--stack: var(--sp-5)" onsubmit="return false">
@@ -769,10 +955,100 @@ const locale = localeFromParam(Astro.params.lang);
     <div class="prose sg-note">
       <p>{L('這個示範的腳本就在本頁原始碼最下方，可以直接照抄：讀取三個輸入 → 計算 → 更新 Ledger 的 [data-amount]、ResultPanel 的 [data-part]，再用 updateChart() 重畫兩張圖（同一段繪圖程式，建置時與瀏覽器裡共用）。沒有 JavaScript 時，頁面顯示預設情境，表單仍可閱讀。', 'The script behind this demo is at the bottom of this page’s source and can be copied as is: read the three inputs → compute → update the Ledger’s [data-amount] and the ResultPanel’s [data-part], then redraw both charts with updateChart() (the same drawing code runs at build time and in the browser). Without JavaScript the page shows the default scenario and the form is still readable.')}</p>
     </div>
+
+    <div class="sg-after">
+      <Block name={L('ResultPanel：三種結果', 'ResultPanel: three verdicts')} file="ui/ResultPanel.astro" wide code={`<ResultPanel id="result" locale={locale} verdict="A"
+  sentence={t.verdict.A}           {/* 一句話，寫在數字上面；數字由試算引擎算 */}
+  title="買的時候差多少" prefix="NT$" value="…">
+  <p slot="deadline" data-money-if="dayCount"
+     data-money-template={money.dayCount[locale]}></p>   {/* 只有結果 A 才會顯示（R10） */}
+  <ul slot="next"> … </ul>                               {/* 只有結果 C 才會顯示 */}
+  <Ledger … />
+</ResultPanel>
+<script> panel.dataset.verdict = 'C'; </script>          {/* 切換狀態：標籤、圖示、色調跟著變 */}`}>
+        <Fragment slot="note">
+          <p>{L('試算結果有三種（V36），每一種都先用一句話講結論，再給數字：A 打得平（乾淨色調、綠色行人號誌）、B 買得起但每個月多花一點（中性色調、約等號）、C 以現在的條件打不平（廢氣色調、不等號，加上「可以先做的事」）。三種靠文字和圖示區分，不只靠顏色。C 是一個完整的答案，不是錯誤訊息。', 'A calculator answers in one of three ways (V36), each stating its conclusion in a sentence before the number: A it adds up (clean tone, the green walking signal), B affordable to buy but a little more each month (neutral tone, an about-equal mark), C on today’s terms it does not add up (exhaust tone, a not-equal mark, plus “what you can do first”). They are told apart by words and glyph, not colour alone. C is a complete answer, not an error message.')}</p>
+          <p>{L('deadline 插槽只在結果是 A 的時候出現：倒數天數只給算得過來的人看，而且一定和縣市的名額狀態放在一起（R10）。', 'The deadline slot is rendered only while the verdict is A: a day count is shown only to readers for whom it adds up, and always with their city’s quota status beside it (R10).')}</p>
+        </Fragment>
+        <div class="grid" style="--min: 17rem">
+          <ResultPanel locale={locale} verdict="A" sentence={L('示意句子：以你的條件，電動機車實付比新的燃油機車少，每個月的開銷也不比加油多。', 'Sample sentence: on your details an electric scooter costs less to buy than a new gasoline one, and no more to run each month.')} title={L('買的時候少付（示意）', 'You pay less at purchase (sample)')} prefix="NT$" value="1,000" sample>
+            <p slot="deadline">{L('示意：某市還有名額（某日查）。最晚 12 月 31 日前買車、領牌，還有 N 天。', 'Sample: the city still has places (checked on a date). Buy and register by 31 December at the latest: N days left.')}</p>
+          </ResultPanel>
+          <ResultPanel locale={locale} verdict="B" sentence={L('示意句子：買的時候差不多，但每個月大約多花一點。值不值得，由你決定。', 'Sample sentence: about the same to buy, but a little more each month. Whether that is worth it is your call.')} title={L('每個月多花（示意）', 'More each month (sample)')} prefix="NT$" value="200" sample>
+            <p slot="deadline">{L('這一行不會出現在結果 B。', 'This line never appears in verdict B.')}</p>
+          </ResultPanel>
+          <ResultPanel locale={locale} verdict="C" sentence={L('示意句子：買的時候還差一截，每個月也不會比較省。我們不會叫你硬換。', 'Sample sentence: there is still a gap at purchase, and it is no cheaper to run. We will not tell you to force it.')} title={L('買的時候還差（示意）', 'Still short at purchase (sample)')} prefix="NT$" value="9,000" sample>
+            <ul slot="next">
+              <li>{L('示意：讓差距變小的做法。', 'Sample: a way to narrow the gap.')}</li>
+              <li>{L('示意：車還沒換之前可以先做的事。', 'Sample: something to do before changing scooters.')}</li>
+            </ul>
+          </ResultPanel>
+        </div>
+      </Block>
+
+      <Block name="DecisionStrip" file="ui/DecisionStrip.astro" wide code={`<DecisionStrip locale={locale} name="energy"
+  steps={[{ id: 'charge', legend: '停車的地方能不能充電？', options: [{ value: 'yes', label: '可以' }, { value: 'no', label: '不行' }] }, …]}
+  outcomes={[
+    { when: { charge: 'yes' }, title: '在家充電', body: '…', value: 'home-charge' },   // 先寫特定情況
+    { when: {}, title: '月租', body: '…', value: 'monthly' },                          // 最後放通用的
+  ]} />
+<script>
+  root.addEventListener('decision:change', (e) => setPlan(e.detail.value));
+</script>`}>
+        <Fragment slot="note"><p>{L('換電還是充電（V42）：幾個問題排成一列（手機上直排），答完給一個建議。有 JavaScript 時顯示第一個符合的結果，並送出 decision:change 事件給試算工具；沒有的時候列出所有結果和各自的條件，仍然是一張讀得懂的對照表。', 'Swap or charge (V42): a few questions in a row (stacked on phones) that end in one recommendation. With JavaScript the first matching outcome is shown and a decision:change event goes to the calculator; without it every outcome is listed with its conditions, so it still reads as a decision table.')}</p></Fragment>
+        <DecisionStrip locale={locale} name="sg-decision" steps={decisionDemo.steps} outcomes={decisionDemo.outcomes} />
+      </Block>
+    </div>
+  </Section>
+
+  <!-- ================================================================ MONEY / DATE STATE -->
+  <Section id="money" eyebrow="12" title={L('日期狀態與補助', 'Date state and subsidies')} rule lead={L('這個靜態網站會在 12 月 31 日的兩邊被閱讀。所有跟日期有關的文案，都由同一個模組決定現在是哪一種狀態，並且在瀏覽器裡用今天的日期重新判斷。', 'This static site will be read on both sides of 31 December. One module decides which state every date-dependent sentence is in, and re-evaluates it in the browser from today’s date.')}>
+    <Block name="site-state" file="lib/site-state.ts · lib/site-state.client.ts" wide code={`// 建置時（Astro frontmatter、Node）
+import { snapshot, moneyState, todayInTaipei } from '@/lib/site-state.data';
+const state = moneyState(todayInTaipei(), 'kaohsiung', snapshot);
+// state.id → 'A-city-exhausted'   state.city.asOf → '2026-08-11'   state.mayShowDayCount → false
+
+// 頁面：<Base money> 會印出快照並載入瀏覽器端的重新判斷
+<p data-money-when="static">…絕對日期，任何時候讀都成立…</p>   {/* 沒有 JavaScript 時只顯示這個 */}
+<p data-money-when="A">…</p>  <p data-money-when="B">…</p>  <p data-money-when="C D">…</p>
+<p data-money-state="A-city-open" data-money-template="{city}：還有名額（{date} 查）。"></p>
+<span data-money-fill="daysSince"></span>
+<Select id="city" … data-money-city />                        {/* 讀者的縣市 */}`}>
+      <Fragment slot="note">
+        <p>{L('狀態有這幾種：到 12 月 31 日為止是 A（還沒選縣市／縣市還有名額／只剩汰舊或特定身分／名額沒公布／已用完／已截止／查不到）；之後到線上申請截止是 B；再之後、沒有任何新方案定案是 C；資料庫裡出現 2027 年之後才開始的方案就是 D。縣市的錢用完是一種狀態，不是註腳。', 'The states: up to 31 December it is A (no city chosen / the city has places / only scrappage or certain groups left / quota not published / used up / closed / could not be checked); from then to the filing deadline, B; after that with nothing confirmed, C; and D once a programme starting after 2026 is in the registry. A city’s money running out is a state, not a footnote.')}</p>
+        <p><b>{L('怎麼避免顯示過期的狀態：', 'How a stale state is avoided: ')}</b>{L('（1）建置時把每一種狀態的文案都印出來，各自標上它成立的階段，另外有一句 static：只有絕對日期和查證日，任何時候讀都成立。（2）Base 在第一次繪製前用今天的台灣日期設定 html 的 data-money-phase，CSS 只顯示對的那一句；沒有 JavaScript 就只顯示 static。（3）需要數字或縣市的部分，由瀏覽器端的模組用頁面裡的小快照重算，讀者選縣市、或隔夜回到分頁時再算一次。（4）建置之後才用完的名額，瀏覽器不會知道，所以每個狀態都帶查證日，超過三週會加上「可能已經變了」，倒數天數也會收起來。', '(1) The build prints the copy for every state, each marked with the phase it is true in, plus one static sentence with absolute dates and the check date that is true whenever it is read. (2) Before first paint, Base sets data-money-phase on html from today’s date in Taiwan and CSS shows only the matching sentence; with no JavaScript only static shows. (3) Anything that needs a number or a city is recomputed by the browser module from a small snapshot in the page, again when the reader picks a city or returns to a tab left open overnight. (4) The browser cannot know about quota used up after the build, so every status carries its check date; after three weeks it adds “this may have changed” and the day count is withdrawn.')}</p>
+        <p>{L('下面的元件都接在同一個狀態上。用這排按鈕預覽不同的日期（只有這一頁有，正式頁面一律用今天的日期）。', 'The components below all hang off the same state. Use these buttons to preview other dates (this page only; real pages always use today’s date).')}</p>
+      </Fragment>
+      <div class="sg-dates" data-sg-dates>
+        <span class="meta">{L('預覽日期', 'Preview date')}</span>
+        {[['', L('今天', 'Today')], ['2026-12-31', '2026-12-31'], ['2027-01-05', '2027-01-05'], ['2027-02-14', '2027-02-14']].map(([d, label]) => <button type="button" class="sg-date" data-date={d} aria-pressed={d === '' ? 'true' : 'false'}>{label}</button>)}
+      </div>
+      <div class="grid" style="--min: 19rem; --grid-gap: var(--sp-7)">
+        <div class="stack" style="--stack: var(--sp-4)">
+          <p class="meta">MoneyBanner + Select data-money-city</p>
+          <Select id="sg-money-city" label={L('你住在哪個縣市？', 'Which city or county do you live in?')} options={cityOptions} value="" data-money-city />
+          <MoneyBanner locale={locale} tone="box" />
+        </div>
+        <div class="stack" style="--stack: var(--sp-4)">
+          <p class="meta">SubsidyTimeline (V19)</p>
+          <SubsidyTimeline locale={locale} />
+        </div>
+      </div>
+    </Block>
+
+    <Block name="TileMap" file="ui/TileMap.astro" wide code={`<TileMap locale={locale} name="city">
+  <Fragment slot="taipei"> … 金額、條件，每個數字附查證日 … </Fragment>
+</TileMap>`}>
+      <Fragment slot="note">
+        <p>{L(`22 個縣市的磚塊地圖（V41）。這裡的狀態不是示意：取自資料庫（${formatDate(snapshot.checkedOn, 'zh-TW', true)} 查），由 site-state 依今天的日期判斷。狀態用色塊的花紋和文字區分：有名額（實心）、只限汰舊或特定身分（斜紋）、已用完或已截止（空格加一道斜線）、查不到（虛線加問號，絕對不會顯示成 0）。藍圖列了四種；資料庫裡有不少縣市「方案還在進行、但剩餘名額沒有公布」，寫成「有名額」不對，所以多了第五種「名額沒公布」（圓環）。`, `The 22 cities and counties as a tile map (V41). The states here are not sample data: they come from the registry (checked ${formatDate(snapshot.checkedOn, 'en', true)}) through site-state for today’s date. States are told apart by a swatch pattern and a word: places left (solid), scrappage or certain groups only (hatched), used up or closed (an empty swatch with a strike), could not be checked (dashed with a question mark, never shown as zero). The blueprint lists four; the registry has many counties whose programme is running with no published remaining quota, and calling those “places left” would be wrong, so there is a fifth, “places not published” (a ring).`)}</p>
+        <p>{L('每一塊是連到下方明細的連結。有 JavaScript 時明細變成跟著選取走的一格；沒有的時候是一份完整的清單。用以縣市 id 命名的插槽放金額與條件。360px 時是四欄、不需要橫向捲動。', 'Each tile links to its detail row below. With JavaScript the rows become one panel that follows the selection; without it they are a complete list. Put amounts and conditions in a slot named after the jurisdiction id. Four columns at 360px, no sideways scrolling.')}</p>
+      </Fragment>
+      <TileMap locale={locale} name="sg-city" />
+    </Block>
   </Section>
 
   <!-- ================================================================ CHARTS -->
-  <Section id="charts" eyebrow="10" title={L('圖表', 'Charts')} rule lead={L('在 src/components/charts/。伺服器端產生的內嵌 SVG，沒有圖表函式庫；寬度用百分比、文字是固定大小的真文字，所以從 300px 到桌機都是同一張圖。每張圖都有 title、可展開的資料表，以及滑鼠或觸控的數值提示。', 'In src/components/charts/. Server-rendered inline SVG, no charting library. Widths are percentages and text is real fixed-size text, so one chart works from 300px to desktop. Every chart has a title, an expandable data table and a hover / touch readout.')}>
+  <Section id="charts" eyebrow="13" title={L('圖表', 'Charts')} rule lead={L('在 src/components/charts/。伺服器端產生的內嵌 SVG，沒有圖表函式庫；寬度用百分比、文字是固定大小的真文字，所以從 300px 到桌機都是同一張圖。每張圖都有 title、可展開的資料表，以及滑鼠或觸控的數值提示。', 'In src/components/charts/. Server-rendered inline SVG, no charting library. Widths are percentages and text is real fixed-size text, so one chart works from 300px to desktop. Every chart has a title, an expandable data table and a hover / touch readout.')}>
     <Callout label={L('圖表規則', 'Chart rules')}>
       <ul class="sg-list">
         <li>{L('先選形式，最後才選顏色。一個數字用 Stat，不要畫一根長條。', 'Pick the form first and the colour last. One number is a Stat, not a one-bar chart.')}</li>
@@ -824,10 +1100,951 @@ const locale = localeFromParam(Astro.params.lang);
       </Figure>
     </div>
     <p class="meta sg-note">{L('WaterfallChart 與 BreakEvenChart 在上面的「表單與試算」一節。', 'WaterfallChart and BreakEvenChart are shown in the Forms and calculator section above.')}</p>
+
+    <Block name={L('空白的圖：Figure empty + EmptyChart', 'The empty chart: Figure empty + EmptyChart')} file="ui/Figure.astro · charts/EmptyChart.astro · charts/ChartShell.astro" wide code={`<Figure locale={locale} empty title="…|這張圖是空的" subtitle="…"
+  who="各縣市環保局、環境部、大學都量得出來。">     {/* 或用 who 插槽放連結 */}
+  <EmptyChart locale={locale} title="空白的圖：…" desc="三個面板分別是…" />
+</Figure>
+
+{/* 其他形狀的空白：自己給面板、數列和橫軸 */}
+<EmptyChart locale={locale} title="…"
+  panels={[{ label: '怠速排放', unit: 'g/分鐘' }]}
+  series={[{ label: '一台台灣的機車' }]}
+  x={{ from: 0, to: 60, step: 10, label: '怠速時間（秒）' }} />`}>
+      <Fragment slot="note">
+        <p>{L('網站的招牌圖（V8）：一張畫得完整的圖，有面板、座標軸、刻度、格線和紅燈轉綠燈的色條，但沒有任何資料點，因為沒有人量過。它必須看起來是刻意的，不是壞掉：外框和其他圖一樣完整；y 軸只標出 0 在哪裡，不編造刻度；每個面板角落寫著「無資料」，被截圖裁切之後仍然讀得出來。沒有線、沒有點、沒有任何佔位的形狀。', 'The site’s signature graphic (V8): a completely drawn chart with panels, axes, ticks, gridlines and the red-then-green phase bar, and no data marks at all, because nobody has measured it. It has to look deliberate, never broken: the frame is as finished as any other chart; the y axis shows only where zero would be and invents no scale; each panel says “no data” in its corner, so a cropped screenshot still reads. No line, no dots, no placeholder shape.')}</p>
+        <p>{L('Figure 的 empty 狀態：圖說預設是「這不是版面錯誤。這張圖的數據不存在。」；來源那一行換成「沒人量過」標記；who 說誰量得出來（空白後面一定要接這一句）。螢幕閱讀器會讀到：圖的名稱、你給的 desc，加上「這張圖是刻意留白的…」，以及一張每一格都是「無資料」的資料表。ChartShell 的 empty 屬性就是做這件事，自己寫 render 函式的人可以直接用。', 'Figure’s empty state: the caption defaults to “This is not a layout error. The data for this chart does not exist.”; the source line is replaced by the “nobody has measured this” badge; who says who could measure it (a gap is always followed by that). A screen reader gets the graphic’s name, your desc plus “this chart is empty on purpose…”, and a data table whose every cell reads “no data”. ChartShell’s empty prop is what does this, for anyone writing their own render function.')}</p>
+      </Fragment>
+      <div class="grid" style="--min: 20rem; --grid-gap: var(--sp-7)">
+        <Figure locale={locale} empty title={L('紅燈旁邊的行人吸進多少？|這張圖是空的', 'What does a pedestrian breathe beside a red light? |This chart is empty')} subtitle={L('預設的三個面板與兩個高度', 'The default three panels and two heights')} who={L('各縣市環保局、環境部、大學都量得出來。', 'A city environmental bureau, the environment ministry or a university could.')}>
+          <EmptyChart locale={locale} title={L('空白的圖：紅燈倒數期間路口行人高度的三種污染物', 'Empty chart: three pollutants at pedestrian height through the red-light countdown')} desc={L('三個面板分別是一氧化碳、苯和超細微粒，橫軸是紅燈倒數 90 到 0 秒，接著是綠燈。', 'Three panels for carbon monoxide, benzene and ultrafine particles; the x axis is the red-light countdown from 90 to 0 seconds, then green.')} />
+        </Figure>
+        <Figure locale={locale} empty title={L('一台台灣的機車怠速時排多少？|也是空的', 'How much does one Taiwanese scooter emit at idle? |Also empty')} subtitle={L('自訂面板、數列與橫軸的例子', 'An example with custom panel, series and axis')} who={L('環境部、車輛測試機構。', 'The environment ministry, or a vehicle test laboratory.')}>
+          <EmptyChart locale={locale} title={L('空白的圖：機車怠速排放率', 'Empty chart: scooter idle emission rate')} panels={[{ label: L('怠速排放', 'Idle emissions'), unit: L('克/分鐘', 'g/min') }]} series={[{ label: L('一台台灣的四行程機車', 'One Taiwanese four-stroke scooter') }]} x={{ from: 0, to: 60, step: 10, label: L('怠速時間（秒）', 'Time at idle (seconds)') }} panelHeight={110} />
+        </Figure>
+      </div>
+    </Block>
   </Section>
 
   <!-- ================================================================ ART -->
-  <Section id="art" eyebrow="11" title={L('插畫', 'Illustration')} tone="sunken" lead={L('在 src/components/art/。全部是手寫的內嵌 SVG，零件定義在 parts.ts，顏色只來自 --art-* 色票，所以兩個主題都能用。', 'In src/components/art/. All hand-built inline SVG. The parts live in parts.ts and take colour only from --art-* tokens, so everything works in both themes.')}>
+  <Section id="art" eyebrow="14" title={L('插畫', 'Illustration')} tone="sunken" lead={L('在 src/components/art/。全部是手寫的內嵌 SVG，顏色只來自 --art-* 色票。完整的規格（六格畫面、兩個鏡頭、空氣怎麼畫、平面圖、號誌循環、量測建議圖）在插畫專用的說明頁。', 'In src/components/art/. All hand-built inline SVG, coloured only by --art-* tokens. The full specification (six frames, two cameras, how air is drawn, the plan of the approach, the signal cycle, the measurement diagram) is on the art reference page.')}>
+    <p><Button href={href('/styleguide-art/', locale)} variant="secondary" arrow>{L('插畫說明頁', 'Art reference page')}</Button></p>
+    <Block name="StreetScene" file="art/StreetScene.astro" wide code={`<StreetScene slot="art" locale={locale} frame="pack" />        {/* K1：一章一格靜態畫面 */}
+<StreetScene locale={locale} frame="kerb" emphasis="heights" />
+<SceneCompare locale={locale} />                               {/* 燃油／電動切換，不需要 JavaScript */}`}>
+      <Fragment slot="note">
+        <p>{L('紅燈現場：六格靜態畫面（empty、pack、kerb、paused、green、clean），一章放一格。畫面永遠是示意圖，而且畫面裡自己會說：地面附近是固定濃度的斜線，標著「有廢氣｜多濃沒人量過」，不會隨倒數變濃，也不畫機車起步的那一下。健康數字不和畫面放在同一格。', 'The red light: six static frames (empty, pack, kerb, paused, green, clean), one per chapter. The scene is always an illustration and says so inside the frame: the layer near the ground is hatching at one fixed density, labelled “exhaust present | amount not measured”; it never thickens with the countdown and never shows a pull-away surge. No health statistic shares a frame with it.')}</p>
+      </Fragment>
+      <div class="sg-bleed"><SceneCompare locale={locale} name="sg-scene" /></div>
+      <div style="margin-block-start: var(--sp-5)"><PollutantKey locale={locale} /></div>
+    </Block>
+
+    <Block name="Haze" file="art/Haze.astro" wide code={`<Chapter haze … />                     {/* 一律用 Chapter：固定濃度、kind="unmeasured" */}
+<Haze density={0.5} kind="unmeasured" />  {/* 單獨使用：放在 position: relative 的容器底部 */}`}>
+      <Fragment slot="note"><p>{L('章節底部的那一條。Chapter 的 haze 只有開和關：開的時候一律是「沒量過」的斜線，濃度固定為 0.5。其他 kind（fumes、co、ufp、all）只用在圖例與說明。', 'The band along the bottom of a chapter. Chapter’s haze is on or off: when on it is always the “unmeasured” hatching at the fixed density of 0.5. The other kinds (fumes, co, ufp, all) are for keys and explanations only.')}</p></Fragment>
+      <div class="grid" style="--min: 15rem">
+        {(['unmeasured', 'fumes', 'co', 'ufp'] as const).map((kind) => (
+          <div class="sg-haze">
+            <code>kind="{kind}"</code>
+            <Haze {...({ kind } as { kind: 'all' })} density={0.5} height={150} animated={false} />
+          </div>
+        ))}
+      </div>
+    </Block>
+
+    <Block name="Scooter / ScrambleCrossing" file="art/Scooter.astro · art/ScrambleCrossing.astro" wide code={`<Scooter kind="gas" label="燃油機車" />
+<Scooter kind="electric" rider label="電動機車" />`}>
+      <Fragment slot="note"><p>{L('通用造型的一對側面機車（不是任何品牌的車款），以及路口俯視圖。', 'A matching pair of generic scooters in side view (no brand’s model), and a junction from above.')}</p></Fragment>
+      <div class="grid" style="--min: 13rem">
+        <figure><Scooter kind="gas" label={series2[0].label} /><figcaption class="meta">kind="gas"</figcaption></figure>
+        <figure><Scooter kind="electric" rider label={series2[1].label} /><figcaption class="meta">kind="electric" rider</figcaption></figure>
+        <figure><ScrambleCrossing kind="gas" label={L('路口俯視示意圖。', 'Illustrative top view of a junction.')} /><figcaption class="meta">ScrambleCrossing</figcaption></figure>
+      </div>
+    </Block>
+  </Section>
+
+  <!-- ================================================================ COPY + SHARE -->
+  <Section id="copy" eyebrow="15" title={L('文案與分享圖', 'Copy and share cards')} rule lead={L('文案怎麼放、怎麼被檢查，以及分享圖怎麼產生。', 'Where copy lives, how it is checked, and how share cards are made.')}>
+    <Block name={L('文案模組與檢查', 'Copy modules and the guard')} file="i18n/pages/*.ts · scripts/check-copy.mjs · i18n/copy-allowlist.json" wide code={`// src/i18n/pages/home.ts            字串 id：home.link3.body.1
+import { copy } from './_copy.ts';
+export default copy({
+  link3: {
+    title: { 'zh-TW': '這一格，|沒有人量過', en: 'This box is empty. |Nobody has measured it.' },
+    body: [ { 'zh-TW': '…', en: '…' }, { 'zh-TW': '…', en: '…' } ],
+  },
+});
+
+// 頁面
+import home from '@/i18n/pages/home';
+import { fill, localize } from '@/i18n/pages/_copy';
+const t = localize(home, locale);        // t.link3.title, t.link3.body[1]
+
+// src/i18n/copy-allowlist.json       以（字串 id, 規則 id）為鍵，一定要寫理由
+{ "id": "home.link5.honesty", "rule": "associations-not-causes-tw",
+  "reason": "這一句是在說研究看到的是『有關』不是『造成』。", "reviewedBy": "…", "reviewedOn": "2026-11-25" }`}>
+      <Fragment slot="note">
+        <ul>
+          <li>{L('每一頁的文案放在 src/i18n/pages/<頁面>.ts，預設匯出一棵樹，葉子是中英各一的字串。共用的介面字串在 ui.ts。.astro 頁面裡不寫中文。', 'Each page’s copy lives in src/i18n/pages/<page>.ts: a default-exported tree whose leaves hold the string in both languages. Shared interface strings are in ui.ts. No Chinese is written in a .astro page.')}</li>
+          <li>{L('字串 id 是「模組名.路徑」，陣列用索引。id 要穩定：允許清單是用它當鍵。', 'A string id is module name plus dotted path, arrays by index. Keep ids stable: the allow-list is keyed by them.')}</li>
+          <li>{L('npm run check 會跑 scripts/check-copy.mjs：把 claims-policy.ts 的 flagCopy() 套在每一個字串上，再加三個語氣檢查（寫「台灣」不寫「臺灣」、用「你」不用「您」、沒有驚嘆號）。有比對到、而且沒有在允許清單裡，就失敗。', 'npm run check runs scripts/check-copy.mjs: flagCopy() from claims-policy.ts over every string, plus three voice checks (台灣 not 臺灣, 你 never 您, no exclamation marks). A match that is not in the allow-list fails the check.')}</li>
+          <li>{L('比對到不等於寫錯：藍圖裡有些句子是刻意的（「不是『造成』」、每一個「怠速」、「這不是零污染」）。讀過那條規則之後，在 copy-allowlist.json 加一筆，寫清楚這一句為什麼是對的。不再比對到的舊項目也會讓檢查失敗，所以清單不會過期。', 'A match is not an error: some blueprint sentences match on purpose (“not cause”, every use of “idling”, “this is not zero pollution”). After reading the rule, add an entry to copy-allowlist.json saying why this string is right. An entry that no longer matches anything also fails the check, so the list cannot go stale.')}</li>
+          <li><code>node scripts/check-copy.mjs --list</code> {L('列出所有字串 id。R1–R16 裡機器查不到的規則，仍然要由人檢查。', 'prints every string id. The rules in R1–R16 that a machine cannot check still need a person.')}</li>
+        </ul>
+      </Fragment>
+    </Block>
+
+    <Block name={L('分享圖卡', 'Share cards')} file="scripts/build-share-cards.mjs · lib/share-cards.ts" wide code={`<Base locale={locale} title="…" share="smell">      {/* og:image、LINE 用的方形圖、alt 文字 */}
+
+npm run share-cards              # 產生 public/share/{zh,en}/<id>.png 與 <id>-sq.png，然後 commit
+npm run share-cards -- smell     # 只重畫某一張
+npm run check                    # 其中一步會確認圖卡和現在的文案一致（不需要瀏覽器）`}>
+      <Fragment slot="note"><p>{L('每個問題頁一張、首頁一張、七件事一張，中英各一，各有 1200×630 和 1080×1080 兩種尺寸。問題、一句話回答、但書和證據標記都畫在圖裡，所以截圖不會把但書丟掉。圖卡的文字來自 src/i18n/pages/questions.ts 與 chain.summary；改了文案就重跑一次並 commit，否則 npm run check 會失敗。腳本用本機已安裝的 Playwright，CI 不需要瀏覽器。', 'One per question page, one for the home page and one for the seven lines, in both languages, each at 1200×630 and 1080×1080. The question, the one-line answer, the caveat and the badge are drawn inside the image, so a screenshot cannot shed the caveat. Card text comes from src/i18n/pages/questions.ts and chain.summary; change the copy, rerun and commit, or npm run check fails. The script uses the Playwright already on the machine, so CI needs no browser.')}</p></Fragment>
+      <div class="grid" style="--min: 18rem">
+        <figure><img src={asset(cardZh.wide)} width="1200" height="630" alt={cardZh.alt} loading="lazy" lang="zh-Hant-TW" /><figcaption class="meta">share="smell" · zh · 1200×630</figcaption></figure>
+        <figure><img src={asset(cardEn.wide)} width="1200" height="630" alt={cardEn.alt} loading="lazy" lang="en" /><figcaption class="meta">share="smell" · en · 1200×630</figcaption></figure>
+        <figure class="sg-square"><img src={asset(shareCard('brief', locale).square)} width="1080" height="1080" alt={shareCard('brief', locale).alt} loading="lazy" /><figcaption class="meta">share="brief" · 1080×1080</figcaption></figure>
+      </div>
+    </Block>
+  </Section>
+</Base>`}</code></pre>
+    </div>
+  </Section>
+
+  <!-- ================================================================ COLOUR -->
+  <Section id="colour" eyebrow="03" title={L('色彩', 'Colour')} lead={L('兩個主題同等重要：跟隨系統設定，右上角可手動切換並記住。所有文字與底色的組合都通過 WCAG AA。', 'Both themes are first-class: the site follows the system setting, and the toggle in the header overrides and remembers it. Every text and background pair passes WCAG AA.')}>
+    <h3 class="sg-h">{L('表面與文字', 'Surfaces and ink')}</h3>
+    <div class="sg-swatches">
+      <Swatch token="--bg" note={L('頁面：陰天', 'Page: overcast')} />
+      <Swatch token="--bg-sunken" note={L('凹陷區塊', 'Recessed bands')} />
+      <Swatch token="--surface" note={L('卡片、輸入框', 'Cards, inputs')} />
+      <Swatch token="--line" note={L('細線', 'Hairlines')} />
+      <Swatch token="--line-strong" note={L('控制項邊框 ≥3:1', 'Control borders ≥3:1')} />
+      <Swatch token="--ink" text note={L('主要文字', 'Primary text')} />
+      <Swatch token="--ink-2" text note={L('次要文字', 'Secondary text')} />
+      <Swatch token="--ink-3" text note={L('圖說、註記', 'Captions, meta')} />
+    </div>
+
+    <h3 class="sg-h">{L('語意色：廢氣、乾淨、紅燈', 'Semantic: exhaust, clean, red phase')}</h3>
+    <div class="sg-swatches">
+      <Swatch token="--exhaust" note={L('廢氣：標記、線條', 'Exhaust: marks, rules')} />
+      <Swatch token="--exhaust-ink" text note={L('廢氣：可當文字', 'Exhaust: text-safe')} />
+      <Swatch token="--exhaust-wash" note={L('廢氣：底色', 'Exhaust: wash')} />
+      <Swatch token="--clean" note={L('乾淨/電動：標記', 'Clean / electric: marks')} />
+      <Swatch token="--clean-ink" text note={L('乾淨：可當文字', 'Clean: text-safe')} />
+      <Swatch token="--clean-wash" note={L('乾淨：底色', 'Clean: wash')} />
+      <Swatch token="--accent" note={L('連結與主要按鈕（綠燈）', 'Links and primary action (go)')} />
+      <Swatch token="--signal-red" note={L('紅燈：只用在「等紅燈」', 'Red phase only')} />
+      <Swatch token="--signal-red-ink" text note={L('紅燈：可當文字', 'Red: text-safe')} />
+      <Swatch token="--paint-yellow" note={L('標線黃：插畫、示意標籤', 'Paint yellow: art, sample tag')} />
+    </div>
+
+    <h3 class="sg-h">{L('圖表：類別色（順序固定）', 'Charts: categorical set (fixed order)')}</h3>
+    <div class="sg-swatches">
+      <Swatch token="--chart-exhaust" note={L('1 燃油/廢氣', '1 gasoline / exhaust')} />
+      <Swatch token="--chart-clean" note={L('2 電動/乾淨', '2 electric / clean')} />
+      <Swatch token="--chart-blue" note="3 blue" />
+      <Swatch token="--chart-lime" note="4 lime" />
+      <Swatch token="--chart-magenta" note="5 magenta" />
+      <Swatch token="--chart-violet" note="6 violet" />
+      <Swatch token="--chart-neutral" note={L('其他/淡化', 'Other / de-emphasis')} />
+      <Swatch token="--chart-signal" note={L('保留：超過限值', 'Reserved: over a limit')} />
+    </div>
+    <div class="prose sg-note">
+      <p>
+        {L(
+          '六個類別色在兩個主題下都用 dataviz 驗證程式檢查過（紅綠色盲模擬下相鄰色差 ΔE 至少 11.8；一般視覺至少 16.4；對底色對比全部 ≥3:1）。前三色兩兩之間也通過，所以散佈圖與小倍數圖最多用三色。順序是安全機制的一部分：不要重排、不要循環、不要自己加第七色，超過就併成「其他」。',
+          'The six categorical colours were checked with the dataviz validator in both themes (adjacent ΔE at least 11.8 under red-green colour-blindness simulation, at least 16.4 for normal vision, all ≥3:1 against the surface). The first three also pass pairwise, so scatter plots and small multiples may use at most three. The order is part of the safety mechanism: never reorder, cycle, or add a seventh. Fold the tail into “other”.',
+        )}
+      </p>
+      <p>{L('顏色跟著「對象」走，不跟著排名走：燃油永遠是赭黃，電動永遠是綠。文字永遠用墨色，不用數列色。', 'Colour follows the entity, never its rank: gasoline is always ochre, electric always green. Text always wears ink, never a series colour.')}</p>
+    </div>
+
+    <h3 class="sg-h">{L('圖表：順序色階（少 → 多）', 'Charts: ordinal ramps (less → more)')}</h3>
+    <div class="sg-ramps">
+      <div class="sg-ramp">{[1, 2, 3, 4, 5].map((i) => <span style={`background:var(--exhaust-s${i})`}><code>--exhaust-s{i}</code></span>)}</div>
+      <div class="sg-ramp">{[1, 2, 3, 4, 5].map((i) => <span style={`background:var(--clean-s${i})`}><code>--clean-s{i}</code></span>)}</div>
+    </div>
+    <p class="meta sg-note">{L('深色主題下色階方向相反（愈多愈亮）。對比兩極時用廢氣 ↔ 乾淨，中點用 --chart-neutral。', 'In the dark theme the ramps run the other way (more is lighter). For diverging scales use exhaust ↔ clean with --chart-neutral at the midpoint.')}</p>
+
+    <h3 class="sg-h">{L('區塊色調', 'Tones')}</h3>
+    <div class="grid sg-tones">
+      {(['sunken', 'surface', 'exhaust', 'clean', 'inverse'] as const).map((tone) => (
+        <div class={`tone-${tone} sg-tone`}>
+          <code>tone="{tone}"</code>
+          <p>{L('文字在這個色調上的樣子。', 'How text reads on this tone.')} <a href="#colour">{L('連結', 'A link')}</a></p>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- ================================================================ TYPE -->
+  <Section id="type" eyebrow="04" title={L('文字', 'Typography')} tone="sunken" lead={L('中文內文用讀者手機裡的系統字型，零下載；只有大標題用思源黑體（Noto Sans TC）最粗的 Black。拉丁字母與數字用 Archivo：一套字、兩種寬度，英文標題與大數字用窄體，像路面上拉長的標字。', 'Chinese body text uses the reader’s own system font: zero download. Only headlines use Noto Sans TC Black. Latin letters and figures are Archivo: one family, two widths, with English headlines and big numbers condensed like elongated lettering on a road.')}>
+    <div class="sg-type">
+      {[
+        ['.display', 'display', L('紅燈亮起的那一刻', 'The moment the light turns red')],
+        ['h1', 'h1', L('排氣管離地不到一公尺', 'The tailpipe is under a metre up')],
+        ['h2', 'h2', L('這一格，沒有人量過', 'Nobody has measured this')],
+        ['h3', 'h3', L('誰在路口站得最久', 'Who stands at the crossing longest')],
+        ['h4', 'h4', L('怎麼讀這張圖', 'How to read this chart')],
+      ].map(([name, cls, sample]) => (
+        <div class="sg-type__row">
+          <code>{name}</code>
+          <p class={cls}>{sample}</p>
+        </div>
+      ))}
+      <div class="sg-type__row">
+        <code>.lead</code>
+        <p class="lead">{L('引言用來把一個章節的重點在兩三行內說完，字比內文大一級、顏色淡一級。', 'A lead says what the section is about in two or three lines, one step larger and one step quieter than body text.')}</p>
+      </div>
+      <div class="sg-type__row">
+        <code>p (.prose)</code>
+        <div class="prose">
+          <p set:html={L(
+              '內文行高 1.8、每行約 34 個字，標點用全形並採嚴格避頭尾。強調用<em>粗體</em>而不是斜體，因為中文沒有斜體；書名與報告名用《》。數字與英文像 PM2.5、CO、125 cc 前後各留一個半形空格，瀏覽器支援時也會自動補上間距。',
+              'Body text is set at a line-height of 1.6 and about 66 characters a line. Emphasis is a real <em>italic</em> in English and bold in Chinese, because Chinese has no italic. Units stay attached to their numbers, such as 125 cc, and dashes — like this one — come from the Latin font in English and from the CJK font in Chinese.',
+            )} />
+          <p>
+            {L('句子裡可以用', 'Inside a sentence you can use ')}<mark>{L('螢光標記', 'a highlight')}</mark>{L('、', ', ')}<a href="#type">{L('連結', 'a link')}</a>{L('、來源標記', ' and a citation marker')}<Cite locale={locale} id="sample-a" n={1} />{L('。單位請用', '. For units use ')}<code>units.ugm3</code>{L(':', ': ')}<span class="nowrap">35 {units.ugm3}</span>{L('。', '.')}
+          </p>
+        </div>
+      </div>
+      <div class="sg-type__row">
+        <code>.meta / .eyebrow</code>
+        <div class="stack">
+          <p class="eyebrow">{L('小標：一段車道線加一行字', 'Eyebrow: a lane dash, then a label')}</p>
+          <p class="meta">{L('註記與圖說用 13px，這是中文可讀的下限，不要再小。', 'Meta and captions are 13px, the floor for legible Chinese. Never go smaller.')}</p>
+        </div>
+      </div>
+      <div class="sg-type__row">
+        <code lang="en">{en ? 'lang="zh-Hant"' : 'lang="en"'}</code>
+        <div class="prose">
+          {en ? (
+            <p>A Chinese fragment inside English text carries its own lang attribute, so it gets Chinese punctuation and line-breaking: <span lang="zh-Hant-TW">機車待轉區——等紅燈的地方。</span></p>
+          ) : (
+            <p>中文頁面裡的英文片段要加上 lang 屬性，才會套用英文的標點與字距：<span lang="en">“Stop line — the place where the pack waits.”</span></p>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid sg-rules">
+      <Callout label={L('標題斷行', 'Headline wrapping')}>
+        <p>{L('中文沒有空格，瀏覽器可能把一個詞從中間切開。用 | 標出語意單位，<Phrased> 會讓標題只在單位之間換行。Section、Chapter、Figure 的 title 都直接支援。', 'Chinese has no spaces, so a browser may break a headline mid-word. Mark phrase units with | and <Phrased> only wraps between them. The title prop of Section, Chapter and Figure supports it directly.')}</p>
+        <p><code>{L('title="等紅燈的時候，|我們吸進了什麼"', 'title="What we breathe |at the red light"')}</code></p>
+      </Callout>
+      <Callout label={L('數字', 'Numbers')}>
+        <p>{L('內文與大數字用比例數字；表格、座標軸、試算結果用等寬數字（.tnum，table 與 output 已預設）。負號用「−」（U+2212），範圍用「–」。', 'Running text and big numbers use proportional figures; tables, axes and calculator output use tabular figures (.tnum; tables and <output> have it by default). Use a real minus “−” (U+2212) and an en dash for ranges.')}</p>
+        <table class="sg-nums"><tbody><tr><td>{L('比例', 'Proportional')}</td><td class="num" style="font-variant-numeric:proportional-nums">1,111.1</td></tr><tr><td>{L('等寬', 'Tabular')}</td><td class="num">1,111.1</td></tr><tr><td></td><td class="num">8,888.8</td></tr></tbody></table>
+      </Callout>
+      <Callout label={L('字型載入', 'Font loading')}>
+        <p>{L('中文網路字型只用在 .display、h1、h2（字重 900）。它切成約一百個 unicode-range 分片，瀏覽器只下載標題用到的那幾片。h3 以下與所有內文都是系統字型，所以最粗只到 700。拉丁字型只有一個檔案，預先載入。', 'The Chinese web font is used only by .display, h1 and h2 (weight 900). It ships as about a hundred unicode-range slices and the browser fetches only the few a page’s headlines need. h3 and below, and all body text, are system fonts, so they stop at weight 700. The Latin font is a single preloaded file.')}</p>
+      </Callout>
+    </div>
+  </Section>
+
+  <!-- ================================================================ LAYOUT -->
+  <Section id="layout" eyebrow="05" title={L('間距與版面', 'Space and layout')}>
+    <div class="sg-two">
+      <div>
+        <h3 class="sg-h">{L('間距', 'Space')}</h3>
+        <div class="sg-space">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+            <div><code>--sp-{i}</code><span style={`inline-size:var(--sp-${i})`} /></div>
+          ))}
+        </div>
+      </div>
+      <div class="stack" style="--stack: var(--sp-5)">
+        <div>
+          <h3 class="sg-h">{L('圓角與線', 'Radii and rules')}</h3>
+          <div class="cluster">
+            <span class="sg-radius" style="border-radius:var(--radius-1)">2</span>
+            <span class="sg-radius" style="border-radius:var(--radius-2)">4</span>
+            <span class="sg-radius" style="border-radius:var(--radius-3)">8</span>
+            <span class="sg-radius" style="border-radius:var(--radius-pill)">pill</span>
+          </div>
+          <p class="meta sg-note">{L('沒有陰影。分隔只用三種線：1px 細線、3px 漆線（--rule-paint）、8px 停止線（--rule-stop）。', 'No shadows. Separation uses three rules only: a 1px hairline, a 3px painted rule (--rule-paint) and the 8px stop line (--rule-stop).')}</p>
+        </div>
+        <div>
+          <h3 class="sg-h">{L('容器', 'Containers')}</h3>
+          <ul class="prose sg-list">
+            <li><code>.container</code> {L('最寬 76rem，兩側留白 --gutter（手機 16px）', 'max 76rem, side gutters --gutter (16px on phones)')}</li>
+            <li><code>.container--wide</code> 60rem</li>
+            <li><code>.container--prose</code> / <code>.prose</code> {L('一欄文字：中文 34 字、英文約 66 字元', 'one text column: 34 Chinese characters, about 66 Latin')}</li>
+            <li><code>.grid</code> {L('自動欄數，用 --min 設定每欄最小寬度', 'auto-fit columns; set --min for the column floor')}</li>
+            <li><code>.stack</code> / <code>.cluster</code> {L('垂直節奏與橫向群組', 'vertical rhythm and wrapping rows')}</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="sg-h">{L('動態', 'Motion')}</h3>
+          <p class="meta">{L('介面只有 120–240ms 的顏色與位移變化。插畫的飄移很慢（17–31 秒一個循環）。使用者要求減少動態時，全部停止，畫面仍然完整。', 'Interface motion is limited to 120–240ms colour and position changes. Illustration drift is slow (17–31s a cycle). Under prefers-reduced-motion everything stops and every picture is still complete.')}</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ================================================================ MOTIFS -->
+  <Section id="motifs" eyebrow="06" title={L('街道語彙', 'Street motifs')} tone="sunken" lead={L('讓網站看起來屬於台灣街頭的幾個小零件。都是裝飾，不帶資訊。', 'A handful of parts that make the site belong to a Taiwanese street. All decorative; none carries information.')}>
+    <div class="grid" style="--min: 17rem">
+      <div class="stack">
+        <div class="zebra" aria-hidden="true"></div>
+        <p class="meta"><code>.zebra</code> {L('斑馬線（枕木紋）：頁尾上緣、章節之間。', 'Zebra crossing: top of the footer, between chapters.')}</p>
+      </div>
+      <div class="stack">
+        <hr class="stopline" />
+        <p class="meta"><code>.stopline</code> {L('停止線：一個段落的開始。Section 的 rule 屬性、Stat 上緣都是它。', 'Stop line: where something begins. Used by Section rule and the top of a Stat.')}</p>
+      </div>
+      <div class="stack">
+        <div class="paintbox"><span class="meta">{L('待轉區', 'Waiting box')}</span></div>
+        <p class="meta"><code>.paintbox</code> {L('機車待轉區的白框：Callout 用它。', 'The painted waiting box: Callout is built on it.')}</p>
+      </div>
+      <div class="stack">
+        <div class="cluster">
+          <Signal state="red" count={42} size="4.5rem" />
+          <Signal state="green" count={9} size="4.5rem" />
+          <Signal state="red" size="2.8rem" />
+          <Signal state="green" size="2.8rem" />
+        </div>
+        <p class="meta"><code>&lt;Signal state count /&gt;</code> {L('行人號誌與倒數：紅代表問題（等紅燈的那一刻），綠代表出口。', 'Pedestrian signal and countdown: red marks the problem (the red-light moment), green the way out.')}</p>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ================================================================ COMPONENTS -->
+  <Section id="components" eyebrow="07" title={L('元件', 'Components')} lead={L('都在 src/components/ui/。每個檔案開頭的註解列出所有屬性。', 'All in src/components/ui/. The comment at the top of each file lists every prop.')}>
+    <Block name="Section" file="ui/Section.astro" code={`<Section id="who" eyebrow="…" title="誰離得最近" lead="…" tone="sunken" width="wide" rule>
+  …
+</Section>`}>
+      <Fragment slot="note">
+        <p>{L('一般區塊：上下留白、容器、可選的小標、標題與引言。這一頁的每個大段落都是 Section。tone 換底色，width 換容器寬度，rule 在上緣畫一條停止線。', 'The standard block: vertical rhythm, a container, and an optional eyebrow, title and lead. Every major part of this page is a Section. tone repaints it, width changes the container, rule draws a stop line across the top.')}</p>
+      </Fragment>
+    </Block>
+
+    <Block name="Stat" file="ui/Stat.astro" wide code={`<Stat locale={locale} label="…" value="62" unit={units.ugm3} tone="exhaust" sample>
+  一句話說明這個數字。<Cite locale={locale} id="…" n={1} />
+</Stat>`}>
+      <Fragment slot="note"><p>{L('大數字。一個畫面最多三個；一定要有標籤、單位與一句脈絡。色調只改變上緣的線，數字永遠是墨色。', 'The big number. At most three per screen, always with a label, a unit and one line of context. The tone only colours the top rule; the numeral is always ink.')}</p></Fragment>
+      <div class="grid" style="--min: 14rem">
+        <Stat locale={locale} label={L('示意：路口行人', 'Sample: at the crossing')} value="62" unit={units.ugm3} tone="exhaust" sample>
+          {L('一句話交代這個數字量的是什麼、在哪裡量的。', 'One sentence on what was measured and where.')}<Cite locale={locale} id="sample-a" n={1} />
+        </Stat>
+        <Stat locale={locale} label={L('示意：電動機車', 'Sample: electric scooter')} value="0" unit={L('排氣管', 'tailpipes')} tone="clean" sample>
+          {L('乾淨色調用在解方。', 'The clean tone belongs to the solution.')}
+        </Stat>
+        <Stat locale={locale} label={L('示意：實付價格', 'Sample: net price')} prefix="NT$" value="58,000" size="md" sample>
+          {L('size="md" 用在較長的數字。', 'size="md" suits longer numbers.')}
+        </Stat>
+      </div>
+    </Block>
+
+    <Block name="Cite" file="ui/Cite.astro" code={`…顯著較高<Cite locale={locale} id="wu-2021" n={3} />。
+<Cite locale={locale} id="wu-2021" n={3} variant="chip" />`}>
+      <Fragment slot="note"><p>{L('來源標記，連到 /sources/#<id>。內文用上標；圖表註腳、卡片與證據鏈用 chip。同一個來源在全站用同一個編號。', 'A citation marker linking to /sources/#<id>. Superscript in running text; chip in figure footers, cards and chain links. A source keeps the same number across the site.')}</p></Fragment>
+      <p>
+        {L('街道上的濃度明顯高於測站', 'Street-level concentrations are well above the monitoring station')}<Cite locale={locale} id="sample-a" n={1} /><Cite locale={locale} id="sample-b" n={2} />{L('。', '.')}
+        <span style="margin-inline-start:1rem"><Cite locale={locale} id="sample-c" n={3} variant="chip" /></span>
+      </p>
+    </Block>
+
+    <Block name="Figure" file="ui/Figure.astro" code={`<Figure locale={locale} number={1} title="發現寫在這裡" subtitle="畫了什麼（單位）" caption="怎麼讀" sample>
+  <BarChart … />
+  <Cite slot="source" locale={locale} id="…" n={1} variant="chip" />
+</Figure>`}>
+      <Fragment slot="note"><p>{L('所有圖表、表格與資訊圖的外框：編號與標題 → 副標 → 內容 → 圖說 → 來源。沒有卡片，只有上緣一條漆線。下面「圖表」一節的每張圖都放在 Figure 裡。', 'The frame for every chart, table and infographic: number and title → subtitle → body → caption → source. No card, just a painted rule on top. Every chart in the Charts section below sits in one.')}</p></Fragment>
+    </Block>
+
+    <Block name="Callout / PullQuote" file="ui/Callout.astro · ui/PullQuote.astro" wide code={`<Callout tone="exhaust" label="注意" title="…"> … </Callout>
+<PullQuote tone="exhaust">「…」<Fragment slot="attribution">某某，職稱 <Cite … /></Fragment></PullQuote>`}>
+      <div class="grid" style="--min: 18rem">
+        <Callout label={ui.note[locale]} title={L('怎麼讀這張圖', 'How to read this chart')}>
+          <p>{L('說明框像待轉區的白框：粗線矩形，標籤嵌在上緣。', 'A callout is drawn like a painted waiting box: a thick rectangle with its label set into the top edge.')}</p>
+        </Callout>
+        <Callout tone="exhaust" label={L('注意', 'Caution')}>
+          <p>{L('廢氣色調：用在限制、警語、不確定性。', 'Exhaust tone: limitations, warnings, uncertainty.')}</p>
+        </Callout>
+        <Callout tone="clean" label={L('你可以做的', 'What you can do')}>
+          <p>{L('乾淨色調：用在行動與解方。', 'Clean tone: actions and solutions.')}</p>
+        </Callout>
+        <Callout tone="signal" label={L('紅燈', 'Red phase')}>
+          <p>{L('紅燈色調：只用在「等紅燈的那一刻」。', 'Signal tone: only for the red-light moment.')}</p>
+        </Callout>
+      </div>
+      <div style="margin-block-start: var(--sp-6)">
+        <PullQuote tone="exhaust">
+          {L('「示意引言：每天早上牽著孩子等紅燈，最前面永遠是一整排排氣管。」', '“Sample quote: every morning I wait at the light holding my child’s hand, and the front row is always a line of tailpipes.”')}
+          <Fragment slot="attribution">{L('受訪者，身分說明', 'Speaker, who they are')} <Cite locale={locale} id="sample-b" n={2} /></Fragment>
+        </PullQuote>
+      </div>
+    </Block>
+
+    <Block name="Card" file="ui/Card.astro" wide code={`<div class="grid">
+  <Card title="…" href={href('/questions/', locale)} eyebrow="…" tone="exhaust"> … </Card>
+</div>`}>
+      <div class="grid" style="--min: 15rem">
+        <Card title={L('問題：路口的那一層', 'The problem: the layer at the crossing')} href="#components" eyebrow={L('連結卡片', 'Link card')} tone="exhaust">
+          <p>{L('有 href 時整張卡片都是連結。', 'With href the whole card is one link.')}</p>
+        </Card>
+        <Card title={L('換電動要花多少', 'What going electric costs')} href="#components" eyebrow={L('連結卡片', 'Link card')} tone="clean">
+          <p>{L('上緣的漆線跟著色調變。', 'The painted top rule follows the tone.')}</p>
+          <Fragment slot="footer"><Tag tone="clean">{L('試算', 'Calculator')}</Tag></Fragment>
+        </Card>
+        <Card title={L('沒有連結的卡片', 'A card without a link')} eyebrow={L('靜態', 'Static')}>
+          <Fragment slot="media"><Scooter kind="electric" /></Fragment>
+          <p>{L('media 插槽放插畫。', 'The media slot takes an illustration.')}</p>
+        </Card>
+      </div>
+    </Block>
+
+    <Block name="Button / Tag / Icon" file="ui/Button.astro · ui/Tag.astro · ui/Icon.astro" code={`<Button href={href('/electric/#calc', locale)} size="lg" arrow>用我的條件算</Button>
+<Button variant="secondary">…</Button>  <Button variant="ghost">…</Button>
+<Button href="https://…" external locale={locale}>官方補助頁</Button>`}>
+      <Fragment slot="note"><p>{L('主要按鈕是綠燈色，一個畫面只放一個。外部連結加 external，會開新分頁並向螢幕閱讀器說明。', 'The primary button is signal green: one per view. External links take external, which opens a new tab and says so to screen readers.')}</p></Fragment>
+      <div class="stack" style="--stack: var(--sp-4)">
+        <div class="cluster">
+          <Button size="lg" arrow>{L('看我的城市補助', 'Check my city’s subsidy')}</Button>
+          <Button variant="secondary">{L('看證據', 'See the evidence')}</Button>
+          <Button variant="ghost">{L('讀完整說明', 'Read the full note')}</Button>
+          <Button href="#components" external locale={locale} variant="secondary">{L('官方資料', 'Official data')}</Button>
+        </div>
+        <div class="cluster">
+          <Tag>{L('一般標籤', 'Neutral')}</Tag>
+          <Tag tone="sample">{S}</Tag>
+          <Tag tone="exhaust">{L('燃油', 'Gasoline')}</Tag>
+          <Tag tone="clean">{L('電動', 'Electric')}</Tag>
+          <Tag tone="signal">{ui.phaseRed[locale]}</Tag>
+        </div>
+        <div class="cluster sg-icons">
+          {(['arrow-right', 'arrow-up-right', 'arrow-down', 'chevron-down', 'check', 'plus', 'minus', 'close', 'menu', 'info', 'alert', 'table', 'sun', 'moon'] as const).map((name) => <Icon name={name} size="1.5rem" label={name} />)}
+        </div>
+      </div>
+    </Block>
+
+    <Block name="CompareTable" file="ui/CompareTable.astro" code={`<CompareTable caption="…" rowHeader="項目"
+  columns={[{ label: '燃油機車', tone: 'exhaust' }, { label: '電動機車', tone: 'clean' }]}
+  rows={[{ label: '每公里能源費', values: ['NT$ 2.2', 'NT$ 0.5'], note: '…' }]} />`}>
+      <Fragment slot="note"><p>{L('兩到四個選項逐列比較。真正的表格；在窄螢幕上每一列變成一小塊，欄名重複在每個數值上方，360px 不需要橫向捲動。', 'Two to four options compared row by row. A real table; on narrow screens each row becomes a small block with the column name repeated above each value, so nothing scrolls sideways at 360px.')}</p></Fragment>
+      <CompareTable
+        caption={L(`每月開銷比較（${S}）`, `Monthly costs compared (${S.toLowerCase()})`)}
+        rowHeader={L('項目', 'Item')}
+        columns={[{ label: series2[0].label, tone: 'exhaust' }, { label: series2[1].label, tone: 'clean' }]}
+        rows={[
+          { label: L('每公里能源費', 'Energy per km'), values: ['NT$ 2.2', 'NT$ 0.5'], note: L('汽油/電池資費', 'Fuel / battery plan') },
+          { label: L('每月固定支出', 'Fixed monthly cost'), values: ['NT$ 250', 'NT$ 320'] },
+          { label: L('定期保養', 'Routine servicing'), values: [L('每 1,000 公里', 'Every 1,000 km'), L('每 5,000 公里', 'Every 5,000 km')] },
+          { label: L('排氣管廢氣', 'Tailpipe exhaust'), values: [L('有', 'Yes'), L('無', 'None')] },
+        ]}
+      />
+    </Block>
+
+    <Block name="Details" file="ui/Details.astro" code={`<Details name="faq" summary="問題">答案</Details>`}>
+      <div>
+        <Details name="sg-faq" summary={L('這些數字是真的嗎？', 'Are these numbers real?')} open>
+          <p>{L('這一頁不是。正式頁面上每個數字都有來源標記。', 'Not on this page. On real pages every number carries a citation marker.')}</p>
+        </Details>
+        <Details name="sg-faq" summary={L('同一個 name 的項目一次只開一個', 'Items sharing a name open one at a time')}>
+          <p>{L('原生 details 元素，不需要 JavaScript。', 'Native details elements; no JavaScript needed.')}</p>
+        </Details>
+      </div>
+    </Block>
+
+    <Block name="Tabs" file="ui/Tabs.astro · ui/TabPanel.astro" code={`<Tabs label="城市">
+  <TabPanel id="city-a" label="示意城市甲"> … </TabPanel>
+  <TabPanel id="city-b" label="示意城市乙"> … </TabPanel>
+</Tabs>`}>
+      <Fragment slot="note"><p>{L('漸進增強：沒有 JavaScript 時，所有面板依序顯示，各有標題；有 JavaScript 時變成分頁（方向鍵、Home/End 可操作）。', 'Progressively enhanced: without JavaScript every panel shows in order under its own heading; with it they become tabs (arrow keys, Home/End).')}</p></Fragment>
+      <Tabs label={L('示意城市', 'Sample cities')}>
+        {calc.cities.map((c) => (
+          <TabPanel id={`sg-tab-${c.value}`} label={c.label}>
+            <p>{L(`這裡放 ${c.label} 的內容。地方補助（${S}）：NT$ ${nf(c.local)}。`, `Content for ${c.label} goes here. City subsidy (${S.toLowerCase()}): NT$ ${nf(c.local)}.`)}</p>
+          </TabPanel>
+        ))}
+      </Tabs>
+    </Block>
+  </Section>
+
+  <!-- ================================================================ RECIPE -->
+  <Section id="recipe" eyebrow="08" title={L('怎麼做一個章節', 'How to build a chapter')} rule lead={L('首頁是一個紅燈，每個章節是這 90 秒裡的一拍。手機上一個章節的預算是固定的；超過的東西放到「看這一環的全部證據」後面。', 'The home page is one red light, and each chapter is one beat of its ninety seconds. A chapter has a fixed budget on a phone; anything beyond it goes behind “see all the evidence for this link”.')}>
+    <div class="sg-two">
+      <div class="prose">
+        <ol>
+          <li>{L('文案先寫進 src/i18n/pages/home.ts（每個字串中英各一），頁面只負責排版。', 'Write the copy into src/i18n/pages/home.ts first (each string in both languages); the page only lays it out.')}</li>
+          <li><b>{L('畫面', 'Frame')}</b>{L('：art 插槽放這一章的那一格靜態畫面，在最上面。手機上沒有東西是釘住的，只有倒數軌。', ': the art slot takes the chapter’s one static frame, at the top. Nothing is pinned on a phone except the rail.')}</li>
+          <li><b>{L('小標', 'Kicker')}</b>{L('：把倒數寫成文字（「紅燈 · 剩 64 秒」），沒有 JavaScript 也讀得到。不寫的話會依 count 自動產生。', ': print the count as text (“Red light · 64 seconds left”) so it reads without JavaScript. Leave it out and it is generated from the count.')}</li>
+          <li><b>{L('標題', 'Headline')}</b>{L('，再來是', ', then the ')}<b>{L('導言', 'deck')}</b>{L('：最多約 100 個中文字。', ': about 100 Chinese characters at most.')}</li>
+          <li><b>{L('一張主圖', 'One lead visual')}</b>{L('：visual 插槽，緊接在導言後面，放在 Figure 裡，附來源和證據標記。', ': the visual slot, right after the deck, inside a Figure with its source and badge.')}</li>
+          <li><b>{L('內文', 'Body')}</b>{L('：最多三段、每段約 100 字（第 7 環四段），用 paragraphs 屬性傳字串。', ': at most three paragraphs of about 100 characters (four for link 7), passed as strings in paragraphs.')}</li>
+          <li><b>{L('一個但書', 'One caveat')}</b>{L('（這一段沒有說的事）、', ' (what this does not say), ')}<b>{L('一個行動', 'one action')}</b>{L('（你現在可以做的，附上它背後的證據標記）。', ' (what you can do now, with the badge of the evidence behind it).')}</li>
+          <li><b>{L('一行交棒', 'One hand-off line')}</b>{L('，把讀者交給下一章。', ' that hands the reader to the next chapter.')}</li>
+          <li>{L('haze 只在第 1–4、6 環和綠燈那一拍打開；它只有一種濃度，不會跟著倒數變。第 5 環沒有畫面色彩，也沒有霧。', 'haze is on only for links 1–4 and 6 and the green beat; it has one density and never follows the countdown. Link 5 carries no scene colour and no haze.')}</li>
+          <li>{L('健康章節（第 1–6 環、綠燈、接起來）不放價格和購買按鈕。', 'No price and no purchase button in links 1–6, the green beat or the chain board.')}</li>
+        </ol>
+        <p class="meta">{L('建置時 Chapter 會對超出預算的導言和段落印出警告（[chapter budget]）；算錢那一章可以用 budget={false} 關掉。', 'At build time Chapter prints a warning ([chapter budget]) for a deck or paragraph over budget; the money chapter can switch it off with budget={false}.')}</p>
+      </div>
+      <pre class="sg-code" tabindex="0"><code>{`---
+import home from '@/i18n/pages/home';
+import { localize } from '@/i18n/pages/_copy';
+const t = localize(home, locale);
+---
+<Base locale={locale} title="…" home money>
+  <CountdownRail slot="rail" locale={locale} />
+
+  <Chapter locale={locale} id="link-3" link={3} tone="night"
+    kicker={t.link3.kicker}            {/* 紅燈 · 剩 64 秒 */}
+    title={t.link3.title}
+    lead={t.link3.deck}
+    paragraphs={t.link3.body}
+    caveat={t.link3.caveat}
+    handoff={t.link3.handoff}
+    moreHref={href('/evidence/#link-3', locale)}
+    haze>
+    <StreetScene slot="art" locale={locale} frame="paused" />
+    <Figure slot="visual" locale={locale} empty
+      title={t.link3.figure} who={t.link3.who}>
+      <EmptyChart locale={locale} title={t.link3.chartTitle} />
+    </Figure>
+    <Fragment slot="action">
+      <p>{t.link3.action}
+        <a href={href('/unmeasured/#ask', locale)}>…</a></p>
+    </Fragment>
+  </Chapter>
+</Base>`}</code></pre>
+    </div>
+    <div class="sg-budget">
+      <table>
+        <caption class="vh">{L('各章的倒數、畫面與霧', 'Count, frame and haze by chapter')}</caption>
+        <thead><tr><th>{L('章節', 'Chapter')}</th><th>id</th><th>{L('屬性', 'Props')}</th><th>{L('倒數', 'Count')}</th><th>{L('畫面', 'Frame')}</th><th>haze</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">{L('序', 'Prologue')}</th><td><code>top</code></td><td><code>count={'{90}'}</code></td><td>90</td><td>K0 empty</td><td>–</td></tr>
+          <tr><th scope="row">{L('懶人包', 'The 30-second version')}</th><td><code>brief</code></td><td><code>Section tone="sunken"</code></td><td>–</td><td>–</td><td>–</td></tr>
+          <tr><th scope="row">{L('第 1 環', 'Link 1')}</th><td><code>link-1</code></td><td><code>link={'{1}'}</code></td><td>90 → 78</td><td>K1 pack</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 2 環', 'Link 2')}</th><td><code>link-2</code></td><td><code>link={'{2}'}</code></td><td>78 → 64</td><td>K2 kerb</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 3 環', 'Link 3')}</th><td><code>link-3</code></td><td><code>link={'{3}'} tone="night"</code></td><td>64 → 50</td><td>K3 paused</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 4 環', 'Link 4')}</th><td><code>link-4</code></td><td><code>link={'{4}'}</code></td><td>50 → 38</td><td>K2 kerb</td><td>✓</td></tr>
+          <tr><th scope="row">{L('第 5 環', 'Link 5')}</th><td><code>link-5</code></td><td><code>link={'{5}'} tone="sunken"</code></td><td>{L('停在 38', 'held at 38')}</td><td>K3 paused</td><td>–</td></tr>
+          <tr><th scope="row">{L('第 6 環', 'Link 6')}</th><td><code>link-6</code></td><td><code>link={'{6}'}</code></td><td>38 → 05</td><td>K2 kerb</td><td>✓</td></tr>
+          <tr><th scope="row">{L('綠燈', 'Green')}</th><td><code>green</code></td><td><code>phase="green" size="auto"</code></td><td>05 → 00</td><td>K4 green</td><td>✓</td></tr>
+          <tr><th scope="row">{L('接起來', 'Joining it up')}</th><td><code>connect</code></td><td><code>count={'{0}'} tone="sunken"</code></td><td>00</td><td>–</td><td>–</td></tr>
+          <tr><th scope="row">{L('第 7 環', 'Link 7')}</th><td><code>link-7</code></td><td><code>link={'{7}'} tone="clear"</code></td><td>{L('回到 90', 'back to 90')}</td><td>K5 clean</td><td>–</td></tr>
+          <tr><th scope="row">{L('算錢', 'The money')}</th><td><code>money</code></td><td><code>budget={'{false}'}</code></td><td>–</td><td>–</td><td>–</td></tr>
+          <tr><th scope="row">{L('下一個紅燈', 'The next red light')}</th><td><code>next</code></td><td><code>size="auto"</code></td><td>–</td><td>K0 empty</td><td>–</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <!-- ================================================================ RED LIGHT DEMO -->
+  <Section id="redlight" eyebrow="09" title={L('紅燈示範與倒數軌', 'The red light and the rail')} tone="sunken" lead={L('下面是縮小版的首頁：每一環一個 Chapter。往下捲，頁首下方那條 44px 的倒數軌會跟著走；點它會打開跳轉選單。章節裡的文字是示意，數字都不是真的。', 'Below is the home page in miniature: one Chapter per link. Scroll, and the 44px rail under the header follows; tap it for the jump menu. The copy in these chapters is placeholder and none of the numbers are real.')} pad="tight">
+    <p><Tag tone="sample">{ui.sampleDataLong[locale]}</Tag></p>
+    <Block name="CountdownRail" file="ui/CountdownRail.astro" code={`<Base locale={locale} …>
+  <CountdownRail slot="rail" locale={locale} />            {/* 首頁 */}
+  <CountdownRail slot="rail" locale={locale} page="/evidence/" />
+  …
+</Base>`}>
+      <Fragment slot="note">
+        <p>{L('全站唯一釘住的東西。LED 倒數、七顆圓點、目前這一環的名稱；整條是一顆按鈕，打開跳轉選單（七環、接起來、算錢、行動）。放在 Base 的 rail 插槽，一頁一個。', 'The only pinned element on the site. LED count, seven pips, the current link’s name; the whole strip is one button that opens the jump menu (the seven links, joining it up, the money, take action). It goes in Base’s rail slot, one per page.')}</p>
+        <ul>
+          <li>{L('倒數依捲動進度在每個章節裡內插（分配表在 ui.ts 的 chain.countdown）。第 5 環暫停，第 7 環回到 90，算錢之後不顯示數字。', 'The count interpolates with scroll progress inside each chapter (the allocation is chain.countdown in ui.ts). Link 5 is paused, link 7 resets to 90, and no number is shown after the money chapter.')}</li>
+          <li>{L('圓點的畫法就是證據：實心是台灣的資料，空心是推估或國際證據，第 3 環斷開、兩端空心，最後一顆是綠的。紅圈是「你在這裡」。', 'A pip’s style is its evidence: filled for Taiwan data, a ring for modelled or international, a break with hollow ends at link 3, the last in green. The red ring is “you are here”.')}</li>
+          <li>{L('沒有 JavaScript：LED 不會出現（停在 90 的數字是錯的），軌道是一個原生的 details 選單，每個章節的小標用文字印出倒數。', 'Without JavaScript the LED is not rendered (a frozen 90 would be wrong); the rail is a native details menu, and each chapter’s kicker prints its count as text.')}</li>
+          <li>{L('LED 是 aria-hidden，整條不是 live region。高度固定 44px、單行、名稱過長會截斷，不會推動版面。沒有動畫。', 'The LED is aria-hidden and nothing is a live region. Fixed 44px, one line, the name truncates: it cannot shift the layout. There is no animation.')}</li>
+          <li>{L('窄於 360px 時圓點列會收起來，把位置留給名稱；選單裡仍然有七顆。', 'Below 360px the row of pips is dropped to leave room for the name; the menu still shows all seven.')}</li>
+        </ul>
+      </Fragment>
+      <div class="stack" style="--stack: var(--sp-3)">
+        <p class="meta">{L('ChainMarker：章節裡的路標（Chapter 的 link 屬性會自動放一個）。count 會把秒數印成文字。', 'ChainMarker: the signpost inside a chapter (Chapter’s link prop places one). count prints the seconds as text.')}</p>
+        {[1, 3, 5, 7].map((n) => <ChainMarker locale={locale} n={n} count={n === 3 ? 64 : undefined} />)}
+      </div>
+    </Block>
+  </Section>
+
+  <div id="chapter-demo">
+    <Chapter locale={locale} id="link-1" link={1} haze title={L('示意標題：|粉塵很少，油氣很多', 'Sample headline: |little dust, a lot of fumes')} lead={L('示意導言：這是 Chapter。這一章示範完整的預算：畫面、小標、標題、導言、一張主圖、內文、一個但書、一個行動、一行交棒。', 'Sample deck: this is a Chapter. This one shows the whole budget: frame, kicker, headline, deck, one lead visual, body, one caveat, one action and one hand-off line.')} paragraphs={[L('示意內文第一段：每段大約一百個字，一段只講一件事，一句話只放一個數字，並且說清楚量的是誰。', 'Sample body, paragraph one: about a hundred characters each, one idea per paragraph, one number per sentence, and say who was measured.'), L('示意內文第二段：超過三段的東西，放到「看這一環的全部證據」後面。', 'Sample body, paragraph two: anything beyond three paragraphs goes behind “see all the evidence for this link”.')]} caveat={L('示意但書：這裡寫這一段「沒有」說的事，例如這是排放量的占比，不是你吸進去的比例。', 'Sample caveat: say what this passage does not claim, for example that these are shares of emissions, not of what you breathe.')} action={L('示意行動：一件讀者現在做得到的事。', 'Sample action: one thing the reader can do now.')} actionBadge="official-tw" moreHref="#chain" handoff={L('示意交棒：排什麼知道了。下一題：排在哪裡？', 'Sample hand-off: that is what comes out. Next: where?')}>
+      <StreetScene slot="art" locale={locale} frame="pack" />
+      <Figure slot="visual" locale={locale} number={1} title={L('示意主圖：|占比畫在 0 到 100% 上', 'Sample lead visual: |shares drawn on 0 to 100%')} subtitle={L('機車占全國排放量的比例（示意）', 'Scooters’ share of national emissions (sample)')} badge="official-tw" source={L('示意來源', 'Sample source')} sample>
+        <StackedBar locale={locale} title={L('示意堆疊長條圖', 'Sample stacked bar chart')} series={[{ label: L('機車', 'Scooters'), tone: 'exhaust' }, { label: L('其他來源', 'Everything else'), tone: 'neutral' }]} rows={[{ label: L('粉塵（示意）', 'Dust (sample)'), values: [2, 98] }, { label: L('油氣（示意）', 'Fumes (sample)'), values: [12, 88] }]} categoryLabel={L('污染物', 'Pollutant')} />
+      </Figure>
+    </Chapter>
+
+    <Chapter locale={locale} id="link-2" link={2} haze size="auto" title={L('示意：第 2 環', 'Sample: link 2')} lead={L('短的章節用 size="auto"。倒數從 78 走到 64。', 'A short chapter uses size="auto". The count runs from 78 to 64.')} handoff={L('示意交棒：那站在旁邊的人，吸進了多少？', 'Sample hand-off: so how much does the person beside it breathe?')} />
+
+    <Chapter locale={locale} id="link-3" link={3} tone="night" haze title={L('這一格，|沒有人量過', 'This box is empty. |Nobody has measured it.')} lead={L('tone="night" 在兩個主題下都是深色。這一章的主圖是空白的圖：整個網站的招牌圖。', 'tone="night" is dark in both themes. The lead visual here is the empty chart, the site’s signature graphic.')} handoff={L('示意交棒：儀器還沒到。但你身上有一個偵測器，一直開著。', 'Sample hand-off: no instrument has been here yet. But you carry a detector that is always switched on.')}>
+      <Figure slot="visual" locale={locale} empty title={L('紅燈旁邊的行人吸進多少？|這張圖是空的', 'What does a pedestrian breathe beside a red light? |This chart is empty')} subtitle={L('紅燈 90 秒裡，嬰兒車高度與成人高度的一氧化碳、苯、超細微粒', 'Carbon monoxide, benzene and ultrafine particles at stroller and adult height through a 90-second red light')}>
+        <EmptyChart locale={locale} title={L('空白的圖：紅燈倒數期間路口行人高度的三種污染物', 'Empty chart: three pollutants at pedestrian height through the red-light countdown')} desc={L('三個面板分別是一氧化碳、苯和超細微粒，橫軸是紅燈倒數 90 到 0 秒，接著是綠燈。', 'Three panels for carbon monoxide, benzene and ultrafine particles; the x axis is the red-light countdown from 90 to 0 seconds, then green.')} />
+        <Fragment slot="who">{L('各縣市環保局、環境部、大學都量得出來。', 'A city environmental bureau, the environment ministry or a university could.')} <a href={href('/unmeasured/#ask', locale)}>{L('請來量我家路口', 'Ask them to measure my crossing')}</a></Fragment>
+      </Figure>
+    </Chapter>
+
+    <Chapter locale={locale} id="link-4" link={4} haze size="auto" title={L('示意：第 4 環', 'Sample: link 4')} lead={L('倒數從 50 走到 38。', 'The count runs from 50 to 38.')} />
+
+    <Chapter locale={locale} id="link-5" link={5} tone="sunken" title={L('示意：倒數暫停，|鏡頭拉遠', 'Sample: the countdown pauses, |the camera pulls back')} lead={L('第 5 環的 phase 預設是 paused，倒數停在 38。這一章沒有畫面、沒有霧：健康數字不和示意畫面放在同一格。', 'Link 5 defaults to phase="paused" and the count holds at 38. No frame and no haze here: health figures never share a frame with the scene.')}>
+      <TimeLadder slot="visual" locale={locale} stops={ladderDemo} />
+    </Chapter>
+
+    <Chapter locale={locale} id="link-6" link={6} haze size="auto" title={L('示意：第 6 環', 'Sample: link 6')} lead={L('倒數從 38 走到 05，是整個紅燈裡最長的一段。', 'The count runs from 38 to 05, the longest stretch of the red light.')} handoff={L('剩 5 秒。', 'Five seconds.')} />
+
+    <Chapter locale={locale} id="green" phase="green" haze size="auto" title={L('綠燈亮的|那一秒', 'The second |it turns green')} lead={L('phase="green"：小標旁是綠色的行人號誌，倒數從 05 走到 00，軌道上的 LED 變成綠色。', 'phase="green": the green walking signal beside the kicker, the count running from 05 to 00, and the rail’s LED turning green.')} handoff={L('90 秒過了。把剛才看到的接起來。', 'The ninety seconds are up. Now put together what you saw.')} />
+
+    <Chapter locale={locale} id="connect" count={0} tone="sunken" size="auto" title={L('每一環都有出處。|接起來的那一步，你自己看', 'Every link has a source. |The step that joins them is yours to judge.')} lead={L('證據板：六件有出處的事，一格沒有人量過的空白。本站自己的推論預設是關起來的。', 'The chain board: six sourced facts and one blank that nobody has measured. The site’s own inference is closed by default.')}>
+      <EvidenceChain locale={locale} links={boardDemo} question={L('所以，這 90 秒裡，站在旁邊的人吸進了什麼？', 'So what did the person standing beside it breathe in these ninety seconds?')} collapseSources>
+        <Fragment slot="reveal">
+          <p>{L('我們的推論：示意文字。這裡放本站自己接起來的那一步，開頭一定是「我們的推論：」，只講方向，不講健康影響有多大。', 'Our inference: placeholder. This is where the site’s own joining step goes. It always opens with “Our inference:”, claims a direction, and says nothing about the size of any health effect.')}</p>
+        </Fragment>
+        <Fragment slot="boxes">
+          <StanceBox locale={locale} kind="not-saying" items={[L('示意：等一個紅燈會生病。', 'Sample: that one red light makes you ill.'), L('示意：味道愈重，傷害愈大。', 'Sample: that a stronger smell means more harm.')]} />
+          <StanceBox locale={locale} kind="change-mind"><p>{L('示意文字：如果有人量出來，結果和附近的背景值差不多，這一環就不成立。我們會改寫這一頁，並且寫明為什麼改。', 'Placeholder: if someone measures it and finds it close to the nearby background, this link fails. We will rewrite this page and say why.')}</p></StanceBox>
+        </Fragment>
+      </EvidenceChain>
+    </Chapter>
+
+    <Chapter locale={locale} id="link-7" link={7} tone="clear" size="auto" title={L('同一個路口，|沒有排氣管', 'Same crossing. |No tailpipes.')} lead={L('最後一環用 tone="clear"：沒有霧，倒數回到 90。', 'The last link uses tone="clear": no haze, and the count goes back to 90.')}>
+      <div class="cluster"><Button size="lg" arrow>{L('示意按鈕', 'Sample button')}</Button></div>
+    </Chapter>
+  </div>
+
+  <!-- ================================================================ CHAIN -->
+  <Section id="chain" eyebrow="10" title={L('證據與證據鏈', 'Evidence and the chain')} rule lead={L('網站的論證是一條七環的鏈。每個說法都帶著它是哪一種證據；本站自己的推論戴最弱的標記；沒人量過的地方畫成斷開的線。', 'The site’s argument is a chain of seven links. Every claim says what kind of evidence it is; the site’s own inference wears the weakest badge; where nobody has measured, the line is drawn broken.')}>
+    <Block name="EvidenceBadge / EvidenceLegend" file="ui/EvidenceBadge.astro · ui/EvidenceLegend.astro" wide code={`<EvidenceBadge locale={locale} kind="measured-tw" />
+<EvidenceBadge locale={locale} kind="official-tw" secondary />      {/* + 次級來源 */}
+<EvidenceBadge locale={locale} {...evidenceBadge(fact.evidence, fact.confidence)} />
+<EvidenceBadge locale={locale} kind="gap" variant="icon" />         {/* 只有圖示 */}
+<EvidenceLegend locale={locale} lines />`}>
+      <Fragment slot="note">
+        <p>{L('八種標記：資料庫的六種證據類型（文字直接取自 src/data/types.ts 的 evidenceLabels），加上本站自己的兩種：「我們的推論」和「沒人量過」。不靠顏色也分得出來：文字、圖示、邊框各不相同（實心／實線／細線底色／虛線／兩端開口）。資料庫裡 confidence 是 secondary 的事實，加上 secondary 屬性，會多一個「次級來源」小標。', 'Eight badges: the registry’s six evidence types (their words come straight from evidenceLabels in src/data/types.ts) plus two for the site’s own voice, “our inference” and “nobody has measured this”. They are told apart without colour: the words, the icon and the edge all differ (filled / solid / thin on a tint / dashed / open at both ends). A fact whose registry confidence is secondary takes the secondary prop and gains the small “Secondary” tag.')}</p>
+        <p>{L('同一種證據在鏈上用同一種線：實線實心、實線空心、虛線、斷開。「市場公開價格」不會畫在鏈上。舊的 level="measured" / "established" 仍然可以用，會對應到台灣實測與國際證據。', 'Each kind has one line style wherever the chain is a line: solid filled, solid outline, dashed, broken. “Published prices” is never drawn on the chain. The old level="measured" / "established" still work and map to Measured in Taiwan and International evidence.')}</p>
+      </Fragment>
+      <EvidenceLegend locale={locale} lines />
+      <div class="stack sg-badges" style="--stack: var(--sp-3)">
+        <p class="meta">{L('並排、小尺寸（13px），含次級來源與只有圖示的版本：', 'Side by side at the small size (13px), with the secondary tag and the icon-only variant:')}</p>
+        <p class="cluster" style="--cluster: var(--sp-2)">{evidenceKinds.map((k) => <EvidenceBadge kind={k} locale={locale} />)}</p>
+        <p class="cluster" style="--cluster: var(--sp-2)"><EvidenceBadge kind="official-tw" locale={locale} secondary /> <EvidenceBadge kind="modelled-tw" locale={locale} secondary /></p>
+        <p class="cluster" style="--cluster: var(--sp-2)">{evidenceKinds.map((k) => <EvidenceBadge kind={k} locale={locale} variant="icon" />)}</p>
+        <div class="tone-inverse sg-onink"><p class="cluster" style="--cluster: var(--sp-2)">{evidenceKinds.map((k) => <EvidenceBadge kind={k} locale={locale} />)}</p></div>
+      </div>
+    </Block>
+
+    <Block name="ChainStrip" file="ui/ChainStrip.astro" wide code={`<ChainStrip locale={locale} />                                  {/* 首頁：完整七行 */}
+<ChainStrip locale={locale} variant="collapsed" current={3} />  {/* 問題頁：亮著這一頁的那一行 */}`}>
+      <Fragment slot="note"><p>{L('30 秒懶人包的七句話。每一句單獨讀都成立，各自帶著證據標記，連到它的章節。文字只有一個來源：ui.ts 的 chain.summary，問題頁、分享圖和影片都用同一份，不要在頁面裡重打。每一行上緣的線就是那一環的證據線型；第 3 行的線是斷開的。collapsed 是原生 details：沒有 JavaScript 也能展開，底下一行把讀者帶到證據板。', 'The seven sentences of the 30-second version. Each is true read alone, carries its badge and links to its chapter. The text has one source, chain.summary in ui.ts, shared with question pages, share cards and the film: never retype a line in a page. The rule above each line is that link’s evidence line; line 3’s is broken. The collapsed form is a native details element, so it opens without JavaScript, and its footer hands on to the chain board.')}</p></Fragment>
+      <div class="grid" style="--min: 20rem; --grid-gap: var(--sp-7)">
+        <div class="stack"><p class="meta">variant="full"</p><ChainStrip locale={locale} page="/styleguide/" /></div>
+        <div class="stack"><p class="meta">variant="collapsed" current={'{3}'}</p><ChainStrip locale={locale} variant="collapsed" current={3} page="/styleguide/" /></div>
+      </div>
+    </Block>
+
+    <Block name="QuestionChips" file="ui/QuestionChips.astro" code={`<QuestionChips locale={locale}>
+  <a slot="after" href={href(questions.askMeasurePath, locale)}>{questions.askMeasure[locale]} →</a>
+</QuestionChips>`}>
+      <Fragment slot="note"><p>{L('用讀者自己的話問的問題，畫成行人觸動按鈕。每一顆都是普通連結；360px 時兩欄。預設是首頁的六題（ui.ts 的 questions.chips），最後一題「我換得起嗎？」連到 /electric/，不是問題頁。', 'Questions in the reader’s own words, drawn as pedestrian push-buttons. Each is an ordinary link; two columns at 360px. The default set is the home page’s six (questions.chips in ui.ts); the last, “Can I afford to switch?”, goes to /electric/, not to a question page.')}</p></Fragment>
+      <QuestionChips locale={locale}>
+        <a slot="after" href={href(questions.askMeasurePath, locale)}>{questions.askMeasure[locale]}<Icon name="arrow-right" size="1.05em" /></a>
+      </QuestionChips>
+    </Block>
+
+    <Block name="EvidenceChain / ChainLink" file="ui/EvidenceChain.astro · ui/ChainLink.astro" code={`{/* 證據板（V15）：六件事 + 一格空白 + 關著的推論 */}
+<EvidenceChain locale={locale} links={sixFacts} collapseSources
+  question="所以，這 90 秒裡，站在旁邊的人吸進了什麼？">
+  <Fragment slot="reveal"><p>我們的推論：…</p></Fragment>
+  <Fragment slot="boxes">
+    <StanceBox locale={locale} kind="not-saying" items={[…]} />
+    <StanceBox locale={locale} kind="change-mind"><p>…</p></StanceBox>
+  </Fragment>
+</EvidenceChain>
+
+{/* 傳統的七環：最後一環是「可以切斷的那一環」 */}
+<EvidenceChain locale={locale} current={3} links={sevenLinks}>
+  <Button slot="action" href={href('/electric/', locale)} arrow>…</Button>
+</EvidenceChain>`}>
+      <Fragment slot="note">
+        <p>{L('上面「接起來」那一章就是證據板：傳入 question，鏈的最後就是一個沒有接上的環（軌道斷開、節點是空心的問號、戴「沒人量過」），接著是 reveal 插槽。reveal 是原生 details，預設關著，按鈕旁邊就先掛著「我們的推論」；讀者先看到六件事和那個問題，才看到結論。collapseSources 把每一環的來源收在「看來源」後面；/evidence/ 不要用它，並且可以設 revealOpen。', 'The “joining it up” chapter above is the chain board: pass question and the chain ends in an open link (the rail breaks, the node is a hollow question mark, it wears “nobody has measured this”), followed by the reveal slot. The reveal is a native details element, closed by default, with “our inference” shown beside its button; the reader meets the six facts and the question before any conclusion. collapseSources puts each link’s citations behind “see sources”; leave it off on /evidence/, where revealOpen may also be set.')}</p>
+        <p>{L('不傳 question 時是傳統的七環：最後一環脫離軌道、換成綠色並可放行動按鈕。每一環的節點和它往下的軌道，依證據線型畫。', 'Without question it is the classic chain of seven: the last link is detached from the rail, turns green and can hold a call to action. Each node and the rail below it are drawn in the line style of that link’s evidence.')}</p>
+      </Fragment>
+      <EvidenceChain locale={locale} current={3} links={classicDemo}>
+        <Button slot="action" arrow>{L('示意按鈕', 'Sample button')}</Button>
+      </EvidenceChain>
+    </Block>
+
+    <Block name="StanceBox / NotClaimedList" file="ui/StanceBox.astro · ui/NotClaimedList.astro" wide code={`<StanceBox locale={locale} kind="not-saying" items={['等一個紅燈會生病。', …]} />
+<StanceBox locale={locale} kind="change-mind"><p>…</p></StanceBox>
+
+{/* /evidence/#not-claimed：由 claims-policy 產生 */}
+<NotClaimedList locale={locale} items={claimRuleList
+  .filter((r) => r.kind === 'do-not-claim')
+  .map((r) => ({ claim: r.rule[locale], why: r.why[locale], instead: r.instead?.[locale] }))} />`}>
+      <Fragment slot="note"><p>{L('StanceBox 是放在推論旁邊、永遠打開的兩個框：「我們沒有說」（實線）和「什麼會讓我們改口」（虛線，因為它是關於一個推論的承諾）。NotClaimedList 是「我們不會說的話」：每一句劃掉，後面一行說為什麼。刪除線用 s 元素，每一項前面有給螢幕閱讀器的「我們不會說：」，因為多數閱讀器不會唸出刪除線。', 'StanceBox is the pair of always-open boxes beside the inference: “what we are not saying” (solid) and “what would change our mind” (dashed, because it is a promise about an inference). NotClaimedList is “what we will not say”: each sentence struck through, followed by one line of why. The strike uses the s element, and every item carries a screen-reader prefix “We will not say:”, because most readers do not announce a strike-through.')}</p></Fragment>
+      <div class="grid" style="--min: 18rem; --grid-gap: var(--sp-6)">
+        <NotClaimedList locale={locale} items={[
+          { claim: L('示意：機車廢氣是第 1 級致癌物。', 'Sample: scooter exhaust is a Group 1 carcinogen.'), why: L('示意理由：分級講的是整體汽油引擎廢氣，等級不同。', 'Sample reason: the classification covers gasoline engine exhaust as a whole, at a different grade.'), instead: L('示意：照實寫分級。', 'Sample: state the classification as it is.') },
+          { claim: L('示意：等一個紅燈會生病。', 'Sample: one red light makes you ill.'), why: L('示意理由：沒有研究看過這麼短的時間。', 'Sample reason: no study has looked at so short a time.') },
+        ]} />
+        <div class="stack" style="--stack: var(--sp-5)">
+          <StanceBox locale={locale} kind="not-saying" items={[L('示意：機車是 PM2.5 的主要來源。', 'Sample: that scooters are a main source of PM2.5.'), L('示意：味道愈重，傷害愈大。', 'Sample: that a stronger smell means more harm.')]} />
+          <StanceBox locale={locale} kind="change-mind"><p>{L('示意文字：寫出哪一種量測結果會讓這一環不成立，以及我們會怎麼改。', 'Placeholder: say which measurement would make this link fail, and what we would then change.')}</p></StanceBox>
+        </div>
+      </div>
+    </Block>
+
+    <Block name="TimeLadder" file="ui/TimeLadder.astro" wide code={`<TimeLadder locale={locale} stops={[
+  { time: '90 秒', empty: true },                                       // 沒有研究：虛線空卡
+  { time: '1 小時', body: '…', badge: 'measured-tw', scope: 'all-sources' },
+  { time: '2 小時', body: '…', badge: 'international', scope: 'traffic' },
+  { time: '很多年', body: '…', badge: 'measured-tw', scope: 'all-sources' },
+]} />`}>
+      <Fragment slot="note"><p>{L('時間的尺（V11）：四個一樣大的站，不管研究的樣本多大。第一站是紅燈本身，是一張虛線的空卡。scope 會印出「整體車流」或「所有來源的 PM2.5」，因為每一個 PM2.5 的健康結果都要在同一句或下一句說清楚（R2）。手機上直排。上面第 5 環的示範章節裡有一個。', 'The ruler of time (V11): four stops of equal size, whatever the study’s sample. The first is the red light itself, an empty dashed card. scope prints “traffic as a whole” or “PM2.5 from all sources”, because every PM2.5 health result has to say so in the same sentence or the next (R2). Stacked on phones. There is one in the link 5 demo chapter above.')}</p></Fragment>
+      <TimeLadder locale={locale} stops={ladderDemo} />
+    </Block>
+  </Section>
+
+  <!-- ================================================================ FORMS -->
+  <Section id="forms" eyebrow="11" title={L('表單與試算', 'Forms and calculator')} tone="sunken" lead={L('試算工具的零件：選城市、有沒有舊車可汰換、每月里程，然後看到價格怎麼一層層扣下來、和燃油車還差多少、多久打平。', 'The parts of the calculator: pick a city, say whether there is an old scooter to scrap, set monthly distance, then see the price come down line by line, the remaining gap to a gasoline scooter, and how long until it pays back.')}>
+    <p><Tag tone="sample">{ui.sampleDataLong[locale]}</Tag></p>
+    <div class="sg-calc" id="sg-calc">
+      <form class="sg-calc__form stack" style="--stack: var(--sp-5)" onsubmit="return false">
+        <Select id="sg-city" label={L('你住在哪個城市？', 'Which city do you live in?')} options={calc.cities.map((c) => ({ value: c.value, label: c.label }))} value="a" hint={L('地方補助每個城市不同。', 'The city subsidy differs by city.')} />
+        <RadioGroup name="sg-scrap" legend={L('有舊機車可以汰換嗎？', 'Do you have an old scooter to scrap?')} options={[{ value: 'yes', label: L('有', 'Yes') }, { value: 'no', label: L('沒有', 'No') }]} value="yes" />
+        <Range id="sg-km" label={L('每個月大約騎多遠？', 'How far do you ride each month?')} min={100} max={2000} step={50} value={calc.km} unit={L('公里/月', 'km / month')} />
+        <RadioGroup
+          name="sg-stack-demo"
+          variant="stack"
+          legend={L('另一種樣式：variant="stack"', 'The other variant: variant="stack"')}
+          options={[
+            { value: 'swap', label: L('換電池', 'Battery swap'), hint: L('每個選項可以有一行說明。', 'Each option can carry a line of help.') },
+            { value: 'charge', label: L('在家充電', 'Charge at home'), hint: L('適合選項需要解釋的時候。', 'Use it when options need explaining.') },
+          ]}
+          value="swap"
+        />
+      </form>
+
+      <div class="stack" style="--stack: var(--sp-5)">
+        <ResultPanel id="sg-result" locale={locale} title={calc.text.net} prefix="NT$" value={nf(net0)} tone="clean" sample note={calc.text.noteEven.replace('{km}', nf(calc.km))}>
+          <Ledger
+            caption={L('價格怎麼算出來的', 'How the price is worked out')}
+            hideCaption
+            rows={[
+              { id: 'list', label: calc.text.list, amount: `NT$ ${nf(calc.list)}` },
+              { id: 'central', label: calc.text.central, amount: `NT$ ${nf(calc.central)}`, kind: 'minus' },
+              { id: 'local', label: calc.text.local, amount: `NT$ ${nf(local0)}`, kind: 'minus' },
+              { id: 'scrap', label: calc.text.scrap, amount: `NT$ ${nf(calc.scrap)}`, kind: 'minus' },
+              { id: 'net', label: calc.text.net, amount: `NT$ ${nf(net0)}`, kind: 'total' },
+              { id: 'gas', label: calc.text.gas, amount: `NT$ ${nf(calc.gas)}`, kind: 'compare' },
+              { id: 'gap', label: calc.text.gap, amount: `${net0 - calc.gas < 0 ? '−' : '+'}NT$ ${nf(Math.abs(net0 - calc.gas))}`, kind: 'gap' },
+            ]}
+          />
+        </ResultPanel>
+      </div>
+    </div>
+
+    <div class="grid sg-calc-charts" style="--min: 20rem; --grid-gap: var(--sp-7)">
+      <Figure locale={locale} number="A" title={L('補助一層層扣下來之後，|還差多少', 'After each subsidy comes off, |how much is left')} subtitle={L('新台幣', 'New Taiwan dollars')} sample tone="clean">
+        <WaterfallChart
+          id="sg-waterfall"
+          locale={locale}
+          title={L('電動機車價格瀑布圖', 'Waterfall chart of the electric scooter price')}
+          start={{ label: calc.text.list, value: calc.list }}
+          steps={[
+            { label: calc.text.central, value: calc.central },
+            { label: calc.text.local, value: local0 },
+            { label: calc.text.scrap, value: calc.scrap },
+          ]}
+          totalLabel={calc.text.net}
+          compare={{ label: calc.text.gas, value: calc.gas }}
+          gapLabel={calc.text.gap}
+          categoryLabel={cat}
+          valueLabel={val}
+        />
+      </Figure>
+      <Figure locale={locale} number="B" title={L('兩條線在哪裡交叉，|就是哪時候打平', 'Where the lines cross |is where it pays back')} subtitle={L('累計花費（購車 + 每月開銷），新台幣', 'Cumulative cost (purchase + running costs), NT$')} sample tone="clean">
+        <BreakEvenChart
+          id="sg-breakeven"
+          locale={locale}
+          title={L('累計花費折線圖', 'Line chart of cumulative cost')}
+          a={evLine}
+          b={gasLine}
+          months={60}
+          tickLabel={tickLabel}
+          breakEvenLabel={(m) => calc.text.even.replace('{n}', String(m))}
+          noBreakEvenLabel={calc.text.never}
+          aheadLabel={calc.text.ahead}
+          xLabel={calc.text.month}
+        />
+      </Figure>
+    </div>
+    <script type="application/json" id="sg-calc-data" set:html={JSON.stringify({ ...calc, locale, cat, val })} />
+
+    <div class="prose sg-note">
+      <p>{L('這個示範的腳本就在本頁原始碼最下方，可以直接照抄：讀取三個輸入 → 計算 → 更新 Ledger 的 [data-amount]、ResultPanel 的 [data-part]，再用 updateChart() 重畫兩張圖（同一段繪圖程式，建置時與瀏覽器裡共用）。沒有 JavaScript 時，頁面顯示預設情境，表單仍可閱讀。', 'The script behind this demo is at the bottom of this page’s source and can be copied as is: read the three inputs → compute → update the Ledger’s [data-amount] and the ResultPanel’s [data-part], then redraw both charts with updateChart() (the same drawing code runs at build time and in the browser). Without JavaScript the page shows the default scenario and the form is still readable.')}</p>
+    </div>
+
+    <div class="sg-after">
+      <Block name={L('ResultPanel：三種結果', 'ResultPanel: three verdicts')} file="ui/ResultPanel.astro" wide code={`<ResultPanel id="result" locale={locale} verdict="A"
+  sentence={t.verdict.A}           {/* 一句話，寫在數字上面；數字由試算引擎算 */}
+  title="買的時候差多少" prefix="NT$" value="…">
+  <p slot="deadline" data-money-if="dayCount"
+     data-money-template={money.dayCount[locale]}></p>   {/* 只有結果 A 才會顯示（R10） */}
+  <ul slot="next"> … </ul>                               {/* 只有結果 C 才會顯示 */}
+  <Ledger … />
+</ResultPanel>
+<script> panel.dataset.verdict = 'C'; </script>          {/* 切換狀態：標籤、圖示、色調跟著變 */}`}>
+        <Fragment slot="note">
+          <p>{L('試算結果有三種（V36），每一種都先用一句話講結論，再給數字：A 打得平（乾淨色調、綠色行人號誌）、B 買得起但每個月多花一點（中性色調、約等號）、C 以現在的條件打不平（廢氣色調、不等號，加上「可以先做的事」）。三種靠文字和圖示區分，不只靠顏色。C 是一個完整的答案，不是錯誤訊息。', 'A calculator answers in one of three ways (V36), each stating its conclusion in a sentence before the number: A it adds up (clean tone, the green walking signal), B affordable to buy but a little more each month (neutral tone, an about-equal mark), C on today’s terms it does not add up (exhaust tone, a not-equal mark, plus “what you can do first”). They are told apart by words and glyph, not colour alone. C is a complete answer, not an error message.')}</p>
+          <p>{L('deadline 插槽只在結果是 A 的時候出現：倒數天數只給算得過來的人看，而且一定和縣市的名額狀態放在一起（R10）。', 'The deadline slot is rendered only while the verdict is A: a day count is shown only to readers for whom it adds up, and always with their city’s quota status beside it (R10).')}</p>
+        </Fragment>
+        <div class="grid" style="--min: 17rem">
+          <ResultPanel locale={locale} verdict="A" sentence={L('示意句子：以你的條件，電動機車實付比新的燃油機車少，每個月的開銷也不比加油多。', 'Sample sentence: on your details an electric scooter costs less to buy than a new gasoline one, and no more to run each month.')} title={L('買的時候少付（示意）', 'You pay less at purchase (sample)')} prefix="NT$" value="1,000" sample>
+            <p slot="deadline">{L('示意：某市還有名額（某日查）。最晚 12 月 31 日前買車、領牌，還有 N 天。', 'Sample: the city still has places (checked on a date). Buy and register by 31 December at the latest: N days left.')}</p>
+          </ResultPanel>
+          <ResultPanel locale={locale} verdict="B" sentence={L('示意句子：買的時候差不多，但每個月大約多花一點。值不值得，由你決定。', 'Sample sentence: about the same to buy, but a little more each month. Whether that is worth it is your call.')} title={L('每個月多花（示意）', 'More each month (sample)')} prefix="NT$" value="200" sample>
+            <p slot="deadline">{L('這一行不會出現在結果 B。', 'This line never appears in verdict B.')}</p>
+          </ResultPanel>
+          <ResultPanel locale={locale} verdict="C" sentence={L('示意句子：買的時候還差一截，每個月也不會比較省。我們不會叫你硬換。', 'Sample sentence: there is still a gap at purchase, and it is no cheaper to run. We will not tell you to force it.')} title={L('買的時候還差（示意）', 'Still short at purchase (sample)')} prefix="NT$" value="9,000" sample>
+            <ul slot="next">
+              <li>{L('示意：讓差距變小的做法。', 'Sample: a way to narrow the gap.')}</li>
+              <li>{L('示意：車還沒換之前可以先做的事。', 'Sample: something to do before changing scooters.')}</li>
+            </ul>
+          </ResultPanel>
+        </div>
+      </Block>
+
+      <Block name="DecisionStrip" file="ui/DecisionStrip.astro" wide code={`<DecisionStrip locale={locale} name="energy"
+  steps={[{ id: 'charge', legend: '停車的地方能不能充電？', options: [{ value: 'yes', label: '可以' }, { value: 'no', label: '不行' }] }, …]}
+  outcomes={[
+    { when: { charge: 'yes' }, title: '在家充電', body: '…', value: 'home-charge' },   // 先寫特定情況
+    { when: {}, title: '月租', body: '…', value: 'monthly' },                          // 最後放通用的
+  ]} />
+<script>
+  root.addEventListener('decision:change', (e) => setPlan(e.detail.value));
+</script>`}>
+        <Fragment slot="note"><p>{L('換電還是充電（V42）：幾個問題排成一列（手機上直排），答完給一個建議。有 JavaScript 時顯示第一個符合的結果，並送出 decision:change 事件給試算工具；沒有的時候列出所有結果和各自的條件，仍然是一張讀得懂的對照表。', 'Swap or charge (V42): a few questions in a row (stacked on phones) that end in one recommendation. With JavaScript the first matching outcome is shown and a decision:change event goes to the calculator; without it every outcome is listed with its conditions, so it still reads as a decision table.')}</p></Fragment>
+        <DecisionStrip locale={locale} name="sg-decision" steps={decisionDemo.steps} outcomes={decisionDemo.outcomes} />
+      </Block>
+    </div>
+  </Section>
+
+  <!-- ================================================================ MONEY / DATE STATE -->
+  <Section id="money" eyebrow="12" title={L('日期狀態與補助', 'Date state and subsidies')} rule lead={L('這個靜態網站會在 12 月 31 日的兩邊被閱讀。所有跟日期有關的文案，都由同一個模組決定現在是哪一種狀態，並且在瀏覽器裡用今天的日期重新判斷。', 'This static site will be read on both sides of 31 December. One module decides which state every date-dependent sentence is in, and re-evaluates it in the browser from today’s date.')}>
+    <Block name="site-state" file="lib/site-state.ts · lib/site-state.client.ts" wide code={`// 建置時（Astro frontmatter、Node）
+import { snapshot, moneyState, todayInTaipei } from '@/lib/site-state.data';
+const state = moneyState(todayInTaipei(), 'kaohsiung', snapshot);
+// state.id → 'A-city-exhausted'   state.city.asOf → '2026-08-11'   state.mayShowDayCount → false
+
+// 頁面：<Base money> 會印出快照並載入瀏覽器端的重新判斷
+<p data-money-when="static">…絕對日期，任何時候讀都成立…</p>   {/* 沒有 JavaScript 時只顯示這個 */}
+<p data-money-when="A">…</p>  <p data-money-when="B">…</p>  <p data-money-when="C D">…</p>
+<p data-money-state="A-city-open" data-money-template="{city}：還有名額（{date} 查）。"></p>
+<span data-money-fill="daysSince"></span>
+<Select id="city" … data-money-city />                        {/* 讀者的縣市 */}`}>
+      <Fragment slot="note">
+        <p>{L('狀態有這幾種：到 12 月 31 日為止是 A（還沒選縣市／縣市還有名額／只剩汰舊或特定身分／名額沒公布／已用完／已截止／查不到）；之後到線上申請截止是 B；再之後、沒有任何新方案定案是 C；資料庫裡出現 2027 年之後才開始的方案就是 D。縣市的錢用完是一種狀態，不是註腳。', 'The states: up to 31 December it is A (no city chosen / the city has places / only scrappage or certain groups left / quota not published / used up / closed / could not be checked); from then to the filing deadline, B; after that with nothing confirmed, C; and D once a programme starting after 2026 is in the registry. A city’s money running out is a state, not a footnote.')}</p>
+        <p><b>{L('怎麼避免顯示過期的狀態：', 'How a stale state is avoided: ')}</b>{L('（1）建置時把每一種狀態的文案都印出來，各自標上它成立的階段，另外有一句 static：只有絕對日期和查證日，任何時候讀都成立。（2）Base 在第一次繪製前用今天的台灣日期設定 html 的 data-money-phase，CSS 只顯示對的那一句；沒有 JavaScript 就只顯示 static。（3）需要數字或縣市的部分，由瀏覽器端的模組用頁面裡的小快照重算，讀者選縣市、或隔夜回到分頁時再算一次。（4）建置之後才用完的名額，瀏覽器不會知道，所以每個狀態都帶查證日，超過三週會加上「可能已經變了」，倒數天數也會收起來。', '(1) The build prints the copy for every state, each marked with the phase it is true in, plus one static sentence with absolute dates and the check date that is true whenever it is read. (2) Before first paint, Base sets data-money-phase on html from today’s date in Taiwan and CSS shows only the matching sentence; with no JavaScript only static shows. (3) Anything that needs a number or a city is recomputed by the browser module from a small snapshot in the page, again when the reader picks a city or returns to a tab left open overnight. (4) The browser cannot know about quota used up after the build, so every status carries its check date; after three weeks it adds “this may have changed” and the day count is withdrawn.')}</p>
+        <p>{L('下面的元件都接在同一個狀態上。用這排按鈕預覽不同的日期（只有這一頁有，正式頁面一律用今天的日期）。', 'The components below all hang off the same state. Use these buttons to preview other dates (this page only; real pages always use today’s date).')}</p>
+      </Fragment>
+      <div class="sg-dates" data-sg-dates>
+        <span class="meta">{L('預覽日期', 'Preview date')}</span>
+        {[['', L('今天', 'Today')], ['2026-12-31', '2026-12-31'], ['2027-01-05', '2027-01-05'], ['2027-02-14', '2027-02-14']].map(([d, label]) => <button type="button" class="sg-date" data-date={d} aria-pressed={d === '' ? 'true' : 'false'}>{label}</button>)}
+      </div>
+      <div class="grid" style="--min: 19rem; --grid-gap: var(--sp-7)">
+        <div class="stack" style="--stack: var(--sp-4)">
+          <p class="meta">MoneyBanner + Select data-money-city</p>
+          <Select id="sg-money-city" label={L('你住在哪個縣市？', 'Which city or county do you live in?')} options={cityOptions} value="" data-money-city />
+          <MoneyBanner locale={locale} tone="box" />
+        </div>
+        <div class="stack" style="--stack: var(--sp-4)">
+          <p class="meta">SubsidyTimeline (V19)</p>
+          <SubsidyTimeline locale={locale} />
+        </div>
+      </div>
+    </Block>
+
+    <Block name="TileMap" file="ui/TileMap.astro" wide code={`<TileMap locale={locale} name="city">
+  <Fragment slot="taipei"> … 金額、條件，每個數字附查證日 … </Fragment>
+</TileMap>`}>
+      <Fragment slot="note">
+        <p>{L(`22 個縣市的磚塊地圖（V41）。這裡的狀態不是示意：取自資料庫（${formatDate(snapshot.checkedOn, 'zh-TW', true)} 查），由 site-state 依今天的日期判斷。狀態用色塊的花紋和文字區分：有名額（實心）、只限汰舊或特定身分（斜紋）、已用完或已截止（空格加一道斜線）、查不到（虛線加問號，絕對不會顯示成 0）。藍圖列了四種；資料庫裡有不少縣市「方案還在進行、但剩餘名額沒有公布」，寫成「有名額」不對，所以多了第五種「名額沒公布」（圓環）。`, `The 22 cities and counties as a tile map (V41). The states here are not sample data: they come from the registry (checked ${formatDate(snapshot.checkedOn, 'en', true)}) through site-state for today’s date. States are told apart by a swatch pattern and a word: places left (solid), scrappage or certain groups only (hatched), used up or closed (an empty swatch with a strike), could not be checked (dashed with a question mark, never shown as zero). The blueprint lists four; the registry has many counties whose programme is running with no published remaining quota, and calling those “places left” would be wrong, so there is a fifth, “places not published” (a ring).`)}</p>
+        <p>{L('每一塊是連到下方明細的連結。有 JavaScript 時明細變成跟著選取走的一格；沒有的時候是一份完整的清單。用以縣市 id 命名的插槽放金額與條件。360px 時是四欄、不需要橫向捲動。', 'Each tile links to its detail row below. With JavaScript the rows become one panel that follows the selection; without it they are a complete list. Put amounts and conditions in a slot named after the jurisdiction id. Four columns at 360px, no sideways scrolling.')}</p>
+      </Fragment>
+      <TileMap locale={locale} name="sg-city" />
+    </Block>
+  </Section>
+
+  <!-- ================================================================ CHARTS -->
+  <Section id="charts" eyebrow="13" title={L('圖表', 'Charts')} rule lead={L('在 src/components/charts/。伺服器端產生的內嵌 SVG，沒有圖表函式庫；寬度用百分比、文字是固定大小的真文字，所以從 300px 到桌機都是同一張圖。每張圖都有 title、可展開的資料表，以及滑鼠或觸控的數值提示。', 'In src/components/charts/. Server-rendered inline SVG, no charting library. Widths are percentages and text is real fixed-size text, so one chart works from 300px to desktop. Every chart has a title, an expandable data table and a hover / touch readout.')}>
+    <Callout label={L('圖表規則', 'Chart rules')}>
+      <ul class="sg-list">
+        <li>{L('先選形式，最後才選顏色。一個數字用 Stat，不要畫一根長條。', 'Pick the form first and the colour last. One number is a Stat, not a one-bar chart.')}</li>
+        <li>{L('一張圖只有一個 y 軸。不同單位就畫兩張圖。', 'One y axis per chart. Two units means two charts.')}</li>
+        <li>{L('直接標示數值，少用圖例；兩個以上數列才需要圖例。', 'Label values directly and lean on legends as little as possible; a legend appears only for two or more series.')}</li>
+        <li>{L('不用圓餅圖與甜甜圈圖：占比用 StackedBar 或 WaffleChart。', 'No pies or donuts: use StackedBar or WaffleChart for shares.')}</li>
+        <li>{L('標籤請短：中文 30 字、英文 60 字元以內（會自動折成兩行）。', 'Keep labels short: under 30 Chinese characters or 60 Latin (they wrap to two lines).')}</li>
+      </ul>
+    </Callout>
+
+    <div class="sg-charts">
+      <Figure locale={locale} number={1} title={L('騎車與走路的人，|吸到的最多', 'People riding and walking |breathe the most')} subtitle={L(`各種通勤方式的平均暴露濃度（${units.ugm3}）`, `Average exposure by commuting mode (${units.ugm3})`)} caption={L('BarChart，emphasis 模式：故事裡的兩根用色，其他淡化。直線是參考值。', 'BarChart in emphasis mode: the two bars the story is about take the colour, the rest recede. The vertical line is a reference value.')} sample>
+        <BarChart locale={locale} title={L('各種通勤方式的暴露濃度長條圖', 'Bar chart of exposure by commuting mode')} desc={L('騎機車與步行最高，捷運最低。', 'Highest when riding a scooter or walking, lowest on the metro.')} data={barData} unit={units.ugm3} emphasis reference={{ value: 15, label: L('指引值（示意）', 'Guideline (sample)') }} categoryLabel={L('通勤方式', 'Mode')} valueLabel={L('濃度', 'Concentration')} />
+      </Figure>
+
+      <Figure locale={locale} number={2} title={L('同一條路，|兩種機車', 'Same street, |two kinds of scooter')} subtitle={L('每公里排放量（公克）', 'Emissions per kilometre (grams)')} caption={L('GroupedBarChart：每個類別裡比較同樣的兩到四個數列。', 'GroupedBarChart: the same two to four series compared inside each category.')} sample>
+        <GroupedBarChart locale={locale} title={L('燃油與電動機車排放量分組長條圖', 'Grouped bar chart of gasoline and electric scooter emissions')} series={series2} groups={[{ label: L('一氧化碳', 'Carbon monoxide'), values: [1.8, 0] }, { label: L('碳氫化合物', 'Hydrocarbons'), values: [0.6, 0] }, { label: L('氮氧化物', 'Nitrogen oxides'), values: [0.2, 0] }]} unit="g/km" decimals={1} categoryLabel={L('污染物', 'Pollutant')} />
+      </Figure>
+
+      <Figure locale={locale} number={3} title={L('平均值看不到的：|高低差可以很大', 'What an average hides: |the spread is wide')} subtitle={L(`個人暴露濃度的範圍與中位數（${units.ugm3}）`, `Range and median of personal exposure (${units.ugm3})`)} caption={L('RangePlot：圓點是中位數，橫條是最小到最大。', 'RangePlot: the dot is the median, the bar runs from minimum to maximum.')} sample>
+        <RangePlot locale={locale} title={L('個人暴露範圍圖', 'Range plot of personal exposure')} data={[{ label: L('走在人行道', 'Walking on the sidewalk'), min: 10, mid: 40, max: 180 }, { label: L('路口等紅燈', 'Waiting at the crossing'), min: 22, mid: 71, max: 240 }, { label: L('公園內', 'Inside a park'), min: 6, mid: 14, max: 21, tone: 'clean' }]} unit={units.ugm3} labels={{ min: ui.chart.min[locale], mid: ui.chart.median[locale], max: ui.chart.max[locale] }} categoryLabel={L('地點', 'Place')} />
+      </Figure>
+
+      <Figure locale={locale} number={4} title={L('機車在粉塵裡占得少，|在氣體裡占得多', 'Scooters are a small share of dust |and a large share of the gases')} subtitle={L('各類車輛占道路排放的比例', 'Share of road-transport emissions by vehicle type')} caption={L('StackedBar：比較幾個「整體」怎麼分。占比印在色塊下方，放不下的在資料表。', 'StackedBar: comparing how several wholes split. Shares are printed under the segments where they fit; the rest are in the data table.')} sample>
+        <StackedBar locale={locale} title={L('各污染物的車種占比堆疊長條圖', 'Stacked bar chart of vehicle shares by pollutant')} series={[{ label: L('機車', 'Scooters'), tone: 'exhaust' }, { label: L('汽車', 'Cars'), tone: 'blue' }, { label: L('貨車與公車', 'Trucks and buses'), tone: 'violet' }, { label: L('其他', 'Other'), tone: 'neutral' }]} rows={[{ label: 'PM2.5', values: [9, 31, 52, 8] }, { label: L('一氧化碳', 'Carbon monoxide'), values: [38, 47, 11, 4] }, { label: L('碳氫化合物', 'Hydrocarbons'), values: [46, 39, 9, 6] }]} categoryLabel={L('污染物', 'Pollutant')} />
+      </Figure>
+
+      <Figure locale={locale} number={5} title={L('電動機車變多了，|但還是少數', 'Electric scooters are growing, |but still few')} subtitle={L('每年新掛牌機車數（萬輛）', 'New scooter registrations per year (ten thousands)')} caption={L('LineChart：多個數列時線尾直接標數值，寬螢幕再加上名稱。滑鼠移過會出現十字線。', 'LineChart: with several series the line ends carry their values, and their names too on wide screens. Hover for a crosshair.')} sample>
+        <LineChart locale={locale} title={L('新掛牌機車數折線圖', 'Line chart of new scooter registrations')} x={[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]} series={[{ label: series2[0].label, tone: 'exhaust', values: [84, 96, 78, 73, 94, 72, 65, 78, 71, 69] }, { label: series2[1].label, tone: 'clean', values: [2, 4, 8, 17, 10, 9, 9, 8, 7, 9] }]} unit={L('萬輛', '×10k')} xLabel={L('年', 'Year')} />
+      </Figure>
+
+      <Figure locale={locale} number={6} title={L('單一數列：|加上淡淡的面積', 'A single series |gets a soft area')} subtitle={L(`路口年平均濃度（${units.ugm3}）`, `Annual mean at a crossing (${units.ugm3})`)} caption={L('LineChart，單一數列加參考線。', 'LineChart, one series with a reference line.')} sample>
+        <LineChart locale={locale} title={L('路口年平均濃度折線圖', 'Line chart of the annual mean at a crossing')} x={[2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]} series={[{ label: L('路口', 'Crossing'), tone: 'exhaust', values: [41, 38, 33, 35, 31, 29, 30, 27] }]} unit={units.ugm3} reference={{ value: 15, label: L('指引值（示意）', 'Guideline (sample)') }} xLabel={L('年', 'Year')} height={180} />
+      </Figure>
+
+      <Figure locale={locale} number={7} title={L('把人和車分開之後', 'After people and traffic are separated')} subtitle={L(`行人穿越時的暴露濃度（${units.ugm3}）`, `Exposure while crossing (${units.ugm3})`)} caption={L('BeforeAfterChart：每列兩個點，一條線連起來。', 'BeforeAfterChart: two dots per row joined by a line.')} sample>
+        <BeforeAfterChart locale={locale} title={L('行人專用時相前後比較圖', 'Before and after chart for the pedestrian scramble')} data={[{ label: L('示意路口甲', 'Sample crossing A'), before: 58, after: 21 }, { label: L('示意路口乙', 'Sample crossing B'), before: 44, after: 30 }, { label: L('示意路口丙', 'Sample crossing C'), before: 71, after: 12 }]} beforeLabel={L('一般時相', 'Conventional phase')} afterLabel={L('行人專用時相', 'Pedestrian scramble')} unit={units.ugm3} categoryLabel={L('路口', 'Crossing')} />
+      </Figure>
+
+      <Figure locale={locale} number={8} title={L('每 100 輛機車，|有幾輛是電動的', 'Of every 100 scooters, |how many are electric')} subtitle={L('每一格代表一輛', 'One cell is one scooter')} caption={L('WaffleChart：「每 100 個裡有幾個」。從最底下一排往上填。', 'WaffleChart: “N in 100”. Cells fill from the bottom row up.')} sample>
+        <WaffleChart locale={locale} title={L('電動機車占比方格圖', 'Waffle chart of the electric share')} parts={[{ value: 7, label: series2[1].label, tone: 'clean' }]} restLabel={series2[0].label} categoryLabel={L('車種', 'Type')} valueLabel={L('輛', 'Count')} />
+      </Figure>
+
+      <Figure locale={locale} number={9} title={L('十個等紅燈的人裡，|有三個是孩子或長者', 'Of ten people at the light, |three are children or elders')} subtitle={L('每個圖示代表一個人', 'One figure is one person')} caption={L('PictogramRow：用網站自己的人形與機車圖示。', 'PictogramRow: built from the site’s own figures and scooters.')} sample>
+        <div class="stack" style="--stack: var(--sp-6)">
+          <PictogramRow locale={locale} title={L('路口行人組成圖示', 'Pictogram of people at a crossing')} count={3} total={10} label={L('孩童與長者', 'Children and elders')} restLabel={L('其他行人', 'Other pedestrians')} tone="signal" categoryLabel={L('族群', 'Group')} valueLabel={L('人數', 'People')} />
+          <PictogramRow locale={locale} title={L('電動機車占比圖示', 'Pictogram of the electric share')} count={1} total={8} cols={4} icon="scooter-electric" tone="clean" label={series2[1].label} restLabel={series2[0].label} categoryLabel={L('車種', 'Type')} valueLabel={L('輛', 'Count')} />
+        </div>
+      </Figure>
+    </div>
+    <p class="meta sg-note">{L('WaterfallChart 與 BreakEvenChart 在上面的「表單與試算」一節。', 'WaterfallChart and BreakEvenChart are shown in the Forms and calculator section above.')}</p>
+
+    <Block name={L('空白的圖：Figure empty + EmptyChart', 'The empty chart: Figure empty + EmptyChart')} file="ui/Figure.astro · charts/EmptyChart.astro · charts/ChartShell.astro" wide code={`<Figure locale={locale} empty title="…|這張圖是空的" subtitle="…"
+  who="各縣市環保局、環境部、大學都量得出來。">     {/* 或用 who 插槽放連結 */}
+  <EmptyChart locale={locale} title="空白的圖：…" desc="三個面板分別是…" />
+</Figure>
+
+{/* 其他形狀的空白：自己給面板、數列和橫軸 */}
+<EmptyChart locale={locale} title="…"
+  panels={[{ label: '怠速排放', unit: 'g/分鐘' }]}
+  series={[{ label: '一台台灣的機車' }]}
+  x={{ from: 0, to: 60, step: 10, label: '怠速時間（秒）' }} />`}>
+      <Fragment slot="note">
+        <p>{L('網站的招牌圖（V8）：一張畫得完整的圖，有面板、座標軸、刻度、格線和紅燈轉綠燈的色條，但沒有任何資料點，因為沒有人量過。它必須看起來是刻意的，不是壞掉：外框和其他圖一樣完整；y 軸只標出 0 在哪裡，不編造刻度；每個面板角落寫著「無資料」，被截圖裁切之後仍然讀得出來。沒有線、沒有點、沒有任何佔位的形狀。', 'The site’s signature graphic (V8): a completely drawn chart with panels, axes, ticks, gridlines and the red-then-green phase bar, and no data marks at all, because nobody has measured it. It has to look deliberate, never broken: the frame is as finished as any other chart; the y axis shows only where zero would be and invents no scale; each panel says “no data” in its corner, so a cropped screenshot still reads. No line, no dots, no placeholder shape.')}</p>
+        <p>{L('Figure 的 empty 狀態：圖說預設是「這不是版面錯誤。這張圖的數據不存在。」；來源那一行換成「沒人量過」標記；who 說誰量得出來（空白後面一定要接這一句）。螢幕閱讀器會讀到：圖的名稱、你給的 desc，加上「這張圖是刻意留白的…」，以及一張每一格都是「無資料」的資料表。ChartShell 的 empty 屬性就是做這件事，自己寫 render 函式的人可以直接用。', 'Figure’s empty state: the caption defaults to “This is not a layout error. The data for this chart does not exist.”; the source line is replaced by the “nobody has measured this” badge; who says who could measure it (a gap is always followed by that). A screen reader gets the graphic’s name, your desc plus “this chart is empty on purpose…”, and a data table whose every cell reads “no data”. ChartShell’s empty prop is what does this, for anyone writing their own render function.')}</p>
+      </Fragment>
+      <div class="grid" style="--min: 20rem; --grid-gap: var(--sp-7)">
+        <Figure locale={locale} empty title={L('紅燈旁邊的行人吸進多少？|這張圖是空的', 'What does a pedestrian breathe beside a red light? |This chart is empty')} subtitle={L('預設的三個面板與兩個高度', 'The default three panels and two heights')} who={L('各縣市環保局、環境部、大學都量得出來。', 'A city environmental bureau, the environment ministry or a university could.')}>
+          <EmptyChart locale={locale} title={L('空白的圖：紅燈倒數期間路口行人高度的三種污染物', 'Empty chart: three pollutants at pedestrian height through the red-light countdown')} desc={L('三個面板分別是一氧化碳、苯和超細微粒，橫軸是紅燈倒數 90 到 0 秒，接著是綠燈。', 'Three panels for carbon monoxide, benzene and ultrafine particles; the x axis is the red-light countdown from 90 to 0 seconds, then green.')} />
+        </Figure>
+        <Figure locale={locale} empty title={L('一台台灣的機車怠速時排多少？|也是空的', 'How much does one Taiwanese scooter emit at idle? |Also empty')} subtitle={L('自訂面板、數列與橫軸的例子', 'An example with custom panel, series and axis')} who={L('環境部、車輛測試機構。', 'The environment ministry, or a vehicle test laboratory.')}>
+          <EmptyChart locale={locale} title={L('空白的圖：機車怠速排放率', 'Empty chart: scooter idle emission rate')} panels={[{ label: L('怠速排放', 'Idle emissions'), unit: L('克/分鐘', 'g/min') }]} series={[{ label: L('一台台灣的四行程機車', 'One Taiwanese four-stroke scooter') }]} x={{ from: 0, to: 60, step: 10, label: L('怠速時間（秒）', 'Time at idle (seconds)') }} panelHeight={110} />
+        </Figure>
+      </div>
+    </Block>
+  </Section>
+
+  <!-- ================================================================ ART -->
+  <Section id="art" eyebrow="14" title={L('插畫', 'Illustration')} tone="sunken" lead={L('在 src/components/art/。全部是手寫的內嵌 SVG，零件定義在 parts.ts，顏色只來自 --art-* 色票，所以兩個主題都能用。', 'In src/components/art/. All hand-built inline SVG. The parts live in parts.ts and take colour only from --art-* tokens, so everything works in both themes.')}>
     <Block name="StreetScene / SceneCompare" file="art/StreetScene.astro · art/SceneCompare.astro" wide code={`<StreetScene locale={locale} />                  {/* 紅燈：燃油機車 */}
 <StreetScene locale={locale} state="clean" />    {/* 同一個路口：電動機車 */}
 <SceneCompare locale={locale} />                 {/* 兩者切換，不需要 JavaScript */}`}>
@@ -1166,7 +2383,72 @@ const locale = localeFromParam(Astro.params.lang);
   figure .meta {
     margin-block-start: var(--sp-2);
   }
+  .sg-after {
+    margin-block-start: var(--sp-7);
+  }
+  .sg-budget {
+    margin-block-start: var(--sp-6);
+    overflow-x: auto;
+  }
+  .sg-budget table {
+    min-inline-size: 38rem;
+    font-size: var(--fs-xs);
+  }
+  .sg-budget code {
+    white-space: nowrap;
+  }
+  .sg-badges {
+    margin-block-start: var(--sp-6);
+    padding-block-start: var(--sp-4);
+    border-block-start: 1px solid var(--line);
+  }
+  .sg-onink {
+    padding: var(--sp-3);
+  }
+  .sg-dates {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-block-end: var(--sp-5);
+  }
+  .sg-date {
+    min-block-size: 2.25rem;
+    padding-inline: var(--sp-3);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    background: var(--surface);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+  .sg-date[aria-pressed='true'] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .sg-square {
+    max-inline-size: 22rem;
+  }
+  figure img {
+    border: 1px solid var(--line);
+  }
 </style>
+
+<script>
+  // Styleguide only: preview the money state on other dates by overriding Date.now().
+  import { applyMoneyState } from '@/lib/site-state.client';
+  const realNow = Date.now.bind(Date);
+  document.querySelectorAll<HTMLButtonElement>('[data-sg-dates] button').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const d = btn.dataset.date;
+      Date.now = d ? () => new Date(`${d}T04:00:00Z`).getTime() : realNow; // noon in Taiwan on that day
+      document.querySelectorAll('[data-sg-dates] button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      applyMoneyState();
+    }),
+  );
+</script>
 
 <script>
   // Reference calculator wiring. Copy this pattern for the real tool.

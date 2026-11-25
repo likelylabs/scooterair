@@ -195,8 +195,8 @@ export function slimSnapshot(snap: MoneySnapshot): MoneySnapshot {
 // ---------------------------------------------------------------------------
 
 /** Today's date in Taiwan (UTC+8, no daylight saving), as 'YYYY-MM-DD'. */
-export function todayInTaipei(now: Date = new Date()): ISODate {
-  return new Date(now.getTime() + 8 * 3_600_000).toISOString().slice(0, 10);
+export function todayInTaipei(now?: Date): ISODate {
+  return new Date((now ? now.getTime() : Date.now()) + 8 * 3_600_000).toISOString().slice(0, 10);
 }
 
 const KNOWN_OPEN: QuotaStatus[] = ['unlimited', 'available', 'limited', 'nearly-exhausted'];

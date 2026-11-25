@@ -9,6 +9,9 @@
  *   options  { value: string; label: string }[]
  *   value    initially selected value
  *   hint     helper text under the label
+ * Any other attribute (data-*, required, autocomplete) is passed to the <select>.
+ * `data-money-city` marks it as the reader's city for the date-state utility
+ * (option values are JurisdictionIds; '' = not chosen).
  */
 interface Props {
   id: string;
@@ -18,15 +21,16 @@ interface Props {
   value?: string;
   hint?: string;
   class?: string;
+  [attr: string]: unknown;
 }
-const { id, name = id, label, options, value, hint, class: cls } = Astro.props;
+const { id, name = id, label, options, value, hint, class: cls, ...rest } = Astro.props;
 ---
 
 <div class:list={['field', cls]}>
   <label class="field__label" for={id}>{label}</label>
   {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
   <div class="select">
-    <select id={id} name={name} aria-describedby={hint ? `${id}-hint` : undefined}>
+    <select id={id} name={name} aria-describedby={hint ? `${id}-hint` : undefined} {...rest}>
       {options.map((o) => <option value={o.value} selected={o.value === value}>{o.label}</option>)}
     </select>
   </div>
