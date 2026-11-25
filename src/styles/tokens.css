@@ -1,0 +1,382 @@
+/*
+ * Design tokens — 行人呼吸 / ScooterAir
+ * =====================================
+ * Concept: "the low layer". The page is an overcast street. Cool asphalt
+ * neutrals are the clean air; everything warm (ochre → soot) is exhaust and
+ * hugs the ground; signal green is the clean-air resolution; signal red marks
+ * the red-light moment. Edges are crisp like road paint: small radii, no
+ * shadows, hairlines and thick painted rules.
+ *
+ * Structure
+ *   1. Raw ramps (theme-independent)       --asphalt-*, --exhaust-*, --clean-*
+ *   2. Semantic tokens, light theme        --bg, --ink, --accent …
+ *   3. Semantic tokens, dark theme         (two selectors, keep in sync)
+ *   4. Type, space, radii, motion
+ *   5. Language-dependent tokens           :lang(zh) / :lang(en)
+ *
+ * Components must use semantic tokens (section 2+), never raw ramps.
+ * Every text/background pair below has been checked for WCAG AA; the chart
+ * palette was validated with the dataviz skill's validate_palette.js in both
+ * themes (see the styleguide page for the numbers).
+ */
+
+:root {
+  /* ---- 1. Raw ramps ---------------------------------------------------- */
+  --asphalt-0: #ffffff;
+  --asphalt-50: #f3f5f3;
+  --asphalt-100: #e8ece9;
+  --asphalt-200: #d5dbd8;
+  --asphalt-300: #b3bcbd;
+  --asphalt-400: #8e999c;
+  --asphalt-500: #7c8992;
+  --asphalt-600: #5a666e;
+  --asphalt-700: #47525a;
+  --asphalt-750: #2a3237;
+  --asphalt-800: #181e21;
+  --asphalt-900: #101416;
+  --asphalt-950: #0a0d0f;
+
+  --exhaust-100: #f3e6d4;
+  --exhaust-200: #f2bc80;
+  --exhaust-300: #d6a064;
+  --exhaust-400: #c4853c;
+  --exhaust-500: #b0651a;
+  --exhaust-600: #8a4a0e;
+  --exhaust-700: #5f350f;
+  --exhaust-900: #2a2118;
+
+  --clean-100: #ddf0eb;
+  --clean-200: #9ae6d6;
+  --clean-300: #62bdac;
+  --clean-400: #2ca28f;
+  --clean-500: #00897a;
+  --clean-600: #006b5f;
+  --clean-700: #004d45;
+  --clean-900: #11272a;
+
+  --paint-yellow: #f2c230; /* road-paint yellow / school cap. Art + <mark> only */
+  --signal-red-led: #e0402f;
+  --signal-green-led: #14b89a;
+
+  /* ---- 2. Semantic, light ---------------------------------------------- */
+  color-scheme: light;
+
+  --bg: var(--asphalt-50); /* page: overcast sky */
+  --bg-sunken: var(--asphalt-100); /* recessed bands, table stripes */
+  --surface: var(--asphalt-0); /* cards, panels, inputs */
+  --ink: #14191c; /* primary text 16:1 */
+  --ink-2: var(--asphalt-700); /* secondary text 7.3:1 */
+  --ink-3: var(--asphalt-600); /* captions, meta 5.4:1 */
+  --line: var(--asphalt-200); /* hairlines */
+  --line-strong: var(--asphalt-500); /* control borders ≥3:1 */
+
+  --accent: var(--clean-600); /* links, primary action = green signal */
+  --accent-hover: var(--clean-700);
+  --on-accent: #ffffff;
+  --focus: #14191c;
+
+  --exhaust: var(--exhaust-500); /* marks, rules */
+  --exhaust-ink: var(--exhaust-600); /* text-safe */
+  --exhaust-wash: var(--exhaust-100); /* tinted backgrounds */
+  --clean: var(--clean-500);
+  --clean-ink: var(--clean-600);
+  --clean-wash: var(--clean-100);
+  --signal-red: #d93a2b; /* marks */
+  --signal-red-ink: #b93225; /* text-safe */
+  --signal-red-wash: #fbe4df;
+  --mark-bg: #f7dc7e; /* <mark> highlighter */
+
+  /* Charts. Order of the categorical slots is fixed: never cycle or reorder. */
+  --chart-exhaust: #b0651a; /* slot 1: gasoline / exhaust */
+  --chart-clean: #00897a; /* slot 2: electric / clean */
+  --chart-blue: #3a6fd8; /* slot 3 */
+  --chart-lime: #6e9b12; /* slot 4 */
+  --chart-magenta: #b8327d; /* slot 5 */
+  --chart-violet: #7256cc; /* slot 6 */
+  --chart-neutral: #9aa5a8; /* de-emphasis / "other" */
+  --chart-ink: #14191c; /* totals, reference marks */
+  --chart-signal: #d93a2b; /* reserved: red-phase / limit exceeded */
+  --chart-track: #dce2df; /* empty waffle cells, range tracks */
+  --chart-grid: #dde2df;
+  --chart-axis: #aeb8ba;
+  /* Ordinal ramps, light → dark = less → more */
+  --exhaust-s1: #d6a064;
+  --exhaust-s2: #c4853c;
+  --exhaust-s3: #a8641c;
+  --exhaust-s4: #854b14;
+  --exhaust-s5: #5f350f;
+  --clean-s1: #62bdac;
+  --clean-s2: #2ca28f;
+  --clean-s3: #00897a;
+  --clean-s4: #006b60;
+  --clean-s5: #004d45;
+
+  /* Illustration */
+  --art-ink: #1d2428; /* figures, scooters */
+  --art-deep: #0d1113; /* tyres, seats */
+  --art-far: #8a969b; /* second row of the pack */
+  --art-far-2: #b5bec0; /* third row */
+  --art-line: #b7c0c1; /* architecture hairlines */
+  --art-fill: #e4e9e6; /* architecture planes */
+  --art-road: #2a3237;
+  --art-paint: #f3f5f3;
+  --art-haze: #b5853f; /* what you can smell */
+  --art-haze-2: #8c6a45;
+  --art-co: #3f6c8c; /* odourless gas: hollow rings */
+  --art-ufp: #1d2428; /* ultrafine particles: pin-point stipple */
+  --art-metal: #7c8992;
+  --art-yellow: var(--paint-yellow);
+  --art-red: var(--signal-red-led);
+  --art-green: #0fa58a;
+  --art-lamp-off: #3d474d;
+
+  /* ---- 4. Type scale ---------------------------------------------------- */
+  --font-latin: 'Archivo';
+  --font-cjk: 'Noto Sans TC Variable', 'PingFang TC', 'Noto Sans CJK TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  --font-zh: var(--font-latin), var(--font-cjk);
+  --font-en: var(--font-latin), 'Archivo Punct', 'Helvetica Neue', Arial, var(--font-cjk);
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  --fs-xs: 0.8125rem; /* 13 — the floor; CJK is illegible below this */
+  --fs-sm: 0.9375rem; /* 15 */
+  --fs-base: 1.0625rem; /* 17 */
+  --fs-md: 1.1875rem; /* 19 */
+  --fs-lg: 1.375rem; /* 22 */
+  --fs-xl: clamp(1.5rem, 1.32rem + 0.8vw, 1.875rem);
+  --fs-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
+  --fs-3xl: clamp(2.125rem, 1.45rem + 3vw, 3.5rem);
+  --fs-4xl: clamp(2.5rem, 1.3rem + 5.6vw, 5.25rem); /* display */
+  --fs-stat: clamp(3.75rem, 2rem + 9vw, 7.5rem); /* big-number */
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-bold: 700;
+  --fw-black: 900;
+
+  /* ---- Space ------------------------------------------------------------ */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
+  --sp-9: 6rem;
+  --sp-10: 8rem;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --section-y: clamp(3rem, 2rem + 5vw, 6rem);
+  --page-max: 76rem;
+  --wide-max: 60rem;
+
+  /* ---- Radii: crisp, like road paint ------------------------------------ */
+  --radius-1: 2px;
+  --radius-2: 4px;
+  --radius-3: 8px;
+  --radius-pill: 999px;
+
+  /* ---- Rules ------------------------------------------------------------ */
+  --rule-hair: 1px;
+  --rule-paint: 3px; /* figure tops, section heads */
+  --rule-stop: 8px; /* the stop line */
+
+  /* ---- Motion ------------------------------------------------------------ */
+  --dur-1: 120ms;
+  --dur-2: 240ms;
+  --dur-3: 480ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.6, 0, 0.4, 1);
+
+  --header-h: 3.5rem;
+  --tap: 2.75rem; /* 44px minimum hit target */
+}
+
+/* ---- 3. Semantic, dark ---------------------------------------------------
+ * Applied when the OS asks for dark and the reader has not forced light, or
+ * when the reader has forced dark. The two blocks below MUST stay identical.
+ * `.tone-inverse` reuses the dark values to make an asphalt band inside a
+ * light page (footer, night chapters).
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: var(--asphalt-900);
+    --bg-sunken: var(--asphalt-950);
+    --surface: var(--asphalt-800);
+    --ink: #ecefea;
+    --ink-2: var(--asphalt-300);
+    --ink-3: var(--asphalt-400);
+    --line: var(--asphalt-750);
+    --line-strong: #66737a;
+
+    --accent: #4fd1ba;
+    --accent-hover: var(--clean-200);
+    --on-accent: #06211d;
+    --focus: #ecefea;
+
+    --exhaust: #d08234;
+    --exhaust-ink: #e8a662;
+    --exhaust-wash: var(--exhaust-900);
+    --clean: #17ad96;
+    --clean-ink: #4fd1ba;
+    --clean-wash: var(--clean-900);
+    --signal-red: #f0523f;
+    --signal-red-ink: #f0806e;
+    --signal-red-wash: #33191a;
+    --mark-bg: #6b5410;
+
+    --chart-exhaust: #d08234;
+    --chart-clean: #17ad96;
+    --chart-blue: #5b8def;
+    --chart-lime: #86ad32;
+    --chart-magenta: #dc5b9f;
+    --chart-violet: #9a82ee;
+    --chart-neutral: #5f6b72;
+    --chart-ink: #ecefea;
+    --chart-signal: #f0523f;
+    --chart-track: #262e33;
+    --chart-grid: #252c31;
+    --chart-axis: #48535a;
+    --exhaust-s1: #70431c;
+    --exhaust-s2: #965a26;
+    --exhaust-s3: #bd7230;
+    --exhaust-s4: #de9448;
+    --exhaust-s5: #f2bc80;
+    --clean-s1: #0e5a50;
+    --clean-s2: #138072;
+    --clean-s3: #17ad96;
+    --clean-s4: #55cfb9;
+    --clean-s5: #9ae6d6;
+
+    --art-ink: #d5dbd8;
+    --art-deep: #8e999c;
+    --art-far: #5a666e;
+    --art-far-2: #39434a;
+    --art-line: #2e373c;
+    --art-fill: #161b1e;
+    --art-road: #1c2327;
+    --art-paint: #cfd6d4;
+    --art-haze: #d9933f;
+    --art-haze-2: #f0b56a;
+    --art-co: #7fa8c4;
+    --art-ufp: #ecefea;
+    --art-metal: #7c8992;
+    --art-green: #1fd6b0;
+    --art-lamp-off: #2a3237;
+  }
+}
+
+:root[data-theme='dark'],
+.tone-inverse {
+  color-scheme: dark;
+
+  --bg: var(--asphalt-900);
+  --bg-sunken: var(--asphalt-950);
+  --surface: var(--asphalt-800);
+  --ink: #ecefea;
+  --ink-2: var(--asphalt-300);
+  --ink-3: var(--asphalt-400);
+  --line: var(--asphalt-750);
+  --line-strong: #66737a;
+
+  --accent: #4fd1ba;
+  --accent-hover: var(--clean-200);
+  --on-accent: #06211d;
+  --focus: #ecefea;
+
+  --exhaust: #d08234;
+  --exhaust-ink: #e8a662;
+  --exhaust-wash: var(--exhaust-900);
+  --clean: #17ad96;
+  --clean-ink: #4fd1ba;
+  --clean-wash: var(--clean-900);
+  --signal-red: #f0523f;
+  --signal-red-ink: #f0806e;
+  --signal-red-wash: #33191a;
+  --mark-bg: #6b5410;
+
+  --chart-exhaust: #d08234;
+  --chart-clean: #17ad96;
+  --chart-blue: #5b8def;
+  --chart-lime: #86ad32;
+  --chart-magenta: #dc5b9f;
+  --chart-violet: #9a82ee;
+  --chart-neutral: #5f6b72;
+  --chart-ink: #ecefea;
+  --chart-signal: #f0523f;
+  --chart-track: #262e33;
+  --chart-grid: #252c31;
+  --chart-axis: #48535a;
+  --exhaust-s1: #70431c;
+  --exhaust-s2: #965a26;
+  --exhaust-s3: #bd7230;
+  --exhaust-s4: #de9448;
+  --exhaust-s5: #f2bc80;
+  --clean-s1: #0e5a50;
+  --clean-s2: #138072;
+  --clean-s3: #17ad96;
+  --clean-s4: #55cfb9;
+  --clean-s5: #9ae6d6;
+
+  --art-ink: #d5dbd8;
+  --art-deep: #8e999c;
+  --art-far: #5a666e;
+  --art-far-2: #39434a;
+  --art-line: #2e373c;
+  --art-fill: #161b1e;
+  --art-road: #1c2327;
+  --art-paint: #cfd6d4;
+  --art-haze: #d9933f;
+  --art-haze-2: #f0b56a;
+  --art-co: #7fa8c4;
+  --art-ufp: #ecefea;
+  --art-metal: #7c8992;
+  --art-green: #1fd6b0;
+  --art-lamp-off: #2a3237;
+}
+
+/* ---- 5. Language-dependent tokens ----------------------------------------
+ * Set on every element that carries a lang attribute, so an English fragment
+ * inside a Chinese page (and vice versa) picks up its own metrics.
+ */
+:lang(zh) {
+  --font-body: var(--font-zh);
+  --lh-body: 1.8; /* CJK needs air: full-height glyphs, no ascender rhythm */
+  --lh-snug: 1.55;
+  --lh-heading: 1.3;
+  --lh-display: 1.18;
+  --ls-heading: 0.02em;
+  --ls-display: 0.01em;
+  --ls-caps: 0.08em;
+  --measure: 34em; /* ≈ 34 full-width characters per line */
+  --display-stretch: 100%;
+}
+
+:lang(en) {
+  --font-body: var(--font-en);
+  --lh-body: 1.6;
+  --lh-snug: 1.4;
+  --lh-heading: 1.12;
+  --lh-display: 0.98;
+  --ls-heading: -0.005em;
+  --ls-display: -0.01em;
+  --ls-caps: 0.09em;
+  --measure: 33em; /* ≈ 66 Latin characters per line */
+  --display-stretch: 72%; /* condensed, like elongated road-paint lettering */
+}
+
+@media (min-width: 48em) {
+  :root {
+    --fs-base: 1.125rem; /* 18 */
+    --header-h: 4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0.01ms;
+    --dur-2: 0.01ms;
+    --dur-3: 0.01ms;
+  }
+}

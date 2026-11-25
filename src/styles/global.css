@@ -1,0 +1,485 @@
+/*
+ * Global styles — reset, base typography, layout utilities, shared motifs.
+ * Imported once by src/layouts/Base.astro (after fonts.css and tokens.css).
+ */
+
+/* ---- Reset --------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-regular);
+  /* Never fake a bold or an oblique: CJK has no italic, and a synthesised one
+     is the fastest way to make Chinese text look broken. */
+  font-synthesis: none;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* CJK line breaking: keep closing punctuation, small kana-like marks and
+     prolonged marks off the start of a line. */
+  line-break: strict;
+  overflow-wrap: break-word;
+  /* Thin automatic gap between Han characters and Latin letters / digits
+     where the author did not type a space (Chrome 140+, Safari 18.4+). */
+  text-autospace: normal;
+  overflow-x: clip;
+}
+
+main {
+  flex: 1;
+}
+
+/* Elements that carry a lang attribute re-resolve the font stack, so mixed
+   fragments get the right punctuation and metrics. */
+:where([lang]) {
+  font-family: var(--font-body);
+}
+:where(p, li, dd, dt, blockquote, figcaption, td, th, div)[lang] {
+  line-height: var(--lh-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd,
+ol,
+ul,
+pre {
+  margin: 0;
+}
+
+img,
+picture,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+svg {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+/* ---- Typography ---------------------------------------------------------- */
+h1,
+h2,
+h3,
+h4,
+.display,
+.h1,
+.h2,
+.h3,
+.h4 {
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  font-weight: var(--fw-black);
+  text-wrap: balance;
+  /* Chromium breaks Japanese at phrase boundaries with this; harmless
+     elsewhere. For Chinese headlines use <Phrased> to mark phrase units. */
+  word-break: auto-phrase;
+}
+
+.display {
+  font-size: var(--fs-4xl);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  font-stretch: var(--display-stretch);
+}
+
+h1,
+.h1 {
+  font-size: var(--fs-3xl);
+  font-stretch: var(--display-stretch);
+  line-height: calc((var(--lh-heading) + var(--lh-display)) / 2);
+}
+
+h2,
+.h2 {
+  font-size: var(--fs-2xl);
+}
+
+h3,
+.h3 {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+}
+
+h4,
+.h4 {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+}
+
+:lang(en):is(h2, .h2) {
+  font-stretch: 84%;
+  font-weight: 800;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.lead {
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  color: var(--ink-2);
+  max-width: var(--measure);
+}
+
+@media (min-width: 48em) {
+  .lead {
+    font-size: var(--fs-lg);
+  }
+}
+
+small,
+.small {
+  font-size: var(--fs-sm);
+}
+
+.meta {
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+
+/* Eyebrow / kicker: a lane-marking dash, then a short label. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  line-height: 1.4;
+  letter-spacing: var(--ls-caps);
+  color: var(--ink-2);
+}
+.eyebrow:lang(en) {
+  text-transform: uppercase;
+}
+.eyebrow::before {
+  content: '';
+  flex: none;
+  inline-size: 1.5em;
+  block-size: 3px;
+  background: currentColor;
+}
+
+/* Emphasis. Chinese has no italic: emphasis is weight; titles use 《》. */
+:lang(zh) :is(em, i, cite, dfn, var, address) {
+  font-style: normal;
+}
+:lang(zh) em {
+  font-weight: var(--fw-bold);
+}
+strong,
+b {
+  font-weight: var(--fw-bold);
+}
+:lang(zh) q {
+  quotes: '「' '」' '『' '』';
+}
+:lang(en) q {
+  quotes: '“' '”' '‘' '’';
+}
+
+mark {
+  background: var(--mark-bg);
+  color: var(--ink);
+  padding: 0.05em 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+sup,
+sub {
+  line-height: 0;
+  font-size: 0.72em;
+}
+
+/* Numbers. Running text keeps proportional figures; anything that lines up
+   in a column gets tabular ones. */
+.tnum,
+table,
+output,
+input[type='number'] {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* A number-plus-unit or name that must not break across lines. */
+.nowrap {
+  white-space: nowrap;
+}
+
+/* Phrase unit inside a headline: the line may break between phrases but
+   never inside one. Use via <Phrased text="…|…" />. */
+.phrase {
+  display: inline-block;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.22em;
+  transition: color var(--dur-1) var(--ease-out);
+}
+a:hover {
+  color: var(--accent-hover);
+  text-decoration-thickness: 0.16em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-1);
+}
+
+::selection {
+  background: var(--mark-bg);
+  color: var(--ink);
+}
+
+hr {
+  border: 0;
+  block-size: 3px;
+  inline-size: 3rem;
+  margin: var(--sp-7) 0;
+  background: var(--ink);
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+code {
+  background: var(--bg-sunken);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-1);
+}
+
+table {
+  border-collapse: collapse;
+  inline-size: 100%;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+th,
+td {
+  text-align: start;
+  vertical-align: top;
+  padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
+  border-block-end: 1px solid var(--line);
+}
+thead th {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  color: var(--ink-2);
+  border-block-end: 1px solid var(--line-strong);
+  vertical-align: bottom;
+}
+td.num,
+th.num {
+  text-align: end;
+  padding-inline: var(--sp-3) 0;
+}
+
+/* ---- Layout -------------------------------------------------------------- */
+.container {
+  inline-size: min(100% - 2 * var(--gutter), var(--page-max));
+  margin-inline: auto;
+}
+.container--wide {
+  inline-size: min(100% - 2 * var(--gutter), var(--wide-max));
+}
+.container--prose {
+  inline-size: min(100% - 2 * var(--gutter), var(--measure));
+}
+
+.stack > * + * {
+  margin-block-start: var(--stack, var(--sp-4));
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cluster, var(--sp-3));
+}
+
+/* Auto-fitting grid. Set --min on the element to change the column floor. */
+.grid {
+  display: grid;
+  gap: var(--grid-gap, var(--sp-5));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min, 16rem)), 1fr));
+}
+
+/* Long-form text. */
+.prose {
+  max-inline-size: var(--measure);
+}
+.prose > * + * {
+  margin-block-start: 1em;
+}
+.prose > :is(h2, h3, h4) {
+  margin-block-start: 1.8em;
+}
+.prose > :is(h2, h3, h4) + * {
+  margin-block-start: 0.6em;
+}
+.prose :is(ul, ol) {
+  padding-inline-start: 1.4em;
+}
+.prose li + li {
+  margin-block-start: 0.35em;
+}
+.prose li::marker {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.vh {
+  position: absolute !important;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Tones ---------------------------------------------------------------
+ * A tone repaints a region. Each one also sets --here, the colour charts and
+ * illustrations use for "the surface behind me" (gaps, rings, cut-outs).
+ */
+:root {
+  --here: var(--bg);
+}
+.tone-sunken {
+  --here: var(--bg-sunken);
+  background: var(--bg-sunken);
+}
+.tone-surface {
+  --here: var(--surface);
+  background: var(--surface);
+}
+.tone-exhaust {
+  --here: var(--exhaust-wash);
+  background: var(--exhaust-wash);
+}
+.tone-clean {
+  --here: var(--clean-wash);
+  background: var(--clean-wash);
+}
+.tone-inverse {
+  --here: var(--bg);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* ---- Street motifs ------------------------------------------------------- */
+
+/* Zebra crossing (枕木紋): painted blocks on an asphalt band. Decorative. */
+.zebra {
+  block-size: 1.75rem;
+  background-color: var(--art-road);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--art-paint) 0 1.75rem,
+    transparent 1.75rem 3.25rem
+  );
+  background-position: center;
+}
+
+/* Stop line (停止線): a single thick painted rule. */
+.stopline {
+  border: 0;
+  block-size: var(--rule-stop);
+  inline-size: 100%;
+  margin: 0;
+  background: var(--ink);
+}
+
+/* Waiting box (機車待轉區): a painted rectangle. Used by Callout. */
+.paintbox {
+  border: var(--rule-paint) solid var(--ink);
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.skip-link {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+  transform: translateY(-300%);
+}
+.skip-link:focus {
+  transform: none;
+  color: var(--bg);
+}
+
+/* JS-only affordances stay out of the way when scripting is off. */
+html:not(.js) [data-js-only] {
+  display: none !important;
+}
+
+@media print {
+  .site-header,
+  .site-footer nav,
+  [data-js-only] {
+    display: none !important;
+  }
+}
