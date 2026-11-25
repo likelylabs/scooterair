@@ -442,7 +442,7 @@ export const tiles = {
     unknown: { 'zh-TW': '查不到', en: 'Could not be checked' },
   } as Record<'available' | 'restricted' | 'exhausted' | 'unknown', L10n>,
   unknownDetail: { 'zh-TW': '查不到，請洽環保局', en: 'We could not check this. Please ask the environmental bureau.' } as L10n,
-  checked: { 'zh-TW': '{date} 查', en: 'checked {date}' } as L10n,
+  checked: { 'zh-TW': '{date}查', en: 'checked {date}' } as L10n,
   pick: { 'zh-TW': '點一個縣市，看金額和查證日期。', en: 'Choose a city or county for amounts and the date we checked.' } as L10n,
   official: { 'zh-TW': '官方頁面', en: 'Official page' } as L10n,
 } as const;

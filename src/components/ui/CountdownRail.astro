@@ -61,13 +61,14 @@ const items = Astro.props.items ?? [
 ];
 const digits = '0123456789'.split('');
 const shown = count !== undefined ? String(Math.max(0, Math.min(99, Math.round(count)))).padStart(2, '0') : null;
-const idleKicker = current ? t(chain.linkN, locale, { n: current }) : rail.jump[locale];
-const idleName = current ? chain.links[current - 1][locale] : { 'zh-TW': '章節', en: 'a chapter' }[locale];
+const text_name = (n: number) => (n === total ? chain.breakable[locale] : chain.links[n - 1][locale]);
 const text = {
   link: chain.linkN[locale],
-  links: chain.links.map((l) => l[locale]),
+  links: chain.links.map((l, i) => (i === total - 1 ? chain.breakable[locale] : l[locale])),
   jump: rail.jump[locale],
 };
+const idleKicker = current ? t(chain.linkN, locale, { n: current }) : '';
+const idleName = current ? text_name(current) : { 'zh-TW': '跳到章節', en: 'Jump to a chapter' }[locale];
 ---
 
 <nav class:list={['rail', cls]} aria-label={rail.label[locale]} data-rail data-text={JSON.stringify(text)}>
@@ -289,8 +290,21 @@ const text = {
     align-items: center;
     gap: 0.4em;
   }
-  @media (max-width: 22.4em) {
-    /* 320–358px: the name gets the room; the row of pips goes */
+  @media (max-width: 30em) {
+    /* phones: the name gets the room. The ring on the pips already says which link. */
+    .rail__row {
+      gap: var(--sp-2);
+    }
+    .rail__kicker {
+      display: none;
+    }
+    .rail__pips {
+      inline-size: 6.25rem;
+      block-size: auto;
+    }
+  }
+  @media (max-width: 21.5em) {
+    /* under 344px the row of pips goes too; the jump menu still shows all seven */
     .rail__pips {
       display: none;
     }
@@ -358,7 +372,8 @@ const text = {
       const key = `${cur.id}|${count}`;
       if (key === shown) return;
       shown = key;
-      setLed(count, d.phase ?? 'red');
+      // at 00 the light has turned: the LED is green from there on
+      setLed(count, count === 0 ? 'green' : (d.phase ?? 'red'));
       el.querySelectorAll<SVGGElement>('.rail__pips [data-pip]').forEach((g) => g.toggleAttribute('data-now', Number(g.dataset.pip) === linkN));
       el.querySelectorAll<HTMLAnchorElement>('[data-rail-item]').forEach((a) => {
         if (Number(a.dataset.railItem) === linkN) a.setAttribute('aria-current', 'location');
@@ -386,7 +401,7 @@ const text = {
       const close = (focus = false) => {
         if (!menu.open) return;
         menu.open = false;
-        if (focus) summary?.focus();
+        if (focus) summary?.focus({ preventScroll: true });
       };
       document.addEventListener('keydown', (e) => e.key === 'Escape' && close(true));
       document.addEventListener('click', (e) => !menu.contains(e.target as Node) && close());

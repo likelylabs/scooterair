@@ -35,13 +35,31 @@ export const join = (...parts: L10n[]): L10n =>
       .join(' '),
   );
 
+const ZH_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+const EN_NUM = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+/** A horizon in words: 60 → 五年 / five years; 36 → 三年 / three years; 30 → 30個月 / 30 months. */
+export function horizonText(months: number): L10n {
+  if (months % 12 === 0) {
+    const y = months / 12;
+    return t(`${y <= 10 ? ZH_NUM[y] : y}年`, y === 1 ? 'one year' : `${y <= 10 ? EN_NUM[y] : y} years`);
+  }
+  return t(`${months}個月`, months === 1 ? 'one month' : `${months} months`);
+}
+
+/** "N days left" / "today is the last day" for a deadline. */
+export function daysLeftText(days: number, on: string): L10n {
+  const d = date(on);
+  if (days <= 0) return t(`今天（${d['zh-TW']}）是最後一天`, `Today (${d.en}) is the last day`);
+  return t(`距離${d['zh-TW']}還有${days}天`, `${days} day${days === 1 ? '' : 's'} left until ${d.en}`);
+}
+
 /** "Label: detail" in both languages. */
 export const detail = (label: L10n, more: L10n): L10n => t(`${label['zh-TW']}：${more['zh-TW']}`, `${label.en}: ${more.en}`);
 
 export const reasonText: Record<ExclusionReason, L10n> = {
   'not-eligible': t('不符合資格', 'Not eligible'),
   'mutually-exclusive': t('與金額較高的項目擇一', 'Either/or with a larger item'),
-  expired: t('已過申請期限', 'Programme has ended'),
+  expired: t('已過購車期限', 'Programme has ended'),
   'not-yet-valid': t('尚未開始', 'Not yet open'),
   unconfirmed: t('公告期限較長，但上位辦法只確認到2026年底', 'Listed as running longer, but its umbrella rule is confirmed only to the end of 2026'),
   'quota-exhausted': t('名額或經費已用完', 'Quota or budget used up'),
@@ -70,6 +88,14 @@ export const ui = {
   year: t('第 {n} 年', 'Year {n}'),
   even: t('第 {n} 個月打平', 'Even at month {n}'),
   never: t('五年內不會打平', 'No break-even within five years'),
+  /** The same for any horizon: {h} is horizonText(). */
+  neverIn: t('{h}內不會打平', 'No break-even within {h}'),
+  /** Dearer to buy, briefly even, dearer again at the horizon. */
+  evenThenBehind: t('第 {n} 個月曾一度打平，但{h}後仍貴 {gap}', 'Briefly even at month {n}, but {gap} dearer after {h}'),
+  /** Cheaper to buy, costs more to run, still ahead at the horizon. */
+  aheadDearerToRun: t('買時較便宜；騎起來較貴，但{h}內總花費仍較低', 'Cheaper to buy; costs more to run but still cheaper in total over {h}'),
+  /** Cheaper to buy and at the horizon, but dearer for a while in between. */
+  aheadWithDip: t('買時較便宜，{h}後總花費仍較低（中間有幾個月較貴）', 'Cheaper to buy and still cheaper in total after {h} (dearer for a few months in between)'),
   ahead: t('買和騎都比較便宜', 'Cheaper to buy and to run'),
   catchesUp: t('買時較便宜，但第 {n} 個月起總花費超過燃油機車', 'Cheaper to buy, but total cost passes the gasoline scooter at month {n}'),
 };

@@ -139,7 +139,7 @@ export const householdFlags = [
   'neighbourhoodWatch', // member of a neighbourhood watch team (Taoyuan)
   'disasterAffected', // household eligible for natural-disaster aid (Tainan)
   'remoteDistrict', // lives in a district the jurisdiction defines as remote
-  'previousLocalSubsidy', // has received this jurisdiction's scooter subsidy before
+  'previousLocalSubsidy', // has received this jurisdiction's scooter subsidy before (some places also count past MOENV subsidies: see each programme's condition text)
   'foreignNational', // not an ROC national
 ] as const;
 export type HouseholdFlag = (typeof householdFlags)[number];
@@ -171,12 +171,22 @@ export type Condition =
   /** Model uses swappable rental batteries. */
   | { kind: 'battery-swap' }
   | { kind: 'gas-max-cc'; cc: number }
-  | { kind: 'household'; flag: HouseholdFlag; value?: boolean }
+  /**
+   * A household flag. `ambiguous`: failing it is not a clear "no" (the rule has exceptions we cannot
+   * test), so the line is excluded as ambiguous and the amount reported. `why` replaces the generic
+   * failure text; `assumption` replaces the generic assumption when the flag is not given.
+   */
+  | { kind: 'household'; flag: HouseholdFlag; value?: boolean; ambiguous?: boolean; why?: L10n; assumption?: L10n }
   /** `ambiguous` levels are neither clearly in nor out: the engine excludes them and says why. */
   | { kind: 'income'; levels: IncomeLevel[]; ambiguous?: IncomeLevel[] }
   | { kind: 'age'; min?: number; max?: number }
   /** Household registration in the programme's jurisdiction. */
-  | { kind: 'residency'; minYears?: number; registeredBy?: ISODate }
+  | { kind: 'residency'; minYears?: number; registeredBy?: ISODate; why?: L10n; assumption?: L10n }
+  /**
+   * Some applicants must apply earlier than the purchase window ends (MOEA: foreign nationals by
+   * 10 December 2026). On a later date such an applicant can no longer claim the line.
+   */
+  | { kind: 'applicant-deadline'; applicants: 'foreign-national'; date: ISODate; why: L10n }
   /** Lives in one of these jurisdictions (central regional options). */
   | { kind: 'region'; jurisdictions: JurisdictionId[] }
   | { kind: 'any-of'; conditions: Condition[] };
@@ -248,15 +258,23 @@ export interface Programme extends Provenance {
    */
   requires?: { anyOf: string[]; waivedIfUnavailable: boolean; text: L10n };
   cap?: Cap;
-  /** Purchase (invoice) window. */
+  /** Purchase window. What exactly must be done by `validTo` is in `validToRule`. */
   validFrom: ISODate;
   validTo: ISODate;
+  /**
+   * What must be completed by `validTo` (buy only; buy, plate and scrap; register on the platform
+   * before buying...). Shown with the deadline. Without it the engine says "purchase deadline".
+   */
+  validToRule?: L10n;
   /**
    * Published as running past this date, but the umbrella rule is confirmed only to here.
    * After it, the engine excludes the line as unconfirmed and says so.
    */
   confirmedThrough?: ISODate;
+  /** The last day an application is accepted (for a two-stage process, the first stage). */
   applicationDeadline?: ISODate;
+  /** A later second-stage deadline (documents), when the first stage closes earlier. */
+  documentsDeadline?: ISODate;
   applicationNote?: L10n;
   quota: Quota;
   status2027: L10n;
@@ -282,6 +300,19 @@ export interface ExclusiveGroup {
    * take, flagged "confirm before relying on it").
    */
   advisory?: boolean;
+  /**
+   * Two-sided group: programmes listed here form one side and every other member the other. A
+   * member conflicts only with members of the other side, so members on the same side stack (Kinmen
+   * money versus all MOENV payments together). Without it, at most one member counts.
+   */
+  sideA?: string[];
+  /**
+   * Advisory groups: the members whose amount is at risk when counted with another member (default:
+   * every member but the largest).
+   */
+  atRiskIds?: string[];
+  /** Advisory groups: the stacking rests on secondary sources, so the engine lists it as a secondary input. */
+  secondaryStacking?: boolean;
   /** Shown with the result when a conservative group changed the outcome. */
   ambiguity?: L10n;
   sources?: SourceId[];
@@ -300,6 +331,19 @@ export interface DealerPromo extends Provenance {
   paid: 'at-purchase' | 'after-approval';
   validFrom: ISODate;
   validTo: ISODate;
+  /**
+   * What the date window applies to: 'plate' = the scooter must be plated (registered) by
+   * `validTo`, which can be days after the invoice; 'invoice' = the invoice date; 'order' = order
+   * and payment; 'unknown' = the offer does not say (ask the dealer).
+   */
+  windowBasis?: 'plate' | 'invoice' | 'order' | 'unknown';
+  /** The old scooter must also be scrapped by this date. */
+  scrapBy?: ISODate;
+  /**
+   * The offer does not say whether it needs scrapping; the engine counts it only with scrapping and
+   * reports the amount as possible upside for a buyer with nothing to scrap.
+   */
+  ambiguousScrap?: boolean;
   conditionText: L10n;
 }
 
@@ -365,7 +409,7 @@ export type PlanUsage =
   /** Free inside daily time windows, `offWindowRate` per unit outside them. `fairUseUnits`: monthly use above which the operator may treat it as commercial. */
   | { kind: 'time-window'; offWindowRate: number; windows: L10n; fairUseUnits?: number }
   /** Household electricity at a marginal tariff (NTD/kWh). */
-  | { kind: 'tariff'; rate: Band };
+  | { kind: 'tariff'; rate: Band; losses?: { low: number; typical: number; high: number; basis: L10n } };
 
 export interface EnergyPlan extends Provenance {
   id: string;
@@ -395,14 +439,20 @@ export interface PlanCredit extends Provenance {
   /** Purchase / plate-registration window. */
   validFrom: ISODate;
   validTo: ISODate;
+  /** What must be completed inside the window (order and invoice, plate registration...). */
+  windowRule?: L10n;
 }
 
 export interface FuelPrices {
   /** Pump price used for the calculation (95 unleaded), and the week it applies to. */
   petrol95: Num & { week: L10n };
   petrol92: Num & { week: L10n };
-  /** NTD per litre held off the pump price by the temporary smoothing programme. */
-  smoothing: Band & { mechanism: L10n };
+  /**
+   * NTD per litre held off the pump price by the temporary smoothing programme. `scheduledEnd` is
+   * when its goods-tax part is due to end unless extended; after it the engine says so in the past
+   * tense (`mechanismAfterEnd`) and raises the message to a warning.
+   */
+  smoothing: Band & { mechanism: L10n; scheduledEnd?: ISODate; mechanismAfterEnd?: L10n };
   /** Real-world fuel economy at the poor end (km/L), applied to every model as the high-cost bound. */
   realWorldKmPerL: Num;
 }

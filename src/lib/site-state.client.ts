@@ -68,7 +68,7 @@ export function applyMoneyState(): MoneyState | null {
   };
   const flags: Record<string, boolean> = {
     dayCount: state.mayShowDayCount,
-    stale: !!state.city?.stale && state.phase === 'A' && state.city.status !== 'exhausted' && state.city.status !== 'ended',
+    stale: !!state.city?.stale && state.phase === 'A' && ['available', 'restricted', 'unpublished'].includes(state.city.status),
     nothingConfirmed: state.nothingConfirmed,
     filingOpen: state.filingOpen,
   };

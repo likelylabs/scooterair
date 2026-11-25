@@ -35,7 +35,7 @@ const CHECK = args.includes('--check');
 const only = args.filter((a) => !a.startsWith('--'));
 
 /** Bump when the card design changes, so --check asks for a re-render. */
-const TEMPLATE = 3;
+const TEMPLATE = 5;
 const OUT = join(root, 'public/share');
 const SIZES = { wide: [1200, 630], square: [1080, 1080] };
 
@@ -80,8 +80,8 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const phrased = (s) =>
   s
     .split('|')
-    .map((p) => `<span class="phrase">${esc(p)}</span>`)
-    .join('');
+    .map((p) => `<span class="phrase">${esc(p.trim())}</span>`)
+    .join(/\s\||\|\s/.test(s) ? ' ' : '');
 const nm = (p) => pathToFileURL(join(root, 'node_modules', p)).href;
 const cjkCss = readFileSync(join(root, 'node_modules/@fontsource-variable/noto-sans-tc/index.css'), 'utf8').replace(/url\(\.\/files\//g, `url(${nm('@fontsource-variable/noto-sans-tc/files/')}`);
 const tokens = readFileSync(join(root, 'src/styles/tokens.css'), 'utf8');
@@ -117,7 +117,8 @@ body{--here:var(--bg);background:var(--bg);color:var(--ink);font-family:'Archivo
 .head .mark{width:34px;height:34px;}
 .head .host{margin-left:auto;font-weight:500;font-size:20px;letter-spacing:0;color:var(--ink-2);}
 :lang(en) .head{font-stretch:76%;font-weight:800;letter-spacing:0;font-size:28px;}
-.main{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:calc(18px * var(--k));font-size:calc(1px * var(--k));padding-block:20px;}
+.main{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-block:24px 22px;overflow:hidden;}
+.fit{display:flex;flex-direction:column;gap:calc(18px * var(--k));font-size:calc(1px * var(--k));}
 .phrase{display:inline-block;}
 .kicker{font-size:22em;font-weight:700;color:var(--signal-red-ink);letter-spacing:.06em;}
 :lang(en) .kicker{letter-spacing:.02em;}
@@ -148,7 +149,7 @@ body{--here:var(--bg);background:var(--bg);color:var(--ink);font-family:'Archivo
 .band span{position:absolute;right:64px;top:50%;transform:translateY(-50%);padding:.15em .6em;background:var(--bg);border:1.5px solid var(--art-haze);color:var(--exhaust-ink);font-size:${size === 'wide' ? 17 : 22}px;font-weight:700;letter-spacing:.04em;white-space:nowrap;}
 </style></head><body><div class="card" style="--k:1">
 <div class="head">${mark}<span>${esc(site.name[locale])}</span><span class="host">${esc(host)}</span></div>
-<div class="main">${body}</div>
+<div class="main"><div class="fit">${body}</div></div>
 <div class="band"><span>${esc(share.band[locale])}</span></div>
 </div></body></html>`;
 }
@@ -181,8 +182,11 @@ try {
       const k = await page.evaluate(async () => {
         const card = document.querySelector('.card');
         const main = document.querySelector('.main');
-        let k = 1;
-        const over = () => main.scrollHeight > main.clientHeight + 1 || main.scrollWidth > main.clientWidth + 1;
+        // start large on the square card, where short copy would otherwise float in empty space
+        let k = innerHeight > innerWidth * 0.8 ? 1.5 : 1.12;
+        card.style.setProperty('--k', String(k));
+        const fit = document.querySelector('.fit');
+        const over = () => fit.offsetHeight > main.clientHeight - 46 || fit.scrollWidth > main.clientWidth + 1;
         while (over() && k > 0.5) card.style.setProperty('--k', String((k -= 0.02)));
         await document.fonts.ready;
         return k;

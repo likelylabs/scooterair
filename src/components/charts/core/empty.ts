@@ -83,7 +83,7 @@ export function renderEmpty(p: EmptyChartProps): ChartRender {
   y -= 18;
   ticks.forEach((t, i) => {
     o.push(`<line class="c-axis" x1="${xp(t)}%" x2="${xp(t)}%" y1="${y}" y2="${y + 5}"/>`);
-    o.push(text('c-tick', `${xp(t)}%`, y + 19, String(t), `text-anchor="${i === 0 ? 'start' : 'middle'}"`));
+    o.push(text('c-tick', `${xp(t)}%`, y + 19, String(t), `text-anchor="${i === 0 ? 'start' : xp(t) > 97 ? 'end' : 'middle'}"`));
   });
   y += 28;
   if (p.x.phase) {

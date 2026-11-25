@@ -37,7 +37,7 @@ interface Step {
   options: { value: string; label: string }[];
 }
 interface Outcome {
-  when: Record<string, string | string[]>;
+  when: Partial<Record<string, string | string[]>>;
   title: string;
   body?: string;
   value?: string;
@@ -55,7 +55,7 @@ const describe = (o: Outcome) =>
   steps
     .filter((s) => o.when[s.id] !== undefined)
     .map((s) => {
-      const want = ([] as string[]).concat(o.when[s.id]);
+      const want = ([] as string[]).concat(o.when[s.id] ?? []);
       return s.options
         .filter((op) => want.includes(op.value))
         .map((op) => op.label)

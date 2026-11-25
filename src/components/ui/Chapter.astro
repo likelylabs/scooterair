@@ -30,7 +30,8 @@
  *   count      seconds on the countdown while this chapter scrolls past: a number
  *              (held) or [from, to]. Defaults: the link's allocation; [5, 0] for
  *              phase="green". Omit on chapters outside the red light (money, close)
- *   railLabel  name shown on the rail (default: the link's name, else the title)
+ *   railLabel  name shown on the rail (default: the link's name; 接起來 / 算錢 / 綠燈亮的那一秒
+ *              for those chapters; otherwise the title)
  *   haze       true = the hatched "present, amount not measured" band along the
  *              bottom, at the ONE fixed density. It never varies by chapter and never
  *              follows the countdown (blueprint R11). A number is accepted and treated
@@ -52,7 +53,7 @@
  *   caveat   rich caveat        action   rich action (links, a share button)
  */
 import type { Locale } from '@/i18n';
-import { chain, chapterText, t, ui, type EvidenceKind } from '@/i18n/ui';
+import { chain, chapterText, rail, t, ui, type EvidenceKind } from '@/i18n/ui';
 import Haze from '@/components/art/Haze.astro';
 import Signal from '@/components/art/Signal.astro';
 import Callout from './Callout.astro';
@@ -93,15 +94,13 @@ const { locale, id, title, lead, paragraphs = [], link, chainHref, railLabel, ha
 const HAZE_DENSITY = 0.5;
 const HAZE_HEIGHT = 200;
 const hazeOn = Boolean(Astro.props.haze);
-// `unmeasured` is added to Haze by the art workstream; the cast keeps this file building on either side of that change.
-const hazeProps = { kind: hazeKind } as { kind: 'all' };
 
 const phase = Astro.props.phase ?? (link ? (link === 5 ? 'paused' : 'red') : 'none');
 const rawCount = Astro.props.count ?? (link ? chain.countdown.links[link - 1] : phase === 'green' ? chain.countdown.green : undefined);
 const count: [number, number] | undefined = rawCount === undefined ? undefined : Array.isArray(rawCount) ? rawCount : [rawCount, rawCount];
 const kicker =
   Astro.props.kicker ??
-  (count
+  (count && phase !== 'none'
     ? phase === 'paused'
       ? chain.kickerPaused[locale]
       : phase === 'green'
@@ -114,7 +113,7 @@ const toneClass = { street: '', sunken: 'tone-sunken', night: 'tone-inverse', cl
 const hasArt = Astro.slots.has('art');
 const hasCaveat = Boolean(caveat) || Astro.slots.has('caveat');
 const hasAction = Boolean(action) || Astro.slots.has('action');
-const label = railLabel ?? (link ? '' : title.replaceAll('|', ''));
+const label = railLabel ?? (link ? '' : id === chain.anchors.connect ? rail.connect[locale] : id === chain.anchors.money ? rail.money[locale] : phase === 'green' ? rail.green[locale] : title.replaceAll('|', ''));
 
 // Budget check (build time, warnings only): see blueprint 3.0.
 if (budget) {
@@ -182,7 +181,7 @@ if (budget) {
     )}
   </div>
   {hasArt && artPosition === 'bottom' && <div class="chapter__art chapter__art--bottom"><slot name="art" /></div>}
-  {hazeOn && <Haze density={HAZE_DENSITY} {...hazeProps} height={HAZE_HEIGHT} seed={id.length * 7 + 3} animated={false} />}
+  {hazeOn && <Haze density={HAZE_DENSITY} kind={hazeKind} height={HAZE_HEIGHT} seed={id.length * 7 + 3} animated={false} />}
 </section>
 
 <style>
@@ -241,8 +240,11 @@ if (budget) {
   }
   @media (min-width: 56em) {
     .chapter__asides {
-      grid-template-columns: repeat(2, minmax(0, var(--measure)));
+      grid-template-columns: repeat(2, minmax(0, 31rem));
       gap: var(--sp-6);
+    }
+    .chapter__asides > :global(.callout) {
+      max-inline-size: none;
     }
   }
   .chapter__more a {

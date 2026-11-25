@@ -8,7 +8,7 @@ export default copy({
   /** One status line per state. `static` is what a reader without JavaScript sees: true whenever it is read. */
   banner: {
     static: {
-      'zh-TW': '2026 年的電動機車補助，最晚要在 2026 年 12 月 31 日前買車、領牌；線上申請多半到 2027 年 1 月 10 日。2027 年的方案，在我們 {date} 查證時還沒有一項定案。',
+      'zh-TW': '2026 年的電動機車補助，最晚要在 2026 年 12 月 31 日前買車、領牌；線上申請多半到 2027 年 1 月 10 日。2027 年的方案，在我們 {date}查證時還沒有一項定案。',
       en: 'Every 2026 electric-scooter subsidy requires purchase and registration by 31 December 2026 at the latest; most online applications close on 10 January 2027. When we checked on {date}, nothing was confirmed for 2027.',
     },
     'A-no-city': {
@@ -16,23 +16,23 @@ export default copy({
       en: '2026 subsidies end by 31 December at the latest. Choose your city or county to see whether places are left.',
     },
     'A-city-open': {
-      'zh-TW': '{city}：還有名額（{date} 查）。最晚 12 月 31 日前買車、領牌。',
+      'zh-TW': '{city}：還有名額（{date}查）。最晚 12 月 31 日前買車、領牌。',
       en: '{city}: places left (checked {date}). Buy and register by 31 December at the latest.',
     },
     'A-city-restricted': {
-      'zh-TW': '{city}：剩下的名額只限汰舊換新或特定身分（{date} 查）。最晚 12 月 31 日前買車、領牌。',
+      'zh-TW': '{city}：剩下的名額只限汰舊換新或特定身分（{date}查）。最晚 12 月 31 日前買車、領牌。',
       en: '{city}: the places left are for scrap-and-replace or certain groups only (checked {date}). Buy and register by 31 December at the latest.',
     },
     'A-city-unpublished': {
-      'zh-TW': '{city}：方案還在進行，剩多少名額沒有公布（{date} 查）。最晚 12 月 31 日前買車、領牌。',
+      'zh-TW': '{city}：方案還在進行，剩多少名額沒有公布（{date}查）。最晚 12 月 31 日前買車、領牌。',
       en: '{city}: the programme is running; how many places remain has not been published (checked {date}). Buy and register by 31 December at the latest.',
     },
     'A-city-exhausted': {
-      'zh-TW': '{city}的補助已在 {date} 用完。中央補助到 12 月 31 日。',
+      'zh-TW': '{city}的補助已在 {date}用完。中央補助到 12 月 31 日。',
       en: '{city}’s subsidy ran out on {date}. Central subsidies run to 31 December.',
     },
     'A-city-ended': {
-      'zh-TW': '{city}的補助已在 {date} 截止。中央補助到 12 月 31 日。',
+      'zh-TW': '{city}的補助已在 {date}截止。中央補助到 12 月 31 日。',
       en: '{city}’s subsidy closed on {date}. Central subsidies run to 31 December.',
     },
     'A-city-unknown': {
@@ -44,26 +44,26 @@ export default copy({
       en: 'The purchase deadline has passed. If you bought by 31 December, most online applications are open until 10 January.',
     },
     C: {
-      'zh-TW': '2026 年的補助結束了。2027 年的方案，還沒有一項定案（{date} 查）。',
+      'zh-TW': '2026 年的補助結束了。2027 年的方案，還沒有一項定案（{date}查）。',
       en: 'The 2026 subsidies have ended. Nothing is confirmed for 2027 (checked {date}).',
     },
     D: {
-      'zh-TW': '2027 年方案公布了（{date} 查）。',
+      'zh-TW': '2027 年方案公布了（{date}查）。',
       en: 'A 2027 programme has been announced (checked {date}).',
     },
   },
   /** Added to a city status once its check date is more than three weeks old. */
   stale: {
-    'zh-TW': '這是 {date} 查到的狀態，可能已經變了。下單前請再看一次官方頁面。',
+    'zh-TW': '這是 {date}查到的狀態，可能已經變了。下單前請再看一次官方頁面。',
     en: 'This was the status on {date} and it may have changed. Look at the official page again before you order.',
   },
   /** R10: only inside a verdict A panel, with the city status beside it. */
   dayCount: {
-    'zh-TW': '{city}還有名額（{date} 查）。最晚 12 月 31 日前買車、領牌，還有 {n} 天。',
+    'zh-TW': '{city}還有名額（{date}查）。最晚 12 月 31 日前買車、領牌，還有 {n} 天。',
     en: '{city} still has places (checked {date}). Buy and register by 31 December at the latest: {n} days left.',
   },
   lastDay: {
-    'zh-TW': '{city}還有名額（{date} 查）。今天是買車、領牌的最後一天。',
+    'zh-TW': '{city}還有名額（{date}查）。今天是買車、領牌的最後一天。',
     en: '{city} still has places (checked {date}). Today is the last day to buy and register.',
   },
   /** The timeline strip (V19). */
@@ -79,6 +79,6 @@ export default copy({
     nextConfirmed: { 'zh-TW': '新方案公布了', en: 'A new programme is announced' },
     daysWithout: { 'zh-TW': '已經 {n} 天沒有定案', en: '{n} days with nothing confirmed' },
     past: { 'zh-TW': '已過', en: 'passed' },
-    checked: { 'zh-TW': '{date} 查', en: 'checked {date}' },
+    checked: { 'zh-TW': '{date}查', en: 'checked {date}' },
   },
 });

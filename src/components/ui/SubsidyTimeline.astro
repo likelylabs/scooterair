@@ -2,7 +2,9 @@
 /**
  * SubsidyTimeline — the date-aware timeline strip (V19): today · 12/31, the
  * last day to buy and register · 1/10, online applications close (varies by
- * city) · then a dotted stretch for 2027, where nothing is confirmed.
+ * city) · then a dotted stretch for 2027, where nothing is confirmed. The
+ * 2027 stop is drawn in the gap style (dotted line, hollow dot) and carries the
+ * date we checked, not the 沒人量過 badge: that badge is for measurements.
  *
  * - Before the deadline it never counts down: dates only (blueprint, decision 0).
  * - After the filing deadline, with nothing confirmed, the dotted stretch
@@ -20,7 +22,6 @@ import type { Locale } from '@/i18n';
 import money from '@/i18n/pages/money';
 import { fill } from '@/i18n/pages/_copy';
 import { formatDate, snapshot } from '@/lib/site-state.data';
-import EvidenceBadge from './EvidenceBadge.astro';
 
 interface Props {
   locale: Locale;
@@ -56,7 +57,7 @@ const checked = fill(t.checked[locale], { date: formatDate(snapshot.checkedOn, l
         ) : (
           <Fragment>
             <span>{t.next[locale]}</span>
-            <EvidenceBadge kind="gap" locale={locale} label={checked} />
+            <span class="tl__checked">{locale === 'en' ? `(${checked})` : `（${checked}）`}</span>
             <span class="tl__count" data-money-when="C">
               <span class="tl__led" aria-hidden="true" data-money-fill="daysSince"></span>
               <span data-money-template={t.daysWithout[locale]}></span>
@@ -160,6 +161,11 @@ const checked = fill(t.checked[locale], { date: formatDate(snapshot.checkedOn, l
     align-items: center;
     gap: var(--sp-2);
     font-weight: var(--fw-bold);
+  }
+  .tl__checked {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    color: var(--ink-2);
   }
   .tl__count {
     align-items: center;

@@ -9,15 +9,27 @@ export function cumulative(upfront: number, monthly: number[]): number[] {
   return out;
 }
 
-/** Classify how the electric line (e) compares with the gasoline line (g), both cumulative from month 0. */
+/**
+ * Classify how the electric line (e) compares with the gasoline line (g), both cumulative from
+ * month 0. The answer is decided by where the lines stand at the horizon, not by the first time
+ * they touch: a setup-fee renewal can push electric back above gasoline after an early crossing,
+ * and the lines can cross back the other way too. `month` is the last crossing, after which the
+ * order holds to the horizon; `crossings` lists every month in which the order changed.
+ */
 export function breakEven(e: number[], g: number[]): BreakEven {
   const H = e.length - 1;
-  if (e[0] > g[0]) {
-    for (let m = 1; m <= H; m++) if (e[m] <= g[m]) return { kind: 'breaks-even', month: m };
-    return { kind: 'no-break-even', gapAtHorizon: Math.round(e[H] - g[H]) };
+  const above = (m: number) => e[m] > g[m];
+  const crossings: number[] = [];
+  for (let m = 1; m <= H; m++) if (above(m) !== above(m - 1)) crossings.push(m);
+  const gapAtHorizon = Math.round(e[H] - g[H]);
+  const detail = { gapAtHorizon, crossings, horizonMonths: H };
+  const last = crossings[crossings.length - 1];
+  if (above(0)) {
+    if (!above(H)) return { kind: 'breaks-even', month: last, ...detail };
+    return { kind: 'no-break-even', ...detail };
   }
-  for (let m = 1; m <= H; m++) if (e[m] > g[m]) return { kind: 'gas-catches-up', month: m };
-  return { kind: 'ev-ahead' };
+  if (above(H)) return { kind: 'gas-catches-up', month: last, ...detail };
+  return { kind: 'ev-ahead', runningCheaper: e[H] - e[0] <= g[H] - g[0], ...detail };
 }
 
 export function series(purchaseEv: { value: number; high: number }, purchaseGas: number, ev: RunningCosts, gas: RunningCosts) {
@@ -47,15 +59,26 @@ export function series(purchaseEv: { value: number; high: number }, purchaseGas:
 }
 
 /**
- * Scan monthly km (step 10, up to 5,000) for the first interval where `f(km) <= 0`.
- * Returns null if there is none.
+ * Scan monthly km (step 10, up to 5,000) for every interval where `f(km) <= 0`, in order. The
+ * cost curves are not always monotonic in km (allowance plans, fair-use thresholds), so there can
+ * be more than one.
  */
-export function scanInterval(f: (km: number) => number, maxKm = 5000, step = 10): { fromKm: number; toKm: number | null } | null {
+export function scanIntervals(f: (km: number) => number, maxKm = 5000, step = 10): { fromKm: number; toKm: number | null }[] {
+  const out: { fromKm: number; toKm: number | null }[] = [];
   let from: number | null = null;
   for (let km = step; km <= maxKm; km += step) {
     const ok = f(km) <= 0;
     if (ok && from === null) from = km;
-    if (!ok && from !== null) return { fromKm: from, toKm: km - step };
+    if (!ok && from !== null) {
+      out.push({ fromKm: from, toKm: km - step });
+      from = null;
+    }
   }
-  return from === null ? null : { fromKm: from, toKm: null };
+  if (from !== null) out.push({ fromKm: from, toKm: null });
+  return out;
+}
+
+/** The first interval of `scanIntervals`, or null if there is none. */
+export function scanInterval(f: (km: number) => number, maxKm = 5000, step = 10): { fromKm: number; toKm: number | null } | null {
+  return scanIntervals(f, maxKm, step)[0] ?? null;
 }

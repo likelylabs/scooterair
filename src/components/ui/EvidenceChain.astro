@@ -176,8 +176,11 @@ const hasBoxes = Astro.slots.has('boxes');
   }
   @media (min-width: 56em) {
     .chainboard__boxes {
-      grid-template-columns: repeat(2, minmax(0, var(--measure)));
+      grid-template-columns: repeat(2, minmax(0, 31rem));
       gap: var(--sp-6);
+    }
+    .chainboard__boxes > :global(.stance) {
+      max-inline-size: none;
     }
   }
 </style>

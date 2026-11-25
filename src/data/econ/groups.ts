@@ -1,5 +1,7 @@
 // Either/or groups. A programme lists the groups it belongs to; the engine counts at most one
-// programme per group and picks the combination worth the most to the buyer.
+// programme per group and picks the combination worth the most to the buyer. A two-sided group
+// (`sideA`) instead sets one set of programmes against the rest: members on the same side stack.
+// Advisory groups are not either/or rules: every member counts and the amount at risk is reported.
 // `conservative: true` marks our cautious reading of an ambiguous rule: the engine also works
 // out what the buyer would get under the generous reading and reports the difference.
 
@@ -23,16 +25,60 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       sources: ['moenv-platform-faq', 'tcnews-2026-02-moenv-release'],
     }),
     g('gas-goods-tax-new', '貨物稅新購減徵', 'Goods-tax cut for a new purchase'),
+    g('gas-goods-tax-stacking', '燃油機車：新購與汰舊換新貨物稅減徵都計入（財政部未確認可相加）', 'Gasoline: new-purchase and scrap-and-replace goods-tax cuts both counted (not confirmed by the MOF)', {
+      advisory: true,
+      secondaryStacking: true,
+      ambiguity: t(
+        '燃油機車這邊同時扣了新購2,000元與汰舊換新的貨物稅減徵：車廠官方優惠與台中市環保局的金額表都這樣算，但財政部網頁把兩者分開列，沒有寫可以相加。若不能相加，燃油機車會貴下列金額，電動機車相對更划算。',
+        'The gasoline side deducts both the NT$2,000 new-purchase and the scrap-and-replace goods-tax cuts, as the manufacturers\' official offers and Taichung\'s EPB amount table do; but the MOF page lists them separately and does not say they add up. If they do not, the gasoline scooter costs the amount below more and electric looks better.',
+      ),
+      sources: ['etax-goods-tax-scooter-cut', 'kymco-goods-tax-models', 'taichung-epb-2026-amount-table'],
+    }),
     // Taipei
     g('tpe-base', '臺北市基本補助（新購或汰購擇一）', 'Taipei base subsidy (new purchase or scrap-and-replace, one only)'),
+    g('tpe-lowincome-stacking', '台北市中低及低收入戶加碼疊加在其他加碼上（請先確認）', 'Taipei low-income top-up stacked on the other top-ups (confirm first)', {
+      advisory: true,
+      atRiskIds: ['tpe-lowincome-topup'],
+      ambiguity: t(
+        '試算把台北市中低及低收入戶加碼10,000元加在電池資費（與袋鼠方案）加碼之上：計畫把它列為獨立項目，但沒有寫可以疊加，只有Taiwan News引述環保局說可再加領。申請前請向台北市環保局確認；若不能疊加，會少領下列金額。',
+        'We count the Taipei low-income NT$10,000 on top of the battery-fee (and kangaroo) top-ups: the plan lists it as a separate line but does not say it stacks, and only a Taiwan News report quoting the bureau says it does. Confirm with the Department of Environmental Protection before relying on it; if it does not stack you would get the amount below less.',
+      ),
+      sources: ['taipei-dep-ev-subsidy-plan', 'taiwannews-2026-04-taipei-subsidy'],
+    }),
     g('tpe-old-scooter-use', '臺北市：同一輛舊車只能換購電動機車、TPASS或汰舊獎勵金擇一', 'Taipei: one old scooter, one claim (electric replacement, TPASS or scrap bonus)'),
     // New Taipei
     g('ntpc-base', '新北市基本補助（新購或換購擇一）', 'New Taipei base subsidy (new purchase or replacement, one only)'),
+    // Kept for backward compatibility (no programme uses it any more): the low-income question is
+    // now two groups, and early bird versus double-scrap is a separate question.
     g('ntpc-lowincome-vs-addons', '新北市：中低收入戶加碼與早鳥／雙汰舊加碼只計一項（保守解讀）', 'New Taipei: low-income top-up or early-bird/double-scrap add-on, one only (conservative reading)', {
       conservative: true,
       ambiguity: t(
         '新北市計畫沒有寫明早鳥或雙汰舊加碼能否疊加在中低收入戶金額上。試算只算金額較高的一項；若可疊加，最多可再多領下列金額。',
         'The New Taipei plan does not say whether the early-bird or double-scrap add-ons stack on the low-income amount. We count the larger one; if they stack you could receive up to the amount below in addition.',
+      ),
+      sources: ['ntpc-motor-2026-plan'],
+    }),
+    g('ntpc-lowincome-vs-earlybird', '新北市：中低收入戶加碼與早鳥加碼只計一項（保守解讀）', 'New Taipei: low-income top-up or early-bird add-on, one only (conservative reading)', {
+      conservative: true,
+      ambiguity: t(
+        '新北市計畫沒有寫明早鳥加碼能否疊加在中低收入戶金額上。試算只算金額較高的一項；若可疊加，最多可再多領下列金額。',
+        'The New Taipei plan does not say whether the early-bird add-on stacks on the low-income amount. We count the larger one; if it stacks you could receive up to the amount below in addition.',
+      ),
+      sources: ['ntpc-motor-2026-plan'],
+    }),
+    g('ntpc-lowincome-vs-double', '新北市：中低收入戶加碼與雙汰舊加碼只計一項（保守解讀）', 'New Taipei: low-income top-up or double-scrap add-on, one only (conservative reading)', {
+      conservative: true,
+      ambiguity: t(
+        '新北市計畫沒有寫明雙汰舊加碼能否疊加在中低收入戶金額上。試算只算金額較高的一項；若可疊加，最多可再多領下列金額。',
+        'The New Taipei plan does not say whether the double-scrap add-on stacks on the low-income amount. We count the larger one; if it stacks you could receive up to the amount below in addition.',
+      ),
+      sources: ['ntpc-motor-2026-plan'],
+    }),
+    g('ntpc-earlybird-vs-double', '新北市：早鳥加碼與雙汰舊加碼只計一項（保守解讀）', 'New Taipei: early-bird or double-scrap add-on, one only (conservative reading)', {
+      conservative: true,
+      ambiguity: t(
+        '新北市計畫沒有寫明早鳥加碼與雙汰舊加碼可以同時領；只有一則新聞（TVBS的39,600元範例）把兩者相加。試算只算金額較高的一項；若可同時領，可再多領下列金額。',
+        'The New Taipei plan does not say the early-bird and double-scrap add-ons can both be claimed; only a news report (TVBS\'s NT$39,600 example) adds them together. We count the larger one; if they combine you could receive the amount below in addition.',
       ),
       sources: ['ntpc-motor-2026-plan'],
     }),
@@ -56,12 +102,15 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('khh-old-scooter-use', '高雄市：同一輛舊車只能申請純淘汰或汰舊換購擇一', 'Kaohsiung: one old scooter, scrap-only or scrap-and-replace'),
     // Counties
     g('kinmen-base', '金門縣補助（換購或新購擇一）', 'Kinmen subsidy (replacement or new purchase, one only)'),
-    g('kinmen-vs-moenv', '金門縣補助與環境部獎勵只計一項（保守解讀）', 'Kinmen subsidy or MOENV payments, one only (conservative reading)', {
+    g('kinmen-vs-moenv', '金門縣補助或環境部各項獎勵，只計其中一方（保守解讀）', 'Kinmen subsidy or the MOENV payments together, one side only (conservative reading)', {
       conservative: true,
       jurisdictions: ['kinmen'],
+      // Two-sided: Kinmen money on one side, every MOENV payment (carbon, air, NT$300 recycling) on
+      // the other. The MOENV payments still stack with each other under their own rules.
+      sideA: ['kinmen-swap', 'kinmen-new', 'kinmen-small', 'kinmen-scrap-only'],
       ambiguity: t(
-        '金門縣補助要點排除「曾向環境部申請機車汰舊換新相關補助者」，同一次購車領環境部獎勵是否會被排除，要點沒有寫明，環保局也未回覆。試算只算金額較高的一方；若可併領，最多可再多領下列金額。',
-        'Kinmen\'s guidelines exclude anyone who "has applied to MOENV for related scrap-and-replace subsidies"; whether claiming the MOENV reward for the same purchase disqualifies you is not stated. We count only the larger side; if both can be claimed you could receive up to the amount below in addition.',
+        '金門縣補助要點排除「曾向環境部申請機車汰舊換新相關補助者」，同一次購車領環境部獎勵（減碳、空污與300元回收獎勵金）是否會被排除，要點沒有寫明，環保局也未回覆。試算只算金額較高的一方；若可併領，最多可再多領下列金額。',
+        'Kinmen\'s guidelines exclude anyone who "has applied to MOENV for related scrap-and-replace subsidies"; whether claiming the MOENV payments (carbon, air and the NT$300 recycling payment) for the same purchase disqualifies you is not stated. We count only the larger side; if both can be claimed you could receive up to the amount below in addition.',
       ),
       sources: ['kinmen-epb-2026-guidelines'],
     }),

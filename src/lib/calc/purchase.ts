@@ -3,15 +3,18 @@
 //
 // Selection: among eligible programmes, at most one per either/or group is counted, and a
 // programme that `requires` another counts only if that one is taken (when it is available).
-// We pick the combination worth the most to the buyer. Groups marked `conservative` encode our
-// cautious reading of an ambiguous rule; we also solve without them and report the difference.
+// A two-sided group (`sideA`) sets one set of programmes against the rest: members on the same
+// side stack, members on opposite sides exclude each other (Kinmen money versus all MOENV
+// payments together). We pick the combination worth the most to the buyer. Groups marked
+// `conservative` encode our cautious reading of an ambiguous rule; we also solve without them
+// and report the difference.
 
 import type { DealerPromo, EconDataset, EvModel, GasModel, Programme } from '../../data/econ/types.ts';
-import { cmp, daysBetween } from './dates.ts';
+import { cmp, daysBetween, earlier } from './dates.ts';
 import { checkAll, type EligibilityContext } from './eligibility.ts';
 import { date, detail, join, list, ntd, reasonText, t } from './text.ts';
 import type { L10n } from './text.ts';
-import type { ExcludedLine, ExclusionReason, LedgerLine, LineKind, Message, PurchaseLedger, Situation } from './types.ts';
+import type { DeadlineBasis, ExcludedLine, ExclusionReason, LedgerLine, LineDeadline, LineKind, Message, PurchaseLedger, Situation } from './types.ts';
 
 interface Candidate {
   p: Programme;
@@ -49,6 +52,19 @@ export function liveGroups(ids: string[] | undefined, data: EconDataset, jurisdi
   });
 }
 
+/** Side of a two-sided group a programme is on ('a' | 'b'), or null for an ordinary group. */
+export function groupSide(groupId: string, programmeId: string, data: EconDataset): 'a' | 'b' | null {
+  const g = data.groups[groupId];
+  if (!g?.sideA) return null;
+  return g.sideA.includes(programmeId) ? 'a' : 'b';
+}
+
+/** Do two programmes that share `groupId` exclude each other? (Same side of a two-sided group: no.) */
+export function conflicts(groupId: string, a: string, b: string, data: EconDataset): boolean {
+  const sa = groupSide(groupId, a, data);
+  return sa === null || sa !== groupSide(groupId, b, data);
+}
+
 export function select(candidates: Candidate[], data: EconDataset, jurisdiction: string, ignoreGroups: Set<string> = new Set()): SelectionResult {
   const groupsOf = (c: Candidate) => liveGroups(c.p.exclusiveGroups, data, jurisdiction, ignoreGroups);
   const requiredIds = new Set(candidates.flatMap((c) => c.p.requires?.anyOf ?? []));
@@ -59,7 +75,15 @@ export function select(candidates: Candidate[], data: EconDataset, jurisdiction:
   let best: Candidate[] = [];
   let bestTotal = -1;
   const picked: Candidate[] = [];
-  const used = new Set<string>();
+  // group -> the side taken ('a' | 'b', or null for an ordinary group) and how many members hold it
+  const used = new Map<string, { side: 'a' | 'b' | null; n: number }>();
+  const canTake = (c: Candidate, gs: string[]) =>
+    gs.every((g) => {
+      const u = used.get(g);
+      if (!u) return true;
+      const side = groupSide(g, c.p.id, data);
+      return side !== null && side === u.side;
+    });
 
   const valid = () =>
     picked.every((c) => {
@@ -80,12 +104,20 @@ export function select(candidates: Candidate[], data: EconDataset, jurisdiction:
     }
     const c = choice[i];
     const gs = groupsOf(c);
-    if (gs.every((g) => !used.has(g))) {
-      gs.forEach((g) => used.add(g));
+    if (canTake(c, gs)) {
+      for (const g of gs) {
+        const u = used.get(g) ?? { side: groupSide(g, c.p.id, data), n: 0 };
+        u.n += 1;
+        used.set(g, u);
+      }
       picked.push(c);
       walk(i + 1, total + c.amount);
       picked.pop();
-      gs.forEach((g) => used.delete(g));
+      for (const g of gs) {
+        const u = used.get(g)!;
+        u.n -= 1;
+        if (u.n === 0) used.delete(g);
+      }
     }
     walk(i + 1, total);
   };
@@ -109,6 +141,39 @@ function excluded(p: Programme, reason: ExclusionReason, more: L10n | undefined,
   };
 }
 
+const PROMO_RULE: Record<NonNullable<DealerPromo['windowBasis']>, L10n> = {
+  plate: t('車廠以領牌日為準：新車須在這天以前完成領牌，只開發票不算。', 'The maker counts the plate-registration date: the new scooter must be plated by then; an invoice alone is not enough.'),
+  invoice: t('以發票日為準：須在這天以前開立發票。', 'The invoice date counts: invoice by then.'),
+  order: t('須在這天以前下訂並付款。', 'Order and pay by then.'),
+  unknown: t('優惠在這天結束；官方沒有寫以發票日還是領牌日為準，請先問車行。', 'The offer ends that day; it does not say whether the invoice or the plate date counts, so ask the dealer.'),
+};
+const PROMO_BASIS: Record<NonNullable<DealerPromo['windowBasis']>, DeadlineBasis> = { plate: 'plate', invoice: 'invoice', order: 'order', unknown: 'dealer-unknown' };
+
+export function promoDeadline(pr: DealerPromo, s: Situation): LineDeadline {
+  const basis = pr.windowBasis ?? 'unknown';
+  const days = daysBetween(s.date as string, pr.validTo);
+  const scrapRule = pr.scrapBy
+    ? t(`舊車也須在${date(pr.scrapBy)['zh-TW']}以前完成報廢。`, `The old scooter must also be scrapped by ${date(pr.scrapBy).en}.`)
+    : undefined;
+  return { date: pr.validTo, daysLeft: days, lastDay: days === 0, basis: PROMO_BASIS[basis], rule: scrapRule ? join(PROMO_RULE[basis], scrapRule) : PROMO_RULE[basis] };
+}
+
+const DEFAULT_RULE = t('這是購車期限；其他須在期限前完成的條件請見各項說明。', 'This is the purchase deadline; see each line\'s conditions for anything else that must be done by then.');
+
+/** The date that decides a programme line, and what must be done by then. */
+export function programmeDeadline(p: Programme, s: Situation): LineDeadline {
+  const confirmedOnly = Boolean(p.confirmedThrough && cmp(p.confirmedThrough, p.validTo) < 0);
+  const on = confirmedOnly ? earlier(p.validTo, p.confirmedThrough as string) : p.validTo;
+  const days = daysBetween(s.date as string, on);
+  const rule = confirmedOnly
+    ? join(
+        t(`官方表列到${date(p.validTo)['zh-TW']}，但上位辦法只確認到這天；要確定拿到，請在這天以前完成。`, `Listed to ${date(p.validTo).en} but its umbrella rule is only confirmed to this date: to be sure of it, complete it by then.`),
+        p.validToRule ?? t('', ''),
+      )
+    : (p.validToRule ?? DEFAULT_RULE);
+  return { date: on, daysLeft: days, lastDay: days === 0, basis: confirmedOnly ? 'confirmed-only' : 'purchase', rule };
+}
+
 function promoLine(pr: DealerPromo, s: Situation): LedgerLine {
   return {
     id: pr.id,
@@ -121,7 +186,8 @@ function promoLine(pr: DealerPromo, s: Situation): LedgerLine {
     conditionText: pr.conditionText,
     paid: pr.paid,
     validTo: pr.validTo,
-    daysLeft: daysBetween(s.date, pr.validTo),
+    daysLeft: daysBetween(s.date as string, pr.validTo),
+    deadline: promoDeadline(pr, s),
     sources: pr.sources,
     confidence: pr.confidence,
     ...(pr.note ? { note: pr.note } : {}),
@@ -132,8 +198,10 @@ export interface LedgerInternals {
   ledger: PurchaseLedger;
   /** Assumptions taken by the conditions of counted lines. */
   assumptions: L10n[];
-  /** Upside if the conservative groups were not applied, per group id. */
-  upside: { group: string; amount: number }[];
+  /** Upside if the conservative groups were not applied, per group id, with the member lines involved. */
+  upside: { group: string; amount: number; ids: string[] }[];
+  /** Dealer offers counted only with scrapping although the offer does not say so: possible upside. */
+  promoUpside: { id: string; amount: number; label: L10n; note: L10n; sources: string[] }[];
   /** Advisory groups with more than one counted member: the amount at risk if only one can be claimed. */
   atRisk: { group: string; amount: number; ids: string[] }[];
 }
@@ -162,15 +230,21 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
   };
 
   // --- programmes: who is eligible ----------------------------------------------------------
-  const ctx = (p: Programme): EligibilityContext => ({ s, side, ev, gas, programmeJurisdiction: p.jurisdiction });
+  const remoteDistricts = data.jurisdictions[s.jurisdiction]?.remoteDistricts;
+  const ctx = (p: Programme): EligibilityContext => ({ s, side, ev, gas, programmeJurisdiction: p.jurisdiction, remoteDistricts });
   const candidates: Candidate[] = [];
   const relevant = data.programmes.filter((p) => sideMatches(p, side) && (p.jurisdiction === 'central' || p.jurisdiction === s.jurisdiction));
-  const goodsTaxScrapOk = side === 'gasoline' && relevant.some((p) => p.id === 'gas-goods-tax-scrap' && checkAll(p.conditions, ctx(p)).ok && cmp(s.date, p.validTo) <= 0);
+  const goodsTaxScrapOk = side === 'gasoline' && relevant.some((p) => p.id === 'gas-goods-tax-scrap' && checkAll(p.conditions, ctx(p)).ok && cmp(s.date as string, p.validTo) <= 0);
 
   for (const p of relevant) {
     const r = checkAll(p.conditions, ctx(p));
     const nominal = programmeAmount(p, ev, gas) ?? 0;
     if (!r.ok) {
+      if (r.failed === 'applicant-deadline') {
+        // e.g. MOEA: foreign nationals had to apply by 10 December 2026.
+        exclusions.push({ ...excluded(p, 'expired', undefined, { failedCondition: r.failed }, nominal), reasonText: detail(t('已過申請期限', 'Application deadline passed'), r.why) });
+        continue;
+      }
       exclusions.push(excluded(p, r.ambiguous ? (r.failed === 'domestic-cells' ? 'model-unknown' : 'ambiguous') : 'not-eligible', r.why, { failedCondition: r.failed }, nominal));
       continue;
     }
@@ -184,19 +258,19 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
       );
       continue;
     }
-    if (cmp(s.date, p.validFrom) < 0) {
+    if (cmp(s.date as string, p.validFrom) < 0) {
       exclusions.push(excluded(p, 'not-yet-valid', t(`自${date(p.validFrom)['zh-TW']}起`, `from ${date(p.validFrom).en}`), {}, nominal));
       continue;
     }
-    if (cmp(s.date, p.validTo) > 0) {
+    if (cmp(s.date as string, p.validTo) > 0) {
       exclusions.push(excluded(p, 'expired', t(`購車期限為${date(p.validTo)['zh-TW']}`, `purchases had to be made by ${date(p.validTo).en}`), {}, nominal));
       continue;
     }
-    if (p.confirmedThrough && cmp(s.date, p.confirmedThrough) > 0) {
+    if (p.confirmedThrough && cmp(s.date as string, p.confirmedThrough) > 0) {
       exclusions.push(excluded(p, 'unconfirmed', p.status2027, {}, nominal));
       continue;
     }
-    if (p.quota.status === 'exhausted' && cmp(s.date, p.quota.asOf) >= 0) {
+    if (p.quota.status === 'exhausted' && cmp(s.date as string, p.quota.asOf) >= 0) {
       exclusions.push(excluded(p, 'quota-exhausted', p.quota.text, {}, nominal));
       continue;
     }
@@ -214,9 +288,9 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
   for (const c of candidates) {
     if (chosenIds.has(c.p.id)) continue;
     const live = (ids: string[] | undefined) => liveGroups(ids, data, s.jurisdiction);
-    const sharing = sel.chosen.filter((x) => live(x.p.exclusiveGroups).some((g) => live(c.p.exclusiveGroups).includes(g)));
+    const sharing = sel.chosen.filter((x) => live(x.p.exclusiveGroups).some((g) => live(c.p.exclusiveGroups).includes(g) && conflicts(g, x.p.id, c.p.id, data)));
     if (sharing.length) {
-      const sharedGroup = live(c.p.exclusiveGroups).find((g) => sharing.some((x) => live(x.p.exclusiveGroups).includes(g)));
+      const sharedGroup = live(c.p.exclusiveGroups).find((g) => sharing.some((x) => live(x.p.exclusiveGroups).includes(g) && conflicts(g, x.p.id, c.p.id, data)));
       const group = sharedGroup ? data.groups[sharedGroup] : undefined;
       exclusions.push(
         excluded(c.p, 'mutually-exclusive', join(list(sharing.map((x) => x.p.name)), group ? t(`（${group.label['zh-TW']}）`, `(${group.label.en})`) : t('', '')), { instead: sharing.map((x) => x.p.id) }, c.amount),
@@ -229,11 +303,11 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
   }
 
   // Upside under the generous reading of each conservative group that bound.
-  const upside: { group: string; amount: number }[] = [];
+  const upside: { group: string; amount: number; ids: string[] }[] = [];
   for (const g of Object.values(data.groups).filter((x) => x.conservative)) {
     const generous = select(candidates, data, s.jurisdiction, new Set([g.id]));
     const diff = generous.total - sel.total;
-    if (diff > 0) upside.push({ group: g.id, amount: diff });
+    if (diff > 0) upside.push({ group: g.id, amount: diff, ids: candidates.filter((c) => (c.p.exclusiveGroups ?? []).includes(g.id)).map((c) => c.p.id) });
   }
 
   // Advisory groups: all members counted, the smaller ones reported as at risk.
@@ -241,38 +315,49 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
   for (const g of Object.values(data.groups).filter((x) => x.advisory)) {
     const members = sel.chosen.filter((c) => (c.p.exclusiveGroups ?? []).includes(g.id));
     if (members.length > 1) {
-      const sorted = [...members].sort((a, b) => b.amount - a.amount);
-      atRisk.push({ group: g.id, amount: sorted.slice(1).reduce((a, c) => a + c.amount, 0), ids: members.map((m) => m.p.id) });
+      const risky = g.atRiskIds ? members.filter((m) => g.atRiskIds!.includes(m.p.id)) : [...members].sort((a, b) => b.amount - a.amount).slice(1);
+      const amount = risky.reduce((a, c) => a + c.amount, 0);
+      if (amount > 0 && risky.length < members.length) atRisk.push({ group: g.id, amount, ids: members.map((m) => m.p.id) });
     }
   }
 
   // --- dealer promotions -------------------------------------------------------------------
+  const promoUpside: LedgerInternals['promoUpside'] = [];
   for (const pr of model.promos) {
-    if (cmp(s.date, pr.validFrom) < 0 || cmp(s.date, pr.validTo) > 0) {
+    const before = cmp(s.date as string, pr.validFrom) < 0;
+    if (before || cmp(s.date as string, pr.validTo) > 0) {
+      const from = date(pr.validFrom);
+      const to = date(pr.validTo);
       exclusions.push({
         id: pr.id,
         label: pr.name,
         payer: t('車廠或經銷商', 'Manufacturer or dealer'),
         amount: pr.amount,
-        reason: cmp(s.date, pr.validFrom) < 0 ? 'not-yet-valid' : 'expired',
-        reasonText: detail(reasonText.expired, t(`優惠期間${date(pr.validFrom)['zh-TW']}至${date(pr.validTo)['zh-TW']}`, `offer ran ${date(pr.validFrom).en} to ${date(pr.validTo).en}`)),
+        reason: before ? 'not-yet-valid' : 'expired',
+        reasonText: before
+          ? detail(reasonText['not-yet-valid'], t(`優惠期間為${from['zh-TW']}至${to['zh-TW']}`, `the offer runs ${from.en} to ${to.en}`))
+          : detail(t('優惠已結束', 'Offer has ended'), t(`優惠期間為${from['zh-TW']}至${to['zh-TW']}`, `the offer ran ${from.en} to ${to.en}`)),
         sources: pr.sources,
         confidence: pr.confidence,
       });
       continue;
     }
     if (pr.when === 'goods-tax-scrap' && !goodsTaxScrapOk) {
+      const unclear = Boolean(pr.ambiguousScrap) && !s.scrap;
       exclusions.push({
         id: pr.id,
         label: pr.name,
         payer: t('車廠或經銷商', 'Manufacturer or dealer'),
         amount: pr.amount,
-        reason: 'not-eligible',
-        reasonText: detail(reasonText['not-eligible'], t('須汰舊並通過貨物稅汰舊換新核定', 'requires scrapping with an approved goods-tax scrap-and-replace claim')),
+        reason: unclear ? 'ambiguous' : 'not-eligible',
+        reasonText: unclear
+          ? detail(reasonText.ambiguous, pr.conditionText)
+          : detail(reasonText['not-eligible'], t('須汰舊並通過貨物稅汰舊換新核定', 'requires scrapping with an approved goods-tax scrap-and-replace claim')),
         failedCondition: 'scrap',
         sources: pr.sources,
         confidence: pr.confidence,
       });
+      if (unclear) promoUpside.push({ id: pr.id, amount: pr.amount, label: pr.name, note: pr.conditionText, sources: pr.sources });
       continue;
     }
     lines.push(promoLine(pr, s));
@@ -293,8 +378,11 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
       conditionText: p.conditionText,
       paid: 'after-approval',
       validTo: p.validTo,
-      daysLeft: daysBetween(s.date, p.validTo),
+      daysLeft: daysBetween(s.date as string, p.validTo),
+      ...(p.confirmedThrough ? { confirmedThrough: p.confirmedThrough } : {}),
+      deadline: programmeDeadline(p, s),
       ...(p.applicationDeadline ? { applicationDeadline: p.applicationDeadline } : {}),
+      ...(p.documentsDeadline ? { documentsDeadline: p.documentsDeadline } : {}),
       ...(p.applicationNote ? { applicationNote: p.applicationNote } : {}),
       quota: p.quota,
       status2027: p.status2027,
@@ -363,5 +451,5 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
     paidLater: lines.filter((l) => l.paid === 'after-approval').reduce((a, l) => a + l.amount, 0),
     messages,
   };
-  return { ledger, assumptions, upside, atRisk };
+  return { ledger, assumptions, upside, atRisk, promoUpside };
 }

@@ -20,6 +20,8 @@ export interface EligibilityContext {
   gas?: GasModel;
   /** Jurisdiction of the programme being tested ('central' for national programmes). */
   programmeJurisdiction: JurisdictionId | 'central';
+  /** What the buyer's jurisdiction calls its remote districts (Taoyuan: Fuxing District). */
+  remoteDistricts?: L10n;
 }
 
 const OK: CondResult = { ok: true, assumptions: [] };
@@ -35,7 +37,7 @@ const flagLabels: Record<string, L10n> = {
   neighbourhoodWatch: t('守望相助隊隊員', 'neighbourhood-watch membership'),
   disasterAffected: t('天然災害災損戶', 'a disaster-affected household'),
   remoteDistrict: t('居住在偏遠地區', 'living in a designated remote district'),
-  previousLocalSubsidy: t('曾領過本縣市機車補助', 'having received this city\'s scooter subsidy before'),
+  previousLocalSubsidy: t('曾領過這項規定排除的機車補助（本縣市的，部分縣市也包括環境部的）', 'having received a scooter subsidy this rule excludes (this city\'s, and in some places MOENV\'s)'),
   foreignNational: t('外籍人士', 'being a foreign national'),
 };
 
@@ -115,13 +117,19 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       const want = c.value ?? true;
       const have = Boolean(h[c.flag]);
       if (have === want) {
-        if (!want && h[c.flag] === undefined && c.flag === 'previousLocalSubsidy') {
-          return assume(t('假設你從未領過本縣市的機車補助', 'Assumes you have never received this city\'s scooter subsidy'));
+        if (!want && h[c.flag] === undefined && (c.flag === 'previousLocalSubsidy' || c.assumption)) {
+          return assume(c.assumption ?? t('假設你從未領過本縣市的機車補助', 'Assumes you have never received this city\'s scooter subsidy'));
         }
         return OK;
       }
-      const label = flagLabels[c.flag] ?? t(c.flag, c.flag);
-      return want ? fail(c.kind, t(`須符合：${label['zh-TW']}`, `requires ${label.en}`)) : fail(c.kind, t(`不適用於${label['zh-TW']}`, `not available when ${label.en}`));
+      if (c.why) return fail(c.kind, c.why, Boolean(c.ambiguous));
+      const label =
+        c.flag === 'remoteDistrict' && ctx.remoteDistricts
+          ? t(`居住在${ctx.remoteDistricts['zh-TW']}`, `living in ${ctx.remoteDistricts.en}`)
+          : (flagLabels[c.flag] ?? t(c.flag, c.flag));
+      return want
+        ? fail(c.kind, t(`須符合：${label['zh-TW']}`, `requires ${label.en}`), Boolean(c.ambiguous))
+        : fail(c.kind, t(`不適用於${label['zh-TW']}`, `not available when ${label.en}`), Boolean(c.ambiguous));
     }
     case 'income': {
       const level = h.income ?? 'none';
@@ -129,11 +137,16 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       if (c.ambiguous?.includes(level)) {
         return fail(c.kind, t('公告只寫「中低收入戶」，低收入戶是否適用不明確，未計入；請向承辦單位確認', 'the notice says only "middle-low income"; whether low-income households qualify is unclear, so it is not counted (ask the bureau)'), true);
       }
+      const only = (lv: string) => c.levels.length === 1 && c.levels[0] === lv;
       return fail(
         c.kind,
-        c.levels.length === 1 && c.levels[0] === 'low'
+        only('low')
           ? t('限低收入戶（中低收入戶不適用）', 'low-income households only (middle-low does not qualify)')
-          : t('限中低收入戶或低收入戶', 'low or middle-low income households only'),
+          : only('middle-low')
+            ? c.ambiguous?.includes('low')
+              ? t('限中低收入戶（低收入戶是否適用請向承辦單位確認）', 'middle-low income households only (ask the bureau whether low-income households qualify)')
+              : t('限中低收入戶', 'middle-low income households only')
+            : t('限中低收入戶或低收入戶', 'low or middle-low income households only'),
       );
     }
     case 'age': {
@@ -149,17 +162,22 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       if (ctx.programmeJurisdiction !== 'central' && ctx.programmeJurisdiction !== s.jurisdiction) return fail(c.kind, t('須設籍於該縣市', 'requires household registration there'));
       if (!c.minYears && !c.registeredBy) return OK;
       if (!h.residentSince) {
+        if (c.assumption) return assume(c.assumption);
         const rule = c.registeredBy
           ? t(`${date(c.registeredBy)['zh-TW']}前已設籍`, `registered there by ${date(c.registeredBy).en}`)
           : t(`設籍滿${c.minYears}年`, `registered there for at least ${c.minYears} year${(c.minYears ?? 0) > 1 ? 's' : ''}`);
         return assume(t(`假設你已${rule['zh-TW']}`, `Assumes your household is ${rule.en}`));
       }
       if (c.registeredBy && !onOrBefore(h.residentSince, c.registeredBy)) {
-        return fail(c.kind, t(`須在${date(c.registeredBy)['zh-TW']}前設籍`, `household must be registered by ${date(c.registeredBy).en}`));
+        return fail(c.kind, c.why ?? t(`須在${date(c.registeredBy)['zh-TW']}前設籍`, `household must be registered by ${date(c.registeredBy).en}`));
       }
       if (c.minYears && fullYears(h.residentSince, s.date) < c.minYears) {
         return fail(c.kind, t(`須設籍滿${c.minYears}年`, `household must have been registered for ${c.minYears} year(s)`));
       }
+      return OK;
+    }
+    case 'applicant-deadline': {
+      if (c.applicants === 'foreign-national' && h.foreignNational && !onOrBefore(s.date as string, c.date)) return fail(c.kind, c.why);
       return OK;
     }
     case 'region':
@@ -169,7 +187,11 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       const good = results.find((r) => r.ok);
       if (good) return good;
       const amb = results.find((r) => !r.ok && r.ambiguous);
-      return amb ?? results[0] ?? fail(c.kind, t('不符合資格', 'not eligible'));
+      if (amb) return amb;
+      const whys = results.flatMap((r) => (r.ok ? [] : [r.why]));
+      if (!whys.length) return fail(c.kind, t('不符合資格', 'not eligible'));
+      const first = results.find((r) => !r.ok) as Extract<CondResult, { ok: false }>;
+      return fail(first.failed, t(whys.map((w) => w['zh-TW']).join('，或'), whys.map((w) => w.en).join(', or ')));
     }
   }
 }

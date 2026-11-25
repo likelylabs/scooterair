@@ -56,7 +56,11 @@ const GRID: Record<JurisdictionId, [number, number]> = {
   pingtung: [2, 8],
 };
 const today = todayInTaipei();
-const short = (id: JurisdictionId, full: string) => (locale === 'en' ? (/^(hsinchu|chiayi)-/.test(id) ? full.replace('County', 'Co.') : full.replace(/ (City|County)$/, '')) : full);
+const short = (id: JurisdictionId, full: string) => {
+  if (locale !== 'en') return full;
+  const name = full.replace(/\s*\(.*\)$/, '');
+  return /^(hsinchu|chiayi)-/.test(id) ? name.replace('County', 'Co.') : name.replace(/ (City|County)$/, '');
+};
 const order = [...jurisdictionIds].sort((a, b) => GRID[a][1] - GRID[b][1] || GRID[a][0] - GRID[b][0]);
 const cells = order.map((id) => {
   const c = cityMoney(id, today, snapshot);
