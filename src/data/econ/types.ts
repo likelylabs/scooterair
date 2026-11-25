@@ -274,6 +274,8 @@ export interface ExclusiveGroup {
   label: L10n;
   /** True when the group is our conservative reading, not the published rule. */
   conservative?: boolean;
+  /** Only applies to buyers in these jurisdictions (default: everywhere). */
+  jurisdictions?: JurisdictionId[];
   /** Shown with the result when a conservative group changed the outcome. */
   ambiguity?: L10n;
   sources?: SourceId[];
@@ -349,8 +351,8 @@ export type PlanUsage =
   | { kind: 'credit'; creditNtd: number; allowance: Band; overageRate: number }
   /** Pay per unit, no monthly fee. */
   | { kind: 'per-unit'; rate: number }
-  /** Free inside daily time windows, `offWindowRate` per unit outside them. */
-  | { kind: 'time-window'; offWindowRate: number; windows: L10n }
+  /** Free inside daily time windows, `offWindowRate` per unit outside them. `fairUseUnits`: monthly use above which the operator may treat it as commercial. */
+  | { kind: 'time-window'; offWindowRate: number; windows: L10n; fairUseUnits?: number }
   /** Household electricity at a marginal tariff (NTD/kWh). */
   | { kind: 'tariff'; rate: Band };
 
@@ -407,9 +409,15 @@ export interface ElectricityPrices extends Provenance {
 // Running costs
 // ---------------------------------------------------------------------------
 
+/**
+ * Maintenance. The middle estimate is the MOTC owner-reported yearly average (`ownerAverage`,
+ * verified), raised to the schedule-based minimum when the buyer rides more than average;
+ * the low and high bounds come from the manufacturer schedules priced with dealer parts lists
+ * (`perKm` or `perVisit`, secondary).
+ */
 export type MaintenanceProfile =
-  | ({ id: string; label: L10n; kind: 'per-km'; perKm: Band })
-  | ({ id: string; label: L10n; kind: 'visits'; intervalKm: number; minVisitsPerYear: number; perVisit: Band; intervalBasis: Provenance & { text: L10n } });
+  | { id: string; label: L10n; kind: 'per-km'; perKm: Band; ownerAverage: Num }
+  | { id: string; label: L10n; kind: 'visits'; intervalKm: number; minVisitsPerYear: number; perVisit: Band; intervalBasis: Provenance & { text: L10n }; ownerAverage: Num };
 
 export interface FixedFees {
   roadFeeGasoline: { upToCc: number; perYear: Num }[];

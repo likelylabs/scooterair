@@ -33,8 +33,10 @@ export type Confidence = (typeof confidences)[number];
  *  - international: evidence from outside Taiwan (WHO, IARC, HEI, and single non-Taiwan studies;
  *                   the statement wording says which, so a single study is never presented as consensus)
  *  - derived:       our own arithmetic on cited figures (the fact lists its inputs in `derivedFrom`)
+ *  - market-tw:     prices and terms published by Taiwanese manufacturers, dealers or energy
+ *                   operators (scooter prices, battery plans, pump prices)
  */
-export const evidenceTypes = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived'] as const;
+export const evidenceTypes = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived', 'market-tw'] as const;
 export type Evidence = (typeof evidenceTypes)[number];
 
 export const confidenceLabels: Record<Confidence, { label: L10n; description: L10n }> = {
@@ -75,6 +77,10 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
     label: t('本站計算', 'Our calculation'),
     description: t('由本站根據引用的數字自行計算，計算所用的數字均附出處。', 'Our own arithmetic on cited figures; every input is itself cited.'),
   },
+  'market-tw': {
+    label: t('市場價格', 'Market prices'),
+    description: t('臺灣的車廠、經銷商或能源業者公布的售價、優惠與資費。', 'Prices, offers and plan terms published by Taiwanese manufacturers, dealers or energy operators.'),
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -111,6 +117,11 @@ export const units = {
   year: { short: t('年', ''), long: t('年份', 'year') },
   phase: { short: t('期', ''), long: t('排放標準期別', 'emission-standard phase') },
   ntd: { short: t('元', 'NT$'), long: t('新臺幣元', 'New Taiwan dollars') },
+  'ntd-per-km': { short: t('元／公里', 'NT$/km'), long: t('每公里新臺幣元', 'New Taiwan dollars per kilometre') },
+  'ntd-per-month': { short: t('元／月', 'NT$/month'), long: t('每月新臺幣元', 'New Taiwan dollars per month') },
+  'ntd-per-year': { short: t('元／年', 'NT$/year'), long: t('每年新臺幣元', 'New Taiwan dollars per year') },
+  'ntd-per-litre': { short: t('元／公升', 'NT$/L'), long: t('每公升新臺幣元', 'New Taiwan dollars per litre') },
+  'km-per-month': { short: t('公里／月', 'km/month'), long: t('每月公里數', 'kilometres per month') },
   cc: { short: t('cc', 'cc'), long: t('排氣量（cc）', 'engine displacement (cc)') },
 } as const satisfies Record<string, { short: L10n; long: L10n }>;
 

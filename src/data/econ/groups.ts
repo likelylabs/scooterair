@@ -50,6 +50,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('kinmen-base', '金門縣補助（換購或新購擇一）', 'Kinmen subsidy (replacement or new purchase, one only)'),
     g('kinmen-vs-moenv', '金門縣補助與環境部獎勵只計一項（保守解讀）', 'Kinmen subsidy or MOENV payments, one only (conservative reading)', {
       conservative: true,
+      jurisdictions: ['kinmen'],
       ambiguity: t(
         '金門縣補助要點排除「曾向環境部申請機車汰舊換新相關補助者」，同一次購車領環境部獎勵是否會被排除，要點沒有寫明，環保局也未回覆。試算只算金額較高的一方；若可併領，最多可再多領下列金額。',
         'Kinmen\'s guidelines exclude anyone who "has applied to MOENV for related scrap-and-replace subsidies"; whether claiming the MOENV reward for the same purchase disqualifies you is not stated. We count only the larger side; if both can be claimed you could receive up to the amount below in addition.',

@@ -1,0 +1,194 @@
+{
+ "scope": "energy-prices-r2",
+ "round": 2,
+ "checkedOn": "2026-11-25",
+ "summary": "Petrol this week (from 23 Nov) is NT$32.7/L for 95 and 31.2 for 92, per CPC's own page, unchanged for seven weeks; in January it was about 5 NTD lower (95 at 27.9). Official lab tests give about 60-66 km/L for mainstream 125cc scooters, so fuel is about NT$0.55 per km in the lab and NT$0.65-0.95 in real use (unverified owner estimates of 35-50 km/L). Home charging at current 台電 tariffs (1.78 to 2.26 per kWh in low tiers, as reported by two media outlets) costs roughly NT$0.06-0.08 per km, up to about 0.19 in higher tiers, assuming 31.4 km/kWh from one operator. The December tariff review may raise rates. Annual distance and independent cost-of-ownership data could not be found, so the calculator is our own arithmetic. MOTC survey data show electric owners spending more, mainly on battery rental.",
+ "findings": [
+  {
+   "id": "cpc-current-2026-11-23",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Fetched cpc.com.tw/historyprice.aspx?n=2890 by curl; table row for 115/11/23 shows 31.2 32.7 34.7 29.9. The page shows only 7 weekly rows.",
+   "subject": "CPC pump reference price, week from 2026-11-23: 95 unleaded",
+   "value": 32.7,
+   "unit": "NTD/L",
+   "period": "2026-11-23 to 2026-11-29",
+   "sourceUrl": "https://www.cpc.com.tw/historyprice.aspx?n=2890",
+   "quote": "115/11/23 31.2 32.7 34.7 29.9",
+   "status2027": "unknown/at risk"
+  },
+  {
+   "id": "cpc-92-current-2026-11-23",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Same CPC page.",
+   "subject": "CPC 92 unleaded, week from 2026-11-23",
+   "value": 31.2,
+   "unit": "NTD/L",
+   "sourceUrl": "https://www.cpc.com.tw/historyprice.aspx?n=2890",
+   "quote": "115/11/23 31.2 32.7 34.7 29.9"
+  },
+  {
+   "id": "cpc-flat-since-oct-12",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "CPC page lists 7 rows 115/10/12 to 115/11/23, all 31.2/32.7/34.7/29.9.",
+   "subject": "CPC prices unchanged for seven weeks",
+   "value": 32.7,
+   "unit": "NTD/L (95)",
+   "sourceUrl": "https://www.cpc.com.tw/historyprice.aspx?n=2890",
+   "quote": "115/10/12 31.2 32.7 34.7 29.9"
+  },
+  {
+   "id": "cpc-2026-ytd-points",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Upgraded from SECONDARY: opened both chinatimes pages. 2026-01-12 week: 92=26.4, 95=27.9. 2026-01-04 article: 92=26.6, 95=28.1 after a 0.2 cut. Combined with first-sweep points (33.9 peak 05-11, 30.4 on 03-16, 32.0 on 08-17) the 2026 95 range is at least 27.9 to 33.9. Still no true year-to-date average (full series unavailable).",
+   "subject": "CPC 95 early-2026 prices",
+   "value": 27.9,
+   "unit": "NTD/L",
+   "period": "2026-01-05 to 2026-01-12",
+   "sourceUrl": "https://wantrich.chinatimes.com/news/20260111900167-420301",
+   "quote": "中油參考零售價格為92無鉛汽油每公升26.4元、95無鉛汽油每公升27.9元、98無鉛汽油每公升29.9元、超級柴油每公升24.8元",
+   "sourcePublisher": "工商時報"
+  },
+  {
+   "id": "tariff-nonsummer-2026",
+   "verdict": "CONFIRMED",
+   "confidence": "SECONDARY",
+   "verifierNote": "Opened ctee and TVBS: both show 1.78/2.26/3.13/4.24/5.27/7.03 non-summer. TVBS says the rates follow the 台電 2026-03-27 review and apply from 04-01. Claim 'unchanged since 2025-10-01' not checked. Official 台電 page not opened by me.",
+   "subject": "台電 residential non-TOU tiers, non-summer",
+   "value": 2.26,
+   "unit": "NTD/kWh (121-330 tier)",
+   "sourceUrl": "https://news.tvbs.com.tw/life/3201267",
+   "quote": "121～330度 2.26 2.55 +0.29 331～500度 3.13 3.80 +0.67 501～700度 4.24 5.14 +0.90 701～1000度 5.27 6.44 +1.17 1001度以上 7.03 8.86 +1.83"
+  },
+  {
+   "id": "tariff-summer-2026",
+   "verdict": "CONFIRMED",
+   "confidence": "SECONDARY",
+   "verifierNote": "Same two outlets show summer 1.78/2.55/3.80/5.14/6.44/8.86. Not seen on 台電 itself.",
+   "subject": "台電 residential non-TOU tiers, summer",
+   "value": 2.55,
+   "unit": "NTD/kWh (121-330 tier)",
+   "sourceUrl": "https://news.tvbs.com.tw/life/3201267",
+   "quote": "1001度以上 7.03 8.86"
+  },
+  {
+   "id": "tariff-2026-review-sept",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Opened 今周刊 page; title and body show 3.7823 average kept, 711億, December review. Did not re-read the 12.83% line in my grep but it is in the researcher's quote of the same page; treat 12.83% as researcher-reported.",
+   "subject": "電價費率審議會 2026-09-18 outcome",
+   "value": 3.7823,
+   "unit": "NTD/kWh average, unchanged",
+   "sourceUrl": "https://www.businesstoday.com.tw/article/category/183027/post/202609180046/",
+   "quote": "全國平均電價將繼續維持在每度3.7823元"
+  },
+  {
+   "id": "lab-fueleco-2026-ranking",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Opened TVBS page; rows seen: 光陽 新豪邁125 61.5; 新豪邁特仕版125 61.3; 大地名流2.0 125 61.3; 三陽 迪爵125 60.9. Other models in the researcher list not re-read. Media compilation of 能源署 data.",
+   "subject": "Official-test fuel consumption of best-selling 125cc scooters",
+   "value": 61.5,
+   "unit": "km/L (KYMCO 新豪邁 125)",
+   "sourceUrl": "https://cars.tvbs.com.tw/car-news/249214",
+   "quote": "光陽 新豪邁125 61.5 11 光陽 新豪邁特仕版125 61.3"
+  },
+  {
+   "id": "lab-fueleco-113-guide",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "KingAutos page opened; the 2,163 annual fuel cost figure appears. Rest of the table assumed per researcher; stale (2025 publication).",
+   "subject": "能源署 113年 scooter Top 10",
+   "value": 63.9,
+   "unit": "km/L",
+   "sourceUrl": "https://www.kingautos.net/362895",
+   "quote": "三陽 全新迪爵 DUKE FU12T1 124.9cc 63.9km/L 2,163"
+  },
+  {
+   "id": "realworld-fueleco-delivery",
+   "verdict": "UNREACHABLE",
+   "confidence": "SECONDARY",
+   "verifierNote": "Not opened (PTT age gate not bypassed). Anecdote only.",
+   "value": 35,
+   "unit": "km/L (single rider)"
+  },
+  {
+   "id": "ev-kwh-per-km-taipei-assumption",
+   "verdict": "UNREACHABLE",
+   "confidence": "SECONDARY",
+   "verifierNote": "Taipei PDF URL returns an HTML page, not a PDF; value not seen by me.",
+   "value": 0.024,
+   "unit": "kWh/km"
+  },
+  {
+   "id": "annual-km-taipei-assumption",
+   "verdict": "UNREACHABLE",
+   "confidence": "SECONDARY",
+   "verifierNote": "Same PDF returns HTML, not opened. My own search found no national annual-km figure; MOTC survey asks about odometer km but no average appeared in search results.",
+   "value": 3527,
+   "unit": "km/year"
+  },
+  {
+   "id": "delivery-km-anecdote",
+   "verdict": "UNREACHABLE",
+   "confidence": "SECONDARY",
+   "verifierNote": "Not re-opened; single old vendor-friendly anecdote with inconsistent numbers; do not publish.",
+   "value": 120,
+   "unit": "km/day"
+  },
+  {
+   "id": "motc-2022-electric-extra",
+   "verdict": "CORRECTED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Opened TVBS article (dated 2023-11-13). The survey ran March to June 2023 on vehicles as of end of 111 (2022), not 2022-03 to 06 as stated. Text: electric total spend is NT$1,306 above 白牌 petrol and NT$4,626 above 輕型 petrol. Headline blames battery rental. I did not see the 113年 figures (10,506 vs 8,610).",
+   "subject": "MOTC survey (published 2023-11): electric owners spent more per year",
+   "value": 1306,
+   "unit": "NTD/year more than white-plate petrol",
+   "period": "survey March-June 2023",
+   "sourceUrl": "https://cars.tvbs.com.tw/car-news/154273",
+   "quote": "電動機車的總花費比起一般白牌燃油機車多出1,306元，更比輕型的燃油機車花出4,626元"
+  },
+  {
+   "id": "tco-independent-none",
+   "verdict": "UNREACHABLE",
+   "confidence": "UNVERIFIED",
+   "verifierNote": "I did not find an independent study either; absence is not proof.",
+   "value": 0,
+   "unit": "n/a"
+  },
+  {
+   "id": "calc-fuel-per-km",
+   "verdict": "CONFIRMED",
+   "confidence": "SECONDARY",
+   "verifierNote": "Arithmetic rechecked: 32.7/60=0.545, /50=0.654, /45=0.727, /35=0.934, /24.7=1.324; at 92=31.2: 0.520, 0.624, 0.693, 0.891, 1.263. Price input verified; km/L 35-50 real-world inputs are unverified anecdotes."
+  },
+  {
+   "id": "calc-home-charge-per-km",
+   "verdict": "CONFIRMED",
+   "confidence": "SECONDARY",
+   "verifierNote": "Arithmetic rechecked: 1/31.4=0.0318 kWh/km; x1.10-1.15 = 0.035-0.037. Non-summer 1.78: 0.062-0.065; 2.26: 0.079-0.083; 3.13: 0.110-0.115; 4.24: 0.149-0.155. Summer 2.55: 0.089-0.093; 3.80: 0.133-0.139; 5.14: 0.180-0.188. Top tiers (7.03/8.86) give about 0.25-0.32. The 31.4 km/kWh and loss factor are unverified."
+  }
+ ],
+ "gaps": [
+  "Full 2026 CPC weekly series and true YTD average (CPC page shows 7 weeks).",
+  "Official 台電 tariff page not opened by me.",
+  "December 2026 review outcome not yet known.",
+  "能源署 database not reached; no km/kWh test values; no km/L for 勁戰 or Jet SL.",
+  "No annual-km statistic, distribution or delivery-rider km found.",
+  "Taipei appendix PDF (3,527 km/yr, 0.024 kWh/km) not opened.",
+  "No real-world km/L source opened.",
+  "No independent TCO study.",
+  "MOTC 113年 spend figures not seen by me."
+ ],
+ "needsManualFetch": [
+  "https://www.taipower.com.tw/2289/2406/2411/2412/10133/normalPost - official residential tariff table.",
+  "https://www.cpc.com.tw/historyprice.aspx?n=2890 - date-range picker, 115/01/01 to 115/11/23.",
+  "https://www.ptt.cc/bbs/Gossiping/M.1770821952.A.DBD.html - age prompt.",
+  "Taipei law database, 附錄六 汰換老舊機車為電動機車之減量計算基準 (PDF URL returns HTML).",
+  "https://www.motc.gov.tw/ch/statistics101.jsp?id=56 - 機車使用狀況調查 mileage tables.",
+  "能源署 energy label / 車輛油耗 database - 勁戰, Jet SL, electric scooters."
+ ]
+}

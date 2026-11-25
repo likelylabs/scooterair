@@ -23,6 +23,7 @@ import type { Confidence, Datum, Evidence, L10n, Locale, ResearchRef } from './t
 import { confidenceLabels, evidenceLabels, t, v } from './types.ts';
 import type { SourceId } from './sources.ts';
 import { formatCitation, shortCitation, sourceUrl } from './sources.ts';
+import { economics } from './facts-economics.ts';
 
 export interface FactInput {
   /** Raw values for charts and calculations. May be empty for qualitative facts (e.g. an IARC group). */
@@ -499,8 +500,8 @@ const electric = {
     confidence: 'secondary',
     evidence: 'official-tw',
     caveat: t(
-      '出自TVBS報導，未查閱法規原文；媒體認為這是電動機車銷量疲弱的原因之一，但本站未查證其效果。',
-      'From a TVBS report; the regulation itself was not checked. Media cite it as one reason for weak electric sales, which we have not verified.',
+      '出自TVBS報導；財政部稅務入口網寫的實施日期是2025年9月7日（至2030年底），另有汰舊換新最高4,000元的減徵（見「價格、補助與使用成本」）。媒體認為這是電動機車銷量疲弱的原因之一，但本站未查證其效果。',
+      'From a TVBS report; the MOF tax portal gives the start date as 7 September 2025 (running to the end of 2030) and lists a further scrap-and-replace cut of up to NT$4,000 (see "Prices, subsidies and running costs"). Media cite it as one reason for weak electric sales, which we have not verified.',
     ),
     research: '01 §7',
   },
@@ -2230,7 +2231,7 @@ const children = {
 // Registry assembly
 // ---------------------------------------------------------------------------
 
-export const factGroups = { fleet, electric, policy, emissions, exposure, standards, hazard, health, children };
+export const factGroups = { fleet, electric, policy, emissions, exposure, standards, hazard, health, children, economics };
 export type Topic = keyof typeof factGroups;
 
 export const topicLabels: Record<Topic, L10n> = {
@@ -2243,9 +2244,10 @@ export const topicLabels: Record<Topic, L10n> = {
   hazard: t('危害分類', 'Hazard classifications'),
   health: t('健康證據', 'Health evidence'),
   children: t('兒童', 'Children'),
+  economics: t('價格、補助與使用成本', 'Prices, subsidies and running costs'),
 };
 
-const merged = { ...fleet, ...electric, ...policy, ...emissions, ...exposure, ...standards, ...hazard, ...health, ...children };
+const merged = { ...fleet, ...electric, ...policy, ...emissions, ...exposure, ...standards, ...hazard, ...health, ...children, ...economics };
 export type FactId = keyof typeof merged;
 export type Fact = FactInput & { id: FactId; topic: Topic };
 

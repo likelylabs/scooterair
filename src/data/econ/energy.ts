@@ -51,7 +51,7 @@ export const plans: EnergyPlan[] = [
     batteries: 1,
     unit: 'Ah',
     monthlyFee: 488,
-    usage: { kind: 'time-window', offWindowRate: 2.3, windows: WINDOWS },
+    usage: { kind: 'time-window', offWindowRate: 2.3, windows: WINDOWS, fairUseUnits: 1600 },
     lockInMonths: 24,
     terms: t(
       '綁約24個月；指定時段外換電每安時2.3元；提前解約須付2,400元乘以剩餘天數除以730；連續兩個月超過1,600安時可能被視為商業使用。',

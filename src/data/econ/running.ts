@@ -23,7 +23,14 @@ export const maintenance: MaintenanceProfile[] = [
       sources: ['2motor-maintenance-prices', 'sym-maintenance-schedule-2022'],
       confidence: 'secondary',
       research: ['maintenance-fees#derived-gas-5k', 'maintenance-fees#derived-gas-10k', 'maintenance-fees#price-oil', 'maintenance-fees#sched-sym-oil'],
-      note: t('「照表保養」的估計，很多車主換機油的頻率較低；交通部調查普通重型燃油機車車主自報平均每年保養維修2,070元。', 'A "by the book" estimate; many riders change oil less often. In the MOTC survey, heavy-class gasoline owners report NT$2,070 a year on maintenance and repairs on average.'),
+      note: t('「照表保養」的估計，很多車主換機油的頻率較低。', 'A "by the book" estimate; many riders change oil less often.'),
+    },
+    ownerAverage: {
+      value: 2070,
+      sources: ['motc-2024-scooter-survey'],
+      confidence: 'verified',
+      research: ['running-costs#spend-electric-vs-gas', 'running-costs#maintenance-estimates'],
+      note: t('交通部調查普通重型燃油機車車主自報的平均每年保養維修費。', 'MOTC survey: heavy-class gasoline owners\' reported average yearly maintenance and repair spend.'),
     },
   },
   {
@@ -46,7 +53,14 @@ export const maintenance: MaintenanceProfile[] = [
       sources: ['pixnet-2020-gogoro2-service'],
       confidence: 'secondary',
       research: ['maintenance-fees#price-gogoro2-invoice', 'maintenance-fees#derived-gogoro-5k10k'],
-      note: t('其他品牌沒有公開價格，也套用這組數字；交通部調查電動機車車主自報平均每年保養維修1,947元。', 'Other brands publish no prices, so the same figures are used; in the MOTC survey electric owners report NT$1,947 a year on maintenance and repairs on average.'),
+      note: t('其他品牌沒有公開價格，也套用這組數字。', 'Other brands publish no prices, so the same figures are used.'),
+    },
+    ownerAverage: {
+      value: 1947,
+      sources: ['motc-2024-scooter-survey'],
+      confidence: 'verified',
+      research: ['running-costs#spend-electric-vs-gas', 'running-costs#maintenance-estimates'],
+      note: t('交通部調查電動機車車主自報的平均每年保養維修費。', 'MOTC survey: electric owners\' reported average yearly maintenance and repair spend.'),
     },
   },
 ];
