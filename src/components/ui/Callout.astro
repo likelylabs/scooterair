@@ -1,0 +1,82 @@
+---
+/**
+ * Callout — a boxed aside, drawn like a painted waiting box (待轉區): a thick
+ * rectangle with its label set into the top edge.
+ *
+ * Props
+ *   tone   'note' (ink) | 'exhaust' | 'clean' | 'signal'
+ *   label  short tab text on the top edge ("說明", "注意", "怎麼讀這張圖")
+ *   title  optional heading inside the box
+ * Slot
+ *   default  body content
+ */
+interface Props {
+  tone?: 'note' | 'exhaust' | 'clean' | 'signal';
+  label?: string;
+  title?: string;
+  class?: string;
+}
+const { tone = 'note', label, title, class: cls } = Astro.props;
+---
+
+<aside class:list={['callout', `callout--${tone}`, cls]}>
+  {label && <p class="callout__label">{label}</p>}
+  {title && <p class="callout__title">{title}</p>}
+  <div class="callout__body stack"><slot /></div>
+</aside>
+
+<style>
+  .callout {
+    --c: var(--ink);
+    --c-ink: var(--ink);
+    position: relative;
+    max-inline-size: var(--measure);
+    margin-block-start: 0.75em; /* room for the label tab */
+    padding: var(--sp-5) var(--sp-4) var(--sp-4);
+    border: var(--rule-paint) solid var(--c);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .callout--exhaust {
+    --c: var(--exhaust);
+    --c-ink: var(--exhaust-ink);
+  }
+  .callout--clean {
+    --c: var(--clean);
+    --c-ink: var(--clean-ink);
+  }
+  .callout--signal {
+    --c: var(--signal-red);
+    --c-ink: var(--signal-red-ink);
+  }
+  .callout__label {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: var(--sp-3);
+    transform: translateY(-55%);
+    padding-inline: 0.5em;
+    background: var(--here);
+    color: var(--c-ink);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    line-height: 1.4;
+  }
+  .callout__label:lang(en) {
+    text-transform: uppercase;
+  }
+  .callout__title {
+    margin-block-end: var(--sp-2);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .callout__body {
+    --stack: 0.7em;
+  }
+  @media (min-width: 48em) {
+    .callout {
+      padding: var(--sp-5);
+    }
+  }
+</style>

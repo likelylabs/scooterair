@@ -1,0 +1,157 @@
+---
+/**
+ * CompareTable — compare two to four options row by row (gasoline vs
+ * electric, city vs city). A real <table>. Below 34em each row becomes a
+ * small block: the row label on its own line, then the values side by side,
+ * each under a repeat of its column name, so nothing scrolls sideways at 360px.
+ *
+ * Props
+ *   caption    table caption (required; visually hidden with `hideCaption`)
+ *   rowHeader  header of the first column ("項目" / "Item")
+ *   columns    { label: string; tone?: 'exhaust' | 'clean' | 'neutral' }[]  — the options compared
+ *   rows       { label: string; values: string[]; note?: string }[]       — values in column order
+ *   hideCaption  keep the caption for screen readers only
+ *   numeric    right-align the value columns with tabular figures (default true)
+ */
+interface Column {
+  label: string;
+  tone?: 'exhaust' | 'clean' | 'neutral';
+}
+interface Row {
+  label: string;
+  values: string[];
+  note?: string;
+}
+interface Props {
+  caption: string;
+  rowHeader: string;
+  columns: Column[];
+  rows: Row[];
+  hideCaption?: boolean;
+  numeric?: boolean;
+  class?: string;
+}
+const { caption, rowHeader, columns, rows, hideCaption = false, numeric = true, class: cls } = Astro.props;
+---
+
+<table class:list={['ct', numeric && 'ct--numeric', cls]} style={`--cols:${columns.length}`} role="table">
+  <caption class:list={[hideCaption && 'vh']}>{caption}</caption>
+  <thead role="rowgroup">
+    <tr role="row">
+      <th scope="col" role="columnheader">{rowHeader}</th>
+      {columns.map((c) => (
+        <th scope="col" role="columnheader" class="ct__col">
+          <span class:list={['ct__key', `ct__key--${c.tone ?? 'neutral'}`]} />{c.label}
+        </th>
+      ))}
+    </tr>
+  </thead>
+  <tbody role="rowgroup">
+    {rows.map((r) => (
+      <tr role="row">
+        <th scope="row" role="rowheader">
+          {r.label}
+          {r.note && <span class="ct__note">{r.note}</span>}
+        </th>
+        {r.values.map((v, i) => (
+          <td role="cell" class="ct__val">
+            <span class="ct__mini" aria-hidden="true">
+              <span class:list={['ct__key', `ct__key--${columns[i]?.tone ?? 'neutral'}`]} />{columns[i]?.label}
+            </span>
+            {v}
+          </td>
+        ))}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  .ct {
+    font-size: var(--fs-sm);
+  }
+  .ct caption {
+    padding-block-end: var(--sp-2);
+    font-weight: var(--fw-bold);
+    text-align: start;
+    caption-side: top;
+  }
+  .ct th[scope='row'] {
+    font-weight: var(--fw-medium);
+    color: var(--ink);
+  }
+  .ct--numeric .ct__col,
+  .ct--numeric .ct__val {
+    text-align: end;
+    padding-inline: var(--sp-3) 0;
+  }
+  .ct__val {
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .ct__note {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    color: var(--ink-3);
+  }
+  .ct__key {
+    display: inline-block;
+    inline-size: 0.65em;
+    block-size: 0.65em;
+    margin-inline-end: 0.45em;
+    background: var(--chart-neutral);
+  }
+  .ct__key--exhaust {
+    background: var(--chart-exhaust);
+  }
+  .ct__key--clean {
+    background: var(--chart-clean);
+  }
+  .ct__mini {
+    display: none;
+  }
+
+  @media (max-width: 34em) {
+    .ct,
+    .ct tbody {
+      display: block;
+    }
+    .ct thead {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .ct tr {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+      gap: var(--sp-1) var(--sp-3);
+      padding-block: var(--sp-3);
+      border-block-end: 1px solid var(--line);
+    }
+    .ct th,
+    .ct td {
+      display: block;
+      padding: 0;
+      border: 0;
+    }
+    .ct th[scope='row'] {
+      grid-column: 1 / -1;
+    }
+    .ct--numeric .ct__val {
+      text-align: start;
+      padding-inline: 0;
+    }
+    .ct__val {
+      font-size: var(--fs-base);
+    }
+    .ct__mini {
+      display: block;
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-regular);
+      color: var(--ink-3);
+    }
+  }
+</style>

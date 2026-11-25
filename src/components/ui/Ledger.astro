@@ -1,0 +1,116 @@
+---
+/**
+ * Ledger — a price breakdown read top to bottom: a starting amount, the
+ * lines taken off (or added), a ruled total, and optional comparison lines
+ * under it. Pairs with WaterfallChart, which draws the same rows.
+ *
+ * Props
+ *   caption  what the ledger adds up (visually hidden with hideCaption)
+ *   rows     { id?: string; label: string; amount: string; kind?: Kind; note?: string }[]
+ *            kind: 'base' (default) | 'minus' | 'plus' | 'total' | 'compare' | 'gap'
+ *            `amount` is pre-formatted text without a sign: the kind adds − / +.
+ *            `id` becomes data-row, so a calculator script can update
+ *            `[data-row="central"] [data-amount]`.
+ *   hideCaption
+ */
+type Kind = 'base' | 'minus' | 'plus' | 'total' | 'compare' | 'gap';
+interface Row {
+  id?: string;
+  label: string;
+  amount: string;
+  kind?: Kind;
+  note?: string;
+}
+interface Props {
+  caption: string;
+  rows: Row[];
+  hideCaption?: boolean;
+  class?: string;
+}
+const { caption, rows, hideCaption = false, class: cls } = Astro.props;
+const sign: Record<Kind, string> = { base: '', minus: '−', plus: '+', total: '=', compare: '', gap: '' };
+---
+
+<table class:list={['ledger', cls]}>
+  <caption class:list={[hideCaption && 'vh']}>{caption}</caption>
+  <tbody>
+    {rows.map((r) => {
+      const kind = r.kind ?? 'base';
+      return (
+        <tr class={`ledger__row ledger__row--${kind}`} data-row={r.id}>
+          <th scope="row">
+            <span class="ledger__sign" aria-hidden="true">{sign[kind]}</span>
+            <span>
+              {r.label}
+              {r.note && <span class="ledger__note" data-note>{r.note}</span>}
+            </span>
+          </th>
+          <td>
+            {kind === 'minus' && <span class="vh">{sign.minus}</span>}
+            <span data-amount>{r.amount}</span>
+          </td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
+
+<style>
+  .ledger {
+    font-size: var(--fs-sm);
+  }
+  .ledger caption {
+    padding-block-end: var(--sp-2);
+    font-weight: var(--fw-bold);
+    text-align: start;
+  }
+  .ledger th {
+    display: flex;
+    gap: 0.5em;
+    font-weight: var(--fw-medium);
+    border: 0;
+  }
+  .ledger td {
+    text-align: end;
+    white-space: nowrap;
+    font-weight: var(--fw-bold);
+    padding-inline: var(--sp-3) 0;
+    border: 0;
+  }
+  .ledger__row {
+    border-block-end: 1px solid var(--line);
+  }
+  .ledger__sign {
+    flex: none;
+    inline-size: 1em;
+    font-weight: var(--fw-bold);
+    text-align: center;
+  }
+  .ledger__note {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    color: var(--ink-3);
+  }
+  .ledger__row--minus td,
+  .ledger__row--minus .ledger__sign {
+    color: var(--clean-ink);
+  }
+  .ledger__row--total {
+    border-block-start: var(--rule-paint) solid var(--ink);
+    border-block-end: 0;
+    font-size: var(--fs-md);
+  }
+  .ledger__row--total th,
+  .ledger__row--total td {
+    padding-block: var(--sp-3);
+    font-weight: var(--fw-black);
+  }
+  .ledger__row--compare,
+  .ledger__row--gap {
+    color: var(--ink-2);
+  }
+  .ledger__row--gap td {
+    color: var(--exhaust-ink);
+  }
+</style>

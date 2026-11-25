@@ -1,0 +1,75 @@
+---
+/**
+ * Haze — a band of street-level air to sit along the bottom of a section.
+ * Decorative (aria-hidden). Position it yourself, or let <Chapter haze> do it.
+ *
+ * The three pollutant treatments can be shown together or alone:
+ *   fumes  what you smell — warm wavy ribbons plus a wash, densest at the ground
+ *   co     the gas you can't smell — hollow rings
+ *   ufp    the particles you can't see — pin-point stipple, reaching highest
+ *
+ * Props
+ *   density   0–1, how thick the air is (default 0.6). 0 renders nothing.
+ *   kind      'all' | 'fumes' | 'co' | 'ufp' (default 'all')
+ *   height    band height in px (default 220)
+ *   seed      change to get a different arrangement
+ *   animated  slow drift; always off under prefers-reduced-motion (default true)
+ *   class     extra class on the wrapper
+ */
+import '@/styles/art.css';
+import { coRings, fumes, ufpDots } from './parts';
+
+interface Props {
+  density?: number;
+  kind?: 'all' | 'fumes' | 'co' | 'ufp';
+  height?: number;
+  seed?: number;
+  animated?: boolean;
+  class?: string;
+}
+const { density = 0.6, kind = 'all', height = 220, seed = 7, animated = true, class: cls } = Astro.props;
+const d = Math.max(0, Math.min(1, density));
+const W = 2400; // drawn once at this width; the wrapper clips it
+const show = (k: string) => kind === 'all' || kind === k;
+const sc = height / 230; // vertical compression of the standard 230cm column
+---
+
+{d > 0 && (
+  <div class:list={['haze', animated && 'a-animated', cls]} style={`--haze-h:${height}px;--haze-d:${d}`} aria-hidden="true">
+    {show('fumes') && <div class="haze__wash" />}
+    <svg width={W} height={height} viewBox={`0 ${-height} ${W} ${height}`} focusable="false">
+      {show('ufp') && <g class="a-ufp a-drift-3" set:html={ufpDots({ width: W, count: Math.round(520 * d), seed: seed + 2, scale: 105 * sc, top: height - 6 })} />}
+      {show('co') && <g class="a-co a-drift-2" set:html={coRings({ width: W, count: Math.round(70 * d), seed: seed + 1, scale: 70 * sc, top: height - 10 })} />}
+      {show('fumes') && <g class="a-fumes a-drift-1" set:html={fumes({ width: W, count: Math.round(64 * d), seed, scale: 34 * sc, top: height * 0.8 })} />}
+    </svg>
+  </div>
+)}
+
+<style>
+  .haze {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: var(--haze-h);
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .haze svg {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 50%;
+    max-inline-size: none;
+    margin-inline-start: -1200px;
+    overflow: visible;
+  }
+  .haze__wash {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--art-haze) calc(var(--haze-d) * 46%), transparent),
+      color-mix(in srgb, var(--art-haze) calc(var(--haze-d) * 18%), transparent) 38%,
+      transparent 82%
+    );
+  }
+</style>

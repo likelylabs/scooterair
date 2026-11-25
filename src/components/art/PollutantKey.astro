@@ -1,0 +1,83 @@
+---
+/**
+ * PollutantKey — the legend for how the site draws air:
+ * fumes you can smell (warm ribbons), the gas you can't (hollow rings) and
+ * the particles you can't see (pin-point stipple). Put it under any scene or
+ * haze band that uses the vocabulary. Copy comes from ui.pollutant; pass
+ * `items` to override it (e.g. once fact-checked wording is final).
+ *
+ * Props
+ *   locale  Locale
+ *   items   optional override: { kind: 'fumes' | 'co' | 'ufp'; title: string; body: string }[]
+ *   class   extra class
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import { coRings, fumes, ufpDots } from './parts';
+
+type Kind = 'fumes' | 'co' | 'ufp';
+interface Props {
+  locale: Locale;
+  items?: { kind: Kind; title: string; body: string }[];
+  class?: string;
+}
+const { locale, class: cls } = Astro.props;
+const items = Astro.props.items ?? [
+  { kind: 'fumes' as Kind, title: ui.pollutant.odorTitle[locale], body: ui.pollutant.odorBody[locale] },
+  { kind: 'co' as Kind, title: ui.pollutant.coTitle[locale], body: ui.pollutant.coBody[locale] },
+  { kind: 'ufp' as Kind, title: ui.pollutant.ufpTitle[locale], body: ui.pollutant.ufpBody[locale] },
+];
+const swatch: Record<Kind, string> = {
+  fumes: `<g class="a-fumes">${fumes({ width: 96, count: 11, seed: 14, scale: 16, top: 50 })}</g>`,
+  co: `<g class="a-co">${coRings({ width: 96, count: 13, seed: 4, scale: 26, top: 52 })}</g>`,
+  ufp: `<g class="a-ufp">${ufpDots({ width: 96, count: 90, seed: 8, scale: 40, top: 54 })}</g>`,
+};
+---
+
+<ul class:list={['pkey', cls]}>
+  {items.map((item) => (
+    <li class="pkey__item">
+      <svg class="pkey__swatch" viewBox="0 -56 96 56" aria-hidden="true" focusable="false" set:html={swatch[item.kind]} />
+      <div>
+        <p class="pkey__title">{item.title}</p>
+        <p class="pkey__body">{item.body}</p>
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .pkey {
+    display: grid;
+    gap: var(--sp-4) var(--sp-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pkey__item {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: var(--sp-3);
+    align-items: start;
+  }
+  .pkey__swatch {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    overflow: hidden;
+    border-block-end: 2px solid var(--ink);
+  }
+  .pkey__title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .pkey__body {
+    margin-block-start: 0.15em;
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+</style>

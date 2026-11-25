@@ -1,0 +1,76 @@
+---
+/**
+ * EvidenceBadge — how strong the evidence behind a claim is. Four levels,
+ * each told apart three ways (never by colour alone): its words, its icon
+ * and its border/fill.
+ *
+ *   measured     solid fill      crosshair   "在台灣量測到 / Measured in Taiwan"
+ *   established  solid outline   globe       "國際上已確立 / Established internationally"
+ *   inference    dashed outline  dashed arrow "我們的推論 / Our inference"
+ *   gap          dotted outline  open circle "尚未證實 / Not yet shown"
+ *
+ * Props
+ *   level   'measured' | 'established' | 'inference' | 'gap'
+ *   locale  Locale
+ *   label   override the default label text
+ *
+ * Use <EvidenceLegend> once per page to explain the levels.
+ */
+import type { Locale } from '@/i18n';
+import { evidence, type EvidenceLevel } from '@/i18n/ui';
+
+interface Props {
+  level: EvidenceLevel;
+  locale: Locale;
+  label?: string;
+  class?: string;
+}
+const { level, locale, label = evidence.levels[level].label[locale], class: cls } = Astro.props;
+const icons: Record<EvidenceLevel, string> = {
+  measured: '<circle cx="8" cy="8" r="4"/><path d="M8 1v4M8 11v4M1 8h4M11 8h4"/>',
+  established: '<circle cx="8" cy="8" r="6.2"/><ellipse cx="8" cy="8" rx="2.7" ry="6.2"/><path d="M1.8 8h12.4"/>',
+  inference: '<path stroke-dasharray="2.2 2.4" d="M1.5 8h9"/><path d="M9.5 4.5 13.5 8l-4 3.5"/>',
+  gap: '<circle cx="8" cy="8" r="6" stroke-dasharray="1.2 2.6"/><path d="M6.2 6.4a1.9 1.9 0 1 1 2.7 1.8c-.6.3-.9.7-.9 1.3M8 11.6v.2"/>',
+};
+---
+
+<span class:list={['ev', `ev--${level}`, cls]}>
+  <span class="vh">{evidence.heading[locale]}: </span>
+  <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[level]} />
+  <span>{label}</span>
+</span>
+
+<style>
+  .ev {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.2em 0.6em 0.2em 0.45em;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-1);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.45;
+    color: var(--ink);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .ev svg {
+    flex: none;
+    inline-size: 1.15em;
+    block-size: 1.15em;
+  }
+  .ev--measured {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .ev--inference {
+    border-style: dashed;
+  }
+  .ev--gap {
+    border-style: dotted;
+    border-color: var(--line-strong);
+    color: var(--ink-2);
+    font-weight: var(--fw-medium);
+  }
+</style>

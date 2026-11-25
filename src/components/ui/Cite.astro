@@ -1,0 +1,84 @@
+---
+/**
+ * Cite — a citation marker that links to the entry on the sources page
+ * (/sources/#<id>). Every factual claim and every chart gets one.
+ *
+ * Props
+ *   locale   Locale
+ *   id       the source's id on /sources/ (e.g. 'iot-2025-scramble')
+ *   n        the number shown; keep it stable per source across the site
+ *   variant  'sup' (default, inline superscript) | 'chip' ("Source 3" pill, for
+ *            figure footers, cards and chain links)
+ *
+ *   …暴露量顯著較高<Cite locale={locale} id="wu-2021" n={3} />。
+ */
+import { href, type Locale } from '@/i18n';
+import { t, ui } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  id: string;
+  n: number | string;
+  variant?: 'sup' | 'chip';
+}
+const { locale, id, n, variant = 'sup' } = Astro.props;
+const url = href(`/sources/#${id}`, locale);
+const label = t(ui.sourceN, locale, { n });
+---
+
+{variant === 'sup' ? (
+  <sup class="cite"><a href={url} aria-label={label}>{n}</a></sup>
+) : (
+  <a class="cite-chip" href={url}>{label}</a>
+)}
+
+<style>
+  .cite {
+    font-size: 0.7em;
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    margin-inline-start: 0.1em;
+  }
+  .cite a {
+    position: relative;
+    display: inline-block;
+    min-inline-size: 1.5em;
+    padding: 0 0.3em;
+    border-radius: var(--radius-1);
+    background: var(--bg-sunken);
+    color: var(--accent);
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.5;
+  }
+  /* Enlarge the hit area without disturbing the line */
+  .cite a::after {
+    content: '';
+    position: absolute;
+    inset: -0.7em -0.45em;
+  }
+  .cite a:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .cite-chip {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.75rem;
+    padding: 0 0.6em;
+    border: 1.5px solid currentColor;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .cite-chip:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+  }
+</style>

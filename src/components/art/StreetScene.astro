@@ -1,0 +1,282 @@
+---
+/**
+ * StreetScene — the signature illustration: the red-light moment.
+ *
+ * A Taiwanese crossing in side view. A pack of scooters idles behind the stop
+ * line under a red signal with a countdown; pedestrians cross in front of it.
+ * In the `red` state the scooters burn gasoline: fumes pool along the ground,
+ * thicken as the countdown runs, and a ring marks where each person breathes —
+ * the baby and the schoolchild inside the densest layer, the adults above it.
+ * The `clean` state is the same crossing and the same red light with electric
+ * scooters and clear air.
+ *
+ * Two compositions are drawn: `compact` (phones: one row of people, a cropped
+ * pack, no text labels) and `wide` (arcade buildings, a longer pack, a height
+ * ruler with labels). `auto` renders both and switches on container width.
+ *
+ * Props
+ *   locale    Locale
+ *   state     'red' | 'clean' (default 'red')
+ *   variant   'auto' | 'wide' | 'compact' (default 'auto')
+ *   labels    show the height ruler and labels (default true)
+ *   animated  drift, puffs, breathing rings, countdown (default true;
+ *             always still under prefers-reduced-motion)
+ *   class     extra class on the wrapper
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import { MOUTH, TAILPIPE, SCOOTER_LENGTH, breath, coRings, fumes, ledDigit, person, puffs, scooter, ufpDots } from './parts';
+
+interface Props {
+  locale: Locale;
+  state?: 'red' | 'clean';
+  variant?: 'auto' | 'wide' | 'compact';
+  labels?: boolean;
+  animated?: boolean;
+  class?: string;
+}
+const { locale, state = 'red', variant = 'auto', labels = true, animated = true, class: cls } = Astro.props;
+const clean = state === 'clean';
+const alt = clean ? ui.scene.altClean[locale] : ui.scene.altRed[locale];
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+let uid = 0;
+const nextId = () => `scene-${state}-${Math.random().toString(36).slice(2, 7)}-${uid++}`;
+
+function build(v: 'wide' | 'compact') {
+  const wide = v === 'wide';
+  const W = wide ? 1280 : 600;
+  const TOP = wide ? -392 : -338;
+  const NEAR = wide ? 58 : 50; // road in front of the ground line
+  const FAR = -30; // road behind it
+  const STOP = wide ? 792 : 262;
+  const RULER = wide ? 1236 : 588;
+  const kind = clean ? 'electric' : 'gas';
+  const id = nextId();
+  const o: string[] = [];
+
+  // -- defs
+  o.push(
+    `<defs>
+      <linearGradient id="${id}-wash" x1="0" y1="0" x2="0" y2="1">
+        <stop class="a-wash-stop" offset="0" stop-opacity="0"/>
+        <stop class="a-wash-stop" offset="0.42" stop-opacity="0.1"/>
+        <stop class="a-wash-stop" offset="0.74" stop-opacity="0.34"/>
+        <stop class="a-wash-stop" offset="1" stop-opacity="0.6"/>
+      </linearGradient>
+      <radialGradient id="${id}-glow">
+        <stop class="a-glow-stop" offset="0" stop-opacity="0.5"/>
+        <stop class="a-glow-stop" offset="0.35" stop-opacity="0.16"/>
+        <stop class="a-glow-stop" offset="1" stop-opacity="0"/>
+      </radialGradient>
+      <clipPath id="${id}-count"><rect x="0" y="0" width="52" height="52"/></clipPath>
+    </defs>`,
+  );
+
+  // -- architecture: an arcade (騎樓) shop-house row, faint
+  const bays = wide ? [40, 270, 500, 730, 960, 1190] : [34, 250, 466];
+  const signs = ['早餐', '機車行', '藥局', '五金', '麵店', '眼鏡'];
+  o.push('<g class="scene-arch">');
+  o.push(`<rect class="a-plane" x="-10" y="${FAR - 330}" width="${W + 20}" height="30"/>`);
+  o.push(`<path class="a-line" d="M-10,${FAR - 330} H${W + 10} M-10,${FAR - 300} H${W + 10}"/>`);
+  // upper-floor windows with iron grilles, and air-conditioner boxes
+  for (let x = 96; x < W; x += wide ? 230 : 216) {
+    o.push(`<rect class="a-line" x="${x}" y="${FAR - 420}" width="120" height="70"/>`);
+    let g = '';
+    for (let k = 1; k < 8; k++) g += `M${x + k * 15},${FAR - 420} V${FAR - 350} `;
+    o.push(`<path class="a-line" stroke-width="1" d="${g}"/>`);
+    o.push(`<rect class="a-plane" x="${x + 134}" y="${FAR - 372}" width="36" height="24"/><rect class="a-line" x="${x + 134}" y="${FAR - 372}" width="36" height="24"/>`);
+  }
+  bays.forEach((x, i) => {
+    // shutter or shopfront between columns
+    const bw = (wide ? 230 : 216) - 28;
+    if (i % 2 === 0) {
+      let d = '';
+      for (let y = FAR - 250; y < FAR; y += 22) d += `M${x + 44},${y} H${x + bw} `;
+      o.push(`<path class="a-line" stroke-width="1" d="${d}"/><rect class="a-line" x="${x + 44}" y="${FAR - 262}" width="${bw - 44}" height="262"/>`);
+    } else {
+      o.push(`<rect class="a-line" x="${x + 48}" y="${FAR - 200}" width="62" height="200"/><rect class="a-line" x="${x + 126}" y="${FAR - 200}" width="${bw - 130}" height="120"/>`);
+    }
+    // column
+    o.push(`<rect class="a-plane" x="${x}" y="${FAR - 300}" width="28" height="300"/><path class="a-line" d="M${x},${FAR - 300} V${FAR} M${x + 28},${FAR - 300} V${FAR}"/>`);
+    // vertical signboard (招牌) hanging off the column
+    const chars = [...signs[i % signs.length]];
+    const sh = chars.length * 34 + 16;
+    o.push(`<rect class="a-plane" x="${x - 8}" y="${FAR - 290}" width="44" height="${sh}"/><rect class="a-line" x="${x - 8}" y="${FAR - 290}" width="44" height="${sh}"/>`);
+    chars.forEach((c, k) => o.push(`<text class="scene-sign" x="${x + 14}" y="${FAR - 290 + 38 + k * 34}" text-anchor="middle">${c}</text>`));
+  });
+  o.push('</g>');
+
+  // -- road: a shallow stage. Ground line for the front row is y = 0.
+  o.push(`<rect class="a-road" x="-10" y="${FAR}" width="${W + 20}" height="${NEAR - FAR + 4}"/>`);
+  // stop line and zebra bars (long axis along the lane, stacked into depth)
+  o.push(`<rect class="a-paint" x="${STOP}" y="${FAR}" width="13" height="${NEAR - FAR + 4}"/>`);
+  const zx = STOP + 34;
+  const zw = wide ? 300 : 286;
+  [
+    [FAR + 5, 5],
+    [FAR + 17, 7],
+    [7, 9],
+    [25, 12],
+    [NEAR - 12, 16],
+  ].forEach(([y, h]) => o.push(`<rect class="a-paint" x="${zx}" y="${y}" width="${zw}" height="${h}"/>`));
+  if (wide) o.push(`<path class="a-paint" d="M${zx + zw + 40},${FAR + 8} H${W + 10} v5 H${zx + zw + 45} V${NEAR + 4} h-5 Z"/>`);
+
+  // -- the pack: three rows, back to front
+  const s = SCOOTER_LENGTH;
+  const rowsWide = { r3: [750, 572, 392, 214, 34], r2: [690, 502, 312, 124, -64], r1: [780, 586, 392, 198, 4] };
+  const rowsCompact = { r3: [232, 78, -70], r2: [166, -12], r1: [250, 60] };
+  const rows = wide ? rowsWide : rowsCompact;
+  const place = (front: number, scale: number, lift: number, i: number, front_row: boolean) => {
+    const rear = front - s * scale;
+    let g = `<g transform="translate(${rear.toFixed(1)} ${-lift}) scale(${scale})">`;
+    if (!clean && front_row) g += `<g transform="translate(${TAILPIPE.x} ${TAILPIPE.y})">${puffs(i + 3)}</g>`;
+    g += scooter({ kind, rider: true });
+    return g + '</g>';
+  };
+  o.push(`<g class="a-row-3">${rows.r3.map((x, i) => place(x, 0.84, 25, i, false)).join('')}</g>`);
+  o.push(`<g class="a-row-2">${rows.r2.map((x, i) => place(x, 0.92, 12, i, false)).join('')}</g>`);
+  o.push(`<g>${rows.r1.map((x, i) => place(x, 1, 0, i, true)).join('')}</g>`);
+
+  // -- pedestrians, crossing in front of the pack
+  const pairX = wide ? 852 : 304;
+  const strollerX = wide ? 956 : 392;
+  const elderX = wide ? 1108 : 548;
+  o.push(`<g transform="translate(${pairX} 0)">${person('adult-with-child')}</g>`);
+  o.push(`<g transform="translate(${strollerX} 0)">${person('stroller')}</g>`);
+  o.push(`<g transform="translate(${elderX} 0) scale(-1 1)">${person('elder')}</g>`);
+  const mouths = {
+    adult: { x: pairX + MOUTH.adult.x, y: MOUTH.adult.y },
+    child: { x: pairX + 36 + MOUTH.child.x, y: MOUTH.child.y },
+    parent: { x: strollerX + MOUTH.parent.x, y: MOUTH.parent.y },
+    baby: { x: strollerX + MOUTH.stroller.x, y: MOUTH.stroller.y },
+    elder: { x: elderX - MOUTH.elder.x, y: MOUTH.elder.y },
+  };
+
+  // -- the air (red state only): wash, then the three treatments
+  if (!clean) {
+    o.push(`<g class="a-build">`);
+    o.push(`<rect x="-10" y="-230" width="${W + 20}" height="${230 + NEAR + 4}" fill="url(#${id}-wash)"/>`);
+    o.push(`<g class="a-ufp a-drift-3">${ufpDots({ width: W, count: wide ? 420 : 220, seed: 31 })}</g>`);
+    o.push(`<g class="a-co a-drift-2">${coRings({ width: W, count: wide ? 46 : 24, seed: 12 })}</g>`);
+    o.push(`<g class="a-fumes a-drift-1">${fumes({ width: W, count: wide ? 56 : 30, seed: 5, scale: 40, top: 180 })}</g>`);
+    o.push('</g>');
+  }
+
+  // -- breathing points
+  o.push('<g>' + Object.values(mouths).map((m) => breath(m.x, m.y, 9.5)).join('') + '</g>');
+
+  // -- height ruler and labels
+  if (labels) {
+    let ticks = `M${RULER},4 V-205`;
+    for (let h = 0; h <= 200; h += 10) ticks += ` M${RULER},${-h} h${h % 50 === 0 ? 12 : 6}`;
+    o.push(`<path class="a-rule" d="${ticks}"/>`);
+    [50, 100, 150, 200].forEach((h) => o.push(`<text class="a-label scene-num" x="${RULER + 16}" y="${-h + 5}">${h}</text>`));
+    o.push(`<text class="a-label scene-num" x="${RULER + 16}" y="-218">${esc(ui.scene.heightUnit[locale])}</text>`);
+    const lines: [number, number, string][] = [
+      [mouths.adult.x + 14, mouths.adult.y, ui.scene.adult[locale]],
+      [mouths.child.x + 14, mouths.child.y, ui.scene.child[locale]],
+      [mouths.baby.x + 14, mouths.baby.y, ui.scene.stroller[locale]],
+    ];
+    lines.forEach(([x, y, text]) => {
+      o.push(`<path class="a-rule a-rule--dot" d="M${x},${y} H${RULER - 3}"/>`);
+      if (wide) o.push(`<text class="a-label scene-label" x="${RULER - 10}" y="${y - 8}" text-anchor="end">${esc(text)}</text>`);
+    });
+    if (!clean) {
+      o.push(`<path class="a-rule a-rule--dot" d="M0,${TAILPIPE.y} H${RULER - 3}"/>`);
+      if (wide) o.push(`<text class="a-label scene-label" x="${RULER - 10}" y="${TAILPIPE.y - 8}" text-anchor="end">${esc(ui.scene.tailpipe[locale])}</text>`);
+    }
+  }
+
+  // -- the signal: red, with a countdown (the same in both states)
+  const sx = wide ? 1012 : 448; // lamp housing
+  const sy = TOP + 14;
+  const bx = sx - 58; // countdown box
+  const p = 4.2;
+  const digitAt = (ch: string, col: number, row: number) => ledDigit(ch, p, 1.65, 3.2 + col * 6 * p, 11.3 + row * 52);
+  const units = [...'9876543210'].map((c, k) => `<path d="${digitAt(c, 1, k)}"/>`).join('');
+  const tens = [...'210'].map((c, k) => `<path d="${digitAt(c, 0, k)}"/>`).join('');
+  o.push(`<circle cx="${sx + 26}" cy="${sy + 26}" r="${wide ? 150 : 120}" fill="url(#${id}-glow)"/>`);
+  o.push(`<path class="a-ink-s" stroke-width="7" d="M${sx + 132},${sy + 26} H${W + 10}"/>`);
+  o.push(`<rect class="a-housing" x="${sx}" y="${sy}" width="136" height="52" rx="6"/>`);
+  o.push(`<circle class="a-led-red" cx="${sx + 26}" cy="${sy + 26}" r="17"/><circle class="a-lamp-off" cx="${sx + 68}" cy="${sy + 26}" r="17"/><circle class="a-lamp-off" cx="${sx + 110}" cy="${sy + 26}" r="17"/>`);
+  o.push(`<rect class="a-housing" x="${bx}" y="${sy}" width="52" height="52" rx="6"/>`);
+  o.push(
+    `<g transform="translate(${bx} ${sy})" clip-path="url(#${id}-count)" class="a-led-red">
+      <g class="a-count-tens" transform="translate(0 -52)" style="--count-tens-span:-156px">${tens}</g>
+      <g class="a-count-units" transform="translate(0 -52)" style="--count-units-span:-520px">${units}</g>
+    </g>`,
+  );
+
+  return { viewBox: `0 ${TOP} ${W} ${NEAR - TOP}`, body: o.join('') };
+}
+
+const show = variant === 'auto' ? (['compact', 'wide'] as const) : ([variant] as const);
+const scenes = show.map((v) => ({ v, ...build(v) }));
+---
+
+<div class:list={['scene', `scene--${variant}`, clean ? 'is-clean' : 'is-red', animated && 'a-animated', cls]}>
+  {scenes.map((sc) => (
+    <svg class={`scene__svg scene__svg--${sc.v}`} viewBox={sc.viewBox} role="img" aria-label={alt} focusable="false" set:html={sc.body} />
+  ))}
+</div>
+
+<style>
+  .scene {
+    container-type: inline-size;
+    inline-size: 100%;
+    overflow: hidden;
+  }
+  .scene__svg {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+  .scene--auto .scene__svg--wide {
+    display: none;
+  }
+  @container (min-width: 44rem) {
+    .scene--auto .scene__svg--compact {
+      display: none;
+    }
+    .scene--auto .scene__svg--wide {
+      display: block;
+    }
+  }
+  /* SVG text is in drawing units (cm); step it so it lands near 13px. */
+  .scene :global(.scene-label) {
+    font-size: 23px;
+  }
+  .scene :global(.scene-num) {
+    font-size: 17px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .scene :global(.scene__svg--compact .scene-num) {
+    display: none;
+  }
+  .scene :global(.scene-sign) {
+    font-family: var(--font-cjk);
+    font-size: 26px;
+    font-weight: 700;
+    fill: var(--art-line);
+    opacity: 0.8;
+  }
+  @container (min-width: 60rem) {
+    .scene :global(.scene-label) {
+      font-size: 18px;
+    }
+    .scene :global(.scene-num) {
+      font-size: 14px;
+    }
+  }
+  @container (min-width: 76rem) {
+    .scene :global(.scene-label) {
+      font-size: 15px;
+    }
+    .scene :global(.scene-num) {
+      font-size: 12px;
+    }
+  }
+</style>

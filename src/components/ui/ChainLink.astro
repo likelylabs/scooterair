@@ -1,0 +1,172 @@
+---
+/**
+ * ChainLink — one link of the evidence chain, as a list item inside
+ * <EvidenceChain>. A numbered node on a rail, the link's claim, its
+ * evidence-strength badge, a short body and its citations.
+ * The final link is drawn apart from the rail, in green: it is the one the
+ * reader can act on.
+ *
+ * Props
+ *   locale    Locale
+ *   n         link number, 1-based
+ *   title     the claim (default chain.links[n-1])
+ *   strength  'measured' | 'established' | 'inference' | 'gap' (omit for none)
+ *   href      link the title to the chapter that argues this link
+ *   final     this is the breakable link (default: n is the last link)
+ *   current   highlight as "you are here"
+ *   level     heading level (default 3)
+ * Slots
+ *   default  one or two sentences of body
+ *   cites    one or more <Cite variant="chip" … />
+ *   action   (final link) a <Button>
+ */
+import type { Locale } from '@/i18n';
+import { chain, type EvidenceLevel } from '@/i18n/ui';
+import EvidenceBadge from './EvidenceBadge.astro';
+
+interface Props {
+  locale: Locale;
+  n: number;
+  title?: string;
+  strength?: EvidenceLevel;
+  href?: string;
+  final?: boolean;
+  current?: boolean;
+  level?: 3 | 4;
+  class?: string;
+}
+const { locale, n, strength, href, current = false, level = 3, class: cls } = Astro.props;
+const final = Astro.props.final ?? n === chain.links.length;
+const title = Astro.props.title ?? chain.links[n - 1]?.[locale] ?? '';
+const H = `h${level}` as 'h3' | 'h4';
+---
+
+<li class:list={['link', final && 'link--final', current && 'link--current', cls]} aria-current={current ? 'step' : undefined}>
+  <div class="link__rail" aria-hidden="true">
+    {final && (
+      <svg class="link__cut" viewBox="0 0 24 16" width="24" height="16"><path d="M5,13 l5,-10 M14,13 l5,-10" /></svg>
+    )}
+    <span class="link__node">{n}</span>
+  </div>
+  <div class="link__body">
+    {final && <p class="eyebrow link__flag">{chain.breakable[locale]}</p>}
+    <H class="link__title">
+      <span class="vh">{n}. </span>
+      {href ? <a href={href}>{title}</a> : title}
+    </H>
+    {strength && <p class="link__strength"><EvidenceBadge level={strength} locale={locale} /></p>}
+    {Astro.slots.has('default') && <div class="link__text"><slot /></div>}
+    {Astro.slots.has('cites') && <p class="link__cites cluster"><slot name="cites" /></p>}
+    {Astro.slots.has('action') && <p class="link__action"><slot name="action" /></p>}
+  </div>
+</li>
+
+<style>
+  .link {
+    --node: 2.25rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--node) minmax(0, 1fr);
+    gap: 0 var(--sp-4);
+    padding-block-end: var(--sp-6);
+  }
+  /* the rail: runs from this node down to the next */
+  .link::before {
+    content: '';
+    position: absolute;
+    inset-block: var(--node) 0;
+    inset-inline-start: calc(var(--node) / 2 - 1.5px);
+    inline-size: 3px;
+    background: var(--ink);
+  }
+  .link:last-child::before,
+  .link--final::before {
+    display: none;
+  }
+  .link:last-child {
+    padding-block-end: 0;
+  }
+  .link__node {
+    display: grid;
+    place-items: center;
+    inline-size: var(--node);
+    block-size: var(--node);
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    background: var(--here);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .link--current .link__node {
+    background: var(--exhaust);
+    color: #fff;
+  }
+  .link__body {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+    padding-block-start: 0.3rem;
+    min-inline-size: 0;
+  }
+  .link__title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    font-stretch: 100%;
+    line-height: var(--lh-snug);
+    letter-spacing: 0;
+  }
+  .link__title a {
+    color: inherit;
+  }
+  .link__text {
+    max-inline-size: 34em;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .link__cites {
+    --cluster: var(--sp-2);
+  }
+
+  /* The link you can break: detached from the rail, signal green, boxed. */
+  .link--final {
+    margin-block-start: var(--sp-3);
+  }
+  .link--final .link__rail {
+    position: relative;
+  }
+  .link__cut {
+    position: absolute;
+    inset-block-end: calc(100% + 0.9rem);
+    inset-inline-start: calc(var(--node) / 2 - 12px);
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .link--final .link__node {
+    border-color: var(--clean);
+    background: var(--clean);
+    color: #fff;
+  }
+  .link--final .link__body {
+    padding: var(--sp-4);
+    border: var(--rule-paint) solid var(--clean);
+    background: var(--clean-wash);
+  }
+  .link--final .link__flag {
+    color: var(--clean-ink);
+  }
+  .link--final .link__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+  .link--final .link__text {
+    color: var(--ink);
+  }
+  .link__action {
+    margin-block-start: var(--sp-2);
+  }
+</style>

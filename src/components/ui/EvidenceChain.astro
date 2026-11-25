@@ -1,0 +1,69 @@
+---
+/**
+ * EvidenceChain — the whole argument at a glance: every link in order on one
+ * vertical rail (it reads the same on a phone and on a desktop), each with
+ * its evidence strength and citations, the last one set apart as the link
+ * the reader can break.
+ *
+ * Two ways to fill it:
+ *  1. Data: pass `links` and the component renders the items.
+ *  2. Composition: put <ChainLink> children in the default slot when a link
+ *     needs rich content.
+ *
+ * Props
+ *   locale   Locale
+ *   label    accessible name for the list (default "證據鏈 / Evidence chain")
+ *   current  highlight link n as "you are here"
+ *   links    { title?: string; body?: string; strength?: EvidenceLevel; href?: string;
+ *              cites?: { id: string; n: number | string }[] }[]
+ *            title defaults to chain.links[i]; the last item becomes the final link.
+ * Slots
+ *   default  <ChainLink> children (when `links` is not used)
+ *   action   with `links`: the call to action inside the final link
+ */
+import type { Locale } from '@/i18n';
+import { chain, type EvidenceLevel } from '@/i18n/ui';
+import ChainLink from './ChainLink.astro';
+import Cite from './Cite.astro';
+
+interface LinkData {
+  title?: string;
+  body?: string;
+  strength?: EvidenceLevel;
+  href?: string;
+  cites?: { id: string; n: number | string }[];
+}
+interface Props {
+  locale: Locale;
+  label?: string;
+  current?: number;
+  links?: LinkData[];
+  class?: string;
+}
+const { locale, label = chain.name[locale], current, links, class: cls } = Astro.props;
+---
+
+<ol class:list={['chain', cls]} aria-label={label}>
+  {links
+    ? links.map((l, i) => (
+        <ChainLink locale={locale} n={i + 1} title={l.title} strength={l.strength} href={l.href} final={i === links.length - 1} current={current === i + 1}>
+          {l.body && <p>{l.body}</p>}
+          {l.cites?.length ? (
+            <Fragment slot="cites">
+              {l.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}
+            </Fragment>
+          ) : null}
+          {i === links.length - 1 && Astro.slots.has('action') ? <slot name="action" slot="action" /> : null}
+        </ChainLink>
+      ))
+    : <slot />}
+</ol>
+
+<style>
+  .chain {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-inline-size: 44rem;
+  }
+</style>

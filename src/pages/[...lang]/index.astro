@@ -1,6 +1,18 @@
 ---
+import Base from '@/layouts/Base.astro';
+import StreetScene from '@/components/art/StreetScene.astro';
 import { localeFromParam, localeStaticPaths } from '@/i18n';
+import { site } from '@/i18n/ui';
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 ---
-<html lang={locale}><body><h1>{locale === 'en' ? 'ScooterAir' : '行人呼吸'}</h1></body></html>
+
+<Base locale={locale} title={site.name[locale]} home>
+  <div class="container" style="padding-block: 3rem 1rem">
+    <p class="eyebrow">{site.name[locale]}</p>
+    <h1 class="display">{site.tagline[locale]}</h1>
+    <p class="lead">{site.description[locale]}</p>
+  </div>
+  <StreetScene locale={locale} />
+  <StreetScene locale={locale} state="clean" />
+</Base>

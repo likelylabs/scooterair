@@ -1,0 +1,55 @@
+---
+/**
+ * Scooter — a single scooter in side view, as a standalone drawing.
+ * The gasoline and electric versions share a wheelbase and stance so they can
+ * sit side by side in a comparison. Generic designs: no real model or brand.
+ *
+ * Props
+ *   kind      'gas' | 'electric'
+ *   rider     seat a rider on it (default false)
+ *   exhaust   gas only: show the tailpipe plume (default true)
+ *   flip      face left instead of right
+ *   label     accessible name; omit and the drawing is decorative
+ *   animated  animate the plume (default true)
+ *   class     extra class
+ */
+import '@/styles/art.css';
+import { TAILPIPE, fumes, puffs, scooter } from './parts';
+
+interface Props {
+  kind: 'gas' | 'electric';
+  rider?: boolean;
+  exhaust?: boolean;
+  flip?: boolean;
+  label?: string;
+  animated?: boolean;
+  class?: string;
+}
+const { kind, rider = false, exhaust = true, flip = false, label, animated = true, class: cls } = Astro.props;
+const plume = kind === 'gas' && exhaust;
+const body =
+  (plume ? `<g class="a-fumes" transform="translate(-70 0)">${fumes({ width: 110, count: 9, seed: 9, scale: 26, top: 80 })}</g><g transform="translate(${TAILPIPE.x} ${TAILPIPE.y})">${puffs(2)}</g>` : '') +
+  scooter({ kind, rider });
+---
+
+<svg
+  class:list={['scooter-art', animated && 'a-animated', cls]}
+  viewBox="-90 -168 290 176"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  <g transform={flip ? 'translate(110 0) scale(-1 1)' : undefined}>
+    <path class="a-rule" d="M-90,0 H200"></path>
+    <Fragment set:html={body} />
+  </g>
+</svg>
+
+<style>
+  .scooter-art {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+</style>

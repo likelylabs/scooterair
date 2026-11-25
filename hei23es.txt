@@ -1,0 +1,849 @@
+                                                           Updated October 14, 2022
+
+
+
+
+SPECIAL REPORT 23
+June 2022
+
+
+
+
+       Systematic Review and Meta-analysis of
+        Selected Health Effects of Long-Term
+      Exposure to Traffic-Related Air Pollution
+            HEI Panel on the Health Effects of Long-Term Exposure to
+                           Traffic-Related Air Pollution
+
+
+                     EXECUTIVE SUMMARY
+                       Health Effects Institute
+ABOUT HEI
+
+   The Health Effects Institute is a nonprofit corporation chartered in 1980 as an independent
+research organization to provide high-­quality, impartial, and relevant science on the effects of air
+pollution on health. To accomplish its mission, the Institute
+
+   •    Identifies the highest-­priority areas for health effects research
+
+   •    Competitively funds and oversees research projects
+
+   •    Provides intensive independent review of HEI-­supported studies and related research
+
+   •    Integrates HEI’s research results with those of other institutions into broader evaluations
+
+   •    Communicates the results of HEI’s research and analyses to public and private decision
+        makers.
+
+   HEI typically receives balanced funding from the U.S. Environmental Protection Agency and the
+worldwide motor vehicle industry. Frequently, other public and private organizations in the United
+States and around the world also support major projects or research programs. HEI has funded
+more than 340 research projects in North America, Europe, Asia, and Latin America, the results
+of which have informed decisions regarding carbon monoxide, air toxics, nitrogen oxides, diesel
+exhaust, ozone, particulate matter, and other pollutants. These results have appeared in more than
+260 comprehensive reports published by HEI, as well as in more than 2,500 articles in the peer-­
+reviewed literature.
+
+    HEI’s independent Board of Directors consists of leaders in science and policy who are
+committed to fostering the public–private partnership that is central to the organization. The
+Research Committee solicits input from HEI sponsors and other stakeholders and works with
+scientific staff to develop a Five-Year Strategic Plan, select research projects for funding, and
+oversee their conduct. The Review Committee, which has no role in selecting or overseeing
+studies, works with staff to evaluate and interpret the results of funded studies and related
+research.
+
+   All project results and accompanying comments by the Review Committee (or in this case,
+the HEI Panel on the Health Effects of Long-Term Exposure to Traffic-Related Air Pollution) are
+widely disseminated through HEI’s website (www.healtheffects.org), reports, newsletters and other
+publications, annual conferences, and presentations to legislative bodies and public agencies.
+CO N T R I B U TO R S
+
+In 2018, the Board of Directors of the Health Effects Institute (HEI) appointed an expert Panel to review the scientific literature
+on traffic-­related air pollution and health. The Panel consisted of scientists from a variety of disciplines and was co-­chaired by
+Francesco Forastiere, Imperial College London, and Frederick Lurmann, Sonoma Technology, Inc., Petaluma, California. During
+the course of the review, consultants to the Panel were added. In addition, HEI hired a contractor team at the Swiss Tropical
+and Public Health Institute, Switzerland, to execute certain parts of the review. HEI is indebted to the Panel, the consultants to
+the Panel, and contract team for their expertise, cooperation, and enthusiasm. A draft of the resulting report was submitted for
+outside peer review.
+
+
+
+HEI PANEL ON THE HEALTH EFFECTS OF LONG-TERM EXPOSURE TO
+TRAFFIC-RELATED AIR POLLUTION
+Francesco Forastiere (co-­chair) Visiting Professor, Environmental Research Group, School of Public Health, Faculty of Medicine,
+Imperial College London, United Kingdom
+Frederick Lurmann (co-­chair) Manager of Exposure Assessment Studies, Sonoma Technology, Inc., Petaluma, California
+Richard Atkinson Professor of Epidemiology, Population Health Research Institute, St. George’s University of London, United
+Kingdom
+Jeffrey Brook Assistant Professor, Occupational and Environmental Health Division, Dalla Lana School of Public Health, University of
+Toronto, Canada; HEI Research Committee
+Howard Chang Professor, Department of Biostatistics and Bioinformatics, Rollins School of Public Health, Emory University, Atlanta,
+Georgia
+Gerard Hoek Associate Professor, Institute for Risk Assessment Sciences, Environmental Epidemiology, Utrecht University, the
+Netherlands
+Barbara Hoffmann Professor of Environmental Epidemiology, Institute of Occupational, Social, and Environmental Medicine,
+Heinrich Heine University Düsseldorf, Germany; HEI Research Committee
+Sharon Sagiv Associate Adjunct Professor of Epidemiology, Center for Environmental Research and Children's Health, Division of
+Epidemiology, University of California, Berkeley School of Public Health, Berkeley, California
+Evangelia Samoli Associate Professor of Epidemiology and Medical Statistics, Department of Hygiene, Epidemiology and Medical
+Statistics, School of Medicine, National and Kapodistrian University of Athens, Greece; HEI Research Committee
+Audrey Smargiassi Associate Professor, Department of Environmental and Occupational Health, School of Public Health, University
+of Montreal, Quebec, Canada
+Adam Szpiro Associate Professor of Biostatistics, Department of Biostatistics, University of Washington, Seattle
+Danielle Vienneau Assistant Professor (Habilitation), Department of Epidemiology and Public Health, Swiss Tropical and Public
+Health Institute, Switzerland; and University of Basel, Switzerland
+Jennifer Weuve Associate Professor, Department of Epidemiology, Boston University School of Public Health, Massachusetts
+
+
+
+CONSULTANTS TO THE PANEL
+Julia Fussell Senior Research Fellow, School of Public Health, Imperial College London, United Kingdom
+Frank Kelly Humphrey Battcock Chair of Environment and Health, School of Public Health, Imperial College London, United
+Kingdom; HEI Review Committee
+Tim Nawrot Professor Environmental Epidemiology, Centre for Environmental Sciences, Hasselt University, Belgium
+Gregory Wellenius Professor of Environmental Health, Boston University School of Public Health, Massachusetts; HEI Research
+Committee
+
+                                                                                                                          Continued
+    CO N T R I B U TO R S
+    HEI SCIENCE STAFF
+    Hanna Boogaard Project Leader, Consulting Principal Scientist           Eva Tanner Peer-Review Process, Staff Scientist
+    Allison Patton Deputy Project Leader, Senior Scientist                  Dan Greenbaum President
+    Dan Crouse Wheeze Outcomes, Senior Scientist                            Rashid Shaikh Director of Science Emeritus
+    Eleanne van Vliet Term Birth Weight, Staff Scientist                    Ellen Mantus Director of Science
+    Martha Ondras Neurological Outcomes, Research Fellow                    Annemoon van Erp Deputy Director of Science
+
+
+    HEI EDITORIAL STAFF
+    Kristin Eckles Senior Editorial Manager                                 Mary Brennan Consulting Editor
+    Hope Green Editorial Project Manager                                    William Fogle Consulting Editor
+    Carol Moyer Lead Consulting Editor
+
+
+    CONTRACTOR TEAM
+    Meltem Kutlar Joss, Ron Kappeler, and students Lara Stucki, Zoe Roth, and Elina Wüthrich under the supervision of Professor Nino
+    Künzli, Swiss Literature Database and Services on Health Effects of Ambient Air Pollution (LUDOK), Department of Epidemiology
+    and Public Health, Swiss Tropical and Public Health Institute, University of Basel, Switzerland, as well as students Leonie Hoffmann and
+    Pascale Haddad under the supervision of Professor Barbara Hoffmann. We would also like to thank Alan da Silveira Fleck and Margaux
+    Sadoine under the supervision of Dr. Audrey Smargiassi.
+
+
+    PEER REVIEWERS—FULL REPORT
+    Bert Brunekreef (chair) Emeritus Professor of Environmental             Neil Pearce Professor of Epidemiology and Biostatistics, London
+    Epidemiology, Institute for Risk Assessment Sciences, Utrecht            School of Hygiene and Tropical Medicine, United Kingdom; HEI
+    University, the Netherlands                                              Research Committee
+    Haneen Khreis Senior Research Associate, MRC Epidemiology               Marie Pedersen Associate Professor, Department of Public
+    Unit, University of Cambridge, United Kingdom                            Health, Section of Epidemiology, University of Copenhagen,
+    Michael Jerrett Professor and Chair, Department of                      Denmark
+    Environmental Health Sciences, Fielding School of Public Health,         David Savitz Professor of Epidemiology, School of Public Health,
+    University of California–Los Angeles, California; HEI Review Committee   and Professor of Obstetrics and Gynecology, Alpert Medical School,
+    Susan Norris Department of Family Medicine, Oregon Health               Brown University; Chair, HEI Research Committee
+    & Science University, Portland, Oregon                                   Jay Turner Vice Dean for Education and James McKelvey
+    Annette Peters Chair of Epidemiology, Director of the Institute         Professor of Engineering Education, Washington University in
+    of Epidemiology, Helmholtz Zentrum München, Germany                      St. Louis, Missouri
+
+
+
+    PEER REVIEWERS—SPECIFIC CHAPTERS
+    Chad R. Bailey U.S. EPA Office of Transportation and Air                Mònica Guxens Associate Research Professor, Barcelona
+    Quality, Ann Arbor, Michigan                                             Institute for Global Health, Spain
+    David Carslaw Wolfson Atmospheric Chemistry Laboratories,               Michael Kleeman Professor, Department of Civil and
+    University of York, United Kingdom                                       Environmental Engineering, University of California–Davis, California
+    Flemming Cassee Professor, Chief Science Officer, National              Nick Molden Founder and CEO Emissions Analytics,
+    Institute for Public Health and the Environment, the Netherlands         Stokenchurch, United Kingdom
+    David E. Foster Phil and Jean Myers Professor Emeritus,                 Marc Weisskopf Cecil K. and Philip Drinker Professor of
+    University of Wisconsin–Madison, Wisconsin                               Environmental Epidemiology and Physiology, Environmental Health,
+    Mark Frampton Professor Emeritus, Department of Medicine,               Harvard T.H. Chan School of Public Health, Boston, Massachusetts
+    Pulmonary Diseases and Critical Care, University of Rochester
+    Medical Center, New York
+4
+E X E C U T I V E S U M M A RY
+
+                                                             and infrastructure, electricity decarboniza-
+INTRODUCTION
+                                                             tion, nontailpipe emissions mitigation, and
+                                                             fleet turnover (Khreis et al. 2020). However,
+   Motor vehicles are a significant source of
+                                                             their sale is growing rapidly as technical and
+urban air pollution and are important contribu-
+                                                             infrastructural barriers are overcome, and gov-
+tors of anthropogenic carbon dioxide and other
+                                                             ernment policies and manufacturers’ pledge to
+greenhouse gases.
+                                                             boost their adoption come to fruition.
+    Traffic-­related air pollution (TRAP*) is a
+                                                                Interest in the contribution of nontailpipe
+complex mixture of gases and particles result-
+                                                             emissions to air quality and health is increasing
+ing from the use of motor vehicles including
+                                                             in most high-­income countries as vehicle miles
+heavy-­duty and light-­duty vehicles, buses, pas-
+                                                             traveled increase and regulations continue to
+senger cars, and motorcycles. Motor vehicles
+                                                             be targeted almost exclusively to tailpipe emis-
+emit a variety of pollutants including nitrogen
+                                                             sions. For the foreseeable future, a substantial
+oxides (NOx), elemental carbon (EC), particu-
+                                                             number of people globally will continue to
+late matter ≤2.5 μm in aerodynamic diameter
+                                                             be exposed to tailpipe and nontailpipe TRAP,
+(PM2.5), ultrafine particles (UFPs), heavy metals,
+                                                             especially in urban settings and residences in
+polycyclic aromatic hydrocarbons, and volatile
+                                                             proximity to busy roadways.
+organic compounds. When emitted through
+vehicle exhaust, these pollutants are called                     The rate at which vehicle emissions disperse
+tailpipe emissions. When emitted by other                    into ambient air depends on multiple factors
+means, such as evaporative emissions of fuel,                that are highly variable, including wind speed,
+the resuspension of dust, the wear of brakes                 wind direction, atmospheric stability, and
+and tires, and the abrasion of road surfaces,                terrain and land use. In addition, air pollution
+they are called nontailpipe emissions.                       from other sources—­such as industry, oil, coal
+                                                             and wood burning, and agricultural sources as
+   Tailpipe emissions from motor vehicles
+                                                             well as atmospheric transport of pollutants from
+and ambient concentrations of most moni-
+                                                             distant sources—­contributes to the overall air
+tored traffic-­related pollutants have decreased
+                                                             quality. The results of these emissions are ele-
+steadily over the last several decades in most
+                                                             vated concentrations of air pollutants through
+high-­income countries. This trend is a result
+                                                             primary emissions and through the formation
+of air quality regulations and improvements in
+                                                             of secondary pollutants, such as secondary
+vehicular emission-­   control technologies and
+                                                             PM and ozone. People are exposed to these air
+is likely to continue (Frey 2018). However,
+                                                             pollutants when outdoors or indoors through
+decreases in emissions from individual motor
+                                                             the infiltration of outdoor air pollutants. Human
+vehicles, while substantial, do not fully com-
+                                                             exposures are also determined by various
+pensate for the rapid growth and increased
+                                                             dynamic factors such as mobility patterns and
+vehicular congestion of the motor vehicle fleet
+                                                             distance from the source.
+due to population growth, urbanization, and
+economic activity, as well as to the continued                  In 2010, HEI published Special Report 17,
+presence of older or malfunctioning vehicles                 Traffic-Related Air Pollution: A Critical Review
+on the roads. The adoption of new technologies               of the Literature on Emissions, Exposure,
+such as electric vehicles—­     while promising              and Health Effects. This review, developed
+alleviation of some components of TRAP—­has                  by the HEI Panel on the Health Effects of
+been relatively slow so far due to the slow                  Traffic-Related Air Pollution, summarized and
+development and cost of battery technology                   synthesized research on emissions, exposure,
+                                                             and health effects from TRAP and drew conclu-
+                                                             sions about whether the associations between
+* A list of abbreviations appears at the end of this Exec-   exposure and health outcomes were causal.
+utive Summary.                                               The Panel reviewed both toxicological and epi-
+                                                             demiological evidence. At that time, the Panel
+
+
+
+                                                                                                                 5
+Special Report 23 Executive Summary
+
+
+
+concluded that the evidence was sufficient to support a causal      some important issues related to technologies and emissions
+relationship between exposure to TRAP and exacerbation of           from motor vehicles, including a high-­level, succinct review
+asthma in children. The Panel also found suggestive evidence        on the mechanistic evidence of health effects of exposure to
+of a causal relationship with the onset of childhood asthma,        TRAP, and summarizes the health effects of short-­term expo-
+nonasthma respiratory symptoms in adults, impaired lung             sure to TRAP. This information, which is not included in this
+function in children and adults, all-­cause and cardiovascular      summary, is meant to provide background material and serve
+mortality, and cardiovascular morbidity. For a number of            as complementary and supporting evidence to the systematic
+other health outcomes, there was only limited evidence of           review on the health effects of long-­term exposure to TRAP.
+associations, and the data were deemed to be either inade-
+quate or insufficient to draw firmer conclusions (HEI 2010).
+   Since HEI published its review in 2010, many additional          GENERAL METHODS
+studies investigating the health effects of exposure to TRAP
+have been published, and regulations and vehicular technol-            The Panel used a rigorous and systematic approach to search
+ogy have advanced significantly. In addition, there is a better     the literature, select studies for inclusion in the review, assess
+appreciation that, beyond air pollution, traffic can be a source    study quality, summarize results, and reach conclusions about
+of other exposures with potential relevance to health, most         the confidence in the body of evidence. The Panel’s approach
+notably noise. These exposures may either confound or modify        was largely based on standards set by Cochrane, the World
+the health effects of TRAP, which continues to be of public         Health Organization (WHO), and the National Institute of
+health interest and is of concern to policy makers and motor        Environmental Health Sciences. To this end, a review protocol
+vehicle manufacturers alike. Therefore, in response to broad        was published in 2019 (HEI 2019) and registered in Prospero,
+interest from its sponsors, HEI decided to conduct a new lit-       a registry of systematic reviews (https://www.crd.york.ac.uk/
+erature review, as described in HEI’s Strategic Plan 2015–2020      PROSPERO/display_record.php?RecordID=150642).
+(HEI 2015) and reconvened the Panel with new members to                 Health outcomes were selected by the Panel based on
+conduct the review. The new Panel consisted of 13 experts           evidence of causality (causal or likely causal), according to
+in epidemiology, exposure assessment, and statistics at insti-      the latest determination for general air pollution (broader
+tutions in North America and Europe. The resulting Special          than TRAP) from available authoritative integrated science
+Report was subjected to detailed peer review. This review is        assessments and other considerations such as relevance for
+the largest systematic effort to date that evaluates the epidemi-   public health and policy. Selected health outcomes were
+ological evidence regarding the associations between long-­term     clinical (rather than preclinical) outcomes and included birth
+exposure to TRAP and selected adverse health outcomes.              outcomes (e.g., term low birth weight), respiratory outcomes
+                                                                    (e.g., asthma onset), cardiometabolic outcomes (e.g., ischemic
+OBJECTIVE                                                           heart disease [IHD] and diabetes) and all-­cause and cause-­
+                                                                    specific (e.g., circulatory, respiratory) mortality.
+    The overall objective of this Special Report was to system-        A PECOS question (Population, Exposure, Comparator,
+atically evaluate the epidemiological evidence regarding the        Outcome and Study) was developed, and then inclusion
+associations between long-­term exposure to TRAP and selected       and exclusion criteria were listed for each PECOS domain
+adverse health outcomes. Results were quantitatively combined       in relation to the selected health effects of long-­term expo-
+to evaluate the strength of the evidence, where appropriate.        sure to TRAP. The focus of the review was on health effects
+The Panel was charged with drawing conclusions about the            observed in the general population. Cohort, case-­     control,
+confidence in the quality of the body of evidence and with          cross-­
+                                                                          sectional, and intervention studies using individual-­
+assessing the level of confidence in the presence of an associ-     level health outcome data were included.
+ation. The Panel did not assess causality because they did not         An extensive search was conducted of literature published
+conduct separate, independent systematic assessments of the         between January 1980 and July 2019. Studies were checked
+mechanistic, toxicological, and human clinical studies relating     for eligibility by two reviewers. Data from all included stud-
+TRAP to human health. For these reasons, the descriptors of the     ies were extracted and evaluated extensively, including key
+overall confidence assessment still mention association rather      information for meta-­analysis. Effect estimates from single-­
+than causal association, causal relationship, or effect.            pollutant models were selected as the effect estimates for the
+   The Special Report describes the methodology and                 meta-­analysis. In this review multipollutant models were
+findings from the systematic review of the epidemiological          of less interest as the aim was to assess the TRAP mixture,
+evidence, discusses the strengths and limitations of the evi-       not individual components. A random-­effects meta-­analysis
+dence base and makes recommendations for future research.           was performed when at least three studies were available for
+In addition to the systematic review of the epidemiological         a specific exposure–outcome pair. The Panel decided to use
+evidence, the Special Report features a section that addresses      the pollutant concentration increments from the ESCAPE
+
+
+
+
+6
+                                                                                          Special Report 23 Executive Summary
+
+
+
+study to reflect a realistic range of exposure contrasts in most      The exposure assessment framework included three strat-
+studies (Beelen et al. 2014, 2015). Forest plots with meta-­       egies to determine whether a study was sufficiently traffic-­
+analysis estimates were produced, where appropriate. In the        specific, namely the selection of traffic-­related pollutants,
+Special Report, the forest plots are accompanied by summary        the exposure assessment method, and the spatial resolution.
+tables with important information on the studies. Risk of          None of the selected pollutants is fully specific to traffic and
+bias was assessed for all exposure–outcome associations            therefore the additional requirements outlined in this sum-
+that were included in the meta-­analyses using a modified          mary were needed.
+version of the tool developed for the risk of bias assessment         Broadly, emissions from motorized traffic may affect air
+in the WHO Air Quality Guidelines review (WHO 2020,                quality at the local, neighborhood, urban, and regional scale.
+2021). Where possible, additional analyses were performed          The Panel judged, however, that epidemiological studies
+to assess consistency in subgroups of studies, for example,        focusing on exposure contrasts at the local and neighborhood
+across geographic region, time period, risk of bias, and           scale offered the greatest potential in determining exposure
+confounder adjustment for individual-­        level behavioral     derived from TRAP emissions. The Panel included studies
+factors (i.e., smoking). An adapted GRADE (Grading of Rec-         that evaluated exposure to nitrogen dioxide (NO2), EC (which
+ommendations Assessment, Development and Evaluation)               includes studies using related metrics such as black carbon,
+assessment of the confidence in the quality of the body of         black smoke, and PM absorbance), carbon monoxide, UFPs,
+evidence was made using the Office of Health Assessment            and other pollutants, and indirect traffic measures (distance
+and Translation (OHAT) method as a guide (OHAT 2019).              and density), as well as PM2.5 and PM ≤10 μm in aerody-
+The OHAT confidence rating was heavily geared toward the           namic diameter (PM10). For studies that evaluated exposure
+studies entering a meta-­analysis. The Panel thought it was        to PM2.5 and PM10, more stringent requirements for inclusion
+prudent to accompany the OHAT assessment with a broader            were needed regarding exposure assessment and study
+approach and developed a narrative assessment to evaluate          setting to indicate that the exposure contrasts were likely
+the level of confidence in the presence of an association,         due to variation in traffic emissions. For example, the Panel
+considering the meta-­analyzed studies as well as other stud-      excluded PM studies that were solely based on monitoring
+ies not entering the meta-­analysis. The findings based on the     data. The Panel also excluded nationwide studies on any
+narrative assessment and the modified OHAT assessment              pollutant where the primary exposure contrast was due to
+were combined into an overall confidence assessment, with          between-­cities variations, rather than within cities.
+the two approaches considered complementary.
+                                                                       In addition, the Panel developed a traffic specificity indi-
+    In addition to the systematic review of the selected health    cator (high or moderate) based on stricter criteria for the three
+outcomes described earlier, literature reviews were devel-         elements of the general framework. For example, all PM2.5 and
+oped for neurodevelopmental outcomes in children and               PM10 studies were considered as having moderate (as opposed
+dementia-related outcomes and Parkinson disease in adults.         to high) traffic specificity. Furthermore, the spatial scale of
+Those literature reviews were added because the Panel              the pollution surface needed to be within 1 km for high traffic
+thought these were important emerging areas that should be         specificity as opposed to only 5 km for the study to be included
+represented in the Special Report, even while a larger body        in the review. The majority of studies that were included based
+of evidence develops. The literature review differs from           on the general exposure framework also met the stricter high
+the systematic review in some important respects: (1) no           traffic specificity criteria. The Panel developed two tiers of
+meta-­analyses were conducted, (2) there was no evaluation         criteria because it initially thought that only one tier—­based on
+of the confidence in the quality of the body of evidence, and      a highly strict set of criteria—­would be too restrictive, leading
+(3) there was no formal risk of bias assessment on individual      to fewer studies for assessment. The Panel concluded that the
+studies. Hence, those findings are not included in this Exec-      finding most studies satisfied the stricter criteria is reassuring
+utive Summary.                                                     and lends confidence to knowing the exposure framework suc-
+                                                                   cessfully identified studies that are informative of the impact of
+EXPOSURE FRAMEWORK                                                 TRAP on the selected health outcomes.
+
+
+    Exposure assessment of TRAP is challenging because it is a
+complex mixture of PM and gaseous pollutants and is charac-        MAIN FINDINGS OF THE SYSTEMATIC REVIEW
+terized by high spatial and temporal variability. Building on
+the 2010 HEI Traffic Review, which identified the exposure            The number of studies on long-­term exposure to TRAP and
+assessment as a significant limitation in the then-­current        health outcomes included in this review has more than tri-
+literature, the Panel developed a novel exposure framework         pled compared with the 2010 HEI Traffic Review (HEI 2010),
+to define transparently which studies assessed TRAP and are        although a direct comparison is difficult because of the dif-
+therefore eligible for inclusion in the current review.            ferences in scope, methods, and criteria for study inclusion.
+
+
+
+
+                                                                                                                                   7
+Special Report 23 Executive Summary
+
+
+
+   In total, 353 studies were included in the review. Respi-       considered moderate, low, or very low for the other selected
+ratory effects in children (N = 118 studies, 33%) and birth        outcomes. The main findings for each broad health outcome
+outcomes (N = 86 studies, 24%) were the most common                category are described in the following sections.
+outcomes. Fewer studies investigated cardiometabolic effects
+(N = 57 studies, 16%), respiratory effects in adults (N = 50
+                                                                   BIRTH OUTCOMES
+studies, 14%), and mortality (N = 48 studies, 13%). Studies
+were conducted in populations residing in a wide range                 The summary estimates showed that PM2.5 exposure over
+of countries, although the majority were done in Europe            the entire pregnancy is most clearly associated with measures
+(N = 163 studies, 46%), and North America (N = 130 studies,        of fetal growth restriction. The summary relative risk was 1.11
+37%). Studies in Asia (predominantly China) emerged more           (95% confidence interval [CI]: 1.03 to 1.20) for term low birth
+recently (N = 41 studies, 12%). More TRAP studies in low-          weight and 1.09 (1.04 to 1.14) for small for gestational age, and
+and middle-­income countries are needed.                           a mean difference in term birth weight of −17.3 (−33.2 to −1.5)
+   Most meta-­analyses by outcome involved NO2 as the most         grams per 5-μg/m3. The PM2.5 associations were supported by
+commonly studied TRAP exposure indicator, followed by EC           consistent associations with PM10 as well. Associations for
+and PM2.5. Few studies were identified for some pollutants,        preterm birth were largely null, although a few studies of
+in particular nontailpipe PM indicators and UFPs, and such         traffic-PM and indirect traffic measures (distance and density)
+studies were identified as a future research need.                 supported an association. Associations for the other meta-­
+                                                                   analyzed traffic-­related air pollutants—­including NO2, NOx,
+    The results of the meta-­analyses of associations between      and EC—­were mostly null for all four birth outcomes, with
+long-­term exposure to the most commonly studied TRAP              the exception of an association of NOx with term low birth
+exposure indicators (NO2, EC, and PM2.5) and selected health       weight. Studies that were not included in the meta-­analyses
+outcomes are displayed in the Executive Summary Table.             broadly agreed with the summary estimates for the various
+We use the term relative risk to describe effect estimates as      pollutants.
+it is easier to communicate, even if in some of the included
+studies it would be technically more correct to refer to an           The majority of TRAP studies and birth outcomes were
+odds ratio, or hazard ratio. The following are important           conducted in North America and Europe. Most used a cohort
+considerations while reviewing the results: (1) although the       study design and registry data and therefore lacked potentially
+results are presented by pollutant, the individual pollutants      important confounder information on lifestyle factors, such as
+are considered indicators of the TRAP mixture; (2) effect          maternal smoking during pregnancy and prepregnancy body
+estimates cannot be compared directly across traffic-related       mass index. As a result, those studies were rated high risk of
+pollutants because selected increments do not necessarily          bias for potential confounding, which reduced confidence in
+represent the same contrast in exposure; and (3) studies           the quality of the body of evidence, particularly for term birth
+included in a meta-analysis represent only about half of all       weight and preterm birth.
+studies considered for various reasons, such as when multi-           The Panel concluded that there was an overall moderate
+ple studies conducted in the same population, less than three      level of confidence in the evidence for an association between
+studies were available for a particular exposure–­outcome          TRAP exposure and term low birth weight (categorical outcome)
+pair, or definitions of indirect traffic measures varied across    and small for gestational age, and a low level of confidence for
+studies. Thus, the Panel did not pursue meta-analyses of           term birth weight (continuous outcome) and preterm birth.
+indirect traffic measures. Despite not being included in
+the meta-analyses, the remaining studies added important
+                                                                   RESPIRATORY OUTCOMES
+information to the overall confidence assessment.
+   The Executive Summary Figure and Table provide for                 The summary estimates for NO2 per 10-μg/m3 were 1.05
+each health outcome the overall level of confidence in an          (95% CI: 0.99–1.12) for asthma onset in children, 1.10
+association with long-­term exposure to TRAP. This overall         (1.01–1.21) for asthma onset in adults, and 1.09 (1.03–1.16)
+confidence assessment is a combination of the narrative            for ALRI in children.
+assessment and the modified OHAT assessment. Detailed                 For these outcomes, positive associations were also
+descriptors of the overall confidence assessment evidence          reported for other traffic-­related air pollutants, either in meta-­
+are listed in the Executive Summary Sidebar.                       analyses or in single large studies. Most of the studies had a
+   The Panel found a high or moderate-­to-­high level of confi-    cohort design, were conducted in different populations, and
+dence in an association between long-­term exposure to TRAP        were at a low or moderate risk of bias.
+and the adverse health outcomes all-cause, circulatory, ischemic       The Panel concluded that the overall level of confidence
+heart disease (IHD), and lung cancer mortality; asthma onset in    in the evidence for an association between exposure to TRAP
+both children and adults; and acute lower respiratory infections   and asthma onset in both children and adults and ALRI in
+(ALRI) in children. The Panel’s confidence in the evidence was     children was considered moderate to high. Studies examining
+
+
+
+8
+                                                                                              Special Report 23 Executive Summary
+
+
+
+
+Executive Summary Table. Overall Confidence Assessment and Meta-­analytical Summary Estimates of Associations
+Between Long-Term Exposure to the Most Common Traffic-Related Air Pollutants (NO2, EC, PM2.5) and Health Outcomes
+(NOTE: the individual pollutants are considered indicators of TRAP)
+                                                          NO2 per 10-μg/m3            EC per 1-μg/m3            PM2.5 per 5-μg/m3
+                               Overall Confidence             Relative Risk              Relative Risk               Relative Risk
+ Health Outcome                                       N                           N                         N
+                                  Assessment                    (95% CI)                   (95% CI)                    (95% CI)
+ Birth Outcomes
+   Term low birth weight       Moderate               12 1.01 (0.99–1.03)          5 1.01 (0.99–1.04)        7 1.11 (1.03–1.20)
+   Term birth weight           Low                     8 −3.2 (−11.0 to 4.6)a      4 −2.6 (−6.1 to 0.9)a     6 −17.3 (−33.2 to −1.5)a
+   Small for gestational age Moderate                 11 1.00 (0.98–1.02)          3 1.02 (0.92–1.14)        4 1.09 (1.04–1.14)
+   Preterm birth               Low                    14 1.00 (0.96–1.04)          5 1.02 (0.97–1.07)        4 0.99 (0.90–1.09)
+ Respiratory Outcomes—Children
+   Asthma onsetb               Moderate to high       12 1.05 (0.99–1.12)          5 1.11 (0.94–1.31)        5 1.33 (0.90–1.98)
+   Asthma everc                Moderate               21 1.09 (1.01–1.18)          3 1.30 (0.56–3.04)        3 1.29 (0.58–2.87)
+   Active asthma    c
+                               Moderate               12 1.12 (1.02–1.23)          3 1.25 (0.98–1.59)       <3 NA
+   ALRI  b
+                               Moderate to high       11 1.09 (1.03–1.16)          4 1.30 (0.78–2.18)       <3 NA
+ Respiratory Outcomes—Adults
+   Asthma onsetb               Moderate to high        7 1.10 (1.01–1.21)         <3 NA                     <3 NA
+   ALRIb                       Very low to low         3 1.07 (0.71–1.61)         <3 NA                     <3 NA
+   COPDb                       Low                     7 1.03 (0.94–1.13)         <3 NA                      4 0.91 (0.62–1.36)
+ Cardiometabolic Outcomes
+   IHD eventsb                 Moderate                5 0.99 (0.94–1.05)          5 1.01 (0.99–1.03)        4 1.09 (0.86–1.39)
+   Coronary events      b
+                               Low                     7 1.03 (0.95–1.11)         <3 NA                     <3 NA
+   Stroke eventsb              Low to moderate         7 0.98 (0.92–1.05)          6 1.03 (0.98–1.09)        4 1.08 (0.89–1.32)
+   Diabetesb                   Moderate                7 1.04 (0.96–1.13)          3 1.16 (0.57–2.36)        4 1.05 (0.96–1.15)
+   Diabetesc                                           7 1.09 (1.02–1.17)         <3 NA                      3 1.08 (0.70–1.67)
+ Mortality
+   All-­cause                  High                   11 1.04 (1.01–1.06)         11 1.02 (1.00–1.04)       12 1.03 (1.01–1.05)
+   Circulatory                 High                   10 1.04 (1.00–1.09)          9 1.02 (1.00–1.04)       11 1.04 (1.01–1.08)
+   Respiratory                 Moderate                8 1.05 (1.00–1.09)          8 1.01 (0.98–1.05)        7 1.03 (0.97–1.10)
+   Lung cancer                 Moderate to high        5 1.04 (1.01–1.07)          3 1.02 (0.88–1.19)        6 1.06 (0.99–1.13)
+   IHD                         High                    6 1.05 (1.03–1.08)          6 1.05 (0.99–1.11)        7 1.07 (1.04–1.10)
+   Stroke                      Low to moderate         6 1.01 (0.98–1.04)         <3 NA                      3 1.04 (1.01–1.07)
+   COPD                        Low                     3 1.03 (1.00–1.05)         <3 NA                     <3 NA
+
+95% CI = 95% confidence interval; ALRI = acute lower respiratory infection; COPD = chronic obstructive pulmonary disease; IHD = ischemic
+   heart disease; NA = not applicable.
+a
+  Mean difference in grams.
+b
+  Incidence.
+c
+  Prevalence.
+
+
+
+
+                                                                                                                                      9
+Special Report 23 Executive Summary
+
+
+
+
+     Health o
+     Health outcomes
+             uttc
+                come
+                   es
+                    saassociated
+                       ssociia
+                             ate
+                             ated w
+                                  with
+                                    th ttraffic-related
+                                         ra
+                                          afff c rre
+                                                   e at
+                                                     atted
+                                                        ed
+                                                        edaairr p
+                                                                pollution
+                                                                 ou ut
+                                                                    utio
+                                                                     t on
+
+
+
+                                                                                       In Adults:
+                   Birth outcomes:
+                                                                                     • All-cause mortality
+              Term low birth weight
+                                                                                     • Circulatory mortality
+            Small for gestational age
+                                                                                     • Ischemic heart disease mortality
+                         In Children:                                                • Lung cancer mortality
+                        Asthma onset                                                 • Asthma onset
+     Acute lower respiratory infections                                              • Respiratory mortality
+                         Asthma ever                                                 • Ischemic heart disease events
+                       Active asthma                                                 • Diabetes
+
+
+
+      Overall confidence in the evidence for an association with long term exposure to traffic-related air pollution:
+                                       high      moderate to high        moderate
+
+Executive Summary Figure. Overall confidence in the evidence for an association between long-­term exposure to TRAP and selected health
+outcomes. Health outcomes for which the overall confidence in the evidence was low to moderate, low, or very low are not in the figure.
+
+
+exposure to NO2 have made the greatest contribution to this          with a monotonic exposure–response function. Studies that
+evaluation. The overall level of confidence in the evidence          were not included in meta-­    analyses provided additional
+for an association between TRAP and asthma ever and active           support for an association between TRAP and IHD, diabetes,
+asthma in children was moderate. Asthma ever refers to               and stroke. In contrast, for coronary events the number of
+lifetime asthma prevalence and active asthma refers to preva-        studies was smaller and insufficient for meta-­analyses, except
+lence of asthma in the last 12 months.                               for NO2, which yielded a positive but imprecise association.
+   For most of the other respiratory outcomes investigated—­         Because cardiometabolic outcomes are likely influenced by
+including incidence of chronic obstructive pulmonary                 traffic noise, some studies investigated possible confounding
+disease (COPD) and ALRI in adults, and wheeze outcomes               or effect modification by noise with mostly similar results
+as well as exacerbation of asthma and COPD in diseased               after adjustment for co-­exposure to noise.
+adults—­the confidence was very low or low for an associ-               The Panel had overall moderate confidence in the evidence
+ation with TRAP, hampered in part by the small number of             for associations between long-term exposure to TRAP and
+qualifying studies.                                                  IHD and to TRAP and diabetes; low-­to-­moderate confidence
+                                                                     in the evidence for an association of TRAP with stroke; and
+CARDIOMETABOLIC OUTCOMES                                             low confidence in the evidence for an association of TRAP
+                                                                     with coronary events.
+   The summary estimates were mostly positive and were
+consistent with an association of PM10 with IHD: 1.14
+                                                                     MORTALITY
+(95% CI: 0.99–1.31) per 10-μg/m3, with evidence suggesting
+a monotonic exposure–response function. Evidence was                    The summary estimates showed that NO2, EC, and PM2.5
+suggestive for EC and PM2.5 but was less consistent overall.         were associated with all-­cause, circulatory, IHD, respiratory,
+Associations were reported with NO2 and diabetes prevalence          and lung cancer mortality, ranging from 1.01 to 1.07. Asso-
+with a summary estimate of 1.09 (1.02–1.17) per 10-μg/m3,            ciations of these pollutants with stroke and COPD mortality
+supported by consistent positive but imprecise estimates for         were less certain because fewer studies were available for
+the other pollutants. The summary estimates of EC, PM10, and         consideration. The studies on pollutants not included in the
+PM2.5 with stroke incidence were slightly less precise, but the      meta-­analyses and the studies with indirect traffic measures
+evidence was strengthened by several high-­quality studies           supported those associations. All studies on mortality were
+
+
+
+10
+                                                                                                                 Special Report 23 Executive Summary
+
+
+
+
+                          EXECUTIVE SUMMARY SIDEBAR
+              OVERALL CONFIDENCE ASSESSMENT: DESCRIPTORS OF THE LEVEL
+                OF CONFIDENCE IN THE EVIDENCE FOR AN ASSOCIATIONa
+
+       High        Evidence is sufficient to conclude that the strength of the evidence for an association is high; that is, the exposure has been
+                   shown to be associated with health effects in studies in which chance, confounding, and other biases could be ruled out with
+                   reasonable confidence. The determination is based on multiple high-quality studies conducted in different populations and
+                   geographical areas with consistent results for multiple exposure indicators.
+                   High confidence in the association between exposure and the outcome.
+       Moderate    Evidence is sufficient to conclude that an association is likely to exist; that is, the exposure has been shown to be associated
+                   with health effects in studies where results are not explained by chance, confounding, and other biases, but uncertainties
+                   remain in the evidence overall. The determination is based on some high-quality studies in different populations and geograph-
+                   ical areas, but the results are not entirely consistent across areas and for multiple exposure indicators.
+                   Moderate confidence in the association between exposure and the outcome.
+       Low         Evidence is suggestive but limited, and chance, confounding, and other biases cannot be ruled out. Generally, the body of
+                   evidence is relatively small with few high-quality studies available; however, at least one high-quality epidemiological study
+                   shows an association with a given health outcome and/or when the body of evidence is relatively large, but the evidence from
+                   studies of varying quality and across multiple exposure indicators is generally supportive although not entirely consistent.
+                   Low confidence in the association between exposure and the outcome.
+       Very low    Evidence is inadequate to determine if an association exists with the relevant exposures. The available studies are of insuf-
+                   ficient quantity, quality, consistency, or statistical power to permit a conclusion regarding the presence or absence of an
+                   association.
+                   Very low confidence in the association between exposure and the outcome.
+   a
+    The overall confidence assessment of the association of each health outcome with long-term exposure to TRAP is a combination of the narrative assessment and
+   the modified OHAT assessment. The descriptors are modified from the U.S. Environmental Protection Agency (2015) and the OHAT (2019).
+
+
+
+
+cohort studies, with outcome during follow-­up determined by                        level of confidence in an association between long-term
+linkage to mortality registries. Most studies were conducted                        exposure to TRAP and the adverse health outcomes all-cause,
+in North America and Europe; some were set in Asia. The                             circulatory, IHD, and lung cancer mortality; asthma onset in
+majority of studies accounted for a large number of individual                      both children and adults; and ALRI in children. The Panel’s
+and area-­level covariates—­  including smoking, body mass                          confidence in the evidence was considered moderate, low, or
+index, and individual and area-­level socioeconomic status—­                        very low for the other selected outcomes.
+and were judged at a low or moderate risk for bias.                                    Tailpipe emissions from motor vehicles and ambient con-
+   The overall confidence in the evidence for an association                        centrations of most monitored traffic-­related pollutants have
+between TRAP exposure and mortality was high for all-­cause,                        decreased steadily over the last several decades in most high-­
+circulatory, and IHD mortality. The Panel’s overall confidence                      income countries. The Panel’s main findings were derived from
+was moderate to high for lung cancer, moderate for respira-                         studies conducted when exposure levels were generally higher
+tory, low to moderate for stroke, and low for COPD mortality.                       than present-­day levels in high-­income countries and compara-
+                                                                                    ble to or lower than present-­day levels in low-­income countries.
+OVERALL CONCLUSIONS                                                                    In light of the large number of people exposed to TRAP—­
+                                                                                    both in and beyond the near-­road environment—­the Panel
+   The findings from the systematic review, meta-analyses,                          concluded that the overall high or moderate-­to-­high level of
+and evaluation of the quality of the studies and potential                          confidence in the evidence for an association between long-­
+biases have provided an overall high or moderate-to-high                            term exposure to TRAP and several adverse health outcomes
+
+
+
+                                                                                                                                                                   11
+Special Report 23 Executive Summary
+
+
+
+indicates that exposures to TRAP remain an important public        Durham, NC:National Toxicology Program, National Institute
+health concern and deserve greater attention from the public       of Environmental Health Sciences, U.S. Department of Health
+and from policymakers.                                             and Human Services.
+                                                                   U.S. EPA (U.S. Environmental Protection Agency). 2015. Pream-
+REFERENCES                                                         ble to the Integrated Science Assessments. EPA/600/R-15/067.
+                                                                   Washington, DC:U.S. EPA.
+Beelen R, Hoek G, Raaschou-Nielsen O, Stafoggia M, Ander-
+                                                                   WHO (World Health Organization). 2020. Risk of Bias Assess-
+sen ZJ, Weinmayr G, et al. 2015. Natural-­cause mortality and
+                                                                   ment Instrument for Systematic Reviews Informing WHO
+long-­term exposure to particle components: an analysis of 19
+                                                                   Global Air Quality Guidelines. WHO Regional Office for
+­European cohorts within the multicenter ESCAPE project.
+                                                                   Europe. Geneva:World Health Organization.
+ Environ Health Perspect; doi:10.1289/ehp.1408095.
+                                                                   WHO (World Health Organization). 2021. WHO Global Air
+Beelen R, Raaschou-Nielsen O, Stafoggia M, Andersen ZJ,
+                                                                   Quality Guidelines: Particulate Matter (PM2.5 and PM10),
+Weinmayr G, Hoffmann B, et al. 2014. Effects of long-­term
+                                                                   Ozone, Nitrogen Dioxide, Sulfur Dioxide and Carbon Monox-
+exposure to air pollution on natural-­cause mortality: An anal-
+                                                                   ide. Geneva:World Health Organization.
+ysis of 22 European cohorts within the multicentre ESCAPE
+project. Lancet; doi:10.1016/S0140-6736(13)62158-3.
+Frey HC. 2018. Trends in onroad transportation energy and          ABBREVIATIONS
+emissions. J Air Waste Manag Assoc; doi:10.1080/10962247
+.2018.1454357.                                                        ALRI     acute lower respiratory infection
+                                                                         CI    confidence interval
+HEI (Health Effects Institute). 2010. Traffic-Related Air Pollu-
+                                                                     COPD      chronic obstructive pulmonary disease
+tion: A Critical Review of the Literature on Emissions, Expo-
+sure, and Health Effects. Special Report 17. Boston, MA:Health          EC     elemental carbon
+Effects Institute.                                                 ESCAPE      European Study of Cohorts for Air Pollution
+                                                                                Effects
+HEI (Health Effects Institute). 2015. HEI Strategic Plan 2015–
+2020. Available: https://www.healtheffects.org/about/strategic         IHD     ischemic heart disease
+-­plan [accessed 14 June 2021].                                        NO2     nitrogen dioxide
+HEI (Health Effects Institute). 2019. Protocol for a System­           NOx     nitrogen oxides
+atic Review and Meta-Analysis of Selected Health Effects             OHAT      Office of Health Assessment and Translation
+of Long-Term Exposure to Traffic-Related Air Pollution.                 PM     particulate matter
+­Boston, MA:Health Effects Institute. Available: https://www.         PM2.5    particulate matter ≤2.5 μm in aerodynamic
+ healtheffects.org/system/files/TrafficReviewProtocol.pdf.                      diameter
+Khreis H, Nieuwenhuijsen M, Zietsman J, Ramani T, eds. 2020.          PM10     particulate matter ≤10 μm in aerodynamic
+Traffic-Related Air Pollution. 1st ed. Waltham, MA:Elsevier.                    diameter
+OHAT (Office of Health Assessment and Translation). 2019. Hand-      TRAP      traffic-­related air pollution
+book for Conducting a Literature-Based Health Assessment Using        UFPs     ultrafine particles
+OHAT Approach for Systematic Review and Evidence Integration.         WHO      World Health Organization
+
+
+
+
+12
+H EI B OARD, COMMIT TE E S , a nd STA F F
+
+Board of Directors
+Richard A. Meserve, Chair Senior of Counsel, Covington & Burling LLP; President Emeritus, Carnegie Institution for Science;
+former Chair, U.S. Nuclear Regulatory Commission
+Enriqueta Bond President Emerita, Burroughs Wellcome Fund
+Jo Ivey Boufford President, International Society for Urban Health
+Homer Boushey Emeritus Professor of Medicine, University of California–San Francisco
+Michael T. Clegg Professor of Biological Sciences, University of California–Irvine
+Jared L. Cohon President Emeritus and Professor, Civil and Environmental Engineering and Engineering and Public Policy,
+Carnegie Mellon University
+Stephen Corman         President, Corman Enterprises
+Martha J. Crawford		 Operating Partner, Macquarie Asset Management
+Michael J. Klag Dean Emeritus and Second Century Distinguished Professor, Johns Hopkins Bloomberg School of Public Health
+Alan I. Leshner       CEO Emeritus, American Association for the Advancement of Science
+Catherine L. Ross Regents’ Professor and Harry West Professor of City and Regional Planning and Civil and Environmental
+Engineering, and Director of the Center for Quality Growth and Regional Development, Georgia Institute of Technology
+Karen C. Seto		 Frederick Hixon Professor of Geography and Urbanization Science, Yale School of the Environment
+
+
+Research Committee
+David A. Savitz, Chair Professor of Epidemiology, School of Public Health, and Professor of Obstetrics and Gynecology, Alpert
+Medical School, Brown University
+Jeffrey R. Brook Assistant Professor, University of Toronto, Canada
+Amy H. Herring		 Sara & Charles Ayres Professor of Statistical Science and Global Health, Duke University
+Barbara Hoffmann		 Professor of Environmental Epidemiology, Institute of Occupational, Social, and Environmental Medicine,
+University of Düsseldorf, Germany
+Heather A. Holmes          Associate Professor, Department of Chemical Engineering, University of Utah
+Neil Pearce Professor of Epidemiology and Biostatistics, London School of Hygiene and Tropical Medicine, United Kingdom
+Ana Rule Assistant Professor and Director, Environmental Exposure Assessment Laboratories, Department of Environmental
+Health and Engineering, Johns Hopkins School of Public Health
+Ivan Rusyn      Professor, Department of Veterinary Integrative Biosciences, Texas A&M University
+Evangelia (Evi) Samoli Associate Professor of Epidemiology and Medical Statistics, Department of Hygiene, Epidemiology and
+Medical Statistics, School of Medicine, National and Kapodistrian University of Athens, Greece
+Gregory Wellenius Professor, Department of Environmental Health, Boston University School of Public Health
+
+
+
+
+                                                                                                                    Continued
+
+
+
+
+                                                                                                                             13
+     H EI BOARD, COMMIT TE E S , a nd STA F F
+
+     Review Committee
+     Melissa Perry, Chair Professor and Chair, Department of Environmental and Occupational Health, George Washington University
+     Milken Institute School of Public Health
+     Sara D. Adar Associate Professor and Associate Chair, Department of Epidemiology, University of Michigan School of Public Health
+     Kiros Berhane Professor and Chair, Department of Biostatistics, Mailman School of Public Health, Columbia University
+     Michael Jerrett		 Professor and Chair, Department of Environmental Health Sciences, Fielding School of Public Health, University of
+     California–Los Angeles
+     Frank Kelly Henry Battcock Chair of Environment and Health and Director of the Environmental Research Group, Imperial College
+     London School of Public Health, United Kingdom
+     Jana B. Milford Professor, Department of Mechanical Engineering and Environmental Engineering Program, University of Colorado–
+     Boulder
+     Jennifer L. Peel Professor of Epidemiology, Colorado School of Public Health and Department of Environmental and Radiological
+     Health Sciences, Colorado State University
+     Eric J. Tchetgen Tchetgen		 Luddy Family President’s Distinguished Professor, Professor of Statistics and Data Science, The
+     Wharton School, University of Pennsylvania
+
+
+     Officers and Staff
+     Daniel S. Greenbaum           President
+     Robert M. O’Keefe Vice President
+     Ellen K. Mantus Director of Science
+     Donna J. Vorhees Director of Energy Research
+     Annemoon M. van Erp		 Deputy Director of Science
+     Thomas J. Champoux            Director of Science Communications
+     Jacqueline C. Rutledge          Director of Finance and Administration
+     Jason Desmond         Deputy Director of Finance and Administration
+     Emily Alden       Corporate Secretary
+
+
+     Amy Andreini		 Communications Assistant
+     Palak Balyan		 Consulting Staff Scientist
+     Hanna Boogaard          Consulting Principal Scientist
+     Sofia Chang-DePuy           Digital Communications Manager
+     Aaron J. Cohen        Consulting Principal Scientist
+     Dan Crouse        Senior Scientist
+     Robert M. Davidson          Staff Accountant
+     Philip J. DeMarco Compliance Manager
+     Kristin C. Eckles       Senior Editorial Manager
+     Elise G. Elliott Staff Scientist
+     Hope Green Editorial Project Manager
+
+                                                                                                                              Continued
+
+
+14
+H EI B OARD, COMMIT TE E S , a nd STA F F
+
+Yi Lu   Staff Scientist
+Lissa McBurney Senior Science Administrator
+Janet I. McGovern         Executive Assistant
+Martha Ondras Research Fellow
+Pallavi Pant    Senior Scientist
+Allison P. Patton     Senior Scientist
+Quoc Pham       Science Administrative Assistant
+Anna S. Rosofsky Senior Scientist
+Robert A. Shavers         Operations Manager
+Eva Tanner Staff Scientist
+
+
+
+
+                                                   15
+HEA LTH
+EF F E CTS
+IN STITUTE
+75 Federal Street, Suite 1400
+Boston, MA 02110, USA
++1-617-488-2300
+www.healtheffects.org           Publishing history:
+                                Publishing history: This  documentSummary
+                                                    The Executive    was posted
+                                                                             andat       Report 23 wereinposted
+                                                                                   www.healtheffects.org
+                                                                                 Special                  July 2022.
+                                at www.healtheffects.org in June 2022.
+                                Citation for document:
+
+SR EP SEE C
+          A RI C
+               A HL                        Brauer M, Brook JR, Christidis T, ChuY, Crouse DL, Erickson A, et al. 2022.
+RR EE PP O O RR TT              Citation forMortality–Air
+                                            Executive Summary:
+                                                          Pollution Associations in Low Exposure Environments
+                                        (MAPLE):
+                                       HEI  Panel onPhase  2. Research
+                                                      the Health         Report
+                                                                 Effects of      212. Boston,
+                                                                            Long-Term ExposureMA:Health
+                                                                                                to Traffic- Effects
+Number 23                               Institute.
+                                       Related  Air Pollution. 2022. Executive Summary. Systematic Review
+Number
+Number 212
+       212
+June 2022                              and Meta-analysis of Selected Health Effects of Long-Term Exposure
+July 2022
+                                       to Traffic-Related Air Pollution. Special Report 23. Boston, MA:Health
+                                © 2022 Effects
+                                       Health Institute.
+                                                Effects Institute, Boston, Mass., U.S.A. Progressive Publishing
+                                Services,forYork,
+                                Citation          Pa.,Report
+                                             Special   Compositor.
+                                                             23:   Printed by Recycled Paper Printing, Waltham,
+                                Mass. Library of Congress Catalog Number for the HEI Report Series: WA 754
+                                         HEI Panel on the Health Effects of Long-Term Exposure to Traffic-
+                                R432. Related Air Pollution. 2022. Systematic Review and Meta-analysis of
+                                          Selected Health Effects of Long-Term Exposure to Traffic-Related Air
+                                          Pollution. Special Report 23. Boston, MA:Health Effects Institute.
+
+
+                                © 2022 Health Effects Institute, Boston, MA, USA. Progressive Publishing
+                                Services, York, PA, Compositor. Printed by Keys Innovative Solutions, an RR
+                                Donnelley Company, Greenville, SC. Library of Congress Catalog Number for the
+                                HEI Report Series: WA 754 R432.
+

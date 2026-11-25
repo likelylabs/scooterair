@@ -1,0 +1,118 @@
+---
+/**
+ * ResultPanel — where a calculator answers. One headline number, then room
+ * for the working (a <Ledger>, a chart, notes). The headline region is an
+ * aria-live area so screen readers hear updates.
+ *
+ * Props
+ *   id       id for the panel (use it to target [data-part] from your script)
+ *   title    what the result is ("實際要付的價格")
+ *   value    the headline number, pre-formatted
+ *   prefix   small text before the number ("NT$")
+ *   unit     small text after the number ("元", "個月")
+ *   note     one line under the number
+ *   tone     'neutral' | 'clean' | 'exhaust'
+ *   sample   true = demo numbers: shows the sample-data tag
+ *   locale   Locale
+ * Slots
+ *   default  the working: Ledger, chart, caveats
+ *
+ * Script hooks:  [data-part="value"]  [data-part="note"]
+ */
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import Tag from './Tag.astro';
+
+interface Props {
+  id?: string;
+  title: string;
+  value: string;
+  prefix?: string;
+  unit?: string;
+  note?: string;
+  tone?: 'neutral' | 'clean' | 'exhaust';
+  sample?: boolean;
+  locale: Locale;
+  class?: string;
+}
+const { id, title, value, prefix, unit, note, tone = 'neutral', sample = false, locale, class: cls } = Astro.props;
+---
+
+<section id={id} class:list={['result', `result--${tone}`, 'tone-surface', cls]}>
+  <div class="result__head" aria-live="polite" aria-atomic="true">
+    <h3 class="result__title">
+      <span>{title}</span>
+      {sample && <Tag tone="sample">{ui.sampleData[locale]}</Tag>}
+    </h3>
+    <p class="result__value">
+      {prefix && <span class="result__affix">{prefix}</span>}<span class="result__num" data-part="value">{value}</span>{unit && <span class="result__affix">{unit}</span>}
+    </p>
+    <p class="result__note" data-part="note">{note}</p>
+  </div>
+  {Astro.slots.has('default') && <div class="result__body stack"><slot /></div>}
+</section>
+
+<style>
+  .result {
+    --c: var(--ink);
+    border: 1px solid var(--line);
+    border-block-start: var(--rule-stop) solid var(--c);
+    padding: var(--sp-4);
+    min-inline-size: 0;
+  }
+  .result--clean {
+    --c: var(--clean);
+  }
+  .result--exhaust {
+    --c: var(--exhaust);
+  }
+  .result__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    font-stretch: 100%;
+    letter-spacing: 0;
+    color: var(--ink-2);
+  }
+  .result__value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.15em;
+    margin-block-start: var(--sp-2);
+    line-height: 1;
+  }
+  .result__num {
+    font-size: clamp(2.75rem, 2rem + 5vw, 4.5rem);
+    font-weight: 800;
+    font-stretch: 68%;
+    font-variant-numeric: lining-nums;
+  }
+  .result__affix {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+  }
+  .result__note {
+    margin-block-start: var(--sp-2);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .result__note:empty {
+    display: none;
+  }
+  .result__body {
+    --stack: var(--sp-5);
+    margin-block-start: var(--sp-5);
+    padding-block-start: var(--sp-4);
+    border-block-start: 1px solid var(--line);
+  }
+  @media (min-width: 48em) {
+    .result {
+      padding: var(--sp-5);
+    }
+  }
+</style>

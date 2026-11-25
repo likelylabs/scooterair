@@ -1,0 +1,144 @@
+---
+/**
+ * ChainMarker — "link 3 of 7". The per-chapter signpost for the evidence
+ * chain: the count in words, a row of pips (done · current · to come, with
+ * the final, breakable link drawn apart from the rest), and the link's name.
+ * <Chapter link={3}> renders one for you.
+ *
+ * Props
+ *   locale  Locale
+ *   n       this link, 1-based
+ *   total   number of links (default: length of chain.links)
+ *   title   link name (default chain.links[n-1])
+ *   href    link the marker to the chain overview (e.g. href('/#chain', locale))
+ *   sticky  pin under the header while its chapter is on screen
+ */
+import type { Locale } from '@/i18n';
+import { chain, t } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  n: number;
+  total?: number;
+  title?: string;
+  href?: string;
+  sticky?: boolean;
+  class?: string;
+}
+const { locale, n, total = chain.links.length, title = chain.links[n - 1]?.[locale] ?? '', href, sticky = false, class: cls } = Astro.props;
+const last = n === total;
+const STEP = 18;
+const W = (total - 1) * STEP + 22 + 8; // extra gap before the final pip
+const x = (i: number) => 9 + i * STEP + (i === total - 1 ? 8 : 0);
+const Tag = href ? 'a' : 'span';
+---
+
+<p class:list={['cm', last && 'cm--last', sticky && 'cm--sticky', cls]}>
+  <Tag class="cm__inner" href={href}>
+    <span class="cm__count">
+      <span class="cm__name">{chain.name[locale]}</span>
+      <span class="vh">{t(chain.linkOf, locale, { n, total })}</span>
+      <span class="cm__frac" aria-hidden="true"><b>{n}</b><i>/</i>{total}</span>
+    </span>
+    <svg class="cm__pips" viewBox={`0 0 ${W} 18`} width={W} height="18" aria-hidden="true" focusable="false">
+      <path class="cm__rail" d={`M${x(0)},9 H${x(total - 2)}`} />
+      <path class="cm__cut" d={`M${x(total - 2) + 9},5 l-3,8 M${x(total - 2) + 13},5 l-3,8`} />
+      {Array.from({ length: total }, (_, i) => {
+        const state = i + 1 < n ? 'done' : i + 1 === n ? 'now' : 'todo';
+        return <circle class={`cm__pip cm__pip--${state} ${i === total - 1 ? 'cm__pip--final' : ''}`} cx={x(i)} cy="9" r={state === 'now' ? 6.5 : 4} />;
+      })}
+    </svg>
+    <span class="cm__title">{last ? chain.breakable[locale] : title}</span>
+  </Tag>
+</p>
+
+<style>
+  .cm {
+    --c: var(--exhaust);
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+  }
+  .cm--last {
+    --c: var(--clean);
+  }
+  .cm--sticky {
+    position: sticky;
+    inset-block-start: var(--header-h);
+    z-index: 5;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: var(--sp-2) var(--gutter);
+    background: var(--here);
+    border-block-end: 1px solid var(--line);
+  }
+  .cm__inner {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
+    min-block-size: 1.75rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  a.cm__inner:hover .cm__title {
+    text-decoration: underline;
+  }
+  .cm__count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6em;
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+  }
+  .cm__name:lang(en) {
+    text-transform: uppercase;
+  }
+  .cm__frac {
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+  .cm__frac b {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    color: var(--ink);
+  }
+  .cm__frac i {
+    margin-inline: 0.15em;
+    font-style: normal;
+  }
+  .cm__pips {
+    flex: none;
+    overflow: visible;
+  }
+  .cm__rail {
+    stroke: var(--line-strong);
+    stroke-width: 2;
+  }
+  .cm__cut {
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+  .cm__pip--done {
+    fill: var(--ink);
+  }
+  .cm__pip--now {
+    fill: var(--c);
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+  .cm__pip--todo {
+    fill: var(--here);
+    stroke: var(--line-strong);
+    stroke-width: 2;
+  }
+  .cm__pip--final.cm__pip--todo {
+    stroke: var(--clean);
+  }
+  .cm__title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+</style>

@@ -1,0 +1,112 @@
+---
+/**
+ * Chapter — a full-bleed chapter of the scroll narrative. Tall, one idea,
+ * with the street's air along its bottom edge: set `haze` high in the
+ * problem chapters and let it fall to 0 as the story reaches clean air.
+ *
+ * Props
+ *   locale   Locale
+ *   id       anchor id (required: chapters are navigation targets)
+ *   title    chapter headline; '|' phrase marks allowed
+ *   kicker   short label above the title (ignored when `link` is set)
+ *   lead     intro paragraph
+ *   link     evidence-chain link number: shows the "link n of 7" marker
+ *   chainHref  where the marker links to (the chain overview)
+ *   phase    'red' | 'green': puts the pedestrian signal beside the kicker
+ *   haze     0–1 density of the air band along the bottom (default 0)
+ *   hazeKind 'all' | 'fumes' | 'co' | 'ufp'
+ *   tone     'street' (page) | 'sunken' | 'night' (asphalt, both themes) | 'clear' (green wash) | 'exhaust'
+ *   size     'tall' (default, ~a screen) | 'auto'
+ * Slots
+ *   default  chapter content (prose, figures, stats)
+ *   art      full-bleed illustration under the content, behind the haze
+ */
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import Haze from '@/components/art/Haze.astro';
+import Signal from '@/components/art/Signal.astro';
+import ChainMarker from './ChainMarker.astro';
+import Phrased from './Phrased.astro';
+
+interface Props {
+  locale: Locale;
+  id: string;
+  title: string;
+  kicker?: string;
+  lead?: string;
+  link?: number;
+  chainHref?: string;
+  phase?: 'red' | 'green';
+  haze?: number;
+  hazeKind?: 'all' | 'fumes' | 'co' | 'ufp';
+  tone?: 'street' | 'sunken' | 'night' | 'clear' | 'exhaust';
+  size?: 'tall' | 'auto';
+  class?: string;
+}
+const { locale, id, title, kicker, lead, link, chainHref, phase, haze = 0, hazeKind = 'all', tone = 'street', size = 'tall', class: cls } = Astro.props;
+const toneClass = { street: '', sunken: 'tone-sunken', night: 'tone-inverse', clear: 'tone-clean', exhaust: 'tone-exhaust' }[tone];
+const hazeH = Math.round(140 + haze * 120);
+---
+
+<section id={id} class:list={['chapter', `chapter--${size}`, toneClass, haze > 0 && 'chapter--haze', cls]} aria-labelledby={`${id}-title`} style={`--haze-room:${haze > 0 ? Math.round(hazeH * 0.55) : 0}px`}>
+  <div class="container chapter__inner">
+    <header class="chapter__head">
+      {link ? (
+        <ChainMarker locale={locale} n={link} href={chainHref} />
+      ) : (
+        (kicker || phase) && (
+          <p class="eyebrow chapter__kicker">
+            {phase && <Signal state={phase} size="1.9rem" label={phase === 'red' ? ui.phaseRed[locale] : ui.phaseGreen[locale]} />}
+            {kicker}
+          </p>
+        )
+      )}
+      <h2 id={`${id}-title`} class="chapter__title"><Phrased text={title} /></h2>
+      {lead && <p class="lead">{lead}</p>}
+    </header>
+    {Astro.slots.has('default') && <div class="chapter__body"><slot /></div>}
+  </div>
+  {Astro.slots.has('art') && <div class="chapter__art"><slot name="art" /></div>}
+  <Haze density={haze} kind={hazeKind} height={hazeH} seed={id.length * 7 + 3} />
+</section>
+
+<style>
+  .chapter {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--section-y) calc(var(--section-y) + var(--haze-room));
+    overflow: hidden;
+    border-block-start: 1px solid var(--line);
+  }
+  .chapter--tall {
+    min-block-size: min(92svh, 56rem);
+  }
+  .chapter__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--sp-6);
+    align-content: start;
+  }
+  .chapter__head {
+    display: grid;
+    gap: var(--sp-3);
+    max-inline-size: 48rem;
+  }
+  .chapter__kicker::before {
+    display: none;
+  }
+  .chapter__title {
+    font-size: var(--fs-3xl);
+    font-stretch: var(--display-stretch);
+    line-height: calc((var(--lh-heading) + var(--lh-display)) / 2);
+  }
+  .chapter__art {
+    position: relative;
+    z-index: 1;
+    margin-block-start: auto;
+    padding-block-start: var(--sp-6);
+    margin-block-end: calc((var(--section-y) + var(--haze-room)) * -1);
+  }
+</style>

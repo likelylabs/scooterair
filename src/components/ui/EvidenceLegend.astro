@@ -1,0 +1,52 @@
+---
+/**
+ * EvidenceLegend — explains the four evidence-strength levels. Show it once
+ * near the first EvidenceBadge on a page (or inside the chain overview).
+ *
+ * Props
+ *   locale  Locale
+ *   title   override the heading (default "證據強度 / Evidence strength")
+ */
+import type { Locale } from '@/i18n';
+import { evidence, type EvidenceLevel } from '@/i18n/ui';
+import EvidenceBadge from './EvidenceBadge.astro';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  class?: string;
+}
+const { locale, title = evidence.heading[locale], class: cls } = Astro.props;
+const levels = Object.keys(evidence.levels) as EvidenceLevel[];
+---
+
+<div class:list={['evl', cls]}>
+  <p class="eyebrow">{title}</p>
+  <dl class="evl__list">
+    {levels.map((level) => (
+      <div class="evl__item">
+        <dt><EvidenceBadge level={level} locale={locale} /></dt>
+        <dd>{evidence.levels[level].help[locale]}</dd>
+      </div>
+    ))}
+  </dl>
+</div>
+
+<style>
+  .evl__list {
+    display: grid;
+    gap: var(--sp-3) var(--sp-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    margin-block-start: var(--sp-3);
+  }
+  .evl__item {
+    display: grid;
+    gap: var(--sp-1);
+    justify-items: start;
+  }
+  .evl__item dd {
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+</style>

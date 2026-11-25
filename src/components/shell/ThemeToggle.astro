@@ -1,0 +1,88 @@
+---
+/**
+ * ThemeToggle — light/dark switch. Hidden without JavaScript (the page then
+ * simply follows prefers-color-scheme). The choice is stored in localStorage
+ * under `sa-theme` and applied before first paint by the inline script in
+ * Base.astro, so there is no flash.
+ *
+ * Props
+ *   locale  Locale
+ */
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<button class="theme-toggle" type="button" data-theme-toggle data-js-only aria-label={ui.themeToggle[locale]} title={ui.themeToggle[locale]}>
+  <span class="theme-toggle__sun"><Icon name="sun" size="1.25rem" /></span>
+  <span class="theme-toggle__moon"><Icon name="moon" size="1.25rem" /></span>
+</button>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--tap);
+    block-size: var(--tap);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-2);
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .theme-toggle:hover {
+    background: var(--bg-sunken);
+  }
+  .theme-toggle span {
+    grid-area: 1 / 1;
+    display: grid;
+  }
+  /* Show the icon of the theme you would switch TO. */
+  .theme-toggle__sun {
+    display: none !important;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .theme-toggle__sun {
+      display: grid !important;
+    }
+    :global(:root:not([data-theme='light'])) .theme-toggle__moon {
+      display: none;
+    }
+  }
+  :global(:root[data-theme='dark']) .theme-toggle__sun {
+    display: grid !important;
+  }
+  :global(:root[data-theme='dark']) .theme-toggle__moon {
+    display: none;
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const current = () => root.dataset.theme ?? (mq.matches ? 'dark' : 'light');
+
+  function apply(theme: string) {
+    root.dataset.theme = theme;
+    const colour = theme === 'dark' ? '#101416' : '#f3f5f3';
+    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => (m.content = colour));
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = current() === 'dark' ? 'light' : 'dark';
+      apply(next);
+      try {
+        localStorage.setItem('sa-theme', next);
+      } catch {
+        /* private mode: the choice just lasts for this page */
+      }
+    });
+  });
+</script>

@@ -1,0 +1,121 @@
+---
+/**
+ * SceneCompare — the red-light moment, before and after: the same crossing
+ * with gasoline scooters and with electric ones. A two-option switch (plain
+ * radio buttons, so it works without JavaScript) swaps the scene.
+ *
+ * Props
+ *   locale   Locale
+ *   name     radio group name; must be unique per page (default 'scene-compare')
+ *   initial  'red' | 'clean' (default 'red')
+ *   labels   passed to StreetScene
+ *   class    extra class
+ */
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import StreetScene from './StreetScene.astro';
+
+interface Props {
+  locale: Locale;
+  name?: string;
+  initial?: 'red' | 'clean';
+  labels?: boolean;
+  class?: string;
+}
+const { locale, name = 'scene-compare', initial = 'red', labels = true, class: cls } = Astro.props;
+---
+
+<div class:list={['compare', cls]}>
+  <fieldset class="compare__switch">
+    <legend class="compare__legend">{ui.scene.compareLegend[locale]}</legend>
+    <label class="compare__opt compare__opt--red">
+      <input type="radio" name={name} value="red" checked={initial === 'red'} />
+      <span>{ui.scene.red[locale]}</span>
+    </label>
+    <label class="compare__opt compare__opt--clean">
+      <input type="radio" name={name} value="clean" checked={initial === 'clean'} />
+      <span>{ui.scene.clean[locale]}</span>
+    </label>
+  </fieldset>
+  <div class="compare__scene compare__scene--red"><StreetScene locale={locale} state="red" labels={labels} /></div>
+  <div class="compare__scene compare__scene--clean"><StreetScene locale={locale} state="clean" labels={labels} /></div>
+</div>
+
+<style>
+  .compare {
+    display: grid;
+  }
+  .compare__switch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    margin: 0 var(--gutter) var(--sp-3);
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+  }
+  .compare__legend {
+    float: inline-start;
+    margin-inline-end: auto;
+    padding: 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+  .compare__opt {
+    position: relative;
+    display: inline-flex;
+    cursor: pointer;
+  }
+  .compare__opt input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .compare__opt span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    min-block-size: var(--tap);
+    padding-inline: 0.9rem;
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .compare__opt span::before {
+    content: '';
+    inline-size: 0.7em;
+    block-size: 0.7em;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+  }
+  .compare__opt input:checked + span {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .compare__opt--red input:checked + span::before {
+    background: var(--art-haze);
+    border-color: var(--art-haze);
+  }
+  .compare__opt--clean input:checked + span::before {
+    background: var(--art-green);
+    border-color: var(--art-green);
+  }
+  .compare__opt input:focus-visible + span {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  /* The radios decide which scene shows. Both stay in the DOM. */
+  .compare__scene {
+    grid-area: 2 / 1;
+    min-inline-size: 0;
+  }
+  .compare:has(input[value='red']:checked) .compare__scene--clean,
+  .compare:has(input[value='clean']:checked) .compare__scene--red {
+    visibility: hidden;
+  }
+</style>

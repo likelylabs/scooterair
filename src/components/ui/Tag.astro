@@ -1,0 +1,58 @@
+---
+/**
+ * Tag — a small label. `sample` is the one that matters most: every demo or
+ * placeholder number on the site must sit next to it.
+ *
+ * Props
+ *   tone  'neutral' | 'sample' | 'exhaust' | 'clean' | 'signal' (default 'neutral')
+ * Slot
+ *   default  the label text
+ */
+interface Props {
+  tone?: 'neutral' | 'sample' | 'exhaust' | 'clean' | 'signal';
+  class?: string;
+}
+const { tone = 'neutral', class: cls } = Astro.props;
+---
+
+<span class:list={['tag', `tag--${tone}`, cls]}><slot /></span>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.15em 0.55em;
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  /* Sample data: hazard-tape edge so it cannot be mistaken for decoration */
+  .tag--sample {
+    border-color: var(--ink);
+    border-inline-start-width: 0;
+    color: var(--ink);
+    background:
+      repeating-linear-gradient(-45deg, var(--ink) 0 3px, var(--paint-yellow) 3px 6px) left / 0.6em 100% no-repeat,
+      var(--mark-bg);
+    padding-inline-start: 1em;
+  }
+  .tag--exhaust {
+    border-color: var(--exhaust);
+    color: var(--exhaust-ink);
+  }
+  .tag--clean {
+    border-color: var(--clean);
+    color: var(--clean-ink);
+  }
+  .tag--signal {
+    border-color: var(--signal-red);
+    color: var(--signal-red-ink);
+  }
+</style>

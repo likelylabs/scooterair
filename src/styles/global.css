@@ -430,10 +430,10 @@ th.num {
 /* Zebra crossing (枕木紋): painted blocks on an asphalt band. Decorative. */
 .zebra {
   block-size: 1.75rem;
-  background-color: var(--art-road);
+  background-color: var(--asphalt-750);
   background-image: repeating-linear-gradient(
     90deg,
-    var(--art-paint) 0 1.75rem,
+    var(--asphalt-50) 0 1.75rem,
     transparent 1.75rem 3.25rem
   );
   background-position: center;

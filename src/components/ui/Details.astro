@@ -1,0 +1,71 @@
+---
+/**
+ * Details — one accordion item (native <details>, so it needs no JavaScript).
+ * Stack several for an FAQ; give them the same `name` to make them exclusive.
+ *
+ * Props
+ *   summary  the always-visible question / heading
+ *   open     start expanded
+ *   name     group name: only one item with the same name stays open
+ *   id       anchor id (a link to #id opens the item)
+ * Slot
+ *   default  the answer
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  summary: string;
+  open?: boolean;
+  name?: string;
+  id?: string;
+  class?: string;
+}
+const { summary, open = false, name, id, class: cls } = Astro.props;
+---
+
+<details id={id} class:list={['acc', cls]} open={open} name={name}>
+  <summary>
+    <span>{summary}</span>
+    <Icon name="chevron-down" size="1.25rem" class="acc__chev" />
+  </summary>
+  <div class="acc__body prose"><slot /></div>
+</details>
+
+<style>
+  .acc {
+    border-block-start: 1px solid var(--line-strong);
+  }
+  .acc:last-of-type {
+    border-block-end: 1px solid var(--line-strong);
+  }
+  .acc > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    min-block-size: 3.25rem;
+    padding-block: var(--sp-3);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    list-style: none;
+    cursor: pointer;
+  }
+  .acc > summary::-webkit-details-marker {
+    display: none;
+  }
+  .acc > summary:hover {
+    color: var(--accent);
+  }
+  .acc :global(.acc__chev) {
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .acc[open] :global(.acc__chev) {
+    transform: rotate(180deg);
+  }
+  .acc__body {
+    padding-block: 0 var(--sp-5);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-body);
+    color: var(--ink-2);
+  }
+</style>
