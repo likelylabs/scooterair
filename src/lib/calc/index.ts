@@ -16,27 +16,40 @@
 //   e.comparison.breakEven         // { kind: 'breaks-even', month } | { kind: 'no-break-even', ... } | ...
 //   e.messages                     // deadlines, exhausted quotas, ambiguities, secondary inputs (L10n)
 //
+// Dates are calendar dates in Taiwan (UTC+8). Omit `date` to evaluate for today in Taiwan, whatever
+// the browser's time zone; todayInTaiwan() gives the same date for display. Invalid input (an
+// unknown id, a bad date, NaN, Infinity, zero or negative km, a fractional horizon...) throws a
+// CalcInputError whose `issues` name each field; validateSituation() returns the same list
+// without throwing.
+//
 // Every function takes the dataset as an optional last argument (defaults to the published
 // econData), so tests and previews can pass a fixture.
 
 import { econData } from '../../data/econ/index.ts';
 import type { EconDataset } from '../../data/econ/types.ts';
-import { bestOptions as rank, evaluate as run } from './evaluate.ts';
-import type { BestOptions, Evaluation, Situation } from './types.ts';
+import { bestOptions as rank, evaluate as run, validateSituation as validate } from './evaluate.ts';
+import type { BestOptions, Evaluation, InputIssue, Situation } from './types.ts';
 
 export * from './types.ts';
 export { toWaterfall, toLedgerRows, toBreakEven, breakEvenText, lineLabel, formatNtd, label } from './adapters.ts';
-export { reasonText, ui as calcText } from './text.ts';
-export { purchaseLedger, select } from './purchase.ts';
-export { electricRunning, gasolineRunning, evEnergy, gasFuel } from './running.ts';
-export { breakEven, cumulative } from './compare.ts';
+export { reasonText, ui as calcText, horizonText, daysLeftText } from './text.ts';
+export { purchaseLedger, select, programmeDeadline, promoDeadline } from './purchase.ts';
+export { electricRunning, gasolineRunning, evEnergy, gasFuel, maintenanceMonthly } from './running.ts';
+export { breakEven, cumulative, scanInterval, scanIntervals } from './compare.ts';
+export { breakEvenPhrase, DEFAULT_OFF_WINDOW_SHARE, SMALL_QUOTA, STALE_AFTER_DAYS } from './evaluate.ts';
+export { todayInTaiwan, taiwanDate, evaluationDate, isCalendarDate, daysBetween, cmp as compareDates } from './dates.ts';
 
 /** Evaluate one situation end to end. */
 export function evaluate(situation: Situation, data: EconDataset = econData): Evaluation {
   return run(situation, data);
 }
 
-/** Rank every available electric model and plan by net price and by five-year total. */
+/** Every problem with a situation's input ([] when valid); evaluate() throws a CalcInputError with the same list. */
+export function validateSituation(situation: Partial<Situation>, data: EconDataset = econData): InputIssue[] {
+  return validate(situation, data);
+}
+
+/** Rank every available electric model and plan by net price and by total cost at the horizon. */
 export function bestOptions(situation: Omit<Situation, 'electricModel' | 'energyPlan'>, data: EconDataset = econData): BestOptions {
   return rank(situation, data);
 }

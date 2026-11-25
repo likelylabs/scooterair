@@ -420,6 +420,8 @@ export interface Option {
   usesSecondaryInputs: boolean;
   /** Some of the money is an "up to" ceiling: the price could be as high as netPriceHigh. */
   hasUpToAmounts: boolean;
+  /** Codes of this option's own warning and critical messages (evaluate() it for the text). */
+  warningCodes: MessageCode[];
 }
 
 export interface BestOptions {
@@ -441,7 +443,11 @@ export interface BestOptions {
    * vehicles; their performance equivalence to a 125cc is NOT verified unless likeForLike says so.
    */
   closestToParitySamePlateClass: Option | null;
-  /** Warnings that apply to the ranking (deadlines, up-to amounts, quotas, ambiguities...), from every option, de-duplicated. */
+  /**
+   * Warnings that go with the ranking (deadlines, up-to amounts, quotas, ambiguities, MOEA filing...),
+   * from the options it puts forward, de-duplicated; plus a 'like-for-like' message when no option
+   * is a verified like-for-like substitute.
+   */
   messages: Message[];
 }
 

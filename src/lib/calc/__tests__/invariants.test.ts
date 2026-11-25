@@ -18,9 +18,11 @@ function checkText(where: string, v: L10n | undefined) {
   assert.ok(typeof v['zh-TW'] === 'string' && v['zh-TW'].trim() !== '', `${where}: empty zh-TW`);
   assert.ok(typeof v.en === 'string' && v.en.trim() !== '', `${where}: empty en`);
   for (const re of ZH_BAD) assert.ok(!re.test(v['zh-TW']), `${where}: zh-TW punctuation ${re} in "${v['zh-TW']}"`);
-  assert.ok(!v['zh-TW'].includes('台灣') && !v['zh-TW'].includes('台北'), `${where}: use 臺`);
+  // Reader-facing copy writes 台 (台灣, 台北...); only official agency names keep 臺, and those are payer fields, not checked here.
+  assert.ok(!/臺(灣|北|中|南|東)/.test(v['zh-TW']), `${where}: use 台 in reader-facing copy: "${v['zh-TW']}"`);
   assert.ok(!EN_BAD.test(v.en), `${where}: full-width punctuation in "${v.en}"`);
-  assert.ok(!/undefined|NaN/.test(v.en + v['zh-TW']), `${where}: undefined/NaN in text`);
+  assert.ok(!/undefined|NaN|Infinity/.test(v.en + v['zh-TW']), `${where}: undefined/NaN in text`);
+  assert.ok(!/0 days left|還有0天/.test(v.en + v['zh-TW']), `${where}: "0 days left" reads as already over`);
 }
 
 const scraps: (OldScooter | null)[] = [null, { engine: 'two-stroke', builtOn: '2001-08' }, { engine: 'four-stroke', builtOn: '2006-02' }, { engine: 'four-stroke', builtOn: '2013-11' }, { engine: 'four-stroke', builtOn: '2020-05' }];

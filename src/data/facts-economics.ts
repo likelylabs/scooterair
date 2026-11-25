@@ -6,8 +6,8 @@
 import type { FactInput } from './facts.ts';
 import { t, v } from './types.ts';
 
-const TW = t('臺灣（全國）', 'Taiwan (national)');
-const TAIPEI = t('臺北市', 'Taipei City');
+const TW = t('台灣（全國）', 'Taiwan (national)');
+const TAIPEI = t('台北市', 'Taipei City');
 const KAOHSIUNG = t('高雄市', 'Kaohsiung City');
 const NOV_2026 = t('2026年11月', 'November 2026');
 const PROMO_CAVEAT = t(
@@ -73,14 +73,14 @@ export const economics = {
     data: {
       moeaHeavyAndLight1: v(7000, 'ntd'),
       moeaLight2AndSmall: v(5100, 'ntd'),
-      domesticCellBonus: v(3000, 'ntd'),
+      domesticCellBonus: v(3000, 'ntd', { note: 'in the MOEA table, but no model of any brand has been shown to qualify; never counted' }),
       scrapBonus: v(1000, 'ntd'),
-      moeaMax: v(11000, 'ntd', { derived: true }),
+      moeaMax: v(8000, 'ntd', { derived: true, note: '7,000 + 1,000 scrap bonus; the unproven 3,000 cell bonus is left out' }),
     },
-    display: t('最高 11,000 元，至 2026 年底', 'up to NT$11,000, until the end of 2026'),
+    display: t('最高 8,000 元，至 2026 年底', 'up to NT$8,000, until the end of 2026'),
     statement: t(
-      '經濟部2026年新購電動機車補助7,000元（普通輕型第2級與小型輕型為5,100元），國產電池芯車款再加3,000元，淘汰10年以上燃油機車再加1,000元，購車期限到2026年12月31日。',
-      'The 2026 MOEA subsidy for a new electric scooter is NT$7,000 (NT$5,100 for 普通輕型 level 2 and small-light), plus NT$3,000 for Taiwan-made battery cells and NT$1,000 for scrapping a gasoline scooter at least 10 years old; purchases must be made by 31 December 2026.',
+      '經濟部2026年新購電動機車補助7,000元（普通輕型第2級與小型輕型為5,100元），淘汰10年以上燃油機車再加1,000元，購車期限到2026年12月31日。補助表另列國產電池芯加碼3,000元，但認可車款清單上查不到任何符合的車款，所以不算在內。',
+      'The 2026 MOEA subsidy for a new electric scooter is NT$7,000 (NT$5,100 for 普通輕型 level 2 and small-light), plus NT$1,000 for scrapping a gasoline scooter at least 10 years old; purchases must be made by 31 December 2026. The MOEA table also lists a NT$3,000 bonus for Taiwan-made battery cells, but the approved-model list shows no model that qualifies, so it is not counted.',
     ),
     period: t('2022年12月11日至2026年12月31日', '11 December 2022 to 31 December 2026'),
     place: TW,
@@ -89,9 +89,10 @@ export const economics = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '11,000元是三項相加的上限，只有少數國產電池芯車款能拿到；哪些車款符合未能查證。環境部另有汰舊獎勵（見下）。',
-      'NT$11,000 is the sum of all three and only certified Taiwan-cell models reach it; which models qualify could not be checked. MOENV pays a separate scrap reward (see below).',
+      '8,000元是新購7,000元加汰舊1,000元。國產電池芯加碼3,000元，至今沒有任何品牌的車款被證實符合；除非車行書面確認，或向經濟部補助專線（0800-527-027）查證，不要指望這筆錢。外籍人士須在2026年12月10日前申請。環境部另有汰舊獎勵（見下）。',
+      'NT$8,000 is the NT$7,000 new-purchase amount plus the NT$1,000 scrap bonus. No model of any brand has been shown to qualify for the NT$3,000 Taiwan-made cell bonus; do not count on it without written confirmation from the shop or the MOEA subsidy line (0800-527-027). Foreign nationals must apply by 10 December 2026. MOENV pays a separate scrap reward (see below).',
     ),
+    requiresCaveat: true,
     research: 'econ/central#moea-new-purchase-heavy-light',
   },
   'econ-moenv-scrap-reward-2026': {
@@ -139,7 +140,7 @@ export const economics = {
     data: { newPurchaseMax: v(33000, 'ntd'), twoStrokeReplaceMax: v(49300, 'ntd'), oldHeavySlotsLeft: v(194, 'count') },
     display: t('最高 49,300 元', 'up to NT$49,300'),
     statement: t(
-      '臺北市公布的2026年最高補助（含中央）是新購33,000元、淘汰二行程機車換購49,300元，兩者都需要家中有12歲以下兒童；沒有孩子、汰換10年以上四行程機車的人，依本站計算約38,300元。',
+      '台北市公布的2026年最高補助（含中央）是新購33,000元、淘汰二行程機車換購49,300元，兩者都需要家中有12歲以下兒童；沒有孩子、汰換10年以上四行程機車的人，依本站計算約38,300元。',
       'Taipei\'s published 2026 maximums, including central money, are NT$33,000 for a new purchase and NT$49,300 for replacing a two-stroke, both requiring a child aged 12 or under; someone without a child replacing a 10-year-old four-stroke gets about NT$38,300 by our arithmetic.',
     ),
     period: t('2026年（11月20日新聞稿）', '2026 (press release of 20 November)'),
@@ -159,11 +160,11 @@ export const economics = {
     data: { newPurchase: v(3000, 'ntd'), scrapTwoStroke: v(16000, 'ntd'), scrapPhase5: v(5000, 'ntd'), lowIncomeScrap: v(30000, 'ntd'), child: v(3000, 'ntd') },
     display: t('3,000 至 30,000 元', 'NT$3,000–30,000'),
     statement: t(
-      '臺中市2026年新購電動機車補助3,000元；汰舊換購依舊車期別為16,000（二行程）、13,000、10,000或5,000元（取代而非加在3,000元上），中低收入戶換購30,000元，育有12歲以下兒童再加3,000元；城市、環境部與經濟部補助合計不超過車價。',
+      '台中市2026年新購電動機車補助3,000元；汰舊換購依舊車期別為16,000（二行程）、13,000、10,000或5,000元（取代而非加在3,000元上），中低收入戶換購30,000元，育有12歲以下兒童再加3,000元；城市、環境部與經濟部補助合計不超過車價。',
       'In 2026 Taichung pays NT$3,000 for a new electric scooter; scrap-and-replace pays NT$16,000 (two-stroke), 13,000, 10,000 or 5,000 by the old scooter\'s age (instead of, not on top of, the 3,000), NT$30,000 for low-income households, plus NT$3,000 for a guardian of a child aged 12 or under; city, MOENV and MOEA money together may not exceed the price.',
     ),
     period: t('2026年', '2026'),
-    place: t('臺中市', 'Taichung City'),
+    place: t('台中市', 'Taichung City'),
     sources: ['taichung-epb-2026-amount-table', 'taichung-epb-2026-announcement'],
     locator: '附表1: 新購 3,000 / 25,000; 二行程 16,000; 1至3期 13,000; 4期 10,000; 5期 5,000; 中(低)收入戶 30,000; 兒童加碼 3,000',
     confidence: 'verified',
@@ -192,8 +193,8 @@ export const economics = {
     },
     display: t('每公升 32.7 元（壓低約 6 元）', 'NT$32.7 a litre (held down by about NT$6)'),
     statement: t(
-      '2026年11月中旬95無鉛汽油每公升32.7元，政府與中油的暫時平穩措施每公升吸收6元（11月初曾達11.6元）；措施沒有公布結束日期。',
-      'In mid-November 2026, 95 unleaded cost NT$32.7 a litre, with a temporary government and CPC smoothing programme absorbing NT$6 a litre (NT$11.6 in early November); no end date has been announced.',
+      '2026年11月中旬95無鉛汽油每公升32.7元，政府與中油的暫時平穩措施每公升吸收6元（11月初曾達11.6元）；其中汽油貨物稅減徵（3.7元）預定2027年3月31日到期（除非延長），中油的部分逐週決定。',
+      'In mid-November 2026, 95 unleaded cost NT$32.7 a litre, with a temporary government and CPC smoothing programme absorbing NT$6 a litre (NT$11.6 in early November); the goods-tax part (NT$3.7) is set to end on 31 March 2027 unless extended, and CPC\'s part is decided week by week.',
     ),
     period: t('2026年11月', 'November 2026'),
     place: TW,
@@ -201,8 +202,8 @@ export const economics = {
     locator: 'CPC: 115/11/23 31.2 32.7; EY: 汽油吸收3.7元＋中油2.3元＝6.0元; CNA: 11月2日至8日共11.6元',
     confidence: 'verified',
     evidence: 'market-tw',
-    caveat: t('2026年1月95無鉛只有27.9元。平穩措施中的汽油貨物稅減徵目前延長到2027年3月31日，中油的部分逐週決定；未平穩的價格約38.7元是本站相加的結果。', 'In January 2026, 95 unleaded cost only NT$27.9. The goods-tax part of the smoothing currently runs to 31 March 2027 and CPC\'s part is set weekly; the unsmoothed price of about NT$38.7 is our sum.'),
-    research: 'econ/running-costs#fuel-smoothing-mechanism',
+    caveat: t('2026年1月95無鉛只有27.9元。每公升6元是11月16日至22日那一週吸收的金額（11月23日至29日的金額未查到）；未平穩的價格約38.7元是本站相加的結果。', 'In January 2026, 95 unleaded cost only NT$27.9. The NT$6 is the amount absorbed in the week of 16–22 November (the figure for 23–29 November was not found); the unsmoothed price of about NT$38.7 is our sum.'),
+    research: 'econ/outlook-2027-r2#s2-petrol-goods-tax-cut-expiry',
   },
   'econ-petrol-cost-per-km': {
     data: { atOfficial: v(0.55, 'ntd-per-km', { derived: true, note: '32.7 / 60' }), atRealWorld: v(0.73, 'ntd-per-km', { derived: true, note: '32.7 / 45' }) },
@@ -234,12 +235,12 @@ export const economics = {
     data: {
       petrolAt300: v(160, 'ntd-per-month', { derived: true }),
       gogoro488: v(488, 'ntd-per-month'),
-      ionex318At300: v(515, 'ntd-per-month', { derived: true }),
+      ionex318At300: v(567, 'ntd-per-month', { derived: true, note: '318 + (300 / 31.3 − 250 / 52) × 52 (CoolOne, swapping)' }),
     },
     display: t('每月300公里：油錢約160至220元，換電月租488元起', '300 km a month: fuel about NT$160–220, swap plans from NT$488'),
     statement: t(
-      '騎得少的人，換電月租比油錢貴：每月騎300公里，新款125cc的油錢約160至220元，而Gogoro 488方案即使全部在免費時段換電也要488元，Ionex 318方案約515元。',
-      'For low-mileage riders a swap subscription costs more than fuel: at 300 km a month a modern 125cc uses about NT$160–220 of fuel, while the Gogoro 488 plan costs NT$488 even if every swap is in a free window, and the Ionex 318 plan about NT$515.',
+      '騎得少的人，換電月租比油錢貴：每月騎300公里，新款125cc的油錢約160至220元，而Gogoro 488方案即使全部在免費時段換電也要488元，Ionex 318方案（換電）約567元。',
+      'For low-mileage riders a swap subscription costs more than fuel: at 300 km a month a modern 125cc uses about NT$160–220 of fuel, while the Gogoro 488 plan costs NT$488 even if every swap is in a free window, and the Ionex 318 plan (swapping) about NT$567.',
     ),
     period: NOV_2026,
     place: TW,
@@ -285,7 +286,7 @@ export const economics = {
   'econ-gogoro-network': {
     data: { stations: v(2725, 'count', { bound: 'gt' }), owners: v(650000, 'people', { bound: 'gt' }), swapsPerDay: v(370000, 'count'), batteries: v(1400000, 'count', { bound: 'gt' }) },
     display: t('逾 2,725 座換電站', 'over 2,725 swap stations'),
-    statement: t('Gogoro表示截至2026年4月全臺有超過2,725座換電站、逾65萬名車主，每日換電約37萬次。', 'Gogoro says that by April 2026 it had more than 2,725 swap stations in Taiwan and over 650,000 owners, with about 370,000 swaps a day.'),
+    statement: t('Gogoro表示截至2026年4月全台有超過2,725座換電站、逾65萬名車主，每日換電約37萬次。', 'Gogoro says that by April 2026 it had more than 2,725 swap stations in Taiwan and over 650,000 owners, with about 370,000 swaps a day.'),
     period: t('2026年3至4月', 'March–April 2026'),
     place: TW,
     sources: ['bnext-2026-gogoro-stations', 'mirrormedia-2026-03-gogoro'],
@@ -298,7 +299,7 @@ export const economics = {
   'econ-ev-brand-share-2026-07': {
     data: { total: v(3657, 'vehicles'), gogoro: v(3183, 'vehicles'), gogoroShare: v(87.04, 'percent'), yamaha: v(144, 'vehicles'), kymco: v(113, 'vehicles') },
     display: t('Gogoro 占 87%', 'Gogoro 87%'),
-    statement: t('2026年7月全臺電動機車新掛牌3,657輛，其中Gogoro占3,183輛（87.04%），第二名Yamaha只有144輛、光陽113輛。', 'Of 3,657 electric scooters newly registered in July 2026, 3,183 (87.04%) were Gogoros; second-placed Yamaha had 144 and KYMCO 113.'),
+    statement: t('2026年7月全台電動機車新掛牌3,657輛，其中Gogoro占3,183輛（87.04%），第二名Yamaha只有144輛、光陽113輛。', 'Of 3,657 electric scooters newly registered in July 2026, 3,183 (87.04%) were Gogoros; second-placed Yamaha had 144 and KYMCO 113.'),
     period: t('2026年7月（單月）', 'July 2026 (single month)'),
     place: TW,
     sources: ['tvbs-cars-2026-07-ev-sales'],

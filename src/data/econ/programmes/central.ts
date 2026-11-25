@@ -182,7 +182,7 @@ export const centralProgrammes: Programme[] = [
     },
   },
   {
-    ...carbon('moenv-carbon-tainan', ['環境部減碳獎勵（臺南市收購）', 'MOENV carbon reward (bought by Tainan City)'], 1500, '2026-01-12', '2026-12-31', 3300, { kind: 'region', jurisdictions: ['tainan'] }),
+    ...carbon('moenv-carbon-tainan', ['環境部減碳獎勵（台南市收購）', 'MOENV carbon reward (bought by Tainan City)'], 1500, '2026-01-12', '2026-12-31', 3300, { kind: 'region', jurisdictions: ['tainan'] }),
     quota: liveQuota(1670, 3300),
     research: ['central#moenv-carbon-reward-options', 'outlook-2027-r2#s2-platform-quota-live'],
   },

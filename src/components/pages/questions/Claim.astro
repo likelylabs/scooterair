@@ -1,0 +1,104 @@
+---
+/**
+ * Claim — one sentence or short paragraph of a question page, with what stands behind it:
+ * a citation marker for every source of the registry facts it rests on, its evidence
+ * badge(s), the caveat the registry marks as required (set right under the number), and,
+ * for a gap, who could measure it and what it would take (a gap never ends a paragraph).
+ *
+ * Props
+ *   locale     Locale
+ *   text       the sentence (already resolved from the copy module)
+ *   facts      registry fact ids the sentence rests on
+ *   gaps       registry gap ids the sentence states
+ *   badge      evidence kind(s) to show; default: derived from the facts (or 'gap')
+ *   caveats    fact ids whose required caveat to print here (the page decides where each
+ *              caveat first appears; default none)
+ *   gapNotes   gap ids whose "who could measure it" note to print here (default none)
+ *   as         'p' (default) | 'li'
+ *   badges     false to hide the badge row (e.g. inside a caveat list)
+ */
+import type { Locale } from '@/i18n';
+import type { EvidenceKind } from '@/i18n/ui';
+import type { FactId, GapId } from '@/data';
+import Cite from '@/components/ui/Cite.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import questions from '@/i18n/pages/questions';
+import { asKinds, factBadge, lg, requiredCaveats, sourcesOf } from './q';
+
+interface Props {
+  locale: Locale;
+  text: string;
+  facts?: readonly FactId[];
+  gaps?: readonly GapId[];
+  badge?: EvidenceKind | EvidenceKind[];
+  caveats?: readonly FactId[];
+  gapNotes?: readonly GapId[];
+  as?: 'p' | 'li';
+  badges?: boolean;
+}
+const { locale, text, facts = [], gaps = [], caveats = [], gapNotes = [], as = 'p', badges: showBadges = true } = Astro.props;
+const P = questions.page;
+const cites = sourcesOf(facts, gaps);
+const fromFacts = facts.map(factBadge);
+const kinds: { kind: EvidenceKind; secondary: boolean }[] = Astro.props.badge
+  ? asKinds(Astro.props.badge).map((k) => ({ kind: k, secondary: fromFacts.some((b) => b.kind === k && b.secondary) }))
+  : fromFacts.length
+    ? fromFacts.filter((b, i, a) => a.findIndex((x) => x.kind === b.kind) === i)
+    : gaps.length
+      ? [{ kind: 'gap', secondary: false }]
+      : [];
+const notes = requiredCaveats(caveats.filter((c) => facts.includes(c)), locale);
+const gapList = gapNotes.filter((g) => gaps.includes(g)).map((g) => lg(g, locale));
+const Tag = as;
+---
+
+<Tag class="claim">
+  <span class="claim__text">{text}{cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</span>
+  {showBadges && kinds.length > 0 && (
+    <span class="claim__badges">{kinds.map((k) => <EvidenceBadge locale={locale} kind={k.kind} secondary={k.secondary} />)}</span>
+  )}
+  {notes.map((n) => (
+    <span class="claim__note"><b>{P.note[locale]}</b> {n.text}</span>
+  ))}
+  {gapList.map((g) => (
+    <span class="claim__gap">
+      {g.whoCouldMeasure && <span><b>{P.gapWho[locale]}</b> {g.whoCouldMeasure}</span>}
+      <span><b>{P.gapClose[locale]}</b> {g.wouldClose}</span>
+    </span>
+  ))}
+</Tag>
+
+<style>
+  .claim {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+  }
+  .claim__text {
+    display: block;
+  }
+  .claim__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-2);
+  }
+  .claim__note,
+  .claim__gap {
+    display: block;
+    padding-inline-start: var(--sp-3);
+    border-inline-start: 2px solid var(--line-strong);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .claim__gap {
+    display: grid;
+    gap: var(--sp-1);
+    border-inline-start-style: dashed;
+  }
+  .claim__note b,
+  .claim__gap b {
+    color: var(--ink);
+    margin-inline-end: 0.25em;
+  }
+</style>

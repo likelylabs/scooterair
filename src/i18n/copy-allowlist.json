@@ -56,6 +56,134 @@
       "reason": "Prologue deck (blueprint 3.1, verbatim): 怠速 / idles describes the scene the reader knows. It cites no measurement and the sentence goes on to ask what has and has not been measured.",
       "reviewedBy": "system (blueprint text)",
       "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link2.body.1",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Blueprint 3.4 / R1 wording: 怠速 / idling names the anti-idling rule and what it covers (vehicles waiting over three minutes). No idle emission figure is cited and nothing is called legal or illegal.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link2.caveat",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "States that the idle emission rate has NOT been measured or published for Taiwan: the gap the rule protects, not a measurement.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link3.deck",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Blueprint 3.5 deck: 怠速 describes the scene the question is about, and the same deck says nobody in Taiwan has measured it. No figure is cited.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link5.deck",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Blueprint 3.7 deck: says NO study has looked at a few minutes beside idling scooters. The word appears only in stating the gap.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.green.body.0",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Blueprint 3.9: says idling may NOT be the worst moment (the signal-cycle studies abroad). No Taiwanese idle measurement is cited or implied.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.connect.reveal",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "The site's own inference (blueprint 3.10), opened with 我們的推論, closed by default and badged as inference; it says nobody has measured it directly and cites no idle figure.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link5.ladder.s1",
+      "rule": "r2-pm25-health-all-sources",
+      "reason": "The sentence itself says the PM2.5 is from all sources (所有來源 / from all sources), and the ladder card prints the all-sources scope tag beside it, as R2 requires.",
+      "reviewedBy": "home workstream",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link5.ladder.s3",
+      "rule": "r2-pm25-health-all-sources",
+      "reason": "The next sentence says 算的是所有來源的 PM2.5 / This counts PM2.5 from every source, and the card carries the all-sources scope tag: R2 satisfied.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link5.ruler.text",
+      "rule": "associations-not-causes-tw",
+      "reason": "The 'mind the ruler' callout from blueprint 3.7 rules causation OUT: 「有關」，不是「造成」 / association, not cause. The word appears only to be denied.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link5.walk.label",
+      "rule": "do-not-discourage-exercise",
+      "reason": "Label of the callout that tells readers to KEEP walking (這不是叫你不要走路 / This is not a reason to stop walking): the opposite of what the rule forbids.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link5.caveat",
+      "rule": "hei-is-association-no-lung-function",
+      "locale": "zh-TW",
+      "reason": "Says exactly what the rule requires: the HEI review itself did not assess causality (blueprint 3.7 caveat). It makes no claim about lung function.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.connect.notSaying.1",
+      "rule": "gasoline-exhaust-is-2b",
+      "reason": "An item in the 「我們沒有說」 / 'what we are not saying' box: the site states it does NOT claim scooter exhaust is Group 1. Rendered as a list of things not said.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.connect.notSaying.2",
+      "rule": "scooter-pm25-small-fumes-large",
+      "reason": "An item in the 「我們沒有說」 box: the site says it does NOT claim scooters are a main PM2.5 source.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.connect.notSaying.2",
+      "rule": "no-scooters-main-source",
+      "reason": "An item in the 「我們沒有說」 box: the site says it does NOT claim scooters are a main PM2.5 source.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.connect.notSaying.3",
+      "rule": "smell-is-not-dose",
+      "locale": "en",
+      "reason": "An item in the 'what we are not saying' box: the site says it does NOT claim a stronger smell means more harm.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.connect.notSaying.4",
+      "rule": "associations-not-causes-tw",
+      "reason": "An item in the 「我們沒有說」 box: the site says it does NOT claim any Taiwanese health finding was caused by scooters.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link7.body.0",
+      "rule": "ev-emissions-not-zero",
+      "reason": "Blueprint 3.11: 這不是零污染 / This is NOT zero pollution, then limits zero to this scooter's exhaust at the crossing and lists what remains (tyres, brakes, road dust, generation, other traffic).",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "home.link7.body.0",
+      "rule": "r8-zero-only-own-exhaust",
+      "reason": "Uses zero only for this scooter's own exhaust at the crossing and says the crossing is not zero (cars and buses still running), as R8 asks.",
+      "reviewedBy": "home workstream (blueprint text)",
+      "reviewedOn": "2026-11-25"
     }
   ],
   "inlineCopyAllowed": [

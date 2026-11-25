@@ -1,0 +1,325 @@
+---
+/**
+ * MoreVisuals — 「再多看一張圖」 for each question page (blueprint 4.2, part 7, and the V-numbers
+ * each question names). Every chart is a registry series or fact; every figure has a title
+ * that says what it shows, a source line and, where the registry requires it, its caveat.
+ *
+ * Props
+ *   locale  Locale
+ *   slug    question slug
+ */
+import type { Locale } from '@/i18n';
+import { ui, units } from '@/i18n/ui';
+import Figure from '@/components/ui/Figure.astro';
+import Cite from '@/components/ui/Cite.astro';
+import CompareTable from '@/components/ui/CompareTable.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import BarChart from '@/components/charts/BarChart.astro';
+import BeforeAfterChart from '@/components/charts/BeforeAfterChart.astro';
+import RangePlot from '@/components/charts/RangePlot.astro';
+import WaffleChart from '@/components/charts/WaffleChart.astro';
+import StreetScene from '@/components/art/StreetScene.astro';
+import SignalCycle from '@/components/art/SignalCycle.astro';
+import QChart from './QChart.astro';
+import RedLightYear from './RedLightYear.astro';
+import { renderOdour, renderShareLine, renderStroller } from './charts';
+import { catLabel, lf, ls, points, requiredCaveats, seriesCites, sourcesOf, type Slug } from './q';
+import { facts, unitLabel } from '@/data';
+import questions from '@/i18n/pages/questions';
+import { localize } from '@/i18n/pages/_copy';
+
+interface Props {
+  locale: Locale;
+  slug: Slug;
+}
+const { locale, slug } = Astro.props;
+const all = localize(questions, locale);
+const C = (ids: Parameters<typeof sourcesOf>[0], gaps: Parameters<typeof sourcesOf>[1] = []) => sourcesOf(ids, gaps);
+const caveatOf = (id: Parameters<typeof lf>[0]) => lf(id, locale).caveat;
+const rangeLabels = { min: ui.chart.min[locale], mid: ui.chart.median[locale], max: ui.chart.max[locale] };
+
+// ---- smell: V27 odour bands, V28 classifications
+const smell = slug === 'smell' ? all.pages.smell.more : undefined;
+let odour: ReturnType<typeof renderOdour> | undefined;
+let odourSeries: ReturnType<typeof ls> | undefined;
+if (smell) {
+  odourSeries = ls('odour-thresholds', locale);
+  const ys = (keys: string[]) =>
+    odourSeries!.datasets.flatMap((d) => d.points.filter((p) => keys.includes(String(p.x)) && p.y !== null).flatMap((p) => [p.y as number, ...(p.low !== undefined ? [p.low] : []), ...(p.high !== undefined ? [p.high] : [])]));
+  const ald = ys(['acetaldehyde', 'acrolein']);
+  const ben = ys(['benzene']);
+  odour = renderOdour({
+    locale,
+    bands: [
+      { label: smell.odour.aldehydes, low: Math.min(...ald), high: Math.max(...ald), tone: 'exhaust' },
+      { label: smell.odour.benzene, low: Math.min(...ben), high: Math.max(...ben), tone: 'neutral' },
+    ],
+    none: { label: catLabel(odourSeries, 'co'), text: smell.odour.co },
+    unit: 'ppm',
+    ppbLabel: smell.odour.ppb,
+    ppmLabel: smell.odour.ppm,
+    categoryLabel: smell.odour.compound,
+    rangeLabel: smell.odour.range,
+    noneValue: smell.odour.none,
+  });
+}
+
+// ---- beside-me: V7, V14, V23, V24
+const beside = slug === 'beside-me' ? all.pages['beside-me'].more : undefined;
+const limits = beside ? ls('idle-test-limits-by-build-date', locale) : undefined;
+const limitRows = (ds: string) => (limits ? points(limits, ds).points.map((p) => ({ label: catLabel(limits, String(p.x)), value: p.y as number })) : []);
+const per100 = beside ? facts['inspection-2025-per-100'].data : undefined;
+
+// ---- app: V9
+const appMore = slug === 'app' ? all.pages.app.more : undefined;
+const stations = appMore ? ls('taipei-traffic-vs-general-stations', locale) : undefined;
+const stationRows = stations
+  ? (() => {
+      const g = points(stations, 'general').points.filter((p) => p.y !== null);
+      const t = points(stations, 'traffic').points.filter((p) => p.y !== null);
+      return [g[0], g[g.length - 1]].map((gp) => ({ label: String(gp.x), before: gp.y as number, after: t.find((tp) => tp.x === gp.x)!.y as number }));
+    })()
+  : [];
+
+// ---- how-much and rider: V26 (three studies, never merged)
+const near = slug === 'how-much' ? all.pages['how-much'].nearest : undefined;
+const riderMore = slug === 'rider' ? all.pages.rider.more : undefined;
+const wuS = near || riderMore ? ls('scooter-lane-vs-cyclist-wu2021', locale) : undefined;
+const wuRows = wuS ? points(wuS, 'btex').points.map((p) => ({ label: catLabel(wuS, String(p.x)), value: p.y as number, highlight: p.x === 'scooterLane' })) : [];
+const chS = near ? ls('commute-pm25-chuang2020', locale) : undefined;
+const chRows = chS ? points(chS, 'mean').points.map((p) => ({ label: catLabel(chS, String(p.x)), value: p.y as number, highlight: p.x === 'walking' || p.x === 'scooter' })) : [];
+const waS = near || riderMore ? ls('commute-pm25-wang2021', locale) : undefined;
+const waRows = waS
+  ? points(waS, 'median')
+      .points.filter((p) => p.x === 'walking' || p.x === 'motorcycle')
+      .map((p) => ({ label: catLabel(waS, String(p.x)), min: p.low as number, mid: p.y as number, max: p.high as number, tone: (p.x === 'motorcycle' ? 'exhaust' : 'neutral') as 'exhaust' | 'neutral' }))
+  : [];
+
+// ---- one-red-light: V12 tool, V32 quiet route
+const orl = slug === 'one-red-light' ? all.pages['one-red-light'].more : undefined;
+const quietS = orl ? ls('wu2021-quiet-route', locale) : undefined;
+const quietRows = quietS ? points(quietS, 'rush').points.map((p) => ({ label: catLabel(quietS, String(p.x)), value: Math.abs(p.y as number) })) : [];
+
+// ---- my-child: V29
+const child = slug === 'my-child' ? all.pages['my-child'].more.stroller : undefined;
+let stroller: ReturnType<typeof renderStroller> | undefined;
+const strollerS = child ? ls('stroller-height-studies', locale) : undefined;
+if (child && strollerS) {
+  // Mainz (harr2022) is left out: blueprint 9.6 shows it only if the site owner agrees.
+  const pts = points(strollerS, 'difference').points.filter((p) => p.x !== 'harr2022');
+  const band = facts['stroller-height-review'].data;
+  stroller = renderStroller({
+    locale,
+    rows: pts.map((p) => ({
+      label: catLabel(strollerS, String(p.x)),
+      value: p.y,
+      low: p.low,
+      high: p.high,
+      upTo: p.flags?.includes('maximum'),
+    })),
+    band: { low: band.kenagy2016Low.value, high: band.kenagy2016High.value, label: child.band },
+    zeroLabel: child.zero,
+    upToLabel: child.upTo,
+    noDiffLabel: child.noDiff,
+    footLabel: child.taiwan,
+    categoryLabel: child.study,
+    valueLabel: child.diff,
+  });
+}
+
+// ---- electric: V17, V21
+const elec = slug === 'electric' ? all.pages.electric.more : undefined;
+let shareLine: ReturnType<typeof renderShareLine> | undefined;
+const evS = elec ? ls('ev-share-new-registrations', locale) : undefined;
+if (elec && evS) {
+  shareLine = renderShareLine({
+    locale,
+    actual: points(evS, 'actual').points.map((p) => ({ x: Number(p.x), y: p.y })),
+    targets: points(evS, 'target').points.map((p) => ({ x: Number(p.x), y: p.y as number })),
+    actualLabel: elec.share.actual,
+    targetLabel: elec.share.target,
+    yearLabel: elec.share.year,
+    unit: '%',
+  });
+}
+const benS = elec ? ls('tsai2023-benzene-by-class', locale) : undefined;
+const benRows = benS
+  ? (['motorcycles', 'gasoline'] as const).map((k) => {
+      const d = points(benS, k);
+      return { label: d.label, before: d.points[0].y as number, after: d.points[d.points.length - 1].y as number };
+    })
+  : [];
+const benYears = benS ? [String(points(benS, 'motorcycles').points[0].x), String(points(benS, 'motorcycles').points.at(-1)!.x)] : [];
+---
+
+{smell && odour && odourSeries && (
+  <Figure locale={locale} title={smell.odour.title} subtitle={smell.odour.subtitle} badge="international" caption={odourSeries.caveat}>
+    <QChart locale={locale} render={odour} title={smell.odour.chart} desc={smell.odour.desc} />
+    <Fragment slot="source">{seriesCites('odour-thresholds').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{smell && (
+  <Figure locale={locale} title={smell.iarc.title} subtitle={smell.iarc.subtitle} badge="international">
+    <CompareTable
+      caption={smell.iarc.subtitle}
+      hideCaption
+      rowHeader={smell.iarc.rowHeader}
+      columns={[{ label: smell.iarc.column }]}
+      numeric={false}
+      rows={[
+        { label: smell.iarc.rows.benzene, values: [lf('iarc-benzene-group1', locale).display] },
+        { label: smell.iarc.rows.outdoor, values: [lf('iarc-outdoor-air-pollution-group1', locale).display] },
+        { label: smell.iarc.rows.diesel, values: [lf('iarc-diesel-exhaust-group1', locale).display], note: caveatOf('iarc-diesel-exhaust-group1') },
+        { label: smell.iarc.rows.gasoline, values: [lf('iarc-gasoline-exhaust-2b', locale).display], note: caveatOf('iarc-gasoline-exhaust-2b') },
+      ]}
+    />
+    <Fragment slot="caption">
+      <p>{smell.iarc.caption}</p>
+      <p>{smell.iarc.whoBenzene}{C(['who-benzene-no-safe-level']).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</p>
+    </Fragment>
+    <Fragment slot="source">{C(['iarc-benzene-group1', 'iarc-outdoor-air-pollution-group1', 'iarc-diesel-exhaust-group1', 'iarc-gasoline-exhaust-2b']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{beside && (
+  <Figure locale={locale} title={beside.kerb.title} subtitle={beside.kerb.subtitle} badge="international" frame="none">
+    <StreetScene locale={locale} frame="kerb" emphasis="heights" />
+    <Fragment slot="source">{C(['first-metre-sharma-kumar-2018']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{beside && (
+  <Figure locale={locale} title={beside.cycle.title} subtitle={beside.cycle.subtitle} badge={['international', 'gap']} frame="none" caption={caveatOf('signal-cycle-peaks-international')}>
+    <SignalCycle locale={locale}>
+      <EvidenceBadge slot="badge" locale={locale} kind="international" />
+      <EvidenceBadge slot="gap" locale={locale} kind="gap" />
+    </SignalCycle>
+    <Fragment slot="source">{C(['signal-cycle-peaks-international'], ['gap-pull-away-spike']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{beside && limits && (
+  <Figure locale={locale} title={beside.limits.title} subtitle={beside.limits.subtitle} badge="official-tw" caption={beside.limits.caption}>
+    <div class="q-pair">
+      <BarChart locale={locale} title={beside.limits.coChart} data={limitRows('co')} unit="%" decimals={1} tone="neutral" categoryLabel={beside.limits.built} valueLabel={beside.limits.co} />
+      <BarChart locale={locale} title={beside.limits.hcChart} data={limitRows('hc')} unit="ppm" tone="neutral" categoryLabel={beside.limits.built} valueLabel={beside.limits.hc} />
+    </div>
+    <Fragment slot="source">{seriesCites('idle-test-limits-by-build-date').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{beside && per100 && (
+  <Figure locale={locale} title={beside.waffle.title} subtitle={beside.waffle.subtitle} badge="derived">
+    <WaffleChart
+      locale={locale}
+      title={beside.waffle.chart}
+      parts={[
+        { value: per100.passed.value, label: beside.waffle.passed, tone: 'clean' },
+        { value: per100.failed.value, label: beside.waffle.failed, tone: 'exhaust' },
+      ]}
+      restLabel={beside.waffle.absent}
+      categoryLabel={beside.waffle.category}
+      valueLabel={beside.waffle.value}
+    />
+    <Fragment slot="caption">
+      <p><strong>{beside.waffle.caption}</strong></p>
+      <p>{caveatOf('inspection-2025')}</p>
+    </Fragment>
+    <Fragment slot="source">{C(['inspection-2025-per-100', 'inspection-2025']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{appMore && stations && (
+  <Figure locale={locale} title={appMore.stations.title} subtitle={appMore.stations.subtitle} badge="measured-tw" caption={`${appMore.stations.caption} ${stations.caveat ?? ''}`}>
+    <BeforeAfterChart
+      locale={locale}
+      title={appMore.stations.chart}
+      data={stationRows}
+      beforeLabel={points(stations, 'general').label}
+      afterLabel={points(stations, 'traffic').label}
+      beforeTone="neutral"
+      afterTone="exhaust"
+      unit={units.ugm3}
+      decimals={1}
+      categoryLabel={appMore.stations.year}
+    />
+    <Fragment slot="source">{seriesCites('taipei-traffic-vs-general-stations').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{near && wuS && (
+  <Figure locale={locale} title={near.wu.title} subtitle={near.wu.subtitle} badge="measured-tw">
+    <BarChart locale={locale} title={near.wu.chart} data={wuRows} unit="ppb" decimals={2} emphasis categoryLabel={catLabel(wuS, 'cyclists')} valueLabel="BTEX" />
+    <Fragment slot="caption">
+      <p><strong>{near.wu.differs}</strong></p>
+      {requiredCaveats(['scooter-lane-btex-wu2021'], locale).map((n) => <p>{n.text}</p>)}
+    </Fragment>
+    <Fragment slot="source">{seriesCites('scooter-lane-vs-cyclist-wu2021').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{near && chS && (
+  <Figure locale={locale} title={near.chuang.title} subtitle={near.chuang.subtitle} badge="measured-tw">
+    <BarChart locale={locale} title={near.chuang.chart} data={chRows} unit={units.ugm3} decimals={1} emphasis categoryLabel={all.pages.rider.figure.mode} valueLabel={all.pages.rider.figure.value} />
+    <Fragment slot="caption">
+      <p><strong>{near.chuang.differs}</strong></p>
+      <p>{chS.caveat}</p>
+    </Fragment>
+    <Fragment slot="source">{seriesCites('commute-pm25-chuang2020').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{(near || riderMore) && waS && (
+  <Figure locale={locale} title={near ? near.wang.title : riderMore!.wang.title} subtitle={near ? near.wang.subtitle : riderMore!.wang.subtitle} badge="measured-tw">
+    <RangePlot locale={locale} title={all.pages['how-much'].nearest.wang.chart} data={waRows} unit={units.ugm3} labels={rangeLabels} categoryLabel={rangeLabels.mid} />
+    <Fragment slot="caption">
+      {near && <p><strong>{near.wang.differs}</strong></p>}
+      {requiredCaveats(['commute-walking-wang2021', 'idle-motorcycle-pm25-wang2021'], locale).map((n) => <p>{n.text}</p>)}
+    </Fragment>
+    <Fragment slot="source">{seriesCites('commute-pm25-wang2021').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{riderMore && wuS && (
+  <Figure locale={locale} title={riderMore.wu.title} subtitle={riderMore.wu.subtitle} badge="measured-tw">
+    <BarChart locale={locale} title={all.pages['how-much'].nearest.wu.chart} data={wuRows} unit="ppb" decimals={2} emphasis categoryLabel={catLabel(wuS, 'cyclists')} valueLabel="BTEX" />
+    <Fragment slot="caption">
+      {requiredCaveats(['scooter-lane-btex-wu2021'], locale).map((n) => <p>{n.text}</p>)}
+    </Fragment>
+    <Fragment slot="source">{seriesCites('scooter-lane-vs-cyclist-wu2021').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{orl && <RedLightYear locale={locale} />}
+{orl && quietS && (
+  <Figure locale={locale} title={orl.quiet.title} subtitle={orl.quiet.subtitle} badge="measured-tw" caption={orl.quiet.caption}>
+    <BarChart locale={locale} title={orl.quiet.chart} data={quietRows} unit="%" decimals={0} tone="clean" categoryLabel={orl.quiet.pollutant} valueLabel={orl.quiet.less} />
+    <Fragment slot="source">{seriesCites('wu2021-quiet-route').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{child && stroller && strollerS && (
+  <Figure locale={locale} title={child.title} subtitle={child.subtitle} badge="international" caption={strollerS.caveat}>
+    <QChart locale={locale} render={stroller} title={child.chart} desc={child.desc} />
+    <Fragment slot="source">{seriesCites('stroller-height-studies').filter((c) => c.id !== 'harr-2022-uclim').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{elec && shareLine && evS && (
+  <Figure locale={locale} title={elec.share.title} subtitle={elec.share.subtitle} badge="official-tw" secondary caption={`${elec.share.caption} ${evS.caveat ?? ''}`}>
+    <QChart locale={locale} render={shareLine} title={elec.share.chart} desc={elec.share.desc} />
+    <Fragment slot="source">{seriesCites('ev-share-new-registrations').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+{elec && benS && (
+  <Figure locale={locale} title={elec.benzene.title} subtitle={elec.benzene.subtitle} badge="modelled-tw" caption={`${elec.benzene.caption} ${benS.caveat ?? ''}`}>
+    <BeforeAfterChart locale={locale} title={elec.benzene.chart} data={benRows} beforeLabel={benYears[0]} afterLabel={benYears[1]} beforeTone="neutral" afterTone="exhaust" unit={unitLabel('tonnes-per-year', locale)} categoryLabel={elec.benzene.vehicle} />
+    <Fragment slot="source">{seriesCites('tsai2023-benzene-by-class').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+<style>
+  .q-pair {
+    display: grid;
+    gap: var(--sp-6);
+  }
+  @media (min-width: 48em) {
+    .q-pair {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

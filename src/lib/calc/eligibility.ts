@@ -55,7 +55,7 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
         : fail(c.kind, c.engines.includes('two-stroke') ? t('舊車必須是二行程機車', 'the old scooter must be a two-stroke') : t('舊車必須是四行程機車', 'the old scooter must be a four-stroke'));
     case 'scrap-min-age': {
       if (!old) return fail(c.kind, t('需要淘汰一輛舊燃油機車', 'requires scrapping an old gasoline scooter'));
-      const years = fullYears(normalise(old.builtOn), s.date);
+      const years = fullYears(normalise(old.builtOn), s.date as string);
       return years >= c.years ? OK : fail(c.kind, t(`舊車須出廠滿${c.years}年（目前${years}年）`, `the old scooter must be at least ${c.years} years old (it is ${years})`));
     }
     case 'scrap-built': {
@@ -84,7 +84,7 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       if (c.byDate && !onOrBefore(old.registeredLocallySince, c.byDate)) {
         return fail(c.kind, t(`舊車須在${date(c.byDate)['zh-TW']}前設籍本縣市`, `the old scooter must be registered locally by ${date(c.byDate).en}`));
       }
-      if (c.minYears && fullYears(old.registeredLocallySince, s.date) < c.minYears) {
+      if (c.minYears && fullYears(old.registeredLocallySince, s.date as string) < c.minYears) {
         return fail(c.kind, t(`舊車須在本縣市設籍滿${c.minYears}年`, `the old scooter must have been registered locally for ${c.minYears} year(s)`));
       }
       return OK;
@@ -171,7 +171,7 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       if (c.registeredBy && !onOrBefore(h.residentSince, c.registeredBy)) {
         return fail(c.kind, c.why ?? t(`須在${date(c.registeredBy)['zh-TW']}前設籍`, `household must be registered by ${date(c.registeredBy).en}`));
       }
-      if (c.minYears && fullYears(h.residentSince, s.date) < c.minYears) {
+      if (c.minYears && fullYears(h.residentSince, s.date as string) < c.minYears) {
         return fail(c.kind, t(`須設籍滿${c.minYears}年`, `household must have been registered for ${c.minYears} year(s)`));
       }
       return OK;

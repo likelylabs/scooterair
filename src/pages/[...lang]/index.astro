@@ -1,76 +1,597 @@
 ---
 /**
- * Home — placeholder shell.
- * The real long-form narrative is written by the home workstream (blueprint
- * Part 3); this file only proves the shell: Base, the rail slot, the prologue
- * from its copy module and the signature scene. Copy lives in
- * src/i18n/pages/home.ts, never inline here (see src/i18n/pages/_copy.ts).
+ * Home — one red light, ninety seconds (blueprint Part 3, chapters 3.1–3.13).
+ *
+ * Copy: src/i18n/pages/home.ts (never inline here). Numbers, badges, citation numbers and the
+ * two worked buyers: src/components/pages/home/home-data.ts, computed at build time from the
+ * fact registry and the calculator engine. Chapter ids follow chain.anchors: the prologue is the
+ * page top (Base already puts id="top" on <html>), then brief, link-1 … link-6, green, connect,
+ * link-7, money, next.
+ *
+ * Rules kept here: the scene never shares a frame with a health number (link 5 has no art);
+ * no price or purchase button before the money chapter (R9); the site's own inference is closed
+ * by default and wears the inference badge; money copy that depends on the date is gated on the
+ * site-state utility (data-money-when / data-money-if), with a static variant for no JavaScript.
  */
 import Base from '@/layouts/Base.astro';
 import Button from '@/components/ui/Button.astro';
+import Callout from '@/components/ui/Callout.astro';
+import Card from '@/components/ui/Card.astro';
+import ChainStrip from '@/components/ui/ChainStrip.astro';
+import Chapter from '@/components/ui/Chapter.astro';
+import Cite from '@/components/ui/Cite.astro';
+import CountdownRail from '@/components/ui/CountdownRail.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import EvidenceChain from '@/components/ui/EvidenceChain.astro';
+import Figure from '@/components/ui/Figure.astro';
+import Icon from '@/components/ui/Icon.astro';
+import MoneyBanner from '@/components/ui/MoneyBanner.astro';
 import Phrased from '@/components/ui/Phrased.astro';
+import PullQuote from '@/components/ui/PullQuote.astro';
+import QuestionChips from '@/components/ui/QuestionChips.astro';
+import Section from '@/components/ui/Section.astro';
+import Select from '@/components/ui/Select.astro';
+import StanceBox from '@/components/ui/StanceBox.astro';
+import SubsidyTimeline from '@/components/ui/SubsidyTimeline.astro';
+import TimeLadder from '@/components/ui/TimeLadder.astro';
+import BarChart from '@/components/charts/BarChart.astro';
+import BeforeAfterChart from '@/components/charts/BeforeAfterChart.astro';
+import EmptyChart from '@/components/charts/EmptyChart.astro';
+import WaterfallChart from '@/components/charts/WaterfallChart.astro';
+import ApproachPlan from '@/components/art/ApproachPlan.astro';
 import PollutantKey from '@/components/art/PollutantKey.astro';
+import SceneCompare from '@/components/art/SceneCompare.astro';
+import SignalCycle from '@/components/art/SignalCycle.astro';
 import Signal from '@/components/art/Signal.astro';
+import SmellStrip from '@/components/art/SmellStrip.astro';
 import StreetScene from '@/components/art/StreetScene.astro';
-import { href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { nav, questions, site, ui } from '@/i18n/ui';
-import home from '@/i18n/pages/home';
-import { localize } from '@/i18n/pages/_copy';
+import Ev from '@/components/pages/home/Ev.astro';
+import Notes from '@/components/pages/home/Notes.astro';
+import EvShareChart from '@/components/pages/home/EvShareChart.astro';
+import RedLightYear from '@/components/pages/home/RedLightYear.astro';
+import { homeData, type Evidence } from '@/components/pages/home/home-data';
+import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { chain, questions, rail, t as tr, type EvidenceKind } from '@/i18n/ui';
+import { art } from '@/i18n/art';
+import { shareCard } from '@/lib/share-cards';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
-const t = localize(home, locale).prologue;
+const d = homeData(locale);
+const { t } = d;
+const ev = (e: Evidence) => ({ badge: e.badges.map((b) => b.kind) as EvidenceKind[], secondary: e.badges.some((b) => b.secondary) });
+const more = (n: number) => href(`/evidence/#link-${n}`, locale);
+const prologueCount = chain.countdown.prologue;
+const keyItems = (['fumes', 'co', 'ufp'] as const).map((kind) => ({ kind, title: art.key[kind].title[locale], body: kind === 'ufp' ? t.link4.keyUfp : art.key[kind].body[locale] }));
+const briefCard = shareCard('brief', locale);
+const roles = [
+  { id: 'walk', r: t.next.roles.walk, b1: null, b2: null },
+  { id: 'keep', r: t.next.roles.ride, b1: d.next.rideEv, b2: d.next.twoStrokeEv },
+  { id: 'parents', r: t.next.roles.parents, b1: 'inference', b2: 'inference' },
+  { id: 'neighbourhood', r: t.next.roles.neighbourhood, b1: null, b2: null },
+  { id: 'policy', r: { ...t.next.roles.policy, a1: d.next.policy }, b1: null, b2: null },
+] as const;
+const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === null ? [] : b === 'inference' ? ['inference'] : b.badges.map((x) => x.kind));
 ---
 
-<Base locale={locale} title={site.name[locale]} home>
-  <section class="hero" aria-labelledby="hero-title">
+<Base locale={locale} title={t.meta.title} description={t.meta.description} home money share="home">
+  <CountdownRail slot="rail" locale={locale} />
+
+  <!-- 3.1 Prologue ======================================================================== -->
+  <section
+    class="hero"
+    aria-labelledby="hero-title"
+    data-rail-chapter
+    data-phase="red"
+    data-count-from={prologueCount[0]}
+    data-count-to={prologueCount[1]}
+    data-rail-label={rail.idle[locale]}
+  >
     <div class="container hero__text">
       <p class="eyebrow hero__kicker">
-        <Signal state="red" size="2rem" label={ui.phaseRed[locale]} />
-        <span>{t.kicker}</span>
+        <Signal state="red" size="2.25rem" label={tr(chain.kickerRed, locale, { n: prologueCount[0] })} />
+        <span>{t.prologue.kicker}</span>
       </p>
-      <h1 id="hero-title" class="display"><Phrased text={t.title} /></h1>
-      <p class="lead">{t.deck}</p>
-      <div class="cluster">
-        <Button href={href(nav[0].path, locale)} size="lg" arrow>{questions.all[locale]}</Button>
-        <Button href={href('/electric/', locale)} size="lg" variant="secondary">{questions.chips[5].label[locale]}</Button>
-      </div>
+      <h1 id="hero-title" class="display hero__title"><Phrased text={t.prologue.title} /></h1>
+      <p class="lead">{t.prologue.deck}</p>
+      <p class="hero__rider">{t.prologue.rider}</p>
     </div>
     <div class="hero__scene">
-      <StreetScene locale={locale} />
+      <StreetScene locale={locale} frame="empty" count={prologueCount[0]} />
     </div>
-    <div class="container hero__key">
-      <p class="meta">{t.disclosure}</p>
-      <PollutantKey locale={locale} />
+    <div class="container hero__after">
+      <p class="hero__disclosure"><b>{t.prologue.disclosureLabel}</b> {t.prologue.disclosure}</p>
+      <p class="meta hero__micro">{t.prologue.microcopy}</p>
+      <p class="handoff"><Icon name="arrow-down" size="1.25em" /><a href="#brief">{t.prologue.handoff}</a></p>
     </div>
   </section>
+
+  <!-- 3.2 The 30-second version ============================================================= -->
+  <Section id="brief" tone="sunken" title={chain.summaryTitle[locale]} rule>
+    <div class="brief">
+      <ChainStrip locale={locale} />
+      <p class="brief__under">{chain.summaryUnder[locale]}</p>
+      <QuestionChips locale={locale}>
+        <a slot="after" href={href(questions.askMeasurePath, locale)}>{questions.askMeasure[locale]}<Icon name="arrow-right" size="1.05em" /></a>
+      </QuestionChips>
+      <p class="handoff"><Icon name="arrow-down" size="1.25em" /><span>{t.brief.handoff}</span></p>
+    </div>
+  </Section>
+
+  <!-- 3.3 Link 1 ============================================================================ -->
+  <Chapter locale={locale} id="link-1" link={1} haze title={t.link1.title} lead={d.link1.deck} moreHref={more(1)} handoff={t.link1.handoff}>
+    <StreetScene slot="art" locale={locale} frame="pack" />
+    <Figure slot="visual" locale={locale} title={t.link1.figure.title} subtitle={d.link1.figure.subtitle} caption={d.link1.figure.caption} tone="exhaust" {...ev(d.link1.figure.ev)}>
+      <BarChart
+        locale={locale}
+        title={t.link1.figure.chart}
+        desc={d.link1.figure.desc}
+        data={d.link1.figure.rows}
+        unit="%"
+        max={100}
+        decimals={1}
+        tone="exhaust"
+        categoryLabel={t.link1.figure.category}
+        valueLabel={t.link1.figure.scooters}
+      />
+      <Fragment slot="source">{d.link1.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+    <div class="prose">
+      {d.link1.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
+    </div>
+    <Fragment slot="caveat">
+      <p>{d.link1.caveat}<Ev locale={locale} ev={d.link1.caveatEv} /></p>
+      <Notes locale={locale} notes={d.link1.caveatEv.notes} />
+    </Fragment>
+    <Fragment slot="action">
+      <p>{t.link1.action}<Ev locale={locale} ev={d.link1.actionEv} /></p>
+    </Fragment>
+  </Chapter>
+
+  <!-- 3.4 Link 2 ============================================================================ -->
+  <Chapter locale={locale} id="link-2" link={2} haze title={d.link2.title} lead={d.link2.deck} actionBadge="inference" action={t.link2.action} moreHref={more(2)} handoff={t.link2.handoff}>
+    <StreetScene slot="art" locale={locale} frame="kerb" emphasis="heights" />
+    <Figure slot="visual" locale={locale} title={d.link2.figure.title} subtitle={t.link2.figure.subtitle} frame="none" {...ev(d.link2.figure.ev)}>
+      <ApproachPlan locale={locale} />
+      <Fragment slot="source">{d.link2.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+    <div class="prose">
+      {d.link2.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
+      <Notes locale={locale} notes={d.link2.body.flatMap((p) => p.ev.notes)} />
+    </div>
+    <Fragment slot="caveat">
+      <p>{t.link2.caveat}<Ev locale={locale} ev={d.link2.caveatEv} /></p>
+      {d.link2.who && <p class="who"><b>{t.meta.who}</b>{d.link2.who}</p>}
+    </Fragment>
+  </Chapter>
+
+  <!-- 3.5 Link 3: the centre of the page ===================================================== -->
+  <Chapter locale={locale} id="link-3" link={3} tone="night" haze title={t.link3.title} lead={t.link3.deck} moreHref={more(3)} handoff={t.link3.handoff} class="chapter--centre">
+    <StreetScene slot="art" locale={locale} frame="paused" />
+    <div slot="visual" class="empty-room">
+      <Figure locale={locale} empty title={t.link3.figure.title} subtitle={t.link3.figure.subtitle} level={3}>
+        <EmptyChart locale={locale} title={t.link3.figure.chart} desc={t.link3.figure.desc} panelHeight={96} />
+        <Fragment slot="who">{d.link3.who} <a href={href(questions.askMeasurePath, locale)}>{t.link3.actionLink}</a></Fragment>
+      </Figure>
+    </div>
+    <div class="prose">
+      {d.link3.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
+    </div>
+    <Figure locale={locale} title={t.link3.small.title} subtitle={d.link3.small.subtitle} caption={d.link3.small.caption} {...ev(d.link3.small.ev)} class="small-fig">
+      <BeforeAfterChart
+        locale={locale}
+        title={t.link3.small.chart}
+        desc={d.link3.small.desc}
+        data={d.link3.small.rows}
+        beforeLabel={d.link3.small.before}
+        afterLabel={d.link3.small.after}
+        beforeTone="neutral"
+        afterTone="ink"
+        unit="µg/m³"
+        decimals={1}
+        categoryLabel={t.link3.small.category}
+      />
+      <Fragment slot="source">{d.link3.small.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+    <PullQuote>
+      {t.link3.pledge}
+      <Fragment slot="attribution">{t.link3.pledgeBy}</Fragment>
+    </PullQuote>
+    <Fragment slot="caveat">
+      <p>{t.link3.caveat}<Ev locale={locale} ev={d.link3.caveatEv} /></p>
+    </Fragment>
+    <Fragment slot="action">
+      <p>{t.link3.action}<a href={href(questions.askMeasurePath, locale)}>{t.link3.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
+    </Fragment>
+  </Chapter>
+
+  <!-- 3.6 Link 4 ============================================================================ -->
+  <Chapter locale={locale} id="link-4" link={4} haze title={t.link4.title} lead={t.link4.deck} moreHref={more(4)} handoff={t.link4.handoff}>
+    <div slot="art" class="art-with-key">
+      <StreetScene locale={locale} frame="kerb" emphasis="fumes" />
+      <div class="container"><PollutantKey locale={locale} layers={['fumes', 'co', 'ufp']} items={keyItems} /></div>
+    </div>
+    <Figure slot="visual" locale={locale} title={t.link4.figure.title} frame="none" {...ev(d.link4.smellEv)}>
+      <SmellStrip locale={locale}>
+        <Fragment slot="can">{t.link4.smell.can}</Fragment>
+        <Fragment slot="cannot">{t.link4.smell.cannot}</Fragment>
+      </SmellStrip>
+      <Fragment slot="source">{d.link4.smellEv.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+    <div class="prose">
+      {d.link4.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
+      {d.link4.gapWho && <p class="who"><b>{t.meta.who}</b>{d.link4.gapWho}</p>}
+      <Notes locale={locale} notes={d.link4.body.flatMap((p) => p.ev.notes)} />
+    </div>
+    <Callout label={t.link4.marker.label}>
+      <p>{t.link4.marker.text}<Ev locale={locale} ev={d.link4.markerEv} /></p>
+    </Callout>
+    <Fragment slot="caveat"><p>{t.link4.caveat}</p></Fragment>
+    <Fragment slot="action">
+      <p>{t.link4.action}</p>
+      <p><a href={href(questions.chips[0].path, locale)}>{t.link4.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
+    </Fragment>
+  </Chapter>
+
+  <!-- 3.7 Link 5: no scene colour, no figures beside a number ================================= -->
+  <Chapter locale={locale} id="link-5" link={5} tone="sunken" title={t.link5.title} lead={t.link5.deck} moreHref={more(5)} handoff={t.link5.handoff}>
+    <div class="stack-l">
+      <div class="prose">
+        {d.link5.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
+      </div>
+      <TimeLadder
+        locale={locale}
+        stops={d.link5.ladder.map((s) => ({
+          time: s.time,
+          ...('empty' in s ? { empty: true } : { body: s.body, scope: s.scope }),
+          badge: s.ev.badges.map((b) => b.kind),
+          secondary: s.ev.badges.some((b) => b.secondary),
+        }))}
+      />
+      <p class="meta ladder-cites">
+        {d.link5.ladder.map((s) => s.ev.cites.length > 0 && (<span class="ladder-cites__item">{s.time}{s.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</span>))}
+      </p>
+      <Callout tone="signal" label={t.link5.ruler.label}>
+        <p>{t.link5.ruler.text}<Ev locale={locale} ev={d.link5.gapEv} /></p>
+      </Callout>
+      <Notes locale={locale} notes={d.link5.ladder.flatMap((s) => s.ev.notes)} />
+      <Callout tone="clean" label={t.link5.walk.label}>
+        <p>{t.link5.walk.text}<Ev locale={locale} ev={d.link5.walkEv} /></p>
+      </Callout>
+      <RedLightYear locale={locale} />
+    </div>
+    <Fragment slot="caveat"><p>{t.link5.caveat}</p></Fragment>
+    <Fragment slot="action"><p>{d.link5.action}<Ev locale={locale} ev={d.link5.actionEv} /></p></Fragment>
+  </Chapter>
+
+  <!-- 3.8 Link 6 ============================================================================ -->
+  <Chapter locale={locale} id="link-6" link={6} haze title={t.link6.title} lead={t.link6.deck} actionBadge="inference" action={t.link6.action} moreHref={more(6)} handoff={t.link6.handoff}>
+    <StreetScene slot="art" locale={locale} frame="kerb" emphasis="heights" />
+    <Figure slot="visual" locale={locale} title={t.link6.figure.title} subtitle={d.link6.figure.subtitle} caption={d.link6.figure.caption} {...ev(d.link6.figure.ev)} class="small-fig">
+      <BarChart locale={locale} title={t.link6.figure.chart} desc={d.link6.figure.desc} data={d.link6.figure.data} unit="µg/m³" decimals={1} emphasis categoryLabel={t.link6.figure.category} valueLabel={t.link6.figure.value} />
+      <Fragment slot="source">{d.link6.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+    <div class="prose">
+      {d.link6.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
+      <p class="who"><b>{t.meta.who}</b><a href={href('/unmeasured/', locale)}>{t.meta.askPage}<Icon name="arrow-right" size="1.05em" /></a></p>
+      <Notes locale={locale} notes={d.link6.body.flatMap((p) => p.ev.notes)} />
+    </div>
+    <Fragment slot="caveat"><p>{t.link6.caveat}<Ev locale={locale} ev={d.link6.caveatEv} /></p></Fragment>
+  </Chapter>
+
+  <!-- 3.9 Green ============================================================================= -->
+  <Chapter locale={locale} id="green" phase="green" haze size="auto" title={t.green.title} lead={t.green.deck} handoff={t.green.handoff}>
+    <StreetScene slot="art" locale={locale} frame="green" />
+    <Figure slot="visual" locale={locale} title={t.green.figure.title} subtitle={t.green.figure.subtitle} frame="none" {...ev(d.green.deckEv)}>
+      <SignalCycle locale={locale}>
+        <EvidenceBadge slot="badge" locale={locale} kind="international" />
+        <EvidenceBadge slot="gap" locale={locale} kind="gap" />
+      </SignalCycle>
+      <Fragment slot="source">{d.green.deckEv.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+    <div class="prose">
+      {t.green.body.map((p) => <p>{p}</p>)}
+      <Notes locale={locale} notes={d.green.deckEv.notes} />
+    </div>
+    <Fragment slot="caveat"><p>{t.green.caveat}<Ev locale={locale} ev={d.green.gapEv} /></p></Fragment>
+  </Chapter>
+
+  <!-- 3.10 Joining it up ==================================================================== -->
+  <Chapter locale={locale} id="connect" count={0} tone="sunken" size="auto" title={t.connect.title} lead={t.connect.deck} handoff={t.connect.handoff}>
+    <EvidenceChain locale={locale} links={d.connect.links} question={t.connect.question} collapseSources>
+      <Fragment slot="reveal"><p>{t.connect.reveal}</p></Fragment>
+      <Fragment slot="boxes">
+        <StanceBox locale={locale} kind="not-saying" items={t.connect.notSaying} />
+        <StanceBox locale={locale} kind="change-mind"><p>{t.connect.changeMind}</p></StanceBox>
+      </Fragment>
+    </EvidenceChain>
+  </Chapter>
+
+  <!-- 3.11 Link 7 =========================================================================== -->
+  <Chapter locale={locale} id="link-7" link={7} tone="clear" title={t.link7.title} lead={t.link7.deck} moreHref={more(7)} handoff={t.link7.handoff}>
+    <SceneCompare slot="art" locale={locale} name="home-compare" count={chain.countdown.links[6][0]} />
+    <Figure slot="visual" locale={locale} title={t.link7.figure.title} subtitle={d.link7.figure.subtitle} caption={t.link7.figure.caption} tone="clean" {...ev(d.link7.figure.ev)}>
+      <EvShareChart
+        locale={locale}
+        title={t.link7.figure.chart}
+        desc={d.link7.figure.desc}
+        years={d.link7.chart.years}
+        actual={d.link7.chart.actual}
+        targets={d.link7.chart.targets}
+        labels={d.link7.chart.labels}
+        format={d.link7.chart.fmt}
+        names={{ actual: t.link7.figure.actual, target: t.link7.figure.target, year: t.link7.figure.year }}
+      />
+      <Fragment slot="source">{d.link7.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+    <div class="prose">
+      {d.link7.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
+      <Notes locale={locale} notes={[...d.link7.figure.ev.notes, ...d.link7.body.flatMap((p) => p.ev?.notes ?? [])]} />
+    </div>
+    <Fragment slot="caveat">
+      <p>{t.link7.caveat}<Ev locale={locale} ev={d.link7.caveatEv} /></p>
+      <Notes locale={locale} notes={d.link7.caveatEv.notes} />
+    </Fragment>
+    <Fragment slot="action">
+      <p>{t.link7.action}<a href={href('/act/#keep', locale)}>{t.link7.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
+    </Fragment>
+  </Chapter>
+
+  <!-- 3.12 The money ======================================================================== -->
+  <Chapter locale={locale} id="money" budget={false} title={d.money.title} lead={d.money.deck}>
+    <div class="stack-l">
+      <div class="prose">
+        <p>{d.money.body}<Ev locale={locale} ev={d.money.bodyEv} /></p>
+        {
+          d.money.nothingConfirmed && (
+            <p class="money-next" data-money-when="A B" data-money-if="nothingConfirmed">
+              {d.money.next2027}
+              <Ev locale={locale} ev={d.money.next2027Ev} />
+            </p>
+          )
+        }
+      </div>
+
+      <div class="money-city">
+        <Select id="home-money-city" label={t.money.cityLabel} options={d.money.cityOptions} value="" hint={t.money.cityHint} data-money-city />
+        <MoneyBanner locale={locale} tone="box" />
+      </div>
+
+      <section class="personas" aria-labelledby="personas-title">
+        <h3 id="personas-title" class="personas__title">{t.money.personasLabel}</h3>
+        <p class="personas__intro">{t.money.personasIntro}</p>
+        <div class="personas__grid">
+          {
+            d.money.personas.map((p) => (
+              <Figure locale={locale} title={p.title} subtitle={p.subtitle} tone={p.parity ? 'clean' : 'exhaust'} badge={['derived', 'market-tw']} level={4}>
+                <p class="persona__who">{p.who}</p>
+                <WaterfallChart {...p.waterfall} title={t.money.chart} />
+                <Fragment slot="caption">
+                  {p.status && <span class="persona__status">{p.status} </span>}
+                  {p.caption}
+                </Fragment>
+                <Fragment slot="source">{p.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+              </Figure>
+            ))
+          }
+        </div>
+        <p class="money-past" data-money-when="B C D">{d.money.pastNote}</p>
+      </section>
+
+      <SubsidyTimeline locale={locale} />
+
+      <div class="cluster money-actions" data-money-when="static A B D">
+        <Button href={href('/electric/#calc', locale)} size="lg" arrow>{t.money.calc}</Button>
+        <Button href={href('/act/#keep', locale)} size="lg" variant="secondary">{t.money.keep}</Button>
+      </div>
+      <div class="cluster money-actions" data-money-when="C">
+        <Button href={href('/act/#policy', locale)} size="lg" arrow>{d.money.askPolicy}</Button>
+        <Button href={href('/electric/', locale)} size="lg" variant="secondary">{t.money.noSubsidy}</Button>
+      </div>
+    </div>
+    <Fragment slot="caveat">
+      <p>{t.money.caveat}<Ev locale={locale} ev={d.money.caveatEv} /></p>
+      <Notes locale={locale} notes={d.money.caveatEv.notes} />
+    </Fragment>
+  </Chapter>
+
+  <!-- 3.13 The next red light =============================================================== -->
+  <Chapter locale={locale} id="next" size="auto" title={t.next.title} lead={t.next.deck}>
+    <div class="stack-l">
+      <div class="next-scene"><StreetScene locale={locale} frame="empty" variant="compact" labels={false} /></div>
+      <h3 class="roles__title">{t.next.rolesLabel}</h3>
+      <div class="roles">
+        {
+          roles.map((role) => (
+            <Card title={role.r.title} href={href(`/act/#${role.id}`, locale)} level={4}>
+              <ul class="roles__list">
+                <li>
+                  {role.r.a1}
+                  {roleBadges(role.b1).map((k) => <EvidenceBadge locale={locale} kind={k} />)}
+                </li>
+                <li>
+                  {role.r.a2}
+                  {roleBadges(role.b2).map((k) => <EvidenceBadge locale={locale} kind={k} />)}
+                </li>
+              </ul>
+            </Card>
+          ))
+        }
+      </div>
+      <ul class="next-links">
+        <li><a href={asset(briefCard.wide)}>{t.next.share}<Icon name="arrow-right" size="1.05em" /></a> <span class="meta">{t.next.shareNote}</span></li>
+        <li><a href={href('/sources/', locale)}>{t.next.sources}<Icon name="arrow-right" size="1.05em" /></a></li>
+      </ul>
+      <p class="next-corrections">{t.next.corrections} <a href={href('/about/#corrections', locale)}>{t.next.correctionsLink}</a></p>
+    </div>
+  </Chapter>
 </Base>
 
 <style>
+  /* ---- prologue ---- */
   .hero {
     display: grid;
-    gap: var(--sp-6);
-    padding-block-start: clamp(2rem, 6vw, 4.5rem);
+    gap: var(--sp-5);
+    padding-block: clamp(1.5rem, 5vw, 4rem) var(--sp-6);
   }
   .hero__text {
     display: grid;
     gap: var(--sp-4);
     justify-items: start;
   }
+  .hero__kicker {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    color: var(--signal-red-ink);
+  }
   .hero__kicker::before {
     display: none;
   }
-  .hero__kicker {
-    color: var(--signal-red-ink);
+  .hero__title {
+    max-inline-size: 14em;
+  }
+  .hero__rider {
+    max-inline-size: var(--measure);
+    color: var(--ink-2);
   }
   .hero__scene {
     max-inline-size: 110rem;
     inline-size: 100%;
     margin-inline: auto;
-    border-block-end: 1px solid var(--line);
   }
-  .hero__key {
+  .hero__after {
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .hero__disclosure {
+    max-inline-size: 46rem;
+    padding: var(--sp-3) var(--sp-4);
+    border-inline-start: var(--rule-paint, 4px) solid var(--ink);
+    background: var(--bg-sunken);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .hero__disclosure b {
+    margin-inline-end: 0.4em;
+  }
+  .handoff {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-weight: var(--fw-bold);
+  }
+
+  /* ---- brief ---- */
+  .brief {
+    display: grid;
+    gap: var(--sp-5);
+  }
+  .brief__under {
+    font-weight: var(--fw-medium);
+    max-inline-size: var(--measure);
+  }
+
+  /* ---- shared chapter pieces ---- */
+  .who {
+    font-size: var(--fs-sm);
+  }
+  .stack-l {
+    display: grid;
+    gap: var(--sp-6);
+    min-inline-size: 0;
+  }
+  .small-fig {
+    max-inline-size: 40rem;
+  }
+  .art-with-key {
     display: grid;
     gap: var(--sp-4);
+  }
+
+  /* link 3: the centre of the page — give the empty chart room */
+  .empty-room {
+    padding-block: var(--sp-5) var(--sp-6);
+  }
+  :global(.chapter--centre) .empty-room :global(.chart) {
+    margin-block: var(--sp-3);
+  }
+
+  .ladder-cites {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    margin-block-start: calc(-1 * var(--sp-4));
+  }
+
+  /* ---- money ---- */
+  .money-next {
+    font-weight: var(--fw-bold);
+  }
+  .money-city {
+    display: grid;
+    gap: var(--sp-4);
+    max-inline-size: 40rem;
+  }
+  .personas {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .personas__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+  .personas__intro {
+    color: var(--ink-2);
+    max-inline-size: var(--measure);
+  }
+  .personas__grid {
+    display: grid;
+    gap: var(--sp-7) var(--sp-6);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    align-items: start;
+  }
+  .persona__who {
+    font-weight: var(--fw-bold);
+    margin-block-end: var(--sp-3);
+  }
+  .persona__status {
+    font-weight: var(--fw-bold);
+  }
+  .money-actions {
+    --cluster: var(--sp-3);
+  }
+
+  /* ---- close ---- */
+  .next-scene {
+    max-inline-size: 36rem;
+  }
+  .roles__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+  .roles {
+    display: grid;
+    gap: var(--sp-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+  .roles__list {
+    display: grid;
+    gap: var(--sp-2);
+    padding-inline-start: 1.1em;
+    margin: 0;
+  }
+  .roles__list :global(.ev-wrap) {
+    margin-inline-start: 0.4em;
+  }
+  .next-links {
+    display: grid;
+    gap: var(--sp-2);
+    padding: 0;
+    list-style: none;
+    font-weight: var(--fw-bold);
+  }
+  .next-corrections {
+    max-inline-size: var(--measure);
   }
 </style>

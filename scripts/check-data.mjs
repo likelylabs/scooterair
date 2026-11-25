@@ -478,7 +478,9 @@ if (econ) {
     const feeds = p.calculator === true;
     checkProvenance(w, p, { feeds: true });
     if (p.jurisdiction !== 'central' && !jIds.has(p.jurisdiction)) err(w, `unknown jurisdiction "${p.jurisdiction}"`);
-    for (const key of ['name', 'payerName', 'conditionText', 'status2027']) checkL10n(`${w}.${key}`, p[key]);
+    for (const key of ['name', 'conditionText', 'status2027']) checkL10n(`${w}.${key}`, p[key]);
+    // The payer is an agency's official name: it keeps the form its own documents use (臺北市政府…).
+    checkL10n(`${w}.payerName`, p.payerName, { properNoun: true });
     if (p.applicationNote) checkL10n(`${w}.applicationNote`, p.applicationNote);
     if (!isDate(p.validFrom)) err(w, `validFrom must be YYYY-MM-DD: ${p.validFrom}`);
     if (!isDate(p.validTo)) err(w, `every programme needs a valid-to date (YYYY-MM-DD): ${p.validTo}`);

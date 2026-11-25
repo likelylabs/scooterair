@@ -4,7 +4,7 @@
 // not exceed the price; any excess comes off the city amount.
 
 import type { Condition, Programme } from '../types.ts';
-import { notSubsidisedBefore, age, builtBetween, builtBy, fixed, flag, lowIncome, notPreviouslySubsidised, quota, residency, scrap, scrapAge, t, twoStroke } from './helpers.ts';
+import { notSubsidisedBefore, age, builtBetween, builtBy, fixed, flag, lowIncome, quota, residency, scrap, scrapAge, t, twoStroke } from './helpers.ts';
 
 const PAYER = t('臺中市政府環境保護局', 'Taichung City Environmental Protection Bureau');
 const SRC = ['taichung-epb-2026-amount-table', 'taichung-epb-2026-announcement'] as const;
@@ -14,9 +14,9 @@ const budget = quota('unknown', '2026-11-25', t('計畫沒有數量上限，依�
 
 const notSubsidised: Condition = notSubsidisedBefore(t('假設你2016年起沒有領過台中市或環境部的機車補助', 'Assumes you have not received a Taichung or MOENV scooter subsidy since 2016'));
 const general: Condition[] = [residency(), age(18), notSubsidised];
-const GENERAL = '年滿18歲、申請時設籍臺中市；新車首次領牌並登記於臺中市；2016年起領過臺中市或環境部機車補助者不適用；每人限1輛。';
+const GENERAL = '年滿18歲、申請時設籍台中市；新車首次領牌並登記於台中市；2016年起領過台中市或環境部機車補助者不適用；每人限1輛。';
 const GENERAL_EN = 'Aged 18+ and registered in Taichung when applying; the new scooter is newly plated and registered in Taichung; anyone who has had a Taichung or MOENV scooter subsidy since 2016 is excluded; one per person.';
-const OLD = '舊車為臺中市籍燃油機車，115年1月1日後沒有外縣市過戶或車主戶籍遷出紀錄。';
+const OLD = '舊車為台中市籍燃油機車，115年1月1日後沒有外縣市過戶或車主戶籍遷出紀錄。';
 const OLD_EN = 'The old scooter is a Taichung-plated gasoline scooter with no out-of-county transfer, and no out-of-county household move by its owner, since 1 January 2026.';
 const oldLocal: Condition = { kind: 'scrap-registered-locally', byDate: '2026-01-01' };
 // tc2-residency (2026-06-29 amendment): "老舊機車車主戶籍於115年1月1日以後不得有外縣市異動紀錄".
@@ -64,7 +64,7 @@ const tier = (id: string, name: [string, string], value: number, conds: Conditio
 export const taichungProgrammes: Programme[] = [
   p({
     id: 'tc-new',
-    name: t('臺中市新購電動機車', 'Taichung new electric scooter'),
+    name: t('台中市新購電動機車', 'Taichung new electric scooter'),
     amount: fixed(3000),
     conditions: [...general],
     conditionText: t(`${GENERAL}各車種同一金額。`, `${GENERAL_EN} One amount for every class.`),
@@ -72,24 +72,24 @@ export const taichungProgrammes: Programme[] = [
   }),
   p({
     id: 'tc-new-lowincome',
-    name: t('臺中市新購電動機車（中低收入戶）', 'Taichung new electric scooter (low income)'),
+    name: t('台中市新購電動機車（中低收入戶）', 'Taichung new electric scooter (low income)'),
     amount: fixed(25000),
     conditions: [...general, lowIncome(['low', 'middle-low'])],
     conditionText: t(`${GENERAL}檢附區公所核發、115年內有效的（中）低收入戶證明。`, `${GENERAL_EN} With a district-office (middle-)low income certificate valid in 2026.`),
     research: ['taichung-r2#tc2-new-lowincome'],
   }),
-  tier('tc-scrap-two-stroke', ['臺中市淘汰二行程機車換購電動', 'Taichung scrap a two-stroke and buy electric'], 16000, [twoStroke, builtBy('2003-12-31')], ['舊車為92年12月31日以前出廠的二行程機車。', 'The old scooter is a two-stroke built by 31 December 2003.'], 'tc2-scrap-2stroke'),
-  tier('tc-scrap-phase1to3', ['臺中市淘汰1至3期機車換購電動', 'Taichung scrap a phase 1–3 scooter and buy electric'], 13000, [{ kind: 'scrap-engine', engines: ['four-stroke'] }, builtBy('2003-12-31')], ['舊車為92年12月31日以前出廠的1至3期四行程機車。', 'The old scooter is a phase 1–3 four-stroke built by 31 December 2003.'], 'tc2-scrap-1to3'),
-  tier('tc-scrap-phase4', ['臺中市淘汰4期機車換購電動', 'Taichung scrap a phase 4 scooter and buy electric'], 10000, [builtBetween('2004-01-01', '2007-06-30')], ['舊車為93年1月1日至96年6月30日出廠的4期機車。', 'The old scooter is a phase 4 scooter built 1 January 2004 to 30 June 2007.'], 'tc2-scrap-4th'),
-  tier('tc-scrap-phase5', ['臺中市淘汰5期機車換購電動', 'Taichung scrap a phase 5 scooter and buy electric'], 5000, [builtBetween('2007-07-01', '2015-12-31'), scrapAge(10)], ['舊車為96年7月1日至104年12月31日出廠的5期機車（只限出廠滿10年者）。', 'The old scooter is a phase 5 scooter built 1 July 2007 to 31 December 2015 (10 years or older only).'], 'tc2-scrap-5th'),
-  tier('tc-scrap-lowincome', ['臺中市汰購換電動（中低收入戶）', 'Taichung scrap and buy electric (low income)'], 30000, [builtBy('2015-12-31'), lowIncome(['low', 'middle-low'])], ['各期別舊車一律30,000元；須有115年內有效的（中）低收入戶證明。', 'NT$30,000 for every eligible old-scooter tier, with a (middle-)low income certificate valid in 2026.'], 'tc2-scrap-lowincome'),
+  tier('tc-scrap-two-stroke', ['台中市淘汰二行程機車換購電動', 'Taichung scrap a two-stroke and buy electric'], 16000, [twoStroke, builtBy('2003-12-31')], ['舊車為92年12月31日以前出廠的二行程機車。', 'The old scooter is a two-stroke built by 31 December 2003.'], 'tc2-scrap-2stroke'),
+  tier('tc-scrap-phase1to3', ['台中市淘汰1至3期機車換購電動', 'Taichung scrap a phase 1–3 scooter and buy electric'], 13000, [{ kind: 'scrap-engine', engines: ['four-stroke'] }, builtBy('2003-12-31')], ['舊車為92年12月31日以前出廠的1至3期四行程機車。', 'The old scooter is a phase 1–3 four-stroke built by 31 December 2003.'], 'tc2-scrap-1to3'),
+  tier('tc-scrap-phase4', ['台中市淘汰4期機車換購電動', 'Taichung scrap a phase 4 scooter and buy electric'], 10000, [builtBetween('2004-01-01', '2007-06-30')], ['舊車為93年1月1日至96年6月30日出廠的4期機車。', 'The old scooter is a phase 4 scooter built 1 January 2004 to 30 June 2007.'], 'tc2-scrap-4th'),
+  tier('tc-scrap-phase5', ['台中市淘汰5期機車換購電動', 'Taichung scrap a phase 5 scooter and buy electric'], 5000, [builtBetween('2007-07-01', '2015-12-31'), scrapAge(10)], ['舊車為96年7月1日至104年12月31日出廠的5期機車（只限出廠滿10年者）。', 'The old scooter is a phase 5 scooter built 1 July 2007 to 31 December 2015 (10 years or older only).'], 'tc2-scrap-5th'),
+  tier('tc-scrap-lowincome', ['台中市汰購換電動（中低收入戶）', 'Taichung scrap and buy electric (low income)'], 30000, [builtBy('2015-12-31'), lowIncome(['low', 'middle-low'])], ['各期別舊車一律30,000元；須有115年內有效的（中）低收入戶證明。', 'NT$30,000 for every eligible old-scooter tier, with a (middle-)low income certificate valid in 2026.'], 'tc2-scrap-lowincome'),
   p({
     id: 'tc-child',
-    name: t('臺中市育兒加碼（12歲以下兒童）', 'Taichung child top-up (child aged 12 or under)'),
+    name: t('台中市育兒加碼（12歲以下兒童）', 'Taichung child top-up (child aged 12 or under)'),
     kind: 'top-up',
     amount: fixed(3000),
     conditions: [...general, flag('childUnder12')],
-    conditionText: t('申請人是設籍臺中市12歲以下兒童的法定監護人（以發票日判定）；每名兒童一生只能加碼一次，新購與汰購都適用。', 'The applicant is the legal guardian of a Taichung-registered child aged 12 or under at the invoice date; each child can be used once ever; applies to new purchases and replacements.'),
+    conditionText: t('申請人是設籍台中市12歲以下兒童的法定監護人（以發票日判定）；每名兒童一生只能加碼一次，新購與汰購都適用。', 'The applicant is the legal guardian of a Taichung-registered child aged 12 or under at the invoice date; each child can be used once ever; applies to new purchases and replacements.'),
     exclusiveGroups: [],
     research: ['taichung-r2#tc2-child-topup'],
   }),

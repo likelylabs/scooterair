@@ -10,11 +10,11 @@
 // and report the difference.
 
 import type { DealerPromo, EconDataset, EvModel, GasModel, Programme } from '../../data/econ/types.ts';
-import { cmp, daysBetween, earlier } from './dates.ts';
+import { cmp, daysBetween, earlier, todayInTaiwan } from './dates.ts';
 import { checkAll, type EligibilityContext } from './eligibility.ts';
 import { date, detail, join, list, ntd, reasonText, t } from './text.ts';
 import type { L10n } from './text.ts';
-import type { DeadlineBasis, ExcludedLine, ExclusionReason, LedgerLine, LineDeadline, LineKind, Message, PurchaseLedger, Situation } from './types.ts';
+import type { DeadlineBasis, ExcludedLine, ExclusionReason, LedgerLine, LineDeadline, LineKind, Message, PurchaseLedger, Situation, SourceId } from './types.ts';
 
 interface Candidate {
   p: Programme;
@@ -200,13 +200,19 @@ export interface LedgerInternals {
   assumptions: L10n[];
   /** Upside if the conservative groups were not applied, per group id, with the member lines involved. */
   upside: { group: string; amount: number; ids: string[] }[];
+  /**
+   * Lines excluded because a rule is unclear for this buyer (reason 'ambiguous'): what the buyer
+   * would get on top if they do qualify, worked out with the either/or groups applied.
+   */
+  ambiguousUpside: { amount: number; ids: string[]; why: L10n[] } | null;
   /** Dealer offers counted only with scrapping although the offer does not say so: possible upside. */
-  promoUpside: { id: string; amount: number; label: L10n; note: L10n; sources: string[] }[];
+  promoUpside: { id: string; amount: number; label: L10n; note: L10n; sources: SourceId[] }[];
   /** Advisory groups with more than one counted member: the amount at risk if only one can be claimed. */
   atRisk: { group: string; amount: number; ids: string[] }[];
 }
 
-export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data: EconDataset): LedgerInternals {
+export function purchaseLedger(side: 'electric' | 'gasoline', input: Situation, data: EconDataset): LedgerInternals {
+  const s: Situation = input.date ? input : { ...input, date: todayInTaiwan() };
   const ev = side === 'electric' ? data.evModels.find((m) => m.id === s.electricModel) : undefined;
   const gas = side === 'gasoline' ? data.gasModels.find((m) => m.id === s.gasolineModel) : undefined;
   const model = ev ?? gas;
@@ -233,6 +239,7 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
   const remoteDistricts = data.jurisdictions[s.jurisdiction]?.remoteDistricts;
   const ctx = (p: Programme): EligibilityContext => ({ s, side, ev, gas, programmeJurisdiction: p.jurisdiction, remoteDistricts });
   const candidates: Candidate[] = [];
+  const unclear: { p: Programme; why: L10n }[] = [];
   const relevant = data.programmes.filter((p) => sideMatches(p, side) && (p.jurisdiction === 'central' || p.jurisdiction === s.jurisdiction));
   const goodsTaxScrapOk = side === 'gasoline' && relevant.some((p) => p.id === 'gas-goods-tax-scrap' && checkAll(p.conditions, ctx(p)).ok && cmp(s.date as string, p.validTo) <= 0);
 
@@ -246,6 +253,7 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
         continue;
       }
       exclusions.push(excluded(p, r.ambiguous ? (r.failed === 'domestic-cells' ? 'model-unknown' : 'ambiguous') : 'not-eligible', r.why, { failedCondition: r.failed }, nominal));
+      if (r.ambiguous && r.failed !== 'domestic-cells') unclear.push({ p, why: r.why });
       continue;
     }
     if (p.calculator !== true) {
@@ -308,6 +316,26 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
     const generous = select(candidates, data, s.jurisdiction, new Set([g.id]));
     const diff = generous.total - sel.total;
     if (diff > 0) upside.push({ group: g.id, amount: diff, ids: candidates.filter((c) => (c.p.exclusiveGroups ?? []).includes(g.id)).map((c) => c.p.id) });
+  }
+
+  // Ambiguous rules: what the buyer would get on top if the unclear lines did apply. Only lines
+  // that would otherwise count (in the calculator, inside their window, quota not gone).
+  const unclearCands: Candidate[] = unclear
+    .filter(({ p }) => p.calculator === true && cmp(s.date as string, p.validFrom) >= 0 && cmp(s.date as string, p.validTo) <= 0 && !(p.confirmedThrough && cmp(s.date as string, p.confirmedThrough) > 0) && !(p.quota.status === 'exhausted' && cmp(s.date as string, p.quota.asOf) >= 0) && !(ev && ev.moeaListed !== 'yes' && (p.payer === 'moea' || p.payer === 'local')))
+    .flatMap(({ p }) => {
+      const amount = programmeAmount(p, ev, gas);
+      return amount === null ? [] : [{ p, amount, assumptions: [] }];
+    });
+  let ambiguousUpside: LedgerInternals['ambiguousUpside'] = null;
+  if (unclearCands.length) {
+    const generous = select([...candidates, ...unclearCands], data, s.jurisdiction);
+    const diff = generous.total - sel.total;
+    const gained = generous.chosen.filter((c) => unclearCands.includes(c));
+    if (diff > 0 && gained.length) {
+      const seen = new Set<string>();
+      const why = gained.map((c) => unclear.find((u) => u.p.id === c.p.id)!.why).filter((w) => (seen.has(w.en) ? false : (seen.add(w.en), true)));
+      ambiguousUpside = { amount: diff, ids: gained.map((c) => c.p.id), why };
+    }
   }
 
   // Advisory groups: all members counted, the smaller ones reported as at risk.
@@ -451,5 +479,5 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
     paidLater: lines.filter((l) => l.paid === 'after-approval').reduce((a, l) => a + l.amount, 0),
     messages,
   };
-  return { ledger, assumptions, upside, atRisk, promoUpside };
+  return { ledger, assumptions, upside, atRisk, promoUpside, ambiguousUpside };
 }

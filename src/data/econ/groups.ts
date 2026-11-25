@@ -35,7 +35,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       sources: ['etax-goods-tax-scooter-cut', 'kymco-goods-tax-models', 'taichung-epb-2026-amount-table'],
     }),
     // Taipei
-    g('tpe-base', '臺北市基本補助（新購或汰購擇一）', 'Taipei base subsidy (new purchase or scrap-and-replace, one only)'),
+    g('tpe-base', '台北市基本補助（新購或汰購擇一）', 'Taipei base subsidy (new purchase or scrap-and-replace, one only)'),
     g('tpe-lowincome-stacking', '台北市中低及低收入戶加碼疊加在其他加碼上（請先確認）', 'Taipei low-income top-up stacked on the other top-ups (confirm first)', {
       advisory: true,
       atRiskIds: ['tpe-lowincome-topup'],
@@ -45,7 +45,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       ),
       sources: ['taipei-dep-ev-subsidy-plan', 'taiwannews-2026-04-taipei-subsidy'],
     }),
-    g('tpe-old-scooter-use', '臺北市：同一輛舊車只能換購電動機車、TPASS或汰舊獎勵金擇一', 'Taipei: one old scooter, one claim (electric replacement, TPASS or scrap bonus)'),
+    g('tpe-old-scooter-use', '台北市：同一輛舊車只能換購電動機車、TPASS或汰舊獎勵金擇一', 'Taipei: one old scooter, one claim (electric replacement, TPASS or scrap bonus)'),
     // New Taipei
     g('ntpc-base', '新北市基本補助（新購或換購擇一）', 'New Taipei base subsidy (new purchase or replacement, one only)'),
     // Kept for backward compatibility (no programme uses it any more): the low-income question is
@@ -82,7 +82,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       ),
       sources: ['ntpc-motor-2026-plan'],
     }),
-    g('taichung-base', '臺中市補助（新購或依舊車期別汰購擇一）', 'Taichung subsidy (new purchase or scrap tier, one only)'),
+    g('taichung-base', '台中市補助（新購或依舊車期別汰購擇一）', 'Taichung subsidy (new purchase or scrap tier, one only)'),
     g('keelung-base', '基隆市補助（換購或新購擇一）', 'Keelung subsidy (replacement or new purchase, one only)'),
     g('hsinchu-city-base', '新竹市換購補助（依舊車擇一）', 'Hsinchu City replacement subsidy (one by old scooter)'),
     g('hsinchu-county-base', '新竹縣新購補助（依車種擇一）', 'Hsinchu County new-purchase subsidy (one by class)'),
@@ -94,8 +94,8 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('ty-base', '桃園市基本補助（新購或汰換擇一）', 'Taoyuan base subsidy (new purchase or scrap-and-replace, one only)'),
     g('ty-age', '桃園市年齡專案（依年齡擇一）', 'Taoyuan age-band scheme (one by age)'),
     // Tainan
-    g('tn-base', '臺南市基本補助（一般、偏遠或中低收入戶擇一）', 'Tainan base subsidy (general, remote or low-income column, one only)'),
-    g('tn-project', '臺南市貼心專案（僅可擇一）', 'Tainan support project (one only)', { sources: ['tainan-epb-2026-programme'] }),
+    g('tn-base', '台南市基本補助（一般、偏遠或中低收入戶擇一）', 'Tainan base subsidy (general, remote or low-income column, one only)'),
+    g('tn-project', '台南市貼心專案（僅可擇一）', 'Tainan support project (one only)', { sources: ['tainan-epb-2026-programme'] }),
     // Kaohsiung
     g('khh-base', '高雄市基本補助（一般或低收入戶擇一）', 'Kaohsiung base subsidy (general or low-income, one only)'),
     g('khh-project', '高雄市加碼專案：青年、醫護、家長擇一', 'Kaohsiung top-up: youth, medical staff or parent, one only'),

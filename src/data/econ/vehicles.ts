@@ -19,7 +19,12 @@ const KYMCO_SCRAP_PROMO_TEXT = t(
   '須於2026年11月30日前完成舊車報廢，並在6個月內通過國稅局汰舊換新貨物稅核定，核定後才享有。',
   'The old scooter must be scrapped by 30 November 2026 and the goods-tax scrap-and-replace claim approved by the tax office within six months; paid only after approval.',
 );
-const NOV_ALL = t('11月購車即享，現場直接折抵。', 'Any November 2026 buyer; deducted at the shop.');
+// What each November offer's window applies to (gas-prices / gas-baseline-r2 periods):
+// New Haomai 「領牌完成」, SYM DUKE 「領牌日期」, Yamaha Jog 「以領牌為主」 -> plate registration;
+// K1 and GP 125 state no basis -> unknown. KYMCO's scrap bonuses also need the old scooter
+// scrapped by 30 November (promo-condition-scrap).
+const NOV_PLATE = t('2026年11月領牌即享，現場直接折抵；只開發票、12月才領牌不算。', 'For scooters plated in November 2026, deducted at the shop; an invoice in November with plating in December does not count.');
+const NOV_UNKNOWN = t('2026年11月的優惠，現場直接折抵；官方沒有寫以發票日還是領牌日為準，請問車行。', 'A November 2026 offer, deducted at the shop; the offer does not say whether the invoice or the plate date counts, so ask the dealer.');
 
 export const gasModels: GasModel[] = [
   {
@@ -30,8 +35,8 @@ export const gasModels: GasModel[] = [
     listPrice: { value: 62000, sources: ['kymco-2026-11-new-haomai'], confidence: 'verified', research: ['gas-prices#kymco-newhaomai-list'], note: t('建議空車價，不含牌險。', 'Suggested price, excluding plate and insurance.') },
     goodsTaxScrapCut: { value: 3600, sources: ['kymco-2026-11-new-haomai', 'kymco-goods-tax-models'], confidence: 'verified', research: ['gas-prices#kymco-gov-tax-table'] },
     promos: [
-      { id: 'kymco-new-haomai-credit-2026-11', name: t('光陽購車金（直扣）', 'KYMCO purchase credit (deducted at sale)'), amount: 6500, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', conditionText: NOV_ALL, sources: ['kymco-2026-11-new-haomai'], confidence: 'verified', research: ['gas-prices#kymco-newhaomai-list'] },
-      { id: 'kymco-new-haomai-scrap-2026-11', name: t('光陽汰舊加碼', 'KYMCO scrap bonus'), amount: 1400, when: 'goods-tax-scrap', paid: 'after-approval', validFrom: '2026-11-01', validTo: '2026-11-30', conditionText: KYMCO_SCRAP_PROMO_TEXT, sources: ['kymco-2026-11-new-haomai'], confidence: 'verified', research: ['gas-prices#kymco-newhaomai-scrap-price', 'gas-prices#promo-condition-scrap'] },
+      { id: 'kymco-new-haomai-credit-2026-11', name: t('光陽購車金（直扣）', 'KYMCO purchase credit (deducted at sale)'), amount: 6500, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', conditionText: NOV_PLATE, sources: ['kymco-2026-11-new-haomai'], confidence: 'verified', research: ['gas-prices#kymco-newhaomai-list'] },
+      { id: 'kymco-new-haomai-scrap-2026-11', name: t('光陽汰舊加碼', 'KYMCO scrap bonus'), amount: 1400, when: 'goods-tax-scrap', paid: 'after-approval', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', scrapBy: '2026-11-30', conditionText: KYMCO_SCRAP_PROMO_TEXT, sources: ['kymco-2026-11-new-haomai'], confidence: 'verified', research: ['gas-prices#kymco-newhaomai-scrap-price', 'gas-prices#promo-condition-scrap'] },
     ],
     fuelEconomy: { value: 61.5, sources: [...FUEL], confidence: 'verified', research: fuelResearch, note: t('能源署測試值，實際騎乘通常較低。', 'Energy Administration test figure; real riding is usually lower.') },
     calculator: true,
@@ -44,8 +49,8 @@ export const gasModels: GasModel[] = [
     listPrice: { value: 59000, sources: ['kymco-2026-11-gp125'], confidence: 'verified', research: ['gas-prices#kymco-gp125-list'], note: t('建議空車價，不含牌險。', 'Suggested price, excluding plate and insurance.') },
     goodsTaxScrapCut: { value: 3200, sources: ['kymco-2026-11-gp125', 'kymco-goods-tax-models'], confidence: 'verified', research: ['gas-prices#kymco-gov-tax-table'] },
     promos: [
-      { id: 'kymco-gp125-credit-2026-11', name: t('光陽購車金（直扣）', 'KYMCO purchase credit (deducted at sale)'), amount: 6500, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', conditionText: NOV_ALL, sources: ['kymco-2026-11-gp125'], confidence: 'verified', research: ['gas-prices#kymco-gp125-list'] },
-      { id: 'kymco-gp125-scrap-2026-11', name: t('光陽汰舊再加碼', 'KYMCO scrap bonus'), amount: 1400, when: 'goods-tax-scrap', paid: 'after-approval', validFrom: '2026-11-01', validTo: '2026-11-30', conditionText: KYMCO_SCRAP_PROMO_TEXT, sources: ['kymco-2026-11-gp125'], confidence: 'verified', research: ['gas-prices#kymco-gp125-scrap-price', 'gas-prices#promo-condition-scrap'] },
+      { id: 'kymco-gp125-credit-2026-11', name: t('光陽購車金（直扣）', 'KYMCO purchase credit (deducted at sale)'), amount: 6500, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'unknown', conditionText: NOV_UNKNOWN, sources: ['kymco-2026-11-gp125'], confidence: 'verified', research: ['gas-prices#kymco-gp125-list'] },
+      { id: 'kymco-gp125-scrap-2026-11', name: t('光陽汰舊再加碼', 'KYMCO scrap bonus'), amount: 1400, when: 'goods-tax-scrap', paid: 'after-approval', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'unknown', scrapBy: '2026-11-30', conditionText: KYMCO_SCRAP_PROMO_TEXT, sources: ['kymco-2026-11-gp125'], confidence: 'verified', research: ['gas-prices#kymco-gp125-scrap-price', 'gas-prices#promo-condition-scrap'] },
     ],
     fuelEconomy: null,
     calculator: {
@@ -60,7 +65,7 @@ export const gasModels: GasModel[] = [
     listPrice: { value: 77800, sources: ['kymco-2026-11-k1'], confidence: 'verified', research: ['gas-prices#kymco-k1-list'], note: t('建議空車價，前後碟煞。', 'Suggested price, disc brakes front and rear.') },
     goodsTaxScrapCut: { value: 4000, sources: ['kymco-2026-11-k1'], confidence: 'verified', research: ['gas-prices#kymco-k1-list'] },
     promos: [
-      { id: 'kymco-k1-credit-2026-11', name: t('光陽購車金（直扣）', 'KYMCO purchase credit (deducted at sale)'), amount: 11000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', conditionText: NOV_ALL, sources: ['kymco-2026-11-k1'], confidence: 'verified', research: ['gas-prices#kymco-k1-list'] },
+      { id: 'kymco-k1-credit-2026-11', name: t('光陽購車金（直扣）', 'KYMCO purchase credit (deducted at sale)'), amount: 11000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'unknown', conditionText: NOV_UNKNOWN, sources: ['kymco-2026-11-k1'], confidence: 'verified', research: ['gas-prices#kymco-k1-list'] },
     ],
     fuelEconomy: { value: 60.7, sources: [...FUEL], confidence: 'verified', research: fuelResearch },
     calculator: true,
@@ -81,7 +86,7 @@ export const gasModels: GasModel[] = [
     },
     goodsTaxScrapCut: { value: 4000, sources: ['sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-duke125-nov-promo'] },
     promos: [
-      { id: 'sym-duke-credit-2026-11', name: t('三陽購車補助金（直扣）', 'SYM purchase credit (deducted at sale)'), amount: 15500, when: 'always', paid: 'at-purchase', validFrom: '2026-11-02', validTo: '2026-11-30', conditionText: NOV_ALL, sources: ['sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-duke125-nov-promo'] },
+      { id: 'sym-duke-credit-2026-11', name: t('三陽購車補助金（直扣）', 'SYM purchase credit (deducted at sale)'), amount: 15500, when: 'always', paid: 'at-purchase', validFrom: '2026-11-02', validTo: '2026-11-30', windowBasis: 'plate', conditionText: NOV_PLATE, sources: ['sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-duke125-nov-promo'] },
       {
         id: 'sym-duke-scrap-2026-11',
         name: t('迪爵熱銷汰舊再加碼（電匯）', 'SYM DUKE scrap bonus (bank transfer)'),
@@ -90,7 +95,8 @@ export const gasModels: GasModel[] = [
         paid: 'after-approval',
         validFrom: '2026-11-02',
         validTo: '2026-11-30',
-        conditionText: t('須汰舊並經國稅局核定後電匯。', 'Requires scrapping and tax-office approval; paid by bank transfer.'),
+        windowBasis: 'plate',
+        conditionText: t('須汰舊並經國稅局核定後電匯；以11月領牌日為準。', 'Requires scrapping and tax-office approval; paid by bank transfer; the November plate date counts.'),
         sources: ['sym-2026-11-offers'],
         confidence: 'verified',
         research: ['gas-prices#sym-duke125-nov-promo'],
@@ -116,8 +122,8 @@ export const gasModels: GasModel[] = [
     },
     goodsTaxScrapCut: { value: 4000, sources: ['tvbs-cars-2026-06-new-duke', 'sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-new-duke-ev-list'] },
     promos: [
-      { id: 'sym-new-duke-credit-2026-11', name: t('三陽購車補助金（直扣）', 'SYM purchase credit (deducted at sale)'), amount: 10000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-02', validTo: '2026-11-30', conditionText: NOV_ALL, sources: ['sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-duke125-nov-promo'] },
-      { id: 'sym-new-duke-extra-2026-11', name: t('三陽首購加碼（直扣）', 'SYM extra credit (deducted at sale)'), amount: 6000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-02', validTo: '2026-11-30', conditionText: NOV_ALL, sources: ['sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-duke125-nov-promo', 'gas-prices#sym-newduke-nov-nonscrap'] },
+      { id: 'sym-new-duke-credit-2026-11', name: t('三陽購車補助金（直扣）', 'SYM purchase credit (deducted at sale)'), amount: 10000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-02', validTo: '2026-11-30', windowBasis: 'plate', conditionText: NOV_PLATE, sources: ['sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-duke125-nov-promo'] },
+      { id: 'sym-new-duke-extra-2026-11', name: t('三陽首購加碼（直扣）', 'SYM extra credit (deducted at sale)'), amount: 6000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-02', validTo: '2026-11-30', windowBasis: 'plate', conditionText: NOV_PLATE, sources: ['sym-2026-11-offers'], confidence: 'verified', research: ['gas-prices#sym-duke125-nov-promo', 'gas-prices#sym-newduke-nov-nonscrap'] },
     ],
     fuelEconomy: { value: 65.6, sources: [...FUEL], confidence: 'verified', research: fuelResearch },
     calculator: true,
@@ -130,21 +136,23 @@ export const gasModels: GasModel[] = [
     listPrice: { value: 66000, sources: ['yamaha-jog-2026-11-offer', 'tvbs-cars-2026-05-jog'], confidence: 'verified', research: ['gas-prices#yamaha-jog125-list'], note: t('建議售價，不含牌險。', 'Suggested price, excluding plate and insurance.') },
     goodsTaxScrapCut: { value: 4000, sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
     promos: [
-      { id: 'yamaha-jog-credit-2026-11', name: t('YAMAHA購車金', 'Yamaha purchase credit'), amount: 7000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', conditionText: t('11月在本島實體經銷商領牌即享；網購不適用。', 'Any buyer plating in November at a physical dealer on the main island; not for online purchases.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
+      { id: 'yamaha-jog-credit-2026-11', name: t('YAMAHA購車金', 'Yamaha purchase credit'), amount: 7000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', conditionText: t('11月在本島實體經銷商領牌即享；網購不適用。', 'Any buyer plating in November at a physical dealer on the main island; not for online purchases.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
       {
         id: 'yamaha-jog-conditional-2026-11',
         name: t('YAMAHA符合貨物稅減免資格加碼購車金', 'Yamaha extra credit for buyers qualifying for the goods-tax cut'),
         amount: 5000,
         when: 'goods-tax-scrap',
+        ambiguousScrap: true,
         paid: 'at-purchase',
         validFrom: '2026-11-01',
         validTo: '2026-11-30',
+        windowBasis: 'plate',
         conditionText: t('官網只寫「符合政府貨物稅減免資格」，沒寫是否須汰舊；試算保守地當作須汰舊，沒有舊車的人也可能拿到（價格會再低5,000元），請問車行。', 'The page says only "qualifying for the government goods-tax cut" without saying whether scrapping is needed; we treat it as scrap-only, but a buyer with nothing to scrap may also get it (NT$5,000 less), so ask the dealer.'),
         sources: ['yamaha-jog-2026-11-offer'],
         confidence: 'verified',
         research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'],
       },
-      { id: 'yamaha-jog-scrap-2026-11', name: t('YAMAHA 40週年汰舊加碼感謝金', 'Yamaha 40th-anniversary scrap bonus'), amount: 1000, when: 'goods-tax-scrap', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', conditionText: t('須汰舊並符合國稅局汰舊換新資格。', 'Requires scrapping and tax-office scrap-and-replace eligibility.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
+      { id: 'yamaha-jog-scrap-2026-11', name: t('YAMAHA 40週年汰舊加碼感謝金', 'Yamaha 40th-anniversary scrap bonus'), amount: 1000, when: 'goods-tax-scrap', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', conditionText: t('須汰舊並符合國稅局汰舊換新資格。', 'Requires scrapping and tax-office scrap-and-replace eligibility.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
     ],
     fuelEconomy: { value: 57.6, sources: [...FUEL], confidence: 'verified', research: fuelResearch },
     calculator: true,
@@ -294,7 +302,7 @@ export const evModels: EvModel[] = [
     brand: GOGORO,
     name: t('Luna（白牌）', 'Luna'),
     plateClass: 'heavy',
-    plateClassBasis: { text: t('報導未寫車種等級；「最低入手價」套用臺北市重型最高補助，推定為普通重型。', 'Reports do not state the class; the "lowest price" applies Taipei\'s heavy-class maximum, so we infer heavy.'), sources: ['tvbs-cars-2026-06-ev-sales'], confidence: 'secondary', research: ['other-ev-brands#gogoro-luna-lowest'] },
+    plateClassBasis: { text: t('報導未寫車種等級；「最低入手價」套用台北市重型最高補助，推定為普通重型。', 'Reports do not state the class; the "lowest price" applies Taipei\'s heavy-class maximum, so we infer heavy.'), sources: ['tvbs-cars-2026-06-ev-sales'], confidence: 'secondary', research: ['other-ev-brands#gogoro-luna-lowest'] },
     moeaClass: 'heavy-1-2',
     moeaClassBasis: { text: t('推定為普通重型。', 'Inferred heavy class.'), sources: ['tvbs-cars-2026-06-ev-sales'], confidence: 'secondary', research: ['other-ev-brands#gogoro-luna-lowest'] },
     listPrice: { value: 83980, sources: ['gogoro-subsidy-calculator-data', 'tvbs-cars-2026-06-ev-sales'], confidence: 'verified', research: ['gogoro-official-r2#gogoro-official-list-prices'] },
@@ -368,6 +376,91 @@ export const evModels: EvModel[] = [
       research: ['home-charge-evs-r2#zau-es1000-spec', 'home-charge-evs-r2#zau-dealers'],
     },
     calculator: true,
-    note: t('目前唯一查證到可在家充電、不必付電池月租的機車；補助資格未確認，試算不計入需要經濟部認可的補助。', 'The only verified scooter you can charge at home without a battery plan; its subsidy eligibility is unconfirmed, so subsidies that require MOEA approval are not counted.'),
+    note: t('查證到可在家充電、不必付電池月租的機車中，唯一的輕型、也是最便宜的一款（白牌的ES-2000見下）；補助資格未確認，試算不計入需要經濟部認可的補助。', 'Of the verified scooters you can charge at home without a battery plan, the only light-class one and the cheapest (see the white-plate ES-2000 below); its subsidy eligibility is unconfirmed, so subsidies that require MOEA approval are not counted.'),
+  },
+  {
+    id: 'ionex-ione-fly-techno',
+    brand: IONEX,
+    name: t('i-One Fly Techno 白牌（EB15DB2，雙電池）', 'i-One Fly Techno, white plate (EB15DB2, two batteries)'),
+    plateClass: 'heavy',
+    plateClassBasis: {
+      text: t('工商時報上市報導稱為白牌；經濟部清單上的車種等級未查證。', 'Called white plate in the CTEE launch report; the class on the MOEA list was not checked.'),
+      sources: ['ctee-2025-09-ionex-fly-techno', 'ionex-gov-calculator'],
+      confidence: 'secondary',
+      research: ['other-ev-brands#ionex-flyt-news-price', 'other-ev-brands#ionex-ione-price'],
+    },
+    moeaClass: 'heavy-1-2',
+    moeaClassBasis: { text: t('推定為普通重型（白牌）。', 'Inferred heavy class (white plate).'), sources: ['ionex-gov-calculator', 'ctee-2025-09-ionex-fly-techno'], confidence: 'secondary', research: ['other-ev-brands#ionex-ione-price', 'other-ev-brands#ionex-flyt-news-price'] },
+    listPrice: {
+      value: 75810,
+      sources: ['ionex-gov-calculator', 'ctee-2025-09-ionex-fly-techno'],
+      confidence: 'verified',
+      research: ['other-ev-brands#ionex-ione-price', 'other-ev-brands#ionex-flyt-news-price'],
+      note: t('取自Ionex補助試算頁的程式內價格欄位（2026年11月25日）；2025年9月上市時的建議售價為75,800元。請向門市確認。', 'From the price field in Ionex\'s subsidy calculator (25 November 2026); the launch list price in September 2025 was NT$75,800. Confirm the shop price.'),
+    },
+    promos: [],
+    moeaListed: 'yes',
+    domesticCells: 'unknown',
+    battery: {
+      system: 'ionex',
+      count: 2,
+      basis: { text: t('Ionex雙電池方案清單列有i-One Fly Techno；官方續航140公里為雙電池數字。', 'Ionex\'s dual-battery plan list includes the i-One Fly Techno; the official 140 km range is a dual-battery figure.'), sources: ['ionex-home-page', 'wantrich-2025-09-ionex-fly-techno'], confidence: 'verified', research: ['home-charge-evs-r2#ionex-which-models-charge', 'other-ev-brands#ionex-flyt-perf'] },
+    },
+    efficiency: { unit: 'km-per-kWh', low: 25.6, typical: 25.6, high: 25.6, typicalBasis: t('Ionex公布的雙電池車隊平均每度25.6公里。', 'Ionex\'s published dual-battery fleet average of 25.6 km per kWh.'), sources: ['ionex-plans'], confidence: 'verified', research: ['running-costs#ev-consumption-ionex'] },
+    plans: ['ionex-518-dual', 'ionex-818-dual', 'ionex-1218-dual', 'ionex-2018-dual'],
+    maintenance: 'ev-generic',
+    comparableTo125: 'unverified',
+    performance: {
+      text: t('白牌，4.2 kW側掛馬達，極速74 km/h，0至50 km/h 5.9秒（廠商數字）；可插電也可換電，但試算以換電計費。沒有可查證的125cc比較數據，無法確認與125cc燃油機車相當。', 'White plate, 4.2 kW side-mounted motor, 74 km/h top speed, 0–50 km/h in 5.9 s (maker\'s figures); it can charge or swap, but costs here assume swapping. No verified comparison with a 125cc exists, so equivalence with a 125cc gasoline scooter cannot be confirmed.'),
+      sources: ['wantrich-2025-09-ionex-fly-techno', 'ctee-2025-09-ionex-fly-techno'],
+      confidence: 'verified',
+      research: ['other-ev-brands#ionex-flyt-perf'],
+    },
+    calculator: true,
+    note: t('充換合一車款：在家充電可用的度數較多（每度回饋15元），但另要付家中電費，試算未計這種用法。', 'A plug-and-swap model: charging at home gets more kWh from the plan (NT$15 per kWh back) but you pay household electricity on top; that use is not modelled here.'),
+  },
+  {
+    id: 'zau-es2000',
+    brand: t('泓創ZAU', 'ZAU'),
+    name: t('ES-2000（在家充電，免月租）', 'ES-2000 (charged at home, no monthly fee)'),
+    plateClass: 'heavy',
+    plateClassBasis: { text: t('只有零售頁標題寫「普通重型」，未在官方文件查證；請向車行確認車種。', 'Only the retail listing title says 普通重型 (heavy class); not checked in an official document, so confirm the class with a dealer.'), sources: ['pchome-zau-es2000'], confidence: 'secondary', research: ['home-charge-evs-r2#zau-es2000-price'] },
+    moeaClass: 'heavy-1-2',
+    moeaClassBasis: { text: t('是否在經濟部認可車款清單、屬哪一級都未能查證；試算不計入任何需要經濟部認可的補助。', 'Whether it is on the MOEA approved list, and in which class, could not be checked; no subsidy that needs MOEA approval is counted.'), sources: ['meid-approved-models-csv'], confidence: 'secondary', research: ['home-charge-evs-r2#substitute-verdict'] },
+    moeaListed: 'unknown',
+    listPrice: {
+      value: 79000,
+      sources: ['pchome-zau-es2000'],
+      confidence: 'verified',
+      research: ['home-charge-evs-r2#zau-es2000-price'],
+      note: t('PChome零售價（劃掉的價格82,000元）；ZAU官網沒有公布建議售價，車行實際價格未知。', 'PChome retail price (struck-through NT$82,000); ZAU publishes no list price and the dealer price is unknown.'),
+    },
+    promos: [],
+    domesticCells: 'unknown',
+    battery: { system: 'home', count: 2, basis: { text: t('官方規格：抽取式鋰電池2顆串聯，36V×2×30Ah＝2,200 Wh，充電7.5至8.5小時。', 'Official spec: two removable lithium batteries in series, 36V × 2 × 30Ah = 2,200 Wh, 7.5–8.5 h to charge.'), sources: ['zau-es2000-spec'], confidence: 'verified', research: ['home-charge-evs-r2#zau-es2000-spec'] } },
+    efficiency: {
+      unit: 'km-per-kWh',
+      low: 19.6,
+      typical: 28,
+      high: 36.4,
+      typicalBasis: t(
+        '沒有官方每度里程數；高值為官方定速30 km/h續航80公里除以2.2度，低值依ES-1000研究推算的同一比例下修（本站推算），中間值取兩者中點。',
+        'No official km/kWh; high is the official 80 km at a constant 30 km/h divided by 2.2 kWh, low scales that down by the same ratio as the research estimate for the ES-1000 (our arithmetic), middle the midpoint.',
+      ),
+      sources: ['zau-es2000-spec', 'zau-es1000-spec'],
+      confidence: 'secondary',
+      research: ['home-charge-evs-r2#zau-es2000-spec', 'home-charge-evs-r2#zau-es1000-cost-per-km'],
+    },
+    plans: ['home-charging'],
+    maintenance: 'ev-generic',
+    comparableTo125: 'unverified',
+    performance: {
+      text: t('極速80 km/h，4,500 W馬達，定速30 km/h續航80公里（市區實際較短）；車種等級只見於零售頁，沒有可查證的125cc比較數據。', 'Top speed 80 km/h, 4,500 W motor, 80 km range at a constant 30 km/h (less in traffic); the plate class appears only on a retail listing and no verified comparison with a 125cc exists.'),
+      sources: ['zau-es2000-spec'],
+      confidence: 'verified',
+      research: ['home-charge-evs-r2#zau-es2000-spec'],
+    },
+    calculator: true,
+    note: t('可在家充電、不必付電池月租的白牌車款；補助資格未確認，試算不計入需要經濟部認可的補助。', 'A white-plate model you can charge at home with no battery plan; its subsidy eligibility is unconfirmed, so subsidies that require MOEA approval are not counted.'),
   },
 ];

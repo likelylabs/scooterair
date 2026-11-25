@@ -78,7 +78,8 @@ test('quota: Kaohsiung money counts before 2026-08-11 and is exhausted from that
   const after = evaluate(s);
   assert.equal(excludedReason(after, 'khh-new-heavy'), 'quota-exhausted');
   assert.ok(after.messages.some((m) => m.code === 'quota-exhausted'));
-  assert.equal(excludedReason(evaluate(situation({ scrap: fourStroke2012 })), 'moenv-carbon-nanshan'), 'quota-exhausted');
+  // Nan Shan: the research has only a 0-places reading on 2026-11-25 and no programme dates, so it is never counted.
+  assert.equal(excludedReason(evaluate(situation({ scrap: fourStroke2012 })), 'moenv-carbon-nanshan'), 'unverified');
 });
 
 test('quota: Taipei old-scooter heavy places nearly gone is warned, not excluded', () => {

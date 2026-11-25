@@ -19,7 +19,9 @@ const roc: Condition = {
   ambiguous: true,
   why: t('外籍人士須持居留證、住在桃園市並符合配偶設籍條件才能申請，試算無法判斷，未計入；請向環保局確認', 'foreign nationals qualify only with a residence permit, living in Taoyuan and meeting the spouse-registration condition, which we cannot check, so it is not counted (ask the bureau)'),
 };
-const general: Condition[] = [residency(undefined, '2024-12-31'), age(18), roc];
+// roc is appended last to every line (in p() below), so a foreign buyer's other conditions are
+// tested first and only lines they would otherwise get are reported as ambiguous.
+const general: Condition[] = [residency(undefined, '2024-12-31'), age(18)];
 const GENERAL = '年滿18歲、113年12月31日前設籍桃園市（或持居留證並符合配偶設籍條件）。';
 const GENERAL_EN = 'Aged 18+ and registered in Taoyuan by 31 December 2024 (or a residence-permit holder meeting the spouse rule).';
 const STACK_NOTE = t('桃園市公告沒有說明能否與中央補助併領；試算照其他縣市的做法同時計入中央補助，請向環保局確認。', 'The Taoyuan notice does not say whether its money stacks with central subsidies; like other cities we count both, so confirm with the bureau.');
@@ -43,6 +45,7 @@ const p = (x: Partial<Programme> & Pick<Programme, 'id' | 'name' | 'amount' | 'c
   note: STACK_NOTE,
   calculator: true,
   ...x,
+  conditions: [...x.conditions, roc],
 });
 
 const topup = (id: string, name: [string, string], value: number, conds: Condition[], text: [string, string], q: Programme['quota'], research: string, groups?: string[]) =>

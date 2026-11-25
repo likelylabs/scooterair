@@ -40,9 +40,11 @@ test('cumulative series: 61 points, starting at the purchase (plus setup fee) an
   assert.equal(c.electric[0].typical, e.electric.purchase.net.value + 6000);
   assert.equal(c.gasoline[0].typical, e.gasoline.purchase.net.value);
   for (let m = 1; m <= 60; m++) assert.ok(c.electric[m].typical >= c.electric[m - 1].typical);
-  // Pay-per-use setup fee is paid again at each 24-month renewal.
+  // Pay-per-use setup fee is paid again at each 24-month renewal; the month-49 renewal covers months
+  // 49-72, so only the 12 months inside the 60-month horizon (half the fee) are counted.
   const sched = e.electric.running.schedule.typical;
-  assert.ok(sched[24] - sched[23] > 5999 && sched[48] - sched[47] > 5999);
+  assert.ok(sched[24] - sched[23] > 5999 && sched[24] - sched[23] < 6100);
+  assert.ok(sched[48] - sched[47] > 2999 && sched[48] - sched[47] < 3100);
 });
 
 test('bounds are ordered: low <= typical <= high for every running total and cumulative point', () => {

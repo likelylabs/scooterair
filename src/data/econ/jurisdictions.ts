@@ -40,7 +40,7 @@ const notVerified = (
 export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
   taipei: {
     id: 'taipei',
-    name: t('臺北市', 'Taipei City'),
+    name: t('台北市', 'Taipei City'),
     kind: 'special-municipality',
     status: 'verified',
     statusNote: t(
@@ -48,7 +48,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
       'We read the Environmental Protection Department\'s 2026 plan (amended 1 June 2026), its Q&A and the 20 November press release; remaining slots come from the online application system. The city amount for small-light (小型輕型) scooters is not published.',
     ),
     officialLinks: [
-      { label: t('臺北市環保局：113年至115年電動機車補助', 'Taipei DEP: electric scooter subsidy 2024–2026'), url: 'https://www.dep.gov.taipei/News_Content.aspx?n=CE8746C01243996C&sms=18E59B21BD8494A1&s=9B373391D9A680F0' },
+      { label: t('台北市環保局：113年至115年電動機車補助', 'Taipei DEP: electric scooter subsidy 2024–2026'), url: 'https://www.dep.gov.taipei/News_Content.aspx?n=CE8746C01243996C&sms=18E59B21BD8494A1&s=9B373391D9A680F0' },
       { label: t('線上申辦系統（115年12月31日起改為 www.subsidy.gov.taipei）', 'Online application (moves to www.subsidy.gov.taipei from 31 December 2026)'), url: 'https://www.envimac.com.tw/MotorSubsidy/' },
     ],
     checkedOn: CHECKED,
@@ -89,7 +89,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
   },
   taichung: {
     id: 'taichung',
-    name: t('臺中市', 'Taichung City'),
+    name: t('台中市', 'Taichung City'),
     kind: 'special-municipality',
     status: 'verified',
     statusNote: t(
@@ -97,16 +97,16 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
       'In the second round we read the bureau\'s 2026 plan (amended 29 June) and amount table. The original announcement and whether the budget has run out could not be checked; money is paid in order until it runs out.',
     ),
     officialLinks: [
-      { label: t('臺中ㄅㄨㄅㄨ網：115年補助計畫修正公告', 'Taichung subsidy site: 2026 plan amendment notice'), url: 'https://green.epb.taichung.gov.tw/page/news/show.aspx?num=1865' },
+      { label: t('台中市環保局補助網站：115年補助計畫修正公告', 'Taichung subsidy site: 2026 plan amendment notice'), url: 'https://green.epb.taichung.gov.tw/page/news/show.aspx?num=1865' },
       { label: t('線上申請頁（請留意預算用罄公告）', 'Online application page (watch for budget-exhausted notices)'), url: 'https://green.epb.taichung.gov.tw/page/replace/apply.aspx?identity=0&kind=10' },
-      { label: t('臺中市環保局原始公告（本次無法連線）', 'Taichung EPB original notice (unreachable from our network)'), url: 'https://www.epb.taichung.gov.tw/3218587/post' },
+      { label: t('台中市環保局原始公告（本次無法連線）', 'Taichung EPB original notice (unreachable from our network)'), url: 'https://www.epb.taichung.gov.tw/3218587/post' },
     ],
     checkedOn: CHECKED,
     research: ['taichung-r2'],
   },
   tainan: {
     id: 'tainan',
-    name: t('臺南市', 'Tainan City'),
+    name: t('台南市', 'Tainan City'),
     kind: 'special-municipality',
     status: 'verified',
     statusNote: t(
@@ -114,7 +114,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
       'We read the Environmental Protection Bureau\'s 2026 programme PDF (with its amendment table). Whether the NT$58,300,500 budget has run out could not be checked, and the city\'s claim website could not be confirmed.',
     ),
     officialLinks: [
-      { label: t('臺南市115年補助方案（PDF）', 'Tainan 2026 programme (PDF)'), url: 'https://w3fs.tainan.gov.tw/002/FS01/82/relfile/11857/8827147/c5ee4820-89d6-483d-8b2b-79b9d415ea30.pdf' },
+      { label: t('台南市115年補助方案（PDF）', 'Tainan 2026 programme (PDF)'), url: 'https://w3fs.tainan.gov.tw/002/FS01/82/relfile/11857/8827147/c5ee4820-89d6-483d-8b2b-79b9d415ea30.pdf' },
       meidLink,
     ],
     remoteDistricts: t('左鎮區、楠西區、南化區、龍崎區', 'Zuozhen, Nanxi, Nanhua and Longqi districts'),
@@ -143,8 +143,8 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     kind: 'provincial-city',
     status: 'partly-verified',
     statusNote: t(
-      '金額取自經濟部縣市補助表（2026年7月21日版）；補助期間只到2026年11月30日，每年名額只有個位數到一百多名，很可能已用完。另一個公益青年免費電動機車方案自2026年1月起暫停。',
-      'Amounts come from the MOEA county table (21 July 2026); the programme runs only to 30 November 2026 with a handful to about 130 places a year, so it is probably used up. The separate free scooter scheme for young volunteers has been suspended since January 2026.',
+      '金額取自經濟部縣市補助表（2026年7月21日版）；補助期間只到2026年11月30日，每年名額只有個位數到一百多名，剩餘名額未查證，可能已經用完。另一個公益青年免費電動機車方案自2026年1月起暫停。',
+      'Amounts come from the MOEA county table (21 July 2026); the programme runs only to 30 November 2026 with a handful to about 130 places a year; remaining places were not checked and may already be used up. The separate free scooter scheme for young volunteers has been suspended since January 2026.',
     ),
     officialLinks: [{ label: t('基隆市環保局（本次無法連線）', 'Keelung EPB (unreachable from our network)'), url: 'https://www.klepb.gov.tw' }, meidLink],
     checkedOn: CHECKED,
@@ -284,11 +284,11 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
   ),
   taitung: notVerified(
     'taitung',
-    t('臺東縣', 'Taitung County'),
+    t('台東縣', 'Taitung County'),
     'county',
     t('縣府與環保局網站都無法連上，經濟部的縣市表也未列；不列入任何地方補助。', 'The county and bureau sites could not be reached and the MOEA county table does not list it; no local money is counted.'),
     ['counties-south-east-islands', 'counties-remaining-r2'],
-    [{ label: t('臺東縣環保局（本次無法連線）', 'Taitung EPB (unreachable from our network)'), url: 'https://ttepb.taitung.gov.tw/' }],
+    [{ label: t('台東縣環保局（本次無法連線）', 'Taitung EPB (unreachable from our network)'), url: 'https://ttepb.taitung.gov.tw/' }],
   ),
   penghu: notVerified(
     'penghu',
