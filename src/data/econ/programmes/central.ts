@@ -29,6 +29,13 @@ const MOENV_2027_LONG = t(
   'Listed to 31 December 2027, but the MOENV scrap-and-replace rule is only confirmed to the end of 2026; check the platform before relying on it in 2027.',
 );
 
+const liveQuota = (remaining: number, total: number) =>
+  quota(remaining === 0 ? 'exhausted' : remaining < 3000 ? 'nearly-exhausted' : 'limited', '2026-11-25', t(`環境部媒合平臺2026年11月25日顯示剩餘${remaining.toLocaleString('en')}輛（總名額${total.toLocaleString('en')}輛）；每天變動。`, `On 25 November 2026 the MOENV platform showed ${remaining.toLocaleString('en')} of ${total.toLocaleString('en')} places left; it changes daily.`), {
+    total,
+    remaining,
+    sources: ['moenv-platform-buyers'],
+  });
+
 const carbon = (id: string, name: [string, string], value: number, from: string, to: string, quotaTotal: number, region?: Programme['conditions'][number], research = 'central#moenv-carbon-reward-options'): Programme => ({
   id,
   jurisdiction: 'central',
@@ -40,21 +47,21 @@ const carbon = (id: string, name: [string, string], value: number, from: string,
   amount: fixed(value),
   conditions: [scrap, scrapAge(10), ...(region ? [region] : [])],
   conditionText: moenvScrap,
-  exclusiveGroups: ['moenv-carbon', 'moenv-one-stream', 'kinmen-vs-moenv'],
+  exclusiveGroups: ['moenv-carbon', 'moenv-carbon-and-air', 'kinmen-vs-moenv'],
   validFrom: from,
   validTo: to,
   ...(to > '2026-12-31' ? { confirmedThrough: '2026-12-31' } : {}),
   quota: quota('unknown', '2026-07-21', t(`總名額${quotaTotal.toLocaleString('en')}輛；剩餘名額未查證。`, `${quotaTotal.toLocaleString('en')} places in total; remaining places not checked.`), { total: quotaTotal }),
   status2027: to > '2026-12-31' ? MOENV_2027_LONG : MOENV_2027_SHORT,
-  sources: [...PDF],
+  sources: [...PDF, 'moenv-platform-faq'],
   confidence: 'verified',
-  research: [research, 'central#stacking-central'],
+  research: [research, 'outlook-2027-r2#s2-moenv-carbon-air-separate-streams'],
   calculator: true,
 });
 
 const air = (id: string, name: [string, string], value: number, from: string, to: string, q: Programme['quota'], region?: Programme['conditions'][number]): Programme => ({
   ...carbon(id, name, value, from, to, 0, region, 'central#moenv-air-pollution-options'),
-  exclusiveGroups: ['moenv-air', 'moenv-one-stream', 'kinmen-vs-moenv'],
+  exclusiveGroups: ['moenv-air', 'moenv-carbon-and-air', 'kinmen-vs-moenv'],
   quota: q,
 });
 
@@ -80,7 +87,7 @@ export const centralProgrammes: Programme[] = [
     applicationNote: MOEA_APPLY,
     quota: moeaQuota,
     status2027: MOEA_2027,
-    sources: [...MOEA_SRC],
+    sources: [...MOEA_SRC, 'gogoro-2026-lastcall-promo', 'businesstoday-2026-01-subsidy-guide'],
     confidence: 'verified',
     research: ['central#moea-new-purchase-heavy-light', 'central#moea-validity-applicant', 'central#added-moea-expiry-imminent'],
     calculator: true,
@@ -154,7 +161,7 @@ export const centralProgrammes: Programme[] = [
   },
 
   // ---------------------------------------------------------------- MOENV carbon reward (choose one of four)
-  carbon('moenv-carbon-moea', ['環境部減碳獎勵（經濟部收購）', 'MOENV carbon reward (bought by MOEA)'], 2000, '2024-11-01', '2026-12-31', 69016),
+  { ...carbon('moenv-carbon-moea', ['環境部減碳獎勵（經濟部收購）', 'MOENV carbon reward (bought by MOEA)'], 2000, '2024-11-01', '2026-12-31', 69016), quota: liveQuota(36712, 69016), research: ['central#moenv-carbon-reward-options', 'outlook-2027-r2#s2-platform-quota-live'] },
   {
     ...carbon('moenv-carbon-park', ['環境部減碳獎勵（園管局收購）', 'MOENV carbon reward (bought by the Industrial Park Administration)'], 2000, '2025-11-10', '2026-12-31', 546),
     calculator: {
@@ -162,15 +169,41 @@ export const centralProgrammes: Programme[] = [
       reason: 'unverified',
     },
   },
-  carbon('moenv-carbon-tainan', ['環境部減碳獎勵（臺南市收購）', 'MOENV carbon reward (bought by Tainan City)'], 1500, '2026-01-12', '2026-12-31', 3300, { kind: 'region', jurisdictions: ['tainan'] }),
-  carbon('moenv-carbon-tsmc', ['環境部減碳獎勵（台積電收購）', 'MOENV carbon reward (bought by TSMC)'], 2100, '2026-05-08', '2027-12-31', 54000),
-  carbon('moenv-carbon-tsmc-kaohsiung', ['環境部減碳獎勵（台積電收購，限高雄市）', 'MOENV carbon reward (bought by TSMC, Kaohsiung only)'], 2100, '2026-05-08', '2027-12-31', 6000, {
-    kind: 'region',
-    jurisdictions: ['kaohsiung'],
-  }),
+  {
+    ...carbon('moenv-carbon-tainan', ['環境部減碳獎勵（臺南市收購）', 'MOENV carbon reward (bought by Tainan City)'], 1500, '2026-01-12', '2026-12-31', 3300, { kind: 'region', jurisdictions: ['tainan'] }),
+    quota: liveQuota(1670, 3300),
+    research: ['central#moenv-carbon-reward-options', 'outlook-2027-r2#s2-platform-quota-live'],
+  },
+  {
+    ...carbon('moenv-carbon-tsmc', ['環境部減碳獎勵（台積電收購）', 'MOENV carbon reward (bought by TSMC)'], 2100, '2026-05-08', '2027-12-31', 54000),
+    quota: liveQuota(43847, 54000),
+    research: ['central#moenv-carbon-reward-options', 'outlook-2027-r2#s2-platform-quota-live'],
+  },
+  {
+    ...carbon('moenv-carbon-tsmc-kaohsiung', ['環境部減碳獎勵（台積電收購，限高雄市）', 'MOENV carbon reward (bought by TSMC, Kaohsiung only)'], 2100, '2026-05-08', '2027-12-31', 6000, {
+      kind: 'region',
+      jurisdictions: ['kaohsiung'],
+    }),
+    quota: liveQuota(4933, 6000),
+    research: ['central#moenv-carbon-reward-options', 'outlook-2027-r2#s2-platform-quota-live'],
+  },
+  {
+    ...carbon('moenv-carbon-nanshan', ['環境部減碳獎勵（南山人壽收購）', 'MOENV carbon reward (bought by Nan Shan Life)'], 2500, '2026-01-01', '2026-12-31', 0),
+    quota: quota('exhausted', '2026-11-25', t('環境部媒合平臺2026年11月25日顯示兩批名額都是0。', 'On 25 November 2026 the MOENV platform showed 0 places left in both lots.'), { remaining: 0, sources: ['moenv-platform-buyers'] }),
+    sources: ['moenv-platform-buyers'],
+    research: ['outlook-2027-r2#s2-platform-quota-live'],
+  },
 
   // ---------------------------------------------------------------- MOENV air subsidy (choose one of six)
-  air('moenv-air-national', ['環境部空污補助（全國）', 'MOENV air-pollution subsidy (nationwide)'], 1000, '2023-01-01', '2026-12-31', quota('unlimited', '2026-07-21', t('不限名額。', 'No quota.'))),
+  {
+    ...air('moenv-air-national', ['環境部空污補助（全國）', 'MOENV air-pollution subsidy (nationwide)'], 1000, '2023-01-01', '2026-12-31', quota('unlimited', '2026-07-21', t('不限名額。', 'No quota.'))),
+    status2027: t(
+      '環境部2026年11月11日預告草案，擬將空污補助延長至2030年底，但尚未定案，草案中的機車金額也未查證；試算不計入2027年。',
+      'On 11 November 2026 MOENV pre-announced a draft extending the air subsidy to the end of 2030, but it is not final and the scooter amount in the draft was not verified; it is not counted for 2027.',
+    ),
+    sources: [...PDF, 'moenv-platform-faq', 'chinatimes-2026-11-moenv-draft'],
+    research: ['central#moenv-air-pollution-options', 'outlook-2027-r2#s2-moenv-116-extension-draft'],
+  },
   air('moenv-air-hsinchu-park', ['環境部空污補助（竹科管理局）', 'MOENV air-pollution subsidy (Hsinchu Science Park)'], 2200, '2026-01-01', '2026-12-31', airQuota(10129), {
     kind: 'region',
     jurisdictions: ['hsinchu-city', 'hsinchu-county', 'miaoli'],
@@ -211,7 +244,7 @@ export const centralProgrammes: Programme[] = [
     status2027: t('2027年是否續辦未查證。', 'Whether it continues in 2027 was not checked.'),
     sources: ['taipei-dep-ev-subsidy-plan', 'tvbs-health-2026-01-subsidy'],
     confidence: 'verified',
-    research: ['taipei#tpe-central-moenv', 'central#moenv-central-total-conflict'],
+    research: ['taipei#tpe-central-moenv', 'outlook-2027-r2#s2-recycling-300'],
     note: t('有些報導把這筆錢視為回收業者付的回收金而非補助；無論如何都是車主實際拿到的錢，電動與燃油兩邊都計入。', 'Some reports treat this as the recycler\'s payment rather than a subsidy; either way the owner receives it, so it is counted on both sides.'),
     calculator: true,
   },
@@ -233,9 +266,9 @@ export const centralProgrammes: Programme[] = [
     validTo: '2030-12-31',
     quota: quota('unlimited', '2025-12-05', t('不限名額。', 'No quota.')),
     status2027: t('依財政部網頁實施至119年12月31日。', 'In force to 31 December 2030 per the MOF page.'),
-    sources: ['etax-goods-tax-scooter-cut', 'kymco-goods-tax-models'],
+    sources: ['etax-goods-tax-scooter-cut', 'kymco-goods-tax-models', 'etax-goods-tax-ev-exemption'],
     confidence: 'verified',
-    research: ['central#goods-tax-new-gasoline-2000', 'gas-prices#kymco-gov-tax-table'],
+    research: ['central#goods-tax-new-gasoline-2000', 'central#goods-tax-ev-exempt', 'gas-prices#kymco-gov-tax-table'],
     note: t('電動機車本來就免徵貨物稅（至119年底），已反映在售價中，所以電動那邊沒有這一行。', 'Electric scooters are already exempt from goods tax (to the end of 2030), which is built into their price, so there is no matching line on the electric side.'),
     calculator: true,
   },

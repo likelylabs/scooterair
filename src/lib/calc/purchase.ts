@@ -45,7 +45,7 @@ function programmeAmount(p: Programme, ev?: EvModel, gas?: GasModel): number | n
 export function liveGroups(ids: string[] | undefined, data: EconDataset, jurisdiction: string, ignore: Set<string> = new Set()): string[] {
   return (ids ?? []).filter((g) => {
     const group = data.groups[g];
-    return Boolean(group) && !ignore.has(g) && (!group.jurisdictions || group.jurisdictions.some((j) => j === jurisdiction));
+    return Boolean(group) && !group.advisory && !ignore.has(g) && (!group.jurisdictions || group.jurisdictions.some((j) => j === jurisdiction));
   });
 }
 
@@ -134,6 +134,8 @@ export interface LedgerInternals {
   assumptions: L10n[];
   /** Upside if the conservative groups were not applied, per group id. */
   upside: { group: string; amount: number }[];
+  /** Advisory groups with more than one counted member: the amount at risk if only one can be claimed. */
+  atRisk: { group: string; amount: number; ids: string[] }[];
 }
 
 export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data: EconDataset): LedgerInternals {
@@ -174,6 +176,12 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
     }
     if (p.calculator !== true) {
       exclusions.push(excluded(p, p.calculator.reason, p.calculator.excluded, {}, nominal));
+      continue;
+    }
+    if (ev && ev.moeaListed !== 'yes' && (p.payer === 'moea' || p.payer === 'local')) {
+      exclusions.push(
+        excluded(p, 'model-unknown', t('無法確認這款車在經濟部認可車款清單上，經濟部與多數縣市補助都要求是認可車款', 'we could not confirm this model is on the MOEA approved list, which the MOEA and most local subsidies require'), { failedCondition: 'moea-listed' }, nominal),
+      );
       continue;
     }
     if (cmp(s.date, p.validFrom) < 0) {
@@ -226,6 +234,16 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
     const generous = select(candidates, data, s.jurisdiction, new Set([g.id]));
     const diff = generous.total - sel.total;
     if (diff > 0) upside.push({ group: g.id, amount: diff });
+  }
+
+  // Advisory groups: all members counted, the smaller ones reported as at risk.
+  const atRisk: { group: string; amount: number; ids: string[] }[] = [];
+  for (const g of Object.values(data.groups).filter((x) => x.advisory)) {
+    const members = sel.chosen.filter((c) => (c.p.exclusiveGroups ?? []).includes(g.id));
+    if (members.length > 1) {
+      const sorted = [...members].sort((a, b) => b.amount - a.amount);
+      atRisk.push({ group: g.id, amount: sorted.slice(1).reduce((a, c) => a + c.amount, 0), ids: members.map((m) => m.p.id) });
+    }
   }
 
   // --- dealer promotions -------------------------------------------------------------------
@@ -345,5 +363,5 @@ export function purchaseLedger(side: 'electric' | 'gasoline', s: Situation, data
     paidLater: lines.filter((l) => l.paid === 'after-approval').reduce((a, l) => a + l.amount, 0),
     messages,
   };
-  return { ledger, assumptions, upside };
+  return { ledger, assumptions, upside, atRisk };
 }

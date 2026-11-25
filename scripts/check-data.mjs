@@ -283,6 +283,217 @@ for (const [id, r] of Object.entries(claimRules)) {
 }
 
 // ---------------------------------------------------------------------------
+// Economics dataset (src/data/econ): the calculator's inputs
+// ---------------------------------------------------------------------------
+
+let econ;
+try {
+  econ = (await load('src/data/econ/index.ts')).econData;
+} catch (e) {
+  err('econ', `could not load src/data/econ: ${e.message}`);
+}
+
+// Research findings that may feed a calculation: CONFIRMED, CORRECTED or ADDED. Round-two county
+// findings use the verdict REFUTED to mean "refutes a first-round 'no programme found'" while
+// reporting a VERIFIED official amount; those, and only those, are allow-listed here.
+const USABLE_VERDICTS = new Set(['CONFIRMED', 'CORRECTED', 'ADDED']);
+const REFUTATION_CORRECTIONS = new Set([
+  'counties-north-central-r2#changhua-new-purchase-v3',
+  'counties-north-central-r2#nantou-new-purchase-v3',
+  'counties-north-central-r2#hsinchucounty-new-heavy-v3',
+  'counties-north-central-r2#hsinchucounty-new-light-v3',
+  'counties-north-central-r2#hsinchucounty-swap-topup-v3',
+  'counties-north-central-r2#hsinchucounty-scrap-only-v3',
+  'counties-north-central-r2#keelung-swap-2stroke-heavy-v3',
+  'counties-north-central-r2#keelung-swap-2stroke-light-v3',
+  'counties-north-central-r2#keelung-swap-4stroke-heavy-v3',
+  'counties-north-central-r2#keelung-swap-4stroke-light-v3',
+  'counties-north-central-r2#keelung-new-heavy-v3',
+  'counties-north-central-r2#keelung-new-light-v3',
+]);
+const { readFileSync, existsSync } = await import('node:fs');
+const researchCache = new Map();
+function finding(ref) {
+  const [file, id] = ref.split('#');
+  if (!researchCache.has(file)) {
+    const p = resolve(root, 'research/econ', `${file}.json`);
+    researchCache.set(file, existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null);
+  }
+  const doc = researchCache.get(file);
+  if (!doc) return { missingFile: true };
+  if (!id) return { fileOnly: true };
+  return { f: doc.findings.find((x) => x.id === id) };
+}
+
+/** Validate one Provenance-like object. `feeds` = it can change a calculated number. */
+function checkProvenance(where, o, { feeds = true } = {}) {
+  citeSources(where, o.sources);
+  if (!CONFIDENCES.has(o.confidence)) err(where, `confidence must be 'verified' or 'secondary', got "${o.confidence}"`);
+  if (!Array.isArray(o.research) || o.research.length === 0) err(where, 'no research references');
+  for (const ref of o.research ?? []) {
+    const r = finding(ref);
+    if (r.missingFile) err(where, `research file for "${ref}" does not exist`);
+    else if (r.fileOnly) {
+      if (feeds) err(where, `research reference "${ref}" names a file, not a finding`);
+    } else if (!r.f) err(where, `research finding "${ref}" not found`);
+    else if (feeds && !USABLE_VERDICTS.has(r.f.verdict) && !REFUTATION_CORRECTIONS.has(ref)) {
+      err(where, `research finding "${ref}" has verdict ${r.f.verdict}; only CONFIRMED, CORRECTED or ADDED findings may feed a calculation`);
+    }
+  }
+  if (o.note !== undefined) checkL10n(`${where}.note`, o.note);
+}
+
+const isDate = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && !Number.isNaN(Date.parse(d));
+const nonNeg = (where, n) => {
+  if (typeof n !== 'number' || !Number.isFinite(n) || n < 0) err(where, `amount must be a non-negative number, got ${n}`);
+};
+
+if (econ) {
+  const jIds = new Set(Object.keys(econ.jurisdictions));
+  const groupIds = new Set(Object.keys(econ.groups));
+  const planIds = new Set(econ.plans.map((p) => p.id));
+  const evIds = new Set(econ.evModels.map((m) => m.id));
+  const seenIds = new Set();
+  const uniqueId = (w, id) => {
+    if (!ID_RE.test(id)) err(w, 'id must be kebab-case');
+    if (seenIds.has(id)) err(w, 'duplicate id');
+    seenIds.add(id);
+  };
+  if (!isDate(econ.meta.checkedOn) || !isDate(econ.meta.programmeYearEnd)) err('econ meta', 'dates must be YYYY-MM-DD');
+  checkL10n('econ meta.nextYear', econ.meta.nextYear);
+
+  for (const [id, j] of Object.entries(econ.jurisdictions)) {
+    const w = `econ jurisdiction ${id}`;
+    if (j.id !== id) err(w, 'id mismatch');
+    if (!['verified', 'partly-verified', 'not-verified'].includes(j.status)) err(w, `bad status "${j.status}"`);
+    checkL10n(`${w}.name`, j.name);
+    checkL10n(`${w}.statusNote`, j.statusNote);
+    if (!j.officialLinks?.length) err(w, 'needs at least one official link a reader can check');
+    for (const l of j.officialLinks ?? []) {
+      checkL10n(`${w}.link`, l.label);
+      if (!/^https?:\/\/\S+$/.test(l.url)) err(w, `bad link ${l.url}`);
+    }
+    if (!isDate(j.checkedOn)) err(w, 'checkedOn must be YYYY-MM-DD');
+    const counted = econ.programmes.filter((p) => p.jurisdiction === id && p.calculator === true);
+    if (j.status === 'not-verified' && counted.length) err(w, `is not verified but has ${counted.length} programme(s) in the calculator`);
+  }
+  for (const [id, g] of Object.entries(econ.groups)) {
+    checkL10n(`econ group ${id}.label`, g.label);
+    if ((g.conservative || g.advisory) && !g.ambiguity) err(`econ group ${id}`, 'conservative or advisory groups must explain the ambiguity');
+    if (g.ambiguity) checkL10n(`econ group ${id}.ambiguity`, g.ambiguity);
+    if (g.sources) citeSources(`econ group ${id}`, g.sources);
+    for (const jj of g.jurisdictions ?? []) if (!jIds.has(jj)) err(`econ group ${id}`, `unknown jurisdiction "${jj}"`);
+  }
+
+  for (const p of econ.programmes) {
+    const w = `econ programme ${p.id}`;
+    uniqueId(w, p.id);
+    const feeds = p.calculator === true;
+    checkProvenance(w, p, { feeds: true });
+    if (p.jurisdiction !== 'central' && !jIds.has(p.jurisdiction)) err(w, `unknown jurisdiction "${p.jurisdiction}"`);
+    for (const key of ['name', 'payerName', 'conditionText', 'status2027']) checkL10n(`${w}.${key}`, p[key]);
+    if (p.applicationNote) checkL10n(`${w}.applicationNote`, p.applicationNote);
+    if (!isDate(p.validFrom)) err(w, `validFrom must be YYYY-MM-DD: ${p.validFrom}`);
+    if (!isDate(p.validTo)) err(w, `every programme needs a valid-to date (YYYY-MM-DD): ${p.validTo}`);
+    if (isDate(p.validFrom) && isDate(p.validTo) && p.validFrom > p.validTo) err(w, 'validFrom after validTo');
+    for (const k of ['applicationDeadline', 'confirmedThrough']) if (p[k] !== undefined && !isDate(p[k])) err(w, `${k} must be YYYY-MM-DD`);
+    if (!isDate(p.quota?.asOf)) err(w, 'quota.asOf must be YYYY-MM-DD');
+    checkL10n(`${w}.quota.text`, p.quota?.text);
+    if (p.quota?.sources) citeSources(`${w}.quota`, p.quota.sources);
+    const a = p.amount;
+    if (a.kind === 'fixed') nonNeg(`${w}.amount`, a.value);
+    else if (a.kind === 'per-battery') (nonNeg(`${w}.amount`, a.single), nonNeg(`${w}.amount`, a.double));
+    else if (a.kind === 'model-goods-tax-scrap') nonNeg(`${w}.amount`, a.max);
+    else err(w, `unknown amount kind ${a.kind}`);
+    if (feeds && a.kind === 'fixed' && a.value === 0) err(w, 'a counted programme pays 0; mark it calculator: { excluded }');
+    for (const g of p.exclusiveGroups ?? []) if (!groupIds.has(g)) err(w, `unknown group "${g}"`);
+    for (const r of p.requires?.anyOf ?? []) if (!econ.programmes.some((x) => x.id === r)) err(w, `requires unknown programme "${r}"`);
+    if (p.requires) checkL10n(`${w}.requires.text`, p.requires.text);
+    if (p.calculator !== true) checkL10n(`${w}.calculator.excluded`, p.calculator.excluded);
+    const walkCond = (c) => {
+      if (c.kind === 'region') for (const jj of c.jurisdictions) if (!jIds.has(jj)) err(w, `condition names unknown jurisdiction "${jj}"`);
+      if (c.kind === 'scrap-built') for (const d of [c.onOrBefore, c.onOrAfter]) if (d !== undefined && !isDate(d)) err(w, `bad date ${d}`);
+      if (c.kind === 'any-of') c.conditions.forEach(walkCond);
+    };
+    p.conditions.forEach(walkCond);
+  }
+
+  const checkPromo = (w, pr) => {
+    uniqueId(`${w} promo ${pr.id}`, pr.id);
+    checkProvenance(`${w} promo ${pr.id}`, pr);
+    nonNeg(`${w} promo ${pr.id}`, pr.amount);
+    if (!isDate(pr.validFrom) || !isDate(pr.validTo)) err(`${w} promo ${pr.id}`, 'dates must be YYYY-MM-DD');
+    checkL10n(`${w} promo ${pr.id}.name`, pr.name);
+    checkL10n(`${w} promo ${pr.id}.conditionText`, pr.conditionText);
+  };
+  for (const m of econ.gasModels) {
+    const w = `econ gas model ${m.id}`;
+    uniqueId(w, m.id);
+    const feeds = m.calculator === true;
+    checkL10n(`${w}.name`, m.name);
+    checkProvenance(`${w}.listPrice`, m.listPrice, { feeds });
+    nonNeg(`${w}.listPrice`, m.listPrice.value);
+    if (m.plateInsuranceIncluded) checkProvenance(`${w}.plateInsuranceIncluded`, m.plateInsuranceIncluded, { feeds });
+    checkProvenance(`${w}.goodsTaxScrapCut`, m.goodsTaxScrapCut, { feeds });
+    if (feeds && !m.fuelEconomy) err(w, 'a calculator model needs a fuel economy');
+    if (m.fuelEconomy) checkProvenance(`${w}.fuelEconomy`, m.fuelEconomy, { feeds });
+    m.promos.forEach((pr) => checkPromo(w, pr));
+  }
+  for (const m of econ.evModels) {
+    const w = `econ ev model ${m.id}`;
+    uniqueId(w, m.id);
+    const feeds = m.calculator === true;
+    checkL10n(`${w}.name`, m.name);
+    checkProvenance(`${w}.listPrice`, m.listPrice, { feeds });
+    nonNeg(`${w}.listPrice`, m.listPrice.value);
+    for (const k of ['plateClassBasis', 'moeaClassBasis']) checkProvenance(`${w}.${k}`, m[k], { feeds });
+    checkProvenance(`${w}.battery.basis`, m.battery.basis, { feeds });
+    checkProvenance(`${w}.efficiency`, m.efficiency, { feeds });
+    checkProvenance(`${w}.performance`, m.performance, { feeds: false });
+    if (!['yes', 'unknown'].includes(m.moeaListed)) err(w, 'moeaListed must be yes or unknown');
+    if (feeds && !m.battery.count) err(w, 'a calculator model needs a verified battery count');
+    for (const pid of m.plans) if (!planIds.has(pid)) err(w, `unknown plan "${pid}"`);
+    if (feeds && m.plans.length === 0) err(w, 'a calculator model needs at least one plan');
+    if (!econ.maintenance.some((x) => x.id === m.maintenance)) err(w, `unknown maintenance profile "${m.maintenance}"`);
+    m.promos.forEach((pr) => checkPromo(w, pr));
+  }
+  for (const p of econ.plans) {
+    const w = `econ plan ${p.id}`;
+    uniqueId(w, p.id);
+    checkProvenance(w, p, { feeds: p.calculator === true });
+    checkL10n(`${w}.name`, p.name);
+    checkL10n(`${w}.terms`, p.terms);
+    nonNeg(`${w}.monthlyFee`, p.monthlyFee);
+    if (p.setupFee) checkProvenance(`${w}.setupFee`, p.setupFee);
+    if (p.usage.kind === 'credit') checkProvenance(`${w}.allowance`, p.usage.allowance);
+    if (p.usage.kind === 'tariff') checkProvenance(`${w}.rate`, p.usage.rate);
+  }
+  for (const c of econ.planCredits) {
+    const w = `econ plan credit ${c.id}`;
+    uniqueId(w, c.id);
+    checkProvenance(w, c);
+    for (const pid of c.plans === 'any' ? [] : c.plans) if (!planIds.has(pid)) err(w, `unknown plan "${pid}"`);
+    for (const mid of c.models === 'any' ? [] : c.models) if (!evIds.has(mid)) err(w, `unknown model "${mid}"`);
+    if (!isDate(c.validFrom) || !isDate(c.validTo)) err(w, 'dates must be YYYY-MM-DD');
+  }
+  for (const k of ['petrol95', 'petrol92', 'smoothing', 'realWorldKmPerL']) checkProvenance(`econ fuel.${k}`, econ.fuel[k]);
+  checkProvenance('econ electricity', econ.electricity);
+  for (const m of econ.maintenance) {
+    const band = m.kind === 'per-km' ? m.perKm : m.perVisit;
+    checkProvenance(`econ maintenance ${m.id}`, band);
+    checkProvenance(`econ maintenance ${m.id}.ownerAverage`, m.ownerAverage);
+    if (band.low > band.typical || band.typical > band.high) err(`econ maintenance ${m.id}`, 'band must satisfy low <= typical <= high');
+    if (m.kind === 'visits') checkProvenance(`econ maintenance ${m.id}.intervalBasis`, m.intervalBasis);
+  }
+  for (const b of econ.fees.roadFeeGasoline) checkProvenance(`econ fees.roadFeeGasoline ${b.upToCc}`, b.perYear);
+  for (const k of ['roadFeeElectric', 'licenceTax', 'compulsoryInsurance', 'inspection']) checkProvenance(`econ fees.${k}`, econ.fees[k]);
+  checkProvenance('econ spendReference', econ.spendReference);
+
+  // Sweep every localized field in the dataset (brand and model names may be Latin in zh-TW).
+  walkL10n('econ', econ);
+}
+
+// ---------------------------------------------------------------------------
 // Coverage
 // ---------------------------------------------------------------------------
 

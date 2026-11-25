@@ -153,6 +153,7 @@ function buildMessages(c: Ctx): Message[] {
         ),
         data.meta.nextYear,
       ),
+      sources: ['chinatimes-2026-11-moenv-draft', 'meid-lev-subsidy-portal'],
     });
   }
 
@@ -286,6 +287,13 @@ function buildMessages(c: Ctx): Message[] {
     });
   }
 
+  // Readings we were told to take but must be confirmed (advisory groups).
+  for (const a of evP.atRisk) {
+    const g = data.groups[a.group];
+    if (!g?.ambiguity) continue;
+    push({ code: 'ambiguity', severity: 'warning', text: join(g.ambiguity, t(`（約${ntd(a.amount)['zh-TW']}）`, `(about ${ntd(a.amount).en})`)), amount: a.amount, sources: g.sources, about: a.ids });
+  }
+
   // Ambiguities resolved conservatively.
   for (const u of evP.upside) {
     const g = data.groups[u.group];
@@ -306,12 +314,25 @@ function buildMessages(c: Ctx): Message[] {
       sources: ['meid-lev-2026-subsidy-table'],
     });
   }
+  const unlisted = evP.ledger.excluded.filter((x) => x.failedCondition === 'moea-listed');
+  if (unlisted.length) {
+    push({
+      code: 'ambiguity',
+      severity: 'warning',
+      text: t(
+        `無法確認${ev.name['zh-TW']}在經濟部認可車款清單上，所以經濟部與縣市補助都不計入：${names(unlisted)['zh-TW']}。若車行能證明是認可車款，實付價格會再低一些；請先要求書面確認。`,
+        `We could not confirm that ${ev.name.en} is on the MOEA approved list, so MOEA and local subsidies are not counted: ${names(unlisted).en}. If the dealer can show it is listed, the price would be lower; ask for written confirmation first.`,
+      ),
+      about: unlisted.map((x) => x.id),
+      sources: ['meid-approved-models-csv'],
+    });
+  }
   const cells = evP.ledger.excluded.find((x) => x.id === 'moea-domestic-cells' && x.reason === 'model-unknown');
   if (cells) {
     push({
       code: 'ambiguity',
       severity: 'info',
-      text: t('哪些車款適用經濟部國產電池芯加碼3,000元未能查證，試算不計入；若你的車款符合，可再多3,000元。', 'Which models get the MOEA NT$3,000 Taiwan-made cell bonus could not be checked, so it is not counted; if your model qualifies you get NT$3,000 more.'),
+      text: t('經濟部國產電池芯加碼3,000元確實存在，但查不到任何車款被列為符合（Gogoro自己的補助試算也沒有這一項），試算不計入；除非車行書面確認，不要指望這筆錢。', 'The MOEA NT$3,000 Taiwan-made cell bonus exists, but no model could be shown to qualify (Gogoro\'s own calculator does not include it), so it is not counted; do not rely on it unless the dealer confirms in writing.'),
       amount: 3000,
       about: ['moea-domestic-cells'],
       sources: ['meid-lev-subsidy-portal'],

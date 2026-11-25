@@ -276,6 +276,12 @@ export interface ExclusiveGroup {
   conservative?: boolean;
   /** Only applies to buyers in these jurisdictions (default: everywhere). */
   jurisdictions?: JurisdictionId[];
+  /**
+   * Advisory: not an either/or rule. Members are all counted, but when more than one is counted
+   * the engine reports the smaller one as at risk with `ambiguity` (a reading we were told to
+   * take, flagged "confirm before relying on it").
+   */
+  advisory?: boolean;
   /** Shown with the result when a conservative group changed the outcome. */
   ambiguity?: L10n;
   sources?: SourceId[];
@@ -326,6 +332,11 @@ export interface EvModel {
   moeaClassBasis: Provenance & { text: L10n };
   listPrice: Num;
   promos: DealerPromo[];
+  /**
+   * On the MOEA approved-model list? Most subsidies (MOEA and nearly every city) require it.
+   * 'unknown': the engine counts none of the MOEA or local lines and says why.
+   */
+  moeaListed: 'yes' | 'unknown';
   domesticCells: 'yes' | 'no' | 'unknown';
   battery: { system: 'gogoro' | 'ionex' | 'home'; count: 1 | 2 | null; basis: Provenance & { text: L10n } };
   /** km per unit of the plan's energy unit (km/Ah for Gogoro, km/kWh otherwise). */
@@ -366,6 +377,8 @@ export interface EnergyPlan extends Provenance {
   monthlyFee: number;
   usage: PlanUsage;
   setupFee?: Num;
+  /** The setup fee is charged again when the contract is renewed after `lockInMonths`. */
+  setupFeeRenews?: boolean;
   lockInMonths?: number;
   terms: L10n;
   calculator: true | { excluded: L10n };

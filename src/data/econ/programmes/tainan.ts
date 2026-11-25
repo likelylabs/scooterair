@@ -108,7 +108,7 @@ export const tainanProgrammes: Programme[] = [
     conditions: [resident, heavy],
     conditionText: t('換購或新購電動機車一次給付，依車種分級；官方表格沒有限定換電車款。', 'Paid once for any replacement or new purchase, by class; the official table does not limit it to swap-battery models.'),
     research: ['tainan#tn-battery-rental-credit', 'other-levers#tainan-battery-plan-subsidy'],
-    sources: [...SRC, 'tvbs-2026-02-tainan-subsidy'],
+    sources: [...SRC, 'tvbs-2026-02-tainan-subsidy', 'nownews-2026-02-tainan-gogoro'],
   }),
   p({
     id: 'tn-battery-light',

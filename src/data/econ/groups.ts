@@ -14,13 +14,13 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('moea-base', '經濟部新購補助（依車種等級擇一）', 'MOEA new-purchase subsidy (one amount by class)'),
     g('moenv-carbon', '環境部減碳獎勵（四擇一）', 'MOENV carbon-reduction reward (choose one of four)', { sources: ['meid-lev-2026-subsidy-table'] }),
     g('moenv-air', '環境部空污補助（六擇一）', 'MOENV air-pollution subsidy (choose one of six)', { sources: ['meid-lev-2026-subsidy-table'] }),
-    g('moenv-one-stream', '環境部減碳獎勵與空污補助只計一項（保守解讀）', 'Only one MOENV payment counted: carbon or air (conservative reading)', {
-      conservative: true,
+    g('moenv-carbon-and-air', '環境部減碳獎勵與空污補助兩項都計入（請先確認）', 'MOENV carbon reward and air subsidy both counted (confirm first)', {
+      advisory: true,
       ambiguity: t(
-        '環境部的減碳獎勵與空污補助能否同時領取，官方表格沒有寫明：TVBS 2025年報導說不能併領，今周刊2026年報導則把兩者相加。試算只算一項；若兩項都能領，最多可再多領下列金額。',
-        'Whether the MOENV carbon reward and air subsidy can both be claimed is not stated in the official table: a 2025 TVBS report says no, a 2026 Business Today report adds them together. We count only one; if both can be claimed you could receive up to the amount below in addition.',
+        '試算同時計入環境部減碳獎勵與空污補助：媒合平臺說明兩者分別審核撥款，環境部2026年2月的新聞稿也說符合資格者可同步申請；但那句話出現在汽車段落，2025年也有報導說不能併領。申請前請向平臺確認（減碳02-6630-8000分機437，空污02-2339-0129），若只能領一項，會少下列金額。',
+        'We count both the MOENV carbon reward and the air subsidy: the matching platform says the two are reviewed and paid separately, and a February 2026 MOENV release says qualifying people can apply for both; but that sentence sits in a paragraph about cars and a 2025 report said they could not be combined. Confirm with the platform before relying on it (carbon 02-6630-8000 ext. 437, air 02-2339-0129); if only one can be claimed you would get the amount below less.',
       ),
-      sources: ['meid-lev-2026-subsidy-table', 'businesstoday-2026-01-subsidy-guide'],
+      sources: ['moenv-platform-faq', 'tcnews-2026-02-moenv-release'],
     }),
     g('gas-goods-tax-new', '貨物稅新購減徵', 'Goods-tax cut for a new purchase'),
     // Taipei
@@ -36,6 +36,14 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       ),
       sources: ['ntpc-motor-2026-plan'],
     }),
+    g('taichung-base', '臺中市補助（新購或依舊車期別汰購擇一）', 'Taichung subsidy (new purchase or scrap tier, one only)'),
+    g('keelung-base', '基隆市補助（換購或新購擇一）', 'Keelung subsidy (replacement or new purchase, one only)'),
+    g('hsinchu-city-base', '新竹市換購補助（依舊車擇一）', 'Hsinchu City replacement subsidy (one by old scooter)'),
+    g('hsinchu-county-base', '新竹縣新購補助（依車種擇一）', 'Hsinchu County new-purchase subsidy (one by class)'),
+    g('changhua-base', '彰化縣補助（換購或新購擇一）', 'Changhua subsidy (replacement or new purchase, one only)'),
+    g('nantou-base', '南投縣補助（換購或新購擇一）', 'Nantou subsidy (replacement or new purchase, one only)'),
+    g('yunlin-base', '雲林縣補助（一般換購、中低收入戶換購或新購擇一）', 'Yunlin subsidy (general replacement, low-income replacement or new purchase, one only)'),
+    g('yilan-base', '宜蘭縣補助（換購或新購、一般或優先身分擇一）', 'Yilan subsidy (replacement or new purchase, general or priority group, one only)'),
     // Taoyuan
     g('ty-base', '桃園市基本補助（新購或汰換擇一）', 'Taoyuan base subsidy (new purchase or scrap-and-replace, one only)'),
     g('ty-age', '桃園市年齡專案（依年齡擇一）', 'Taoyuan age-band scheme (one by age)'),

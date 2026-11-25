@@ -165,7 +165,7 @@ export const taipeiProgrammes: Programme[] = [
     conditionText: t('檢附申請年度有效的區公所中低或低收入戶證明，限新購或汰購。', 'With a district-office low or middle-low income certificate valid in the application year; new purchase or replacement only.'),
     quota: quota('limited', '2026-11-25', t('依申請順序至預算用罄。', 'In order of application until the budget runs out.'), { sources: [LIVE] }),
     sources: [...PLAN, 'taiwannews-2026-04-taipei-subsidy'],
-    note: t('計畫把這筆列為獨立項目但沒有寫可與其他加碼疊加；台灣英文新聞引述環保局說可再加領。', 'The plan lists this as a separate line without saying it stacks; Taiwan News quotes the bureau saying it is paid on top.'),
+    note: t('計畫把這筆列為獨立項目但沒有寫可與其他加碼疊加；英文媒體Taiwan News引述環保局說可再加領。', 'The plan lists this as a separate line without saying it stacks; Taiwan News quotes the bureau saying it is paid on top.'),
     research: ['taipei#tpe-lowincome-topup', 'taipei#tpe-2025-baseline'],
   }),
   {

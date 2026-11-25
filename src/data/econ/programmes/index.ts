@@ -9,13 +9,17 @@ import { taoyuanProgrammes } from './taoyuan.ts';
 import { tainanProgrammes } from './tainan.ts';
 import { kaohsiungProgrammes } from './kaohsiung.ts';
 import { countyProgrammes } from './counties.ts';
+import { taichungProgrammes } from './taichung.ts';
+import { countyR2Programmes } from './counties-r2.ts';
 
 export const programmes: Programme[] = [
   ...centralProgrammes,
   ...taipeiProgrammes,
   ...newTaipeiProgrammes,
   ...taoyuanProgrammes,
+  ...taichungProgrammes,
   ...tainanProgrammes,
   ...kaohsiungProgrammes,
   ...countyProgrammes,
+  ...countyR2Programmes,
 ];

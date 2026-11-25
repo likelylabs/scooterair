@@ -1198,6 +1198,18 @@ export const series = {
         note: t('EZZY單電池，以交通部調查平均每安時1.3公里計。', 'EZZY single battery at the MOTC survey average of 1.3 km per Ah.'),
       },
       {
+        key: 'gogoro319',
+        label: t('Gogoro 自由省319（含87安時）', 'Gogoro plan 319 (87 Ah included)'),
+        points: [
+          { x: '300', y: 650 },
+          { x: '500', y: 1004 },
+          { x: '800', y: 1534 },
+          { x: '1000', y: 1888 },
+          { x: '1500', y: 2773 },
+        ],
+        note: t('超過87安時每安時2.3元；EZZY新車前24個月每月可折151元（未計入此圖）。', 'NT$2.3 per Ah beyond 87 Ah; new EZZY buyers get NT$151 a month off for 24 months (not shown).'),
+      },
+      {
         key: 'gogoroPayg',
         label: t('Gogoro 0月租（每安時1.1元，不含設定費）', 'Gogoro pay-per-use (NT$1.1/Ah, excluding setup fee)'),
         points: [
@@ -1207,7 +1219,7 @@ export const series = {
           { x: '1000', y: 846 },
           { x: '1500', y: 1269 },
         ],
-        note: t('另有一次性設定費（2025年上市時單電池6,000元，二手資料）。', 'Plus a one-off setup fee (NT$6,000 single battery at the 2025 launch; secondary).'),
+        note: t('另有一次性設定費（單電池6,000元，每24個月續約再付）。', 'Plus a one-off setup fee (NT$6,000 single battery, again at each 24-month renewal).'),
       },
       {
         key: 'ionex318',
@@ -1234,22 +1246,22 @@ export const series = {
       },
       {
         key: 'homeCharging',
-        label: t('在家充電（每度3.03元，示意）', 'Charging at home (NT$3.03/kWh, illustrative)'),
+        label: t('在家充電：ZAU ES-1000（每度2.26元）', 'Home charging: ZAU ES-1000 (NT$2.26/kWh)'),
         confidence: 'secondary',
         evidence: 'derived',
         points: [
-          { x: '300', y: 29 },
-          { x: '500', y: 48 },
-          { x: '800', y: 77 },
-          { x: '1000', y: 97 },
-          { x: '1500', y: 145 },
+          { x: '300', y: 19 },
+          { x: '500', y: 32 },
+          { x: '800', y: 51 },
+          { x: '1000', y: 63 },
+          { x: '1500', y: 95 },
         ],
-        note: t('以每度31.3公里示意；我們查證的同級車款大多不能在家充電免月租。', 'Illustrative at 31.3 km/kWh; most comparable models we verified cannot be charged at home without a plan.'),
+        note: t('每度約35.8公里（無官方數字，取推估範圍中點）；這款車極速53 km/h，不是125cc的同級車。', 'About 35.8 km per kWh (no official figure; midpoint of the estimate); this model tops out at 53 km/h and is not a 125cc equivalent.'),
       },
     ],
     period: t('2026年11月價格', 'November 2026 prices'),
     place: TW,
-    sources: ['kingautos-2026-11-fuel-price', 'tvbs-cars-2026-06-fuel-ranking', 'kikinote-fuel-cost-assumption', 'gogoro-488-888-promo', 'gogoro-2025-07-payg-press', 'motc-2024-scooter-survey', 'ionex-plans', 'ionex-coolone-product', 'kikinote-2026-05-electricity-tariff'],
+    sources: ['cpc-price-history', 'tvbs-cars-2026-06-fuel-ranking', 'kikinote-fuel-cost-assumption', 'gogoro-488-888-promo', 'gogoro-network-plan-pages', 'gogoro-network-payg-page', 'motc-2024-scooter-survey', 'ionex-plans', 'ionex-coolone-product', 'zau-es1000-spec', 'tvbs-2026-electricity-tariff'],
     confidence: 'verified',
     evidence: 'derived',
     caveat: t(

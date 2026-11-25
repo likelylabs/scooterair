@@ -1,9 +1,9 @@
 // Energy: battery plans, plan credits, pump prices (with the temporary smoothing) and household
 // electricity tiers.
 //
-// Gogoro's allowance plans (自由省 319/519/529/819) are NOT here: their 2026 terms come only from
-// JavaScript-loaded support pages and an older article, and verified alternatives exist (488/888
-// and the NT$1.1/Ah pay-per-use rate), so by the dataset rules they are left out.
+// Gogoro plans are confirmed from Gogoro Network's own support pages (second research round):
+// allowance plans (自由省 / 高用量自由省) are modelled as an included number of Ah with NT$2.3 per Ah
+// beyond it. Gogoro's dynamic discount (up to 20% off at some stations) is not counted.
 
 import { t } from '../types.ts';
 import type { ElectricityPrices, EnergyPlan, FuelPrices, PlanCredit } from './types.ts';
@@ -42,6 +42,38 @@ const ionexPlan = (id: string, fee: number, batteries: 1 | 2, credit: number, lo
   calculator: true,
 });
 
+const gogoroAllowance = (id: string, fee: number, batteries: 1 | 2, ah: number, lockIn: number | undefined, research: string): EnergyPlan => ({
+  id,
+  operator: 'gogoro',
+  system: 'gogoro',
+  name: t(`Gogoro ${fee >= 529 && batteries === 1 ? '高用量自由省' : fee === 1269 ? '高用量自由省' : '自由省'}${fee}（${batteries === 1 ? '單電池' : '雙電池'}）`, `Gogoro ${fee >= 529 && batteries === 1 ? 'high-usage ' : fee === 1269 ? 'high-usage ' : ''}plan ${fee} (${batteries === 1 ? 'single battery' : 'two batteries'})`),
+  batteries,
+  unit: 'Ah',
+  monthlyFee: fee,
+  usage: {
+    kind: 'credit',
+    creditNtd: Math.round(ah * 2.3),
+    allowance: {
+      low: ah,
+      typical: ah,
+      high: ah,
+      typicalBasis: t(`官方支援頁：每月含${ah}安時，超過每安時2.3元。`, `Official support page: ${ah} Ah included each month, NT$2.3 per Ah beyond.`),
+      sources: ['gogoro-network-plan-pages'],
+      confidence: 'verified',
+      research: [research],
+    },
+    overageRate: 2.3,
+  },
+  ...(lockIn ? { lockInMonths: lockIn } : {}),
+  terms: lockIn
+    ? t(`綁約${lockIn}個月（提前解約須付違約金，按剩餘天數比例計）；未用完的額度不累積；超量每安時2.3元；Gogoro可不另行通知調整方案。`, `${lockIn}-month contract (early-exit penalty scaled by remaining days); unused allowance does not carry over; NT$2.3 per Ah beyond it; Gogoro may change plans without individual notice.`)
+    : t('官方頁面沒有寫綁約期；未用完的額度不累積；超量每安時2.3元；Gogoro可不另行通知調整方案。', 'No contract term is stated on the official pages; unused allowance does not carry over; NT$2.3 per Ah beyond it; Gogoro may change plans without individual notice.'),
+  sources: ['gogoro-network-plan-pages', 'gogoro-488-888-promo'],
+  confidence: 'verified',
+  research: [research, 'gogoro-official-r2#plan-table-2025-07'],
+  calculator: true,
+});
+
 export const plans: EnergyPlan[] = [
   {
     id: 'gogoro-488',
@@ -70,7 +102,7 @@ export const plans: EnergyPlan[] = [
     batteries: 2,
     unit: 'Ah',
     monthlyFee: 888,
-    usage: { kind: 'time-window', offWindowRate: 2.3, windows: WINDOWS },
+    usage: { kind: 'time-window', offWindowRate: 2.3, windows: WINDOWS, fairUseUnits: 1600 },
     lockInMonths: 24,
     terms: t('綁約24個月；指定時段外換電每安時2.3元；提前解約須付7,200元乘以剩餘天數除以730。', '24-month contract; swaps outside the free windows cost NT$2.3 per Ah; early exit costs NT$7,200 × remaining days / 730.'),
     sources: [...GOGORO_488],
@@ -89,16 +121,17 @@ export const plans: EnergyPlan[] = [
     usage: { kind: 'per-unit', rate: 1.1 },
     setupFee: {
       value: 6000,
-      sources: ['tvbs-2025-07-gogoro-setup-fee'],
-      confidence: 'secondary',
-      research: ['maintenance-fees#battery-sub-setup-fee', 'running-costs#gogoro-zero-monthly'],
-      note: t('設定費金額取自2025年7月上市時的報導，Gogoro新聞稿沒有寫金額，2026年條件未能查證。', 'The setup fee is from July 2025 launch coverage; Gogoro\'s press release gives no amount and 2026 terms could not be checked.'),
+      sources: ['gogoro-network-payg-page', 'tvbs-2025-07-gogoro-setup-fee'],
+      confidence: 'verified',
+      research: ['gogoro-official-r2#gogoro-payg-plan', 'maintenance-fees#battery-sub-setup-fee'],
+      note: t('設定費不是預付電池費；部分車款或刷卡優惠可減免。24個月後續約須再付一次。', 'The setup fee is not prepaid battery credit; some models or card offers waive part of it. Renewing after 24 months needs a new setup fee.'),
     },
+    setupFeeRenews: true,
     lockInMonths: 24,
-    terms: t('綁約24個月，無月租費，每安時1.1元，開通時收一次性設定費。', '24-month contract, no monthly fee, NT$1.1 per Ah, one-off setup fee at activation.'),
-    sources: ['gogoro-2025-07-payg-press'],
+    terms: t('綁約24個月，無月租費，每安時1.1元，開通時收一次性設定費（續約須再付）；提前解約須付4,800元乘以剩餘比例，設定費按比例退還。', '24-month contract, no monthly fee, NT$1.1 per Ah, one-off setup fee at activation (again on renewal); early exit costs NT$4,800 × the remaining share, with the setup fee refunded pro rata.'),
+    sources: ['gogoro-network-payg-page', 'gogoro-2025-07-payg-press'],
     confidence: 'verified',
-    research: ['running-costs#gogoro-zero-monthly', 'gogoro#plan-payg'],
+    research: ['gogoro-official-r2#gogoro-payg-plan', 'running-costs#gogoro-zero-monthly'],
     calculator: true,
   },
   {
@@ -112,18 +145,25 @@ export const plans: EnergyPlan[] = [
     usage: { kind: 'per-unit', rate: 1.1 },
     setupFee: {
       value: 9000,
-      sources: ['tvbs-2025-07-gogoro-setup-fee'],
-      confidence: 'secondary',
-      research: ['maintenance-fees#battery-sub-setup-fee', 'running-costs#gogoro-zero-monthly'],
-      note: t('設定費金額取自2025年7月上市時的報導，2026年條件未能查證。', 'The setup fee is from July 2025 launch coverage; 2026 terms could not be checked.'),
+      sources: ['gogoro-network-payg-page', 'tvbs-2025-07-gogoro-setup-fee'],
+      confidence: 'verified',
+      research: ['gogoro-official-r2#gogoro-payg-plan', 'maintenance-fees#battery-sub-setup-fee'],
+      note: t('24個月後續約須再付一次設定費。', 'Renewing after 24 months needs a new setup fee.'),
     },
+    setupFeeRenews: true,
     lockInMonths: 24,
-    terms: t('綁約24個月，無月租費，每安時1.1元，開通時收一次性設定費。', '24-month contract, no monthly fee, NT$1.1 per Ah, one-off setup fee at activation.'),
-    sources: ['gogoro-2025-07-payg-press'],
+    terms: t('綁約24個月，無月租費，每安時1.1元，開通時收一次性設定費（續約須再付）；提前解約須付7,200元乘以剩餘比例。', '24-month contract, no monthly fee, NT$1.1 per Ah, one-off setup fee at activation (again on renewal); early exit costs NT$7,200 × the remaining share.'),
+    sources: ['gogoro-network-payg-page', 'gogoro-2025-07-payg-press'],
     confidence: 'verified',
-    research: ['running-costs#gogoro-zero-monthly'],
+    research: ['gogoro-official-r2#gogoro-payg-plan', 'running-costs#gogoro-zero-monthly'],
     calculator: true,
   },
+  gogoroAllowance('gogoro-319-single', 319, 1, 87, undefined, 'gogoro-official-r2#gogoro-official-tariff-plans'),
+  gogoroAllowance('gogoro-529-single', 529, 1, 565.2, 18, 'gogoro-official-r2#gogoro-official-tariff-plans'),
+  gogoroAllowance('gogoro-319-dual', 319, 2, 87, undefined, 'gogoro-official-r2#gogoro-official-tariff-plans'),
+  gogoroAllowance('gogoro-519-dual', 519, 2, 260.9, undefined, 'gogoro-official-r2#gogoro-official-tariff-plans'),
+  gogoroAllowance('gogoro-819-dual', 819, 2, 521.7, undefined, 'gogoro-official-r2#gogoro-official-tariff-plans'),
+  gogoroAllowance('gogoro-1269-dual', 1269, 2, 1304.3, 18, 'gogoro-official-r2#gogoro-official-tariff-plans'),
   ionexPlan('ionex-318-single', 318, 1, 250, 4.8, 6.8, 'other-ev-brands#ionex-plan-single-318'),
   ionexPlan('ionex-518-single', 518, 1, 650, 12.5, 17.6, 'other-ev-brands#ionex-plan-single-518'),
   ionexPlan('ionex-518-dual', 518, 2, 650, 12.5, 17.6, 'other-ev-brands#ionex-plan-dual'),
@@ -141,27 +181,41 @@ export const plans: EnergyPlan[] = [
     usage: {
       kind: 'tariff',
       rate: {
-        low: 1.68,
-        typical: 3.03,
-        high: 5.04,
+        low: 1.78,
+        typical: 2.26,
+        high: 5.14,
         typicalBasis: t(
-          '住宅非時間電價依全戶用電量累進，機車充電以全戶邊際級距計價：低值為最低級距1.68元，中間值為非夏月331至500度的3.03元，高值為夏月501至700度的5.04元。',
-          'Residential tiered tariffs are cumulative, so charging is billed at the household\'s marginal tier: low is the first tier (1.68), middle the non-summer 331–500 kWh tier (3.03), high the summer 501–700 kWh tier (5.04).',
+          '住宅非時間電價依全戶用電量累進，機車充電以全戶邊際級距計價：低值為最低級距1.78元，中間值為非夏月121至330度的2.26元，高值為夏月501至700度的5.14元（2026年4月起費率，媒體轉述）。',
+          'Residential tiered tariffs are cumulative, so charging is billed at the household\'s marginal tier: low is the first tier (1.78), middle the non-summer 121–330 kWh tier (2.26), high the summer 501–700 kWh tier (5.14) (rates from April 2026, as reported by the media).',
         ),
-        sources: ['kikinote-2026-05-electricity-tariff'],
+        sources: ['tvbs-2026-electricity-tariff'],
         confidence: 'secondary',
-        research: ['running-costs#tariff-summer-tiers', 'running-costs#tariff-nonsummer-tiers'],
+        research: ['energy-prices-r2#tariff-nonsummer-2026', 'energy-prices-r2#tariff-summer-2026'],
       },
     },
     terms: t('只適用可插電充電的車款；充電器損耗（常見估計10%至15%）未查證，未計入。', 'Only for plug-in models; charger losses (often put at 10–15%) are unverified and not counted.'),
-    sources: ['kikinote-2026-05-electricity-tariff', 'wantrich-2026-09-tariff-freeze'],
+    sources: ['tvbs-2026-electricity-tariff', 'wantrich-2026-09-tariff-freeze'],
     confidence: 'secondary',
-    research: ['running-costs#home-charge-cost-per-km', 'running-costs#tariff-freeze'],
+    research: ['energy-prices-r2#calc-home-charge-per-km', 'running-costs#tariff-freeze'],
     calculator: true,
   },
 ];
 
 export const planCredits: PlanCredit[] = [
+  {
+    id: 'gogoro-ezzy-151-2026',
+    name: t('Gogoro EZZY新車資費每月折151元（24個月）', 'Gogoro EZZY new-scooter plan credit of NT$151 a month (24 months)'),
+    perMonth: 151,
+    months: 24,
+    plans: ['gogoro-319-single', 'gogoro-529-single', 'gogoro-488'],
+    models: ['gogoro-ezzy'],
+    validFrom: '2026-09-08',
+    validTo: '2026-12-31',
+    sources: ['gogoro-2026-ezzy-promo'],
+    confidence: 'verified',
+    research: ['gogoro-official-r2#ezzy-plan-168', 'gogoro#promo-ezzy-151'],
+    note: t('只折抵基本費；換方案、轉賣或過戶即失效；能否與其他含車價折扣的優惠併用由Gogoro決定。', 'Offsets the base fee only; lost if you change plan, sell or transfer the scooter; Gogoro decides whether it combines with other offers that include a price discount.'),
+  },
   {
     id: 'ionex-q4-2026-99',
     name: t('Ionex資費每月折99元（12個月）', 'Ionex NT$99 a month off the plan (12 months)'),
@@ -180,18 +234,18 @@ export const planCredits: PlanCredit[] = [
 export const fuel: FuelPrices = {
   petrol95: {
     value: 32.7,
-    week: t('2026年11月16日至22日', '16–22 November 2026'),
-    sources: ['kingautos-2026-11-fuel-price'],
+    week: t('2026年11月23日至29日', '23–29 November 2026'),
+    sources: ['cpc-price-history', 'kingautos-2026-11-fuel-price'],
     confidence: 'verified',
-    research: ['running-costs#fuel-95-current'],
-    note: t('中油95無鉛參考牌價；11月23日起的價格未能查到。', 'CPC 95 unleaded reference price; the price from 23 November could not be found.'),
+    research: ['energy-prices-r2#cpc-current-2026-11-23', 'energy-prices-r2#cpc-flat-since-oct-12'],
+    note: t('中油95無鉛參考牌價，自10月12日起連續七週未調整；2026年1月時只有27.9元。', 'CPC 95 unleaded reference price, unchanged for seven weeks since 12 October; in January 2026 it was only NT$27.9.'),
   },
   petrol92: {
     value: 31.2,
-    week: t('2026年11月16日至22日', '16–22 November 2026'),
-    sources: ['kingautos-2026-11-fuel-price'],
+    week: t('2026年11月23日至29日', '23–29 November 2026'),
+    sources: ['cpc-price-history'],
     confidence: 'verified',
-    research: ['running-costs#fuel-92-current'],
+    research: ['energy-prices-r2#cpc-92-current-2026-11-23'],
   },
   smoothing: {
     low: 6.0,
@@ -199,12 +253,12 @@ export const fuel: FuelPrices = {
     high: 11.6,
     typicalBasis: t('採用油價那一週吸收的金額（政府貨物稅3.7元加中油2.3元）；11月初曾高達11.6元。', 'The amount absorbed in the week whose price we use (3.7 goods-tax cut plus 2.3 from CPC); it was as high as 11.6 in early November.'),
     mechanism: t(
-      '政府擴大貨物稅減徵並由中油加碼吸收（專案平穩機制），自2026年2月底起實施，沒有公布結束日期；取消後汽油每公升約貴6至12元。',
-      'A wider goods-tax cut plus extra absorption by CPC (a special smoothing programme) since late February 2026, with no published end date; without it petrol would cost about NT$6–12 more per litre.',
+      '政府擴大貨物稅減徵並由中油加碼吸收（專案平穩機制），自2026年2月底起實施；其中汽油貨物稅減徵目前延長到2027年3月31日，中油的部分逐週決定。取消後汽油每公升約貴6至12元。',
+      'A wider goods-tax cut plus extra absorption by CPC (a special smoothing programme) since late February 2026; the gasoline goods-tax part currently runs to 31 March 2027 and CPC\'s part is set week by week. Without it petrol would cost about NT$6–12 more per litre.',
     ),
-    sources: ['kingautos-2026-11-fuel-price', 'cna-2026-10-fuel-smoothing'],
+    sources: ['ey-2026-11-fuel-prices', 'ey-fuel-goods-tax-cut-round-18', 'cna-2026-10-fuel-smoothing'],
     confidence: 'verified',
-    research: ['running-costs#fuel-smoothing-mechanism'],
+    research: ['outlook-2027-r2#s2-petrol-absorbed-per-litre', 'outlook-2027-r2#s2-petrol-goods-tax-cut-expiry', 'running-costs#fuel-smoothing-mechanism'],
   },
   realWorldKmPerL: {
     value: 45,
@@ -220,24 +274,24 @@ export const fuel: FuelPrices = {
 
 export const electricity: ElectricityPrices = {
   summer: [
-    { upToKwh: 120, rate: 1.68 },
-    { upToKwh: 330, rate: 2.45 },
-    { upToKwh: 500, rate: 3.7 },
-    { upToKwh: 700, rate: 5.04 },
-    { upToKwh: 1000, rate: 6.24 },
-    { upToKwh: null, rate: 8.46 },
+    { upToKwh: 120, rate: 1.78 },
+    { upToKwh: 330, rate: 2.55 },
+    { upToKwh: 500, rate: 3.8 },
+    { upToKwh: 700, rate: 5.14 },
+    { upToKwh: 1000, rate: 6.44 },
+    { upToKwh: null, rate: 8.86 },
   ],
   nonSummer: [
-    { upToKwh: 120, rate: 1.68 },
-    { upToKwh: 330, rate: 2.16 },
-    { upToKwh: 500, rate: 3.03 },
-    { upToKwh: 700, rate: 4.14 },
-    { upToKwh: 1000, rate: 5.07 },
-    { upToKwh: null, rate: 6.63 },
+    { upToKwh: 120, rate: 1.78 },
+    { upToKwh: 330, rate: 2.26 },
+    { upToKwh: 500, rate: 3.13 },
+    { upToKwh: 700, rate: 4.24 },
+    { upToKwh: 1000, rate: 5.27 },
+    { upToKwh: null, rate: 7.03 },
   ],
   reviewNote: t('2026年9月電價審議會決議暫時凍漲，延至12月審議；2027年電價可能調整。', 'The September 2026 review froze tariffs and deferred the decision to December; 2027 tariffs may change.'),
-  sources: ['kikinote-2026-05-electricity-tariff', 'wantrich-2026-09-tariff-freeze'],
+  sources: ['tvbs-2026-electricity-tariff', 'wantrich-2026-09-tariff-freeze'],
   confidence: 'secondary',
-  research: ['running-costs#tariff-summer-tiers', 'running-costs#tariff-nonsummer-tiers', 'running-costs#tariff-freeze'],
-  note: t('級距表取自部落格，台電官網當時無法開啟。', 'Tier table from a blog; the Taipower site could not be opened at the time.'),
+  research: ['energy-prices-r2#tariff-nonsummer-2026', 'energy-prices-r2#tariff-summer-2026', 'running-costs#tariff-freeze'],
+  note: t('2026年4月起的級距，取自兩家媒體報導；台電官網未能開啟。', 'Tiers from April 2026 as reported by two media outlets; the Taipower site could not be opened.'),
 };

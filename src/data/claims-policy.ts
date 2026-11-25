@@ -617,6 +617,43 @@ export const claimRules = {
     sources: ['who-2018-child-health'],
     research: '03 §5',
   },
+
+  // -------------------------------------------------------------------------
+  // economics
+  // -------------------------------------------------------------------------
+  'econ-headline-maximums-not-typical': {
+    kind: 'qualifier',
+    topic: 'economics',
+    rule: t(
+      '城市公布的「最高補助」（臺北49,300元、新北39,600元、桃園44,000元等）只能連同條件一起出現：通常需要淘汰二行程機車、家中有幼兒或低收入，且名額有限。',
+      'City "up to" totals (Taipei NT$49,300, New Taipei NT$39,600, Taoyuan NT$44,000 and so on) may appear only with their conditions: they usually need a two-stroke to scrap, a young child or low income, and places are limited.',
+    ),
+    instead: t('以試算器算出讀者自己的金額，或寫出一般情況（例如臺北沒有孩子、汰換四行程約38,300元）。', 'Use the calculator for the reader\'s own amount, or give the ordinary case (for example about NT$38,300 in Taipei without a child, replacing a four-stroke).'),
+    why: t('研究顯示這些合計是少數人才符合的最佳情況，新北的39,600元還需要兩輛舊車與已額滿的早鳥名額。', 'The research shows these totals are best cases few people meet; New Taipei\'s also needs two old scooters and an early-bird quota that is full.'),
+    patterns: { 'zh-TW': ['4萬9,?300|49,?300', '3萬9,?600|39,?600', '4萬4|44,?000'], en: ['49,?300', '39,?600', '44,?000'] },
+    facts: ['econ-taipei-max-subsidy'],
+    sources: ['taipei-dep-2026-11-20-press', 'tvbs-health-2026-01-subsidy', 'taoyuan-epb-2026-programme'],
+    research: 'econ/taipei#tpe-max-replace, econ/new-taipei#ntpc-best-case-total, econ/taoyuan#ty-max-total',
+  },
+  'econ-electric-not-always-cheaper-to-run': {
+    kind: 'do-not-claim',
+    topic: 'economics',
+    rule: t('不可說電動機車「一定比較省」或「養車更便宜」：換電月租對騎得少的人比油錢貴。', 'Do not say electric scooters are always cheaper to run: for low-mileage riders a swap subscription costs more than fuel.'),
+    instead: t('能在家充電的車款電費遠低於油錢；換電方案是否划算取決於里程與換電時段。', 'Home charging costs far less than fuel; whether a swap plan pays off depends on mileage and when you swap.'),
+    why: t('每月300公里時新款125cc油錢約160至220元，換電月租488元起；交通部調查電動機車車主每年的油電支出也比燃油車主高。', 'At 300 km a month a modern 125cc uses about NT$160–220 of fuel while swap plans start at NT$488; in the MOTC survey electric owners also spend more a year on energy than gasoline owners.'),
+    patterns: { 'zh-TW': ['(電動|電車).{0,10}(一定|絕對|都)(比較)?(省|便宜)'], en: ['electric.{0,30}(always|definitely) cheaper to run'] },
+    facts: ['econ-swap-vs-petrol-low-mileage', 'econ-motc-annual-spend'],
+    research: 'econ/running-costs#swap-vs-petrol-lowmileage',
+  },
+  'econ-domestic-cell-bonus-unproven': {
+    kind: 'do-not-claim',
+    topic: 'economics',
+    rule: t('不可把經濟部國產電池芯加碼3,000元算進任何車款的補助：查不到任何車款被列為符合。', 'Do not count the MOEA NT$3,000 Taiwan-made cell bonus for any model: no model could be shown to qualify.'),
+    why: t('經濟部表格列有這項加碼，但補助車款篩選結果為零，Gogoro自己的補助試算也沒有這一項。', 'The MOEA table lists the bonus, but the approved-model filter returns no qualifying model and Gogoro\'s own calculator omits it.'),
+    patterns: { 'zh-TW': ['國產電池芯', '11,000元'], en: ['domestic(-| )cell', 'NT\\$11,000'] },
+    facts: ['econ-central-subsidy-2026'],
+    research: 'econ/gogoro-official-r2#moea-domestic-battery-bonus-gogoro',
+  },
 } satisfies Record<string, ClaimRule>;
 
 export type ClaimRuleId = keyof typeof claimRules;

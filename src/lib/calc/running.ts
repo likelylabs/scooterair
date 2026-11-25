@@ -103,7 +103,7 @@ function schedule(items: { monthly: Bounds; months?: number; startMonth?: number
   return out;
 }
 
-function finish(side: 'electric' | 'gasoline', items: CostItem[], raw: { monthly: Bounds; months?: number; ongoing: boolean }[], upfront: number, km: number, horizon: number): RunningCosts {
+function finish(side: 'electric' | 'gasoline', items: CostItem[], raw: { monthly: Bounds; months?: number; startMonth?: number; ongoing: boolean }[], upfront: number, km: number, horizon: number): RunningCosts {
   const sched = schedule(raw, horizon);
   const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
   const monthly = round(add(...raw.filter((r) => r.ongoing).map((r) => r.monthly)));
@@ -129,7 +129,7 @@ export function electricRunning(s: Situation, data: EconDataset, horizon: number
   if (!model.plans.includes(plan.id)) throw new Error(`[calc] Plan "${plan.id}" does not fit model "${model.id}"`);
   const km = s.monthlyKm;
   const items: CostItem[] = [];
-  const raw: { monthly: Bounds; months?: number; ongoing: boolean }[] = [];
+  const raw: { monthly: Bounds; months?: number; startMonth?: number; ongoing: boolean }[] = [];
   const energy = evEnergy(model, plan, km, offWindowShare);
   const planSrc = { sources: plan.sources, confidence: plan.confidence };
   const energySrc = { sources: [...plan.sources, ...model.efficiency.sources].filter((x, i, a) => a.indexOf(x) === i), confidence: plan.confidence === 'secondary' || model.efficiency.confidence === 'secondary' ? ('secondary' as const) : ('verified' as const) };
@@ -152,13 +152,22 @@ export function electricRunning(s: Situation, data: EconDataset, horizon: number
   let upfront = 0;
   if (plan.setupFee) {
     const months = plan.lockInMonths ?? 24;
-    const per = plan.setupFee.value / months;
-    upfront = plan.setupFee.value;
+    const fee = plan.setupFee.value;
+    const per = fee / months;
+    upfront = fee;
+    const renewals: number[] = [];
+    if (plan.setupFeeRenews) for (let m = months + 1; m <= horizon; m += months) renewals.push(m);
+    for (const m of renewals) raw.push({ monthly: b(fee, fee, fee), months: 1, startMonth: m, ongoing: false });
     items.push(
       item('setup-fee', t('設定費（攤提於綁約期）', 'Setup fee (spread over the contract)'), b(per, per, per), { sources: plan.setupFee.sources, confidence: plan.setupFee.confidence }, {
         months,
-        paidUpfront: plan.setupFee.value,
-        note: t(`開通時一次付清${ntd(plan.setupFee.value)['zh-TW']}；這裡把它平均攤在${months}個月綁約期顯示，累計花費則算在購車當月。`, `Paid once at activation (${ntd(plan.setupFee.value).en}); shown here spread over the ${months}-month contract, and counted at purchase in the cumulative cost.`),
+        paidUpfront: fee,
+        note: renewals.length
+          ? t(
+              `開通時付${ntd(fee)['zh-TW']}，每${months}個月續約時再付一次（試算期內第${renewals.join('、')}個月）；這裡平均攤在綁約期顯示，累計花費則算在實際付款的月份。`,
+              `${ntd(fee).en} at activation and again at each ${months}-month renewal (month${renewals.length > 1 ? 's' : ''} ${renewals.join(', ')} within the horizon); shown here spread over the contract, and counted in the month it is paid in the cumulative cost.`,
+            )
+          : t(`開通時一次付清${ntd(fee)['zh-TW']}；這裡把它平均攤在${months}個月綁約期顯示，累計花費則算在購車當月。`, `Paid once at activation (${ntd(fee).en}); shown here spread over the ${months}-month contract, and counted at purchase in the cumulative cost.`),
       }),
     );
   }
