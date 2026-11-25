@@ -41,7 +41,7 @@ const hasCredits = Astro.slots.has('credits');
       <div class="site-footer__data">
         <h2 class="eyebrow">{ui.aboutDataTitle[locale]}</h2>
         <p>
-          {ui.aboutData[locale]}
+          {ui.aboutData[locale]}{' '}
           <a href={href('/sources/', locale)}>{ui.sources[locale]}</a>
         </p>
         {hasCredits && (

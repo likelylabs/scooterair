@@ -731,7 +731,7 @@ const locale = localeFromParam(Astro.params.lang);
     </Callout>
 
     <div class="sg-charts">
-      <Figure locale={locale} number={1} title={L('騎車與走路的人，|吸到的最多', 'People riding and walking |breathe the most')} subtitle={L(`各種通勤方式的平均暴露濃度（${units.ugm3}）`, `Average exposure by commuting mode (${units.ugm3})`)} caption={L('BarChart,emphasis 模式：故事裡的兩根用色，其他淡化。直線是參考值。', 'BarChart in emphasis mode: the two bars the story is about take the colour, the rest recede. The vertical line is a reference value.')} sample>
+      <Figure locale={locale} number={1} title={L('騎車與走路的人，|吸到的最多', 'People riding and walking |breathe the most')} subtitle={L(`各種通勤方式的平均暴露濃度（${units.ugm3}）`, `Average exposure by commuting mode (${units.ugm3})`)} caption={L('BarChart，emphasis 模式：故事裡的兩根用色，其他淡化。直線是參考值。', 'BarChart in emphasis mode: the two bars the story is about take the colour, the rest recede. The vertical line is a reference value.')} sample>
         <BarChart locale={locale} title={L('各種通勤方式的暴露濃度長條圖', 'Bar chart of exposure by commuting mode')} desc={L('騎機車與步行最高，捷運最低。', 'Highest when riding a scooter or walking, lowest on the metro.')} data={barData} unit={units.ugm3} emphasis reference={{ value: 15, label: L('指引值（示意）', 'Guideline (sample)') }} categoryLabel={L('通勤方式', 'Mode')} valueLabel={L('濃度', 'Concentration')} />
       </Figure>
 

@@ -66,7 +66,9 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   });
   o.push(text('c-tick', 0, 9, prefix, `dx="${-padLeft}"`));
   for (let m = 0; m <= months; m += 12) {
-    o.push(text('c-tick', `${xp(m)}%`, TOP + H + 18, p.tickLabel(m), `text-anchor="${m === 0 ? 'start' : m === months ? 'end' : 'middle'}"`));
+    // on narrow charts only every other year is labelled, and nothing crowds the last label
+    const always = m === 0 || m === months || (m % 24 === 0 && months - m >= 24);
+    o.push(text(always ? 'c-tick' : 'c-tick c-wideonly', `${xp(m)}%`, TOP + H + 18, p.tickLabel(m), `text-anchor="${m === 0 ? 'start' : m === months ? 'end' : 'middle'}"`));
     if (m > 0 && m < months) o.push(`<line class="c-axis" x1="${xp(m)}%" x2="${xp(m)}%" y1="${TOP + H}" y2="${TOP + H + 4}"/>`);
   }
 

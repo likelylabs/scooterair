@@ -69,9 +69,15 @@
   fill: var(--ink-3);
   font-weight: 500;
 }
-/* series names beside line ends: only when the chart is wide enough */
-.chart__svg .c-endname {
+/* series names beside line ends, and in-between axis labels: only when the chart is wide enough */
+.chart__svg .c-endname,
+.chart__svg .c-wideonly {
   display: none;
+}
+@container (min-width: 30rem) {
+  .chart__svg .c-wideonly {
+    display: inline;
+  }
 }
 @container (min-width: 40rem) {
   .chart__svg .c-endname {
@@ -109,7 +115,7 @@
 .c-grid { stroke: var(--chart-grid); stroke-width: 1; }
 .c-rule { stroke: var(--ink); stroke-width: 2; }
 .c-ref-line { stroke: var(--chart-ink); stroke-width: 1.5; }
-.c-connector { stroke: var(--chart-axis); stroke-width: 1; }
+.c-connector { stroke: var(--ink-3); stroke-width: 1; }
 .c-bracket { stroke: var(--chart-ink); stroke-width: 2; stroke-linecap: round; }
 .c-cross { stroke: var(--ink-3); stroke-width: 1; pointer-events: none; }
 .c-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }

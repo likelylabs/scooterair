@@ -26,6 +26,10 @@ export interface WaterfallProps {
 const LINE = 19;
 const BAR = 16;
 
+/** Two short ticks that tie a row to the one above without running through its label. */
+const connector = (xPct: number, fromY: number, barY: number) =>
+  `<line class="c-connector" x1="${xPct}%" x2="${xPct}%" y1="${fromY}" y2="${fromY + 6}"/><line class="c-connector" x1="${xPct}%" x2="${xPct}%" y1="${barY - 6}" y2="${barY + BAR}"/>`;
+
 /**
  * Horizontal waterfall: list price → each deduction → what you pay.
  * Reads top to bottom like a receipt; every row carries its label and amount.
@@ -70,7 +74,7 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
       amount,
       false,
       (by) =>
-        `<line class="c-connector" x1="${edge}%" x2="${edge}%" y1="${from}" y2="${by + BAR}"/>` +
+        connector(edge, from, by) +
         `<rect class="c-fill-${stepTone} c-light c-mark" x="${a}%" y="${by}" width="${w}%" height="${BAR}" rx="2"/>`,
       `${s.label}: ${amount}`,
     );
@@ -83,7 +87,7 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
   const from = prevBarY + BAR;
   o.push(`<line class="c-rule" x1="0" x2="100%" y1="${y - 4}" y2="${y - 4}"/>`);
   y += 6;
-  row(p.totalLabel, money(total), true, (by) => `<line class="c-connector" x1="${edge}%" x2="${edge}%" y1="${from}" y2="${by + BAR}"/>` + hbar(totalTone, pctN(total, max), by, BAR, 'c-mark'), `${p.totalLabel}: ${money(total)}`);
+  row(p.totalLabel, money(total), true, (by) => connector(edge, from, by) + hbar(totalTone, pctN(total, max), by, BAR, 'c-mark'), `${p.totalLabel}: ${money(total)}`);
   table.push([p.totalLabel, money(total)]);
 
   // comparison + gap

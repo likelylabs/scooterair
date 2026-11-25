@@ -1,18 +1,79 @@
 ---
+/**
+ * Home — placeholder shell.
+ * The real long-form narrative is written by the page builders; this file
+ * only proves the shell: Base, the hero headline slot and the signature scene.
+ * Replace the copy, keep the structure if it helps.
+ */
 import Base from '@/layouts/Base.astro';
+import Button from '@/components/ui/Button.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import PollutantKey from '@/components/art/PollutantKey.astro';
+import Signal from '@/components/art/Signal.astro';
 import StreetScene from '@/components/art/StreetScene.astro';
-import { localeFromParam, localeStaticPaths } from '@/i18n';
-import { site } from '@/i18n/ui';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { site, ui } from '@/i18n/ui';
+
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
+const en = locale === 'en';
+
+const t = {
+  headline: en ? 'What we breathe |at the red light' : '等紅燈的時候，|我們吸進了什麼',
+  primary: en ? 'See the problem' : '看問題在哪裡',
+  secondary: en ? 'What going electric costs' : '換電動要花多少',
+};
 ---
 
 <Base locale={locale} title={site.name[locale]} home>
-  <div class="container" style="padding-block: 3rem 1rem">
-    <p class="eyebrow">{site.name[locale]}</p>
-    <h1 class="display">{site.tagline[locale]}</h1>
-    <p class="lead">{site.description[locale]}</p>
-  </div>
-  <StreetScene locale={locale} />
-  <StreetScene locale={locale} state="clean" />
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero__text">
+      <p class="eyebrow hero__kicker">
+        <Signal state="red" size="2rem" />
+        <span>{ui.phaseRed[locale]}</span>
+      </p>
+      <h1 id="hero-title" class="display"><Phrased text={t.headline} /></h1>
+      <p class="lead">{site.description[locale]}</p>
+      <div class="cluster">
+        <Button href={href('/problem/', locale)} size="lg" arrow>{t.primary}</Button>
+        <Button href={href('/electric/', locale)} size="lg" variant="secondary">{t.secondary}</Button>
+      </div>
+    </div>
+    <div class="hero__scene">
+      <StreetScene locale={locale} />
+    </div>
+    <div class="container hero__key">
+      <p class="meta">{ui.illustrative[locale]}</p>
+      <PollutantKey locale={locale} />
+    </div>
+  </section>
 </Base>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--sp-6);
+    padding-block-start: clamp(2rem, 6vw, 4.5rem);
+  }
+  .hero__text {
+    display: grid;
+    gap: var(--sp-4);
+    justify-items: start;
+  }
+  .hero__kicker::before {
+    display: none;
+  }
+  .hero__kicker {
+    color: var(--signal-red-ink);
+  }
+  .hero__scene {
+    max-inline-size: 110rem;
+    inline-size: 100%;
+    margin-inline: auto;
+    border-block-end: 1px solid var(--line);
+  }
+  .hero__key {
+    display: grid;
+    gap: var(--sp-4);
+  }
+</style>
