@@ -100,8 +100,8 @@ const H = `h${level}` as 'h3' | 'h4';
     line-height: 1;
   }
   .link--current .link__node {
-    background: var(--exhaust);
-    color: #fff;
+    background: var(--ink);
+    color: var(--bg);
   }
   .link__body {
     display: grid;
@@ -147,9 +147,9 @@ const H = `h${level}` as 'h3' | 'h4';
     stroke-linecap: round;
   }
   .link--final .link__node {
-    border-color: var(--clean);
-    background: var(--clean);
-    color: #fff;
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
   }
   .link--final .link__body {
     padding: var(--sp-4);

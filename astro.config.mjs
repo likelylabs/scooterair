@@ -7,18 +7,17 @@ const site = process.env.SITE_URL ?? 'https://scooterair.tw';
 const base = process.env.BASE_PATH ?? '/';
 
 /**
- * Noto Sans TC ships as ~100 unicode-range slices with `font-display: swap`.
- * On a slow phone that means slices pop in one by one, long after first paint.
- * We rewrite it to `fallback`: ~100ms block, ~3s swap window, after which the
- * (very good) system CJK face stays for this page view and the web font is
- * simply cached for the next one. See src/styles/fonts.css for the Latin side.
+ * The CJK display face (@fontsource/noto-sans-tc, weight 900) lists a .woff
+ * fallback beside every .woff2 slice. Every browser we support reads woff2,
+ * so drop the fallbacks instead of shipping ~100 extra files.
+ * See src/styles/fonts.css for the whole font strategy.
  */
-const cjkFontDisplay = {
-  name: 'scooterair:cjk-font-display',
+const woff2Only = {
+  name: 'scooterair:woff2-only',
   enforce: 'pre',
   transform(code, id) {
-    if (!id.includes('@fontsource-variable/noto-sans-tc') || !id.includes('.css')) return null;
-    return { code: code.replaceAll('font-display: swap', 'font-display: fallback'), map: null };
+    if (!id.includes('@fontsource/noto-sans-tc') || !id.includes('.css')) return null;
+    return { code: code.replace(/,\s*url\([^)]*\.woff\)\s*format\('woff'\)/g, ''), map: null };
   },
 };
 
@@ -32,5 +31,5 @@ export default defineConfig({
       filter: (page) => !/\/styleguide\/$/.test(page),
     }),
   ],
-  vite: { plugins: [cjkFontDisplay] },
+  vite: { plugins: [woff2Only] },
 });

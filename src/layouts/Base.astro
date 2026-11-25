@@ -18,11 +18,13 @@
  * Usage
  *   <Base locale={locale} title={t.title} description={t.description}> … </Base>
  */
-import '@fontsource-variable/noto-sans-tc/wght.css';
 import '@/styles/fonts.css';
 import '@/styles/tokens.css';
 import '@/styles/global.css';
 import archivoUrl from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+// The CJK headline font's CSS is ~100 @font-face rules. Loaded as its own
+// non-blocking stylesheet so it never delays first paint (see fonts.css).
+import cjkDisplayCss from '@fontsource/noto-sans-tc/900.css?url';
 
 import { asset, htmlLang, locales, switchLocalePath, type Locale } from '@/i18n';
 import { site, ui } from '@/i18n/ui';
@@ -100,6 +102,12 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
     <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={asset('/apple-touch-icon.png')} />
     <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
+    {locale === 'zh-TW' && (
+      <Fragment>
+        <link rel="stylesheet" href={cjkDisplayCss} media="print" onload={"this.media='all'"} />
+        <noscript><link rel="stylesheet" href={cjkDisplayCss} /></noscript>
+      </Fragment>
+    )}
     <link rel="sitemap" href={asset('/sitemap-index.xml')} />
     <slot name="head" />
   </head>

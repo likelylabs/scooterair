@@ -18,6 +18,7 @@ import '@/styles/charts.css';
 import type { Locale } from '@/i18n';
 import { ui } from '@/i18n/ui';
 import { chartHtml, type ChartRender } from './core/shared';
+import { uid as makeId } from '@/components/uid';
 
 interface Props {
   render: ChartRender;
@@ -28,7 +29,7 @@ interface Props {
   class?: string;
 }
 const { render, title, desc, locale, id, class: cls } = Astro.props;
-const uid = id ?? `chart-${Math.random().toString(36).slice(2, 8)}`;
+const uid = id ?? makeId('chart');
 const tableLabel = ui.dataTable[locale];
 ---
 

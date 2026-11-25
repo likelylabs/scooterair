@@ -54,6 +54,9 @@ body {
 main {
   flex: 1;
 }
+main:focus {
+  outline: none; /* focus target of the skip link */
+}
 
 /* Elements that carry a lang attribute re-resolve the font stack, so mixed
    fragments get the right punctuation and metrics. */
@@ -120,6 +123,15 @@ h4,
   /* Chromium breaks Japanese at phrase boundaries with this; harmless
      elsewhere. For Chinese headlines use <Phrased> to mark phrase units. */
   word-break: auto-phrase;
+}
+
+.display,
+h1,
+h2,
+.h1,
+.h2 {
+  /* the only places the CJK web font (weight 900) is used */
+  font-family: var(--font-heading);
 }
 
 .display {

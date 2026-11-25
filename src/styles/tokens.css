@@ -132,9 +132,13 @@
 
   /* ---- 4. Type scale ---------------------------------------------------- */
   --font-latin: 'Archivo';
-  --font-cjk: 'Noto Sans TC Variable', 'PingFang TC', 'Noto Sans CJK TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  /* system CJK for body text; the web font is for headlines only (see fonts.css) */
+  --font-cjk: 'PingFang TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', sans-serif;
+  --font-cjk-display: 'Noto Sans TC', var(--font-cjk);
   --font-zh: var(--font-latin), var(--font-cjk);
   --font-en: var(--font-latin), 'Archivo Punct', 'Helvetica Neue', Arial, var(--font-cjk);
+  --font-zh-display: var(--font-latin), var(--font-cjk-display);
+  --font-en-display: var(--font-latin), 'Archivo Punct', 'Helvetica Neue', Arial, var(--font-cjk-display);
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
 
   --fs-xs: 0.8125rem; /* 13 — the floor; CJK is illegible below this */
@@ -342,6 +346,7 @@
  */
 :lang(zh) {
   --font-body: var(--font-zh);
+  --font-heading: var(--font-zh-display);
   --lh-body: 1.8; /* CJK needs air: full-height glyphs, no ascender rhythm */
   --lh-snug: 1.55;
   --lh-heading: 1.3;
@@ -355,6 +360,7 @@
 
 :lang(en) {
   --font-body: var(--font-en);
+  --font-heading: var(--font-en-display);
   --lh-body: 1.6;
   --lh-snug: 1.4;
   --lh-heading: 1.12;

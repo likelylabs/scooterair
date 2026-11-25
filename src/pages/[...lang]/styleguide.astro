@@ -308,7 +308,7 @@ const locale = localeFromParam(Astro.params.lang);
   </Section>
 
   <!-- ================================================================ TYPE -->
-  <Section id="type" eyebrow="04" title={L('文字', 'Typography')} tone="sunken" lead={L('中文用思源黑體（Noto Sans TC）可變字型，拉丁字母與數字用 Archivo。一套字、兩種寬度：英文標題與大數字用窄體，像路面上拉長的標字。', 'Chinese is set in Noto Sans TC (variable); Latin letters and figures in Archivo. One family, two widths: English headlines and big numbers are condensed, like elongated lettering on a road.')}>
+  <Section id="type" eyebrow="04" title={L('文字', 'Typography')} tone="sunken" lead={L('中文內文用讀者手機裡的系統字型，零下載；只有大標題用思源黑體（Noto Sans TC）最粗的 Black。拉丁字母與數字用 Archivo：一套字、兩種寬度，英文標題與大數字用窄體，像路面上拉長的標字。', 'Chinese body text uses the reader’s own system font: zero download. Only headlines use Noto Sans TC Black. Latin letters and figures are Archivo: one family, two widths, with English headlines and big numbers condensed like elongated lettering on a road.')}>
     <div class="sg-type">
       {[
         ['.display', 'display', L('紅燈亮起的那一刻', 'The moment the light turns red')],
@@ -367,7 +367,7 @@ const locale = localeFromParam(Astro.params.lang);
         <table class="sg-nums"><tbody><tr><td>{L('比例', 'Proportional')}</td><td class="num" style="font-variant-numeric:proportional-nums">1,111.1</td></tr><tr><td>{L('等寬', 'Tabular')}</td><td class="num">1,111.1</td></tr><tr><td></td><td class="num">8,888.8</td></tr></tbody></table>
       </Callout>
       <Callout label={L('字型載入', 'Font loading')}>
-        <p>{L('中文字型切成約一百個 unicode-range 分片，瀏覽器只下載頁面用到的分片，並採 font-display: fallback：約三秒內沒到就沿用系統字型，不會晚到又跳動。拉丁字型只有一個檔案，預先載入並採 swap。', 'The Chinese font ships as about a hundred unicode-range slices; the browser downloads only the ones a page uses, with font-display: fallback, so a slice that has not arrived in about three seconds is skipped rather than popping in late. The Latin font is one preloaded file with swap.')}</p>
+        <p>{L('中文網路字型只用在 .display、h1、h2（字重 900）。它切成約一百個 unicode-range 分片，瀏覽器只下載標題用到的那幾片。h3 以下與所有內文都是系統字型，所以最粗只到 700。拉丁字型只有一個檔案，預先載入。', 'The Chinese web font is used only by .display, h1 and h2 (weight 900). It ships as about a hundred unicode-range slices and the browser fetches only the few a page’s headlines need. h3 and below, and all body text, are system fonts, so they stop at weight 700. The Latin font is a single preloaded file.')}</p>
       </Callout>
     </div>
   </Section>
@@ -906,6 +906,7 @@ const locale = localeFromParam(Astro.params.lang);
     gap: var(--sp-4);
   }
   .sg-wordmark {
+    font-family: var(--font-heading);
     font-size: var(--fs-3xl);
     font-weight: var(--fw-black);
     letter-spacing: 0.04em;

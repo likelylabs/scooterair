@@ -26,6 +26,7 @@
 import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { ui } from '@/i18n/ui';
+import { uid } from '@/components/uid';
 import { MOUTH, TAILPIPE, SCOOTER_LENGTH, breath, coRings, fumes, ledDigit, person, puffs, scooter, ufpDots } from './parts';
 
 interface Props {
@@ -41,8 +42,6 @@ const clean = state === 'clean';
 const alt = clean ? ui.scene.altClean[locale] : ui.scene.altRed[locale];
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-let uid = 0;
-const nextId = () => `scene-${state}-${Math.random().toString(36).slice(2, 7)}-${uid++}`;
 
 function build(v: 'wide' | 'compact') {
   const wide = v === 'wide';
@@ -53,7 +52,7 @@ function build(v: 'wide' | 'compact') {
   const STOP = wide ? 792 : 262;
   const RULER = wide ? 1218 : 588;
   const kind = clean ? 'electric' : 'gas';
-  const id = nextId();
+  const id = uid('scene');
   const o: string[] = [];
 
   // -- defs
@@ -259,7 +258,7 @@ const scenes = show.map((v) => ({ v, ...build(v) }));
   .scene :global(.scene-sign) {
     font-family: var(--font-cjk);
     font-size: 26px;
-    font-weight: 700;
+    font-weight: 600;
     fill: var(--art-line);
     opacity: 0.8;
   }
