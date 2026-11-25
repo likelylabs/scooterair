@@ -277,7 +277,7 @@ export const sources = {
     accessed: ACCESSED,
     language: 'zh-TW',
     readLevel: 'official-document-read',
-    readNote: '402 pp; read at table/summary level via pdftotext. PI 洪珮瑜 (景丰科技); IOT staff 朱珮芸, 鄔德傳, 黃士騰, 楊家銘. GPN 1011401545. No DOI. Cover: 本研究之結論與建議不代表交通部之意見.',
+    readNote: '402 pp; opened and read at table/summary level via pdftotext by the first research pass (research/02-exposure-science.md, with table and page references, e.g. Tables 4.3.2-29/-30, p.4-28). The red-light sweep (research/redlight/intersection-peaks.json) could not re-open it (host outside that session\'s network), so its findings there are UNREACHABLE; the registry keeps the first reading\'s confidence. PI 洪珮瑜 (景丰科技); IOT staff 朱珮芸, 鄔德傳, 黃士騰, 楊家銘. GPN 1011401545. No DOI. Cover: 本研究之結論與建議不代表交通部之意見.',
   },
   'mohw-cause-of-death-2025': {
     kind: 'government',

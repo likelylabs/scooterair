@@ -17,13 +17,22 @@
  *   level     heading level for the title (default 3)
  *   frame     'rule' (default) | 'none' (for illustrations)
  *   tone      colour of the top rule: 'ink' | 'exhaust' | 'clean' | 'signal'
+ *   badge     EvidenceKind (or several) shown at the start of the source line
+ *   secondary true = the figure rests on a secondary-confidence fact: adds 次級來源
+ *   empty     the empty-data state (V8): nobody has measured what this figure
+ *             would show. The 沒人量過 badge stands where the source line goes,
+ *             the caption defaults to "this is not a layout error…", and `who`
+ *             says who could measure it. Put an <EmptyChart> in the body.
+ *   who       (with `empty`) who could fill the gap, as text
  * Slots
  *   default  the chart / table / art
  *   caption  rich caption
  *   source   rich source line, e.g. <Cite variant="chip" … />
+ *   who      (with `empty`) rich "who could measure it" line, e.g. with the ask link
  */
 import type { Locale } from '@/i18n';
-import { ui } from '@/i18n/ui';
+import { emptyData, ui, type EvidenceKind } from '@/i18n/ui';
+import EvidenceBadge from './EvidenceBadge.astro';
 import Phrased from './Phrased.astro';
 import Tag from './Tag.astro';
 import { uid as makeId } from '@/components/uid';
@@ -40,16 +49,23 @@ interface Props {
   level?: 2 | 3 | 4;
   frame?: 'rule' | 'none';
   tone?: 'ink' | 'exhaust' | 'clean' | 'signal';
+  badge?: EvidenceKind | EvidenceKind[];
+  secondary?: boolean;
+  empty?: boolean;
+  who?: string;
   class?: string;
 }
-const { locale, title, subtitle, number, caption, source, sample = false, id, level = 3, frame = 'rule', tone = 'ink', class: cls } = Astro.props;
+const { locale, title, subtitle, number, source, sample = false, id, level = 3, frame = 'rule', tone = 'ink', badge, secondary = false, empty = false, who, class: cls } = Astro.props;
+const caption = Astro.props.caption ?? (empty ? emptyData.caption[locale] : undefined);
+const badges = badge ? (Array.isArray(badge) ? badge : [badge]) : [];
+const hasWho = empty && (Boolean(who) || Astro.slots.has('who'));
 const H = `h${level}` as 'h2' | 'h3' | 'h4';
 const uid = id ?? makeId('fig');
 const hasCaption = caption || Astro.slots.has('caption');
-const hasSource = source || Astro.slots.has('source');
+const hasSource = source || Astro.slots.has('source') || badges.length > 0;
 ---
 
-<figure id={id} class:list={['fig', `fig--${frame}`, `fig--${tone}`, cls]} aria-labelledby={`${uid}-t`}>
+<figure id={id} class:list={['fig', `fig--${frame}`, `fig--${tone}`, empty && 'fig--empty', cls]} aria-labelledby={`${uid}-t`}>
   <header class="fig__head">
     {(number !== undefined || sample) && (
       <p class="fig__meta">
@@ -61,15 +77,32 @@ const hasSource = source || Astro.slots.has('source');
     {subtitle && <p class="fig__sub">{subtitle}</p>}
   </header>
   <div class="fig__body"><slot /></div>
-  {(hasCaption || hasSource || sample) && (
+  {(hasCaption || hasSource || sample || empty) && (
     <figcaption class="fig__foot">
       {hasCaption && <p class="fig__caption"><slot name="caption">{caption}</slot></p>}
       {sample && <p class="fig__sample">{ui.sampleDataLong[locale]}</p>}
-      {hasSource && (
-        <p class="fig__source">
-          <span class="fig__source-label">{ui.source[locale]}</span>
-          <slot name="source">{source}</slot>
-        </p>
+      {empty ? (
+        <Fragment>
+          <p class="fig__source fig__source--empty">
+            <span class="fig__source-label">{ui.source[locale]}</span>
+            <EvidenceBadge kind="gap" locale={locale} />
+            <span>{emptyData.none[locale]}</span>
+          </p>
+          {hasWho && (
+            <p class="fig__who">
+              <span class="fig__source-label">{emptyData.who[locale]}</span>
+              <span><slot name="who">{who}</slot></span>
+            </p>
+          )}
+        </Fragment>
+      ) : (
+        hasSource && (
+          <p class="fig__source">
+            <span class="fig__source-label">{ui.source[locale]}</span>
+            {badges.map((b, i) => <EvidenceBadge kind={b} locale={locale} secondary={secondary && i === badges.length - 1} />)}
+            <slot name="source">{source}</slot>
+          </p>
+        )
       )}
     </figcaption>
   )}
@@ -166,5 +199,27 @@ const hasSource = source || Astro.slots.has('source');
   }
   .fig__source-label:lang(en) {
     text-transform: uppercase;
+  }
+  /* empty-data state: the footer is where the absence is stated, so it reads at full strength */
+  .fig--empty .fig__caption {
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+  .fig__source--empty,
+  .fig__who {
+    color: var(--ink-2);
+  }
+  .fig__who {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-1) var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--ink);
+  }
+  .fig__who .fig__source-label {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
   }
 </style>

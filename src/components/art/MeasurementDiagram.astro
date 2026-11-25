@@ -1,0 +1,199 @@
+---
+/**
+ * MeasurementDiagram — what it would take to fill the empty chart
+ * (blueprint V35, for /unmeasured/). The plan of the approach with four
+ * numbered instrument positions; a side inset with the two heights; a signal
+ * clock; and the list of what to record. Stamped 本站提議 / "Our proposal":
+ * nobody has adopted this, and the drawing says so.
+ *
+ * Props
+ *   locale  Locale
+ *   class   extra class
+ * Slots
+ *   default  optional extra note under the diagram (e.g. a link to the brief)
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+import { hatchBand } from './parts';
+import { planSvg } from './plan';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+const { locale, class: cls } = Astro.props;
+const m = art.measure;
+const plan = planSvg({ locale, labels: false, instruments: true });
+---
+
+<div class:list={['measure', cls]}>
+  <p class="measure__stamp">{m.stamp[locale]}</p>
+  <svg class="measure__plan" viewBox={plan.viewBox} role="img" aria-label={m.alt[locale]} focusable="false" set:html={plan.body} />
+
+  <div class="measure__grid">
+    <section>
+      <h4 class="measure__h">{m.whereTitle[locale]}</h4>
+      <ol class="measure__points">
+        {m.points.map((p, i) => (
+          <li><span class="measure__n" aria-hidden="true">{i + 1}</span><span>{p[locale]}</span></li>
+        ))}
+      </ol>
+    </section>
+
+    <section>
+      <h4 class="measure__h">{m.heightTitle[locale]}</h4>
+      <div class="measure__heights">
+        <svg viewBox="-34 -176 96 184" role="img" aria-label={`${m.heightLow[locale]} ${m.heightHigh[locale]}`} focusable="false">
+          <Fragment set:html={hatchBand({ x0: -34, width: 96, top: 100, pitch: 13 })} />
+          <path class="a-rule" d="M-34,0 H62"></path>
+          <path class="a-ink-s" stroke-width="4" d="M0,0 V-164 M-14,0 H14"></path>
+          <path class="a-dim" d="M0,-60 h22 M0,-150 h22"></path>
+          <circle class="a-instrument" cx="30" cy="-60" r="9"></circle>
+          <circle class="a-instrument" cx="30" cy="-150" r="9"></circle>
+        </svg>
+        <ul>
+          <li>{m.heightHigh[locale]}</li>
+          <li>{m.heightLow[locale]}</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h4 class="measure__h">{m.whatTitle[locale]}</h4>
+      <ul class="measure__what">
+        {m.what.map((w) => <li>{w[locale]}</li>)}
+      </ul>
+    </section>
+
+    <section>
+      <h4 class="measure__h">{m.clockTitle[locale]}</h4>
+      <div class="measure__clock" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <p class="measure__p">{m.clock[locale]}</p>
+    </section>
+  </div>
+  {Astro.slots.has('default') && <div class="measure__note"><slot /></div>}
+</div>
+
+<style>
+  .measure {
+    position: relative;
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-4);
+    border: var(--rule-paint) dashed var(--ink);
+    container-type: inline-size;
+  }
+  /* the stamp: this is a proposal, not anybody's programme */
+  .measure__stamp {
+    justify-self: start;
+    padding: 0.15em 0.7em;
+    border: 2.5px solid var(--signal-red-ink);
+    color: var(--signal-red-ink);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    letter-spacing: 0.12em;
+    transform: rotate(-3deg);
+  }
+  .measure__stamp:lang(en) {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .measure__plan {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+  .measure :global(.plan-n) {
+    font-size: 22px;
+  }
+  .measure__grid {
+    display: grid;
+    gap: var(--sp-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .measure__h {
+    margin-block-end: var(--sp-2);
+    padding-block-end: var(--sp-1);
+    border-block-end: 2px solid var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+  }
+  .measure__points,
+  .measure__what,
+  .measure__heights ul {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .measure__points li {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr;
+    gap: var(--sp-2);
+    align-items: start;
+  }
+  .measure__n {
+    display: grid;
+    place-items: center;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-black);
+    line-height: 1;
+  }
+  .measure__what li::before {
+    content: '';
+    display: inline-block;
+    inline-size: 0.55em;
+    block-size: 0.55em;
+    margin-inline-end: 0.55em;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+  }
+  .measure__heights {
+    display: grid;
+    grid-template-columns: 4.25rem 1fr;
+    gap: var(--sp-3);
+    align-items: center;
+  }
+  .measure__heights svg {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+  /* a signal clock: red, red, red, green — to be logged second by second */
+  .measure__clock {
+    display: grid;
+    grid-template-columns: 3fr 3fr 3fr 2fr;
+    gap: 2px;
+    block-size: 0.75rem;
+    margin-block-end: var(--sp-2);
+  }
+  .measure__clock span {
+    background: var(--signal-red);
+    background-image: repeating-linear-gradient(90deg, transparent 0 7px, var(--here) 7px 8px);
+  }
+  .measure__clock span:last-child {
+    background-color: var(--clean);
+  }
+  .measure__p {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .measure__note {
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    font-size: var(--fs-sm);
+  }
+  @media (min-width: 48em) {
+    .measure {
+      padding: var(--sp-5);
+    }
+  }
+</style>

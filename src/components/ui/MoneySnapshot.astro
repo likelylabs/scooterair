@@ -1,0 +1,19 @@
+---
+/**
+ * MoneySnapshot — prints the small JSON snapshot the date-state utility needs
+ * in the browser and loads its runtime. <Base money> renders it once per page;
+ * you should not need to place it yourself.
+ *
+ * See src/lib/site-state.ts for the states and for how a static page avoids
+ * showing a stale one; src/lib/site-state.client.ts for the markup contract
+ * (data-money-when / -state / -fill / -template / -if).
+ *
+ * No props.
+ */
+import { slimSnapshot, snapshot } from '@/lib/site-state.data';
+---
+
+<script type="application/json" data-money-snapshot is:inline set:html={JSON.stringify(slimSnapshot(snapshot)).replace(/</g, '\\u003c')} />
+<script>
+  import '@/lib/site-state.client';
+</script>

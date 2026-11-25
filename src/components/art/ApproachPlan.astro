@@ -1,0 +1,103 @@
+---
+/**
+ * ApproachPlan — the plan of one approach to the crossing (blueprint V6).
+ * The same crossing as StreetScene, from above, traffic running left to
+ * right: stop box (2.5–6 m deep by rule) → stop line → crosswalk → 50 cm or
+ * more → two-stage turn box, with the corner where the yellow cap waits at
+ * the bottom right. Each gasoline scooter carries one exhaust-coloured mark,
+ * at its tail, and nothing else in the drawing is exhaust-coloured.
+ *
+ * What the reader should take from it: the rules allow tailpipes this close
+ * to where people walk. The geometry and its sources are documented in
+ * plan.ts.
+ *
+ * Props
+ *   locale   Locale
+ *   kind     'gas' (default) | 'electric'
+ *   labels   zone names and the two dimensions (default true)
+ *   caption  the line under the drawing; default: "50 cm is the minimum the
+ *            rule sets…". Pass false to drop it.
+ *   class    extra class
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+import { planSvg } from './plan';
+
+interface Props {
+  locale: Locale;
+  kind?: 'gas' | 'electric';
+  labels?: boolean;
+  caption?: string | false;
+  class?: string;
+}
+const { locale, kind = 'gas', labels = true, class: cls } = Astro.props;
+const caption = Astro.props.caption ?? art.plan.caption[locale];
+const plan = planSvg({ locale, kind, labels });
+---
+
+<div class:list={['plan', cls]}>
+  <svg class="plan__svg" viewBox={plan.viewBox} role="img" aria-label={art.plan.alt[locale]} focusable="false" set:html={plan.body} />
+  <p class="plan__foot">
+    {kind === 'gas' && (
+      <span class="plan__key"><svg viewBox="0 0 30 14" width="30" height="14" aria-hidden="true"><circle class="a-exh" cx="24" cy="7" r="5" /><path class="a-ribbon-s" d="M19,7 q-5,-4 -9,0 t-8,0" /></svg>{art.plan.tails[locale]}</span>
+    )}
+    {caption && <span>{caption}</span>}
+    <span class="plan__tag">{art.illustration[locale]}</span>
+  </p>
+</div>
+
+<style>
+  .plan {
+    container-type: inline-size;
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .plan__svg {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+  /* drawing units are 2 cm; these steps keep in-plan text near 12–13px */
+  .plan :global(.plan-t) {
+    font-size: 27px;
+  }
+  .plan :global(.plan-t--strong) {
+    font-size: 29px;
+    font-weight: 900;
+  }
+  @container (min-width: 34rem) {
+    .plan :global(.plan-t) {
+      font-size: 19px;
+    }
+    .plan :global(.plan-t--strong) {
+      font-size: 21px;
+    }
+  }
+  @container (min-width: 52rem) {
+    .plan :global(.plan-t) {
+      font-size: 14px;
+    }
+    .plan :global(.plan-t--strong) {
+      font-size: 16px;
+    }
+  }
+  .plan__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .plan__key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+  }
+  .plan__tag {
+    color: var(--ink-3);
+  }
+</style>

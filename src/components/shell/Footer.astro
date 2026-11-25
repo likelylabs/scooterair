@@ -1,6 +1,7 @@
 ---
 /**
- * Footer — zebra strip, wordmark + tagline, nav, "about this data" line and a
+ * Footer — zebra strip, wordmark + tagline, nav (the primary items plus the
+ * footer-only ones: 資料來源, 關於, 修改紀錄), "about this data" line and a
  * credits slot.
  *
  * Props
@@ -9,7 +10,7 @@
  *   credits  optional credits / partner line (plain inline content)
  */
 import { href, htmlLang, switchLocalePath, type Locale } from '@/i18n';
-import { nav, site, ui } from '@/i18n/ui';
+import { footerNav, nav, site, ui } from '@/i18n/ui';
 import Wordmark from './Wordmark.astro';
 
 interface Props {
@@ -32,7 +33,7 @@ const hasCredits = Astro.slots.has('credits');
       <nav class="site-footer__nav" aria-label={ui.footerNav[locale]}>
         <ul>
           <li><a href={href('/', locale)}>{ui.home[locale]}</a></li>
-          {nav.map((item) => (
+          {[...nav, ...footerNav].map((item) => (
             <li><a href={href(item.path, locale)}>{item.label[locale]}</a></li>
           ))}
         </ul>

@@ -1,44 +1,76 @@
 ---
 /**
- * SceneCompare — the red-light moment, before and after: the same crossing
- * with gasoline scooters and with electric ones. A two-option switch (plain
- * radio buttons, so it works without JavaScript) swaps the scene.
+ * SceneCompare — the same red light, twice (blueprint V16): frame K1 with
+ * gasoline scooters and frame K5 with electric ones, swapped by a two-option
+ * switch (plain radio buttons, so it works without JavaScript), and under it
+ * the ledger of what the switch does and does not change:
+ *
+ *   消失的 / Gone             this row's CO, fuel vapour and benzene at the crossing
+ *   留下的 / Still here       tyre, brake and road dust; the cars and buses alongside
+ *   搬走的 / Moved elsewhere  the emissions from generating the electricity
  *
  * Props
  *   locale   Locale
  *   name     radio group name; must be unique per page (default 'scene-compare')
- *   initial  'red' | 'clean' (default 'red')
- *   labels   passed to StreetScene
+ *   initial  'pack' | 'clean' (default 'pack'; the old 'red' is accepted)
+ *   count    LED number shown in both frames (default 90)
+ *   labels   in-frame labels (default true)
+ *   ledger   show the three-column ledger (default true)
  *   class    extra class
+ * Slots
+ *   ledger   replaces the default ledger content (e.g. to add <Cite> chips)
  */
 import type { Locale } from '@/i18n';
-import { ui } from '@/i18n/ui';
+import { art } from '@/i18n/art';
 import StreetScene from './StreetScene.astro';
 
 interface Props {
   locale: Locale;
   name?: string;
-  initial?: 'red' | 'clean';
+  initial?: 'pack' | 'clean' | 'red';
+  count?: number;
   labels?: boolean;
+  ledger?: boolean;
   class?: string;
 }
-const { locale, name = 'scene-compare', initial = 'red', labels = true, class: cls } = Astro.props;
+const { locale, name = 'scene-compare', initial = 'pack', count, labels = true, ledger = true, class: cls } = Astro.props;
+const c = art.compare;
+const cols = [
+  { key: 'gone', ...c.gone },
+  { key: 'stays', ...c.stays },
+  { key: 'moved', ...c.moved },
+];
 ---
 
 <div class:list={['compare', cls]}>
   <fieldset class="compare__switch">
-    <legend class="compare__legend">{ui.scene.compareLegend[locale]}</legend>
+    <legend class="compare__legend">{c.legend[locale]}</legend>
     <label class="compare__opt compare__opt--red">
-      <input type="radio" name={name} value="red" checked={initial === 'red'} />
-      <span>{ui.scene.red[locale]}</span>
+      <input type="radio" name={name} value="pack" checked={initial !== 'clean'} />
+      <span>{c.gas[locale]}</span>
     </label>
     <label class="compare__opt compare__opt--clean">
       <input type="radio" name={name} value="clean" checked={initial === 'clean'} />
-      <span>{ui.scene.clean[locale]}</span>
+      <span>{c.electric[locale]}</span>
     </label>
   </fieldset>
-  <div class="compare__scene compare__scene--red"><StreetScene locale={locale} state="red" labels={labels} /></div>
-  <div class="compare__scene compare__scene--clean"><StreetScene locale={locale} state="clean" labels={labels} /></div>
+  <div class="compare__scene compare__scene--pack"><StreetScene locale={locale} frame="pack" count={count} labels={labels} /></div>
+  <div class="compare__scene compare__scene--clean"><StreetScene locale={locale} frame="clean" count={count} labels={labels} /></div>
+  {ledger && (
+    <div class="compare__ledger">
+      <slot name="ledger">
+        <p class="compare__ledger-title">{c.ledgerTitle[locale]}</p>
+        <dl class="compare__cols">
+          {cols.map((col) => (
+            <div class={`compare__col compare__col--${col.key}`}>
+              <dt>{col.title[locale]}</dt>
+              <dd>{col.body[locale]}</dd>
+            </div>
+          ))}
+        </dl>
+      </slot>
+    </div>
+  )}
 </div>
 
 <style>
@@ -109,13 +141,58 @@ const { locale, name = 'scene-compare', initial = 'red', labels = true, class: c
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
-  /* The radios decide which scene shows. Both stay in the DOM. */
+  /* The radios decide which frame shows. Both stay in the DOM. */
   .compare__scene {
     grid-area: 2 / 1;
     min-inline-size: 0;
   }
-  .compare:has(input[value='red']:checked) .compare__scene--clean,
-  .compare:has(input[value='clean']:checked) .compare__scene--red {
+  .compare:has(input[value='pack']:checked) .compare__scene--clean,
+  .compare:has(input[value='clean']:checked) .compare__scene--pack {
     visibility: hidden;
+  }
+
+  /* the ledger: three columns, told apart by their rule as well as their words */
+  .compare__ledger {
+    margin: var(--sp-5) var(--gutter) 0;
+  }
+  .compare__ledger-title {
+    margin-block-end: var(--sp-3);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .compare__cols {
+    display: grid;
+    gap: var(--sp-4) var(--sp-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    margin: 0;
+  }
+  .compare__col {
+    padding-block-start: var(--sp-2);
+    border-block-start: var(--rule-paint) solid var(--ink);
+  }
+  .compare__col dt {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-snug);
+  }
+  .compare__col dd {
+    margin: 0.2em 0 0;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .compare__col--gone {
+    border-block-start-color: var(--clean);
+  }
+  .compare__col--gone dt {
+    text-decoration: line-through;
+    text-decoration-thickness: 0.09em;
+  }
+  .compare__col--stays {
+    border-block-start-color: var(--ink);
+  }
+  .compare__col--moved {
+    border-block-start-style: dashed;
   }
 </style>

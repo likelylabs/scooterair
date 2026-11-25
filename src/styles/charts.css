@@ -130,6 +130,12 @@
 .c-link { stroke: var(--chart-neutral); stroke-width: 3; }
 .c-row:hover .c-mark { filter: brightness(1.12); }
 
+/* the empty chart: a finished frame, no marks */
+.c-icon { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.c-emptykey { stroke: var(--ink-3); stroke-width: 2; stroke-dasharray: 2 4; stroke-linecap: round; }
+.chart__svg .c-empty-note { fill: var(--ink-3); letter-spacing: 0.04em; }
+.chart--empty .c-grid { stroke: var(--chart-axis); stroke-opacity: 0.5; }
+
 /* pictogram icons reuse the illustration parts, recoloured per state */
 .c-picto--off { --art-ink: var(--chart-track); --art-deep: var(--chart-track); --art-far: var(--chart-track); --art-metal: var(--chart-track); }
 .c-picto--off :is(.a-yellow, .a-exh, .a-clean, .a-clean-s) { fill: var(--chart-track); stroke: var(--chart-track); }

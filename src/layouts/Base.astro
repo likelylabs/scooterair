@@ -6,12 +6,24 @@
  *   locale       Locale (from localeFromParam(Astro.params.lang))
  *   title        page title; the site name is appended automatically
  *   description  meta description (falls back to the site description)
- *   ogImage      path under /public for the share image (default per-locale card)
+ *   share        id of a generated share card (V44): 'home' (default), 'brief', or a
+ *                question slug ('smell', 'my-child', …). See src/lib/share-cards.ts.
+ *                Sets og:image (1200 × 630), a square second image for LINE, and the
+ *                image alt text — the card carries its caveat inside the picture.
+ *   ogImage      path under /public for a hand-made share image (overrides `share`)
  *   noindex      true for utility pages such as the styleguide
  *   home         true on the landing page: <title> is "site name — tagline"
+ *   money        true on pages with date-dependent subsidy copy (home, /electric/,
+ *                /act/): prints the date-state snapshot and loads its runtime once.
+ *                See src/lib/site-state.ts
+ *
+ * Every page gets a three-line pre-paint script that sets <html data-money-phase>
+ * from today's date, so [data-money-when] variants are right before first paint.
  *
  * Slots
  *   default  page content, rendered inside <main id="main">
+ *   rail     the countdown rail: <CountdownRail slot="rail" … />. It sits between the
+ *            header and <main>, and is the only pinned element on the site
  *   head     extra <head> tags
  *   credits  passed through to the footer credits line
  *
@@ -30,29 +42,37 @@ import { asset, htmlLang, locales, switchLocalePath, type Locale } from '@/i18n'
 import { site, ui } from '@/i18n/ui';
 import Header from '@/components/shell/Header.astro';
 import Footer from '@/components/shell/Footer.astro';
+import MoneySnapshot from '@/components/ui/MoneySnapshot.astro';
+import { prePaintScript, snapshot } from '@/lib/site-state.data';
+import { shareCard, type ShareCardId } from '@/lib/share-cards';
 
 interface Props {
   locale: Locale;
   title: string;
   description?: string;
+  share?: ShareCardId;
   ogImage?: string;
   noindex?: boolean;
   home?: boolean;
+  money?: boolean;
 }
 
-const { locale, title, description = site.description[locale], ogImage, noindex = false, home = false } = Astro.props;
+const { locale, title, description = site.description[locale], share = 'home', ogImage, noindex = false, home = false, money = false } = Astro.props;
+const hasRail = Astro.slots.has('rail');
+const card = shareCard(share, locale);
 
 const siteName = site.name[locale];
 const fullTitle = home ? `${siteName} — ${site.tagline[locale]}` : `${title} — ${siteName}`;
 const abs = (p: string) => new URL(p, Astro.site).href;
 const canonical = abs(Astro.url.pathname);
-const image = abs(asset(ogImage ?? (locale === 'en' ? '/og-en.png' : '/og-zh.png')));
+const image = abs(asset(ogImage ?? card.wide));
+const square = ogImage ? null : abs(asset(card.square));
 const ogLocale = { 'zh-TW': 'zh_TW', en: 'en_US' } as const;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
 ---
 
 <!doctype html>
-<html lang={htmlLang[locale]} id="top">
+<html lang={htmlLang[locale]} id="top" class:list={[hasRail && 'has-rail']}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -76,6 +96,7 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
         } catch (e) {}
       })();
     </script>
+    <script is:inline set:html={prePaintScript(snapshot)} />
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
@@ -92,12 +113,22 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
     <meta property="og:image" content={image} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    {!ogImage && <meta property="og:image:alt" content={card.alt} />}
+    {square && (
+      <Fragment>
+        <meta property="og:image" content={square} />
+        <meta property="og:image:width" content="1080" />
+        <meta property="og:image:height" content="1080" />
+        <meta property="og:image:alt" content={card.alt} />
+      </Fragment>
+    )}
     <meta property="og:locale" content={ogLocale[locale]} />
     <meta property="og:locale:alternate" content={ogLocale[other]} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={home ? fullTitle : title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
+    {!ogImage && <meta name="twitter:image:alt" content={card.alt} />}
 
     <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={asset('/apple-touch-icon.png')} />
@@ -114,9 +145,11 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
   <body>
     <a class="skip-link" href="#main">{ui.skipToContent[locale]}</a>
     <Header locale={locale} />
+    <slot name="rail" />
     <main id="main" tabindex="-1">
       <slot />
     </main>
+    {money && <MoneySnapshot />}
     <Footer locale={locale}>
       {Astro.slots.has('credits') && <slot name="credits" slot="credits" />}
     </Footer>

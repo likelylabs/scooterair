@@ -1,0 +1,75 @@
+---
+/**
+ * MoneyBanner — the one status line about subsidy money, for the state the
+ * reader is actually in (blueprint 4.3): before the deadline with or without
+ * city money, in the filing window, after it with nothing confirmed, or with a
+ * 2027 programme announced.
+ *
+ * Every variant is in the HTML; today's date picks one in the browser, so an
+ * old build never shows a wrong state. Without JavaScript the reader gets the
+ * `static` sentence: absolute dates and the day we checked, no day count, no
+ * claim that money is still available.
+ *
+ * Render the page with <Base money> so the browser can re-evaluate the state
+ * (it prints the snapshot and loads the runtime once per page).
+ *
+ * The city comes from any <select data-money-city> on the page (values are
+ * JurisdictionIds; use <Select … data-money-city>), so the banner, the timeline
+ * and the calculator always talk about the same city.
+ *
+ * Props
+ *   locale  Locale
+ *   tone    'plain' (default) | 'box' (a painted box, for the top of /electric/)
+ */
+import type { Locale } from '@/i18n';
+import money from '@/i18n/pages/money';
+import { fill } from '@/i18n/pages/_copy';
+import { formatDate, snapshot } from '@/lib/site-state.data';
+
+interface Props {
+  locale: Locale;
+  tone?: 'plain' | 'box';
+  class?: string;
+}
+const { locale, tone = 'plain', class: cls } = Astro.props;
+const b = money.banner;
+const checked = formatDate(snapshot.checkedOn, locale, true);
+const cityStates = ['A-city-open', 'A-city-restricted', 'A-city-unpublished', 'A-city-exhausted', 'A-city-ended', 'A-city-unknown'] as const;
+---
+
+<div class:list={['mb', `mb--${tone}`, cls]} role="status">
+  <p data-money-when="static">{fill(b.static[locale], { date: checked })}</p>
+  <p class="mb__fallback" data-money-when="A">{b['A-no-city'][locale]}</p>
+  <p data-money-state="A-no-city">{b['A-no-city'][locale]}</p>
+  {cityStates.map((id) => <p data-money-state={id} data-money-template={b[id][locale]}></p>)}
+  <p data-money-when="B">{b.B[locale]}</p>
+  <p data-money-when="C">{fill(b.C[locale], { date: checked })}</p>
+  <p data-money-when="D">{fill(b.D[locale], { date: checked })}</p>
+  <p class="mb__stale" data-money-if="stale" data-money-template={money.stale[locale]}></p>
+</div>
+
+<style>
+  .mb {
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: var(--measure);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .mb--box {
+    padding: var(--sp-4);
+    border: var(--rule-paint) solid var(--ink);
+  }
+  .mb p {
+    margin: 0;
+  }
+  .mb__stale {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-regular);
+    color: var(--exhaust-ink);
+  }
+  /* once the runtime has set a state on <html>, its variants replace the phase-only fallback */
+  :global(html[data-money-state]) .mb__fallback {
+    display: none;
+  }
+</style>

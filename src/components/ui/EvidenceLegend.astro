@@ -1,35 +1,71 @@
 ---
 /**
- * EvidenceLegend — explains the four evidence-strength levels. Show it once
- * near the first EvidenceBadge on a page (or inside the chain overview).
+ * EvidenceLegend — explains the eight evidence badges and, optionally, how
+ * each is drawn where the chain is a line. Show it once near the first
+ * EvidenceBadge on a page, on /evidence/ and on /about/.
  *
  * Props
- *   locale  Locale
- *   title   override the heading (default "證據強度 / Evidence strength")
+ *   locale   Locale
+ *   title    override the heading (default "證據類型 / Kind of evidence")
+ *   kinds    limit to some kinds, in this order (default: all eight)
+ *   lines    also show the four chain line styles (default false)
+ *   compact  badges only, no descriptions: for a tight spot under a figure
  */
 import type { Locale } from '@/i18n';
-import { evidence, type EvidenceLevel } from '@/i18n/ui';
+import { evidence, evidenceKinds, type EvidenceKind, type EvidenceLine } from '@/i18n/ui';
 import EvidenceBadge from './EvidenceBadge.astro';
 
 interface Props {
   locale: Locale;
   title?: string;
+  kinds?: EvidenceKind[];
+  lines?: boolean;
+  compact?: boolean;
   class?: string;
 }
-const { locale, title = evidence.heading[locale], class: cls } = Astro.props;
-const levels = Object.keys(evidence.levels) as EvidenceLevel[];
+const { locale, title = evidence.heading[locale], kinds = [...evidenceKinds], lines = false, compact = false, class: cls } = Astro.props;
+const lineKeys: EvidenceLine[] = ['solid-filled', 'solid-outline', 'dashed', 'open'];
 ---
 
-<div class:list={['evl', cls]}>
+<div class:list={['evl', compact && 'evl--compact', cls]}>
   <p class="eyebrow">{title}</p>
-  <dl class="evl__list">
-    {levels.map((level) => (
+  {compact ? (
+    <ul class="evl__row">
+      {kinds.map((kind) => <li><EvidenceBadge kind={kind} locale={locale} /></li>)}
+    </ul>
+  ) : (
+    <dl class="evl__list">
+      {kinds.map((kind) => (
+        <div class="evl__item">
+          <dt><EvidenceBadge kind={kind} locale={locale} /></dt>
+          <dd>{evidence.kinds[kind].help[locale]}</dd>
+        </div>
+      ))}
       <div class="evl__item">
-        <dt><EvidenceBadge level={level} locale={locale} /></dt>
-        <dd>{evidence.levels[level].help[locale]}</dd>
+        <dt><span class="evl__sec">{evidence.secondary.label[locale]}</span></dt>
+        <dd>{evidence.secondary.help[locale]}</dd>
       </div>
-    ))}
-  </dl>
+    </dl>
+  )}
+  {lines && (
+    <div class="evl__lines">
+      <p class="eyebrow">{evidence.linesHeading[locale]}</p>
+      <ul>
+        {lineKeys.map((line) => (
+          <li>
+            <svg class={`evl__line evl__line--${line}`} viewBox="0 0 64 16" width="64" height="16" aria-hidden="true" focusable="false">
+              {line === 'open' ? (
+                <Fragment><path d="M3 8h16M45 8h16" /><circle cx="23" cy="8" r="4" /><circle cx="41" cy="8" r="4" /></Fragment>
+              ) : (
+                <Fragment><path d="M3 8h58" /><circle cx="32" cy="8" r="5" /></Fragment>
+              )}
+            </svg>
+            <span>{evidence.lines[line][locale]}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
 </div>
 
 <style>
@@ -43,10 +79,68 @@ const levels = Object.keys(evidence.levels) as EvidenceLevel[];
     display: grid;
     gap: var(--sp-1);
     justify-items: start;
+    align-content: start;
   }
   .evl__item dd {
     font-size: var(--fs-xs);
     line-height: var(--lh-snug);
     color: var(--ink-2);
+  }
+  .evl__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .evl__sec {
+    display: inline-block;
+    padding: 0.1em 0.4em;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .evl__lines {
+    margin-block-start: var(--sp-5);
+    padding-block-start: var(--sp-4);
+    border-block-start: 1px solid var(--line);
+  }
+  .evl__lines ul {
+    display: grid;
+    gap: var(--sp-2) var(--sp-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .evl__lines li {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+  .evl__line {
+    flex: none;
+    fill: var(--here);
+    stroke: var(--ink);
+    stroke-width: 3;
+  }
+  .evl__line circle {
+    stroke-width: 2.5;
+  }
+  .evl__line--solid-filled circle {
+    fill: var(--ink);
+  }
+  .evl__line--dashed path {
+    stroke-dasharray: 5 4;
+  }
+  .evl__line--dashed circle {
+    stroke-dasharray: 3 2.4;
   }
 </style>

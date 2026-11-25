@@ -58,28 +58,28 @@ export const confidenceLabels: Record<Confidence, { label: L10n; description: L1
 
 export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }> = {
   'measured-tw': {
-    label: t('臺灣實測', 'Measured in Taiwan'),
-    description: t('在臺灣實際量測或以臺灣資料進行的研究。', 'Measured in Taiwan, or a study using Taiwanese data.'),
+    label: t('台灣實測', 'Measured in Taiwan'),
+    description: t('在台灣實際量測或以台灣資料進行的研究。', 'Measured in Taiwan, or a study using Taiwanese data.'),
   },
   'official-tw': {
-    label: t('臺灣官方統計', 'Official Taiwan data'),
-    description: t('臺灣政府公布的統計、排放清冊、標準或政策目標。', 'Statistics, inventories, standards or policy targets published by the Taiwanese government.'),
+    label: t('台灣官方資料', 'Official Taiwan data'),
+    description: t('台灣政府公布的統計、排放清冊、標準或政策目標。', 'Statistics, inventories, standards or policy targets published by the Taiwanese government.'),
   },
   'modelled-tw': {
-    label: t('臺灣模式推估', 'Modelled for Taiwan'),
-    description: t('以電腦模式或推估方法針對臺灣計算，並非直接量測。', 'Calculated for Taiwan with a computer model or estimation method, not measured directly.'),
+    label: t('台灣模式推估', 'Modelled for Taiwan'),
+    description: t('以電腦模式或推估方法針對台灣計算，並非直接量測。', 'Calculated for Taiwan with a computer model or estimation method, not measured directly.'),
   },
   international: {
     label: t('國際證據', 'International evidence'),
-    description: t('來自臺灣以外的證據，例如世界衛生組織、國際癌症研究機構或國外研究。', 'Evidence from outside Taiwan, such as the WHO, IARC or studies abroad.'),
+    description: t('來自台灣以外的證據，例如世界衛生組織、國際癌症研究機構或國外研究。', 'Evidence from outside Taiwan, such as the WHO, IARC or studies abroad.'),
   },
   derived: {
-    label: t('本站計算', 'Our calculation'),
+    label: t('本站計算', 'Our arithmetic'),
     description: t('由本站根據引用的數字自行計算，計算所用的數字均附出處。', 'Our own arithmetic on cited figures; every input is itself cited.'),
   },
   'market-tw': {
-    label: t('市場價格', 'Market prices'),
-    description: t('臺灣的車廠、經銷商或能源業者公布的售價、優惠與資費。', 'Prices, offers and plan terms published by Taiwanese manufacturers, dealers or energy operators.'),
+    label: t('市場公開價格', 'Published prices'),
+    description: t('台灣的車廠、經銷商或能源業者公布的售價、優惠與資費。', 'Prices, offers and plan terms published by Taiwanese manufacturers, dealers or energy operators.'),
   },
 };
 
@@ -159,6 +159,7 @@ export const units = {
   seconds: { short: t('秒', 's'), long: t('秒', 'seconds') },
   minutes: { short: t('分鐘', 'min'), long: t('分鐘', 'minutes') },
   celsius: { short: t('°C', '°C'), long: t('攝氏度', 'degrees Celsius') },
+  'correlation-r': { short: t('r', 'r'), long: t('相關係數（−1至1）', 'correlation coefficient (−1 to 1)') },
   'lifetime-excess-risk': { short: t('', ''), long: t('終身超額致癌風險指標（無單位）', 'lifetime excess cancer risk indicator (dimensionless)') },
 } as const satisfies Record<string, { short: L10n; long: L10n }>;
 

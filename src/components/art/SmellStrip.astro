@@ -1,0 +1,85 @@
+---
+/**
+ * SmellStrip — 聞得到／聞不到 (blueprint V10). Two columns with nose glyphs:
+ * a filled nose for what a smell tells you, a hollow dashed one for what it
+ * never reports. Used once, in Link 4. It ranks nothing by harm.
+ *
+ * Props
+ *   locale  Locale
+ *   class   extra class
+ * Slots
+ *   can      replaces the left body (add a <Cite> here)
+ *   cannot   replaces the right body
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+import { nose } from './parts';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+const { locale, class: cls } = Astro.props;
+const s = art.smell;
+---
+
+<div class:list={['smell', cls]}>
+  <div class="smell__cols">
+    <div class="smell__col smell__col--can">
+      <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" set:html={nose(true)} />
+      <p class="smell__title">{s.canTitle[locale]}</p>
+      <p class="smell__body"><slot name="can">{s.canBody[locale]}</slot></p>
+    </div>
+    <div class="smell__col smell__col--cannot">
+      <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" set:html={nose(false)} />
+      <p class="smell__title">{s.cannotTitle[locale]}</p>
+      <p class="smell__body"><slot name="cannot">{s.cannotBody[locale]}</slot></p>
+    </div>
+  </div>
+  <p class="smell__foot">{s.footer[locale]}</p>
+</div>
+
+<style>
+  .smell {
+    max-inline-size: 40rem;
+  }
+  .smell__cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .smell__col {
+    display: grid;
+    gap: var(--sp-1);
+    align-content: start;
+    padding: var(--sp-3) var(--sp-3) var(--sp-4);
+    border-block-start: var(--rule-paint) solid var(--ink);
+    min-inline-size: 0;
+  }
+  .smell__col--cannot {
+    border-block-start-style: dashed;
+    border-inline-start: 1px solid var(--line-strong);
+  }
+  .smell__col--can {
+    padding-inline-start: 0;
+  }
+  .smell__col svg {
+    inline-size: 3rem;
+    block-size: 3rem;
+  }
+  .smell__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-snug);
+  }
+  .smell__body {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .smell__foot {
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line-strong);
+    font-weight: var(--fw-bold);
+  }
+</style>

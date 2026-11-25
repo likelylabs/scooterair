@@ -48,8 +48,22 @@ function wheel(cx: number, hub: 'spoke' | 'motor'): string {
   return `<circle class="a-deep" cx="${cx}" cy="-24" r="24"/>${inner}`;
 }
 
-/** A seated rider with a helmet. Scooter-local coordinates. */
-export function rider(): string {
+/**
+ * A seated rider with a helmet. Scooter-local coordinates.
+ * `face: true` raises the visor and shows a face: riders are people, and one
+ * front-row rider in every pack frame is drawn this way.
+ */
+export function rider(opts: { face?: boolean } = {}): string {
+  const head = opts.face
+    ? [
+        '<circle class="a-ink" cx="83" cy="-144" r="13.5"/>',
+        // open-face helmet: the face, an eye, a mouth, and the visor pushed up
+        '<path class="a-bg" d="M85.5,-151 L97.2,-149.5 C98,-144 97.6,-139 96,-134.5 L87,-134 C85,-139 84.6,-146 85.5,-151 Z"/>',
+        '<circle class="a-ink" cx="92.6" cy="-145.2" r="1.5"/>',
+        '<path class="a-ink-s" stroke-width="1.3" d="M90.5,-138.6 q2.6,1.8 5,0.2"/>',
+        '<path class="a-ink-s" stroke-width="3" d="M84,-155.5 L100.5,-159"/>',
+      ]
+    : ['<circle class="a-ink" cx="83" cy="-144" r="13.5"/>', '<path class="a-bg" d="M88,-149 L97.5,-147 L97,-140.5 L89,-141 Z"/>'];
   return [
     // far leg / thigh and shin
     '<path class="a-ink-s" stroke-width="12" d="M66,-80 L102,-76 L112,-44"/>',
@@ -58,9 +72,7 @@ export function rider(): string {
     '<path class="a-ink-s" stroke-width="24" d="M64,-86 L76,-122"/>',
     // arm to the handlebar
     '<path class="a-ink-s" stroke-width="9" d="M78,-124 L106,-104 L137,-110"/>',
-    // helmet with a visor slot
-    '<circle class="a-ink" cx="83" cy="-144" r="13.5"/>',
-    '<path class="a-bg" d="M88,-149 L97.5,-147 L97,-140.5 L89,-141 Z"/>',
+    ...head,
   ].join('');
 }
 
@@ -69,8 +81,8 @@ export function rider(): string {
  * add brand cues. `gas` has a muffler and tailpipe; `electric` has a hub
  * motor, a light strip and nothing behind the rear wheel.
  */
-export function scooter(opts: { kind?: ScooterKind; rider?: boolean; tail?: boolean } = {}): string {
-  const { kind = 'gas', rider: withRider = false, tail = true } = opts;
+export function scooter(opts: { kind?: ScooterKind; rider?: boolean; tail?: boolean; face?: boolean } = {}): string {
+  const { kind = 'gas', rider: withRider = false, tail = true, face = false } = opts;
   const gas = kind === 'gas';
   const p: string[] = [];
 
@@ -122,7 +134,7 @@ export function scooter(opts: { kind?: ScooterKind; rider?: boolean; tail?: bool
     if (tail) p.push('<rect class="a-red" x="5" y="-77" width="4" height="6" rx="1.5"/>');
   }
 
-  if (withRider) p.push(rider());
+  if (withRider) p.push(rider({ face }));
   return p.join('');
 }
 
@@ -130,7 +142,10 @@ export function scooter(opts: { kind?: ScooterKind; rider?: boolean; tail?: bool
 /* People — signal figures                                                    */
 /* ------------------------------------------------------------------------ */
 
-export type PersonKind = 'adult' | 'adult-with-child' | 'child' | 'stroller' | 'elder';
+export type PersonKind =
+  | 'adult' | 'adult-with-child' | 'child' | 'stroller' | 'elder'
+  // added for the red-light frames
+  | 'schoolchild' | 'schoolchild-step' | 'elder-woman' | 'adult-front' | 'stroller-front';
 
 /**
  * Mouth / nose position of each figure in its local coordinates, so scenes
@@ -143,7 +158,15 @@ export const MOUTH: Record<PersonKind | 'parent', { x: number; y: number }> = {
   parent: { x: 9, y: -149 },
   stroller: { x: 73, y: -71 },
   elder: { x: 15, y: -138 },
+  schoolchild: { x: 10, y: -107 },
+  'schoolchild-step': { x: 10, y: -107 },
+  'elder-woman': { x: 15, y: -138 },
+  'adult-front': { x: 0, y: -149 },
+  'stroller-front': { x: 0, y: -66 },
 };
+
+/** Height of the stroller breathing band used across the site, in cm (international review). */
+export const STROLLER_BAND = { low: 55, high: 85 };
 
 function adult(opts: { armTo?: [number, number]; lean?: number; stride?: number; headY?: number } = {}): string {
   const { armTo, stride = 15, headY = -152 } = opts;
@@ -199,6 +222,37 @@ export function person(kind: PersonKind): string {
           '<circle class="a-deep" cx="88" cy="-9" r="9"/><circle class="a-bg" cx="88" cy="-9" r="3.5"/>',
         ].join('')
       );
+    case 'schoolchild':
+      // a primary-school child, about 120 cm: taller than the stroller band
+      return `<g transform="scale(1.11)">${child()}</g>`;
+    case 'schoolchild-step':
+      // the same child, one foot off the kerb
+      return `<g transform="scale(1.11)">${child({ step: true })}</g>`;
+    case 'elder-woman':
+      return '<circle class="a-ink" cx="2.5" cy="-146" r="5.6"/>' + person('elder');
+    case 'adult-front':
+      // walking toward the viewer: someone crossing the street the camera looks along
+      return [
+        '<path class="a-ink-s" stroke-width="11" d="M-6.5,-84 L-8,-6"/>',
+        '<path class="a-ink-s" stroke-width="11" d="M6.5,-84 L8,-6"/>',
+        '<path class="a-ink-s" stroke-width="8.5" d="M-14,-127 L-18,-88"/>',
+        '<path class="a-ink-s" stroke-width="8.5" d="M14,-127 L18,-88"/>',
+        '<path class="a-ink-s" stroke-width="27" d="M0,-126 L0,-94"/>',
+        '<circle class="a-ink" cx="0" cy="-152" r="11.5"/>',
+      ].join('');
+    case 'stroller-front':
+      // a parent pushing a stroller toward the viewer; the baby's face is at about 65 cm
+      return [
+        person('adult-front'),
+        // push bar, frame legs and wheels
+        '<path class="a-ink-s a-halo" stroke-width="4" d="M-19,-90 L-24,-62 M19,-90 L24,-62"/>',
+        '<path class="a-ink-s" stroke-width="3.5" d="M-22,-42 L-27,-12 M22,-42 L27,-12"/>',
+        '<rect class="a-deep" x="-31" y="-17" width="8" height="17" rx="3.5"/><rect class="a-deep" x="23" y="-17" width="8" height="17" rx="3.5"/>',
+        // canopy behind, tub in front, the baby between them
+        '<path class="a-far a-halo" d="M-27,-62 C-27,-96 27,-96 27,-62 Z"/>',
+        '<circle class="a-ink" cx="0" cy="-70" r="7.5"/>',
+        '<path class="a-ink a-halo" d="M-27,-63 L27,-63 L23,-44 C22,-39 18,-37 13,-37 L-13,-37 C-18,-37 -22,-39 -23,-44 Z"/>',
+      ].join('');
     case 'elder':
       return [
         '<path class="a-ink-s" stroke-width="3.5" d="M22,-82 L27,-2"/>',
@@ -211,11 +265,11 @@ export function person(kind: PersonKind): string {
   }
 }
 
-function child(opts: { armTo?: [number, number] } = {}): string {
-  const { armTo } = opts;
+function child(opts: { armTo?: [number, number]; step?: boolean } = {}): string {
+  const { armTo, step = false } = opts;
   return [
     '<path class="a-ink-s" stroke-width="8.5" d="M-1,-52 L-9,-5"/>',
-    '<path class="a-ink-s" stroke-width="8.5" d="M1,-52 L10,-5"/>',
+    step ? '<path class="a-ink-s" stroke-width="8.5" d="M1,-52 L15,-24 L19,2"/>' : '<path class="a-ink-s" stroke-width="8.5" d="M1,-52 L10,-5"/>',
     // school bag
     '<rect class="a-far" x="-17" y="-84" width="13" height="27" rx="4"/>',
     '<path class="a-ink-s" stroke-width="19" d="M0,-78 L0,-58"/>',
@@ -376,3 +430,120 @@ export function ledPath(rows: readonly string[], pitch = 2, r = 0.78, ox = 0, oy
 export function ledDigit(ch: string, pitch = 2, r = 0.78, ox = 0, oy = 0): string {
   return ledPath(DIGITS[ch] ?? DIGITS['0'], pitch, r, ox, oy);
 }
+
+/* ------------------------------------------------------------------------ */
+/* Air, second vocabulary (binding since the scientist's review)              */
+/*                                                                            */
+/* Nobody has measured what people breathe at a crossing, so nothing drawn    */
+/* here may suggest an amount or a change over time. Every function below is  */
+/* deterministic and takes no density, strength or time argument.             */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * "Exhaust present, amount not measured": a band of uniform diagonal hatching
+ * from the ground up to `top` cm, closed by a dashed upper edge. One density,
+ * everywhere, always. The hatch is the map-maker's "no data" texture: it marks
+ * where, and refuses to say how much.
+ */
+export function hatchBand(o: { x0?: number; width: number; top?: number; pitch?: number }): string {
+  const { x0 = 0, width, top = 100, pitch = 15 } = o;
+  let d = '';
+  for (let x = x0 - top; x < x0 + width; x += pitch) d += `M${n(x)},0l${top},${-top}`;
+  return `<path class="a-hatch" d="${d}"/><path class="a-hatch-edge" d="M${x0},${-top}H${x0 + width}"/>`;
+}
+
+/**
+ * The warm ribbon at a tailpipe mouth: three short strokes of fixed length
+ * (about 50 cm), drifting rearward. Place at the pipe opening. `small` is the
+ * distant car's version. There is no longer any other place warm ribbons go.
+ */
+export function ribbon(small = false): string {
+  const g = [
+    '<path d="M-2,0 q-8,-5 -16,0 t-16,0 t-16,0" stroke-width="4.2" opacity="0.95"/>',
+    '<path d="M-3,-5 q-7,-5 -14,-2 t-14,-3 t-13,-4" stroke-width="3" opacity="0.75"/>',
+    '<path d="M-3,4 q-8,3 -15,1 t-15,2" stroke-width="3" opacity="0.65"/>',
+  ].join('');
+  return `<g class="a-ribbon"${small ? ' transform="scale(0.6)"' : ''}>${g}</g>`;
+}
+
+/** Hollow rings (carbon monoxide): a fixed count, spread evenly inside the hatched band. */
+export function ringsInBand(o: { x0?: number; width: number; count: number; top?: number; seed?: number }): string {
+  const { x0 = 0, width, count, top = 100, seed = 21 } = o;
+  const r = rng(seed);
+  const cell = width / count;
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const x = x0 + cell * (i + 0.2 + r() * 0.6);
+    const y = -(12 + r() * (top - 24));
+    out += `<circle cx="${n(x)}" cy="${n(y)}" r="${n(3.6 + r() * 1.4)}"/>`;
+  }
+  return out;
+}
+
+/**
+ * Stipple (ultrafine particles in traffic): one uniform density over the whole
+ * street, top to bottom. It does not rise from the scooters and it does not
+ * change between the gasoline and the electric frame.
+ */
+export function stipple(o: { x0?: number; width: number; top: number; bottom?: number; seed?: number; cell?: number }): string {
+  const { x0 = 0, width, top, bottom = 0, seed = 33, cell = 52 } = o;
+  const r = rng(seed);
+  let d = '';
+  // jittered grid: even coverage without visible rows
+  for (let gy = top; gy < bottom; gy += cell)
+    for (let gx = x0; gx < x0 + width; gx += cell) {
+      const x = gx + r() * cell;
+      const y = gy + r() * cell;
+      const rad = 1.1 + r() * 0.5;
+      d += `M${n(x - rad)},${n(y)}a${n(rad)},${n(rad)} 0 1,0 ${n(rad * 2)},0a${n(rad)},${n(rad)} 0 1,0 ${n(-rad * 2)},0`;
+    }
+  return `<path d="${d}"/>`;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Other traffic                                                              */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * A generic car in side view, heading LEFT (so its tailpipe is at the right).
+ * Length 420 cm. Used small and pale in the far lane: other traffic is still
+ * there when the pack turns electric.
+ */
+export const CAR_TAILPIPE = { x: 418, y: -30 };
+export function car(): string {
+  return [
+    '<path class="a-ink" d="M6,-34 C2,-60 10,-76 40,-82 L112,-92 C140,-128 170,-146 214,-146 L286,-146 C318,-146 342,-128 364,-96 L398,-90 C414,-86 420,-72 418,-34 Z"/>',
+    '<path class="a-bg" d="M136,-96 C156,-122 176,-134 210,-134 L232,-134 L232,-96 Z M244,-134 L284,-134 C308,-134 326,-120 342,-96 L244,-96 Z"/>',
+    '<circle class="a-deep" cx="92" cy="-32" r="32"/><circle class="a-bg" cx="92" cy="-32" r="15"/>',
+    '<circle class="a-deep" cx="330" cy="-32" r="32"/><circle class="a-bg" cx="330" cy="-32" r="15"/>',
+  ].join('');
+}
+
+/* ------------------------------------------------------------------------ */
+/* Glyphs                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * A nose in profile on a 48 × 48 grid, facing left. `filled` = can smell it
+ * (with three ribbons arriving); hollow and dashed = cannot.
+ */
+export function nose(filled: boolean): string {
+  const shape = 'M30,5 L30,22 C30,29 16,31 16,38 C16,42 20,43.5 25,43.5 L34,43.5 C38.5,43.5 38.5,38.5 35,37.5';
+  return filled
+    ? `<path class="a-ink" d="${shape} L43,37.5 L43,5 Z"/><g class="a-ribbon"><path d="M3,30 q3,-3 6,0 t6,0" stroke-width="2.6"/><path d="M2,37 q3,-3 6,0 t6,0" stroke-width="2.6" opacity="0.8"/><path d="M5,23 q3,-3 6,0 t5,0" stroke-width="2.2" opacity="0.7"/></g>`
+    : `<path class="a-ink-s" stroke-width="2.4" stroke-dasharray="4 3.2" d="${shape}"/>`;
+}
+
+/** Rough text width in em, for laying out in-frame labels (CJK = 1, Latin ≈ 0.55). */
+export function em(text: string): number {
+  let w = 0;
+  for (const ch of text) w += ch.codePointAt(0)! >= 0x2e80 ? 1 : ch === ' ' ? 0.28 : /[A-Z0-9]/.test(ch) ? 0.64 : /[.,:;'|il]/.test(ch) ? 0.3 : 0.55;
+  return w;
+}
+
+/** Escape text for SVG. */
+export const esc = (s: string | number) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/** Build-time unique id for gradients and clip paths inside art (a counter, so builds are reproducible). */
+let artSerial = 0;
+export const artId = (prefix: string): string => `${prefix}-${(++artSerial).toString(36)}`;

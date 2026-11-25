@@ -1,62 +1,100 @@
 ---
 /**
  * ChainLink — one link of the evidence chain, as a list item inside
- * <EvidenceChain>. A numbered node on a rail, the link's claim, its
- * evidence-strength badge, a short body and its citations.
- * The final link is drawn apart from the rail, in green: it is the one the
- * reader can act on.
+ * <EvidenceChain>. A numbered node on a rail, the link's claim, its evidence
+ * badge(s), a short body and its citations.
+ *
+ * The node and the rail below it are drawn in the line style of the link's
+ * evidence (blueprint Part 2):
+ *   solid, filled   Taiwan measurements and official data
+ *   solid, outline  modelled and international
+ *   dashed          our arithmetic, our inference
+ *   open            nobody has measured it: the rail breaks, with hollow ends
+ * With two badges the stronger line is drawn; pass `line` to choose.
+ *
+ * Variants
+ *   (default)  a sourced link
+ *   final      the link you can break: detached from the rail, in green
+ *   open       the open question at the end of the chain board (V15): the rail
+ *              breaks before it, the node is a hollow "?", it wears 沒人量過
  *
  * Props
- *   locale    Locale
- *   n         link number, 1-based
- *   title     the claim (default chain.links[n-1])
- *   strength  'measured' | 'established' | 'inference' | 'gap' (omit for none)
- *   href      link the title to the chapter that argues this link
- *   final     this is the breakable link (default: n is the last link)
- *   current   highlight as "you are here"
- *   level     heading level (default 3)
+ *   locale     Locale
+ *   n          link number, 1-based
+ *   title      the claim (default chain.links[n-1])
+ *   strength   EvidenceKind or an array of them (omit for none; `open` defaults to 'gap')
+ *   secondary  the fact behind it has secondary confidence: adds 次級來源
+ *   line       override the line style: 'solid-filled' | 'solid-outline' | 'dashed' | 'open'
+ *   href       link the title to the chapter that argues this link
+ *   final      this is the breakable link (default: n is the last link, unless `open`)
+ *   open       this is the open question
+ *   current    highlight as "you are here"
+ *   level      heading level (default 3)
+ *   collapseSources  put the `cites` slot behind a 「看來源」 expander
  * Slots
  *   default  one or two sentences of body
  *   cites    one or more <Cite variant="chip" … />
  *   action   (final link) a <Button>
  */
 import type { Locale } from '@/i18n';
-import { chain, type EvidenceLevel } from '@/i18n/ui';
+import { board, chain, evidence, toEvidenceKind, type EvidenceLevel, type EvidenceLine } from '@/i18n/ui';
 import EvidenceBadge from './EvidenceBadge.astro';
 
 interface Props {
   locale: Locale;
   n: number;
   title?: string;
-  strength?: EvidenceLevel;
+  strength?: EvidenceLevel | EvidenceLevel[];
+  secondary?: boolean;
+  line?: EvidenceLine;
   href?: string;
   final?: boolean;
+  open?: boolean;
   current?: boolean;
   level?: 3 | 4;
+  collapseSources?: boolean;
   class?: string;
 }
-const { locale, n, strength, href, current = false, level = 3, class: cls } = Astro.props;
-const final = Astro.props.final ?? n === chain.links.length;
+const { locale, n, secondary = false, href, open = false, current = false, level = 3, collapseSources = false, class: cls } = Astro.props;
+const final = !open && (Astro.props.final ?? n === chain.links.length);
 const title = Astro.props.title ?? chain.links[n - 1]?.[locale] ?? '';
+const raw = Astro.props.strength ?? (open ? 'gap' : undefined);
+const kinds = (raw ? (Array.isArray(raw) ? raw : [raw]) : []).map(toEvidenceKind);
+const order: EvidenceLine[] = ['solid-filled', 'solid-outline', 'dashed', 'open'];
+const line: EvidenceLine = Astro.props.line ?? (open ? 'open' : (order.find((l) => kinds.some((k) => evidence.kinds[k].line === l)) ?? 'solid-outline'));
 const H = `h${level}` as 'h3' | 'h4';
 ---
 
-<li class:list={['link', final && 'link--final', current && 'link--current', cls]} aria-current={current ? 'step' : undefined}>
+<li class:list={['link', `link--${line}`, final && 'link--final', open && 'link--question', current && 'link--current', cls]} aria-current={current ? 'step' : undefined}>
   <div class="link__rail" aria-hidden="true">
     {final && (
       <svg class="link__cut" viewBox="0 0 24 16" width="24" height="16"><path d="M5,13 l5,-10 M14,13 l5,-10" /></svg>
     )}
-    <span class="link__node">{n}</span>
+    {open && (
+      <svg class="link__break" viewBox="0 0 24 44" width="24" height="44"><circle cx="12" cy="6" r="4.5" /><circle cx="12" cy="38" r="4.5" /></svg>
+    )}
+    <span class="link__node">{open ? '?' : n}</span>
   </div>
   <div class="link__body">
     {final && <p class="eyebrow link__flag">{chain.breakable[locale]}</p>}
+    {open && <p class="eyebrow link__flag">{board.open[locale]}</p>}
     <H class="link__title">
-      <span class="vh">{n}. </span>
+      {!open && <span class="vh">{n}. </span>}
       {href ? <a href={href}>{title}</a> : title}
     </H>
-    {strength && <p class="link__strength"><EvidenceBadge level={strength} locale={locale} /></p>}
+    {kinds.length > 0 && (
+      <p class="link__strength">{kinds.map((k, i) => <EvidenceBadge kind={k} locale={locale} secondary={secondary && i === kinds.length - 1} />)}</p>
+    )}
     {Astro.slots.has('default') && <div class="link__text"><slot /></div>}
-    {Astro.slots.has('cites') && <p class="link__cites cluster"><slot name="cites" /></p>}
+    {Astro.slots.has('cites') &&
+      (collapseSources ? (
+        <details class="link__src">
+          <summary>{board.sources[locale]}</summary>
+          <p class="link__cites cluster"><slot name="cites" /></p>
+        </details>
+      ) : (
+        <p class="link__cites cluster"><slot name="cites" /></p>
+      ))}
     {Astro.slots.has('action') && <p class="link__action"><slot name="action" /></p>}
   </div>
 </li>
@@ -70,23 +108,28 @@ const H = `h${level}` as 'h3' | 'h4';
     gap: 0 var(--sp-4);
     padding-block-end: var(--sp-6);
   }
-  /* the rail: runs from this node down to the next */
+  /* the rail: runs from this node down to the next, in this link's line style */
   .link::before {
     content: '';
     position: absolute;
     inset-block: var(--node) 0;
     inset-inline-start: calc(var(--node) / 2 - 1.5px);
-    inline-size: 3px;
-    background: var(--ink);
+    inline-size: 0;
+    border-inline-start: 3px solid var(--ink);
+  }
+  .link--dashed::before {
+    border-inline-start-style: dashed;
   }
   .link:last-child::before,
-  .link--final::before {
+  .link--final::before,
+  .link--question::before {
     display: none;
   }
   .link:last-child {
     padding-block-end: 0;
   }
   .link__node {
+    position: relative;
     display: grid;
     place-items: center;
     inline-size: var(--node);
@@ -99,9 +142,16 @@ const H = `h${level}` as 'h3' | 'h4';
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
-  .link--current .link__node {
+  .link--solid-filled .link__node {
     background: var(--ink);
     color: var(--bg);
+  }
+  .link--dashed .link__node {
+    border-style: dashed;
+  }
+  /* "you are here": a second ring, so it never fights the fill */
+  .link--current .link__node {
+    box-shadow: 0 0 0 3px var(--here), 0 0 0 6px var(--signal-red);
   }
   .link__body {
     display: grid;
@@ -120,6 +170,11 @@ const H = `h${level}` as 'h3' | 'h4';
   .link__title a {
     color: inherit;
   }
+  .link__strength {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-2);
+  }
   .link__text {
     max-inline-size: 34em;
     font-size: var(--fs-sm);
@@ -129,12 +184,30 @@ const H = `h${level}` as 'h3' | 'h4';
   .link__cites {
     --cluster: var(--sp-2);
   }
+  .link__src > summary {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2rem;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+    cursor: pointer;
+  }
+  .link__src > summary:hover {
+    color: var(--ink);
+  }
+  .link__src[open] > summary {
+    margin-block-end: var(--sp-1);
+  }
 
   /* The link you can break: detached from the rail, signal green, boxed. */
   .link--final {
     margin-block-start: var(--sp-3);
   }
-  .link--final .link__rail {
+  .link--final .link__rail,
+  .link--question .link__rail {
     position: relative;
   }
   .link__cut {
@@ -168,5 +241,44 @@ const H = `h${level}` as 'h3' | 'h4';
   }
   .link__action {
     margin-block-start: var(--sp-2);
+  }
+
+  /* The open question: the rail breaks (two hollow ends, nothing between), the node is hollow. */
+  .link--question {
+    padding-block-start: 2.75rem;
+  }
+  .link__break {
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: calc(var(--node) / 2 - 12px);
+    fill: var(--here);
+    stroke: var(--ink);
+    stroke-width: 2.5;
+  }
+  .link--question .link__node {
+    border-style: dotted;
+    background: var(--here);
+    color: var(--ink);
+    font-size: var(--fs-md);
+  }
+  .link--question .link__body {
+    padding: var(--sp-4);
+    /* open brackets: the edge is drawn only at the two ends */
+    background:
+      linear-gradient(var(--ink) 0 0) left top / 3px 100% no-repeat,
+      linear-gradient(var(--ink) 0 0) right top / 3px 100% no-repeat,
+      linear-gradient(var(--ink) 0 0) left top / 1.25rem 3px no-repeat,
+      linear-gradient(var(--ink) 0 0) left bottom / 1.25rem 3px no-repeat,
+      linear-gradient(var(--ink) 0 0) right top / 1.25rem 3px no-repeat,
+      linear-gradient(var(--ink) 0 0) right bottom / 1.25rem 3px no-repeat;
+  }
+  .link--question .link__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+  @media (forced-colors: active) {
+    .link--question .link__body {
+      border: 3px dotted CanvasText;
+    }
   }
 </style>

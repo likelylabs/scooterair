@@ -4,23 +4,41 @@
  * for the working (a <Ledger>, a chart, notes). The headline region is an
  * aria-live area so screen readers hear updates.
  *
- * Props
- *   id       id for the panel (use it to target [data-part] from your script)
- *   title    what the result is ("實際要付的價格")
- *   value    the headline number, pre-formatted
- *   prefix   small text before the number ("NT$")
- *   unit     small text after the number ("元", "個月")
- *   note     one line under the number
- *   tone     'neutral' | 'clean' | 'exhaust'
- *   sample   true = demo numbers: shows the sample-data tag
- *   locale   Locale
- * Slots
- *   default  the working: Ledger, chart, caveats
+ * Verdict states (V36). With `verdict` the panel states its answer in one
+ * sentence ABOVE the number, and takes its look from the verdict:
+ *   A  打得平                    clean tone, the green walking signal
+ *   B  買得起，但每個月多花一點    neutral tone, an "about equal" mark
+ *   C  以現在的條件，打不平        exhaust tone, a "not equal" mark, and a next-steps list
+ * The three are told apart by words and glyph as well as colour. C is a full
+ * answer, never an error: give it the `next` slot.
  *
- * Script hooks:  [data-part="value"]  [data-part="note"]
+ * Props
+ *   id        id for the panel (use it to target [data-part] from your script)
+ *   title     what the number is ("實際要付的價格")
+ *   value     the headline number, pre-formatted
+ *   prefix    small text before the number ("NT$")
+ *   unit      small text after the number ("元", "個月")
+ *   note      one line under the number
+ *   verdict   'A' | 'B' | 'C'
+ *   sentence  the verdict in one sentence (blueprint 4.3; built from engine output)
+ *   tone      'neutral' | 'clean' | 'exhaust' (ignored when `verdict` is set)
+ *   sample    true = demo numbers: shows the sample-data tag
+ *   locale    Locale
+ * Slots
+ *   default   the working: Ledger, chart, caveats
+ *   deadline  the day-count line. Rendered ONLY while the verdict is A (rule R10:
+ *             urgency is for readers for whom it adds up). Fill it from
+ *             money.dayCount and gate it on data-money-if="dayCount"
+ *   next      (verdict C) what the reader can do first: a short list
+ *
+ * Script hooks
+ *   [data-part="value"] [data-part="note"] [data-part="sentence"]
+ *   set  panel.dataset.verdict = 'A' | 'B' | 'C'  to switch state: the label,
+ *   glyph, tone and the deadline / next slots follow from CSS.
  */
 import type { Locale } from '@/i18n';
-import { ui } from '@/i18n/ui';
+import { ui, verdict as verdictText } from '@/i18n/ui';
+import Signal from '@/components/art/Signal.astro';
 import Tag from './Tag.astro';
 
 interface Props {
@@ -30,16 +48,35 @@ interface Props {
   prefix?: string;
   unit?: string;
   note?: string;
+  verdict?: 'A' | 'B' | 'C';
+  sentence?: string;
   tone?: 'neutral' | 'clean' | 'exhaust';
   sample?: boolean;
   locale: Locale;
   class?: string;
 }
-const { id, title, value, prefix, unit, note, tone = 'neutral', sample = false, locale, class: cls } = Astro.props;
+const { id, title, value, prefix, unit, note, verdict, sentence, tone = 'neutral', sample = false, locale, class: cls } = Astro.props;
+const states = ['A', 'B', 'C'] as const;
 ---
 
-<section id={id} class:list={['result', `result--${tone}`, 'tone-surface', cls]}>
+<section id={id} class:list={['result', !verdict && `result--${tone}`, 'tone-surface', cls]} data-verdict={verdict}>
   <div class="result__head" aria-live="polite" aria-atomic="true">
+    {verdict && (
+      <div class="result__verdict">
+        <p class="result__state">
+          <span class="vh">{verdictText.heading[locale]}: </span>
+          {states.map((v) => (
+            <span class="result__label" data-for={v}>
+              {v === 'A' && <Signal state="green" size="2rem" />}
+              {v === 'B' && <svg class="result__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9.5c2.7-2.6 5.3-2.6 8 0s5.300 2.600 8 0M4 15.500c2.700-2.600 5.300-2.600 8 0s5.300 2.600 8 0" /></svg>}
+              {v === 'C' && <svg class="result__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h16M4 15h16M16 4 8 20" /></svg>}
+              <span>{verdictText.labels[v][locale]}</span>
+            </span>
+          ))}
+        </p>
+        <p class="result__sentence" data-part="sentence">{sentence}</p>
+      </div>
+    )}
     <h3 class="result__title">
       <span>{title}</span>
       {sample && <Tag tone="sample">{ui.sampleData[locale]}</Tag>}
@@ -49,6 +86,13 @@ const { id, title, value, prefix, unit, note, tone = 'neutral', sample = false, 
     </p>
     <p class="result__note" data-part="note">{note}</p>
   </div>
+  {verdict && Astro.slots.has('deadline') && <div class="result__deadline" data-for="A"><slot name="deadline" /></div>}
+  {verdict && Astro.slots.has('next') && (
+    <div class="result__next" data-for="C">
+      <p class="eyebrow">{verdictText.next[locale]}</p>
+      <slot name="next" />
+    </div>
+  )}
   {Astro.slots.has('default') && <div class="result__body stack"><slot /></div>}
 </section>
 
@@ -60,11 +104,77 @@ const { id, title, value, prefix, unit, note, tone = 'neutral', sample = false, 
     padding: var(--sp-4);
     min-inline-size: 0;
   }
-  .result--clean {
+  .result--exhaust,
+  .result[data-verdict='C'] {
+    --c: var(--exhaust);
+  }
+  .result--clean,
+  .result[data-verdict='A'] {
     --c: var(--clean);
   }
-  .result--exhaust {
-    --c: var(--exhaust);
+  /* verdict: only the parts that belong to the current state are rendered */
+  .result [data-for] {
+    display: none;
+  }
+  .result[data-verdict='A'] .result__label[data-for='A'],
+  .result[data-verdict='B'] .result__label[data-for='B'],
+  .result[data-verdict='C'] .result__label[data-for='C'] {
+    display: inline-flex;
+  }
+  .result[data-verdict='A'] .result__deadline,
+  .result[data-verdict='C'] .result__next {
+    display: block;
+  }
+  .result__verdict {
+    display: grid;
+    gap: var(--sp-2);
+    margin-block-end: var(--sp-4);
+    padding-block-end: var(--sp-4);
+    border-block-end: 1px solid var(--line);
+  }
+  .result__label {
+    align-items: center;
+    gap: 0.5em;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-snug);
+  }
+  .result__glyph {
+    flex: none;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .result__sentence {
+    max-inline-size: var(--measure);
+    font-size: var(--fs-base);
+    line-height: var(--lh-snug);
+  }
+  .result__sentence:empty {
+    display: none;
+  }
+  .result__deadline,
+  .result__next {
+    margin-block-start: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .result__deadline {
+    border-inline-start: var(--rule-stop) solid var(--clean);
+    background: var(--clean-wash);
+  }
+  .result__next {
+    border: var(--rule-paint) solid var(--exhaust);
+  }
+  .result__next > :global(* + *) {
+    margin-block-start: var(--sp-2);
+  }
+  .result__next :global(ul) {
+    padding-inline-start: 1.2em;
   }
   .result__title {
     display: flex;

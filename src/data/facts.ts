@@ -69,9 +69,9 @@ export interface FactInput {
 // Shared places, periods and caveats
 // ---------------------------------------------------------------------------
 
-const TW = t('臺灣（全國）', 'Taiwan (national)');
-const TAIPEI = t('臺北市', 'Taipei City');
-const TAIPEI_METRO = t('大臺北地區', 'Taipei metropolitan area');
+const TW = t('台灣（全國）', 'Taiwan (national)');
+const TAIPEI = t('台北市', 'Taipei City');
+const TAIPEI_METRO = t('大台北地區', 'Taipei metropolitan area');
 const SIX_CITIES = t('六都', "Taiwan's six special municipalities");
 const GLOBAL = t('全球', 'Global');
 const NOT_PLACE = t('不限地區（危害分類）', 'Not place-specific (hazard classification)');
@@ -108,7 +108,7 @@ const fleet = {
     data: { total: v(14.66, 'million-vehicles'), total2023: v(14.55, 'million-vehicles') },
     display: t('1,466 萬輛', '14.66 million'),
     statement: t(
-      '2024年臺灣登記的機車達1,466萬輛，仍逐年增加。',
+      '2024年台灣登記的機車達1,466萬輛，仍逐年增加。',
       'Taiwan had 14.66 million registered motorcycles in 2024, and the number was still rising year on year.',
     ),
     period: t('2024年（民國113年）', '2024'),
@@ -177,7 +177,7 @@ const fleet = {
     data: { perHundred: v(62.7, 'per-100-people'), stock: v(14.662, 'million-vehicles') },
     display: t('每百人約 63 輛', 'about 63 per 100 people'),
     statement: t(
-      '依媒體引述的交通部統計，臺灣平均每100人擁有約63輛機車（62.7輛）。',
+      '依媒體引述的交通部統計，台灣平均每100人擁有約63輛機車（62.7輛）。',
       'According to MOTC figures reported in the media, Taiwan has about 63 registered motorcycles per 100 people (62.7).',
     ),
     period: t('2025年初（當年前兩個月）', 'Early 2025 (first two months)'),
@@ -197,17 +197,17 @@ const fleet = {
     data: { taiwan: v(60, 'per-100-people'), vietnam: v(57, 'per-100-people'), malaysia: v(44, 'per-100-people') },
     display: t('名列前茅', 'among the highest'),
     statement: t(
-      '在一份區域排名中，臺灣（每百人60輛）位居受比較國家之首，略高於越南（57輛）與馬來西亞（44輛），屬機車密度最高的國家之一。',
+      '在一份區域排名中，台灣（每百人60輛）位居受比較國家之首，略高於越南（57輛）與馬來西亞（44輛），屬機車密度最高的國家之一。',
       'In one regional ranking Taiwan (60 motorcycles per 100 people) topped the countries compared, narrowly ahead of Vietnam (57) and Malaysia (44), placing it among the countries with the highest motorcycle density.',
     ),
     period: t('排名未註明年份', 'Ranking undated'),
-    place: t('臺灣與東南亞國家', 'Taiwan and Southeast Asian countries'),
+    place: t('台灣與東南亞國家', 'Taiwan and Southeast Asian countries'),
     sources: ['tvbs-cars-vehicle-registrations-ranking'],
     locator: '「冠軍為平均每百人就持有60輛機車的台灣，排名第二、三則是機車大國越南 (57輛) 與馬來西亞 (44輛)」',
     confidence: 'secondary',
     evidence: 'international',
     caveat: t(
-      '這份排名出自TVBS引述的Seasia Stats，非官方且未註明年份；臺灣與越南只差3輛，在混用登記數與估計值的情況下差距不具意義，因此不能說臺灣是「世界最高」。60與交通部的62.7不同，是定義與時間差異。',
+      '這份排名出自TVBS引述的Seasia Stats，非官方且未註明年份；台灣與越南只差3輛，在混用登記數與估計值的情況下差距不具意義，因此不能說台灣是「世界最高」。60與交通部的62.7不同，是定義與時間差異。',
       'The ranking is Seasia Stats as cited by TVBS: unofficial and undated. The 3-point gap to Vietnam is within the uncertainty of mixing registered counts with estimates, so Taiwan cannot be called "the world\'s highest". The 60 differs from MOTC\'s 62.7 because of definition and date.',
     ),
     requiresCaveat: true,
@@ -218,7 +218,7 @@ const fleet = {
     data: { fuel: v(90.6, 'percent'), batterySwap: v(8.4, 'percent'), plugIn: v(1.0, 'percent') },
     display: t('燃油 90.6%', '90.6% fuel-powered'),
     statement: t(
-      '2024年底臺北市的機車以燃油為主（90.6%），電池交換式占8.4%，充電式占1.0%。',
+      '2024年底台北市的機車以燃油為主（90.6%），電池交換式占8.4%，充電式占1.0%。',
       'At the end of 2024, 90.6% of motorcycles in Taipei City were fuel-powered, 8.4% were battery-swap electric and 1.0% plug-in electric.',
     ),
     period: t('2024年底', 'End of 2024'),
@@ -228,7 +228,7 @@ const fleet = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '數字來自交通部「機車及自用小客車使用狀況調查」，經臺北市主計處轉載，是調查結果而非登記數。',
+      '數字來自交通部「機車及自用小客車使用狀況調查」，經台北市主計處轉載，是調查結果而非登記數。',
       'From the MOTC motorcycle and private-car usage survey as relayed by the Taipei City statistics office: a survey result, not a registration count.',
     ),
     chainLink: 1,
@@ -241,9 +241,9 @@ const fleet = {
       taipeiSalesShare: v(22.1, 'percent'),
       taipeiPenetration: v(10, 'percent'),
     },
-    display: t('臺北市 22.1%', 'Taipei 22.1%'),
+    display: t('台北市 22.1%', 'Taipei 22.1%'),
     statement: t(
-      '2025年六都電動機車市售比為7.5%、普及率6.1%；臺北市最高，市售比22.1%、普及率10%。',
+      '2025年六都電動機車市售比為7.5%、普及率6.1%；台北市最高，市售比22.1%、普及率10%。',
       'In 2025 electric models were 7.5% of new motorcycle sales across the six special municipalities, with a 6.1% penetration rate; Taipei led with a 22.1% sales share and 10% penetration.',
     ),
     period: t('2025年', '2025'),
@@ -271,7 +271,7 @@ const fleet = {
     },
     display: t('58.4% 用於通勤', '58.4% for commuting'),
     statement: t(
-      '2024年全國機車的主要用途有58.4%為通勤；六都介於高雄市57.2%到臺北市63.3%之間。',
+      '2024年全國機車的主要用途有58.4%為通勤；六都介於高雄市57.2%到台北市63.3%之間。',
       'In 2024 commuting was the main purpose of motorcycle use for 58.4% nationally; across the six special municipalities it ranged from 57.2% (Kaohsiung) to 63.3% (Taipei).',
     ),
     period: t('2024年（民國113年）', '2024'),
@@ -314,7 +314,7 @@ const fleet = {
     },
     display: t('機車 20.1%', '20.1% by motorcycle'),
     statement: t(
-      '2024年臺北市平日旅次中，機車占20.1%（2022年為22.2%），公共運輸占38.3%，步行占20.8%。',
+      '2024年台北市平日旅次中，機車占20.1%（2022年為22.2%），公共運輸占38.3%，步行占20.8%。',
       'On weekdays in 2024, 20.1% of trips in Taipei City were by motorcycle (22.2% in 2022), 38.3% by public transport and 20.8% on foot.',
     ),
     period: t('2024年9至12月平日（2022年同期比較）', 'Weekdays, Sept–Dec 2024 (compared with 2022)'),
@@ -505,7 +505,7 @@ const electric = {
     },
     display: t('約 7%（單月）', 'about 7% (one month)'),
     statement: t(
-      '2026年5月全臺機車銷量61,541輛，其中電動機車4,273輛，約占7%。',
+      '2026年5月全台機車銷量61,541輛，其中電動機車4,273輛，約占7%。',
       'In May 2026, 4,273 of the 61,541 motorcycles sold in Taiwan were electric, about 7%.',
     ),
     period: t('2026年5月（單月）', 'May 2026 (single month)'),
@@ -556,7 +556,7 @@ const policy = {
     },
     display: t('2040年 100%', '100% by 2040'),
     statement: t(
-      '臺灣2050淨零排放路徑規劃電動機車市售比在2025年達20%、2030年35%、2035年70%、2040年100%。',
+      '台灣2050淨零排放路徑規劃電動機車市售比在2025年達20%、2030年35%、2035年70%、2040年100%。',
       "Taiwan's 2050 net-zero pathway plans for electric models to reach 20% of new motorcycle sales in 2025, 35% in 2030, 70% in 2035 and 100% in 2040.",
     ),
     period: t('2025–2040年目標', 'Targets for 2025–2040'),
@@ -714,7 +714,7 @@ const emissions = {
     data: { baseYear: v(2023, 'year') },
     display: t('TEDS 13.0', 'TEDS 13.0'),
     statement: t(
-      '臺灣最新版空氣污染物排放清冊為TEDS 13.0，以2023年為基準年，於2026年1月發布。',
+      '台灣最新版空氣污染物排放清冊為TEDS 13.0，以2023年為基準年，於2026年1月發布。',
       "Taiwan's latest official air-pollutant emissions inventory is TEDS 13.0, with base year 2023, published in January 2026.",
     ),
     period: TEDS_PERIOD,
@@ -1020,7 +1020,7 @@ const emissions = {
     },
     display: t('境外約 35.1%', 'about 35.1% from abroad'),
     statement: t(
-      '環境部的模式推估顯示，臺灣空氣中的PM2.5平均約35.1%來自境外、約64.9%來自國內（各空品區不同）。',
+      '環境部的模式推估顯示，台灣空氣中的PM2.5平均約35.1%來自境外、約64.9%來自國內（各空品區不同）。',
       'MOENV modelling estimated that on average about 35.1% of the PM2.5 in Taiwan\'s air came from abroad and about 64.9% from domestic sources (varying by air basin).',
     ),
     period: t('2020年方案，使用TEDS 9.0（2013年基準）', '2020 plan, using TEDS 9.0 (2013 base)'),
@@ -1065,7 +1065,7 @@ const emissions = {
     data: { share: v(2.3, 'percent', { approx: true }), nationalMean: v(13, 'ug/m3', { approx: true }) },
     display: t('約 2.3%', 'about 2.3%'),
     statement: t(
-      '環境部表示，臺灣空氣中PM2.5年平均值（約每立方公尺13微克）約有2.3%來自電力業。',
+      '環境部表示，台灣空氣中PM2.5年平均值（約每立方公尺13微克）約有2.3%來自電力業。',
       'MOENV states that about 2.3% of Taiwan\'s annual mean PM2.5 (about 13 µg/m³) comes from the power sector.',
     ),
     period: t('2025年6月環境部說明', 'MOENV statement, June 2025'),
@@ -1081,7 +1081,7 @@ const emissions = {
     data: { share: v(18, 'percent', { approx: true, derived: true, note: '27.5% × 64.9% = 17.8%' }) },
     display: t('約 18%（推算）', 'about 18% (our estimate)'),
     statement: t(
-      '把移動源占國內來源的27.5%乘上國內來源的64.9%，車輛約貢獻臺灣空氣中PM2.5的18%，遠高於電力業的約2.3%。',
+      '把移動源占國內來源的27.5%乘上國內來源的64.9%，車輛約貢獻台灣空氣中PM2.5的18%，遠高於電力業的約2.3%。',
       'Multiplying the mobile-source share of domestic PM2.5 (27.5%) by the domestic share (64.9%) suggests vehicles contribute roughly 18% of the PM2.5 in Taiwan\'s air, far more than the power sector\'s roughly 2.3%.',
     ),
     period: t('混合年份（2020年方案與2025年說明）', 'Mixed dates (2020 plan and 2025 statement)'),
@@ -1102,7 +1102,7 @@ const emissions = {
     data: { motorcycleVktShare: v(32.6, 'percent'), gasolineCarVktShare: v(42.6, 'percent') },
     display: t('苯：機車排序最高', 'benzene: motorcycles rank highest'),
     statement: t(
-      '一項臺灣車輛排放的模式推估把每公里排放係數排序：機車的PM2.5與氮氧化物低於汽油車與柴油車，碳氫化合物高於汽油車，苯則排在各車種之首；論文只列出排序，沒有列出數值。',
+      '一項台灣車輛排放的模式推估把每公里排放係數排序：機車的PM2.5與氮氧化物低於汽油車與柴油車，碳氫化合物高於汽油車，苯則排在各車種之首；論文只列出排序，沒有列出數值。',
       'A modelled inventory of Taiwan\'s road vehicles ranks per-kilometre emission factors: motorcycles below gasoline and diesel vehicles for PM2.5 and nitrogen oxides, above gasoline cars for hydrocarbons, and first among vehicle classes for benzene; the paper prints only the ranking, not the values.',
     ),
     period: t('排序未註明年份（研究涵蓋2013–2021年）', 'Year of the ranking not stated (study covers 2013–2021)'),
@@ -1119,7 +1119,7 @@ const emissions = {
     chainLink: 1,
     research: 'papers/tsai-2023-atmosphere#ef-order-benzene-formaldehyde; papers/tsai-2023-atmosphere#ef-order-hc-pm-nox; papers/tsai-2023-atmosphere#benzene-conclusion-mismatch; papers/tsai-2023-atmosphere#vkt-total-and-shares',
   },
-  'hc-totals-by-class-tsai2023': {
+  'tsai2023-hc-tonnes-2021': {
     data: {
       motorcycles2013: v(68000, 'tonnes-per-year'),
       motorcycles2021: v(37000, 'tonnes-per-year'),
@@ -1130,7 +1130,7 @@ const emissions = {
     },
     display: t('37,000 對 39,000 公噸', '37,000 t vs 39,000 t'),
     statement: t(
-      '依一項模式推估的臺灣車輛排放清冊，2021年機車排放約37,000公噸碳氫化合物，略少於汽油小客車與輕型車合計的39,000公噸；機車的排放量自2013年的68,000公噸下降約46%。',
+      '依一項模式推估的台灣車輛排放清冊，2021年機車排放約37,000公噸碳氫化合物，略少於汽油小客車與輕型車合計的39,000公噸；機車的排放量自2013年的68,000公噸下降約46%。',
       'In a modelled inventory of Taiwan\'s road vehicles, motorcycles emitted about 37,000 tonnes of hydrocarbons in 2021, slightly less than gasoline cars and light-duty vehicles combined (39,000 t); motorcycle emissions had fallen about 46% from 68,000 t in 2013.',
     ),
     period: t('2013–2021年（四個年度）', '2013–2021 (four years)'),
@@ -1147,7 +1147,7 @@ const emissions = {
     chainLink: 1,
     research: 'papers/tsai-2023-atmosphere#hc-totals; papers/tsai-2023-atmosphere#conclusion-hc-vs-totals',
   },
-  'benzene-totals-by-class-tsai2023': {
+  'tsai2023-benzene-tonnes-2021': {
     data: {
       motorcycles2013: v(1048, 'tonnes-per-year'),
       motorcycles2021: v(286, 'tonnes-per-year'),
@@ -1175,6 +1175,26 @@ const emissions = {
     chainLink: 1,
     research: 'papers/tsai-2023-atmosphere#benzene-totals; papers/tsai-2023-atmosphere#two-stroke-hc-benzene-decline',
   },
+  'tsai2023-trend-2013-2021': {
+    data: {
+      benzeneDrop: v(73, 'percent', { approx: true, derived: true, note: '(1,048 − 286) / 1,048 = 72.7%' }),
+      hcDrop: v(46, 'percent', { approx: true, derived: true, note: '(68,000 − 37,000) / 68,000 = 45.6%' }),
+    },
+    display: t('苯 −73%、碳氫 −46%', 'benzene −73%, hydrocarbons −46%'),
+    statement: t(
+      '依同一項模式推估的數字計算，機車的苯排放從2013年到2021年下降約73%，碳氫化合物下降約46%，研究者歸因於二行程機車淘汰與標準加嚴。',
+      'Calculated from the same modelled estimates, motorcycle benzene emissions fell about 73% from 2013 to 2021 and hydrocarbons about 46%, which the authors credit to the retirement of two-strokes and tighter standards.',
+    ),
+    period: t('2013–2021年', '2013–2021'),
+    place: TW,
+    sources: ['tsai-2023-atmosphere'],
+    confidence: 'verified',
+    evidence: 'derived',
+    derivedFrom: ['tsai2023-benzene-tonnes-2021', 'tsai2023-hc-tonnes-2021'],
+    caveat: t('百分比是本站依論文印出的總量計算，論文本身沒有印出；只有四個年度的模式推估。', 'The percentages are our arithmetic on the totals the paper prints, not printed in the paper; a modelled estimate with four years only.'),
+    chainLink: 1,
+    research: 'papers/tsai-2023-atmosphere#benzene-totals; papers/tsai-2023-atmosphere#hc-totals; papers/tsai-2023-atmosphere#two-stroke-hc-benzene-decline',
+  },
   'ef-older-phase-tsai2018': {
     data: {
       coPhase3VsPhase5: v(156, 'percent'),
@@ -1187,7 +1207,7 @@ const emissions = {
     },
     display: t('一氧化碳 +156%（每公升燃油）', 'CO +156% (per litre of fuel)'),
     statement: t(
-      '臺灣43輛使用中四行程機車的實驗室測試顯示，以每公升燃油計，第三期機車的一氧化碳比第五期高156%、碳氫化合物高84%；第四期的一氧化碳高48%，碳氫化合物與第五期的差異不顯著；氮氧化物反而是舊車較低。',
+      '台灣43輛使用中四行程機車的實驗室測試顯示，以每公升燃油計，第三期機車的一氧化碳比第五期高156%、碳氫化合物高84%；第四期的一氧化碳高48%，碳氫化合物與第五期的差異不顯著；氮氧化物反而是舊車較低。',
       'In laboratory tests of 43 in-use four-stroke motorcycles in Taiwan, Phase 3 machines emitted 156% more carbon monoxide and 84% more hydrocarbons per litre of fuel than Phase 5; Phase 4 emitted 48% more carbon monoxide, and its hydrocarbon difference from Phase 5 was not significant; nitrogen oxides were lower in the older machines.',
     ),
     period: t('2018年發表', 'Published 2018'),
@@ -1290,11 +1310,11 @@ const emissions = {
     },
     display: t('一氧化碳與機車流量 r = 0.96', 'CO vs motorcycle flow r = 0.96'),
     statement: t(
-      '臺北自強隧道的實測中，平日約有一半車輛是機車（51.8%），隧道內的一氧化碳濃度隨機車流量起伏（相關係數0.96）；同一隧道的PM2.5與黑碳則主要隨大型車流量變化。',
+      '台北自強隧道的實測中，平日約有一半車輛是機車（51.8%），隧道內的一氧化碳濃度隨機車流量起伏（相關係數0.96）；同一隧道的PM2.5與黑碳則主要隨大型車流量變化。',
       'In measurements in Taipei\'s Ziqiang Tunnel, about half the weekday traffic was motorcycles (51.8%), and carbon monoxide rose and fell with motorcycle flow (correlation 0.96); PM2.5 and black carbon in the same tunnel tracked heavy-duty vehicles instead.',
     ),
     period: t('2020年3月14–23日', '14–23 March 2020'),
-    place: t('臺北市自強隧道（819公尺）', 'Ziqiang Tunnel, Taipei (819 m)'),
+    place: t('台北市自強隧道（819公尺）', 'Ziqiang Tunnel, Taipei (819 m)'),
     sources: ['ting-2023-envres'],
     locator: 'Sec 3.1.1 p.4 (fleet shares); Sec 3.1.3 p.5 (MC vs CO r = 0.96; LDV vs CO2 r = 0.95); Sec 3.1.2 and 3.1.4 (PM2.5 and eBC with HDV)',
     confidence: 'verified',
@@ -1323,13 +1343,13 @@ const emissions = {
       'Regression estimates from the same tunnel put motorcycle carbon monoxide at 0.209 kg per kg of fuel against 0.022 kg for cars; per kilometre it was 4.33 g against 2.06 g, about twice as much.',
     ),
     period: t('2020年3月14–23日', '14–23 March 2020'),
-    place: t('臺北市自強隧道', 'Ziqiang Tunnel, Taipei'),
+    place: t('台北市自強隧道', 'Ziqiang Tunnel, Taipei'),
     sources: ['ting-2023-envres'],
     locator: 'Table 3 (FCEF) and Table 4 (VKEF), Ziqiang CO rows, p.7',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '各車種數值是由車流比例迴歸推得，論文未說明「±」是標準差還是標準誤；小客車每公斤燃料的不確定範圍接近其數值本身，因此「約10倍」很不精確，倍數為本站計算。機車假設全部燒汽油，油耗採用2018年新車規格。同一表中較早的臺灣路上實測機車一氧化碳為每公里7.65克。',
+      '各車種數值是由車流比例迴歸推得，論文未說明「±」是標準差還是標準誤；小客車每公斤燃料的不確定範圍接近其數值本身，因此「約10倍」很不精確，倍數為本站計算。機車假設全部燒汽油，油耗採用2018年新車規格。同一表中較早的台灣路上實測機車一氧化碳為每公里7.65克。',
       'Vehicle-class values come from a regression on fleet shares, and the paper does not say whether "±" is a standard deviation or error; the car per-fuel uncertainty is nearly as large as the value, so "about 10 times" is imprecise, and the ratios are our arithmetic. All motorcycles were assumed gasoline, with fuel economy from 2018 new-vehicle specifications. An older Taiwanese on-road value in the same table is 7.65 g/km for motorcycle CO.',
     ),
     requiresCaveat: true,
@@ -1351,7 +1371,7 @@ const emissions = {
       'In the same tunnel, motorcycles had the lowest per-kilometre PM2.5 and black-carbon estimates of the three vehicle classes, indistinguishable from zero; the PM2.5 increment tracked heavy-vehicle flow (correlation 0.78). This study does not support calling gasoline scooters a major particle source.',
     ),
     period: t('2020年3月14–23日', '14–23 March 2020'),
-    place: t('臺北市自強隧道', 'Ziqiang Tunnel, Taipei'),
+    place: t('台北市自強隧道', 'Ziqiang Tunnel, Taipei'),
     sources: ['ting-2023-envres'],
     locator: 'Table 4 p.7 (VKEF eBC and PM2.5 by class); Sec 3.1.2 p.4-5 (r = 0.78)',
     confidence: 'verified',
@@ -1371,7 +1391,7 @@ const emissions = {
       'The same study measured the particles\' "oxidative potential" with a laboratory assay (DTT): per microgram, freshly emitted particles at the tunnel exit were generally less potent than the aged particles at the entrance; per cubic metre of air the exit was higher because there were more particles.',
     ),
     period: t('2020年3月14–23日', '14–23 March 2020'),
-    place: t('臺北市自強隧道', 'Ziqiang Tunnel, Taipei'),
+    place: t('台北市自強隧道', 'Ziqiang Tunnel, Taipei'),
     sources: ['ting-2023-envres'],
     locator: 'Sec 3.3 p.8; Fig. 5; Table 5 (OPv 0.15-0.46 nmol/min/m3)',
     confidence: 'verified',
@@ -1391,11 +1411,11 @@ const emissions = {
     },
     display: t('一氧化碳 >90%', 'CO >90%'),
     statement: t(
-      '一項空氣品質模式研究估計，臺北市中心超過90%的一氧化碳、80%的氮氧化物與約一半的PM2.5來自車輛排放。',
+      '一項空氣品質模式研究估計，台北市中心超過90%的一氧化碳、80%的氮氧化物與約一半的PM2.5來自車輛排放。',
       'An air-quality modelling study estimated that vehicle emissions account for more than 90% of carbon monoxide, 80% of nitrogen oxides and about half of PM2.5 in downtown Taipei.',
     ),
     period: t('2021年發表', 'Published 2021'),
-    place: t('臺北市中心', 'Downtown Taipei'),
+    place: t('台北市中心', 'Downtown Taipei'),
     sources: ['tsai-2021-stoten'],
     confidence: 'verified',
     evidence: 'modelled-tw',
@@ -1466,11 +1486,11 @@ const exposure = {
     },
     display: t('10 處路口', '10 intersections'),
     statement: t(
-      '交通部運輸研究所在臺北、新北與高雄的10處路口各連續量測48小時，感測器設在離地1.2至1.5公尺的呼吸高度；各項改善措施的效果則以擴散模式模擬。',
+      '交通部運輸研究所在台北、新北與高雄的10處路口各連續量測48小時，感測器設在離地1.2至1.5公尺的呼吸高度；各項改善措施的效果則以擴散模式模擬。',
       'The MOTC Institute of Transportation measured air at 10 intersections in Taipei, New Taipei and Kaohsiung for 48 hours each, with sensors at breathing height (1.2–1.5 m); the effects of street measures were then simulated with a dispersion model.',
     ),
     period: t('2023–2024年量測，2025年12月出版', 'Measured 2023–2024, published December 2025'),
-    place: t('臺北市、新北市、高雄市', 'Taipei, New Taipei and Kaohsiung'),
+    place: t('台北市、新北市、高雄市', 'Taipei, New Taipei and Kaohsiung'),
     sources: ['iot-2025-intersection-air-quality'],
     confidence: 'verified',
     evidence: 'modelled-tw',
@@ -1492,7 +1512,7 @@ const exposure = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '此範圍排除了離群的第2模擬日。臺北與新北的路口降幅較小（約4%至10%），有的模擬日反而上升，模擬的一氧化碳也常增加。' + IOT_CAVEAT['zh-TW'],
+      '此範圍排除了離群的第2模擬日。台北與新北的路口降幅較小（約4%至10%），有的模擬日反而上升，模擬的一氧化碳也常增加。' + IOT_CAVEAT['zh-TW'],
       'This range excludes the outlier Day 2. At the Taipei and New Taipei intersections the reductions were smaller (about 4–10%), some simulated days showed increases, and modelled carbon monoxide often rose. ' + IOT_CAVEAT.en,
     ),
     requiresCaveat: true,
@@ -1524,11 +1544,11 @@ const exposure = {
     data: { coChangeLow: v(7.45, 'percent'), coChangeHigh: v(39.62, 'percent') },
     display: t('一氧化碳 +7%～+40%', 'CO +7% to +40%'),
     statement: t(
-      '在臺北與新北的路口，模式顯示全天實施行人專用時相後，模擬的一氧化碳濃度反而上升約7%至40%。',
+      '在台北與新北的路口，模式顯示全天實施行人專用時相後，模擬的一氧化碳濃度反而上升約7%至40%。',
       'At the Taipei and New Taipei intersections, the model showed simulated carbon monoxide rising by about 7% to 40% under an all-day exclusive pedestrian phase.',
     ),
     period: t('2024年量測資料驅動的模擬', 'Simulation driven by 2024 field data'),
-    place: t('臺北市、新北市路口（一般路口、單一背景源）', 'Taipei and New Taipei intersections (general, single background source)'),
+    place: t('台北市、新北市路口（一般路口、單一背景源）', 'Taipei and New Taipei intersections (general, single background source)'),
     sources: ['iot-2025-intersection-air-quality'],
     locator: 'Table 4.3.2-29 CO change, all-day scramble: +18.33*, +7.54*, +7.45, +39.62',
     confidence: 'verified',
@@ -1545,7 +1565,7 @@ const exposure = {
       'In the model, widening the sidewalk by 0.5 m changed PM2.5 by anything from a 1.88% decrease to a 5.34% increase, with no consistent direction; the "about 2%" in press reports is the best case.',
     ),
     period: t('2024年量測資料驅動的模擬', 'Simulation driven by 2024 field data'),
-    place: t('臺北市、新北市、高雄市路口', 'Intersections in Taipei, New Taipei and Kaohsiung'),
+    place: t('台北市、新北市、高雄市路口', 'Intersections in Taipei, New Taipei and Kaohsiung'),
     sources: ['iot-2025-intersection-air-quality'],
     locator: 'Tables 4.3.2-29..32, sidewalk +0.5 m. Report conclusion (p.6-2) still calls it the 較佳 measure across background types.',
     confidence: 'verified',
@@ -1628,10 +1648,10 @@ const exposure = {
     },
     display: t('步行 40 µg/m³', 'walking 40 µg/m³'),
     statement: t(
-      '一項大臺北研究由五位志願者攜帶手持式低價感測器量測，沿街步行時PM2.5的中位數為40 µg/m³（216筆讀數），高於開冷氣的公車（35）與關窗開冷氣的汽車（15）；同期政府測站的中位數為14。',
+      '一項大台北研究由五位志願者攜帶手持式低價感測器量測，沿街步行時PM2.5的中位數為40 µg/m³（216筆讀數），高於開冷氣的公車（35）與關窗開冷氣的汽車（15）；同期政府測站的中位數為14。',
       'In a Taipei-area study in which five volunteers carried a hand-held low-cost sensor, median PM2.5 while walking along streets was 40 µg/m³ (216 readings), above air-conditioned buses (35) and closed, air-conditioned cars (15); government stations read a median of 14 in the same period.',
     ),
-    period: t('2019年4–7月（北臺灣PM2.5最低的季節）', 'April–July 2019 (the lowest-PM2.5 season in northern Taiwan)'),
+    period: t('2019年4–7月（北台灣PM2.5最低的季節）', 'April–July 2019 (the lowest-PM2.5 season in northern Taiwan)'),
     place: TAIPEI_METRO,
     sources: ['wang-2021-atmosphere'],
     locator: 'Results p.5, p.8-9; Fig. 8 p.10; station values p.4',
@@ -1754,7 +1774,7 @@ const exposure = {
     },
     display: t('步行 42.7、騎機車 53.6 µg/m³', 'walking 42.7, scooter 53.6 µg/m³'),
     statement: t(
-      '在一項120位臺北健康年輕成人的研究中，早上通勤一小時的個人PM2.5平均值，步行為42.7 µg/m³、騎燃油機車為53.6，搭捷運只有21.7；步行與騎機車都顯著高於捷運與汽車，但兩者之間、以及與公車之間的差異並不顯著。',
+      '在一項120位台北健康年輕成人的研究中，早上通勤一小時的個人PM2.5平均值，步行為42.7 µg/m³、騎燃油機車為53.6，搭捷運只有21.7；步行與騎機車都顯著高於捷運與汽車，但兩者之間、以及與公車之間的差異並不顯著。',
       'In a study of 120 healthy young adults in Taipei, mean personal PM2.5 over a morning commute hour was 42.7 µg/m³ walking and 53.6 riding a gasoline scooter, against 21.7 on the subway; walking and scooter were significantly higher than subway and car, but did not differ significantly from each other or from the bus.',
     ),
     period: t('上午9至10點；2017年2月至2019年12月', '09:00–10:00; February 2017 to December 2019'),
@@ -1779,7 +1799,7 @@ const exposure = {
     },
     display: t('機車 32.1 對 汽車 7.6 µg/m³', 'motorcycle 32.1 vs car 7.6 µg/m³'),
     statement: t(
-      '環保署2017年的臺北通勤調查以微型感測器量測，騎機車的PM2.5平均最高（32.1 µg/m³），開冷氣的汽車最低（7.6），並建議民眾避開需要長時間等候的路口。',
+      '環保署2017年的台北通勤調查以微型感測器量測，騎機車的PM2.5平均最高（32.1 µg/m³），開冷氣的汽車最低（7.6），並建議民眾避開需要長時間等候的路口。',
       'The EPA\'s 2017 Taipei commuter survey, using micro-sensors, found the highest mean PM2.5 on motorcycles (32.1 µg/m³) and the lowest in air-conditioned cars (7.6), and advised people to avoid intersections with long waits.',
     ),
     period: t('2017年4月10、12、13、14日與5月4日；2018年5月31日發布', '10, 12, 13, 14 April and 4 May 2017; released 31 May 2018'),
@@ -1804,7 +1824,7 @@ const exposure = {
     },
     display: t('苯系物 33.96 對 20.07 ppb', 'BTEX 33.96 vs 20.07 ppb'),
     statement: t(
-      '在臺北四條路線上，研究助理騎租來的電動機車在機車道上行駛（因此吸入的是周圍車流的廢氣，不是自己的），苯系物（BTEX）平均為33.96 ppb；在同一路線騎自行車者為20.07 ppb。PM2.5則是27.65對23.27 µg/m³。',
+      '在台北四條路線上，研究助理騎租來的電動機車在機車道上行駛（因此吸入的是周圍車流的廢氣，不是自己的），苯系物（BTEX）平均為33.96 ppb；在同一路線騎自行車者為20.07 ppb。PM2.5則是27.65對23.27 µg/m³。',
       'On four Taipei routes, research assistants riding rented electric scooters in the traffic lane (so breathing surrounding traffic\'s exhaust, not their own) averaged 33.96 ppb of BTEX (benzene, toluene, ethylbenzene, xylenes); cyclists on the same routes averaged 20.07 ppb. PM2.5 was 27.65 against 23.27 µg/m³.',
     ),
     period: t('2017年11月至2018年4月，尖峰與離峰時段', 'November 2017 to April 2018, rush and non-rush hours'),
@@ -1848,7 +1868,7 @@ const exposure = {
     chainLink: 3,
     research: 'papers/wu-2021-trd#bike-vs-scooter-btex; papers/wu-2021-trd#pm25-mode-diff-not-significant; papers/wu-2021-trd#no-btex-source-attribution',
   },
-  'station-btex-correlation-wu2021': {
+  'wu2021-station-correlation': {
     data: {
       pm25RLow: v(0.67, 'ratio', { note: 'correlation r, on-road vs station' }),
       pm25RHigh: v(0.86, 'ratio'),
@@ -1898,7 +1918,7 @@ const exposure = {
     chainLink: 3,
     research: 'papers/wu-2021-trd#rush-vs-nonrush',
   },
-  'quiet-route-wu2021': {
+  'wu2021-quiet-route': {
     data: {
       benzene: v(-33.2, 'percent', { note: 'Route C vs Route P, rush hour, adjusted, P<0.05' }),
       btex: v(-24.27, 'percent', { note: 'P<0.05' }),
@@ -1965,7 +1985,7 @@ const exposure = {
     },
     display: t('差距 3.6 → 0.1 µg/m³', 'gap 3.6 → 0.1 µg/m³'),
     statement: t(
-      '臺北市交通測站的PM2.5年平均值歷年都高於一般測站，但差距已從2017年的3.6 µg/m³縮小到2024年的0.1 µg/m³。',
+      '台北市交通測站的PM2.5年平均值歷年都高於一般測站，但差距已從2017年的3.6 µg/m³縮小到2024年的0.1 µg/m³。',
       "Taipei City's roadside (traffic) monitoring stations have recorded higher annual PM2.5 than its general stations every year, but the gap narrowed from 3.6 µg/m³ in 2017 to 0.1 µg/m³ in 2024.",
     ),
     period: t('2017–2024年', '2017–2024'),
@@ -1982,24 +2002,102 @@ const exposure = {
     research: '02 §4, Corrections #8',
   },
   'ufp-near-road-bands-chang2026': {
-    data: { saufpMax: v(40, 'um2/cm3', { approx: true }) },
-    display: t('道路旁狹窄高濃度帶', 'narrow near-road bands'),
+    data: {
+      urbanRoadKerbside: v(40, 'um2/cm3', { approx: true, note: 'ground-level urban-road source alone, peak hours, 1.6 m' }),
+      allSourceMaxWinter: v(65, 'um2/cm3', { note: 'near urban roads beneath expressways' }),
+      allSourceMaxSummer: v(80, 'um2/cm3'),
+      domainMeanWinter: v(15, 'um2/cm3'),
+      domainMeanSummer: v(31, 'um2/cm3'),
+    },
+    display: t('路旁約 40 µm²/cm³（模式）', 'about 40 µm²/cm³ at the kerb (modelled)'),
     statement: t(
-      '新北市一項計算流體力學模擬顯示，地面道路旁會形成狹窄的超細微粒高濃度帶。',
-      'A computational fluid-dynamics simulation in New Taipei found that ground-level roads create narrow near-road bands of high ultrafine-particle concentration.',
+      '新北市中和一項計算流體力學模擬顯示，平面道路的車流在路緣與人行道形成狹窄的超細微粒高濃度帶（肺部沉積表面積約40 µm²/cm³），在數十公尺內迅速下降；整個1.2公里見方範圍的尖峰平均為15（冬）至31（夏），最高值65至80出現在高架道路下方的道路旁。',
+      'A computational fluid-dynamics simulation of Zhonghe, New Taipei found that traffic on ground-level roads creates narrow kerbside and sidewalk bands of ultrafine particles (lung-deposited surface area about 40 µm²/cm³) that fall off within a few tens of metres; across the 1.2 km square the peak-hour average was 15 (winter) to 31 (summer), with maxima of 65–80 beside roads beneath elevated expressways.',
     ),
-    period: t('2026年發表', 'Published 2026'),
-    place: t('新北市（1.2 × 1.2 公里模擬範圍）', 'New Taipei City (1.2 × 1.2 km model domain)'),
+    period: t('2026年發表（模式情境：冬季與夏季的尖峰與離峰）', 'Published 2026 (modelled winter and summer, peak and off-peak)'),
+    place: t('新北市中和區（1.2 × 1.2 公里模擬範圍）', 'Zhonghe, New Taipei City (1.2 × 1.2 km model domain)'),
     sources: ['chang-hsiao-2026-jhm'],
-    locator: 'Abstract: "Ground-level urban roads create narrow near-road bands with SAUFP maxima of about 40 μm2/cm3"',
+    locator: 'Abstract; Section 3.2 p.8 (about 40 from urban roads); Section 3.3 p.8 (means 15/31, maxima 65/80)',
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '純模式研究，未單獨模擬機車來源。研究另估算的終身致癌風險是模式指標，本站不引用其數值。' + ABSTRACT_ONLY['zh-TW'],
-      'A pure modelling study with no scooter-specific source. It also estimates lifetime cancer risk, a modelled index whose numbers we do not quote. ' + ABSTRACT_ONLY.en,
+      '純模式研究，沒有新的實測；機車只是三類車輛之一，沒有機車專屬的結果，排放係數來自隧道實驗，包含輪胎、煞車等非排氣微粒。模式中的排放是均勻的，沒有號誌、停等或怠速。微粒濃度的驗證在正文中只有定性描述。「約40」只是平面道路單一來源的值，最高值包含高架道路的貢獻。',
+      'A pure modelling study with no new measurements; motorcycles are one of three vehicle classes with no motorcycle-specific result, and the tunnel-derived emission factors include non-exhaust particles. Emissions are uniform, with no signals, queues or idling. Particle validation is only qualitative in the main text. "About 40" is the ground-level road source alone; the maxima include elevated-road contributions.',
+    ),
+    requiresCaveat: true,
+    chainLink: 2,
+    research: 'papers/chang-hsiao-2026-jhm#source-height-ground-roads; papers/chang-hsiao-2026-jhm#domain-mean-and-max-sa; papers/chang-hsiao-2026-jhm#emission-inputs-vehicle-classes; papers/chang-hsiao-2026-jhm#ef-exhaust-and-nonexhaust',
+  },
+  'ufp-intersection-hotspots-chang2026': {
+    data: {},
+    display: t('路口匯流熱點（模式）', 'intersection hotspots (modelled)'),
+    statement: t(
+      '同一模擬中，兩條道路的廢氣煙流在主要路口匯合，形成明顯的熱點；這來自道路配置，模式並沒有模擬紅燈停等或怠速。',
+      'In the same simulation, exhaust plumes from two crossing streets converge at major intersections, creating pronounced hotspots; this comes from street layout, since the model does not simulate red-light queues or idling.',
+    ),
+    period: t('2026年發表', 'Published 2026'),
+    place: t('新北市中和區（模擬範圍）', 'Zhonghe, New Taipei City (model domain)'),
+    sources: ['chang-hsiao-2026-jhm'],
+    locator: 'Section 3.2 p.8; Eq. 15 (uniform line-source flux)',
+    confidence: 'verified',
+    evidence: 'modelled-tw',
+    caveat: t(
+      '正文沒有單獨的路口濃度數值。在一處繁忙的T字路口，模式顯示平面道路是主要來源；在高架道路下方的街谷，約一半以上的模式風險來自高架道路（圖讀值，約略）。',
+      'The main text gives no separate intersection value. At one busy T-junction the model shows the street itself as the main source; in canyons beneath viaducts roughly half or more of the modelled risk came from the elevated road (figure reading, approximate).',
     ),
     chainLink: 2,
-    research: '02 §4',
+    research: 'papers/chang-hsiao-2026-jhm#intersection-hotspots; papers/chang-hsiao-2026-jhm#intersection-F-elcr; papers/chang-hsiao-2026-jhm#hotspot-urban-road-share-added',
+  },
+  'ufp-child-risk-indicator-chang2026': {
+    data: {
+      child9WinterMax: v(4.5e-4, 'lifetime-excess-risk', { approx: true }),
+      child9SummerMax: v(6.5e-4, 'lifetime-excess-risk', { approx: true }),
+      adultWinterMax: v(2.2e-4, 'lifetime-excess-risk', { approx: true }),
+      adultSummerMax: v(3.0e-4, 'lifetime-excess-risk', { approx: true }),
+      childToAdult: v(2.1, 'ratio', { approx: true, derived: true, note: '4.5/2.2 = 2.05; 6.5/3.0 = 2.17' }),
+    },
+    display: t('9歲兒童約為成人的 2 倍（模式指標）', '9-year-olds about 2× adults (modelled indicator)'),
+    statement: t(
+      '在同一模式中，最高點位的9歲兒童終身超額致癌風險指標約為成人的兩倍（冬季約4.5×10⁻⁴對2.2×10⁻⁴），原因是模式假設兒童每公斤體重吸入較多空氣、肺部沉積率較高；作者稱之為潛在風險指標，不是發生率預測。',
+      'In the same model, a 9-year-old at the worst locations had about twice the adult lifetime excess cancer risk indicator (winter about 4.5×10⁻⁴ against 2.2×10⁻⁴), because the model assumes children breathe more air per kilogram and deposit more particles in the lung; the authors call it a potential risk indicator, not a prediction of incidence.',
+    ),
+    period: t('2026年發表（模式情境）', 'Published 2026 (modelled scenarios)'),
+    place: t('新北市中和區（模擬範圍）', 'Zhonghe, New Taipei City (model domain)'),
+    sources: ['chang-hsiao-2026-jhm'],
+    locator: 'Section 3.4 p.11; Fig. 8; Section 4 p.13 (authors\' caveat)',
+    confidence: 'verified',
+    evidence: 'modelled-tw',
+    caveat: t(
+      '這些是模擬範圍中少數熱點的最大值，沒有不確定範圍；多數點位遠低於此。致癌斜率因子來自同一研究團隊的台北微粒金屬成分研究，作者自己也說超細微粒的致癌強度在科學上仍不確定。兒童的倍數來自生理假設，不是觀察到的健康結果；不可說成某個孩子的風險。',
+      'These are maxima at a minority of hotspot locations, with no uncertainty ranges; most of the domain is far lower. The cancer slope factor comes from a Taipei trace-metal study by the same group, and the authors say the carcinogenic potency of ultrafine particles remains scientifically uncertain. The child multiple comes from physiological assumptions, not observed outcomes; never present it as any child\'s risk.',
+    ),
+    requiresCaveat: true,
+    chainLink: 6,
+    research: 'papers/chang-hsiao-2026-jhm#child-elcr; papers/chang-hsiao-2026-jhm#child-mechanism; papers/chang-hsiao-2026-jhm#risk-method-slope-factor; papers/chang-hsiao-2026-jhm#authors-uncertainty-statement; papers/chang-hsiao-2026-jhm#fig8-distribution-added',
+  },
+  'ufp-traffic-cut-chang2026': {
+    data: {
+      emissionCut: v(28, 'percent', { approx: true }),
+      domainMeanCut: v(32, 'percent', { approx: true }),
+      nearRoadCut: v(35, 'percent', { bound: 'gt', note: 'local reductions can exceed 35-40% near major urban roads' }),
+    },
+    display: t('排放少 28%，平均暴露少 32%（模式）', '28% less emission, 32% less average exposure (modelled)'),
+    statement: t(
+      '同一模式比較尖峰與離峰：交通排放平均少約28%時，整個範圍的超細微粒暴露平均少約32%，主要道路旁可少35%至40%以上；這是車流量的時段差異，不是電動化情境。',
+      'Comparing peak and off-peak hours in the same model, traffic emissions about 28% lower gave about 32% lower average ultrafine-particle exposure across the domain, and more than 35–40% lower beside major roads; this is a time-of-day traffic-volume difference, not an electrification scenario.',
+    ),
+    period: t('2026年發表（模式情境）', 'Published 2026 (modelled scenarios)'),
+    place: t('新北市中和區（模擬範圍）', 'Zhonghe, New Taipei City (model domain)'),
+    sources: ['chang-hsiao-2026-jhm'],
+    locator: 'Section 3.3 p.8 (32%); p.10 (28%, 35-40%)',
+    confidence: 'verified',
+    evidence: 'modelled-tw',
+    caveat: t(
+      '論文沒有任何電動化或車隊組成情境，也沒有提到電動機車；模擬的排放包含非排氣微粒，電動化不會全部消除。',
+      'The paper has no electrification or fleet-mix scenario and never mentions electric vehicles; the modelled emissions include non-exhaust particles that electrification would not remove.',
+    ),
+    chainLink: 7,
+    research: 'papers/chang-hsiao-2026-jhm#peak-offpeak-reduction; papers/chang-hsiao-2026-jhm#mitigation-suggestions',
   },
   'national-pm25-trend': {
     data: { y2019: v(16.2, 'ug/m3'), y2025: v(12.8, 'ug/m3'), improvement: v(21, 'percent') },
@@ -2032,7 +2130,7 @@ const standards = {
     data: { annual: v(12, 'ug/m3'), daily: v(30, 'ug/m3') },
     display: t('年平均 12、日平均 30 µg/m³', 'annual 12, 24-hour 30 µg/m³'),
     statement: t(
-      '臺灣的空氣品質標準規定PM2.5年平均值為12 µg/m³、24小時值為30 µg/m³。',
+      '台灣的空氣品質標準規定PM2.5年平均值為12 µg/m³、24小時值為30 µg/m³。',
       "Taiwan's legal air quality standard for PM2.5 is 12 µg/m³ as an annual average and 30 µg/m³ over 24 hours.",
     ),
     period: t('2024年9月30日修正發布', 'As amended 30 September 2024'),
@@ -2058,7 +2156,7 @@ const standards = {
     },
     display: t('一氧化碳 8小時 9 ppm', 'CO 8-hour 9 ppm'),
     statement: t(
-      '臺灣的一氧化碳標準為1小時31 ppm、8小時9 ppm；二氧化氮為1小時0.100 ppm、年平均0.021 ppm。',
+      '台灣的一氧化碳標準為1小時31 ppm、8小時9 ppm；二氧化氮為1小時0.100 ppm、年平均0.021 ppm。',
       "Taiwan's carbon monoxide standard is 31 ppm over 1 hour and 9 ppm over 8 hours; for nitrogen dioxide it is 0.100 ppm hourly and 0.021 ppm annually.",
     ),
     period: t('2024年9月30日修正發布', 'As amended 30 September 2024'),
@@ -2067,7 +2165,7 @@ const standards = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '臺灣標準的氣體以ppm表示，WHO以µg/m³或mg/m³表示，單位不同，不能直接比大小。',
+      '台灣標準的氣體以ppm表示，WHO以µg/m³或mg/m³表示，單位不同，不能直接比大小。',
       'Taiwan states gas standards in ppm while WHO uses µg/m³ or mg/m³; the units differ, so the numbers cannot be compared directly.',
     ),
     chainLink: 3,
@@ -2174,7 +2272,7 @@ const standards = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '這是以歐洲研究為主的區域指引，針對所有道路交通而非機車；臺灣一項幼兒研究中，道路噪音與氣喘盛行率沒有顯著關聯。',
+      '這是以歐洲研究為主的區域指引，針對所有道路交通而非機車；台灣一項幼兒研究中，道路噪音與氣喘盛行率沒有顯著關聯。',
       'A European guideline built mostly on European studies, covering all road traffic rather than scooters; in one Taiwanese kindergarten study road noise was not significantly associated with asthma prevalence.',
     ),
     chainLink: null,
@@ -2221,7 +2319,7 @@ const hazard = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '僅作對照：臺灣的機車幾乎都是汽油引擎，柴油的分類不適用於機車廢氣。',
+      '僅作對照：台灣的機車幾乎都是汽油引擎，柴油的分類不適用於機車廢氣。',
       'For contrast only: Taiwan\'s scooters are almost all gasoline-engined, so the diesel classification does not apply to scooter exhaust.',
     ),
     requiresCaveat: true,
@@ -2398,25 +2496,80 @@ const health = {
     research: '03 §2',
   },
   'chuang2020-cardiovascular-association': {
-    data: { participants: v(120, 'people') },
-    display: t('血壓、心率上升', 'higher blood pressure and heart rate'),
+    data: {
+      participants: v(120, 'people'),
+      walkingIqr: v(24.4, 'ug/m3', { note: 'increment behind the walking estimates (IQR of walking PM2.5)' }),
+      walkingSbp: v(6.5, 'percent', { low: 3.3, high: 9.7 }),
+      walkingHr: v(3.4, 'percent', { low: 0.1, high: 3.5, note: 'CI as printed; asymmetric, possibly a typo' }),
+      walking8ohdg: v(8.1, 'percent', { low: 0.7, high: 8.8, note: 'CI as printed; asymmetric' }),
+      walkingDbp: v(-3.4, 'percent', { low: -5.2, high: -1.6, note: 'unstarred, not discussed by the authors' }),
+    },
+    display: t('步行：收縮壓 +6.5%（每 24.4 µg/m³）', 'walking: systolic +6.5% (per 24.4 µg/m³)'),
     statement: t(
-      '同一項臺北研究發現，步行或騎機車通勤時，個人PM2.5暴露較高與收縮壓、心率及尿中氧化性DNA損傷指標（8-OHdG）較高有關；搭捷運時則沒有顯著關聯。',
-      'The same Taipei study found that, when walking or riding a scooter, higher personal PM2.5 was associated with higher systolic blood pressure, heart rate and a urinary marker of oxidative DNA damage (8-OHdG); in the subway mode the association was not significant.',
+      '同一項台北研究中，步行時個人PM2.5（所有來源）每高出24.4 µg/m³（一個四分位距），同一小時內的收縮壓高6.5%、心率高3.4%、尿中氧化性DNA損傷指標（8-OHdG）高8.1%，都有統計顯著；搭捷運時沒有顯著關聯。',
+      'In the same Taipei study, each 24.4 µg/m³ (one interquartile range) of higher personal PM2.5 from all sources while walking was associated, in the same hour, with 6.5% higher systolic blood pressure, 3.4% higher heart rate and 8.1% higher urinary 8-OHdG, a marker of oxidative DNA damage, all statistically significant; on the subway there was no significant association.',
     ),
-    period: t('上午9至10點通勤時段；2020年發表', '09:00–10:00 commute; published 2020'),
+    period: t('上午9至10點；2017年2月至2019年12月', '09:00–10:00; February 2017 to December 2019'),
     place: TAIPEI,
     sources: ['chuang-2020-aeax'],
-    locator: 'Abstract: "personal exposure to PM2.5 was associated with increased SBP (W: 6.5%; Sc: 7.9%), HR (W: 3.4%; Sc: 6.4%) and urinary 8-OHdG..."',
+    locator: 'Table 2 p.3, Model 6 (walking) and Model 2 (subway); IQR from Table 1',
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '這是健康成人在一小時通勤中的短暫生理變化，與疾病無關的證據；摘要未說明百分比是以多少PM2.5增量計算，因此本站不引用效果大小。戴口罩步行組沒有顯著關聯。' + ASSOCIATION_TW['zh-TW'],
-      'These are small, transient physiological changes in healthy adults during a one-hour commute, not evidence of illness. The abstract does not state the PM2.5 increment behind its percentages, so we do not quote effect sizes. No significant association was seen when walking with a facemask. ' + ASSOCIATION_TW.en,
+      '120位健康年輕成人、早上一小時；體力活動沒有量測也沒有調整，作者自己說這會造成干擾。所有方式合併的模型只有8-OHdG顯著。心率與8-OHdG的信賴區間不對稱，可能是印刷錯誤；舒張壓呈未加註、未討論的負向關聯。這是短暫的生理變化，不是疾病，PM2.5也沒有區分來源。戴口罩步行時血壓與心率沒有顯著關聯，但8-OHdG仍有（+2.3%）。' + ASSOCIATION_TW['zh-TW'],
+      '120 healthy young adults, one morning hour; physical exertion was neither measured nor adjusted for, which the authors say confounds the results. With all modes pooled, only 8-OHdG was significant. The heart-rate and 8-OHdG intervals are asymmetric, possibly a typo; diastolic pressure showed an unstarred, undiscussed negative association. These are transient physiological changes, not disease, and the PM2.5 is not split by source. With a facemask, blood pressure and heart rate showed no significant association, but 8-OHdG did (+2.3%). ' + ASSOCIATION_TW.en,
     ),
     requiresCaveat: true,
     chainLink: 5,
-    research: '03 §4; 03 safe claim #10',
+    research: 'papers/chuang-2020-aex#effect-walking; papers/chuang-2020-aex#effect-subway; papers/chuang-2020-aex#effect-facemask; papers/chuang-2020-aex#covariates',
+  },
+  'chuang2020-scooter-effect-per-iqr': {
+    data: {
+      scooterIqr: v(41.7, 'ug/m3'),
+      sbp: v(7.9, 'percent', { low: 0.9, high: 14.9 }),
+      hr: v(6.4, 'percent', { low: 2.6, high: 10.2 }),
+      ohdg: v(8.9, 'percent', { low: 2.6, high: 15.2 }),
+      dbp: v(0.6, 'percent', { low: -11.9, high: 13.1, note: 'not significant' }),
+    },
+    display: t('騎機車：收縮壓 +7.9%（每 41.7 µg/m³）', 'scooter: systolic +7.9% (per 41.7 µg/m³)'),
+    statement: t(
+      '同一研究中，騎燃油機車的人個人PM2.5每高出41.7 µg/m³（騎士自己的四分位距），同一小時內收縮壓高7.9%、心率高6.4%、8-OHdG高8.9%；舒張壓沒有顯著關聯。這是騎士，不是行人。',
+      'In the same study, among gasoline-scooter riders each 41.7 µg/m³ (the riders\' own interquartile range) of higher personal PM2.5 was associated, in the same hour, with 7.9% higher systolic pressure, 6.4% higher heart rate and 8.9% higher 8-OHdG; diastolic pressure showed no significant association. These are riders, not pedestrians.',
+    ),
+    period: t('上午9至10點；2017年2月至2019年12月', '09:00–10:00; February 2017 to December 2019'),
+    place: TAIPEI,
+    sources: ['chuang-2020-aeax'],
+    locator: 'Table 2 p.3, Model 5',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '各方式的增量不同（騎機車41.7、步行24.4），不能把百分比拿來互相比較，也不是「每1 µg/m³」或「每10 µg/m³」。收縮壓的區間下限0.9很接近零；體力活動與噪音（騎機車平均89.3分貝）會干擾結果。' + ASSOCIATION_TW['zh-TW'],
+      'Each mode has its own increment (scooter 41.7, walking 24.4), so the percentages cannot be compared across modes, and they are not "per 1" or "per 10 µg/m³". The systolic interval\'s lower bound (0.9) is close to zero; exertion and noise (mean 89.3 dBA on scooters) confound the results. ' + ASSOCIATION_TW.en,
+    ),
+    requiresCaveat: true,
+    chainLink: 5,
+    research: 'papers/chuang-2020-aex#effect-scooter; papers/chuang-2020-aex#noise',
+  },
+  'chuang2020-pooled-model': {
+    data: {
+      ohdg: v(4.7, 'percent', { low: 3.7, high: 5.7 }),
+      sbp: v(2.4, 'percent', { low: -2.9, high: 7.7 }),
+      hr: v(0.9, 'percent', { low: -11.7, high: 13.5 }),
+    },
+    display: t('六種方式合併：只有 8-OHdG 顯著', 'all modes pooled: only 8-OHdG significant'),
+    statement: t(
+      '同一研究把六種通勤方式的720次量測合併分析時，PM2.5只與8-OHdG顯著有關（+4.7%），與血壓及心率的關聯都不顯著。',
+      'When the same study pooled all 720 measurements across the six commuting modes, PM2.5 was significantly associated only with 8-OHdG (+4.7%), not with blood pressure or heart rate.',
+    ),
+    period: t('2017年2月至2019年12月', 'February 2017 to December 2019'),
+    place: TAIPEI,
+    sources: ['chuang-2020-aeax'],
+    locator: 'Table 2 p.3, Model 1',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t('論文沒有說明合併模型用的增量；摘要沒有提到這個結果。8-OHdG只是氧化壓力指標，不是疾病。', 'The paper does not state the pooled model\'s increment, and the abstract does not report this result. 8-OHdG is an oxidative-stress marker, not disease.'),
+    chainLink: 5,
+    research: 'papers/chuang-2020-aex#effect-pooled; papers/chuang-2020-aex#dbp-no-effect',
   },
   'guo2019-lung-function': {
     data: {
@@ -2428,8 +2581,8 @@ const health = {
     },
     display: t('每 10 µg/m³ 約低 2～3%', 'about 2–3% lower per 10 µg/m³'),
     statement: t(
-      '一項追蹤24,544名臺灣兒童、青少年與年輕人的研究發現，兩年平均PM2.5每增加10 µg/m³，與肺功能指標約低2%至3%有關。',
-      'A study of 24,544 Taiwanese children, adolescents and young adults found that each 10 µg/m³ increase in two-year average PM2.5 was associated with about 2–3% lower lung function.',
+      '一項追蹤24,544名台灣兒童、青少年與年輕人的研究發現，兩年平均PM2.5（所有來源）每增加10 µg/m³，與肺功能指標約低2%至3%有關。',
+      'A study of 24,544 Taiwanese children, adolescents and young adults found that each 10 µg/m³ increase in two-year average PM2.5 (all sources) was associated with about 2–3% lower lung function.',
     ),
     period: t('2000–2014年', '2000–2014'),
     place: TW,
@@ -2438,7 +2591,7 @@ const health = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '摘要未說明是否屬於「臺灣兒童健康研究（TCHS）」世代，請勿如此稱呼。' + ASSOCIATION_TW['zh-TW'],
+      '摘要未說明是否屬於「台灣兒童健康研究（TCHS）」世代，請勿如此稱呼。' + ASSOCIATION_TW['zh-TW'],
       'The abstract does not say this is the Taiwan Children Health Study cohort, so do not call it that. ' + ASSOCIATION_TW.en,
     ),
     chainLink: 6,
@@ -2453,8 +2606,8 @@ const health = {
     },
     display: t('4,736 名學童', '4,736 schoolchildren'),
     statement: t(
-      '一項針對彰化工業區附近4,736名學童的研究發現，長期PM2.5暴露較高與醫師診斷的氣喘較多、呼氣一氧化氮（呼吸道發炎指標）較高有關。',
-      'A study of 4,736 schoolchildren near industrial areas in Changhua found that higher long-term PM2.5 exposure was associated with more physician-diagnosed asthma and higher exhaled nitric oxide, a marker of airway inflammation.',
+      '一項針對彰化工業區附近4,736名學童的研究發現，長期PM2.5（所有來源）暴露較高與醫師診斷的氣喘較多、呼氣一氧化氮（呼吸道發炎指標）較高有關。',
+      'A study of 4,736 schoolchildren near industrial areas in Changhua found that higher long-term PM2.5 exposure (all sources) was associated with more physician-diagnosed asthma and higher exhaled nitric oxide, a marker of airway inflammation.',
     ),
     period: t('2025年發表（2024年1月線上刊出）', 'Published 2025 (online January 2024)'),
     place: t('彰化縣燃煤電廠等工業區附近六鄉鎮', 'Six townships near industrial areas (incl. coal-fired power plants), Changhua'),
@@ -2504,8 +2657,8 @@ const health = {
     },
     display: t('3,246 名幼兒', '3,246 young children'),
     statement: t(
-      '新北市11所幼兒園3,246名幼兒的研究發現，PM2.5與PM10較高與氣喘盛行率較高有關；二氧化氮與道路噪音則沒有顯著關聯。',
-      'A study of 3,246 children at 11 kindergartens in New Taipei found higher PM2.5 and PM10 associated with higher asthma prevalence; nitrogen dioxide and road traffic noise showed no significant association.',
+      '新北市11所幼兒園3,246名幼兒的研究發現，PM2.5與PM10（所有來源）較高與氣喘盛行率較高有關；二氧化氮與道路噪音則沒有顯著關聯。',
+      'A study of 3,246 children at 11 kindergartens in New Taipei found higher PM2.5 and PM10 (all sources) associated with higher asthma prevalence; nitrogen dioxide and road traffic noise showed no significant association.',
     ),
     period: t('2023年發表', 'Published 2023'),
     place: t('新北市', 'New Taipei City'),
@@ -2524,7 +2677,7 @@ const health = {
     data: { patients: v(675, 'people') },
     display: t('675 名氣喘患者', '675 asthma patients'),
     statement: t(
-      '一項臺灣醫學中心675名氣喘患者的研究發現，PM10、PM2.5與二氧化氮暴露與早發型氣喘患者的肺功能較差有關。',
+      '一項台灣醫學中心675名氣喘患者的研究發現，PM10、PM2.5與二氧化氮暴露與早發型氣喘患者的肺功能較差有關。',
       'A study of 675 asthma patients at a Taiwanese medical centre found PM10, PM2.5 and NO₂ exposure associated with lower lung function in patients with early-onset asthma.',
     ),
     period: t('2024年發表', 'Published 2024'),
@@ -2567,7 +2720,7 @@ const health = {
     },
     display: t('每十萬人 46.4 人', '46.4 per 100,000'),
     statement: t(
-      '肺癌是臺灣癌症死因的首位，2025年肺癌死亡率為每十萬人46.4人；男性與女性的癌症死因首位都是肺癌。',
+      '肺癌是台灣癌症死因的首位，2025年肺癌死亡率為每十萬人46.4人；男性與女性的癌症死因首位都是肺癌。',
       'Lung cancer is the leading cause of cancer death in Taiwan; in 2025 the lung cancer death rate was 46.4 per 100,000 people, and it was the top cancer killer for both men and women.',
     ),
     period: t('2025年（民國114年），2026年6月公布', '2025, released June 2026'),
@@ -2596,7 +2749,7 @@ const health = {
     },
     display: t('53% 從未吸菸', '53% never smoked'),
     statement: t(
-      '一項分析371,084名臺灣肺癌患者的研究發現，53%從未吸菸；1995至2015年間男性吸菸率從59.4%降到29.9%，肺腺癌發生率卻持續上升，研究者正探討空氣污染是否扮演角色。',
+      '一項分析371,084名台灣肺癌患者的研究發現，53%從未吸菸；1995至2015年間男性吸菸率從59.4%降到29.9%，肺腺癌發生率卻持續上升，研究者正探討空氣污染是否扮演角色。',
       'An analysis of 371,084 Taiwanese lung cancer patients found 53% had never smoked; between 1995 and 2015 the male smoking rate fell from 59.4% to 29.9% while lung adenocarcinoma incidence kept rising, and researchers are investigating whether air pollution plays a part.',
     ),
     period: t('1995–2015年', '1995–2015'),
@@ -2615,13 +2768,13 @@ const health = {
   },
   'hill2023-egfr-ecological': {
     data: { egfrCases: v(32957, 'count') },
-    display: t('臺灣資料呈顯著關聯', 'significant association in Taiwan data'),
+    display: t('台灣資料呈顯著關聯', 'significant association in Taiwan data'),
     statement: t(
-      '一篇《自然》期刊研究在包括臺灣在內的區域資料中，發現PM2.5濃度與EGFR突變型肺癌發生率顯著相關，並以小鼠實驗提出空氣污染物促進腫瘤的機制。',
+      '一篇《自然》期刊研究在包括台灣在內的區域資料中，發現PM2.5濃度與EGFR突變型肺癌發生率顯著相關，並以小鼠實驗提出空氣污染物促進腫瘤的機制。',
       'A Nature study found a significant association between PM2.5 levels and the incidence of EGFR-mutant lung cancer in area-level data including Taiwan, and used mouse experiments to propose a mechanism by which air pollutants promote tumours.',
     ),
-    period: t('臺灣資料2011–2017年；2023年發表', 'Taiwan data 2011–2017; published 2023'),
-    place: t('英國、南韓、臺灣（臺灣為長庚研究資料庫九縣市）', 'England, South Korea and Taiwan (Taiwan: Chang Gung Research Database, nine counties)'),
+    period: t('台灣資料2011–2017年；2023年發表', 'Taiwan data 2011–2017; published 2023'),
+    place: t('英國、南韓、台灣（台灣為長庚研究資料庫九縣市）', 'England, South Korea and Taiwan (Taiwan: Chang Gung Research Database, nine counties)'),
     sources: ['hill-2023-nature'],
     locator: 'Abstract: "significant association between PM2.5 levels and the incidence of lung cancer for 32,957 EGFR-driven lung cancer cases in four within-country cohorts"',
     confidence: 'verified',
@@ -2645,7 +2798,7 @@ const health = {
     },
     display: t('約 6,300 人（2014年推估）', 'about 6,300 (2014 estimate)'),
     statement: t(
-      '一項模式推估把2014年臺灣約6,300人（6,282人）因心臟病、中風、肺癌與慢性阻塞性肺病的死亡歸因於環境PM2.5。',
+      '一項模式推估把2014年台灣約6,300人（6,282人）因心臟病、中風、肺癌與慢性阻塞性肺病的死亡歸因於環境PM2.5。',
       'A modelled estimate attributed about 6,300 (6,282) Taiwanese deaths in 2014 from heart disease, stroke, lung cancer and COPD to ambient PM2.5.',
     ),
     period: t('2014年', '2014'),
@@ -2655,7 +2808,7 @@ const health = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '這是使用2014年監測資料的模式推估，年代較久，此後臺灣PM2.5已下降；PM2.5為所有來源，不能說是「機車造成的死亡」。我們找不到更新的臺灣推估。',
+      '這是使用2014年監測資料的模式推估，年代較久，此後台灣PM2.5已下降；PM2.5為所有來源，不能說是「機車造成的死亡」。我們找不到更新的台灣推估。',
       'A modelled estimate from 2014 monitoring data; PM2.5 in Taiwan has fallen since. PM2.5 is from all sources, so these are not "deaths from scooters". We found no newer Taiwanese estimate.',
     ),
     requiresCaveat: true,
@@ -2689,7 +2842,7 @@ const children = {
     data: { fineParticlesUpTo: v(44, 'percent', { bound: 'lte' }), coverReduction: v(39, 'percent', { bound: 'lte' }) },
     display: t('最多高 44%（英國）', 'up to 44% higher (UK)'),
     statement: t(
-      '英國一項實驗（非臺灣）發現，嬰兒推車高度的細微粒濃度比成人呼吸高度最多高44%。',
+      '英國一項實驗（非台灣）發現，嬰兒推車高度的細微粒濃度比成人呼吸高度最多高44%。',
       'In a UK experiment (not in Taiwan), fine-particle concentrations at baby-in-pram height were up to 44% higher than at adult breathing height.',
     ),
     period: t('2020年發表', 'Published 2020'),
@@ -2699,18 +2852,63 @@ const children = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '「最多44%」是各條件中的最大值，不是平均差異，且只針對細微粒；不可說「兒童比成人多吸44%污染」。臺灣沒有兒童高度的實測研究。',
-      '"Up to 44%" is the maximum across conditions, not an average, and only for fine particles; never say "children breathe 44% more pollution". No child-height measurements exist for Taiwan.',
+      '「最多44%」是各條件中的最大值，不是平均差異，且只針對細微粒；不可說「兒童比成人多吸44%污染」。其他研究結果不一，有的發現推車高度反而較低或沒有差異（見文獻回顧）。台灣沒有兒童高度的實測研究。',
+      '"Up to 44%" is the maximum across conditions, not an average, and only for fine particles; never say "children breathe 44% more pollution". Other studies are mixed, some finding pram height lower or no different (see the review). No child-height measurements exist for Taiwan.',
     ),
     requiresCaveat: true,
     chainLink: 6,
     research: '03 §5',
   },
+  'stroller-height-review': {
+    data: {
+      buzzard2009: v(59, 'percent', { note: 'PM2.5 199 vs 125 µg/m3, 0.85 vs 1.65 m, Morgantown USA' }),
+      kenagy2016Low: v(5, 'percent', { note: 'NO2 at 0.8 vs 2.0 m, Edinburgh; 5-15% higher' }),
+      kenagy2016High: v(15, 'percent'),
+      garciaAlgar2015: v(10, 'percent', { note: 'ultrafine particles, 0.55 vs 1.70 m, Barcelona' }),
+      kumar2017Afternoon: v(10, 'percent', { note: 'PM2.5, Guildford, afternoon' }),
+      kumar2017Morning: v(-5, 'percent', { note: 'PM2.5, Guildford, morning: babies significantly LOWER' }),
+    },
+    display: t('通常高 5%～15%，結果不一', 'usually 5–15% higher; mixed'),
+    statement: t(
+      '一篇英國學者的文獻回顧（研究都在英國、西班牙與美國，沒有台灣）中，四項比較嬰兒推車與成人呼吸高度的研究大多發現推車高度高約5%至15%；最高的59%是美國一項路邊PM2.5研究，而英國一項研究的早上時段嬰兒高度反而低5%，愛丁堡另一項研究則沒有一致的差異。',
+      'In a review by UK researchers (studies from the UK, Spain and the US; none in Taiwan), four studies comparing pram and adult breathing heights mostly found about 5–15% higher levels at pram height; the highest, 59%, was PM2.5 in one US roadside study, while a UK study found babies 5% lower in the morning and an Edinburgh study found no consistent difference.',
+    ),
+    period: t('原始研究2009–2017年；回顧2018年發表', 'Original studies 2009–2017; review published 2018'),
+    place: t('英國、西班牙、美國', 'UK, Spain, USA'),
+    sources: ['sharma-kumar-2018-envint'],
+    locator: 'Table 3 p.267; Section 3 p.266 (Galea 2014); Table 1',
+    confidence: 'verified',
+    evidence: 'international',
+    caveat: t(
+      '各研究的污染物（PM2.5、二氧化氮、超細微粒）、高度、儀器與時間都不同，沒有信賴區間，不能合併成一個數字。「最多約60%」只來自一項研究。數字是回顧引用的，原始研究未開啟。回顧作者與一家生產推車空氣淨化產品的公司合作，沒有利益衝突聲明。學齡兒童的呼吸高度高於推車；確定的只有兒童呼吸較快。',
+      'The studies differ in pollutant (PM2.5, NO2, ultrafine particles), height, instrument and averaging time, with no confidence intervals, so they cannot be pooled into one number. "Up to about 60%" rests on a single study. Figures are as cited by the review; the original studies were not opened. The authors acknowledge an industrial collaborator that makes a pram air product, with no conflict statement. A school-age child breathes above the pram band; what is established for them is faster breathing.',
+    ),
+    requiresCaveat: true,
+    chainLink: 6,
+    research: 'papers/sharma-kumar-2018-envint#overall-up-to-60; papers/sharma-kumar-2018-envint#buzzard2009-pm25; papers/sharma-kumar-2018-envint#kenagy2016-no2; papers/sharma-kumar-2018-envint#garciaalgar2015-ufp; papers/sharma-kumar-2018-envint#kumar2017-baby-vs-adult; papers/sharma-kumar-2018-envint#galea2014-no-difference',
+  },
+  'child-breathing-per-bodyweight': {
+    data: { ratio: v(2, 'ratio', { approx: true }) },
+    display: t('每公斤體重呼吸約為成人兩倍', 'about twice the breathing per kilogram'),
+    statement: t(
+      '同一篇回顧引用的研究指出，以每公斤體重計，兒童的呼吸速率一般約為成人的兩倍，因此相對於肺的大小與體重，吸入的微粒劑量較高。',
+      'A study cited by the same review states that, per kilogram of body weight, children\'s breathing rate is generally about twice an adult\'s, so they inhale a higher particle dose relative to lung size and body weight.',
+    ),
+    period: t('回顧2018年發表（引用Ginsberg等2005年）', 'Review published 2018 (citing Ginsberg et al. 2005)'),
+    place: NOT_PLACE,
+    sources: ['sharma-kumar-2018-envint'],
+    locator: 'Section 1 p.263, reason (i)',
+    confidence: 'verified',
+    evidence: 'international',
+    caveat: t('回顧轉述的數字，原始研究未開啟；沒有年齡分組或絕對呼吸量。', 'A figure as cited by the review; the original was not opened; no age bands or absolute breathing rates are given.'),
+    chainLink: 6,
+    research: 'papers/sharma-kumar-2018-envint#physio-dose-per-bodyweight',
+  },
   'child-height-harr2022': {
     data: { higherOnDays: v(6, 'count'), totalDays: v(8, 'count'), higherBy: v(20, 'percent', { bound: 'gt' }) },
     display: t('6 天高逾 20%（德國）', '>20% higher on 6 days (Germany)'),
     statement: t(
-      '德國美因茲一項研究（非臺灣）以低價感測器在1.0與1.6公尺同時量測，8天中有6天兒童高度的PM2.5濃度高出20%以上，靠近車流量大的街道時差異最明顯。',
+      '德國美因茲一項研究（非台灣）以低價感測器在1.0與1.6公尺同時量測，8天中有6天兒童高度的PM2.5濃度高出20%以上，靠近車流量大的街道時差異最明顯。',
       'A study in Mainz, Germany (not Taiwan) measured simultaneously at 1.0 m and 1.6 m with low-cost sensors and found PM2.5 more than 20% higher at child height on six of eight days, with the biggest differences near busy streets.',
     ),
     period: t('2019年11月；2022年發表', 'November 2019; published 2022'),
@@ -2720,7 +2918,7 @@ const children = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '單一國外研究，使用低價感測器，只有8天；臺灣沒有兒童高度的實測研究。',
+      '單一國外研究，使用低價感測器，只有8天；台灣沒有兒童高度的實測研究。',
       'A single study abroad using low-cost sensors over eight days; no child-height measurements exist for Taiwan.',
     ),
     requiresCaveat: true,

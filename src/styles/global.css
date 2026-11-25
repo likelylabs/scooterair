@@ -16,6 +16,10 @@ html {
   scroll-padding-top: calc(var(--header-h) + 1rem);
   -webkit-tap-highlight-color: transparent;
 }
+/* Pages with the countdown rail (Base adds .has-rail when its `rail` slot is filled). */
+html.has-rail {
+  scroll-padding-top: calc(var(--header-h) + var(--rail-h) + 1rem);
+}
 
 @media (prefers-reduced-motion: no-preference) {
   html {
@@ -481,6 +485,79 @@ th.num {
 .skip-link:focus {
   transform: none;
   color: var(--bg);
+}
+
+/* ---- Chain pips ------------------------------------------------------------
+ * Drawn by src/components/ui/pips.ts for the countdown rail, ChainMarker and
+ * the jump menu. Fill encodes the evidence; the ring says "you are here".
+ */
+.pips {
+  flex: none;
+  overflow: visible;
+}
+.pip__rail {
+  stroke: var(--ink-3);
+  stroke-width: 2;
+}
+.pip__cut {
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.pip__dot {
+  fill: var(--here);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.pip--filled .pip__dot {
+  fill: var(--ink);
+}
+.pip--go .pip__dot {
+  fill: var(--clean);
+  stroke: var(--clean);
+}
+.pip__end {
+  fill: var(--here);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+.pip__ring {
+  fill: none;
+  stroke: var(--signal-red);
+  stroke-width: 2;
+  visibility: hidden;
+}
+.pip--go .pip__ring {
+  stroke: var(--clean);
+}
+.pip[data-now] .pip__ring {
+  visibility: visible;
+}
+@media (forced-colors: active) {
+  .pip__ring {
+    stroke: Highlight;
+  }
+}
+
+/* ---- Date-dependent copy ------------------------------------------------------
+ * See src/lib/site-state.ts. Base sets data-money-phase on <html> before first
+ * paint, from today's date; without JavaScript only the "static" variant
+ * (absolute dates, no day counts, no claim that money is still available) shows.
+ */
+[data-money-when] {
+  display: none;
+}
+html:not([data-money-phase]) [data-money-when~='static'],
+html[data-money-phase='A'] [data-money-when~='A'],
+html[data-money-phase='B'] [data-money-when~='B'],
+html[data-money-phase='C'] [data-money-when~='C'],
+html[data-money-phase='D'] [data-money-when~='D'] {
+  display: revert;
+}
+/* variants that need the reader's city or a flag: switched on by site-state.client.ts */
+[data-money-state]:not(html):not([data-money-on]),
+[data-money-if]:not([data-money-on]) {
+  display: none;
 }
 
 /* JS-only affordances stay out of the way when scripting is off. */

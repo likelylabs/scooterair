@@ -192,6 +192,7 @@
   --ease-in-out: cubic-bezier(0.6, 0, 0.4, 1);
 
   --header-h: 3.5rem;
+  --rail-h: 2.75rem; /* the countdown rail under the header: 44px, never taller */
   --tap: 2.75rem; /* 44px minimum hit target */
 }
 

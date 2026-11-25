@@ -14,11 +14,12 @@
 //   import { getSeries, localizeSeries } from '@/data';
 //   const s = localizeSeries('teds13-motorcycle-share', locale);
 
-import type { Confidence, Evidence, L10n, Locale, ResearchRef, Unit } from './types.ts';
+import type { ChainLink, Confidence, Evidence, L10n, Locale, ResearchRef, Unit } from './types.ts';
 import { confidenceLabels, evidenceLabels, t } from './types.ts';
 import type { SourceId } from './sources.ts';
 import { formatCitation, shortCitation, sourceUrl } from './sources.ts';
 import type { FactId, LocalizedCitation, Topic } from './facts.ts';
+import { redlightSeries } from './series-redlight.ts';
 
 export const pointFlags = [
   'derived', // our arithmetic
@@ -29,6 +30,9 @@ export const pointFlags = [
   'upper-bound', // the source gives "below X" / "X or fewer"
   'lower-bound', // the source gives "more than X"
   'target', // a policy target, not an observation
+  'maximum', // the source gives "up to": the largest value across conditions, not typical
+  'not-significant', // the source reports the difference as not statistically significant
+  'chart-reading', // read off a figure in the source, not a printed number
 ] as const;
 export type PointFlag = (typeof pointFlags)[number];
 
@@ -41,6 +45,9 @@ export const pointFlagLabels: Record<PointFlag, L10n> = {
   'upper-bound': t('上限值（「以下」）', 'upper bound ("or fewer")'),
   'lower-bound': t('下限值（「超過」）', 'lower bound ("more than")'),
   target: t('政策目標', 'policy target'),
+  maximum: t('最大值（「最多」）', 'maximum ("up to")'),
+  'not-significant': t('統計上不顯著', 'not statistically significant'),
+  'chart-reading': t('從圖上讀取的約略值', 'read off a chart (approximate)'),
 };
 
 export interface SeriesPoint {
@@ -95,10 +102,16 @@ export interface SeriesInput {
   relatedFacts?: FactId[];
   locator?: string;
   research: ResearchRef;
+  /** Link of the chain of evidence (1-7) or null for context. Required unless the topic has a default. */
+  chainLink?: ChainLink | null;
+  alsoLinks?: ChainLink[];
 }
 
-const TW = t('臺灣（全國）', 'Taiwan (national)');
-const TAIPEI = t('臺北市', 'Taipei City');
+/** Topics whose series may omit `chainLink` (economics, owned elsewhere). Mirrors facts.ts. */
+export const seriesTopicDefaultChainLink: Partial<Record<Topic, ChainLink | null>> = { economics: 7 };
+
+const TW = t('台灣（全國）', 'Taiwan (national)');
+const TAIPEI = t('台北市', 'Taipei City');
 const TEDS_PERIOD = t('基準年2023年（TEDS 13.0）', 'Base year 2023 (TEDS 13.0)');
 const TEDS_CAVEAT = t(
   '排放清冊只計國內直接排放的原生性污染物；排放占比不等於對空氣中濃度的貢獻。「合計」為本站將二行程與四行程兩列相加。',
@@ -124,7 +137,7 @@ const iot = (y: number, mark: '' | '*' | '#' = '', extra: PointFlag[] = []): Ser
 });
 const days = (...pts: SeriesPoint[]): SeriesPoint[] => pts.map((p, i) => ({ ...p, x: `day${i + 1}` }));
 
-export const series = {
+const baseSeries = {
   // -------------------------------------------------------------------------
   // emissions
   // -------------------------------------------------------------------------
@@ -186,6 +199,7 @@ export const series = {
     caveat: TEDS_CAVEAT,
     relatedFacts: ['teds13-mc-pm25-share', 'teds13-mc-nmhc-share', 'teds13-mc-co-share', 'teds13-mc-gas-vs-particle-contrast'],
     locator: 'Workbook sheet 全國: share cells of 二行程機車 / 四行程機車 rows; combined = our sums of tonnes / 總排放量',
+    chainLink: 1,
     research: '01 §4, Chart C',
   },
   'teds13-motorcycle-tonnes': {
@@ -270,6 +284,7 @@ export const series = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: TEDS_CAVEAT,
+    chainLink: 1,
     research: '01 §4',
   },
   'teds13-road-vs-power': {
@@ -301,6 +316,7 @@ export const series = {
     ),
     requiresCaveat: true,
     relatedFacts: ['teds13-road-vs-power', 'ambient-pm25-power-share'],
+    chainLink: 1,
     research: '01 §4, Chart D',
   },
   'ambient-pm25-apportionment-2020': {
@@ -349,12 +365,13 @@ export const series = {
     ),
     requiresCaveat: true,
     relatedFacts: ['ambient-pm25-origin-2020-plan', 'ambient-pm25-domestic-sources-2020-plan'],
+    chainLink: 3,
     research: '01 §5, Chart I',
   },
   'tsai2018-older-phase-excess': {
     topic: 'emissions',
     title: t('舊期別機車多排放多少', 'How much more older-phase scooters emit'),
-    description: t('相對於第五期機車的排放增加比例（實驗室測試）。', 'Excess emissions relative to Phase 5 scooters (lab tests).'),
+    description: t('相對於第五期機車，每公升燃油多排放的比例（實驗室測試）。', 'Excess emissions per litre of fuel relative to Phase 5 machines (lab tests).'),
     chart: 'grouped-bar',
     unit: 'percent',
     categories: [
@@ -363,16 +380,34 @@ export const series = {
     ],
     datasets: [
       { key: 'co', label: t('一氧化碳', 'Carbon monoxide'), points: [{ x: 'phase3', y: 156 }, { x: 'phase4', y: 48 }] },
-      { key: 'hc', label: t('碳氫化合物', 'Hydrocarbons'), points: [{ x: 'phase3', y: 84 }, { x: 'phase4', y: 9 }] },
+      {
+        key: 'hc',
+        label: t('碳氫化合物', 'Hydrocarbons'),
+        points: [
+          { x: 'phase3', y: 84 },
+          { x: 'phase4', y: 9, flags: ['not-significant'], note: t('第四期與第五期的差異不顯著。', 'Phase 4 vs Phase 5 not significant.') },
+        ],
+      },
+      {
+        key: 'nox',
+        label: t('氮氧化物', 'Nitrogen oxides'),
+        points: [{ x: 'phase3', y: -30 }, { x: 'phase4', y: -17 }],
+        note: t('舊車的氮氧化物反而較低。', 'Older machines emitted less NOx.'),
+      },
     ],
     period: t('2018年發表', 'Published 2018'),
     place: TW,
     sources: ['tsai-2018-aaqr'],
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('底盤動力計測試，樣本有限；僅依摘要。', 'Chassis-dynamometer tests on limited samples; abstract only.'),
+    caveat: t(
+      '以每公升燃油計，不是每公里；43輛使用中四行程機車（第三期7輛、第四期16輛、第五期20輛）的底盤動力計測試，期別、車齡與里程互相混雜。',
+      'Per litre of fuel, not per km; chassis-dynamometer tests of 43 in-use four-stroke motorcycles (7 Phase 3, 16 Phase 4, 20 Phase 5), with phase, age and mileage confounded.',
+    ),
+    requiresCaveat: true,
     relatedFacts: ['ef-older-phase-tsai2018'],
-    research: '02 §5, Table H',
+    chainLink: 1,
+    research: 'papers/tsai-2018-aaqr#table1-co-by-phase; papers/tsai-2018-aaqr#table1-hc-by-phase; papers/tsai-2018-aaqr#table1-nox-co2',
   },
 
   // -------------------------------------------------------------------------
@@ -429,6 +464,7 @@ export const series = {
       'The 2026 figures come from a media report (secondary). The registration series has a break in 2013 from sworn scrappage of old scooters; do not compare with pre-2013 counts.',
     ),
     relatedFacts: ['fleet-registered-2024', 'fleet-electric-registered-2024', 'fleet-fuel-mix-may-2026'],
+    chainLink: 1,
     research: '01 §1, Chart E',
   },
   'two-stroke-remaining': {
@@ -459,6 +495,7 @@ export const series = {
     confidence: 'verified',
     evidence: 'official-tw',
     relatedFacts: ['two-stroke-remaining'],
+    chainLink: 1,
     research: '01 §6, Chart F',
   },
   'ev-share-new-registrations': {
@@ -531,6 +568,7 @@ export const series = {
     ),
     requiresCaveat: true,
     relatedFacts: ['ev-share-2019', 'ev-share-2025', 'netzero-ev-sales-targets', 'netzero-2025-gap'],
+    chainLink: 7,
     research: '01 §7, §8, Charts A and G',
   },
   'new-registrations-electric-vs-gasoline': {
@@ -580,12 +618,13 @@ export const series = {
       '出自媒體轉述的統計；2021年為企業（Gogoro）公布的銷量；標示「本站計算」的數字為相減或回推所得，2025年燃油機車數為約略值。',
       'From media reports of statistics; 2021 figures are company (Gogoro) sales data; points marked as our calculation are subtractions or back-calculations, and the 2025 gasoline figure is approximate.',
     ),
+    chainLink: 7,
     research: '01 §7, Chart B',
   },
   'taipei-mode-share': {
     topic: 'fleet',
-    title: t('臺北市平日運具分配', 'Taipei weekday trips by mode'),
-    description: t('機車占臺北市旅次約兩成。', 'Motorcycles carry about a fifth of Taipei trips.'),
+    title: t('台北市平日運具分配', 'Taipei weekday trips by mode'),
+    description: t('機車占台北市旅次約兩成。', 'Motorcycles carry about a fifth of Taipei trips.'),
     chart: 'grouped-bar',
     unit: 'percent',
     categories: [
@@ -623,6 +662,7 @@ export const series = {
     evidence: 'official-tw',
     relatedFacts: ['mode-share-taipei-2024'],
     locator: '2022 public transport (37.2) and walking (18.6) appear only in research Chart H, not in the quoted table row',
+    chainLink: null,
     research: '01 §9, Chart H',
   },
   'scooter-emission-standard-phases': {
@@ -650,6 +690,7 @@ export const series = {
     confidence: 'verified',
     evidence: 'official-tw',
     relatedFacts: ['scooter-emission-standard-phases'],
+    chainLink: 1,
     research: '01 §8',
   },
 
@@ -658,15 +699,15 @@ export const series = {
   // -------------------------------------------------------------------------
   'commute-pm25-wang2021': {
     topic: 'exposure',
-    title: t('大臺北各通勤方式的PM2.5暴露（Wang等，2021）', 'PM2.5 exposure by commuting mode, Taipei area (Wang et al., 2021)'),
-    description: t('中位數與範圍。沿街步行高於公車與汽車，騎機車更高。', 'Median and range. Walking along streets beats bus and car; riding a motorcycle is higher still.'),
+    title: t('大台北各通勤方式的PM2.5暴露（Wang等，2021）', 'PM2.5 exposure by commuting mode, Taipei area (Wang et al., 2021)'),
+    description: t('中位數與範圍。沿街步行高於公車與汽車；機車只在停等時量測。', 'Median and range. Walking along streets is above bus and car; motorcycle readings were taken only while stopped.'),
     chart: 'dot-range',
     unit: 'ug/m3',
     categories: [
       { key: 'walking', label: t('沿街步行', 'Walking along streets') },
       { key: 'bus', label: t('公車', 'Bus') },
       { key: 'car', label: t('汽車', 'Car') },
-      { key: 'motorcycle', label: t('騎機車', 'Riding a motorcycle') },
+      { key: 'motorcycle', label: t('機車停等時（3趟）', 'Motorcycle, while stopped (3 trips)') },
       { key: 'mrtElevatedStation', label: t('高架捷運站', 'Elevated MRT station') },
       { key: 'mrtElevatedCar', label: t('高架段捷運車廂', 'Elevated MRT carriage') },
       { key: 'mrtUndergroundStation', label: t('地下捷運站', 'Underground MRT station') },
@@ -677,71 +718,84 @@ export const series = {
         key: 'median',
         label: t('中位數（範圍）', 'Median (range)'),
         points: [
-          { x: 'walking', y: 40, low: 10, high: 275 },
+          { x: 'walking', y: 40, low: 10, high: 275, note: t('216筆讀數。', '216 readings.') },
           { x: 'bus', y: 35, low: 13, high: 65 },
           { x: 'car', y: 15, low: 8, high: 80 },
-          { x: 'motorcycle', y: 75, low: 60, high: 105 },
+          { x: 'motorcycle', y: 75, low: 60, high: 105, note: t('只在停等時量測，21筆讀數。', 'Measured only while stopped; 21 readings.') },
           { x: 'mrtElevatedStation', y: 33, low: 15, high: 35 },
-          { x: 'mrtElevatedCar', y: 28, low: 13, high: 68 },
-          { x: 'mrtUndergroundStation', y: 80, low: 30, high: 210 },
-          { x: 'mrtUndergroundCar', y: 80, low: 55, high: 185 },
+          { x: 'mrtElevatedCar', y: 20, low: 13, high: 68, note: t('內文為20，摘要為28。', 'Results text 20; abstract 28.') },
+          { x: 'mrtUndergroundStation', y: 75, low: 30, high: 210, note: t('內文為75，摘要為80。', 'Results text 75; abstract 80.') },
+          { x: 'mrtUndergroundCar', y: 80, low: 53, high: 185, note: t('內文下限53，摘要55。', 'Results text lower bound 53; abstract 55.') },
         ],
       },
     ],
-    period: t('2021年發表', 'Published 2021'),
-    place: t('大臺北地區', 'Taipei metropolitan area'),
+    period: t('2019年4–7月', 'April–July 2019'),
+    place: t('大台北地區', 'Taipei metropolitan area'),
     sources: ['wang-2021-atmosphere'],
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '志願者人數不多，使用攜帶式低價感測器；步行數值包含非交通來源，地下捷運的微粒來源也與街道不同。不可與Chuang等（2020）的數字合併。',
-      'A small volunteer sample with portable low-cost monitors; the walking value includes non-traffic sources, and underground MRT particles come from different sources. Do not merge with Chuang et al. (2020).',
+      '五位志願者、一台未校正的低價感測器，作者推論約偏高30%（未調整）；步行數值包含所有來源，有標明來源的最高值來自焚香與烹飪。地下捷運的微粒來自輪軌磨耗。本站採用內文數字。不可與Chuang等（2020）的數字合併。',
+      'Five volunteers with one uncalibrated low-cost sensor that by the authors\' reasoning reads about 30% high (unadjusted); the walking value includes every source, and the highest named peaks were incense and cooking. Underground MRT particles come from rail wear. We use the Results text. Do not merge with Chuang et al. (2020).',
     ),
     requiresCaveat: true,
-    relatedFacts: ['commute-walking-wang2021', 'commute-motorcycle-wang2021', 'commute-mrt-underground-wang2021'],
-    research: '02 §3a, Table A',
+    relatedFacts: ['commute-walking-wang2021', 'idle-motorcycle-pm25-wang2021', 'commute-mrt-underground-wang2021'],
+    chainLink: 3,
+    research: 'papers/wang-2021-atmosphere#walking-street-stats; papers/wang-2021-atmosphere#motorcycle-stats; papers/wang-2021-atmosphere#underground-mrt-stats; papers/wang-2021-atmosphere#elevated-mrt-stats',
   },
   'commute-pm25-chuang2020': {
     topic: 'exposure',
-    title: t('機車與捷運通勤的PM2.5暴露（Chuang等，2020）', 'PM2.5 exposure, scooter vs subway commuters (Chuang et al., 2020)'),
-    description: t('平均值±標準差；摘要只列出最高與最低的兩種方式。', 'Mean ± SD; the abstract reports only the highest and lowest modes.'),
+    title: t('六種通勤方式的PM2.5暴露（Chuang等，2020）', 'PM2.5 exposure by commuting mode (Chuang et al., 2020)'),
+    description: t(
+      '平均值±標準差。步行與騎機車都高於捷運與汽車，但兩者之間及與公車的差異不顯著。',
+      'Mean ± SD. Walking and scooter are both above subway and car, but not significantly different from each other or from the bus.',
+    ),
     chart: 'dot-range',
     unit: 'ug/m3',
     categories: [
-      { key: 'scooter', label: t('騎機車', 'Scooter') },
-      { key: 'subway', label: t('捷運', 'Subway') },
+      { key: 'subway', label: t('捷運（電動）', 'Subway (electric)') },
+      { key: 'car', label: t('汽車', 'Car') },
+      { key: 'bus', label: t('公車', 'Bus') },
+      { key: 'walking', label: t('步行', 'Walking') },
+      { key: 'walkingMask', label: t('戴口罩步行', 'Walking with a respirator'), note: t('感測器在口罩外。', 'Monitor outside the mask.') },
+      { key: 'scooter', label: t('騎燃油機車', 'Gasoline scooter') },
     ],
     datasets: [
       {
         key: 'mean',
         label: t('平均值（±標準差）', 'Mean (± SD)'),
         points: [
-          { x: 'scooter', y: 53.6, sd: 26.1 },
           { x: 'subway', y: 21.7, sd: 5.8 },
+          { x: 'car', y: 26.2, sd: 12.5 },
+          { x: 'bus', y: 34.7, sd: 15.1 },
+          { x: 'walking', y: 42.7, sd: 22.6 },
+          { x: 'walkingMask', y: 43.1, sd: 20.7 },
+          { x: 'scooter', y: 53.6, sd: 26.1 },
         ],
       },
     ],
-    period: t('上午9至10點通勤時段；2020年發表', '09:00–10:00 commute; published 2020'),
+    period: t('上午9至10點；2017年2月至2019年12月', '09:00–10:00; February 2017 to December 2019'),
     place: TAIPEI,
     sources: ['chuang-2020-aeax'],
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '120位健康成人，只量測早上一小時。不可與Wang等（2021）的數字合併。',
-      '120 healthy adults, one morning hour only. Do not merge with Wang et al. (2021).',
+      '120位健康年輕成人，只量早上一小時，只量PM2.5；騎機車是騎士自己的暴露，不是行人。不可與Wang等（2021）的數字合併。',
+      '120 healthy young adults, one morning hour, PM2.5 only; the scooter value is riders\' own exposure, not pedestrians\'. Do not merge with Wang et al. (2021).',
     ),
     relatedFacts: ['commute-scooter-vs-subway-chuang2020'],
-    research: '02 §3b, Table B',
+    chainLink: 3,
+    research: 'papers/chuang-2020-aex#pm-scooter; papers/chuang-2020-aex#pm-walking; papers/chuang-2020-aex#pm-bus-car; papers/chuang-2020-aex#pm-subway; papers/chuang-2020-aex#pm-facemask',
   },
-  'rider-exposure-wu2021': {
+  'scooter-lane-vs-cyclist-wu2021': {
     topic: 'exposure',
-    title: t('機車騎士與自行車騎士的暴露（Wu等，2021）', 'Motorcyclist vs cyclist exposure (Wu et al., 2021)'),
-    description: t('PM2.5差距不大，苯系物（BTEX）差距明顯。', 'PM2.5 differs little; BTEX differs a lot.'),
+    title: t('機車道上的電動機車騎士與自行車騎士（Wu等，2021）', 'Electric-scooter riders in the traffic lane vs cyclists (Wu et al., 2021)'),
+    description: t('未調整平均值。PM2.5差距不大，苯系物（BTEX）差距明顯。', 'Unadjusted means. PM2.5 differs little; BTEX differs a lot.'),
     chart: 'grouped-bar',
     unit: 'ug/m3',
     categories: [
       { key: 'cyclists', label: t('自行車騎士', 'Cyclists') },
-      { key: 'motorcyclists', label: t('機車騎士', 'Motorcyclists') },
+      { key: 'scooterLane', label: t('電動機車騎士（機車道）', 'Electric-scooter riders (traffic lane)') },
     ],
     datasets: [
       {
@@ -750,7 +804,7 @@ export const series = {
         unit: 'ug/m3',
         points: [
           { x: 'cyclists', y: 23.27 },
-          { x: 'motorcyclists', y: 27.65 },
+          { x: 'scooterLane', y: 27.65, flags: ['not-significant'], note: t('調整後與自行車的差異不顯著。', 'Difference from cyclists not significant after adjustment.') },
         ],
       },
       {
@@ -759,26 +813,27 @@ export const series = {
         unit: 'ppb',
         points: [
           { x: 'cyclists', y: 20.07 },
-          { x: 'motorcyclists', y: 33.96 },
+          { x: 'scooterLane', y: 33.96, note: t('論文圖2的平均標記約28.5，論文未解釋。', 'The paper\'s Fig. 2 mean marker reads about 28.5, unexplained.') },
         ],
       },
     ],
-    period: t('尖峰與離峰時段；2021年發表', 'Rush and non-rush hours; published 2021'),
+    period: t('2017年11月至2018年4月', 'November 2017 to April 2018'),
     place: TAIPEI,
     sources: ['wu-2021-trd'],
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '兩組數據單位不同，不可放在同一個數值軸上。這是騎士的路線平均暴露，不是行人暴露。',
-      'The two datasets have different units and must not share a value axis. These are riders\' route-average exposures, not pedestrians\'.',
+      '兩組數據單位不同，不可共用數值軸。騎士騎的是電動機車，量到的是周圍車流的廢氣；這是通勤騎士在行進中的暴露，不是行人，也不是燃油與電動機車的比較。',
+      'The two datasets have different units and must not share a value axis. The riders used electric scooters, so this is surrounding traffic\'s exhaust; it is commuters riding, not pedestrians, and not a gasoline-versus-electric comparison.',
     ),
     requiresCaveat: true,
-    relatedFacts: ['rider-exposure-wu2021'],
-    research: '02 §2, Table C',
+    relatedFacts: ['scooter-lane-btex-wu2021', 'cyclist-vs-scooter-lane-benzene-wu2021'],
+    chainLink: 3,
+    research: 'papers/wu-2021-trd#mean-exposure-bike-vs-scooter; papers/wu-2021-trd#scooter-is-electric; papers/wu-2021-trd#pm25-mode-diff-not-significant',
   },
   'taipei-traffic-vs-general-stations': {
     topic: 'exposure',
-    title: t('臺北市交通測站與一般測站的PM2.5年平均值', 'Taipei annual PM2.5: traffic vs general monitoring stations'),
+    title: t('台北市交通測站與一般測站的PM2.5年平均值', 'Taipei annual PM2.5: traffic vs general monitoring stations'),
     description: t('交通測站歷年都較高，但差距已縮小。', 'Traffic stations are higher every year, but the gap has narrowed.'),
     chart: 'line',
     unit: 'ug/m3',
@@ -825,6 +880,7 @@ export const series = {
     ),
     relatedFacts: ['taipei-traffic-station-gap'],
     locator: 'Table 3-2-7, automatic PM2.5',
+    chainLink: 3,
     research: '02 §4, Table D',
   },
   'iot-scramble-summary': {
@@ -878,6 +934,7 @@ export const series = {
     requiresCaveat: true,
     relatedFacts: ['iot-scramble-typical-range', 'iot-scramble-outlier-day'],
     locator: 'p.4-28 range −21.40% to −2.58%; Table 4.3.2-30 Day 2 −94.86%*',
+    chainLink: 3,
     research: '02 §1a, Corrections #1',
   },
   'iot-scramble-by-day': {
@@ -894,7 +951,7 @@ export const series = {
     datasets: [
       {
         key: 'generalSingleAllDay',
-        label: t('一般路口、單一背景源（臺北／新北），全天', 'General, single background source (Taipei / New Taipei), all day'),
+        label: t('一般路口、單一背景源（台北／新北），全天', 'General, single background source (Taipei / New Taipei), all day'),
         kind: 'modelled',
         points: days(iot(-7.51), iot(-10.23, '*'), iot(10.22, '#'), iot(-4.38, '#')),
       },
@@ -918,7 +975,7 @@ export const series = {
       },
     ],
     period: t('2024年量測資料驅動的模擬', 'Simulation driven by 2024 field data'),
-    place: t('臺北市、新北市、高雄市路口', 'Intersections in Taipei, New Taipei and Kaohsiung'),
+    place: t('台北市、新北市、高雄市路口', 'Intersections in Taipei, New Taipei and Kaohsiung'),
     sources: ['iot-2025-intersection-air-quality'],
     confidence: 'verified',
     evidence: 'modelled-tw',
@@ -928,11 +985,12 @@ export const series = {
     ),
     requiresCaveat: true,
     locator: 'Tables 4.3.2-29 to 4.3.2-32 (* significant at 95%; # failed model-performance evaluation)',
+    chainLink: 3,
     research: '02 §1a, Table E',
   },
   'iot-scramble-co-single-source': {
     topic: 'exposure',
-    title: t('行人專用時相的模擬一氧化碳變化（臺北／新北）', 'Modelled CO change from an all-day scramble phase (Taipei / New Taipei)'),
+    title: t('行人專用時相的模擬一氧化碳變化（台北／新北）', 'Modelled CO change from an all-day scramble phase (Taipei / New Taipei)'),
     description: t('在這些路口，模擬的一氧化碳反而上升。', 'At these intersections, modelled carbon monoxide rose.'),
     chart: 'bar',
     unit: 'percent',
@@ -946,13 +1004,14 @@ export const series = {
       },
     ],
     period: t('2024年量測資料驅動的模擬', 'Simulation driven by 2024 field data'),
-    place: t('臺北市、新北市路口（一般路口、單一背景源）', 'Taipei and New Taipei intersections (general, single background source)'),
+    place: t('台北市、新北市路口（一般路口、單一背景源）', 'Taipei and New Taipei intersections (general, single background source)'),
     sources: ['iot-2025-intersection-air-quality'],
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: IOT_CAVEAT,
     relatedFacts: ['iot-scramble-co-rise'],
     locator: 'Table 4.3.2-29, CO',
+    chainLink: 3,
     research: '02 §1a',
   },
   'iot-sidewalk-widening-by-day': {
@@ -989,7 +1048,7 @@ export const series = {
       },
     ],
     period: t('2024年量測資料驅動的模擬', 'Simulation driven by 2024 field data'),
-    place: t('臺北市、新北市、高雄市路口', 'Intersections in Taipei, New Taipei and Kaohsiung'),
+    place: t('台北市、新北市、高雄市路口', 'Intersections in Taipei, New Taipei and Kaohsiung'),
     sources: ['iot-2025-intersection-air-quality'],
     confidence: 'verified',
     evidence: 'modelled-tw',
@@ -999,6 +1058,7 @@ export const series = {
     ),
     relatedFacts: ['iot-sidewalk-widening'],
     locator: 'Tables 4.3.2-29 to 4.3.2-32, sidewalk +0.5 m. Significance marks per research file §1a text.',
+    chainLink: 3,
     research: '02 §1a, Table F',
   },
 
@@ -1007,9 +1067,9 @@ export const series = {
   // -------------------------------------------------------------------------
   'pm25-standards-who-vs-taiwan': {
     topic: 'standards',
-    title: t('PM2.5標準：WHO指引與臺灣法規', 'PM2.5: WHO guideline vs Taiwan\'s legal standard'),
+    title: t('PM2.5標準：WHO指引與台灣法規', 'PM2.5: WHO guideline vs Taiwan\'s legal standard'),
     description: t(
-      '臺灣的年平均標準（12）是WHO指引（5）的兩倍多，介於WHO第三與第四階段過渡目標之間。',
+      '台灣的年平均標準（12）是WHO指引（5）的兩倍多，介於WHO第三與第四階段過渡目標之間。',
       'Taiwan\'s annual standard (12) is more than double the WHO guideline (5), between WHO interim targets 3 and 4.',
     ),
     chart: 'grouped-bar',
@@ -1021,7 +1081,7 @@ export const series = {
     datasets: [
       {
         key: 'taiwan',
-        label: t('臺灣空氣品質標準（2024年修正）', 'Taiwan standard (amended 2024)'),
+        label: t('台灣空氣品質標準（2024年修正）', 'Taiwan standard (amended 2024)'),
         kind: 'reference',
         evidence: 'official-tw',
         points: [
@@ -1044,16 +1104,17 @@ export const series = {
       { key: 'whoIt3', label: t('WHO過渡目標3', 'WHO interim target 3'), kind: 'reference', evidence: 'international', points: [{ x: 'annual', y: 15 }, { x: 'daily', y: 37.5 }] },
       { key: 'whoIt4', label: t('WHO過渡目標4', 'WHO interim target 4'), kind: 'reference', evidence: 'international', points: [{ x: 'annual', y: 10 }, { x: 'daily', y: 25 }] },
     ],
-    period: t('WHO 2021年；臺灣2024年9月30日修正', 'WHO 2021; Taiwan as amended 30 September 2024'),
-    place: t('臺灣與全球', 'Taiwan and global'),
+    period: t('WHO 2021年；台灣2024年9月30日修正', 'WHO 2021; Taiwan as amended 30 September 2024'),
+    place: t('台灣與全球', 'Taiwan and global'),
     sources: ['moenv-air-quality-standards', 'who-2021-aqg'],
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      'WHO指引是建議值，臺灣標準是法規；WHO的24小時值為第99百分位數（每年可超過3至4天）。',
+      'WHO指引是建議值，台灣標準是法規；WHO的24小時值為第99百分位數（每年可超過3至4天）。',
       'WHO guidelines are recommendations; Taiwan\'s standard is law. WHO 24-hour values are 99th percentiles (3–4 exceedance days a year).',
     ),
     relatedFacts: ['tw-pm25-standard', 'who-pm25-guideline', 'who-pm25-interim-targets'],
+    chainLink: 3,
     research: '02 §8 Table G; 03 §2 Table 0.1',
   },
 
@@ -1121,6 +1182,7 @@ export const series = {
     ),
     requiresCaveat: true,
     relatedFacts: ['hei-sr23-trap-associations'],
+    chainLink: 5,
     research: '03 §6',
   },
 
@@ -1360,16 +1422,24 @@ export const series = {
   },
 } satisfies Record<string, SeriesInput>;
 
-export type SeriesId = keyof typeof series;
-export type Series = SeriesInput & { id: SeriesId };
+export const series = { ...baseSeries, ...redlightSeries } satisfies Record<string, SeriesInput>;
 
-export const seriesList: Series[] = (Object.entries(series) as [SeriesId, SeriesInput][]).map(([id, s]) => ({ id, ...s }));
+export type SeriesId = keyof typeof series;
+export type Series = Omit<SeriesInput, 'chainLink'> & { id: SeriesId; chainLink: ChainLink | null };
+
+const resolve = (id: SeriesId, s: SeriesInput): Series => ({
+  ...s,
+  id,
+  chainLink: s.chainLink !== undefined ? s.chainLink : (seriesTopicDefaultChainLink[s.topic] ?? null),
+});
+
+export const seriesList: Series[] = (Object.entries(series) as [SeriesId, SeriesInput][]).map(([id, s]) => resolve(id, s));
 
 /** Look up a series. Throws on an unknown id so a typo fails the build. */
 export function getSeries(id: SeriesId): Series {
   const s = (series as Record<string, SeriesInput>)[id];
   if (!s) throw new Error(`[data] Unknown series id "${id}"`);
-  return { id, ...s };
+  return resolve(id, s);
 }
 
 export function seriesByTopic(topic: Topic): Series[] {
@@ -1379,6 +1449,8 @@ export function seriesByTopic(topic: Topic): Series[] {
 export interface LocalizedSeries {
   id: SeriesId;
   topic: Topic;
+  chainLink: ChainLink | null;
+  alsoLinks: ChainLink[];
   title: string;
   description: string;
   chart: ChartHint;
@@ -1412,6 +1484,8 @@ export function localizeSeries(idOrSeries: SeriesId | Series, locale: Locale): L
   return {
     id: s.id,
     topic: s.topic,
+    chainLink: s.chainLink,
+    alsoLinks: s.alsoLinks ?? [],
     title: s.title[locale],
     description: s.description[locale],
     chart: s.chart,
