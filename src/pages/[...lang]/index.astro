@@ -12,6 +12,12 @@
  * no price or purchase button before the money chapter (R9); the site's own inference is closed
  * by default and wears the inference badge; money copy that depends on the date is gated on the
  * site-state utility (data-money-when / data-money-if), with a static variant for no JavaScript.
+ *
+ * Wave 2 (blueprint 3.0): at 960px and wider the scene is pinned in a left column and the text
+ * reads in a right one. That layout is src/components/pages/home/PinnedScene.astro; this page
+ * only marks where it applies, with .pin-run (the hero, and a <div> around each stretch of
+ * chapters that have a frame) and .pin-frame (the box holding a chapter's frame). Under 960px,
+ * and with JavaScript off, those classes do nothing.
  */
 import Base from '@/layouts/Base.astro';
 import Button from '@/components/ui/Button.astro';
@@ -47,12 +53,14 @@ import SmellStrip from '@/components/art/SmellStrip.astro';
 import StreetScene from '@/components/art/StreetScene.astro';
 import Ev from '@/components/pages/home/Ev.astro';
 import Notes from '@/components/pages/home/Notes.astro';
+import PinnedScene from '@/components/pages/home/PinnedScene.astro';
 import EvShareChart from '@/components/pages/home/EvShareChart.astro';
 import RedLightYear from '@/components/pages/home/RedLightYear.astro';
 import { homeData, type Evidence } from '@/components/pages/home/home-data';
 import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { chain, questions, rail, t as tr, type EvidenceKind } from '@/i18n/ui';
 import { art } from '@/i18n/art';
+import film from '@/i18n/pages/film';
 import { shareCard } from '@/lib/share-cards';
 
 export const getStaticPaths = localeStaticPaths;
@@ -75,11 +83,12 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
 ---
 
 <Base locale={locale} title={t.meta.title} description={t.meta.description} home money share="home">
+  <PinnedScene slot="head" />
   <CountdownRail slot="rail" locale={locale} />
 
   <!-- 3.1 Prologue ======================================================================== -->
   <section
-    class="hero"
+    class="hero pin-run"
     aria-labelledby="hero-title"
     data-rail-chapter
     data-phase="red"
@@ -95,8 +104,11 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
       <h1 id="hero-title" class="display hero__title"><Phrased text={t.prologue.title} /></h1>
       <p class="lead">{t.prologue.deck}</p>
       <p class="hero__rider">{t.prologue.rider}</p>
+      <Button href={href('/90/', locale)} variant="secondary" class="hero__play">
+        <svg viewBox="0 0 24 24" width="1.1em" height="1.1em" style="margin-inline-end:0.4em;vertical-align:-0.15em" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"></path></svg>{film.hero.play[locale]}
+      </Button>
     </div>
-    <div class="hero__scene">
+    <div class="hero__scene pin-frame">
       <StreetScene locale={locale} frame="empty" count={prologueCount[0]} />
     </div>
     <div class="container hero__after">
@@ -119,8 +131,9 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
   </Section>
 
   <!-- 3.3 Link 1 ============================================================================ -->
+  <div class="pin-run">
   <Chapter locale={locale} id="link-1" link={1} haze title={t.link1.title} lead={d.link1.deck} moreHref={more(1)} handoff={t.link1.handoff}>
-    <StreetScene slot="art" locale={locale} frame="pack" />
+    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="pack" /></div>
     <Figure slot="visual" locale={locale} title={t.link1.figure.title} subtitle={d.link1.figure.subtitle} caption={d.link1.figure.caption} tone="exhaust" {...ev(d.link1.figure.ev)}>
       <BarChart
         locale={locale}
@@ -151,7 +164,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
 
   <!-- 3.4 Link 2 ============================================================================ -->
   <Chapter locale={locale} id="link-2" link={2} haze title={d.link2.title} lead={d.link2.deck} actionBadge="inference" action={t.link2.action} moreHref={more(2)} handoff={t.link2.handoff}>
-    <StreetScene slot="art" locale={locale} frame="kerb" emphasis="heights" />
+    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="kerb" emphasis="heights" /></div>
     <Figure slot="visual" locale={locale} title={d.link2.figure.title} subtitle={t.link2.figure.subtitle} frame="none" {...ev(d.link2.figure.ev)}>
       <ApproachPlan locale={locale} />
       <Fragment slot="source">{d.link2.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
@@ -168,7 +181,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
 
   <!-- 3.5 Link 3: the centre of the page ===================================================== -->
   <Chapter locale={locale} id="link-3" link={3} tone="night" haze title={t.link3.title} lead={t.link3.deck} moreHref={more(3)} handoff={t.link3.handoff} class="chapter--centre">
-    <StreetScene slot="art" locale={locale} frame="paused" />
+    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="paused" /></div>
     <div slot="visual" class="empty-room">
       <Figure locale={locale} empty title={t.link3.figure.title} subtitle={t.link3.figure.subtitle} level={3}>
         <EmptyChart locale={locale} title={t.link3.figure.chart} desc={t.link3.figure.desc} panelHeight={96} />
@@ -208,7 +221,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
 
   <!-- 3.6 Link 4 ============================================================================ -->
   <Chapter locale={locale} id="link-4" link={4} haze title={t.link4.title} lead={t.link4.deck} moreHref={more(4)} handoff={t.link4.handoff}>
-    <div slot="art" class="art-with-key">
+    <div slot="art" class="art-with-key pin-frame">
       <StreetScene locale={locale} frame="kerb" emphasis="fumes" />
       <div class="container"><PollutantKey locale={locale} layers={['fumes', 'co', 'ufp']} items={keyItems} /></div>
     </div>
@@ -233,6 +246,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
       <p><a href={href(questions.chips[0].path, locale)}>{t.link4.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
     </Fragment>
   </Chapter>
+  </div>
 
   <!-- 3.7 Link 5: no scene colour, no figures beside a number ================================= -->
   <Chapter locale={locale} id="link-5" link={5} tone="sunken" title={t.link5.title} lead={t.link5.deck} moreHref={more(5)} handoff={t.link5.handoff}>
@@ -266,8 +280,9 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
   </Chapter>
 
   <!-- 3.8 Link 6 ============================================================================ -->
+  <div class="pin-run">
   <Chapter locale={locale} id="link-6" link={6} haze title={t.link6.title} lead={t.link6.deck} actionBadge="inference" action={t.link6.action} moreHref={more(6)} handoff={t.link6.handoff}>
-    <StreetScene slot="art" locale={locale} frame="kerb" emphasis="heights" />
+    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="kerb" emphasis="heights" /></div>
     <Figure slot="visual" locale={locale} title={t.link6.figure.title} subtitle={d.link6.figure.subtitle} caption={d.link6.figure.caption} {...ev(d.link6.figure.ev)} class="small-fig">
       <BarChart locale={locale} title={t.link6.figure.chart} desc={d.link6.figure.desc} data={d.link6.figure.data} unit="µg/m³" decimals={1} emphasis categoryLabel={t.link6.figure.category} valueLabel={t.link6.figure.value} />
       <Fragment slot="source">{d.link6.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
@@ -282,7 +297,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
 
   <!-- 3.9 Green ============================================================================= -->
   <Chapter locale={locale} id="green" phase="green" haze size="auto" title={t.green.title} lead={t.green.deck} handoff={t.green.handoff}>
-    <StreetScene slot="art" locale={locale} frame="green" />
+    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="green" /></div>
     <Figure slot="visual" locale={locale} title={t.green.figure.title} subtitle={t.green.figure.subtitle} frame="none" {...ev(d.green.deckEv)}>
       <SignalCycle locale={locale}>
         <EvidenceBadge slot="badge" locale={locale} kind="international" />
@@ -296,6 +311,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
     </div>
     <Fragment slot="caveat"><p>{t.green.caveat}<Ev locale={locale} ev={d.green.gapEv} /></p></Fragment>
   </Chapter>
+  </div>
 
   <!-- 3.10 Joining it up ==================================================================== -->
   <Chapter locale={locale} id="connect" count={0} tone="sunken" size="auto" title={t.connect.title} lead={t.connect.deck} handoff={t.connect.handoff}>
@@ -309,8 +325,9 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
   </Chapter>
 
   <!-- 3.11 Link 7 =========================================================================== -->
+  <div class="pin-run">
   <Chapter locale={locale} id="link-7" link={7} tone="clear" title={t.link7.title} lead={t.link7.deck} moreHref={more(7)} handoff={t.link7.handoff}>
-    <SceneCompare slot="art" locale={locale} name="home-compare" count={chain.countdown.links[6][0]} />
+    <SceneCompare slot="art" locale={locale} name="home-compare" count={chain.countdown.links[6][0]} class="pin-frame" />
     <Figure slot="visual" locale={locale} title={t.link7.figure.title} subtitle={d.link7.figure.subtitle} caption={t.link7.figure.caption} tone="clean" {...ev(d.link7.figure.ev)}>
       <EvShareChart
         locale={locale}
@@ -337,6 +354,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
       <p>{t.link7.action}<a href={href('/act/#keep', locale)}>{t.link7.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
     </Fragment>
   </Chapter>
+  </div>
 
   <!-- 3.12 The money ======================================================================== -->
   <Chapter locale={locale} id="money" budget={false} title={d.money.title} lead={d.money.deck}>

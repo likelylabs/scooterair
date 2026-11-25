@@ -16,11 +16,13 @@ export const t = (zh: string, en: string): L10n => ({ 'zh-TW': zh, en });
 // ---------------------------------------------------------------------------
 
 /**
- * How well the research agent was able to check the claim against its source.
+ * How well the figure was checked against its source during research.
  * Nothing tagged UNVERIFIED in the research files is allowed into the registry.
- *  - verified:  the researcher opened the primary document (or its abstract) and saw the figure.
- *  - secondary: rests on a media report of an official figure, a search summary, or our
- *               arithmetic on such figures. The caveat always says what it rests on.
+ *  - verified:  during research the source itself was opened (the document, page, dataset or,
+ *               for some papers, the abstract) and the figure was located in it.
+ *  - secondary: the figure was seen only in a reputable report of the source (usually a news
+ *               report of an official figure), or is our arithmetic on such figures. The caveat
+ *               always says what it rests on.
  */
 export const confidences = ['verified', 'secondary'] as const;
 export type Confidence = (typeof confidences)[number];
@@ -43,15 +45,15 @@ export const confidenceLabels: Record<Confidence, { label: L10n; description: L1
   verified: {
     label: t('已查證', 'Verified'),
     description: t(
-      '研究人員已直接查閱原始文件或摘要並核對數字。',
-      'Our researchers opened the original document or abstract and checked the figure.',
+      '查證時開啟了來源本身（文件、網頁、資料，部分論文為摘要），並在其中找到這個數字。',
+      'During our research the source itself was opened (the document, page, dataset or, for some papers, the abstract) and the figure was found in it.',
     ),
   },
   secondary: {
     label: t('次級來源', 'Secondary'),
     description: t(
-      '依據媒體轉述的官方數字或其他間接來源，尚未能直接核對原始文件；附註會說明依據為何。',
-      'Based on a media report of an official figure or another indirect source that we could not check against the original; the note says what it rests on.',
+      '這個數字只在可靠的轉述中看到，例如媒體報導的官方統計，沒有在原始來源中找到；附註會說明依據。',
+      'The figure was seen only in a reputable report of the source, such as a news report of an official statistic, not in the source itself; the note says what it rests on.',
     ),
   },
 };
@@ -92,7 +94,7 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
  * and evidence gap says which link it belongs to (`null` = context that sits outside the
  * chain, e.g. how people commute). Ask for a link with `evidenceForLink()` in chain.ts.
  *  1 what comes out of the tailpipe      5 what happens to people who breathe traffic exhaust
- *  2 where it comes out                  6 who gets the highest dose
+ *  2 where it comes out                  6 who is closest, and who is most susceptible
  *  3 what people on the street breathe   7 the link you can break (cleaner or electric scooters)
  *  4 what those compounds do
  */
@@ -105,7 +107,7 @@ export const chainLinkLabels: Record<ChainLink, { short: L10n; question: L10n }>
   3: { short: t('街上的人吸進什麼', 'What people on the street breathe'), question: t('走在街上、站在路口的人實際吸進了什麼？', 'What do people walking and waiting at the kerb actually breathe?') },
   4: { short: t('這些物質有什麼作用', 'What those compounds do'), question: t('廢氣中的物質對人體有什麼危害？聞得到又代表什麼？', 'What can these compounds do to the body, and what does the smell tell you?') },
   5: { short: t('吸入交通廢氣的人怎麼了', 'What happens to people who breathe traffic exhaust'), question: t('研究在吸入交通廢氣的人身上看到了什麼？', 'What have studies seen in people who breathe traffic exhaust?') },
-  6: { short: t('誰吸得最多', 'Who gets the highest dose'), question: t('哪些人吸入最多，或最容易受到影響？', 'Who breathes the most, or is most susceptible?') },
+  6: { short: t('誰離得最近', 'Who is closest to it'), question: t('誰離排氣管最近？誰最容易受到影響？', 'Who is closest to the tailpipes, and who is most susceptible?') },
   7: { short: t('可以斬斷的一環', 'The link you can break'), question: t('換成更乾淨的機車或電動機車，能斬斷哪一環？', 'What would cleaner or electric scooters remove from the chain?') },
 };
 
@@ -140,9 +142,12 @@ export const units = {
   dB: { short: t('dB', 'dB'), long: t('分貝', 'decibels') },
   metres: { short: t('公尺', 'm'), long: t('公尺', 'metres') },
   hours: { short: t('小時', 'h'), long: t('小時', 'hours') },
+  years: { short: t('年', 'years'), long: t('年', 'years') },
   year: { short: t('年', ''), long: t('年份', 'year') },
   phase: { short: t('期', ''), long: t('排放標準期別', 'emission-standard phase') },
   ntd: { short: t('元', 'NT$'), long: t('新臺幣元', 'New Taiwan dollars') },
+  'usd-million': { short: t('百萬美元', 'US$ million'), long: t('百萬美元', 'millions of US dollars') },
+  'km/h': { short: t('公里／小時', 'km/h'), long: t('每小時公里數', 'kilometres per hour') },
   'ntd-per-km': { short: t('元／公里', 'NT$/km'), long: t('每公里新臺幣元', 'New Taiwan dollars per kilometre') },
   'ntd-per-month': { short: t('元／月', 'NT$/month'), long: t('每月新臺幣元', 'New Taiwan dollars per month') },
   'ntd-per-year': { short: t('元／年', 'NT$/year'), long: t('每年新臺幣元', 'New Taiwan dollars per year') },

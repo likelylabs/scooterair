@@ -2,22 +2,29 @@
 /**
  * BarChart — horizontal bars for comparing magnitudes across categories.
  * Each row is: label + value on one line, the bar beneath it. No axis to
- * decode, no label ever truncated, same layout from 300px to desktop.
+ * decode, no label ever truncated, same layout from a 320px phone to desktop.
  *
  * Props (plus title, desc, id, class)
  *   locale         Locale
  *   data           { label: string; value: number; tone?: Tone; highlight?: boolean }[]
+ *                  A value may be negative: the bar then grows left from zero, every bar
+ *                  carries a zero tick and zero is labelled once under the rows.
  *   unit           unit text, e.g. units.ugm3
  *   tone           colour for all bars: 'exhaust' (default) | 'clean' | 'neutral' | …
  *   emphasis       true = grey every bar except those with highlight: true
- *   reference      { value, label } vertical reference line (e.g. a WHO guideline)
+ *   reference      { value, label } vertical reference line (e.g. a WHO guideline). It stops
+ *                  short of any label or value it would otherwise cross.
  *   max            axis end (default: a clean number above the largest value)
+ *   min            axis start, only for negative values (default: a clean number below the
+ *                  lowest). Never above zero: a bar's length is always measured from zero.
+ *                  For values that need a cut axis use RangePlot or LineChart.
  *   decimals       decimals for values (default 0)
  *   categoryLabel  data-table header for the label column
  *   valueLabel     data-table header for the value column
  *
  * Colour: one series = one tone. Do not colour bars by their value.
- * Keep labels under ~30 Chinese characters / 60 Latin (they wrap to two lines).
+ * Keep labels under ~30 Chinese characters / 60 Latin (they wrap to two lines;
+ * a longer label takes a third or fourth line and is never clipped).
  */
 import type { Locale } from '@/i18n';
 import ChartShell from './ChartShell.astro';

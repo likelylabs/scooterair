@@ -431,6 +431,37 @@ export function ledDigit(ch: string, pitch = 2, r = 0.78, ox = 0, oy = 0): strin
   return ledPath(DIGITS[ch] ?? DIGITS['0'], pitch, r, ox, oy);
 }
 
+/**
+ * The same LED dots as ledPath(), at about a twentieth of the markup: each horizontal run of
+ * lit dots is one short line, and the element's dash pattern (a 0.01 dash every `pitch`, round
+ * caps; a true zero-length dash is not drawn by every engine) turns
+ * the line into a row of circles. Draw it with ledDots(), which sets the matching attributes.
+ * ledPath() is kept for scripts that read dot centres back out of the path.
+ */
+export function ledRuns(rows: readonly string[], pitch = 2, ox = 0, oy = 0): string {
+  let d = '';
+  rows.forEach((row, y) => {
+    const cy = n(oy + y * pitch + pitch / 2);
+    for (const m of row.matchAll(/#+/g)) {
+      // a hair past the last dot, so the dash that starts on it is inside the line
+      d += `M${n(ox + (m.index ?? 0) * pitch + pitch / 2)},${cy}h${+((m[0].length - 1) * pitch + 0.02).toFixed(2)}`;
+    }
+  });
+  return d;
+}
+
+/** ledRuns() for a digit. */
+export const ledDigitRuns = (ch: string, pitch = 2, ox = 0, oy = 0): string => ledRuns(DIGITS[ch] ?? DIGITS['0'], pitch, ox, oy);
+
+/**
+ * A complete <path> of LED dots from ledRuns() data. `cls` is a colour class that sets
+ * `stroke` (art.css: `a-led-red`, `a-led-green` beside `a-dots`), or any class of your own.
+ */
+export function ledDots(d: string, o: { pitch?: number; r?: number; cls?: string; attrs?: string } = {}): string {
+  const { pitch = 2, r = 0.78, cls = 'a-led-red', attrs = '' } = o;
+  return `<path class="a-dots ${cls}" stroke-width="${n(r * 2)}" stroke-dasharray="0.01 ${+(pitch - 0.01).toFixed(3)}" d="${d}"${attrs ? ' ' + attrs : ''}/>`;
+}
+
 /* ------------------------------------------------------------------------ */
 /* Air, second vocabulary (binding since the scientist's review)              */
 /*                                                                            */

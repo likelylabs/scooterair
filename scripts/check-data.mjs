@@ -359,7 +359,7 @@ for (const [id, g] of Object.entries(gaps)) {
   if (!ID_RE.test(id) || !id.startsWith('gap-')) err(w, "id must be kebab-case and start with 'gap-'");
   if (!CHAIN_LINKS.has(g.chainLink)) err(w, `chainLink must be 1-7, got ${g.chainLink}`);
   for (const key of ['title', 'statement', 'whyItMatters', 'wouldClose']) checkL10n(`${w}.${key}`, g[key]);
-  checkL10n(`${w}.whoCouldMeasure`, g.whoCouldMeasure, { optional: true });
+  checkL10n(`${w}.whoCouldMeasure`, g.whoCouldMeasure);
   if (g.sources) citeSources(w, g.sources, { required: false });
   for (const fid of g.closest?.facts ?? []) if (!factIds.has(fid)) err(w, `closest.facts references unknown fact "${fid}"`);
   for (const sid of g.closest?.series ?? []) if (!seriesIds.has(sid)) err(w, `closest.series references unknown series "${sid}"`);
@@ -594,6 +594,88 @@ for (const [id, f] of Object.entries(facts)) walkL10n(`fact ${id}`, f);
 for (const [id, s] of Object.entries(series)) walkL10n(`series ${id}`, s);
 for (const [id, r] of Object.entries(claimRules)) walkL10n(`claim rule ${id}`, r);
 for (const [id, g] of Object.entries(gaps)) walkL10n(`gap ${id}`, g);
+
+// ---------------------------------------------------------------------------
+// Reader voice: no editor instructions in reader-facing text
+// ---------------------------------------------------------------------------
+// Pages print facts' captions, statements and caveats, series text and gap text to readers.
+// Instructions to editors ("never write…", "不可說成…", "只能用在證據頁…") belong in
+// `editorNote` (never rendered) or in claims-policy.ts. A reader-facing caveat states the limit
+// of the evidence in plain words a reader can use.
+
+const ZH_INSTRUCTION = [
+  /不可(?!能|思議|或缺|否認)/,
+  /不得/,
+  /只能用在/,
+  /請勿/,
+  /切勿/,
+  /絕不/,
+  /不應(?:該)?(?:寫|說|用|呈現|合併)/,
+  /不能說(?!明)/,
+  /不要(?:寫|說成|稱|合併|混用)/,
+];
+const EN_INSTRUCTION = [
+  /\bnever (?:write|say|present|show|use|call|merge|apply|rank|mix|print|quote|draw)\b/i,
+  /\bmust (?:not|never)\b/i,
+  /\bshould (?:be|not|never)\b/i,
+  /(?:^|[.;:!?]\s+|[,;]\s*(?:so|and|but)\s+)(?:do not|don't|never)\b(?!-)/i,
+  /\bdo not (?:merge|rank|mix|call|treat|count|compare|average|apply|use|write|say|share|translate|read|quote|show|present)\b/i,
+];
+/**
+ * Genuine uses: phrases that match a pattern above but are not instructions to editors.
+ * Keyed by the localized field's path prefix ('*' = anywhere); each phrase is removed before
+ * testing. Add an entry only after reading the sentence.
+ */
+const READER_VOICE_ALLOW = {
+  '*': [
+    '不可能', // "impossible"
+    '不得過戶', // a programme's own condition: the scooter may not be transferred
+    '不得遷出', // ... or moved out of the city
+    '不得疊加', // a programme's own rule: the schemes cannot be combined
+  ],
+  // Programme conditions quote the programme's own legal wording (不得再申請, 不得有…).
+  'econ.programmes': ['不得'],
+};
+function readerVoice(where, value, report = err) {
+  if (!isL10n(value)) return;
+  const allowed = Object.entries(READER_VOICE_ALLOW)
+    .filter(([k]) => k === '*' || where.startsWith(k))
+    .flatMap(([, list]) => list);
+  const clean = (s) => allowed.reduce((acc, p) => acc.split(p).join(''), s);
+  const zh = typeof value['zh-TW'] === 'string' ? clean(value['zh-TW']) : '';
+  const en = typeof value.en === 'string' ? clean(value.en) : '';
+  for (const re of ZH_INSTRUCTION) {
+    const m = zh.match(re);
+    if (m) report(where, `zh-TW: instruction to editors in reader-facing text ("${m[0]}"); state the limit for readers and move the instruction to editorNote or claims-policy.ts: "${zh.slice(0, 70)}…"`);
+  }
+  for (const re of EN_INSTRUCTION) {
+    const m = en.match(re);
+    if (m) report(where, `en: instruction to editors in reader-facing text ("${m[0].trim()}"); state the limit for readers and move the instruction to editorNote or claims-policy.ts: "${en.slice(0, 70)}…"`);
+  }
+}
+function walkReaderVoice(where, obj, report = err) {
+  if (!obj || typeof obj !== 'object') return;
+  if (isL10n(obj)) return readerVoice(where, obj, report);
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === 'editorNote' || k === 'patterns') continue;
+    if (v && typeof v === 'object') walkReaderVoice(`${where}.${k}`, v, report);
+  }
+}
+for (const [id, f] of Object.entries(facts)) walkReaderVoice(`fact ${id}`, f);
+for (const [id, s] of Object.entries(series)) walkReaderVoice(`series ${id}`, s);
+for (const [id, g] of Object.entries(gaps)) walkReaderVoice(`gap ${id}`, g);
+for (const [l, lab] of Object.entries(types.chainLinkLabels)) walkReaderVoice(`chainLinkLabels.${l}`, lab);
+walkReaderVoice('confidenceLabels', types.confidenceLabels);
+walkReaderVoice('evidenceLabels', types.evidenceLabels);
+if (econ) walkReaderVoice('econ', econ, warn); // owned elsewhere: warnings only
+for (const [id, f] of Object.entries(facts)) {
+  // Pages print a caveat beside every fact; without one they fall back to a generic line.
+  if (!f.caveat) err(`fact ${id}`, 'every fact needs a reader-facing caveat: one short, true statement of its scope or limit');
+  if (f.editorNote !== undefined && (typeof f.editorNote !== 'string' || !f.editorNote.trim())) err(`fact ${id}`, 'editorNote must be a non-empty string');
+}
+for (const [id, g] of Object.entries(gaps)) {
+  if (!g.whoCouldMeasure) err(`gap ${id}`, 'every gap needs whoCouldMeasure (the site\'s proposal: which body, with what instrument or study)');
+}
 
 // Dedupe messages produced by both the targeted checks and the sweep.
 const uniq = (a) => [...new Set(a)];

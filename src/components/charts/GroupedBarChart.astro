@@ -8,8 +8,10 @@
  * Props (plus title, desc, id, class)
  *   locale         Locale
  *   series         { label: string; tone: Tone }[]   — fixed order, 2–4
- *   groups         { label: string; values: number[] }[]  — values in series order
+ *   groups         { label: string; values: number[] }[]  — values in series order; a value
+ *                  may be negative (the bar grows left from zero, its value sits at its tip)
  *   unit, max, decimals
+ *   min            axis start, only for negative values; never above zero (bars are measured from zero)
  *   categoryLabel  data-table header for the group column
  */
 import type { Locale } from '@/i18n';

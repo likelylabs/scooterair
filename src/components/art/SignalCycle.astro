@@ -30,6 +30,7 @@ const c = art.cycle;
 
 <div class:list={['cycle', cls]}>
   <p class="cycle__note cycle__note--idle">{c.idle[locale]}</p>
+  <div class="cycle__marks cycle__marks--over" aria-hidden="true"><span class="cycle__bracket cycle__bracket--over"></span></div>
   <div class="cycle__bar" role="img" aria-label={c.alt[locale]}>
     <span class="cycle__red"><b>{c.red[locale]}</b></span>
     <span class="cycle__green"><b>{c.green[locale]}</b></span>
@@ -53,15 +54,20 @@ const c = art.cycle;
     font-size: var(--fs-sm);
     line-height: var(--lh-snug);
   }
+  /* the idling note sits over the red stretch, tied to it by a bracket that opens onto the bar
+     (the mirror of the one under the first seconds of green). No box: nothing to hang off an edge. */
   .cycle__note--idle {
-    inline-size: var(--split);
-    padding-block-end: var(--sp-2);
+    max-inline-size: var(--split);
+    padding-block-end: var(--sp-1);
     font-weight: var(--fw-bold);
-    border-inline-start: 2px solid var(--ink);
-    border-inline-end: 2px solid var(--ink);
-    border-block-end: 2px solid var(--ink);
-    padding-inline: var(--sp-2);
-    margin-block-end: var(--sp-1);
+  }
+  .cycle .cycle__marks--over {
+    grid-template-columns: var(--split) 1fr;
+    margin-block: 0 var(--sp-1);
+  }
+  .cycle .cycle__bracket--over {
+    border: 2px solid var(--ink);
+    border-block-end: 0;
   }
   .cycle__bar {
     display: grid;

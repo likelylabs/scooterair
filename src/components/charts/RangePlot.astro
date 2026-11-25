@@ -6,10 +6,18 @@
  *
  * Props (plus title, desc, id, class)
  *   locale         Locale
- *   data           { label: string; min: number; mid: number; max: number; tone?: Tone }[]
- *   labels         { min, mid, max } words for the three numbers (say whether mid is a median or a mean)
+ *   data           { label: string; min: number; max: number; mid?: number; tone?: Tone }[]
+ *                  Leave `mid` out when the source gives only a span (a range of
+ *                  correlations, a low–high estimate): no dot is drawn and the row prints
+ *                  the span, so the chart never invents a centre. Values may be negative.
+ *   labels         { min, mid?, max } words for the numbers (say whether mid is a median or a mean)
  *   unit, max, tone, decimals
- *   reference      { value, label } vertical reference line
+ *   min            axis start. A range plot shows position, not length, so it may start
+ *                  above zero: the chart then rules an axis with ticks and draws the
+ *                  axis-break mark where zero was cut off. With negative values the
+ *                  axis is ruled too, with a line at zero.
+ *   axis           true = rule the axis with ticks on a zero-based plot as well
+ *   reference      { value, label } vertical reference line (e.g. "no difference" at 0 or 1)
  *   categoryLabel  data-table header for the label column
  */
 import type { Locale } from '@/i18n';

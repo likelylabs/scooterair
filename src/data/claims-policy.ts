@@ -109,7 +109,7 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'exposure',
     rule: t(
-      '不可把Wang等（2021）的騎機車75 µg/m³與Chuang等（2020）的53.6 µg/m³合併成「50至75」之類的範圍。',
+      '不可把Wang 等（2021）的騎機車75 µg/m³與Chuang 等（2020）的53.6 µg/m³合併成「50至75」之類的範圍。',
       'Do not merge Wang et al. 2021 (riding 75 µg/m³) and Chuang et al. 2020 (scooter 53.6 µg/m³) into a range such as "50–75".',
     ),
     instead: t('分別引用兩項研究，並說明一個是中位數、一個是平均值。', 'Cite the two studies separately, noting one is a median and the other a mean.'),
@@ -124,7 +124,7 @@ export const claimRules = {
     kind: 'qualifier',
     topic: 'exposure',
     rule: t(
-      'Wu等（2021）一律寫成「台北騎自行車與機車的通勤者」，不可寫成行人；機車組騎的是電動機車，吸入的是周圍車流的廢氣，研究沒有比較燃油與電動機車，也沒有把苯歸因於機車。機車對PM2.5「可能貢獻較多」是因為數量多，每輛公車貨車的影響約為機車的8至10倍。Chuang等（2020）的騎機車組也是騎士自己的暴露。',
+      'Wu 等（2021）一律寫成「台北騎自行車與機車的通勤者」，不可寫成行人；機車組騎的是電動機車，吸入的是周圍車流的廢氣，研究沒有比較燃油與電動機車，也沒有把苯歸因於機車。機車對PM2.5「可能貢獻較多」是因為數量多，每輛公車貨車的影響約為機車的8至10倍。Chuang 等（2020）的騎機車組也是騎士自己的暴露。',
       'Wu et al. 2021 is always "commuters on bicycles and scooters, Taipei", never pedestrians; its scooter group rode electric scooters and breathed surrounding traffic, the study did not compare gasoline with electric, and it does not attribute benzene to scooters. Scooters "could contribute more" to PM2.5 only because there are more of them; per vehicle a bus or truck added about 8-10 times as much. Chuang et al. 2020\'s scooter mode is likewise the rider\'s own exposure.',
     ),
     why: t(
@@ -144,7 +144,7 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'exposure',
     rule: t(
-      '不可把國外研究說成台灣研究：Choi等（2018）路口超細微粒研究（美國加州大學洛杉磯分校團隊）、arXiv 2011.09286、Harr等（2022，德國），以及Sharma與Kumar（2018、2020）和Kumar等（2017）的英國推車研究，都不是台灣研究。',
+      '不可把國外研究說成台灣研究：Choi 等（2018）路口超細微粒研究（美國加州大學洛杉磯分校團隊）、arXiv 2011.09286、Harr 等（2022，德國），以及Sharma 與 Kumar（2018、2020）和Kumar 等（2017）的英國推車研究，都不是台灣研究。',
       'Do not present foreign studies as Taiwanese: Choi et al. 2018 (UCLA group, intersection ultrafine particles), arXiv 2011.09286, Harr et al. 2022 (Germany), Sharma & Kumar 2018 and 2020 and Kumar et al. 2017 (UK pram studies) are not Taiwan studies.',
     ),
     why: t('先前的資料把部分研究誤植為台灣研究。', 'Earlier notes wrongly attributed some of these to Taiwan.'),
@@ -479,7 +479,7 @@ export const claimRules = {
       '靠近車流處的高峰暴露量測得較高，但個別短暫接觸的健康後果尚未確立。',
       'Peak exposures near traffic are measured to be higher, but the health consequences of individual brief encounters are not established.',
     ),
-    why: t('現有證據涵蓋的是數小時至數週（美國心臟學會）或一小時通勤（Chuang等）。', 'The evidence covers hours to weeks (AHA) or a one-hour commute (Chuang et al.).'),
+    why: t('現有證據涵蓋的是數小時至數週（美國心臟學會）或一小時通勤（Chuang 等）。', 'The evidence covers hours to weeks (AHA) or a one-hour commute (Chuang et al.).'),
     patterns: { 'zh-TW': ['幾分鐘.{0,15}(致病|傷害|生病)', '(怠速|紅燈).{0,15}(致病|致癌)'], en: ['(few|several) minutes.{0,40}(ill|harm|disease)', 'idling.{0,30}(cancer|illness)'] },
     facts: ['aha-2010-pm25-cardiovascular', 'chuang2020-cardiovascular-association', 'mccreanor2007-london-walk'],
     sources: ['brook-2010-circulation', 'chuang-2020-aeax'],
@@ -520,7 +520,7 @@ export const claimRules = {
     kind: 'qualifier',
     topic: 'health',
     rule: t(
-      'Chuang等（2020）的百分比是「每高一個四分位距」的變化：步行每24.4 µg/m³、騎機車每41.7 µg/m³；不可寫成「每1 µg/m³」或「每10 µg/m³」，不可跨方式比較，也不可把8-OHdG說成「DNA損傷導致疾病的證據」。引用時要說明是健康年輕成人、一小時、未調整體力活動，且所有方式合併時只有8-OHdG顯著。',
+      'Chuang 等（2020）的百分比是「每高一個四分位距」的變化：步行每24.4 µg/m³、騎機車每41.7 µg/m³；不可寫成「每1 µg/m³」或「每10 µg/m³」，不可跨方式比較，也不可把8-OHdG說成「DNA損傷導致疾病的證據」。引用時要說明是健康年輕成人、一小時、未調整體力活動，且所有方式合併時只有8-OHdG顯著。',
       'Chuang et al. 2020\'s percentages are per interquartile range: per 24.4 µg/m³ walking and 41.7 µg/m³ on a scooter; never write "per 1" or "per 10 µg/m³", never compare modes, and never present 8-OHdG as "proof of DNA damage causing disease". Say it was healthy young adults, one hour, exertion not adjusted, and that with all modes pooled only 8-OHdG was significant.',
     ),
     why: t('全文表2列出各方式的增量與信賴區間。', 'Table 2 of the full text gives each mode\'s increment and confidence interval.'),
@@ -533,7 +533,7 @@ export const claimRules = {
     kind: 'qualifier',
     topic: 'health',
     rule: t(
-      'Tsai等（2025）的氣喘勝算比1.595沒有說明對應多少PM2.5增量，不可寫成「每1 µg/m³」；研究背景是工業區而非機車。',
+      'Tsai 等（2025）的氣喘勝算比1.595沒有說明對應多少PM2.5增量，不可寫成「每1 µg/m³」；研究背景是工業區而非機車。',
       'Tsai et al. 2025\'s asthma odds ratio of 1.595 has no stated PM2.5 increment, so never write "per 1 µg/m³"; the setting is industrial, not scooter traffic.',
     ),
     why: t('摘要未說明增量單位。', 'The abstract does not state the increment.'),
@@ -546,7 +546,7 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'health',
     rule: t(
-      '不可說Hwang等（2005）證明氮氧化物導致台灣兒童氣喘：氮氧化物的估計值不顯著，PM10甚至呈反向關聯。',
+      '不可說Hwang 等（2005）證明氮氧化物導致台灣兒童氣喘：氮氧化物的估計值不顯著，PM10甚至呈反向關聯。',
       'Do not say Hwang et al. 2005 shows NOx causes asthma in Taiwanese children: its NOx estimate was not significant and PM10 was inversely associated.',
     ),
     why: t('作者結論比數據強，應引用實際數字。', 'The authors\' conclusion is stronger than their data; quote the numbers.'),
@@ -575,7 +575,7 @@ export const claimRules = {
       '不可引用2014年以後的台灣PM2.5歸因死亡數，或任何「死於機車廢氣」的人數：都沒有可查證的來源。',
       'Do not cite Taiwanese PM2.5-attributable deaths for any year after 2014, or any number of deaths "from scooters": no verifiable source exists.',
     ),
-    why: t('最新可查證的是Lo等（2017）以2014年資料所做的模式推估。', 'The latest verifiable figure is Lo et al. 2017\'s modelled estimate for 2014.'),
+    why: t('最新可查證的是Lo 等（2017）以2014年資料所做的模式推估。', 'The latest verifiable figure is Lo et al. 2017\'s modelled estimate for 2014.'),
     patterns: { 'zh-TW': ['(死於|因).{0,6}機車.{0,10}(死亡|喪命)'], en: ['deaths? (from|caused by) scooters?'] },
     facts: ['lo2017-pm25-deaths-2014'],
     sources: ['lo-2017-jfma'],
@@ -585,7 +585,7 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'health',
     rule: t(
-      '不可引用Jung等（2015）的失智症數字；最多只能說「一項台灣世代研究曾報告關聯」。',
+      '不可引用Jung 等（2015）的失智症數字；最多只能說「一項台灣世代研究曾報告關聯」。',
       'Do not cite Jung et al. 2015\'s dementia numbers; at most say "one Taiwanese cohort study reported an association".',
     ),
     why: t('摘要報告的風險數字大得不合理，且PM2.5是由PM10推估。', 'The abstract reports implausibly large risk figures, and PM2.5 was estimated from PM10.'),
@@ -812,7 +812,7 @@ export const claimRules = {
       '機車的排放問題在一氧化碳、碳氫化合物與苯；2021年汽油車排放的苯約為機車的兩倍，機車的苯排放自2013年下降約73%。',
       'Scooters\' emissions problem is carbon monoxide, hydrocarbons and benzene; in 2021 gasoline cars emitted about twice as much benzene as scooters, and scooter benzene had fallen about 73% since 2013.',
     ),
-    why: t('TEDS 13.0與Tsai等（2023）把機車的PM2.5與氮氧化物排在最低；苯的年總量從2016年起汽油車較多。', 'TEDS 13.0 and Tsai et al. 2023 put scooters lowest for PM2.5 and NOx; from 2016 gasoline vehicles emitted more benzene in total.'),
+    why: t('TEDS 13.0與Tsai 等（2023）把機車的PM2.5與氮氧化物排在最低；苯的年總量從2016年起汽油車較多。', 'TEDS 13.0 and Tsai et al. 2023 put scooters lowest for PM2.5 and NOx; from 2016 gasoline vehicles emitted more benzene in total.'),
     patterns: {
       'zh-TW': ['機車.{0,10}(主要|最大)的?(苯|PM2\\.5|細懸浮微粒|氮氧化物|微粒)?(排放)?來源', '機車.{0,10}(苯|PM2\\.5).{0,10}(比汽車多|多於汽車)'],
       en: ['scooters?.{0,20}(main|largest|biggest|major) source of (traffic )?(benzene|PM2\\.5|fine particles|NOx)', 'scooters? emit more (PM2\\.5|NOx) than cars'],
@@ -829,7 +829,7 @@ export const claimRules = {
       'Do not say idling scooters emit more particles than moving ones, that idling is when emissions peak, or that crossing concentrations are highest while scooters idle at red.',
     ),
     instead: t('國外研究的路口高峰出現在車輛起步時；台灣唯一的怠速微粒數據略低於行駛時。', 'Studies abroad find junction peaks as vehicles pull away; the only Taiwanese idle particle datum is slightly below driving.'),
-    why: t('Chien與Huang（2010）的怠速微粒數量略低於時速15與30公里；香港、上海與英國的高峰都在起步。', 'Chien & Huang 2010 found idle particle number slightly below 15 and 30 km/h; Hong Kong, Shanghai and UK peaks came at pull-away.'),
+    why: t('Chien 與 Huang（2010）的怠速微粒數量略低於時速15與30公里；香港、上海與英國的高峰都在起步。', 'Chien & Huang 2010 found idle particle number slightly below 15 and 30 km/h; Hong Kong, Shanghai and UK peaks came at pull-away.'),
     patterns: { 'zh-TW': ['怠速.{0,12}(微粒|排放|濃度).{0,6}(最多|最高|更多|更高)'], en: ['idl(e|ing).{0,30}(more|most|highest) (particles|emissions|pollution)', 'peaks? (while|when) (scooters? )?idl'] },
     facts: ['idle-pn-chien-huang-2010', 'signal-cycle-peaks-international'],
     research: 'redlight/idle-emissions (doNotClaim 1); redlight/intersection-peaks (doNotClaim 5); redlight/smell-chemistry (doNotClaim 7); digest must-not 6',
@@ -847,7 +847,7 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'inspection',
     rule: t('不可說最髒的10%至20%機車占多少排放。', 'Do not state the share of emissions from the dirtiest 10–20% of scooters.'),
-    why: t('沒有台灣機車的遙測資料；Ko與Cho（2006）談的是一般車輛，Lin等（2006）發現老車數量少。', 'No Taiwanese scooter remote-sensing data exist; Ko & Cho 2006 covers vehicles in general, and Lin et al. 2006 found old scooters few.'),
+    why: t('沒有台灣機車的遙測資料；Ko 與 Cho（2006）談的是一般車輛，Lin 等（2006）發現老車數量少。', 'No Taiwanese scooter remote-sensing data exist; Ko & Cho 2006 covers vehicles in general, and Lin et al. 2006 found old scooters few.'),
     patterns: { 'zh-TW': ['(最髒|高污染).{0,10}(1|2)0\\s*%'], en: ['dirtiest (10|20)\\s*%'] },
     facts: ['two-stroke-idle-hc-lin2006'],
     research: 'redlight/idle-emissions (doNotClaim 4)',
@@ -907,7 +907,7 @@ export const claimRules = {
   'jou-2011-figures-inconsistent': {
     kind: 'do-not-claim',
     topic: 'levers',
-    rule: t('不可引用Jou等（2011）的每小時1,021公升汽油與0.56公噸二氧化碳。', 'Do not reuse Jou et al. 2011\'s 1,021 L and 0.56 t CO2 figures.'),
+    rule: t('不可引用Jou 等（2011）的每小時1,021公升汽油與0.56公噸二氧化碳。', 'Do not reuse Jou et al. 2011\'s 1,021 L and 0.56 t CO2 figures.'),
     why: t('這些是依意願調查推算的預測，兩個數字互相矛盾。', 'They are projections from stated preferences and inconsistent with each other.'),
     patterns: { 'zh-TW': ['1,?021\\s*公升'], en: ['1,?021\\s*(L|litres)'] },
     research: 'redlight/idle-emissions (doNotClaim 11)',
@@ -916,7 +916,7 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'intersection',
     rule: t(
-      '下列研究的內容尚未讀到，不可引用任何結果：Dhital等（2026，怠速熄火）、Jayaratne等（2009）、Kuo等（2000，台中通勤揮發性有機物）與2026年8月2日台北時報報導的民調（87.9%等）。',
+      '下列研究的內容尚未讀到，不可引用任何結果：Dhital 等（2026，怠速熄火）、Jayaratne 等（2009）、Kuo 等（2000，台中通勤揮發性有機物）與2026年8月2日台北時報報導的民調（87.9%等）。',
       'Do not cite any result from studies whose content was not read: Dhital et al. 2026 (idle-stop), Jayaratne et al. 2009, Kuo et al. 2000 (Taichung commuter VOCs) and the poll in the Taipei Times of 2 August 2026 (87.9% and so on).',
     ),
     why: t('只確認了書目資料，摘要或全文無法開啟。', 'Only bibliographic data were confirmed; abstracts or full texts could not be opened.'),
@@ -926,7 +926,7 @@ export const claimRules = {
   'chen-lin-2013-itri': {
     kind: 'correction',
     topic: 'levers',
-    rule: t('Chen與Lin（2013）怠速熄火研究的作者屬於工研院，不是車輛研究測試中心。', 'The authors of Chen & Lin 2013 (idle-stop) are ITRI staff, not ARTC.'),
+    rule: t('Chen 與 Lin（2013）怠速熄火研究的作者屬於工研院，不是車輛研究測試中心。', 'The authors of Chen & Lin 2013 (idle-stop) are ITRI staff, not ARTC.'),
     why: t('依Crossref的作者單位。', 'Per the Crossref affiliation.'),
     sources: ['chen-lin-2013-sae'],
     research: 'redlight/idle-emissions (doNotClaim 13)',
@@ -1024,7 +1024,7 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'intersection',
     rule: t(
-      '不可把英國Goel與Kumar的29倍、2%時間占25%劑量或7倍，或香港5.4×10⁵的高峰，當成行人或機車的數字。',
+      '不可把英國Goel 與 Kumar的29倍、2%時間占25%劑量或7倍，或香港5.4×10⁵的高峰，當成行人或機車的數字。',
       'Do not use Goel & Kumar\'s 29 times, 2%/25% or 7 times, or the Hong Kong 5.4 × 10⁵ peak, as pedestrian or scooter figures.',
     ),
     why: t('英國數字是2002年柴油測試車的車內高峰對平均，2%/25%只來自一趟；香港高峰是柴油公車。', 'The UK figures are peak-over-average inside a 2002 diesel test car, and 2%/25% comes from a single run; the Hong Kong peak was a diesel bus.'),
@@ -1035,7 +1035,7 @@ export const claimRules = {
   'kumar-2017-pnc-not-ultrafine': {
     kind: 'correction',
     topic: 'children',
-    rule: t('Kumar等（2017）推車研究的微粒數量是0.2至1微米，不是超細微粒。', 'Kumar et al. 2017\'s pram particle number is 0.2–1 µm, not ultrafine.'),
+    rule: t('Kumar 等（2017）推車研究的微粒數量是0.2至1微米，不是超細微粒。', 'Kumar et al. 2017\'s pram particle number is 0.2–1 µm, not ultrafine.'),
     why: t('摘要寫「包括超細微粒」不精確。', 'The abstract\'s "including ultrafine particles" is loose.'),
     facts: ['traffic-near-school-kumar2017-pram'],
     research: 'redlight/intersection-peaks (doNotClaim 6)',
@@ -1043,7 +1043,7 @@ export const claimRules = {
   'wang-275-unattributed': {
     kind: 'do-not-claim',
     topic: 'exposure',
-    rule: t('不可把Wang等（2021）步行最高的275 µg/m³歸因於廟宇或交通。', 'Do not attribute Wang et al. 2021\'s 275 µg/m³ walking maximum to temples or traffic.'),
+    rule: t('不可把Wang 等（2021）步行最高的275 µg/m³歸因於廟宇或交通。', 'Do not attribute Wang et al. 2021\'s 275 µg/m³ walking maximum to temples or traffic.'),
     why: t('論文沒有說明它的來源；有標明來源的最高值是焚香與烹飪。', 'The paper does not say where it came from; the highest named peaks were incense and cooking.'),
     patterns: { 'zh-TW': ['275'], en: ['275'] },
     facts: ['walking-peaks-incense-wang2021'],
@@ -1052,7 +1052,7 @@ export const claimRules = {
   'chen-2024-solvents-not-traffic': {
     kind: 'do-not-claim',
     topic: 'exposure',
-    rule: t('不可說Chen等（2024）顯示擴散不良會讓路邊的交通廢氣升高。', 'Do not claim Chen et al. 2024 shows weak dilution raised traffic exhaust at roadsides.'),
+    rule: t('不可說Chen 等（2024）顯示擴散不良會讓路邊的交通廢氣升高。', 'Do not claim Chen et al. 2024 shows weak dilution raised traffic exhaust at roadsides.'),
     why: t('摘要指的是溶劑揮發等其他來源。', 'Its abstract points to solvent evaporation and other sources.'),
     research: 'redlight/intersection-peaks (doNotClaim 11)',
   },
@@ -1076,7 +1076,7 @@ export const claimRules = {
   'peters-2004-not-kerbside': {
     kind: 'do-not-claim',
     topic: 'acute',
-    rule: t('不可說Peters等（2004）的「在交通中」等同站在怠速機車旁。', 'Do not say Peters et al. 2004\'s traffic exposure is equivalent to standing near idling scooters.'),
+    rule: t('不可說Peters 等（2004）的「在交通中」等同站在怠速機車旁。', 'Do not say Peters et al. 2004\'s traffic exposure is equivalent to standing near idling scooters.'),
     why: t('暴露是在車上的時間（多為汽車），包含壓力、噪音與體力。', 'Exposure was time in vehicles, mostly cars, with stress, noise and exertion.'),
     facts: ['peters2004-traffic-mi'],
     research: 'redlight/acute-health (doNotClaim 3)',
@@ -1109,7 +1109,7 @@ export const claimRules = {
   'pan-2021-trucks-only': {
     kind: 'do-not-claim',
     topic: 'longterm',
-    rule: t('不可說Pan等（2021）顯示小客車或機車流量會提高心血管死亡。', 'Do not say Pan et al. 2021 shows small-car or scooter traffic raises cardiovascular mortality.'),
+    rule: t('不可說Pan 等（2021）顯示小客車或機車流量會提高心血管死亡。', 'Do not say Pan et al. 2021 shows small-car or scooter traffic raises cardiovascular mortality.'),
     why: t('只有貨車的風險比顯著；小型車不顯著，機車沒有分析。', 'Only the truck hazard ratio was significant; small cars were not, and scooters were not analysed.'),
     facts: ['pan2021-truck-traffic-cvd'],
     research: 'redlight/acute-health (doNotClaim 11)',
@@ -1117,7 +1117,7 @@ export const claimRules = {
   'lung-2025-sources': {
     kind: 'do-not-claim',
     topic: 'acute',
-    rule: t('不可說Lung等（2025）找出交通是高雄PM高峰的來源，也不可說它證明交通不是來源。', 'Do not say Lung et al. 2025 identifies traffic as the source of Kaohsiung PM peaks, nor that it shows traffic was not a source.'),
+    rule: t('不可說Lung 等（2025）找出交通是高雄PM高峰的來源，也不可說它證明交通不是來源。', 'Do not say Lung et al. 2025 identifies traffic as the source of Kaohsiung PM peaks, nor that it shows traffic was not a source.'),
     why: t('摘要列出的是社區工廠、蚊香、燒稻草與焚香，沒有說交通被測試並排除。', 'The abstract names factories, mosquito coils, agricultural and incense burning, and does not say traffic was tested and excluded.'),
     facts: ['lung2025-peaks-hrv'],
     research: 'redlight/acute-health (doNotClaim 12); redlight/policy-idling (doNotClaim 12)',
@@ -1125,7 +1125,7 @@ export const claimRules = {
   'wrong-pubmed-links': {
     kind: 'correction',
     topic: 'acute',
-    rule: t('McCreanor（2007）的PubMed編號是18057337，Tsai等（2013）是24284359；早期草稿中的18032763與24217180指向無關的論文。', 'McCreanor 2007 is PMID 18057337 and Tsai et al. 2013 is PMID 24284359; the 18032763 and 24217180 in an early draft point to unrelated papers.'),
+    rule: t('McCreanor（2007）的PubMed編號是18057337，Tsai 等（2013）是24284359；早期草稿中的18032763與24217180指向無關的論文。', 'McCreanor 2007 is PMID 18057337 and Tsai et al. 2013 is PMID 24284359; the 18032763 and 24217180 in an early draft point to unrelated papers.'),
     why: t('查證者核對了PubMed。', 'Checked in PubMed by the verifier.'),
     patterns: { 'zh-TW': ['18032763', '24217180'], en: ['18032763', '24217180'] },
     sources: ['mccreanor-2007-nejm', 'tsai-2013-ijerph'],
@@ -1146,7 +1146,7 @@ export const claimRules = {
   'guo2019-is-regional-pm25': {
     kind: 'do-not-claim',
     topic: 'vulnerable',
-    rule: t('不可說Guo等（2019）的肺功能研究是交通或機車研究。', 'Do not say the 2019 lung-function paper (Guo et al.) is a traffic or scooter study.'),
+    rule: t('不可說Guo 等（2019）的肺功能研究是交通或機車研究。', 'Do not say the 2019 lung-function paper (Guo et al.) is a traffic or scooter study.'),
     why: t('它用的是區域PM2.5。', 'It uses regional PM2.5.'),
     facts: ['guo2019-lung-function'],
     research: 'redlight/vulnerable-groups (doNotClaim 4)',
@@ -1212,7 +1212,7 @@ export const claimRules = {
   'hill-2023-relative-rates': {
     kind: 'do-not-claim',
     topic: 'longterm',
-    rule: t('不可把Hill等（2023）的「相對率」（台灣1.82、英格蘭0.63、南韓0.71）當成風險比，也不可說PM2.5造成EGFR突變。', 'Do not quote Hill et al. 2023\'s "relative rates" (1.82 Taiwan, 0.63 England, 0.71 Korea) as risk ratios, or say PM2.5 causes EGFR mutations.'),
+    rule: t('不可把Hill 等（2023）的「相對率」（台灣1.82、英格蘭0.63、南韓0.71）當成風險比，也不可說PM2.5造成EGFR突變。', 'Do not quote Hill et al. 2023\'s "relative rates" (1.82 Taiwan, 0.63 England, 0.71 Korea) as risk ratios, or say PM2.5 causes EGFR mutations.'),
     why: t('兩國小於1卻被稱為正相關，顯然不是一般的風險比；研究提出的是促進已有突變的細胞。', 'Two values below 1 are called positive associations, so they are not ordinary risk ratios; the study proposes promotion of cells that already carry mutations.'),
     patterns: { 'zh-TW': ['1\\.82'], en: ['1\\.82'] },
     facts: ['hill2023-egfr-ecological'],
@@ -1241,7 +1241,7 @@ export const claimRules = {
   'ckd-unit-unverified': {
     kind: 'do-not-claim',
     topic: 'longterm',
-    rule: t('在核對全文前，不可寫出Chan等（2018）慢性腎病研究的增量單位。', 'Do not state the per-increment unit of Chan et al. 2018 (kidney disease) until checked in the full paper.'),
+    rule: t('在核對全文前，不可寫出Chan 等（2018）慢性腎病研究的增量單位。', 'Do not state the per-increment unit of Chan et al. 2018 (kidney disease) until checked in the full paper.'),
     why: t('摘要中的單位符號無法顯示。', 'The unit symbols are not rendered in the abstract.'),
     research: 'redlight/long-term-traffic (doNotClaim 11)',
   },
@@ -1263,7 +1263,7 @@ export const claimRules = {
   'xiao-2024-ors': {
     kind: 'correction',
     topic: 'levers',
-    rule: t('Xiao等（2024）的勝算比是3.64與0.11，不是3.51與0.22；這是通學方式的結果，不是空氣品質結果。', 'Xiao et al. 2024\'s odds ratios are 3.64 and 0.11, not 3.51 and 0.22; it is a travel-mode result, not an air-quality outcome.'),
+    rule: t('Xiao 等（2024）的勝算比是3.64與0.11，不是3.51與0.22；這是通學方式的結果，不是空氣品質結果。', 'Xiao et al. 2024\'s odds ratios are 3.64 and 0.11, not 3.51 and 0.22; it is a travel-mode result, not an air-quality outcome.'),
     why: t('依摘要。', 'Per the abstract.'),
     patterns: { 'zh-TW': ['3\\.51', '0\\.22'], en: ['3\\.51', '0\\.22'] },
     research: 'redlight/policy-idling (doNotClaim 11, 13)',

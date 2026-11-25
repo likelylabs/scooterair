@@ -1,20 +1,40 @@
 ---
 /**
- * LineChart — one or a few series over evenly spaced time steps. A single
- * series gets a soft area fill. One y axis, starting at zero unless yMin is
- * set. Hover / touch shows a crosshair with every series' value.
+ * LineChart — one or a few series over time. A single series gets a soft area
+ * fill. One y axis, starting at zero unless yMin is set or a value is negative.
+ * Hover / touch shows a crosshair with every series' value.
  *
  * Props (plus title, desc, id, class)
  *   locale     Locale
  *   x          (string | number)[]  — the time steps, e.g. years
- *   series     { label: string; tone: Tone; values: (number | null)[] }[]  — ≤ 4
+ *   xScale     'even' (default): steps are evenly spaced. 'value': x are numbers (real
+ *              years) placed by their value, so uneven gaps are drawn as they happened
+ *   xTicks     the x values to label (default: first, last and what fits between)
+ *   series     { label, tone, values: (number | null)[], … }[]  — ≤ 4. null breaks the line;
+ *              a point left alone between two gaps is always drawn as a dot. Per series:
+ *                dashed        a dashed stroke: targets and projections, never observations
+ *                markers       'end' (default) | 'all' | 'hollow' (rings, for targets) | 'none'
+ *                connectNulls  join across nulls (a sparse series such as targets)
+ *                pointLabels   'end' (default, beside the plot) | 'ends' | 'all' | 'none'
  *   unit       printed on the top gridline and in the table
- *   yMax, yMin axis range
- *   area       fill under the line (default: only for a single series)
+ *   yMax, yMin axis range. Negative values extend the axis below zero by themselves (the
+ *              axis line is then at zero). A yMin above zero draws an axis break under
+ *              the plot and still marks zero, and the area fill is off unless `area` is set
+ *   area       fill under the line (default: a single series on a zero-based axis)
  *   reference  { value, label } horizontal reference line
  *   height     plot height in px (default 220)
  *   decimals
+ *   format     (v) => string for labels, the hover readout and the table (e.g. v => `${v}%`)
  *   xLabel     data-table header for the x column ("年" / "Year")
+ *
+ * Observed share with policy targets (blueprint V17), on a true time axis:
+ *   <LineChart locale={locale} title="…" xScale="value" x={[2019, …, 2025, 2030, 2035, 2040]}
+ *     xTicks={[2019, 2025, 2030, 2040]} yMax={100} unit="%" xLabel="年" format={(v) => `${v}%`}
+ *     series={[
+ *       { label: '實際', tone: 'clean', values: […, null, null, null], markers: 'all', pointLabels: 'ends' },
+ *       { label: '政策目標', tone: 'ink', values: [null, …, 35, 70, 100], dashed: true,
+ *         markers: 'hollow', connectNulls: true, pointLabels: 'all' },
+ *     ]} />
  */
 import type { Locale } from '@/i18n';
 import ChartShell from './ChartShell.astro';

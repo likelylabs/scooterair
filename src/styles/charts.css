@@ -5,6 +5,9 @@
  */
 .chart {
   display: grid;
+  /* one column that may shrink: without this the open data table's widest row sets the
+     width of the whole chart and pushes it past a 320px viewport */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sp-3);
   min-inline-size: 0;
   container-type: inline-size;
@@ -69,6 +72,25 @@
   fill: var(--ink-3);
   font-weight: 500;
 }
+/* A chart squeezed below the width it is laid out for (core/shared.ts MIN_W), e.g. inside a
+   padded panel on a 320px phone: the type goes a step smaller so labels and values keep clear
+   of each other. Positions are percentages, so nothing else needs to move. */
+@container (max-width: 17rem) {
+  .chart__svg text {
+    font-size: 12.5px;
+  }
+  .chart__svg .c-value {
+    font-size: 13.5px;
+  }
+  .chart__svg .c-value--sm {
+    font-size: 12px;
+  }
+  .chart__svg .c-note,
+  .chart__svg .c-tick,
+  .chart__svg .c-ref {
+    font-size: 11px;
+  }
+}
 /* series names beside line ends, and in-between axis labels: only when the chart is wide enough */
 .chart__svg .c-endname,
 .chart__svg .c-wideonly {
@@ -119,6 +141,13 @@
 .c-bracket { stroke: var(--chart-ink); stroke-width: 2; stroke-linecap: round; }
 .c-cross { stroke: var(--ink-3); stroke-width: 1; pointer-events: none; }
 .c-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+/* a dashed line is a target or a projection, never an observation */
+.c-line--dashed { stroke-dasharray: 7 6; stroke-linecap: butt; }
+/* hollow points (targets): the surface shows through, so they never read as measurements */
+.c-ring { fill: var(--here); stroke-width: 2.5; }
+/* the axis-break mark: two strokes across the axis, on a patch of the surface that cuts it */
+.c-break__gap { fill: none; stroke: var(--here); stroke-width: 6; stroke-linecap: round; }
+.c-break__mark { fill: none; stroke: var(--ink-2); stroke-width: 1.5; stroke-linecap: round; }
 .c-area { fill-opacity: 0.12; stroke: none; }
 .c-stretch { overflow: visible; pointer-events: none; }
 /* dots carry a ring in the surface colour so they survive overlaps */
@@ -179,6 +208,16 @@
 .chart__key--dot {
   border-radius: 50%;
 }
+.chart__key--dash {
+  block-size: 3px;
+  inline-size: 1.5em;
+  background: linear-gradient(to right, var(--k) 0 0.4em, transparent 0.4em 0.7em, var(--k) 0.7em 1.1em, transparent 1.1em 1.4em, var(--k) 1.4em);
+}
+.chart__key--ring {
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 0.16em var(--k);
+}
 .chart__key--light {
   background: var(--chart-track);
 }
@@ -229,6 +268,12 @@
 .chart__table th[scope='row'] {
   font-weight: var(--fw-medium);
   padding-inline-end: var(--sp-5);
+  /* wide enough that a label wraps between words, not inside one; the table scrolls instead */
+  min-inline-size: 7.5em;
+}
+/* a figure is never broken across lines */
+.chart__table td.num {
+  white-space: nowrap;
 }
 
 /* ---- tooltip ----------------------------------------------------------------- */

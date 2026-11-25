@@ -134,7 +134,8 @@
   --font-latin: 'Archivo';
   /* system CJK for body text; the web font is for headlines only (see fonts.css) */
   --font-cjk: 'PingFang TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', sans-serif;
-  --font-cjk-display: 'Noto Sans TC', var(--font-cjk);
+  /* headline CJK: the site's own subset first, the package's slices for anything it lacks */
+  --font-cjk-display: 'Noto Sans TC Headline', 'Noto Sans TC', var(--font-cjk);
   --font-zh: var(--font-latin), var(--font-cjk);
   --font-en: var(--font-latin), 'Archivo Punct', 'Helvetica Neue', Arial, var(--font-cjk);
   --font-zh-display: var(--font-latin), var(--font-cjk-display);

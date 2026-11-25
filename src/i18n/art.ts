@@ -6,7 +6,10 @@
 // Copy rules that bind these strings (editorial blueprint, Part 2):
 //  - the scene never states or implies a concentration (R11);
 //  - carbon monoxide, benzene and ultrafine particles are never ranked by
-//    harm: we say only that they cannot be smelled (R3);
+//    harm (R3). What can be said about smell is only what a checked source
+//    supports: carbon monoxide has no smell (WHO); benzene is unlikely to be
+//    smelled at roadside levels (thresholds are parts per million). Nothing
+//    is said about the smell of ultrafine particles: there is no source;
 //  - the stipple is traffic's, not the scooters' (3.0);
 //  - "zero" is only ever a scooter's own exhaust (R8).
 
@@ -130,8 +133,8 @@ export const art = {
     ufp: {
       title: { 'zh-TW': '細點：車流裡的超細微粒', en: 'Fine dots: ultrafine particles in traffic' } as L10n,
       body: {
-        'zh-TW': '沒有味道，也不只來自機車。整條街畫得一樣密，換成電動機車之後還在。',
-        en: 'No smell, and not only from scooters. Drawn at one density across the whole street, and still there in the electric frame.',
+        'zh-TW': '不只來自機車。整條街畫得一樣密，換成電動機車之後還在。',
+        en: 'Not only from scooters. Drawn at one density across the whole street, and still there in the electric frame.',
       } as L10n,
     },
   },
@@ -166,8 +169,8 @@ export const art = {
     } as L10n,
     cannotTitle: { 'zh-TW': '聞不到', en: 'You cannot smell' } as L10n,
     cannotBody: {
-      'zh-TW': '一氧化碳、苯、車流裡的超細微粒。',
-      en: 'Carbon monoxide, benzene, and the ultrafine particles in traffic.',
+      'zh-TW': '一氧化碳：沒有味道。苯：路邊那種濃度，不太可能聞得到。',
+      en: 'Carbon monoxide: no smell. Benzene: unlikely to be smelled at roadside levels.',
     } as L10n,
     footer: { 'zh-TW': '味道是警報，不是量表。', en: 'Smell is an alarm, not a gauge.' } as L10n,
   },

@@ -141,6 +141,32 @@ const cols = [
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
+  /* Phones: the legend takes a line of its own and the two options share the next one equally,
+     so the switch reads as one control instead of one button beside the legend and one under it. */
+  @media (max-width: 34em) {
+    .compare__switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--sp-2);
+    }
+    .compare__legend {
+      grid-column: 1 / -1;
+      margin-block-end: var(--sp-1);
+    }
+    .compare__opt {
+      display: flex;
+      min-inline-size: 0;
+    }
+    .compare__opt span {
+      flex: 1;
+      min-inline-size: 0;
+      padding: 0.35rem 0.7rem;
+      line-height: var(--lh-snug);
+    }
+    .compare__opt span::before {
+      flex: none;
+    }
+  }
   /* The radios decide which frame shows. Both stay in the DOM. */
   .compare__scene {
     grid-area: 2 / 1;

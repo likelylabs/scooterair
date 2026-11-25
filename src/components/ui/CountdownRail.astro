@@ -17,7 +17,9 @@
  *   - Every <Chapter> prints data-rail-* attributes. A small script reads them,
  *     finds the chapter under the reading line and shows its count, pip and
  *     name. The count interpolates with scroll progress inside the chapter
- *     (chain.countdown in ui.ts holds the allocation).
+ *     (chain.countdown in ui.ts holds the allocation). Above the first chapter
+ *     (a page that opens with a hero or an index) no link is current: the LED
+ *     shows dashes, no pip is ringed and the strip reads rail.menu ("跳到章節").
  *   - Without JavaScript the LED is not rendered at all (a frozen "90" would be
  *     wrong three chapters down). The strip is then a plain <details> jump menu,
  *     and each chapter's kicker prints its own count as text.
@@ -38,7 +40,7 @@
  */
 import { href as link, type Locale } from '@/i18n';
 import { chain, rail, t } from '@/i18n/ui';
-import { ledDigit } from '@/components/art/parts';
+import { ledDigitRuns } from '@/components/art/parts';
 import Icon from './Icon.astro';
 import { pipSvg, pipsBody, pipsWidth } from './pips';
 
@@ -68,10 +70,12 @@ const text = {
   jump: rail.jump[locale],
 };
 const idleKicker = current ? t(chain.linkN, locale, { n: current }) : '';
-const idleName = current ? text_name(current) : { 'zh-TW': '跳到章節', en: 'Jump to a chapter' }[locale];
+/** The strip's label when it is not on a chapter: without JavaScript, and above the first chapter. */
+const menuLabel = rail.menu[locale];
+const idleName = current ? text_name(current) : menuLabel;
 ---
 
-<nav class:list={['rail', cls]} aria-label={rail.label[locale]} data-rail data-text={JSON.stringify(text)}>
+<nav class:list={['rail', cls]} aria-label={rail.label[locale]} data-rail data-text={JSON.stringify({ ...text, idle: menuLabel })}>
   <details class="rail__menu">
     <summary class="rail__bar">
       <span class="container rail__row">
@@ -80,7 +84,7 @@ const idleName = current ? text_name(current) : { 'zh-TW': '跳到章節', en: '
             {[0, 1].map((pos) => (
               <g data-led={pos}>
                 <path class="rail__dash" d={`M${3 + pos * 12},9h6`} data-on={shown ? undefined : ''} />
-                {digits.map((d) => <path class="rail__digit" d={ledDigit(d, 2, 0.8, 2 + pos * 12, 3)} data-d={d} data-on={shown && shown[pos] === d ? '' : undefined} />)}
+                {digits.map((d) => <path class="rail__digit" d={ledDigitRuns(d, 2, 2 + pos * 12, 3)} data-d={d} data-on={shown && shown[pos] === d ? '' : undefined} />)}
               </g>
             ))}
           </svg>
@@ -165,8 +169,13 @@ const idleName = current ? text_name(current) : { 'zh-TW': '跳到章節', en: '
   .rail__dash {
     visibility: hidden;
   }
+  /* each run of lit dots is one short line; the dash pattern turns it into dots (see parts.ts ledRuns) */
   .rail__digit {
-    fill: var(--signal-red-led);
+    fill: none;
+    stroke: var(--signal-red-led);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 0.01 1.99;
   }
   .rail__dash {
     fill: none;
@@ -178,10 +187,10 @@ const idleName = current ? text_name(current) : { 'zh-TW': '跳到章節', en: '
     visibility: visible;
   }
   .rail__led[data-phase='green'] .rail__digit {
-    fill: var(--signal-green-led);
+    stroke: var(--signal-green-led);
   }
   .rail__led[data-phase='paused'] .rail__digit {
-    fill: var(--asphalt-300);
+    stroke: var(--asphalt-300);
   }
   .rail__now {
     display: flex;
@@ -335,7 +344,7 @@ const idleName = current ? text_name(current) : { 'zh-TW': '跳到章節', en: '
   const el = document.querySelector<HTMLElement>('[data-rail]');
   const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-rail-chapter]'));
   if (el && chapters.length) {
-    const text = JSON.parse(el.dataset.text ?? '{}') as { link: string; links: string[]; jump: string };
+    const text = JSON.parse(el.dataset.text ?? '{}') as { link: string; links: string[]; jump: string; idle?: string };
     const led = el.querySelector<HTMLElement>('.rail__led');
     const kicker = el.querySelector<HTMLElement>('[data-rail-kicker]');
     const name = el.querySelector<HTMLElement>('[data-rail-name]');
@@ -360,7 +369,18 @@ const idleName = current ? text_name(current) : { 'zh-TW': '跳到章節', en: '
       const line = top + (window.innerHeight - top) * 0.33;
       let cur: HTMLElement | null = null;
       for (const c of chapters) if (c.getBoundingClientRect().top <= line) cur = c;
-      cur ??= chapters[0];
+      if (!cur) {
+        // above the first chapter (a page that opens with a hero or an index): the strip is a
+        // jump menu and nothing else. No link is "current" until the reader reaches one.
+        if (shown === 'idle') return;
+        shown = 'idle';
+        setLed(null, 'off');
+        el.querySelectorAll<SVGGElement>('.rail__pips [data-pip]').forEach((g) => g.removeAttribute('data-now'));
+        el.querySelectorAll<HTMLAnchorElement>('[data-rail-item]').forEach((a) => a.removeAttribute('aria-current'));
+        if (kicker) kicker.textContent = '';
+        if (name) name.textContent = text.idle ?? '';
+        return;
+      }
       const box = cur.getBoundingClientRect();
       const p = Math.max(0, Math.min(1, (line - box.top) / Math.max(1, box.height)));
       const d = cur.dataset;

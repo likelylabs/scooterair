@@ -56,12 +56,13 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '兩組單位不同，不可共用數值軸。這是合格上限，不是實際排放；700 cc以上機車仍適用舊標準。',
-      'The two datasets have different units and must not share an axis. These are pass limits, not actual emissions; machines of 700 cc and above stay on the old standard.',
+      '兩組的單位不同，不能放在同一個刻度上比較。這是合格上限，不是實際排放；700 cc以上機車仍適用舊標準。',
+      'The two datasets are in different units and cannot be read against one scale. These are pass limits, not actual emissions; machines of 700 cc and above stay on the old standard.',
     ),
     requiresCaveat: true,
     relatedFacts: ['idle-test-limits'],
     chainLink: 1,
+    editorNote: 'The two datasets must not share a value axis.',
     research: 'redlight/idle-emissions#moenv-idle-limits-inuse',
   },
   'inspection-2025-per-100': {
@@ -263,7 +264,7 @@ export const redlightSeries = {
     sources: ['tsai-2023-atmosphere'],
     confidence: 'verified',
     evidence: 'modelled-tw',
-    caveat: t('學術研究的模式推估，只有四個年度，點與點之間不可視為實測趨勢；這是排放量，不是行人吸入的濃度。', 'An academic modelled estimate with four years only; do not read the lines between points as measured trends. These are emissions, not what pedestrians breathe.'),
+    caveat: t('學術研究的模式推估，只有四個年度，點與點之間的連線不是量測到的趨勢；這是排放量，不是行人吸入的濃度。', 'An academic modelled estimate with four years only; the lines between points are not measured trends. These are emissions, not what pedestrians breathe.'),
     requiresCaveat: true,
     relatedFacts: ['tsai2023-benzene-tonnes-2021', 'tsai2023-trend-2013-2021'],
     chainLink: 1,
@@ -331,12 +332,13 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '兩組單位不同，不可共用數值軸。迴歸估計值，論文未定義「±」；機車假設全部燒汽油。同一隧道中機車的微粒排放是三類中最低。',
-      'Different units; do not share an axis. Regression estimates with an undefined "±"; all motorcycles assumed gasoline. In the same tunnel motorcycles had the lowest particle emissions of the three classes.',
+      '兩組的單位不同，不能放在同一個刻度上比較。迴歸估計值，論文未定義「±」；機車假設全部燒汽油。同一隧道中機車的微粒排放是三類中最低。',
+      'Different units, which cannot be read against one scale. Regression estimates with an undefined "±"; all motorcycles assumed gasoline. In the same tunnel motorcycles had the lowest particle emissions of the three classes.',
     ),
     requiresCaveat: true,
     relatedFacts: ['tunnel-co-by-vehicle-class-ting2023', 'tunnel-particles-heavy-vehicles-ting2023'],
     chainLink: 1,
+    editorNote: 'The two datasets must not share a value axis.',
     research: 'papers/ting-2023-envres#mc-ldv-hdv-co-fcef; papers/ting-2023-envres#mc-ldv-hdv-co-vkef',
   },
 
@@ -345,7 +347,7 @@ export const redlightSeries = {
   // -------------------------------------------------------------------------
   'wu2021-quiet-route': {
     topic: 'exposure',
-    title: t('小巷路線比主要幹道少多少（Wu等，2021）', 'How much less on the side-street route (Wu et al., 2021)'),
+    title: t('小巷路線比主要幹道少多少（Wu 等，2021）', 'How much less on the side-street route (Wu et al., 2021)'),
     description: t('調整背景與風速後，與主要幹道路線相比的差異百分比。', 'Percent difference from the main-road route, adjusted for background and wind.'),
     chart: 'grouped-bar',
     unit: 'percent',
@@ -387,7 +389,7 @@ export const redlightSeries = {
   },
   'wu2021-station-correlation': {
     topic: 'exposure',
-    title: t('騎士暴露與測站的相關（Wu等，2021）', 'How well stations track riders\' exposure (Wu et al., 2021)'),
+    title: t('騎士暴露與測站的相關（Wu 等，2021）', 'How well stations track riders\' exposure (Wu et al., 2021)'),
     description: t('PM2.5跟得上測站，苯系物跟不上。', 'PM2.5 tracks the stations; BTEX does not.'),
     chart: 'range',
     unit: 'correlation-r',
@@ -433,9 +435,10 @@ export const redlightSeries = {
     sources: ['moenv-2018-taipei-commute-press'],
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('騎士與乘客，不是行人；新聞稿沒有樣本數。不可與其他研究合併。', 'Riders and passengers, not pedestrians; no sample size in the release. Do not merge with other studies.'),
+    caveat: t('騎士與乘客，不是行人；新聞稿沒有樣本數。它和其他研究是不同的量測。', 'Riders and passengers, not pedestrians; no sample size in the release. It is a separate measurement from the other studies.'),
     relatedFacts: ['moenv-2017-taipei-commute'],
     chainLink: 3,
+    editorNote: 'Never merge with other commute studies.',
     research: 'redlight/intersection-peaks#moenv-2018-taipei-commute',
   },
 
@@ -489,12 +492,13 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '不同來源相差一到兩個數量級，只能寫成「十億分之幾」「百萬分之幾」，不可寫單一數字。沒有研究找出機車廢氣氣味的主要物質。超細微粒不在圖中：我們的研究資料沒有任何查證過的來源說明它的氣味。',
-      'Sources differ by one to two orders of magnitude, so write "parts per billion" or "parts per million", never a single value. No study has identified the main odorants of scooter exhaust. Ultrafine particles are not shown: no checked source in our research documents their odour.',
+      '不同來源相差一到兩個數量級，所以只有「十億分之幾」「百萬分之幾」這樣的數量級有意義，沒有準確的單一數字。沒有研究找出機車廢氣氣味的主要物質。超細微粒不在圖中：我們的研究資料沒有任何查證過的來源說明它的氣味。',
+      'Sources differ by one to two orders of magnitude, so only the order of magnitude (parts per billion, parts per million) is meaningful, not a single value. No study has identified the main odorants of scooter exhaust. Ultrafine particles are not shown: no checked source in our research documents their odour.',
     ),
     requiresCaveat: true,
     relatedFacts: ['odour-thresholds', 'co-odourless'],
     chainLink: 4,
+    editorNote: 'R4: write orders of magnitude only, never single values.',
     research: 'redlight/smell-chemistry#nagata-thresholds; redlight/smell-chemistry#epa-odour-thresholds-benzene-hcho-acetaldehyde; redlight/smell-chemistry#who-co-benzene',
   },
 
@@ -503,8 +507,8 @@ export const redlightSeries = {
   // -------------------------------------------------------------------------
   'chuang2020-effects-per-iqr': {
     topic: 'health',
-    title: t('PM2.5每高一個四分位距，同一小時的生理變化（Chuang等，2020）', 'Same-hour changes per interquartile range of PM2.5 (Chuang et al., 2020)'),
-    description: t('百分比與95%信賴區間；各方式的增量不同，不可互相比較。', 'Percent change with 95% CI; each mode has its own increment, so modes cannot be compared.'),
+    title: t('PM2.5每高一個四分位距，同一小時的生理變化（Chuang 等，2020）', 'Same-hour changes per interquartile range of PM2.5 (Chuang et al., 2020)'),
+    description: t('百分比與95%信賴區間；各方式的增量不同，百分比不能直接互相比較。', 'Percent change with 95% CI; each mode has its own increment, so modes cannot be compared.'),
     chart: 'dot-range',
     unit: 'percent',
     categories: [
@@ -605,12 +609,13 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '污染物、高度、儀器與時間都不同，不可合併成平均。59%只是一項研究；44%是「最多」；沒有任何台灣研究。標示回顧來源的數字是回顧所引用，原始研究未開啟。',
-      'Pollutants, heights, instruments and averaging times all differ; do not average them. 59% is one study; 44% is "up to"; none is from Taiwan. Values sourced to the review are as cited there; the original studies were not opened.',
+      '污染物、高度、儀器與時間都不同，所以不能合併成一個平均值。59%只是一項研究；44%是「最多」；沒有任何台灣研究。標示回顧來源的數字是回顧所引用，原始研究未開啟。',
+      'Pollutants, heights, instruments and averaging times all differ; so they cannot be averaged into one figure. 59% is one study; 44% is "up to"; none is from Taiwan. Values sourced to the review are as cited there; the original studies were not opened.',
     ),
     requiresCaveat: true,
     relatedFacts: ['stroller-height-review', 'pram-height-sharma2020', 'child-height-harr2022'],
     chainLink: 6,
+    editorNote: 'R5: never average; 59% is one US study (PM2.5); 44% is "up to" (fine particles, one UK experiment).',
     research: 'papers/sharma-kumar-2018-envint#overall-up-to-60; papers/sharma-kumar-2018-envint#galea2014-no-difference; papers/sharma-kumar-2018-envint#kumar2017-baby-vs-adult; 03 §5; 02 §6',
   },
 } satisfies Record<string, SeriesInput>;

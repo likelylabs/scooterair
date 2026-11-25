@@ -8,6 +8,8 @@
  *
  * Props
  *   locale  Locale
+ *   level   heading level of the four panel titles (2–6, default 4). Set it to one
+ *           below the heading the diagram sits under, so the outline has no gap.
  *   class   extra class
  * Slots
  *   default  optional extra note under the diagram (e.g. a link to the brief)
@@ -20,9 +22,11 @@ import { planSvg } from './plan';
 
 interface Props {
   locale: Locale;
+  level?: 2 | 3 | 4 | 5 | 6;
   class?: string;
 }
-const { locale, class: cls } = Astro.props;
+const { locale, level = 4, class: cls } = Astro.props;
+const H = `h${level}` as 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 const m = art.measure;
 const plan = planSvg({ locale, labels: false, instruments: true });
 ---
@@ -33,7 +37,7 @@ const plan = planSvg({ locale, labels: false, instruments: true });
 
   <div class="measure__grid">
     <section>
-      <h4 class="measure__h">{m.whereTitle[locale]}</h4>
+      <H class="measure__h">{m.whereTitle[locale]}</H>
       <ol class="measure__points">
         {m.points.map((p, i) => (
           <li><span class="measure__n" aria-hidden="true">{i + 1}</span><span>{p[locale]}</span></li>
@@ -42,7 +46,7 @@ const plan = planSvg({ locale, labels: false, instruments: true });
     </section>
 
     <section>
-      <h4 class="measure__h">{m.heightTitle[locale]}</h4>
+      <H class="measure__h">{m.heightTitle[locale]}</H>
       <div class="measure__heights">
         <svg viewBox="-34 -176 96 184" role="img" aria-label={`${m.heightLow[locale]} ${m.heightHigh[locale]}`} focusable="false">
           <Fragment set:html={hatchBand({ x0: -34, width: 96, top: 100, pitch: 13 })} />
@@ -60,14 +64,14 @@ const plan = planSvg({ locale, labels: false, instruments: true });
     </section>
 
     <section>
-      <h4 class="measure__h">{m.whatTitle[locale]}</h4>
+      <H class="measure__h">{m.whatTitle[locale]}</H>
       <ul class="measure__what">
         {m.what.map((w) => <li>{w[locale]}</li>)}
       </ul>
     </section>
 
     <section>
-      <h4 class="measure__h">{m.clockTitle[locale]}</h4>
+      <H class="measure__h">{m.clockTitle[locale]}</H>
       <div class="measure__clock" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
       <p class="measure__p">{m.clock[locale]}</p>
     </section>
@@ -116,8 +120,12 @@ const plan = planSvg({ locale, labels: false, instruments: true });
     margin-block-end: var(--sp-2);
     padding-block-end: var(--sp-1);
     border-block-end: 2px solid var(--ink);
+    /* the same at every `level`: the level is for the outline, not the look */
+    font-family: var(--font-body);
     font-size: var(--fs-sm);
     font-weight: var(--fw-black);
+    font-stretch: 100%;
+    line-height: var(--lh-snug);
   }
   .measure__points,
   .measure__what,

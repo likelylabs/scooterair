@@ -69,10 +69,11 @@ export const inspection = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '2004年的一氧化碳上限（每公里7.0克）高於1998年，是因為測試方法改變，不是放寬，因此不可說7.0到1.0是七倍的改善。這些是新車認證值，不是路上機車的實際排放。',
-      'The 2004 CO limit (7.0 g/km) is higher than 1998\'s because the test procedure changed, not because it loosened, so 7.0 to 1.0 must not be called a seven-fold improvement. These are type-approval values, not on-road emissions.',
+      '2004年的一氧化碳上限（每公里7.0克）高於1998年，是因為測試方法改變，不是放寬，所以從7.0到1.0並不是七倍的改善。這些是新車認證值，不是路上機車的實際排放。',
+      'The 2004 CO limit (7.0 g/km) is higher than 1998\'s because the test procedure changed, not because it loosened, so 7.0 to 1.0 is not a seven-fold improvement. These are type-approval values, not on-road emissions.',
     ),
     chainLink: 1,
+    editorNote: 'Never call 7.0 to 1.0 a seven-fold improvement.',
     research: 'redlight/idle-emissions#moenv-gkm-limits-by-phase; redlight/idle-emissions#artc-phase-cycle-context',
   },
   'inspection-2025': {
@@ -102,11 +103,12 @@ export const inspection = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '只有出廠滿5年的機車需要定檢，而且只測怠速。不合格率是到檢機車中的比例，沒到檢的機車沒有受測，很可能更髒；到檢率的分母沒有扣除已不再使用的機車，因此偏低。不可說成「96%的機車很乾淨」。',
-      'Only scooters five or more years old are tested, and only at idle. The failure rate is among scooters that turned up; non-attenders were not tested and are probably dirtier. The attendance denominator includes scooters no longer in use, so attendance is understated. Never write "96% of scooters are clean".',
+      '只有出廠滿5年的機車需要定檢，而且只測怠速。不合格率是到檢機車中的比例，沒到檢的機車沒有受測，很可能更髒；到檢率的分母沒有扣除已不再使用的機車，因此偏低。所以合格率不能說明路上96%的機車都很乾淨。',
+      'Only scooters five or more years old are tested, and only at idle. The failure rate is among scooters that turned up; non-attenders were not tested and are probably dirtier. The attendance denominator includes scooters no longer in use, so attendance is understated. So the pass rate does not show that 96% of scooters on the road are clean.',
     ),
     requiresCaveat: true,
     chainLink: 1,
+    editorNote: 'Never write "96% of scooters are clean".',
     research: 'redlight/idle-emissions#moenv-inspection-2025',
   },
   'inspection-2025-per-100': {
@@ -204,8 +206,8 @@ export const inspection = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '只有40輛，期別、車齡與里程混雜；測試循環包含怠速，但沒有單獨列出怠速排放。與Tsai等2018年的研究出自同一團隊，可能有部分相同車輛，不應視為兩項獨立證據。' + ABSTRACT_ONLY['zh-TW'],
-      'Only 40 vehicles; phase, age and mileage are confounded; the cycle includes idling but idle emissions are not reported separately. Same group as Tsai et al. 2018, possibly overlapping fleets, so do not count them as independent evidence. ' + ABSTRACT_ONLY.en,
+      '只有40輛，期別、車齡與里程混雜；測試循環包含怠速，但沒有單獨列出怠速排放。與Tsai 等2018年的研究出自同一團隊，可能有部分相同車輛，不應視為兩項獨立證據。' + ABSTRACT_ONLY['zh-TW'],
+      'Only 40 vehicles; phase, age and mileage are confounded; the cycle includes idling but idle emissions are not reported separately. Same group as Tsai et al. 2018, possibly overlapping fleets, so the two papers may not be independent evidence. ' + ABSTRACT_ONLY.en,
     ),
     chainLink: 1,
     research: 'redlight/idle-emissions#tsai-2017-phases; redlight/smell-chemistry#tsai2017-btex-phases',
@@ -228,11 +230,12 @@ export const inspection = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '三台車的個案，不是車隊平均，只能在證據頁以獨立區塊呈現。摘要沒有說明三台車如何分配期別；一氧化碳百分比是實際道路行駛的排氣濃度，不是怠速。' + ABSTRACT_ONLY['zh-TW'],
-      'A three-vehicle case study, not a fleet average; show it only on the evidence page in its own panel. The abstract does not state how the three machines split by phase; the CO percentages are exhaust concentrations under real-world driving, not at idle. ' + ABSTRACT_ONLY.en,
+      '三台車的個案，不是車隊平均。摘要沒有說明三台車如何分配期別；一氧化碳百分比是實際道路行駛的排氣濃度，不是怠速。' + ABSTRACT_ONLY['zh-TW'],
+      'A three-vehicle case study, not a fleet average. The abstract does not state how the three machines split by phase; the CO percentages are exhaust concentrations under real-world driving, not at idle. ' + ABSTRACT_ONLY.en,
     ),
     requiresCaveat: true,
     chainLink: 1,
+    editorNote: 'R13: show only on /evidence/, labelled 三台車的個案 / three-scooter case study, in a visually separate panel.',
     research: 'redlight/idle-emissions#tsai-2026-phase4-vs-7; redlight/smell-chemistry#tsai2026-phaseIV-highemitters',
   },
   'cold-start-multipliers': {
@@ -323,11 +326,12 @@ export const intersection = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '不可寫成紅燈怠速「合法」或「違規」：機車是否受這條規定管、號誌停等是否屬於「停車怠速等候」，都沒有找到官方解釋。電動車不適用。',
-      'Never write that idling at a red light is "legal" or "illegal": no official interpretation was found on whether the rule reaches scooters or whether a signal wait counts as waiting while stopped. Electric vehicles are excluded.',
+      '現行的怠速規定管的是停車等候超過三分鐘的車；一個普通的紅燈，不在它要管的範圍裡。機車是否受這條規定管、號誌停等是否算「停車怠速等候」，都沒有找到官方解釋。電動車不適用。',
+      'The current idling rule covers vehicles waiting more than three minutes; an ordinary red light is not what it is written for. No official interpretation was found on whether the rule reaches scooters, or whether a signal wait counts as waiting while stopped. Electric vehicles are excluded.',
     ),
     requiresCaveat: true,
     chainLink: 2,
+    editorNote: 'R1: never write that red-light idling is legal, illegal, 合法, 不違規 or 違規.',
     research: 'redlight/policy-idling#idling-regulation-text; redlight/policy-idling#apca-idling-fine-definition',
   },
   'first-metre-sharma-kumar-2018': {
@@ -411,8 +415,8 @@ export const intersection = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '這是數百公尺尺度的下降，不是行人與停等車陣之間一兩公尺的距離，不可換算成停止線的距離。與機車無關。' + ABSTRACT_ONLY['zh-TW'],
-      'Decay over hundreds of metres, not the metre or two between a pedestrian and a queue; do not translate it into stop-line distances. Silent on scooters. ' + ABSTRACT_ONLY.en,
+      '這是數百公尺尺度的下降，不是行人與停等車陣之間一兩公尺的距離，無法換算成停止線旁的距離。與機車無關。' + ABSTRACT_ONLY['zh-TW'],
+      'Decay over hundreds of metres, not the metre or two between a pedestrian and a queue; it cannot be translated into distances at a stop line. Silent on scooters. ' + ABSTRACT_ONLY.en,
     ),
     chainLink: 2,
     research: 'redlight/intersection-peaks#karner-2010-distance-decay',
@@ -458,10 +462,11 @@ export const intersection = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '不是台灣的數據，不可套用在台灣機車上；排放標準、里程與是否噴射都未說明。怠速占總量很小，它的重要性在於集中在路口。' + ABSTRACT_ONLY['zh-TW'],
-      'Not Taiwanese data and must not be applied to Taiwanese scooters; standard, mileage and fuel-injection status are not given. Idling is a small share of totals; its relevance is concentration at junctions. ' + ABSTRACT_ONLY.en,
+      '不是台灣的數據，不一定適用於台灣機車；排放標準、里程與是否噴射都未說明。怠速占總量很小，它的重要性在於集中在路口。' + ABSTRACT_ONLY['zh-TW'],
+      'Not Taiwanese data, and it may not hold for Taiwanese scooters; standard, mileage and fuel-injection status are not given. Idling is a small share of totals; its relevance is concentration at junctions. ' + ABSTRACT_ONLY.en,
     ),
     chainLink: 2,
+    editorNote: 'Never apply the Hanoi rates to Taiwanese scooters.',
     research: 'redlight/idle-emissions#nguyen-2021-hanoi-idle',
   },
   'idle-time-vs-acceleration-seedam2017': {
@@ -563,11 +568,12 @@ export const smell = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '閾值是單一物質在乾淨空氣中、依測試者而定的值，不同來源差一到兩個數量級，只能當作數量級，不可寫成單一數字。沒有任何研究找出機車廢氣氣味的主要來源物質；醛類只是可能的候選。一氧化碳不在表中。',
-      'Thresholds are for single compounds in clean air and depend on the panel; sources differ by one to two orders of magnitude, so use them only as orders of magnitude, never single numbers. No study has identified the main odorants of scooter exhaust; aldehydes are only plausible candidates. Carbon monoxide is not in the table.',
+      '閾值是單一物質在乾淨空氣中、依測試者而定的值，不同來源差一到兩個數量級，所以只有數量級有意義，沒有準確的單一數字。沒有任何研究找出機車廢氣氣味的主要來源物質；醛類只是可能的候選。一氧化碳不在表中。',
+      'Thresholds are for single compounds in clean air and depend on the panel; sources differ by one to two orders of magnitude, so only the order of magnitude is meaningful, not a precise single value. No study has identified the main odorants of scooter exhaust; aldehydes are only plausible candidates. Carbon monoxide is not in the table.',
     ),
     requiresCaveat: true,
     chainLink: 4,
+    editorNote: 'R4: odour thresholds as orders of magnitude only (十億分之幾, 百萬分之幾), never single values.',
     research: 'redlight/smell-chemistry#nagata-thresholds; redlight/smell-chemistry#epa-odour-thresholds-benzene-hcho-acetaldehyde',
   },
   'co-odourless': {
@@ -583,10 +589,11 @@ export const smell = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '我們的推論：既然一氧化碳無味，聞到廢氣味並不能告訴你一氧化碳有多少。一氧化碳在這裡是廢氣的指標；沒有任何研究顯示路口的一氧化碳達到危害健康的程度。不可依危害大小排序一氧化碳、苯與超細微粒。',
-      'Our inference: since carbon monoxide has no smell, smelling exhaust cannot tell you how much of it is there. Carbon monoxide is used here as a marker of exhaust; no study shows kerbside carbon monoxide reaching harmful levels. Do not rank carbon monoxide, benzene and ultrafine particles by harm.',
+      '我們的推論：既然一氧化碳無味，聞到廢氣味並不能告訴你一氧化碳有多少。一氧化碳在這裡是廢氣的指標；沒有任何研究顯示路口的一氧化碳達到危害健康的程度。',
+      'Our inference: since carbon monoxide has no smell, smelling exhaust cannot tell you how much of it is there. Carbon monoxide is used here as a marker of exhaust; no study shows kerbside carbon monoxide reaching harmful levels.',
     ),
     chainLink: 4,
+    editorNote: 'R3: never rank carbon monoxide, benzene and ultrafine particles by harm.',
     research: 'redlight/smell-chemistry#who-co-benzene',
   },
   'who-benzene-no-safe-level': {
@@ -655,6 +662,7 @@ export const smell = {
 export const acute = {
   'mccreanor2007-london-walk': {
     data: {
+      exposureHours: v(2, 'hours', { note: 'duration of each walk (Oxford Street or Hyde Park)' }),
       participants: v(60, 'people'),
       fev1Drop: v(6.1, 'percent', { bound: 'lte' }),
       fvcDrop: v(5.4, 'percent', { bound: 'lte' }),
@@ -716,7 +724,7 @@ export const acute = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '暴露是「在車上的時間」，包含壓力、噪音與體力，不是站在路邊；機車與自行車合併。每趟的絕對風險很小，這只是關聯，不能說紅燈會引發心肌梗塞。' + ABSTRACT_ONLY['zh-TW'],
+      '暴露是「在車上的時間」，包含壓力、噪音與體力，不是站在路邊；機車與自行車合併。每趟的絕對風險很小，這只是關聯，並沒有顯示紅燈會引發心肌梗塞。' + ABSTRACT_ONLY['zh-TW'],
       'Exposure means time spent travelling, with stress, noise and exertion, not standing at a kerb; motorcycles and bicycles were pooled. The absolute risk per trip is very small; this is an association and does not show a red light triggers a heart attack. ' + ABSTRACT_ONLY.en,
     ),
     requiresCaveat: true,
@@ -815,9 +823,10 @@ export const longterm = {
     sources: ['guo-2021-cmaj'],
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('健檢自選族群；分組切點不在摘要中；PM2.5是區域推估。不可據此叫人不要走路或運動。' + ASSOC['zh-TW'], 'A self-selected health-check population; cut-points are not in the abstract; PM2.5 is a regional estimate. Do not use it to tell people not to walk or exercise. ' + ASSOC.en),
+    caveat: t('健檢自選族群；分組切點不在摘要中；PM2.5是區域推估。這不是少走路或少運動的理由：同一研究中，規律運動在每一個PM2.5等級都與較低的死亡風險有關。' + ASSOC['zh-TW'], 'A self-selected health-check population; cut-points are not in the abstract; PM2.5 is a regional estimate. It is no reason to walk or exercise less: in the same study, habitual exercise went with lower risk at every PM2.5 level. ' + ASSOC.en),
     requiresCaveat: true,
     chainLink: 5,
+    editorNote: 'Never use this to tell people not to walk or exercise.',
     research: 'redlight/long-term-traffic#mj-cohort-pm25-mortality-exercise-guo-2021',
   },
   'huang2021-never-smoker-lung-cancer': {
@@ -836,9 +845,10 @@ export const longterm = {
     sources: ['huang-2021-ijerph'],
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('只能用在證據頁「我們不用的數字」說明處。單一世代、自選族群，可能受煮食油煙、氡氣與二手菸干擾；死亡的區間下限1.01接近無效。' + ASSOC['zh-TW'], 'For the evidence page\'s "numbers we do not use" note only. One self-selected cohort, with possible confounding by cooking fumes, radon and second-hand smoke; the death interval\'s lower bound (1.01) is close to null. ' + ASSOC.en),
+    caveat: t('單一世代、自選族群，可能受煮食油煙、氡氣與二手菸干擾；死亡的區間下限1.01接近無效。' + ASSOC['zh-TW'], 'One self-selected cohort, with possible confounding by cooking fumes, radon and second-hand smoke; the death interval\'s lower bound (1.01) is close to null. ' + ASSOC.en),
     requiresCaveat: true,
     chainLink: 5,
+    editorNote: 'R14: only on /evidence/#not-used ("numbers we do not use").',
     research: 'redlight/long-term-traffic#mj-cohort-lung-cancer-never-smokers-huang-2021',
   },
   'pan2021-truck-traffic-cvd': {
@@ -872,8 +882,9 @@ export const longterm = {
     sources: ['who-2024-ambient-factsheet'],
     confidence: 'verified',
     evidence: 'international',
-    caveat: t('所有來源的模式歸因，不是交通或機車；不可與另一個「700萬」（2018年估計、室內外合計）混用。', 'A modelled attribution for all sources, not traffic or scooters; do not mix it with the separate "7 million" (a 2018 estimate, outdoor and household combined).'),
+    caveat: t('所有來源的模式歸因，不是交通或機車；常見的另一個「700萬」是2018年的估計，室外與室內合計，是不同的數字。', 'A modelled attribution for all sources, not traffic or scooters; the "7 million" often quoted is a different figure, a 2018 estimate for outdoor and household pollution combined.'),
     chainLink: 5,
+    editorNote: 'Do not mix with the 2018 "7 million" (outdoor plus household).',
     research: 'redlight/long-term-traffic#who-ambient-burden-4-2m-2019',
   },
 } satisfies Record<string, FactInput>;
@@ -951,8 +962,9 @@ export const vulnerable = {
     sources: ['li-2025-jegh'],
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('不吸菸者只差約0.44 ppm，吸菸主導整體數字；呼氣一氧化碳是暴露指標，不是健康結果，也不能和WHO的環境空氣值比較。不可寫成「一氧化碳中毒」。' + ABSTRACT_ONLY['zh-TW'], 'The non-smoker gap is about 0.44 ppm and smoking dominates the overall figure; breath CO is an exposure marker, not a health outcome, and is not comparable with WHO ambient values. Never write "poisoned". ' + ABSTRACT_ONLY.en),
+    caveat: t('不吸菸者只差約0.44 ppm，吸菸主導整體數字；呼氣一氧化碳是暴露指標，不是健康結果，也不能和WHO的環境空氣值比較。這不是一氧化碳中毒。' + ABSTRACT_ONLY['zh-TW'], 'The non-smoker gap is about 0.44 ppm and smoking dominates the overall figure; breath CO is an exposure marker, not a health outcome, and is not comparable with WHO ambient values. This is not carbon monoxide poisoning. ' + ABSTRACT_ONLY.en),
     chainLink: 6,
+    editorNote: 'Never write "poisoned" / 一氧化碳中毒.',
     research: 'redlight/vulnerable-groups#li2025-delivery-workers-co; redlight/acute-health#li-2025-food-delivery-co',
   },
   'lai2005-toll-workers': {
@@ -1114,7 +1126,7 @@ export const levers = {
     sources: ['platt-2014-natcomms'],
     confidence: 'verified',
     evidence: 'international',
-    caveat: t('只適用於二行程車，不能套用在今日以四行程為主的車隊；台灣2025年仍有24萬3,725輛2004年以前出廠的二行程機車接到定檢通知。' + ABSTRACT_ONLY['zh-TW'], 'Two-strokes only; do not apply to today\'s mostly four-stroke fleet. In 2025, 243,725 two-strokes built in 2004 or earlier were still notified for inspection in Taiwan. ' + ABSTRACT_ONLY.en),
+    caveat: t('只適用於二行程車，不能套用在今日以四行程為主的車隊；台灣2025年仍有24萬3,725輛2004年以前出廠的二行程機車接到定檢通知。' + ABSTRACT_ONLY['zh-TW'], 'Two-strokes only; it does not describe today\'s mostly four-stroke fleet. In 2025, 243,725 two-strokes built in 2004 or earlier were still notified for inspection in Taiwan. ' + ABSTRACT_ONLY.en),
     chainLink: 7,
     alsoLinks: [1],
     research: 'redlight/idle-emissions#platt-2014-two-stroke; redlight/policy-idling#platt-two-stroke-2014',

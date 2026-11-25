@@ -52,8 +52,18 @@ export interface FactInput {
   locator?: string;
   confidence: Confidence;
   evidence: Evidence;
-  /** What the reader must know to avoid being misled. */
+  /**
+   * What the reader must know to avoid being misled, stated as a limit of the evidence in plain
+   * words ("this rule covers vehicles waiting more than three minutes"). Pages print it to
+   * readers. Never address editors here: instructions go in `editorNote`.
+   */
   caveat?: L10n;
+  /**
+   * Internal note for editors and page builders (English): how the fact may and may not be used.
+   * Never rendered: localizeFact() does not return it. Binding wording rules belong in
+   * claims-policy.ts as well.
+   */
+  editorNote?: string;
   /** If true, a page must show the caveat right next to the number. */
   requiresCaveat?: boolean;
   /** For evidence 'derived': the facts whose numbers the arithmetic uses. */
@@ -78,12 +88,12 @@ const NOT_PLACE = t('不限地區（危害分類）', 'Not place-specific (hazar
 
 const TEDS_PERIOD = t('基準年2023年（民國112年），TEDS 13.0版，2026年1月發布', 'Base year 2023 (TEDS 13.0, published January 2026)');
 const TEDS_SCOPE = t(
-  '排放清冊只計算國內來源直接排放的原生性污染物，不含境外傳輸，也不含在空氣中二次生成的微粒；排放量占比不等於對空氣中濃度的貢獻，環境部也明確提醒不可如此解讀。',
-  'The inventory counts only primary pollutants emitted directly by domestic sources; it excludes transboundary pollution and particles formed later in the air. An emissions share is not a share of what people breathe, and MOENV explicitly warns against reading it that way.',
+  '排放清冊只計算國內來源直接排放的原生性污染物，不含境外傳輸，也不含在空氣中二次生成的微粒；排放量占比不等於對空氣中濃度的貢獻，環境部也特別提醒兩者是不同的事。',
+  'The inventory counts only primary pollutants emitted directly by domestic sources; it excludes transboundary pollution and particles formed later in the air. An emissions share is not a share of what people breathe, and MOENV itself points out that the two are different things.',
 );
 const TEDS_COMBINED = t(
-  '「燃油機車合計」是本站將清冊中二行程與四行程機車兩列相加的結果；兩列本身為環境部官方數字。',
-  'The "gasoline scooters combined" figure is our sum of the inventory\'s two-stroke and four-stroke rows; each row is an official MOENV figure.',
+  '這是環境部排放清冊的官方數字；清冊把燃油機車分成二行程與四行程兩列，「燃油機車合計」是這兩列相加。',
+  'These are official MOENV inventory figures; the inventory lists gasoline scooters in two rows, two-stroke and four-stroke, and the combined share is the sum of those two rows.',
 );
 const IOT_CAVEAT = t(
   '運研所以實測資料驅動擴散模式，模擬「有／無」改善措施的情境，並非在同一路口實際前後量測；報告封面註明結論不代表交通部意見。',
@@ -137,6 +147,10 @@ const fleet = {
     locator: '「107 年設籍數超過 19 萬輛，113 年已成長至 77 萬輛」',
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '這些是設籍數，不是路上實際在騎的車；環境部報告只給概數（「超過19萬輛」「77萬輛」）。',
+      'These are registered vehicles, not the ones actually on the road; the MOENV review gives rounded figures only ("more than 190,000", "770,000").',
+    ),
     chainLink: 7,
     research: '01 §1',
   },
@@ -153,6 +167,10 @@ const fleet = {
     confidence: 'verified',
     evidence: 'derived',
     derivedFrom: ['fleet-registered-2024', 'fleet-electric-registered-2024'],
+    caveat: t(
+      '本站以環境部報告的77萬輛除以同一報告的1,466萬輛登記機車計算；兩者都是設籍數，包含已不常騎的車。',
+      'Our arithmetic: 770,000 divided by the 14.66 million registered motorcycles in the same MOENV review. Both are registrations, which include scooters rarely ridden.',
+    ),
     chainLink: 7,
     research: '01 Corrections #2',
   },
@@ -207,11 +225,12 @@ const fleet = {
     confidence: 'secondary',
     evidence: 'international',
     caveat: t(
-      '這份排名出自TVBS引述的Seasia Stats，非官方且未註明年份；台灣與越南只差3輛，在混用登記數與估計值的情況下差距不具意義，因此不能說台灣是「世界最高」。60與交通部的62.7不同，是定義與時間差異。',
+      '這份排名出自TVBS引述的Seasia Stats，非官方且未註明年份；台灣與越南只差3輛，在混用登記數與估計值的情況下差距不具意義，所以這份排名不足以說明台灣是「世界最高」。60與交通部的62.7不同，是定義與時間差異。',
       'The ranking is Seasia Stats as cited by TVBS: unofficial and undated. The 3-point gap to Vietnam is within the uncertainty of mixing registered counts with estimates, so Taiwan cannot be called "the world\'s highest". The 60 differs from MOTC\'s 62.7 because of definition and date.',
     ),
     requiresCaveat: true,
     chainLink: 1,
+    editorNote: 'Do not call Taiwan the highest in the world; the ranking is unofficial and the gap to Vietnam is within the uncertainty.',
     research: '01 §2',
   },
   'fleet-taipei-power-source-2024': {
@@ -280,6 +299,10 @@ const fleet = {
     locator: 'table 「全國 58.4 …臺北市 63.3 …新北市 61.2 …」',
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '這是調查中機車使用者自己說的「主要用途」，不是旅次或里程的比例。',
+      'This is the main purpose riders gave in a survey, not a share of trips or of distance ridden.',
+    ),
     chainLink: null,
     research: '01 §9',
   },
@@ -323,6 +346,10 @@ const fleet = {
     locator: 'row 「113 年 63.0 38.3 16.0 13.7 24.7 20.8 3.8 37.0 20.1 16.3 44.2…」',
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '只限台北市平日、9至12月的抽樣調查；台北的捷運與公車比其他城市多，其他五都與全國2024年的同類數字沒有找到。',
+      'A sample survey of Taipei City weekdays from September to December only; Taipei has far more metro and bus service than other cities, and comparable 2024 figures for the other five municipalities and for Taiwan as a whole were not found.',
+    ),
     chainLink: null,
     research: '01 §9',
   },
@@ -357,7 +384,7 @@ const electric = {
     confidence: 'secondary',
     evidence: 'official-tw',
     caveat: t(
-      '出自鉅亨網引述的交通部統計。2015至2018年與2020年的數字未能查證，因此只能說是「現有資料中」的高點。',
+      '出自鉅亨網引述的交通部統計。2015至2018年與2020年的數字未能查證，所以它只是現有資料年份中的高點。',
       'From an Anue (cnyes) report citing MOTC statistics. Figures for 2015–2018 and 2020 could not be verified, so this is the peak only among the years we have.',
     ),
     chainLink: 7,
@@ -515,10 +542,11 @@ const electric = {
     confidence: 'secondary',
     evidence: 'derived',
     caveat: t(
-      '單月數字，比例由本站計算；2026年其他月份未能查證，不可當作全年數字。',
-      'A single month, with the share calculated by us; other 2026 months could not be verified, so do not treat it as an annual figure.',
+      '單月數字，比例由本站計算；2026年其他月份未能查證，這個數字不代表全年。',
+      'A single month, with the share calculated by us; other 2026 months could not be verified, so it does not stand for the whole year.',
     ),
     chainLink: 7,
+    editorNote: 'Single month: never present as an annual share.',
     research: '01 §7',
   },
   'gas-scooter-excise-cut-2025': {
@@ -637,6 +665,10 @@ const policy = {
     locator: '「107 年已將機車數降至 100 萬輛以下，112 年進一步降至約 33 萬輛以下」「113 年進一步降至約 28 萬輛以下」',
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '環境部報告用的是「以下」的概數，不是精確的登記數；登記在案的二行程機車不一定都還在路上騎。',
+      'The MOENV reviews give rounded "or fewer" figures, not exact counts; not every registered two-stroke is still being ridden.',
+    ),
     chainLink: 1,
     research: '01 §6',
   },
@@ -769,7 +801,7 @@ const emissions = {
     sources: ['moenv-teds13-workbook'],
     locator: 'Sheet 全國: 二行程機車 PM2.5 98.1 t (0.29%); 四行程機車 343.6 t (1.02%); 總排放量 33,731.0',
     confidence: 'verified',
-    evidence: 'derived',
+    evidence: 'official-tw',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
     chainLink: 1,
     research: '01 §4',
@@ -791,7 +823,7 @@ const emissions = {
     sources: ['moenv-teds13-workbook'],
     locator: 'Sheet 全國: NMHC 二行程 1,972.9 t (0.56%); 四行程 33,513.2 t (9.44%); 總排放量 355,082.6',
     confidence: 'verified',
-    evidence: 'derived',
+    evidence: 'official-tw',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
     chainLink: 1,
     research: '01 §4',
@@ -813,7 +845,7 @@ const emissions = {
     sources: ['moenv-teds13-workbook'],
     locator: 'Sheet 全國: CO 二行程 2,604.1 t (0.54%); 四行程 71,935.9 t (15.05%); 總排放量 478,024.4',
     confidence: 'verified',
-    evidence: 'derived',
+    evidence: 'official-tw',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
     chainLink: 1,
     research: '01 §4',
@@ -835,7 +867,7 @@ const emissions = {
     sources: ['moenv-teds13-workbook'],
     locator: 'Sheet 全國: THC 二行程 2,133.2 t (0.49%); 四行程 35,147.6 t (8.11%); 總排放量 433,280.2',
     confidence: 'verified',
-    evidence: 'derived',
+    evidence: 'official-tw',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
     chainLink: 1,
     research: '01 §4',
@@ -857,7 +889,7 @@ const emissions = {
     sources: ['moenv-teds13-workbook'],
     locator: 'Sheet 全國: NOx 二行程 41.6 t (0.02%); 四行程 4,406.5 t (2.17%); 總排放量 202,776.2',
     confidence: 'verified',
-    evidence: 'derived',
+    evidence: 'official-tw',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
     chainLink: 1,
     research: '01 §4',
@@ -879,7 +911,7 @@ const emissions = {
     sources: ['moenv-teds13-workbook'],
     locator: 'Sheet 全國: PM10 二行程 100.0 t (0.09%); 四行程 491.6 t (0.45%); 總排放量 108,956.1',
     confidence: 'verified',
-    evidence: 'derived',
+    evidence: 'official-tw',
     caveat: t(TEDS_COMBINED['zh-TW'] + TEDS_SCOPE['zh-TW'], TEDS_COMBINED.en + ' ' + TEDS_SCOPE.en),
     chainLink: 1,
     research: '01 §4',
@@ -1074,6 +1106,10 @@ const emissions = {
     locator: '「我國大氣中PM2.5約2.3%來自於電力業，這是指電力業對我國大氣中PM2.5年平均值約為13微克／立方公尺的貢獻比率」',
     confidence: 'verified',
     evidence: 'modelled-tw',
+    caveat: t(
+      '這是環境部說明的模式推估，指電力業對全國PM2.5年平均值的貢獻，分母包含所有來源；它不是任何一個地點或時段的比例，也不能直接和機車的排放量占比相比。',
+      'A modelled estimate given by MOENV: the power sector\'s contribution to the national annual mean of PM2.5 from all sources. It is not the share at any one place or time, and it is not directly comparable with scooters\' share of emissions.',
+    ),
     chainLink: 3,
     research: '01 §5',
   },
@@ -1168,7 +1204,7 @@ const emissions = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '機車只有在2013年是苯排放最大的類別；2016年起汽油車較多。因此不能說機車是交通苯排放的主要來源。這是模式推估的全國排放量，不是行人吸入的濃度。73%為本站依論文數字計算。',
+      '機車只有在2013年是苯排放最大的類別；2016年起汽油車較多。所以近年交通苯排放的最大來源是汽油車，不是機車。這是模式推估的全國排放量，不是行人吸入的濃度。73%為本站依論文數字計算。',
       'Motorcycles were the largest benzene class only in 2013; from 2016 gasoline vehicles emitted more. So scooters cannot be called the main source of traffic benzene. This is a modelled national emissions estimate, not what pedestrians breathe. The 73% is our arithmetic on the paper\'s totals.',
     ),
     requiresCaveat: true,
@@ -1533,11 +1569,12 @@ const exposure = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '這是模式模擬值，不是實測；是行人等候區有無專用時相的情境比較，不是機車專屬的結果。該日的無專用時相基準值異常偏高，報告未說明原因。同一路口第3、4天的模擬未通過模式效能檢核。不可寫成「行人專用時相可減少94%暴露」。',
-      'A modelled value, not a measurement; it compares scenarios with and without an exclusive phase at the waiting area and is not scooter-specific. The no-phase baseline that day was anomalously high, and the report does not explain why. Days 3 and 4 at the same site failed the model-performance check. Never write "scramble crossings cut exposure by 94%".',
+      '這是模式模擬值，不是實測；是行人等候區有無專用時相的情境比較，不是機車專屬的結果。該日的無專用時相基準值異常偏高，報告未說明原因。同一路口第3、4天的模擬未通過模式效能檢核。這一天的94%不代表行人專用時相的一般效果。',
+      'A modelled value, not a measurement; it compares scenarios with and without an exclusive phase at the waiting area and is not scooter-specific. The no-phase baseline that day was anomalously high, and the report does not explain why. Days 3 and 4 at the same site failed the model-performance check. The 94% is not a typical effect of an exclusive pedestrian phase.',
     ),
     requiresCaveat: true,
     chainLink: 3,
+    editorNote: 'Never write "scramble crossings cut exposure by 94%"; never show the 94% on its own (claims policy).',
     research: '02 §1a, Corrections #1',
   },
   'iot-scramble-co-rise': {
@@ -1636,6 +1673,10 @@ const exposure = {
     locator: '「高度參考汽車、機車排氣管的離地高度設定為 0.5m」',
     confidence: 'verified',
     evidence: 'modelled-tw',
+    caveat: t(
+      '0.5公尺是模式設定的單一高度，不是量測值；實際排氣管高度因車款而不同。同一份報告的現場感測器放在1.2至1.5公尺。',
+      'The 0.5 m is a single height set in the model, not a measurement; real tailpipe heights vary by model. The same report\'s field sensors stood at 1.2–1.5 m.',
+    ),
     chainLink: 2,
     research: '02 §1a, §6',
   },
@@ -1682,11 +1723,12 @@ const exposure = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '只有三趟、21筆讀數，且同一趟內的讀數並不獨立；論文沒有說明機車是否燒汽油。感測器約偏高30%（未調整）。作者推測行進中的暴露「可能」較低，但沒有量測。不可與另一研究的53.6合併成「50至75」。',
-      'Only three trips and 21 readings, not independent within a trip; the paper does not say whether the motorcycle was gasoline. The sensor reads about 30% high (unadjusted). The authors think exposure while moving is "probably" lower but did not measure it. Do not merge with another study\'s 53.6 into "50–75".',
+      '只有三趟、21筆讀數，且同一趟內的讀數並不獨立；論文沒有說明機車是否燒汽油。感測器約偏高30%（未調整）。作者推測行進中的暴露「可能」較低，但沒有量測。另一項研究量到的53.6，對象與方法都不同，兩者不是同一個範圍的兩端。',
+      'Only three trips and 21 readings, not independent within a trip; the paper does not say whether the motorcycle was gasoline. The sensor reads about 30% high (unadjusted). The authors think exposure while moving is "probably" lower but did not measure it. Another study\'s 53.6 comes from different people and methods; the two are not the ends of one range.',
     ),
     requiresCaveat: true,
     chainLink: 3,
+    editorNote: 'R15: never merge with Chuang 2020 (53.6) into "50–75".',
     research: 'papers/wang-2021-atmosphere#motorcycle-stats; papers/wang-2021-atmosphere#motorcycle-idle-only; papers/wang-2021-atmosphere#added-fuel-silence',
   },
   'commute-mrt-underground-wang2021': {
@@ -1757,14 +1799,16 @@ const exposure = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '這些數值與機車無關，因此不可把街上的極端高值歸因於機車，也不可把275歸因於廟宇或交通。',
-      'None of these is scooter-related, so extreme street peaks must not be attributed to scooters, and the 275 must not be attributed to temples or traffic.',
+      '這些高值都不是來自機車，所以街上偶爾量到的極端高值，說明不了機車廢氣；人行道最高的275，研究沒有說來自哪裡，所以也不能算在廟宇或交通頭上。',
+      'None of these peaks came from scooters, so extreme street readings say nothing about scooter exhaust; the study does not say where the 275 came from, so it cannot be put down to temples or traffic either.',
     ),
     chainLink: 3,
+    editorNote: 'Do not attribute extreme street peaks to scooters, or the 275 to temples or traffic.',
     research: 'papers/wang-2021-atmosphere#walking-peak-temple-nightmarket; papers/wang-2021-atmosphere#walking-peak-275-unattributed',
   },
   'commute-scooter-vs-subway-chuang2020': {
     data: {
+      exposureHours: v(1, 'hours', { note: 'duration of each measured exposure: a fixed one-hour commute window, 09:00-10:00' }),
       scooter: v(53.6, 'ug/m3', { sd: 26.1, low: 22.8, high: 92.3, note: 'mean ± SD (range); gasoline scooter riders' }),
       walking: v(42.7, 'ug/m3', { sd: 22.6, low: 19.2, high: 78.2 }),
       walkingMask: v(43.1, 'ug/m3', { sd: 20.7, low: 18.7, high: 81.4, note: 'monitor outside the mask' }),
@@ -1784,11 +1828,12 @@ const exposure = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '只量測早上一小時，路線與車流沒有描述；騎士的數值是騎士自己的暴露，不是站在機車旁的行人。只量PM2.5，沒有一氧化碳或苯。表1列出每種方式20人，與「每人六種方式各量一次」的說法不一致，論文沒有說明。不可與另一研究的75合併成「50至75」。',
-      'Only one morning hour, with route and traffic not described; riders\' values are their own exposure, not a pedestrian standing beside scooters. Only PM2.5 was measured, no CO or benzene. Table 1 lists 20 people per mode, which the paper does not reconcile with "six measurements per participant". Do not merge with another study\'s 75 into "50–75".',
+      '只量測早上一小時，路線與車流沒有描述；騎士的數值是騎士自己的暴露，不是站在機車旁的行人。只量PM2.5，沒有一氧化碳或苯。表1列出每種方式20人，與「每人六種方式各量一次」的說法不一致，論文沒有說明。另一項研究量到的75，對象與方法都不同，兩者不是同一個範圍的兩端。',
+      'Only one morning hour, with route and traffic not described; riders\' values are their own exposure, not a pedestrian standing beside scooters. Only PM2.5 was measured, no CO or benzene. Table 1 lists 20 people per mode, which the paper does not reconcile with "six measurements per participant". Another study\'s 75 comes from different people and methods; the two are not the ends of one range.',
     ),
     chainLink: 3,
-    research: 'papers/chuang-2020-aex#pm-scooter; papers/chuang-2020-aex#pm-walking; papers/chuang-2020-aex#pm-subway; papers/chuang-2020-aex#pm-bus-car; papers/chuang-2020-aex#add-pairwise-not-significant',
+    editorNote: 'R15: never merge with Wang 2021 (75) into "50–75".',
+    research: 'papers/chuang-2020-aex#pm-scooter; papers/chuang-2020-aex#pm-walking; papers/chuang-2020-aex#pm-subway; papers/chuang-2020-aex#pm-bus-car; papers/chuang-2020-aex#add-pairwise-not-significant; papers/chuang-2020-aex#commute-duration-context',
   },
   'moenv-2017-taipei-commute': {
     data: {
@@ -1966,7 +2011,7 @@ const exposure = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '這項車種歸因只做了PM2.5，沒有苯或苯系物，因此不能說研究把苯歸因於機車。計數中的機車沒有區分燃油或電動。摘要說機車「可能」比公車貨車與小客車貢獻更多，是因為數量多，不是每輛排放較多。',
+      '這項車種歸因只做了PM2.5，沒有苯或苯系物，所以這項研究沒有把苯歸因於機車。計數中的機車沒有區分燃油或電動。摘要說機車「可能」比公車貨車與小客車貢獻更多，是因為數量多，不是每輛排放較多。',
       'The vehicle-type attribution covers PM2.5 only, not benzene or BTEX, so the study does not attribute benzene to scooters. Counted scooters were not split into gasoline and electric. The abstract\'s "scooters could contribute more" than buses, trucks and cars is a matter of numbers, not of each scooter emitting more.',
     ),
     requiresCaveat: true,
@@ -2068,11 +2113,12 @@ const exposure = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '這些是模擬範圍中少數熱點的最大值，沒有不確定範圍；多數點位遠低於此。致癌斜率因子來自同一研究團隊的台北微粒金屬成分研究，作者自己也說超細微粒的致癌強度在科學上仍不確定。兒童的倍數來自生理假設，不是觀察到的健康結果；不可說成某個孩子的風險。',
-      'These are maxima at a minority of hotspot locations, with no uncertainty ranges; most of the domain is far lower. The cancer slope factor comes from a Taipei trace-metal study by the same group, and the authors say the carcinogenic potency of ultrafine particles remains scientifically uncertain. The child multiple comes from physiological assumptions, not observed outcomes; never present it as any child\'s risk.',
+      '這些是模擬範圍中少數熱點的最大值，沒有不確定範圍；多數點位遠低於此。致癌斜率因子來自同一研究團隊的台北微粒金屬成分研究，作者自己也說超細微粒的致癌強度在科學上仍不確定。兒童的倍數來自生理假設，不是觀察到的健康結果，不是任何一個孩子的風險。',
+      'These are maxima at a minority of hotspot locations, with no uncertainty ranges; most of the domain is far lower. The cancer slope factor comes from a Taipei trace-metal study by the same group, and the authors say the carcinogenic potency of ultrafine particles remains scientifically uncertain. The child multiple comes from physiological assumptions, not observed outcomes; it is not the risk of any particular child.',
     ),
     requiresCaveat: true,
     chainLink: 6,
+    editorNote: 'Never present the child multiple as an individual child\'s risk.',
     research: 'papers/chang-hsiao-2026-jhm#child-elcr; papers/chang-hsiao-2026-jhm#child-mechanism; papers/chang-hsiao-2026-jhm#risk-method-slope-factor; papers/chang-hsiao-2026-jhm#authors-uncertainty-statement; papers/chang-hsiao-2026-jhm#fig8-distribution-added',
   },
   'ufp-traffic-cut-chang2026': {
@@ -2138,6 +2184,10 @@ const standards = {
     sources: ['moenv-air-quality-standards'],
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '這是環境空氣的法定標準，以測站的長時間平均來判斷，不是用來評估路口幾秒鐘或幾分鐘的濃度；WHO的年平均指引值更低，為5 µg/m³。',
+      'This is the legal standard for ambient air, judged on long averages at monitoring stations; it is not a yardstick for the seconds or minutes spent at a crossing. WHO\'s annual guideline is lower, at 5 µg/m³.',
+    ),
     chainLink: 3,
     research: '02 §8',
   },
@@ -2213,6 +2263,10 @@ const standards = {
     locator: 'Table 0.1, interim targets 1–4',
     confidence: 'verified',
     evidence: 'international',
+    caveat: t(
+      '過渡目標是給污染較重的地方逐步改善用的階段目標，不是安全值；WHO的指引值是5 µg/m³。',
+      'Interim targets are steps for places with heavier pollution to work towards, not safe levels; the WHO guideline itself is 5 µg/m³.',
+    ),
     chainLink: 3,
     research: '03 §2',
   },
@@ -2256,6 +2310,10 @@ const standards = {
     locator: '"Low PNC can be considered < 1 000 particles/cm3 (24-hour mean). High PNC can be considered > 10 000 particles/cm3 (24-hour mean)"',
     confidence: 'verified',
     evidence: 'international',
+    caveat: t(
+      '每立方公分10,000個的界線是WHO用來區分高低濃度的良好作法說明，不是健康指引值；WHO表示證據不足以訂定數值。',
+      'The 10,000 particles/cm³ line is a WHO good-practice statement for telling high from low concentrations, not a health guideline; WHO says the evidence is too thin to set a value.',
+    ),
     chainLink: 4,
     research: '03 §1b, §2',
   },
@@ -2299,11 +2357,12 @@ const hazard = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '2B級比柴油廢氣的1級弱，不可把柴油的分類套用在機車上。IARC分類的是危害，不是日常暴露量下的風險。',
-      'Group 2B is weaker than diesel exhaust\'s Group 1; diesel\'s classification must not be applied to scooters. IARC classifies hazard, not the risk at everyday doses.',
+      '2B級比柴油廢氣的1級弱；柴油廢氣的分類不適用於汽油機車的廢氣。IARC分類的是危害，不是日常暴露量下的風險。',
+      'Group 2B is weaker than diesel exhaust\'s Group 1; the diesel classification does not apply to gasoline scooter exhaust. IARC classifies hazard, not the risk at everyday doses.',
     ),
     requiresCaveat: true,
     chainLink: 4,
+    editorNote: 'Never apply the diesel Group 1 classification to scooters.',
     research: '03 §1a',
   },
   'iarc-diesel-exhaust-group1': {
@@ -2379,6 +2438,10 @@ const hazard = {
     locator: '"PM2.5 and PM10 are capable of penetrating deep into the lungs and PM2.5 can even enter the bloodstream, primarily resulting in cardiovascular and respiratory impacts."',
     confidence: 'verified',
     evidence: 'international',
+    caveat: t(
+      'WHO說明的是一般PM2.5的作用，不是專指機車廢氣，也沒有說多少量才會產生影響。',
+      'WHO describes what PM2.5 in general can do; it is not specific to scooter exhaust and does not say how much exposure it takes.',
+    ),
     chainLink: 4,
     research: '03 §1b',
   },
@@ -2497,6 +2560,7 @@ const health = {
   },
   'chuang2020-cardiovascular-association': {
     data: {
+      exposureHours: v(1, 'hours', { note: 'duration of each measured exposure: a fixed one-hour commute window, 09:00-10:00' }),
       participants: v(120, 'people'),
       walkingIqr: v(24.4, 'ug/m3', { note: 'increment behind the walking estimates (IQR of walking PM2.5)' }),
       walkingSbp: v(6.5, 'percent', { low: 3.3, high: 9.7 }),
@@ -2521,10 +2585,11 @@ const health = {
     ),
     requiresCaveat: true,
     chainLink: 5,
-    research: 'papers/chuang-2020-aex#effect-walking; papers/chuang-2020-aex#effect-subway; papers/chuang-2020-aex#effect-facemask; papers/chuang-2020-aex#covariates',
+    research: 'papers/chuang-2020-aex#effect-walking; papers/chuang-2020-aex#effect-subway; papers/chuang-2020-aex#effect-facemask; papers/chuang-2020-aex#covariates; papers/chuang-2020-aex#commute-duration-context',
   },
   'chuang2020-scooter-effect-per-iqr': {
     data: {
+      exposureHours: v(1, 'hours', { note: 'duration of each measured exposure: a fixed one-hour commute window, 09:00-10:00' }),
       scooterIqr: v(41.7, 'ug/m3'),
       sbp: v(7.9, 'percent', { low: 0.9, high: 14.9 }),
       hr: v(6.4, 'percent', { low: 2.6, high: 10.2 }),
@@ -2548,7 +2613,7 @@ const health = {
     ),
     requiresCaveat: true,
     chainLink: 5,
-    research: 'papers/chuang-2020-aex#effect-scooter; papers/chuang-2020-aex#noise',
+    research: 'papers/chuang-2020-aex#effect-scooter; papers/chuang-2020-aex#noise; papers/chuang-2020-aex#commute-duration-context',
   },
   'chuang2020-pooled-model': {
     data: {
@@ -2591,10 +2656,11 @@ const health = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '摘要未說明是否屬於「台灣兒童健康研究（TCHS）」世代，請勿如此稱呼。' + ASSOCIATION_TW['zh-TW'],
-      'The abstract does not say this is the Taiwan Children Health Study cohort, so do not call it that. ' + ASSOCIATION_TW.en,
+      '摘要沒有說明這是不是「台灣兒童健康研究（TCHS）」的世代。' + ASSOCIATION_TW['zh-TW'],
+      'The abstract does not say whether this is the Taiwan Children Health Study cohort. ' + ASSOCIATION_TW.en,
     ),
     chainLink: 6,
+    editorNote: 'Do not call this the Taiwan Children Health Study (TCHS) cohort.',
     research: '03 §3a',
   },
   'tsai2025-asthma-feno': {
@@ -2615,11 +2681,12 @@ const health = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '橫斷面研究，背景是工業與燃煤電廠而非機車；摘要未說明勝算比1.595對應的PM2.5增量，不可寫成「每1 µg/m³」。' + ASSOCIATION_TW['zh-TW'],
-      'Cross-sectional, in an industrial and coal-power setting rather than a scooter one; the abstract does not state the PM2.5 increment behind the odds ratio of 1.595, so never present it as "per 1 µg/m³". ' + ASSOCIATION_TW.en,
+      '橫斷面研究，背景是工業與燃煤電廠而非機車；摘要沒有說明勝算比1.595對應多少PM2.5增量，所以它不是「每1 µg/m³」的數字。' + ASSOCIATION_TW['zh-TW'],
+      'Cross-sectional, in an industrial and coal-power setting rather than a scooter one; the abstract does not state the PM2.5 increment behind the odds ratio of 1.595, so it is not a "per 1 µg/m³" figure. ' + ASSOCIATION_TW.en,
     ),
     requiresCaveat: true,
     chainLink: 6,
+    editorNote: 'Never write the odds ratio as "per 1 µg/m³".',
     research: '03 §3a',
   },
   'hwang2005-asthma-co': {
@@ -2642,11 +2709,12 @@ const health = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '橫斷面研究，使用測站資料，暴露水準是2000至2001年的；作者結論比數據強（氮氧化物不顯著），請引用實際數字而非標題。' + ASSOCIATION_TW['zh-TW'],
-      'Cross-sectional, using monitoring-station data at 2000–2001 exposure levels; the authors\' conclusion is stronger than their data (NOx was not significant), so quote the numbers, not the headline. ' + ASSOCIATION_TW.en,
+      '橫斷面研究，使用測站資料，暴露水準是2000至2001年的；作者的結論說得比數據強（氮氧化物並不顯著），所以這裡看的是實際數字，不是標題。' + ASSOCIATION_TW['zh-TW'],
+      'Cross-sectional, using monitoring-station data at 2000–2001 exposure levels; the authors\' conclusion is stronger than their data (NOx was not significant), so the numbers matter more than the headline. ' + ASSOCIATION_TW.en,
     ),
     requiresCaveat: true,
     chainLink: 6,
+    editorNote: 'Quote the numbers, not the paper title.',
     research: '03 §3a',
   },
   'cho2023-kindergarten-asthma': {
@@ -2759,11 +2827,12 @@ const health = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '生態學（區域比較）研究，以能見度作為空氣品質的替代指標，無法證明PM2.5導致個別病例，也未排除其他因素。不可說空氣污染是不吸菸者肺癌的「原因」或占某個比例。',
-      'An ecological (regional) analysis using visibility as a proxy for air quality; it cannot show that PM2.5 caused individual cancers and does not rule out other factors. Do not say air pollution is "the cause" of never-smokers\' lung cancer, or any share of it.',
+      '生態學（區域比較）研究，以能見度作為空氣品質的替代指標，無法證明PM2.5導致個別病例，也未排除其他因素。這項研究不能說明空氣污染是不吸菸者肺癌的原因，也算不出它占多少比例。',
+      'An ecological (regional) analysis using visibility as a proxy for air quality; it cannot show that PM2.5 caused individual cancers and does not rule out other factors. It cannot show that air pollution is the cause of never-smokers\' lung cancer, or what share of it.',
     ),
     requiresCaveat: true,
     chainLink: 5,
+    editorNote: 'R14: only on /evidence/#not-used. Never say air pollution is "the cause" of never-smokers\' lung cancer or give a share.',
     research: '03 §3c',
   },
   'hill2023-egfr-ecological': {
@@ -2808,7 +2877,7 @@ const health = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '這是使用2014年監測資料的模式推估，年代較久，此後台灣PM2.5已下降；PM2.5為所有來源，不能說是「機車造成的死亡」。我們找不到更新的台灣推估。',
+      '這是使用2014年監測資料的模式推估，年代較久，此後台灣PM2.5已下降；PM2.5為所有來源，這些不是「機車造成的死亡」。我們找不到更新的台灣推估。',
       'A modelled estimate from 2014 monitoring data; PM2.5 in Taiwan has fallen since. PM2.5 is from all sources, so these are not "deaths from scooters". We found no newer Taiwanese estimate.',
     ),
     requiresCaveat: true,
@@ -2835,6 +2904,10 @@ const children = {
     locator: '"They breathe faster than adults, taking in more air and, with it, more pollutants. Children live closer to the ground, where some pollutants reach peak concentrations."',
     confidence: 'verified',
     evidence: 'international',
+    caveat: t(
+      'WHO說的是所有兒童與一般空氣污染，不是專指台灣或機車廢氣；沒有提出兒童在路口比大人多吸多少的數字。',
+      'WHO is describing children and air pollution in general, not Taiwan or scooter exhaust specifically, and gives no figure for how much more a child breathes at a crossing.',
+    ),
     chainLink: 6,
     research: '03 §5',
   },
@@ -2852,11 +2925,12 @@ const children = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '「最多44%」是各條件中的最大值，不是平均差異，且只針對細微粒；不可說「兒童比成人多吸44%污染」。其他研究結果不一，有的發現推車高度反而較低或沒有差異（見文獻回顧）。台灣沒有兒童高度的實測研究。',
-      '"Up to 44%" is the maximum across conditions, not an average, and only for fine particles; never say "children breathe 44% more pollution". Other studies are mixed, some finding pram height lower or no different (see the review). No child-height measurements exist for Taiwan.',
+      '「最多44%」是各條件中的最大值，不是平均差異，且只針對細微粒；它不代表「兒童比成人多吸44%污染」。其他研究結果不一，有的發現推車高度反而較低或沒有差異（見文獻回顧）。台灣沒有兒童高度的實測研究。',
+      '"Up to 44%" is the maximum across conditions, not an average, and only for fine particles; it does not mean children breathe 44% more pollution. Other studies are mixed, some finding pram height lower or no different (see the review). No child-height measurements exist for Taiwan.',
     ),
     requiresCaveat: true,
     chainLink: 6,
+    editorNote: 'R5: "up to 44%", fine particles, one UK experiment; never "children breathe 44% more".',
     research: '03 §5',
   },
   'stroller-height-review': {
@@ -2894,7 +2968,7 @@ const children = {
       '同一篇回顧引用的研究指出，以每公斤體重計，兒童的呼吸速率一般約為成人的兩倍，因此相對於肺的大小與體重，吸入的微粒劑量較高。',
       'A study cited by the same review states that, per kilogram of body weight, children\'s breathing rate is generally about twice an adult\'s, so they inhale a higher particle dose relative to lung size and body weight.',
     ),
-    period: t('回顧2018年發表（引用Ginsberg等2005年）', 'Review published 2018 (citing Ginsberg et al. 2005)'),
+    period: t('回顧2018年發表（引用Ginsberg 等2005年）', 'Review published 2018 (citing Ginsberg et al. 2005)'),
     place: NOT_PLACE,
     sources: ['sharma-kumar-2018-envint'],
     locator: 'Section 1 p.263, reason (i)',
@@ -3080,4 +3154,13 @@ export function localizeFact(idOrFact: FactId | Fact, locale: Locale): Localized
     })),
     data: f.data,
   };
+}
+
+/**
+ * How long each measured exposure lasted, in hours, for studies whose research file records it
+ * (e.g. Chuang 2020: a one-hour commute; McCreanor 2007: a two-hour walk). Undefined when the
+ * study took spot readings or the duration is not recorded: never guess a time label.
+ */
+export function exposureHours(id: FactId): number | undefined {
+  return fact(id).data.exposureHours?.value;
 }

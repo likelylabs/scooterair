@@ -8,7 +8,7 @@
  *
  * Layout principle: the SVG has NO viewBox. Heights are in px, horizontal
  * positions are percentages, text is real px text. The chart therefore reflows
- * to any width from 300px up with crisp, constant-size type, and never needs a
+ * to any width from a 320px phone up with crisp, constant-size type, and never needs a
  * mobile variant. Space for labels beside the plot is reserved with padding on
  * the wrapper and the SVG is `overflow: visible`.
  */
@@ -27,8 +27,8 @@ export interface ChartTable {
 export interface LegendItem {
   label: string;
   tone: Tone;
-  /** rect = bars/areas, line = lines, dot = points, light = a tint of the tone */
-  shape?: 'rect' | 'line' | 'dot' | 'light';
+  /** rect = bars/areas, line = lines, dot = points, light = a tint of the tone, dash = a dashed line, ring = hollow points (targets) */
+  shape?: 'rect' | 'line' | 'dot' | 'light' | 'dash' | 'ring';
 }
 
 export interface ChartRender {
@@ -49,8 +49,13 @@ export interface ChartRender {
   hover?: { xs: number[]; rows: string[] };
 }
 
-/** The narrowest plot we lay out for: a 360px phone minus gutters. */
-export const MIN_W = 300;
+/**
+ * The narrowest plot we lay out for: a 320px phone minus its two 16px gutters (288px), less
+ * 8px of slack because text widths here are estimates. A chart inside a padded panel can be
+ * narrower still; below 272px charts.css sets the type a step smaller, which keeps this
+ * layout valid down to about 250px.
+ */
+export const MIN_W = 280;
 
 export const esc = (s: string | number) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -94,21 +99,90 @@ export function em(text: string): number {
 }
 export const px = (text: string, size = 14) => em(text) * size;
 
-/** Break a label into at most `maxLines` lines that each fit `maxEm`. */
+const OPENERS = '（「『《〈【〔([“‘';
+const CLOSERS = '，。、；：！？）」』》〉】〕％)]”’,.;:!?%';
+const allIn = (s: string, set: string) => [...s].every((ch) => set.includes(ch));
+const UNIT = /^(µg\/m³|mg\/m³|g\/km|g\/min|ppm|ppb|cc|cm|mm|km|kg|mg|kWh|kW|°C|m|g|s|t|L|%)$/;
+
+/**
+ * A label as unbreakable pieces. Latin words stay whole; CJK breaks between any two
+ * characters, except that closing punctuation never starts a line and opening punctuation
+ * never ends one, whatever script sits beside it: in 「一氧化碳（ppm）」 the brackets stay
+ * with the unit.
+ */
+export function labelTokens(text: string): string[] {
+  const atoms = text.match(/[⺀-￿]|[^\s⺀-￿]+|\s+/g) ?? [text];
+  const out: string[] = [];
+  let glue = false; // the previous atom was an opener: the next atom joins it
+  for (const a of atoms) {
+    const last = out.length - 1;
+    if (/^\s+$/.test(a)) {
+      if (last >= 0) out[last] += a;
+      glue = false;
+    } else if (last >= 0 && /\d\s*$/.test(out[last]) && UNIT.test(a.replace(/[)\]）,.;:]+$/, ''))) {
+      // a figure keeps its unit: 24.4 µg/m³, 125 cc, 1.6 m
+      out[last] += a;
+      glue = false;
+    } else if (last >= 0 && (glue || (allIn(a, CLOSERS) && !/\s$/.test(out[last])) || (/\d$/.test(out[last]) && /^[⺀-鿿]$/.test(a)))) {
+      // …and a figure keeps the counter that follows it (7月, 31日, 5年)
+      out[last] += a;
+      glue = allIn(a, OPENERS);
+    } else {
+      out.push(a);
+      glue = allIn(a, OPENERS);
+    }
+  }
+  return out;
+}
+
+/** How many lines the shared charts let a label take before the rest stays on the last line. */
+export const LABEL_LINES = 4;
+
+/**
+ * Break a label into lines that fit `maxEm`, at most `maxLines` of them (default 2, as it has
+ * always been: with the default, whatever is left over stays on the last line, even if it runs
+ * long). The shared charts pass LABEL_LINES, so a long label grows downward instead of running
+ * off the edge or into the value beside it. Keep labels short enough for two lines.
+ */
+
 export function wrapLabel(text: string, maxEm: number, maxLines = 2): string[] {
   if (em(text) <= maxEm) return [text];
-  // tokens: Latin words stay whole, CJK breaks anywhere except before closing punctuation
-  const tokens = text.match(/[⺀-￿][，。、；：！？）」』》]*|[^\s⺀-￿]+\s*|\s+/g) ?? [text];
-  const lines: string[] = [];
-  let cur = '';
-  for (const tok of tokens) {
-    if (cur && em((cur + tok).trimEnd()) > maxEm && lines.length < maxLines - 1) {
-      lines.push(cur.trimEnd());
-      cur = tok.trimStart();
-    } else cur += tok;
+  const tokens = labelTokens(text);
+  const fill = (width: number) => {
+    const lines: string[] = [];
+    let cur = '';
+    for (const tok of tokens) {
+      if (cur && em((cur + tok).trimEnd()) > width && lines.length < maxLines - 1) {
+        lines.push(cur.trimEnd());
+        cur = tok.trimStart();
+      } else cur += tok;
+    }
+    if (cur.trim()) lines.push(cur.trimEnd());
+    return lines;
+  };
+  const greedy = fill(maxEm);
+  // Among the ways to set it in as few lines, prefer breaks that fall at punctuation (after a
+  // comma or a closing bracket, before an opening one), then lines of even length, so a label
+  // does not end in two stray characters or split a word a bracket would have kept whole.
+  const score = (lines: string[]) => {
+    const widths = lines.map(em);
+    let good = 0;
+    for (let i = 0; i < lines.length - 1; i++) if (allIn(lines[i].slice(-1), CLOSERS) || allIn([...lines[i + 1]][0] ?? '', OPENERS)) good++;
+    return good * 6 - (Math.max(...widths) - Math.min(...widths));
+  };
+  let best = greedy;
+  let bestScore = score(greedy);
+  const lo = em(text) / greedy.length;
+  for (let k = 0; k <= 12; k++) {
+    const tried = fill(lo + ((maxEm - lo) * k) / 12);
+    if (tried.length !== greedy.length || tried.some((l) => em(l) > maxEm)) continue;
+    const s = score(tried);
+    if (s > bestScore) {
+      best = tried;
+      bestScore = s;
+    }
   }
-  if (cur.trim()) lines.push(cur.trimEnd());
-  return lines;
+  return best;
 }
 
 /** Round a maximum up to a clean axis end. */
@@ -131,6 +205,39 @@ export function niceTicks(max: number, count = 4): number[] {
   return out;
 }
 
+const niceStep = (raw: number): number => {
+  const p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const f = raw / p;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+};
+
+/**
+ * A clean axis for values that may be negative, or that need not start at zero: about
+ * `count` ticks from a round number at or below `lo` to a round number at or above `hi`.
+ */
+export function niceScale(lo: number, hi: number, count = 4): { min: number; max: number; ticks: number[] } {
+  if (!(hi > lo)) hi = lo + 1;
+  const step = niceStep((hi - lo) / count);
+  const min = +(Math.floor(lo / step + 1e-9) * step).toPrecision(6);
+  const max = +(Math.ceil(hi / step - 1e-9) * step).toPrecision(6);
+  const ticks: number[] = [];
+  for (let v = min; v <= max + step * 0.001; v += step) ticks.push(+v.toPrecision(6));
+  return { min, max, ticks };
+}
+
+/** A number with a typographic minus, for values that can be negative. */
+export const fmtSigned = (locale: Locale, v: number, decimals = 0) => (v < 0 ? MINUS : '') + fmt(locale, Math.abs(v), decimals);
+
+/**
+ * The axis-break mark: two slanted strokes across an axis, where the scale stops short of
+ * zero. `x` may be a percentage. `vertical` is for a break on a vertical axis. Every chart
+ * whose axis does not start at zero draws one and prints the value the axis starts at.
+ */
+export function axisBreak(x: string | number, y: number, vertical = false): string {
+  const d = vertical ? 'M-5,2.5L5,-2.5M-5,-2.5L5,-7.5' : 'M-2.5,5L2.5,-5M2.5,5L7.5,-5';
+  return `<svg class="c-break" x="${x}" y="${r2(y)}" width="1" height="1" overflow="visible"><path class="c-break__gap" d="${d}"/><path class="c-break__mark" d="${d}"/></svg>`;
+}
+
 /** <text> with optional attributes. Text always wears ink, never a series colour. */
 export function text(cls: string, x: string | number, y: number, content: string, attrs = ''): string {
   return `<text class="${cls}" x="${x}" y="${r2(y)}"${attrs ? ' ' + attrs : ''}>${esc(content)}</text>`;
@@ -146,6 +253,22 @@ export function hbar(tone: Tone, widthPct: number, y: number, h: number, extraCl
   if (widthPct <= 0) return base;
   const cls = `c-fill-${tone}${extraClass ? ' ' + extraClass : ''}`;
   return `<rect class="${cls}" x="0" y="${y}" width="${r2(widthPct)}%" height="${h}" rx="3"/>${widthPct > 1.2 ? `<rect class="${cls}" x="0" y="${y}" width="3" height="${h}"/>` : ''}${base}`;
+}
+
+/**
+ * A horizontal bar between zero and a value when zero is not at the left edge (charts with
+ * negative values). Positions are percentages. Rounded at the data end, square at zero,
+ * with the same short zero tick as hbar(), so a zero-length bar still shows where zero is.
+ */
+export function hbarFrom(tone: Tone, zeroPct: number, valuePct: number, y: number, h: number, extraClass = ''): string {
+  const a = Math.min(zeroPct, valuePct);
+  const w = Math.abs(valuePct - zeroPct);
+  const base = `<line class="c-axis" x1="${r2(zeroPct)}%" x2="${r2(zeroPct)}%" y1="${y - 3}" y2="${y + h + 3}"/>`;
+  if (w <= 0) return base;
+  const cls = `c-fill-${tone}${extraClass ? ' ' + extraClass : ''}`;
+  // a 3px rect squares off the rounded corners on the zero side
+  const sq = w > 1.2 ? `<svg x="${r2(zeroPct)}%" y="${y}" width="1" height="${h}" overflow="visible"><rect class="${cls}" x="${valuePct < zeroPct ? -3 : 0}" y="0" width="3" height="${h}"/></svg>` : '';
+  return `<rect class="${cls}" x="${r2(a)}%" y="${y}" width="${r2(w)}%" height="${h}" rx="3"/>${sq}${base}`;
 }
 
 const TABLE_ICON =

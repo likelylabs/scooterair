@@ -329,8 +329,10 @@ const frames = [
       <p class="eyebrow">V35 · MeasurementDiagram</p>
       <h2>{L('要怎麼量，才填得滿那一格', 'What it would take to fill the empty box')}</h2>
       <p class="lead">{L('給「沒有人量過的事」那一頁。蓋著「本站提議」的章，因為還沒有任何單位採用。', 'For the “what nobody has measured” page. It is stamped “our proposal” because no agency has adopted it.')}</p>
-      <MeasurementDiagram locale={locale} />
-      <pre class="sa-code" tabindex="0"><code>{`<MeasurementDiagram locale={locale} />`}</code></pre>
+      <MeasurementDiagram locale={locale} level={3} />
+      <pre class="sa-code" tabindex="0"><code>{`<MeasurementDiagram locale={locale} />
+<MeasurementDiagram locale={locale} level={3} />   {/* 四個小標的標題層級，預設 4；設成上一層標題的下一級 */}`}</code></pre>
+      <p class="meta">{L('level 只改四個小標在大綱裡的層級（h2 到 h6），樣子不變。這一頁的圖放在 h2 底下，所以用 level={3}。', 'level changes only where the four panel titles sit in the outline (h2 to h6); they look the same. Here the diagram sits under an h2, so it uses level={3}.')}</p>
     </div>
   </section>
 

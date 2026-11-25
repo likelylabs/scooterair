@@ -361,7 +361,7 @@ const locale = localeFromParam(Astro.params.lang);
   </Section>
 
   <!-- ================================================================ TYPE -->
-  <Section id="type" eyebrow="04" title={L('文字', 'Typography')} tone="sunken" lead={L('中文內文用讀者手機裡的系統字型，零下載；只有大標題用思源黑體（Noto Sans TC）最粗的 Black。拉丁字母與數字用 Archivo：一套字、兩種寬度，英文標題與大數字用窄體，像路面上拉長的標字。', 'Chinese body text uses the reader’s own system font: zero download. Only headlines use Noto Sans TC Black. Latin letters and figures are Archivo: one family, two widths, with English headlines and big numbers condensed like elongated lettering on a road.')}>
+  <Section id="type" eyebrow="04" title={L('文字', 'Typography')} tone="sunken" lead={L('中文內文用讀者手機裡的系統字型，零下載；只有大標題用思源黑體（Noto Sans TC）最粗的 Black，而且只下載一個約 45 kB 的檔案：全站標題用到的那幾百個字（改了中文標題之後，build 會列出還沒收進去的字；跑 node scripts/build-display-font.mjs 重做）。拉丁字母與數字用 Archivo：一套字、兩種寬度，英文標題與大數字用窄體，像路面上拉長的標字。', 'Chinese body text uses the reader’s own system font: zero download. Only headlines use Noto Sans TC Black, as one file of about 45 kB holding the few hundred characters the site’s headlines use (after changing a Chinese headline the build lists any character not in it yet; node scripts/build-display-font.mjs rebuilds it). Latin letters and figures are Archivo: one family, two widths, with English headlines and big numbers condensed like elongated lettering on a road.')}>
     <div class="sg-type">
       {[
         ['.display', 'display', L('紅燈亮起的那一刻', 'The moment the light turns red')],
@@ -520,11 +520,18 @@ const locale = localeFromParam(Astro.params.lang);
     </Block>
 
     <Block name="Cite" file="ui/Cite.astro" code={`…顯著較高<Cite locale={locale} id="wu-2021" n={3} />。
-<Cite locale={locale} id="wu-2021" n={3} variant="chip" />`}>
-      <Fragment slot="note"><p>{L('來源標記，連到 /sources/#<id>。內文用上標；圖表註腳、卡片與證據鏈用 chip。同一個來源在全站用同一個編號。', 'A citation marker linking to /sources/#<id>. Superscript in running text; chip in figure footers, cards and chain links. A source keeps the same number across the site.')}</p></Fragment>
+<Cite locale={locale} id="wu-2021" n={3} variant="chip" />
+<a class="row" href="…">…顯著較高<Cite locale={locale} id="wu-2021" n={3} static /></a>   {/* 外層本身是連結 */}`}>
+      <Fragment slot="note">
+        <p>{L('來源標記，連到 /sources/#<id>。內文用上標；圖表註腳、卡片與證據鏈用 chip。同一個來源在全站用同一個編號。', 'A citation marker linking to /sources/#<id>. Superscript in running text; chip in figure footers, cards and chain links. A source keeps the same number across the site.')}</p>
+        <p>{L('放在「整塊都是連結」的東西裡有兩種情況。Card 加 href：卡片本身不是 <a>，標記照常是連結，會浮在整張卡片的連結上面，可以單獨點。外層真的是 <a> 的時候（連結裡不能再放連結），加 static：標記照樣顯示編號，但不是連結。', 'There are two cases for a marker inside something that is one big link. A Card with href is not an <a> itself: the marker stays a link, sits above the card’s stretched link and can be tapped on its own. When the wrapper really is an <a> (a link cannot hold another link), add static: the marker still shows its number and is not a link.')}</p>
+      </Fragment>
       <p>
         {L('街道上的濃度明顯高於測站', 'Street-level concentrations are well above the monitoring station')}<Cite locale={locale} id="sample-a" n={1} /><Cite locale={locale} id="sample-b" n={2} />{L('。', '.')}
         <span style="margin-inline-start:1rem"><Cite locale={locale} id="sample-c" n={3} variant="chip" /></span>
+      </p>
+      <p class="sg-rowlink">
+        <a href="#components">{L('整列都是連結的例子：標記是 static，不是連結', 'A row that is one link: the marker is static, not a link')}<Cite locale={locale} id="sample-a" n={1} static /> <Cite locale={locale} id="sample-c" n={3} variant="chip" static /></a>
       </p>
     </Block>
 
@@ -564,7 +571,7 @@ const locale = localeFromParam(Astro.params.lang);
 </div>`}>
       <div class="grid" style="--min: 15rem">
         <Card title={L('問題：路口的那一層', 'The problem: the layer at the crossing')} href="#components" eyebrow={L('連結卡片', 'Link card')} tone="exhaust">
-          <p>{L('有 href 時整張卡片都是連結。', 'With href the whole card is one link.')}</p>
+          <p>{L('有 href 時整張卡片都是連結。內文裡的來源標記照樣可以單獨點', 'With href the whole card is one link. A citation marker in the text can still be tapped on its own')}<Cite locale={locale} id="sample-a" n={1} />{L('。', '.')}</p>
         </Card>
         <Card title={L('換電動要花多少', 'What going electric costs')} href="#components" eyebrow={L('連結卡片', 'Link card')} tone="clean">
           <p>{L('上緣的漆線跟著色調變。', 'The painted top rule follows the tone.')}</p>
@@ -728,6 +735,7 @@ const t = localize(home, locale);
           <li>{L('倒數依捲動進度在每個章節裡內插（分配表在 ui.ts 的 chain.countdown）。第 5 環暫停，第 7 環回到 90，算錢之後不顯示數字。', 'The count interpolates with scroll progress inside each chapter (the allocation is chain.countdown in ui.ts). Link 5 is paused, link 7 resets to 90, and no number is shown after the money chapter.')}</li>
           <li>{L('圓點的畫法就是證據：實心是台灣的資料，空心是推估或國際證據，第 3 環斷開、兩端空心，最後一顆是綠的。紅圈是「你在這裡」。', 'A pip’s style is its evidence: filled for Taiwan data, a ring for modelled or international, a break with hollow ends at link 3, the last in green. The red ring is “you are here”.')}</li>
           <li>{L('沒有 JavaScript：LED 不會出現（停在 90 的數字是錯的），軌道是一個原生的 details 選單，每個章節的小標用文字印出倒數。', 'Without JavaScript the LED is not rendered (a frozen 90 would be wrong); the rail is a native details menu, and each chapter’s kicker prints its count as text.')}</li>
+          <li>{L('還沒捲到第一個章節的時候（頁面開頭是導言或目錄），沒有哪一環是「目前」：LED 顯示兩條橫線，圓點不圈，軌道上寫「跳到章節」（ui.ts 的 rail.menu，沒有 JavaScript 時也是這一句）。', 'Above the first chapter (a page that opens with a deck or an index) no link is current: the LED shows two dashes, no pip is ringed, and the strip reads “Jump to a chapter” (rail.menu in ui.ts, also the label without JavaScript).')}</li>
           <li>{L('LED 是 aria-hidden，整條不是 live region。高度固定 44px、單行、名稱過長會截斷，不會推動版面。沒有動畫。', 'The LED is aria-hidden and nothing is a live region. Fixed 44px, one line, the name truncates: it cannot shift the layout. There is no animation.')}</li>
           <li>{L('手機上「第幾環」的字會收起來（紅圈已經標出是哪一環），把位置留給名稱；窄於 344px 時圓點列也收起來，選單裡仍然有七顆。', 'On phones the “Link n” words are dropped (the red ring already says which link) to leave room for the name; under 344px the row of pips goes too, and the menu still shows all seven.')}</li>
         </ul>
@@ -884,6 +892,7 @@ const t = localize(home, locale);
         <Select id="sg-city" label={L('你住在哪個城市？', 'Which city do you live in?')} options={calc.cities.map((c) => ({ value: c.value, label: c.label }))} value="a" hint={L('地方補助每個城市不同。', 'The city subsidy differs by city.')} />
         <RadioGroup name="sg-scrap" legend={L('有舊機車可以汰換嗎？', 'Do you have an old scooter to scrap?')} options={[{ value: 'yes', label: L('有', 'Yes') }, { value: 'no', label: L('沒有', 'No') }]} value="yes" />
         <Range id="sg-km" label={L('每個月大約騎多遠？', 'How far do you ride each month?')} min={100} max={2000} step={50} value={calc.km} unit={L('公里/月', 'km / month')} />
+        <Range id="sg-km-empty" label={L('不給 value：一開始是空的', 'Without value: it starts empty')} hint={L('數字框是空白的，滑桿的圓鈕是空心的，停在最小值；讀者填了數字才變實心。這一格不影響右邊的試算。', 'The number box is blank and the slider’s thumb is hollow, parked at the minimum, until the reader sets a number. This field does not feed the sum on the right.')} min={100} max={2000} step={50} placeholder="300" unit={L('公里/月', 'km / month')} />
         <RadioGroup
           name="sg-stack-demo"
           variant="stack"
@@ -1048,14 +1057,17 @@ const state = moneyState(todayInTaipei(), 'kaohsiung', snapshot);
   </Section>
 
   <!-- ================================================================ CHARTS -->
-  <Section id="charts" eyebrow="13" title={L('圖表', 'Charts')} rule lead={L('在 src/components/charts/。伺服器端產生的內嵌 SVG，沒有圖表函式庫；寬度用百分比、文字是固定大小的真文字，所以從 300px 到桌機都是同一張圖。每張圖都有 title、可展開的資料表，以及滑鼠或觸控的數值提示。', 'In src/components/charts/. Server-rendered inline SVG, no charting library. Widths are percentages and text is real fixed-size text, so one chart works from 300px to desktop. Every chart has a title, an expandable data table and a hover / touch readout.')}>
+  <Section id="charts" eyebrow="13" title={L('圖表', 'Charts')} rule lead={L('在 src/components/charts/。伺服器端產生的內嵌 SVG，沒有圖表函式庫；寬度用百分比、文字是固定大小的真文字，所以從 320px 的手機到桌機都是同一張圖：版面以 280px 的圖寬為準，放進更窄的框（272px 以下），字會自動小一級。每張圖都有 title、可展開的資料表，以及滑鼠或觸控的數值提示。', 'In src/components/charts/. Server-rendered inline SVG, no charting library. Widths are percentages and text is real fixed-size text, so one chart works from a 320px phone to desktop: it is laid out for a 280px plot, and in a narrower box (under 272px) the type drops a step by itself. Every chart has a title, an expandable data table and a hover / touch readout.')}>
     <Callout label={L('圖表規則', 'Chart rules')}>
       <ul class="sg-list">
         <li>{L('先選形式，最後才選顏色。一個數字用 Stat，不要畫一根長條。', 'Pick the form first and the colour last. One number is a Stat, not a one-bar chart.')}</li>
         <li>{L('一張圖只有一個 y 軸。不同單位就畫兩張圖。', 'One y axis per chart. Two units means two charts.')}</li>
         <li>{L('直接標示數值，少用圖例；兩個以上數列才需要圖例。', 'Label values directly and lean on legends as little as possible; a legend appears only for two or more series.')}</li>
         <li>{L('不用圓餅圖與甜甜圈圖：占比用 StackedBar 或 WaffleChart。', 'No pies or donuts: use StackedBar or WaffleChart for shares.')}</li>
-        <li>{L('標籤請短：中文 30 字、英文 60 字元以內（會自動折成兩行）。', 'Keep labels short: under 30 Chinese characters or 60 Latin (they wrap to two lines).')}</li>
+        <li>{L('標籤請短：中文 30 字、英文 60 字元以內（會自動折成兩行）。再長的會折到第三、第四行，不會被裁掉；括號和單位不會被拆到下一行。', 'Keep labels short: under 30 Chinese characters or 60 Latin (they wrap to two lines). A longer one takes a third or fourth line and is never clipped; a bracket is never parted from its unit.')}</li>
+        <li>{L('長條的長度一律從 0 量起。負值往左長；長條圖沒有「不從 0 開始」的軸。', 'A bar’s length is always measured from zero. Negative values grow to the left; a bar chart has no axis that starts anywhere else.')}</li>
+        <li>{L('軸不從 0 開始，只用在看位置、不看長度的圖（RangePlot、LineChart）：圖上會畫出斷軸記號，並標出軸從哪個數字開始。', 'An axis that does not start at zero is only for charts read by position, not length (RangePlot, LineChart): the chart draws the axis-break mark and prints the number the axis starts at.')}</li>
+        <li>{L('目標和推估畫虛線、空心點；實線和實心點只給量到或統計到的數字。', 'Targets and projections are dashed lines and hollow points; solid lines and filled points are for what was measured or counted.')}</li>
       </ul>
     </Callout>
 
@@ -1072,7 +1084,7 @@ const state = moneyState(todayInTaipei(), 'kaohsiung', snapshot);
         <RangePlot locale={locale} title={L('個人暴露範圍圖', 'Range plot of personal exposure')} data={[{ label: L('走在人行道', 'Walking on the sidewalk'), min: 10, mid: 40, max: 180 }, { label: L('路口等紅燈', 'Waiting at the crossing'), min: 22, mid: 71, max: 240 }, { label: L('公園內', 'Inside a park'), min: 6, mid: 14, max: 21, tone: 'clean' }]} unit={units.ugm3} labels={{ min: ui.chart.min[locale], mid: ui.chart.median[locale], max: ui.chart.max[locale] }} categoryLabel={L('地點', 'Place')} />
       </Figure>
 
-      <Figure locale={locale} number={4} title={L('機車在粉塵裡占得少，|在氣體裡占得多', 'Scooters are a small share of dust |and a large share of the gases')} subtitle={L('各類車輛占道路排放的比例', 'Share of road-transport emissions by vehicle type')} caption={L('StackedBar：比較幾個「整體」怎麼分。占比印在色塊下方，放不下的在資料表。', 'StackedBar: comparing how several wholes split. Shares are printed under the segments where they fit; the rest are in the data table.')} sample>
+      <Figure locale={locale} number={4} title={L('機車在粉塵裡占得少，|在氣體裡占得多', 'Scooters are a small share of dust |and a large share of the gases')} subtitle={L('各類車輛占道路排放的比例', 'Share of road-transport emissions by vehicle type')} caption={L('StackedBar：比較幾個「整體」怎麼分。每一個占比都印在長條下方，前面帶著同色的小方塊；這裡最小的 4% 色塊下面放不下數字，所以依序往旁邊排。', 'StackedBar: comparing how several wholes split. Every share is printed under the bar behind a chip in its segment’s colour; the 4% here is too narrow to hold its number, so the values are set out in order beside one another.')} sample>
         <StackedBar locale={locale} title={L('各污染物的車種占比堆疊長條圖', 'Stacked bar chart of vehicle shares by pollutant')} series={[{ label: L('機車', 'Scooters'), tone: 'exhaust' }, { label: L('汽車', 'Cars'), tone: 'blue' }, { label: L('貨車與公車', 'Trucks and buses'), tone: 'violet' }, { label: L('其他', 'Other'), tone: 'neutral' }]} rows={[{ label: 'PM2.5', values: [9, 31, 52, 8] }, { label: L('一氧化碳', 'Carbon monoxide'), values: [38, 47, 11, 4] }, { label: L('碳氫化合物', 'Hydrocarbons'), values: [46, 39, 9, 6] }]} categoryLabel={L('污染物', 'Pollutant')} />
       </Figure>
 
@@ -1097,6 +1109,30 @@ const state = moneyState(todayInTaipei(), 'kaohsiung', snapshot);
           <PictogramRow locale={locale} title={L('路口行人組成圖示', 'Pictogram of people at a crossing')} count={3} total={10} label={L('孩童與長者', 'Children and elders')} restLabel={L('其他行人', 'Other pedestrians')} tone="signal" categoryLabel={L('族群', 'Group')} valueLabel={L('人數', 'People')} />
           <PictogramRow locale={locale} title={L('電動機車占比圖示', 'Pictogram of the electric share')} count={1} total={8} cols={4} icon="scooter-electric" tone="clean" label={series2[1].label} restLabel={series2[0].label} categoryLabel={L('車種', 'Type')} valueLabel={L('輛', 'Count')} />
         </div>
+      </Figure>
+
+      <Figure locale={locale} number={10} title={L('實際的線往下走，|目標在上面', 'The observed line heads down. |The targets sit above it.')} subtitle={L('電動機車占新掛牌機車的比例（%），和政策目標', 'Electric share of new scooter registrations (%), with policy targets')} caption={L('LineChart，xScale="value"：年份照實際間隔排，2025 到 2030 的五年就是五年寬。目標是虛線加空心點（dashed、markers="hollow"、connectNulls），不會被讀成預測或實績。2021 年前後各缺一年，單獨一個點照樣畫出來。', 'LineChart with xScale="value": years sit at their real spacing, so the five years from 2025 to 2030 are five years wide. Targets are a dashed line through hollow points (dashed, markers="hollow", connectNulls), so they never read as a forecast or a result. 2021 has a missing year on each side and is still drawn, as a point on its own.')} sample>
+        <LineChart locale={locale} title={L('電動機車占比與政策目標折線圖', 'Line chart of the electric share and the policy targets')} desc={L('實際占比從高點往下走；目標是之後三個年份的空心點。', 'The observed share falls from its peak; the targets are hollow points at three later years.')} xScale="value" x={[2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2030, 2035, 2040]} xTicks={[2018, 2025, 2030, 2035, 2040]} yMax={100} unit="%" xLabel={L('年', 'Year')} format={(v: number) => `${v}%`} series={[{ label: L('實際占比', 'Observed share'), tone: 'clean', values: [17, 19, null, 12, null, 11, 10, 8, null, null, null], markers: 'all', pointLabels: 'ends' }, { label: L('政策目標', 'Policy target'), tone: 'ink', values: [null, null, null, null, null, null, null, 20, 35, 70, 100], dashed: true, markers: 'hollow', connectNulls: true, pointLabels: 'all' }]} />
+      </Figure>
+
+      <Figure locale={locale} number={11} title={L('有增有減：|負值往左長', 'Up and down: |negative values grow to the left')} subtitle={L('和前一年相比的變化（%）', 'Change from the year before (%)')} caption={L('BarChart 的負值：每一根都從 0 量起，0 的位置標一次。參考線碰到標籤或數值會自己斷開，不會從字上面穿過去。', 'BarChart with negative values: every bar is measured from zero, and zero is labelled once. A reference line breaks where it meets a label or a value instead of running through the text.')} sample>
+        <BarChart locale={locale} title={L('各車種掛牌數年增率長條圖', 'Bar chart of year-on-year change in registrations')} desc={L('兩種車減少，兩種車增加。', 'Two kinds fell and two rose.')} data={[{ label: L('燃油機車', 'Gasoline scooters'), value: -12 }, { label: L('電動機車', 'Electric scooters'), value: 31, tone: 'clean' }, { label: L('電動自行車', 'Electric bicycles'), value: 8, tone: 'clean' }, { label: L('二行程機車（估計）', 'Two-stroke scooters (estimate)'), value: -40 }]} unit="%" reference={{ value: 31, label: L('今年最高（示意）', 'This year’s high (sample)') }} categoryLabel={L('車種', 'Type')} valueLabel={L('變化', 'Change')} />
+      </Figure>
+
+      <Figure locale={locale} number={12} title={L('兩條路線，|三種污染物的差別', 'Two routes, |three pollutants')} subtitle={L('和主要幹道相比的差別（%）', 'Difference from the main road (%)')} caption={L('GroupedBarChart 的負值：數值標在長條的尖端，往左的標在左邊。', 'GroupedBarChart with negative values: each value sits at the tip of its bar, to the left of a bar that grows left.')} sample>
+        <GroupedBarChart locale={locale} title={L('兩種路線相對主要幹道的差別分組長條圖', 'Grouped bar chart of two routes against the main road')} series={[{ label: L('巷弄路線', 'Back-street route'), tone: 'clean' }, { label: L('高架下路線', 'Route under the viaduct'), tone: 'exhaust' }]} groups={[{ label: 'PM2.5', values: [-18, 12] }, { label: L('苯類（BTEX）', 'Benzene family (BTEX)'), values: [-33, 4] }, { label: L('一氧化碳（ppm）', 'Carbon monoxide (ppm)'), values: [-21, 9] }]} unit="%" categoryLabel={L('污染物', 'Pollutant')} />
+      </Figure>
+
+      <Figure locale={locale} number={13} title={L('只有範圍、沒有中間值：|就不畫圓點', 'A span with no central value |gets no dot')} subtitle={L('風險比與 95% 信賴區間；1 代表沒有差別', 'Hazard ratio with 95% confidence interval; 1 means no difference')} caption={L('RangePlot：軸從 0.9 開始（min={0.9}），所以底下畫了刻度和斷軸記號。第三列只有範圍、沒有 mid，圖上不替它編一個中心點，右邊直接印出範圍。', 'RangePlot on an axis that starts at 0.9 (min={0.9}), so it is ruled with ticks and carries the axis-break mark. The third row has a span and no mid: the chart invents no centre for it and prints the span itself on the right.')} sample>
+        <RangePlot locale={locale} title={L('三項研究的風險比範圍圖', 'Range plot of hazard ratios from three studies')} data={[{ label: L('示意世代研究甲', 'Sample cohort A'), min: 1.02, mid: 1.09, max: 1.17 }, { label: L('示意世代研究乙', 'Sample cohort B'), min: 0.97, mid: 1.04, max: 1.12 }, { label: L('示意回顧（只給範圍）', 'Sample review (span only)'), min: 1.05, max: 1.3, tone: 'neutral' }]} min={0.9} max={1.4} decimals={2} reference={{ value: 1, label: L('沒有差別', 'No difference') }} labels={{ min: L('下限', 'Lower'), mid: L('估計值', 'Estimate'), max: L('上限', 'Upper') }} categoryLabel={L('研究', 'Study')} />
+      </Figure>
+
+      <Figure locale={locale} number={14} title={L('細微的變化，|軸可以不從 0 開始', 'For a small change |the axis may start above zero')} subtitle={L('示意測站的年平均（ppb）', 'Annual mean at a sample station (ppb)')} caption={L('LineChart 加上 yMin：圖的底部仍然標出 0，中間畫斷軸記號；這種時候不畫面積。', 'LineChart with yMin: zero is still marked at the foot of the chart, with the axis-break mark between it and the scale. No area fill in this case.')} sample>
+        <LineChart locale={locale} title={L('示意測站年平均折線圖', 'Line chart of the annual mean at a sample station')} x={[2019, 2020, 2021, 2022, 2023, 2024, 2025]} series={[{ label: L('示意測站', 'Sample station'), tone: 'blue', values: [412, 409, 415, 417, 419, 421, 424] }]} unit="ppb" yMin={400} yMax={430} height={170} xLabel={L('年', 'Year')} />
+      </Figure>
+
+      <Figure locale={locale} number={15} title={L('很小的占比，|也要印出來', 'A very small share |is still printed')} subtitle={L('各類來源占排放量的比例', 'Share of emissions by source')} caption={L('StackedBar：色塊下面放不下數字的時候（這裡的 1.3%），整張圖的數字都帶上同色的小方塊，依序排在長條下方，一個都不省略。每個數字都放得下的圖，數字就直接印在自己的色塊下面，不加方塊。', 'StackedBar: when a value will not fit under its segment (the 1.3% here), every value in the chart gets a chip in its segment’s colour and they are set out in order under the bar. None is left out. Where every value fits, each is printed under its own segment with no chip.')} sample>
+        <StackedBar locale={locale} title={L('兩種污染物的來源占比堆疊長條圖', 'Stacked bar chart of source shares for two pollutants')} decimals={1} series={[{ label: L('機車', 'Scooters'), tone: 'exhaust' }, { label: L('汽車', 'Cars'), tone: 'blue' }, { label: L('貨車與公車', 'Trucks and buses'), tone: 'violet' }, { label: L('其他來源', 'Other sources'), tone: 'neutral' }]} rows={[{ label: L('PM2.5 排放量', 'PM2.5 emissions'), values: [1.3, 6.2, 9.5, 83] }, { label: L('一氧化碳排放量', 'Carbon monoxide emissions'), values: [15.6, 40.1, 6.3, 38] }]} categoryLabel={L('污染物', 'Pollutant')} />
       </Figure>
     </div>
     <p class="meta sg-note">{L('WaterfallChart 與 BreakEvenChart 在上面的「表單與試算」一節。', 'WaterfallChart and BreakEvenChart are shown in the Forms and calculator section above.')}</p>
@@ -1198,7 +1234,7 @@ const t = localize(home, locale);        // t.link3.title, t.link3.body[1]
 npm run share-cards              # 產生 public/share/{zh,en}/<id>.png 與 <id>-sq.png，然後 commit
 npm run share-cards -- smell     # 只重畫某一張
 npm run check                    # 其中一步會確認圖卡和現在的文案一致（不需要瀏覽器）`}>
-      <Fragment slot="note"><p>{L('每個問題頁一張、首頁一張、七件事一張，中英各一，各有 1200×630 和 1080×1080 兩種尺寸。問題、一句話回答、但書和證據標記都畫在圖裡，所以截圖不會把但書丟掉。圖卡的文字來自 src/i18n/pages/questions.ts 與 chain.summary；改了文案就重跑一次並 commit，否則 npm run check 會失敗。腳本用本機已安裝的 Playwright，CI 不需要瀏覽器。', 'One per question page, one for the home page and one for the seven lines, in both languages, each at 1200×630 and 1080×1080. The question, the one-line answer, the caveat and the badge are drawn inside the image, so a screenshot cannot shed the caveat. Card text comes from src/i18n/pages/questions.ts and chain.summary; change the copy, rerun and commit, or npm run check fails. The script uses the Playwright already on the machine, so CI needs no browser.')}</p></Fragment>
+      <Fragment slot="note"><p>{L('每個問題頁一張、首頁一張、七件事一張，中英各一，各有 1200×630 和 1080×1080 兩種尺寸。問題、一句話回答、但書和證據標記都畫在圖裡，所以截圖不會把但書丟掉。圖卡的文字來自 src/i18n/pages/questions.ts 與 chain.summary；改了文案就重跑一次並 commit，否則 npm run check 會失敗。圖檔存成 256 色的 PNG（大約是瀏覽器原圖的三分之一大），仍然是每個平台都收的 PNG。腳本用本機已安裝的 Playwright，CI 不需要瀏覽器。', 'One per question page, one for the home page and one for the seven lines, in both languages, each at 1200×630 and 1080×1080. The question, the one-line answer, the caveat and the badge are drawn inside the image, so a screenshot cannot shed the caveat. Card text comes from src/i18n/pages/questions.ts and chain.summary; change the copy, rerun and commit, or npm run check fails. The files are saved as 256-colour PNGs, about a third of the size the browser writes and still the PNG every platform accepts. The script uses the Playwright already on the machine, so CI needs no browser.')}</p></Fragment>
       <div class="grid" style="--min: 18rem">
         <figure><img src={asset(cardZh.wide)} width="1200" height="630" alt={cardZh.alt} loading="lazy" lang="zh-Hant-TW" /><figcaption class="meta">share="smell" · zh · 1200×630</figcaption></figure>
         <figure><img src={asset(cardEn.wide)} width="1200" height="630" alt={cardEn.alt} loading="lazy" lang="en" /><figcaption class="meta">share="smell" · en · 1200×630</figcaption></figure>
@@ -1291,6 +1327,20 @@ npm run check                    # 其中一步會確認圖卡和現在的文案
   }
   .sg-note {
     margin-block-start: var(--sp-4);
+  }
+  .sg-rowlink {
+    margin-block-start: var(--sp-3);
+  }
+  .sg-rowlink > a {
+    display: block;
+    padding: var(--sp-3);
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+  }
+  .sg-rowlink > a:hover {
+    border-color: var(--ink);
   }
   .sg-swatches {
     display: grid;

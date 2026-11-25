@@ -1,7 +1,10 @@
 ---
 /**
  * Card — a self-contained teaser or summary. With `href` the whole card is one
- * link (the title is the link; an arrow shows it goes somewhere).
+ * link (the title is the link; an arrow shows it goes somewhere). The card is
+ * never an <a> itself, so links inside it are valid: a <Cite> marker or a link
+ * in the body or the footer is raised above the stretched title link and keeps
+ * its own target.
  *
  * Props
  *   title    card heading
@@ -111,6 +114,12 @@ const H = `h${level}` as 'h2' | 'h3' | 'h4';
     font-size: var(--fs-sm);
     line-height: var(--lh-snug);
     color: var(--ink-2);
+  }
+  /* links and citation markers in the body stay clickable above the stretched title link */
+  .card--link .card__text :global(a),
+  .card--link .card__text :global(.cite) {
+    position: relative;
+    z-index: 1;
   }
   .card__footer {
     --cluster: var(--sp-2);

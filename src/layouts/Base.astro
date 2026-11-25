@@ -34,9 +34,15 @@ import '@/styles/fonts.css';
 import '@/styles/tokens.css';
 import '@/styles/global.css';
 import archivoUrl from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
-// The CJK headline font's CSS is ~100 @font-face rules. Loaded as its own
-// non-blocking stylesheet so it never delays first paint (see fonts.css).
+// The CJK headline font, two ways (see fonts.css and scripts/display-font.mjs):
+// one small file holding exactly the characters the site's headlines use, and behind it the
+// package's ~100 slices for any character that file does not have yet. The slice list is a
+// non-blocking stylesheet, and the build removes its link from every page the small file
+// fully covers (the `data-cjk-slices` marker is how it finds it).
 import cjkDisplayCss from '@fontsource/noto-sans-tc/900.css?url';
+import cjkHeadlineUrl from '@/styles/fonts/noto-sans-tc-900-headline.woff2?url';
+// Keep the range in step with UNICODE_RANGE in scripts/display-font.mjs.
+const cjkHeadlineFace = `@font-face{font-family:'Noto Sans TC Headline';font-style:normal;font-weight:900;font-display:swap;src:url(${cjkHeadlineUrl}) format('woff2');unicode-range:U+00B7,U+2000-2BFF,U+2E80-FFEF}`;
 
 import { asset, htmlLang, locales, switchLocalePath, type Locale } from '@/i18n';
 import { site, ui } from '@/i18n/ui';
@@ -130,13 +136,20 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
     <meta name="twitter:image" content={image} />
     {!ogImage && <meta name="twitter:image:alt" content={card.alt} />}
 
+    {/* Icons, all drawn from public/favicon.svg: .ico for browsers that take no SVG icon (and
+        for anything that asks for /favicon.ico), the SVG for the rest, a full-bleed tile for
+        iOS, and the manifest's 192 / 512 / maskable PNGs for Android. */}
+    <link rel="icon" href={asset('/favicon.ico')} sizes="32x32" />
     <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={asset('/apple-touch-icon.png')} />
+    <link rel="manifest" href={asset('/manifest.webmanifest')} />
     <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
     {locale === 'zh-TW' && (
       <Fragment>
-        <link rel="stylesheet" href={cjkDisplayCss} media="print" onload={"this.media='all'"} />
-        <noscript><link rel="stylesheet" href={cjkDisplayCss} /></noscript>
+        <link rel="preload" href={cjkHeadlineUrl} as="font" type="font/woff2" crossorigin />
+        <style is:inline set:html={cjkHeadlineFace} />
+        <link rel="stylesheet" href={cjkDisplayCss} media="print" onload={"this.media='all'"} data-cjk-slices />
+        <noscript data-cjk-slices><link rel="stylesheet" href={cjkDisplayCss} /></noscript>
       </Fragment>
     )}
     <link rel="sitemap" href={asset('/sitemap-index.xml')} />

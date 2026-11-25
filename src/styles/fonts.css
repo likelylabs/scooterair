@@ -6,11 +6,24 @@
  *    They are good, they render instantly and they cost zero bytes. A full
  *    CJK web font for body text would be over a megabyte on a first visit.
  *
- * 2. Chinese HEADLINES (display, h1, h2: weight 900) use Noto Sans TC Black
- *    from @fontsource/noto-sans-tc, imported in Base.astro. System fonts stop
- *    at semibold on iOS, and the heavy headline is the site's voice. The font
- *    comes as ~100 unicode-range slices, so a page downloads only the slices
- *    its headline characters live in (typically 5–8 slices, ~40 kB each).
+ * 2. Chinese HEADLINES (display, h1, h2: weight 900) use Noto Sans TC Black.
+ *    System fonts stop at semibold on iOS, and the heavy headline is the
+ *    site's voice. It is loaded in Base.astro, on Chinese pages only, as
+ *
+ *    "Noto Sans TC Headline"  ONE file (./fonts/noto-sans-tc-900-headline.woff2,
+ *                    about 45 kB) holding exactly the characters the site's
+ *                    headlines use: a few hundred. Preloaded. Rebuilt with
+ *                    `node scripts/build-display-font.mjs` after a build.
+ *    "Noto Sans TC"  the package's ~100 unicode-range slices (~40 kB each),
+ *                    second in the stack, for a headline character the one
+ *                    file does not hold yet. Its slice list is a 45 kB
+ *                    stylesheet, loaded without blocking; the build removes
+ *                    the link from every page the one file covers, so a
+ *                    reader normally downloads none of it. Before the one
+ *                    file existed the home page pulled ten slices (364 kB).
+ *
+ *    A stale subset is never wrong, only heavier: the browser falls back
+ *    glyph by glyph, and `astro build` names the characters that are missing.
  *    font-display: swap — every CJK glyph is one em wide in either font, so
  *    the swap changes weight, never layout.
  *

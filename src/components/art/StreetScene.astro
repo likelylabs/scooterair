@@ -40,7 +40,7 @@ import type { Locale } from '@/i18n';
 import { art, fill } from '@/i18n/art';
 import {
   CAR_TAILPIPE, LED_FIGURES, MOUTH, SCOOTER_LENGTH, STROLLER_BAND, TAILPIPE,
-  artId, car, em, esc, hatchBand, ledDigit, ledPath, person, ribbon, ringsInBand, scooter, stipple,
+  artId, car, em, esc, hatchBand, ledDigitRuns, ledDots, ledRuns, person, ribbon, ringsInBand, scooter, stipple,
 } from './parts';
 
 type Frame = 'empty' | 'pack' | 'kerb' | 'paused' | 'green' | 'clean';
@@ -211,10 +211,10 @@ function street(v: 'wide' | 'compact') {
     `<circle class="${green ? 'a-lamp-off' : 'a-led-red'}" cx="${hx + 26}" cy="${sy + 26}" r="17"/><circle class="a-lamp-off" cx="${hx + 68}" cy="${sy + 26}" r="17"/><circle class="${green ? 'a-led-green' : 'a-lamp-off'}" cx="${hx + 110}" cy="${sy + 26}" r="17"/>`,
   );
   sig.push(`<rect class="a-housing" x="${bx}" y="${sy}" width="52" height="52" rx="6"/>`);
-  if (countText) sig.push(`<path class="${green ? 'a-led-green' : 'a-led-red'}" d="${ledDigit(countText[0], 4.2, 1.65, bx + 3.2, sy + 11.3)}${ledDigit(countText[1], 4.2, 1.65, bx + 3.2 + 25.2, sy + 11.3)}"/>`);
+  if (countText) sig.push(ledDots(ledDigitRuns(countText[0], 4.2, bx + 3.2, sy + 11.3) + ledDigitRuns(countText[1], 4.2, bx + 3.2 + 25.2, sy + 11.3), { pitch: 4.2, r: 1.65, cls: green ? 'a-led-green' : 'a-led-red' }));
   // pedestrian head (for crossing the other street): red with the pack's red, green with its green
   sig.push(
-    `<g transform="translate(${pole + 8} -262) scale(1.45)"><rect class="a-housing" width="30" height="36" rx="2.5"/><path class="${green ? 'a-led-green' : 'a-led-red'}" d="${ledPath(green ? LED_FIGURES.walk : LED_FIGURES.stand, 2, 0.8, 3, 2)}"/></g>`,
+    `<g transform="translate(${pole + 8} -262) scale(1.45)"><rect class="a-housing" width="30" height="36" rx="2.5"/>${ledDots(ledRuns(green ? LED_FIGURES.walk : LED_FIGURES.stand, 2, 3, 2), { pitch: 2, r: 0.8, cls: green ? 'a-led-green' : 'a-led-red' })}</g>`,
   );
 
   // ---- people

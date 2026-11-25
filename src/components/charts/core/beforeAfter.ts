@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmt, niceMax, pctN, px, text, wrapLabel } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmt, niceMax, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
 
 export interface BeforeAfterProps {
   locale: Locale;
@@ -27,7 +27,7 @@ export function renderBeforeAfter(p: BeforeAfterProps): ChartRender {
 
   data.forEach((d) => {
     const pair = `${f(d.before)} → ${f(d.after)}`;
-    const lines = wrapLabel(d.label, (MIN_W - px(pair, 15) - 14) / 14);
+    const lines = wrapLabel(d.label, (MIN_W - px(pair, 15) - 14) / 14, LABEL_LINES);
     const labelH = lines.length * LINE;
     const cy = y + labelH + 13;
     const a = pctN(d.before, max);

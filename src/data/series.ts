@@ -97,7 +97,10 @@ export interface SeriesInput {
   sources: SourceId[];
   confidence: Confidence;
   evidence: Evidence;
+  /** Reader-facing limit of the evidence; pages print it. Never address editors here. */
   caveat?: L10n;
+  /** Internal note for editors and chart builders (English). Never rendered. */
+  editorNote?: string;
   requiresCaveat?: boolean;
   relatedFacts?: FactId[];
   locator?: string;
@@ -114,8 +117,8 @@ const TW = t('台灣（全國）', 'Taiwan (national)');
 const TAIPEI = t('台北市', 'Taipei City');
 const TEDS_PERIOD = t('基準年2023年（TEDS 13.0）', 'Base year 2023 (TEDS 13.0)');
 const TEDS_CAVEAT = t(
-  '排放清冊只計國內直接排放的原生性污染物；排放占比不等於對空氣中濃度的貢獻。「合計」為本站將二行程與四行程兩列相加。',
-  'The inventory counts only primary pollutants emitted directly by domestic sources; an emissions share is not a share of what people breathe. "Combined" is our sum of the two-stroke and four-stroke rows.',
+  '排放清冊只計國內直接排放的原生性污染物；排放占比不等於對空氣中濃度的貢獻。「合計」是清冊中二行程與四行程兩列相加。',
+  'The inventory counts only primary pollutants emitted directly by domestic sources; an emissions share is not a share of what people breathe. "Combined" is the sum of the inventory\'s two-stroke and four-stroke rows.',
 );
 const IOT_CAVEAT = t(
   '模式模擬結果，不是實測；報告封面註明結論不代表交通部意見。',
@@ -180,14 +183,13 @@ const baseSeries = {
       {
         key: 'combined',
         label: t('燃油機車合計', 'Combined'),
-        evidence: 'derived',
         points: [
-          { x: 'pm25', y: 1.31, flags: ['derived'] },
-          { x: 'pm10', y: 0.54, flags: ['derived'] },
-          { x: 'nox', y: 2.19, flags: ['derived'] },
-          { x: 'nmhc', y: 9.99, flags: ['derived'] },
-          { x: 'thc', y: 8.6, flags: ['derived'] },
-          { x: 'co', y: 15.59, flags: ['derived'] },
+          { x: 'pm25', y: 1.31 },
+          { x: 'pm10', y: 0.54 },
+          { x: 'nox', y: 2.19 },
+          { x: 'nmhc', y: 9.99 },
+          { x: 'thc', y: 8.6 },
+          { x: 'co', y: 15.59 },
         ],
       },
     ],
@@ -237,17 +239,15 @@ const baseSeries = {
       {
         key: 'combined',
         label: t('燃油機車合計', 'Gasoline combined'),
-        evidence: 'derived',
         points: [
-          { x: 'pm25', y: 441.7, flags: ['derived'] },
-          { x: 'pm10', y: 591.6, flags: ['derived'] },
-          { x: 'nox', y: 4448.1, flags: ['derived'] },
-          { x: 'nmhc', y: 35486.1, flags: ['derived'] },
-          { x: 'thc', y: 37280.8, flags: ['derived'] },
+          { x: 'pm25', y: 441.7 },
+          { x: 'pm10', y: 591.6 },
+          { x: 'nox', y: 4448.1 },
+          { x: 'nmhc', y: 35486.1 },
+          { x: 'thc', y: 37280.8 },
           {
             x: 'co',
             y: 74540.1,
-            flags: ['derived'],
             note: t('研究資料的合計值；四捨五入後的兩列相加為74,540.0。', 'Research-file sum; the two rounded rows add to 74,540.0.'),
           },
         ],
@@ -460,8 +460,8 @@ const baseSeries = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '2026年數字出自媒體轉述（次級來源）。登記數在2013年因老舊機車切結報廢而出現斷層，不可與2013年以前的數字直接比較。',
-      'The 2026 figures come from a media report (secondary). The registration series has a break in 2013 from sworn scrappage of old scooters; do not compare with pre-2013 counts.',
+      '2026年數字出自媒體轉述（次級來源）。登記數在2013年因老舊機車切結報廢而出現斷層，所以2013年前後的數字不能直接比較。',
+      'The 2026 figures come from a media report (secondary). The registration series has a break in 2013 from sworn scrappage of old scooters, so counts before and after 2013 are not directly comparable.',
     ),
     relatedFacts: ['fleet-registered-2024', 'fleet-electric-registered-2024', 'fleet-fuel-mix-may-2026'],
     chainLink: 1,
@@ -494,6 +494,10 @@ const baseSeries = {
     sources: ['moenv-air-review-2023', 'moenv-air-review-2024'],
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '環境部報告用的是「以下」的概數，不是精確的登記數；登記在案的二行程機車不一定都還在路上騎。',
+      'The MOENV reviews give rounded "or fewer" figures, not exact counts; not every registered two-stroke is still being ridden.',
+    ),
     relatedFacts: ['two-stroke-remaining'],
     chainLink: 1,
     research: '01 §6, Chart F',
@@ -564,11 +568,12 @@ const baseSeries = {
     evidence: 'official-tw',
     caveat: t(
       '所有年度數字都出自媒體轉述的交通部或產業統計；2015至2018年與2020年無可查證的數字，圖上應留白而非連線。目標出自公視對淨零路徑的描述，國發會原始文件未能開啟。',
-      'Every annual figure comes from media reports of MOTC or industry statistics; 2015–2018 and 2020 have no verified figures and should be left as gaps, not joined. Targets are from PTS\'s description of the net-zero pathway; the NDC original could not be opened.',
+      'Every annual figure comes from media reports of MOTC or industry statistics; 2015–2018 and 2020 have no verified figures, so those years are shown as gaps, not joined by a line. Targets are from PTS\'s description of the net-zero pathway; the NDC original could not be opened.',
     ),
     requiresCaveat: true,
     relatedFacts: ['ev-share-2019', 'ev-share-2025', 'netzero-ev-sales-targets', 'netzero-2025-gap'],
     chainLink: 7,
+    editorNote: 'Leave unverified years as gaps; never interpolate.',
     research: '01 §7, §8, Charts A and G',
   },
   'new-registrations-electric-vs-gasoline': {
@@ -660,6 +665,10 @@ const baseSeries = {
     sources: ['taipei-dbas-bulletin-1341'],
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '只限台北市平日、9至12月的抽樣調查；台北的捷運與公車比其他城市多，不能代表全國。2022年的公共運輸與步行數字取自研究整理的圖表資料。',
+      'A sample survey of Taipei City weekdays from September to December only; Taipei has far more metro and bus service than other cities, so it does not stand for Taiwan as a whole. The 2022 public-transport and walking figures come from our research notes\' chart data.',
+    ),
     relatedFacts: ['mode-share-taipei-2024'],
     locator: '2022 public transport (37.2) and walking (18.6) appear only in research Chart H, not in the quoted table row',
     chainLink: null,
@@ -689,6 +698,10 @@ const baseSeries = {
     sources: ['moenv-air-review-2023'],
     confidence: 'verified',
     evidence: 'official-tw',
+    caveat: t(
+      '這些是新車開始適用各期標準的日期；已在路上的機車仍依出廠時的標準，所以同一時間路上同時有好幾期的車。',
+      'These are the dates from which new scooters had to meet each phase; scooters already on the road stay on the standard they were built to, so several phases are on the road at once.',
+    ),
     relatedFacts: ['scooter-emission-standard-phases'],
     chainLink: 1,
     research: '01 §8',
@@ -699,7 +712,7 @@ const baseSeries = {
   // -------------------------------------------------------------------------
   'commute-pm25-wang2021': {
     topic: 'exposure',
-    title: t('大台北各通勤方式的PM2.5暴露（Wang等，2021）', 'PM2.5 exposure by commuting mode, Taipei area (Wang et al., 2021)'),
+    title: t('大台北各通勤方式的PM2.5暴露（Wang 等，2021）', 'PM2.5 exposure by commuting mode, Taipei area (Wang et al., 2021)'),
     description: t('中位數與範圍。沿街步行高於公車與汽車；機車只在停等時量測。', 'Median and range. Walking along streets is above bus and car; motorcycle readings were taken only while stopped.'),
     chart: 'dot-range',
     unit: 'ug/m3',
@@ -735,17 +748,18 @@ const baseSeries = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '五位志願者、一台未校正的低價感測器，作者推論約偏高30%（未調整）；步行數值包含所有來源，有標明來源的最高值來自焚香與烹飪。地下捷運的微粒來自輪軌磨耗。本站採用內文數字。不可與Chuang等（2020）的數字合併。',
-      'Five volunteers with one uncalibrated low-cost sensor that by the authors\' reasoning reads about 30% high (unadjusted); the walking value includes every source, and the highest named peaks were incense and cooking. Underground MRT particles come from rail wear. We use the Results text. Do not merge with Chuang et al. (2020).',
+      '五位志願者、一台未校正的低價感測器，作者推論約偏高30%（未調整）；步行數值包含所有來源，有標明來源的最高值來自焚香與烹飪。地下捷運的微粒來自輪軌磨耗。本站採用內文數字。這和Chuang 等（2020）是不同的研究，兩者的數字不是同一組量測。',
+      'Five volunteers with one uncalibrated low-cost sensor that by the authors\' reasoning reads about 30% high (unadjusted); the walking value includes every source, and the highest named peaks were incense and cooking. Underground MRT particles come from rail wear. We use the Results text. It is a separate study from Chuang et al. (2020), and the two sets of numbers are not one measurement.',
     ),
     requiresCaveat: true,
     relatedFacts: ['commute-walking-wang2021', 'idle-motorcycle-pm25-wang2021', 'commute-mrt-underground-wang2021'],
     chainLink: 3,
+    editorNote: 'R15: never merge with Chuang 2020 into one range or one chart series.',
     research: 'papers/wang-2021-atmosphere#walking-street-stats; papers/wang-2021-atmosphere#motorcycle-stats; papers/wang-2021-atmosphere#underground-mrt-stats; papers/wang-2021-atmosphere#elevated-mrt-stats',
   },
   'commute-pm25-chuang2020': {
     topic: 'exposure',
-    title: t('六種通勤方式的PM2.5暴露（Chuang等，2020）', 'PM2.5 exposure by commuting mode (Chuang et al., 2020)'),
+    title: t('六種通勤方式的PM2.5暴露（Chuang 等，2020）', 'PM2.5 exposure by commuting mode (Chuang et al., 2020)'),
     description: t(
       '平均值±標準差。步行與騎機車都高於捷運與汽車，但兩者之間及與公車的差異不顯著。',
       'Mean ± SD. Walking and scooter are both above subway and car, but not significantly different from each other or from the bus.',
@@ -780,16 +794,17 @@ const baseSeries = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '120位健康年輕成人，只量早上一小時，只量PM2.5；騎機車是騎士自己的暴露，不是行人。不可與Wang等（2021）的數字合併。',
-      '120 healthy young adults, one morning hour, PM2.5 only; the scooter value is riders\' own exposure, not pedestrians\'. Do not merge with Wang et al. (2021).',
+      '120位健康年輕成人，只量早上一小時，只量PM2.5；騎機車是騎士自己的暴露，不是行人。這和Wang 等（2021）是不同的研究，兩者的數字不是同一組量測。',
+      '120 healthy young adults, one morning hour, PM2.5 only; the scooter value is riders\' own exposure, not pedestrians\'. It is a separate study from Wang et al. (2021), and the two sets of numbers are not one measurement.',
     ),
     relatedFacts: ['commute-scooter-vs-subway-chuang2020'],
     chainLink: 3,
+    editorNote: 'R15: never merge with Wang 2021 into one range or one chart series.',
     research: 'papers/chuang-2020-aex#pm-scooter; papers/chuang-2020-aex#pm-walking; papers/chuang-2020-aex#pm-bus-car; papers/chuang-2020-aex#pm-subway; papers/chuang-2020-aex#pm-facemask',
   },
   'scooter-lane-vs-cyclist-wu2021': {
     topic: 'exposure',
-    title: t('機車道上的電動機車騎士與自行車騎士（Wu等，2021）', 'Electric-scooter riders in the traffic lane vs cyclists (Wu et al., 2021)'),
+    title: t('機車道上的電動機車騎士與自行車騎士（Wu 等，2021）', 'Electric-scooter riders in the traffic lane vs cyclists (Wu et al., 2021)'),
     description: t('未調整平均值。PM2.5差距不大，苯系物（BTEX）差距明顯。', 'Unadjusted means. PM2.5 differs little; BTEX differs a lot.'),
     chart: 'grouped-bar',
     unit: 'ug/m3',
@@ -823,12 +838,13 @@ const baseSeries = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '兩組數據單位不同，不可共用數值軸。騎士騎的是電動機車，量到的是周圍車流的廢氣；這是通勤騎士在行進中的暴露，不是行人，也不是燃油與電動機車的比較。',
-      'The two datasets have different units and must not share a value axis. The riders used electric scooters, so this is surrounding traffic\'s exhaust; it is commuters riding, not pedestrians, and not a gasoline-versus-electric comparison.',
+      '兩組數據的單位不同，不能放在同一個刻度上比較。騎士騎的是電動機車，量到的是周圍車流的廢氣；這是通勤騎士在行進中的暴露，不是行人，也不是燃油與電動機車的比較。',
+      'The two datasets are in different units and cannot be read against one scale. The riders used electric scooters, so this is surrounding traffic\'s exhaust; it is commuters riding, not pedestrians, and not a gasoline-versus-electric comparison.',
     ),
     requiresCaveat: true,
     relatedFacts: ['scooter-lane-btex-wu2021', 'cyclist-vs-scooter-lane-benzene-wu2021'],
     chainLink: 3,
+    editorNote: 'The two datasets must not share a value axis.',
     research: 'papers/wu-2021-trd#mean-exposure-bike-vs-scooter; papers/wu-2021-trd#scooter-is-electric; papers/wu-2021-trd#pm25-mode-diff-not-significant',
   },
   'taipei-traffic-vs-general-stations': {
@@ -928,13 +944,14 @@ const baseSeries = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '兩者都是模式模擬，不是實測，也不是機車專屬結果；94%絕不可單獨呈現。' + IOT_CAVEAT['zh-TW'],
-      'Both are model results, not measurements, and not scooter-specific; the 94% must never be shown on its own. ' + IOT_CAVEAT.en,
+      '兩者都是模式模擬，不是實測，也不是機車專屬結果；94%只出自一個基準值異常偏高的模擬日，單看它會誤導。' + IOT_CAVEAT['zh-TW'],
+      'Both are model results, not measurements, and not scooter-specific; the 94% comes from one simulated day with an anomalously high baseline and is misleading on its own. ' + IOT_CAVEAT.en,
     ),
     requiresCaveat: true,
     relatedFacts: ['iot-scramble-typical-range', 'iot-scramble-outlier-day'],
     locator: 'p.4-28 range −21.40% to −2.58%; Table 4.3.2-30 Day 2 −94.86%*',
     chainLink: 3,
+    editorNote: 'Never show the 94% on its own.',
     research: '02 §1a, Corrections #1',
   },
   'iot-scramble-by-day': {

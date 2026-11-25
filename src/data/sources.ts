@@ -605,16 +605,15 @@ export const sources = {
     kind: 'journal',
     authors: ['Tsai I-C', 'Lee C-Y', 'Lung S-C', 'Su C-W'],
     year: 2021,
-    title: 'Air-quality model (CMAQ) sensitivity study of vehicle-emission contributions in downtown Taipei; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
-    container: 'Science of the Total Environment',
+    title: 'Characterization of the vehicle emissions in the Greater Taipei Area through vision-based traffic analysis system and its impacts on urban air quality',
+    container: 'Science of The Total Environment',
     volume: '782',
     pages: '146571',
     doi: '10.1016/j.scitotenv.2021.146571',
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title missing from the research notes; resolve via the DOI before display. CMAQ sensitivity study, downtown Taipei.',
+    readNote: 'CMAQ sensitivity study, downtown Taipei. Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'ting-2023-envres': {
     kind: 'journal',
@@ -665,8 +664,7 @@ export const sources = {
     kind: 'journal',
     authors: ['Lin Y-C', 'Chou F-C', 'Li Y-C', 'Jhang S-R', 'Shangdiar S'],
     year: 2019,
-    title: 'Particulate PAH emissions from ten in-use motorcycles by running mileage; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
+    title: 'Effect of air pollutants and toxic emissions from various mileage of motorcycles and aerosol related carcinogenicity and mutagenicity assessment',
     container: 'Journal of Hazardous Materials',
     volume: '365',
     pages: '771-777',
@@ -674,14 +672,13 @@ export const sources = {
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title missing from the research notes; resolve via the DOI before display. Ten in-use motorcycles, particulate PAHs.',
+    readNote: 'Ten in-use motorcycles, particulate PAHs. Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'hsieh-2018-iop': {
     kind: 'conference',
-    authors: ['Hsieh', 'Chang', 'Yu', 'Wu'],
+    authors: ['Hsieh PY', 'Chang LFW', 'Yu TY', 'Wu KC'],
     year: 2018,
-    title: 'Energy-flow and system-dynamics model of emission factors for electric vs gasoline heavy-duty scooters in Taiwan; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
+    title: 'Evaluation of mitigation effects on air pollutants for electric scooters in Taiwan with the energy flow analysis and system dynamics approach',
     container: 'IOP Conference Series: Earth and Environmental Science',
     volume: '191',
     pages: '012136',
@@ -689,7 +686,7 @@ export const sources = {
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Author initials and title not in research notes. Energy-flow + system-dynamics model, heavy-duty electric vs gasoline scooters.',
+    readNote: 'Energy-flow + system-dynamics model, heavy-duty electric vs gasoline scooters. Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'harr-2022-uclim': {
     kind: 'journal',
@@ -1742,31 +1739,31 @@ export const sources = {
     kind: 'journal',
     authors: ['Guo C', 'Yu T', 'Chang L-Y', 'Lin C', 'Yang H-T', 'Bo Y', 'Zeng Y', 'Tam T', 'Lau AKH', 'Lao XQ'],
     year: 2021,
-    title: 'MJ health-check cohort study of long-term PM2.5, habitual exercise and natural-cause mortality in Taiwan; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
+    title: 'Effects of air pollution and habitual exercise on the risk of death: a longitudinal cohort study',
     container: 'Canadian Medical Association Journal',
     volume: '193',
+    issue: '32',
     pages: 'E1240-E1249',
     doi: '10.1503/cmaj.202729',
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title not recorded in research/redlight/long-term-traffic.json; resolve via the DOI before display. MJ health-check cohort, 384,130 adults.',
+    readNote: 'MJ health-check cohort, 384,130 adults. Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'huang-2021-ijerph': {
     kind: 'journal',
     authors: ['Huang H-L', 'Chuang Y-H', 'Lin T-H', 'Lin C', 'Chen Y-H', 'Hung J-Y', 'Chan T-C'],
     year: 2021,
-    title: 'MJ cohort study of long-term PM2.5 and lung cancer incidence and mortality by smoking status, Taiwan; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
+    title: 'Ambient Cumulative PM2.5 Exposure and the Risk of Lung Cancer Incidence and Mortality: A Retrospective Cohort Study',
     container: 'International Journal of Environmental Research and Public Health',
     volume: '18',
+    issue: '23',
     pages: '12400',
     doi: '10.3390/ijerph182312400',
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title not recorded in the research file; resolve via the DOI before display.',
+    readNote: 'Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'pan-2021-jepi': {
     kind: 'journal',
@@ -1787,16 +1784,16 @@ export const sources = {
     kind: 'journal',
     authors: ['Gauderman WJ', 'Urman R', 'Avol E', 'Berhane K', 'McConnell R', 'Rappaport E', 'Chang R', 'Lurmann F', 'Gilliland F'],
     year: 2015,
-    title: 'Three Southern California cohorts: lung-function growth in children as air quality improved; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
+    title: 'Association of Improved Air Quality with Lung Development in Children',
     container: 'New England Journal of Medicine',
     volume: '372',
+    issue: '10',
     pages: '905-913',
     doi: '10.1056/NEJMoa1414123',
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title not recorded in the research file; resolve via the DOI before display. Southern California.',
+    readNote: 'Southern California. Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'who-2024-ambient-factsheet': {
     kind: 'intergovernmental',
@@ -1815,8 +1812,7 @@ export const sources = {
     kind: 'journal',
     authors: ['Weiss M', 'Dekker P', 'Moro A', 'Scholz H', 'Patel MK'],
     year: 2015,
-    title: 'Review of the energy, environmental and social performance of electric two-wheelers; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
+    title: 'On the electrification of road transportation – A review of the environmental, economic, and social performance of electric two-wheelers',
     container: 'Transportation Research Part D: Transport and Environment',
     volume: '41',
     pages: '348-366',
@@ -1824,14 +1820,13 @@ export const sources = {
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title not recorded in the research file; resolve via the DOI before display.',
+    readNote: 'Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'chamberlain-2023-lph': {
     kind: 'journal',
     authors: ['Chamberlain RC', 'Fecht D', 'Davies B', 'Laverty AA'],
     year: 2023,
-    title: 'Systematic review of health outcomes after low emission zones and congestion charging; exact title not recorded in our research notes',
-    titleIsDescriptive: true,
+    title: 'Health effects of low emission and congestion charging zones: a systematic review',
     container: 'The Lancet Public Health',
     volume: '8',
     issue: '7',
@@ -1840,15 +1835,14 @@ export const sources = {
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title not recorded in the research file; resolve via the DOI before display.',
+    readNote: 'Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
   'mudway-2019-lph': {
     kind: 'journal',
     authors: ['Mudway IS', 'Dundas I', 'Wood HE'],
     etAl: true,
     year: 2019,
-    title: "London low emission zone, roadside air quality and children's lung function (2009-2014); exact title not recorded in our research notes",
-    titleIsDescriptive: true,
+    title: 'Impact of London\'s low emission zone on air quality and children\'s respiratory health: a sequential annual cross-sectional study',
     container: 'The Lancet Public Health',
     volume: '4',
     issue: '1',
@@ -1857,7 +1851,7 @@ export const sources = {
     accessed: ACCESSED,
     language: 'en',
     readLevel: 'abstract-only',
-    readNote: 'Title not recorded in the research file; resolve via the DOI before display.',
+    readNote: 'Title, journal, volume, issue and pages from the Crossref record for the DOI (retrieved 2026-11-25).',
   },
 
   // -------------------------------------------------------------------------
@@ -3027,6 +3021,60 @@ export const sources = {
     readLevel: 'media-report-read',
     readNote: 'Draft only; the scooter amount in the draft table was not seen.',
   },
+  'udn-2026-08-new-taipei-2027-plan': {
+    kind: 'news',
+    org: t('聯合新聞網', 'United Daily News (udn.com)'),
+    year: 2026,
+    date: '2026-08-04',
+    title: '聯合報報導：新北市環保局研擬明年度電動機車精準補助計畫',
+    titleIsDescriptive: true,
+    titleTranslated: 'UDN report: New Taipei environmental bureau drafting a targeted electric scooter subsidy plan for next year',
+    url: 'https://udn.com/news/story/7323/9670491',
+    accessed: ACCESSED,
+    language: 'zh-TW',
+    readLevel: 'media-report-read',
+    readNote: 'Bureau director to the city council: drafting a 2027 plan for young students and shopping-basket riders; intention only, no amount or budget.',
+  },
+  'ey-ev-industry-subsidy-112-115': {
+    kind: 'government',
+    org: t('行政院', 'Executive Yuan'),
+    year: 2022,
+    date: '2022-12-15',
+    title: '電動機車產業環境加值補助計畫（112-115年）',
+    titleIsDescriptive: true,
+    titleTranslated: 'Executive Yuan page on the electric scooter industry subsidy programme, 2023–2026',
+    url: 'https://www.ey.gov.tw/Page/448DE008087A1971/4da7a1ca-9a13-4c38-a58a-aefbc987c739',
+    accessed: ACCESSED,
+    language: 'zh-TW',
+    readLevel: 'official-page-read',
+    readNote: 'Names the programme as 112-115 (2023-2026). No 116-119 successor found in searches; absence is not proof.',
+  },
+  'gogoro-2026-02-fy2025-results': {
+    kind: 'report',
+    org: t('Gogoro（睿能創意）', 'Gogoro Inc.'),
+    year: 2026,
+    date: '2026-02',
+    title: 'Gogoro Releases Fourth Quarter and Full Year 2025 Financial Results',
+    titleTranslated: 'Gogoro公布2025年第四季與全年財報',
+    url: 'https://www.finanznachrichten.de/nachrichten-2026-02/67686994-gogoro-releases-fourth-quarter-and-full-year-2025-financial-results-008.htm',
+    accessed: ACCESSED,
+    language: 'en',
+    readLevel: 'press-release-read',
+    readNote: 'Company press release, read as republished by finanznachrichten.de. Net loss US$80.8m (2024: 122.8m), cash US$70.6m, 665,000 subscribers; director undertaking of NT$2.5bn equity by end-2026.',
+  },
+  'gogoro-2026-11-q3-results': {
+    kind: 'report',
+    org: t('Gogoro（睿能創意）', 'Gogoro Inc.'),
+    year: 2026,
+    date: '2026-11-11',
+    title: 'Gogoro Releases Third Quarter Financial Results',
+    titleTranslated: 'Gogoro公布2026年第三季財報',
+    url: 'https://finviz.com/news/420812/gogoro-releases-third-quarter-financial-results-gogoro-reports-continued-gross-margin-improvement',
+    accessed: ACCESSED,
+    language: 'en',
+    readLevel: 'press-release-read',
+    readNote: 'Company press release, read as republished by finviz (investor.gogoro.com returned 403). Q3 net loss US$3.4m; cash US$68.9m at 30 Sep 2026; second and final equity round US$61.8m received October 2026; balance sheet at 30 Sep 2026.',
+  },
   'moenv-platform-faq': {
     kind: 'government',
     org: MOENV,
@@ -3115,6 +3163,24 @@ export function sourceUrl(source: SourceId | Source): string {
 
 const isCjk = (s: string) => /[㐀-鿿]/.test(s);
 
+/**
+ * A URL as a reader should see it: percent-encoded characters decoded (so 電動機車 shows instead
+ * of %E9%9B%BB…), except characters that would change how the URL parses or are invisible
+ * (spaces, %, #, ?, &, =, / and control characters stay encoded). For display only: links keep
+ * the original URL as their target.
+ */
+export function readableUrl(url: string): string {
+  return url.replace(/(?:%[0-9A-Fa-f]{2})+/g, (run) => {
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(run);
+    } catch {
+      return run;
+    }
+    return [...decoded].map((ch) => (/[\s%#?&=/+\p{C}]/u.test(ch) ? encodeURIComponent(ch) : ch)).join('');
+  });
+}
+
 function authorList(s: Source, locale: Locale, max = 3): string {
   const names = s.authors ?? [];
   if (names.length === 0) return s.org ? s.org[locale] : '';
@@ -3122,7 +3188,8 @@ function authorList(s: Source, locale: Locale, max = 3): string {
   const shown = names.slice(0, max);
   const more = names.length > max || s.etAl;
   const sep = cjk ? '、' : ', ';
-  const tail = more ? (locale === 'zh-TW' ? '等' : cjk ? ' et al.' : ', et al.') : '';
+  // Chinese: CJK names take 等 directly (陳等); Latin names take a space before it (Wu 等).
+  const tail = more ? (locale === 'zh-TW' ? (cjk ? '等' : ' 等') : cjk ? ' et al.' : ', et al.') : '';
   return shown.join(sep) + tail;
 }
 
@@ -3136,7 +3203,12 @@ export function shortCitation(source: SourceId | Source, locale: Locale): string
     const several = s.authors.length > 2 || s.etAl;
     const two = s.authors.length === 2 && !s.etAl;
     const second = two ? (isCjk(s.authors[1]) ? s.authors[1] : s.authors[1].split(' ')[0]) : '';
-    if (locale === 'zh-TW') who = several ? `${family}等` : two ? `${family}與${second}` : family;
+    if (locale === 'zh-TW') {
+      // A space separates a Latin name from the Chinese 等 / 與 (Wu 等，2021; Sharma 與 Kumar，2018);
+      // CJK names join directly (陳等，2020).
+      const sp = (name: string) => (isCjk(name) ? '' : ' ');
+      who = several ? `${family}${sp(family)}等` : two ? `${family}${sp(family)}與${sp(second)}${second}` : family;
+    }
     else who = several ? `${family} et al.` : two ? `${family} & ${second}` : family;
   } else {
     who = s.org ? s.org[locale] : s.title;
@@ -3176,9 +3248,11 @@ export function formatCitation(source: SourceId | Source, locale: Locale): strin
   if (s.reportNumber) parts.push(s.reportNumber);
   if (s.date && s.kind === 'news') parts.push(s.date);
   const link = s.doi ? `https://doi.org/${s.doi}` : s.url;
+  // Show the link readably (percent-encoded Chinese decoded); the href stays sourceUrl().
+  const shown = link ? readableUrl(link) : undefined;
   const accessed = zh ? `檢索日期：${s.accessed}` : `Accessed ${s.accessed}`;
   if (zh) {
-    return `${who}${year}。${title}。${parts.length ? parts.join('，') + '。' : ''}${link ?? ''}（${accessed}）`;
+    return `${who}${year}。${title}。${parts.length ? parts.join('，') + '。' : ''}${shown ?? ''}（${accessed}）`;
   }
-  return `${who}${year}. ${title}.${parts.length ? ' ' + parts.join('. ') + '.' : ''} ${link ?? ''} (${accessed}).`;
+  return `${who}${year}. ${title}.${parts.length ? ' ' + parts.join('. ') + '.' : ''} ${shown ?? ''} (${accessed}).`;
 }

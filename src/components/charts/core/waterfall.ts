@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, MINUS, type ChartRender, type Tone, esc, fmt, hbar, niceMax, pctN, px, text, wrapLabel } from './shared';
+import { MIN_W, MINUS, type ChartRender, type Tone, esc, fmt, hbar, niceMax, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
 
 export interface WaterfallProps {
   locale: Locale;
@@ -44,7 +44,9 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
   let y = 4;
 
   const row = (label: string, amount: string, strong: boolean, draw: (barY: number) => string, tip: string) => {
-    const lines = wrapLabel(label, (MIN_W - px(amount, 15) - 14) / 14);
+    // total rows are set in the heaviest weight, which runs about a tenth wider in Latin text and figures
+    const k = strong ? 1.12 : 1;
+    const lines = wrapLabel(label, (MIN_W - px(amount, 15) * k - 16) / (14 * k), LABEL_LINES);
     const labelH = lines.length * LINE;
     const barY = y + labelH + 4;
     let g = `<g class="c-row" data-tip="${esc(tip)}"><rect class="c-hit" x="0" y="${y}" width="100%" height="${labelH + BAR + 8}"/>`;

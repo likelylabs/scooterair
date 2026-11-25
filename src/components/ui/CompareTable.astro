@@ -114,7 +114,9 @@ const { caption, rowHeader, columns, rows, hideCaption = false, numeric = true, 
 
   @media (max-width: 34em) {
     .ct,
-    .ct tbody {
+    .ct tbody,
+    .ct caption {
+      /* the caption too: left as a table-caption inside a block it shrinks to one character per line */
       display: block;
     }
     .ct thead {

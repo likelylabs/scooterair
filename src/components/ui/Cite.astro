@@ -9,8 +9,16 @@
  *   n        the number shown; keep it stable per source across the site
  *   variant  'sup' (default, inline superscript) | 'chip' ("Source 3" pill, for
  *            figure footers, cards and chain links)
+ *   static   true = the marker is shown but is not a link. For text inside an
+ *            element that is itself a link (a card or row wrapped in <a>), where a
+ *            nested link would be invalid HTML. The number still tells the reader
+ *            the claim is sourced; the page the link leads to carries the live marker.
  *
  *   …暴露量顯著較高<Cite locale={locale} id="wu-2021" n={3} />。
+ *
+ * Inside <Card href>, whose title link is stretched over the whole card, a Cite
+ * in the body or footer stays a working link of its own: it is raised above the
+ * stretched link (see Card.astro). Only use `static` when the wrapper is an <a>.
  */
 import { href, type Locale } from '@/i18n';
 import { t, ui } from '@/i18n/ui';
@@ -20,14 +28,21 @@ interface Props {
   id: string;
   n: number | string;
   variant?: 'sup' | 'chip';
+  static?: boolean;
 }
-const { locale, id, n, variant = 'sup' } = Astro.props;
+const { locale, id, n, variant = 'sup', static: isStatic = false } = Astro.props;
 const url = href(`/sources/#${id}`, locale);
 const label = t(ui.sourceN, locale, { n });
 ---
 
 {variant === 'sup' ? (
-  <sup class="cite"><a href={url} aria-label={label}>{n}</a></sup>
+  isStatic ? (
+    <sup class="cite cite--static"><span class="cite__n"><span class="vh">{label}</span><span aria-hidden="true">{n}</span></span></sup>
+  ) : (
+    <sup class="cite"><a href={url} aria-label={label}>{n}</a></sup>
+  )
+) : isStatic ? (
+  <span class="cite-chip cite-chip--static">{label}</span>
 ) : (
   <a class="cite-chip" href={url}>{label}</a>
 )}
@@ -40,7 +55,8 @@ const label = t(ui.sourceN, locale, { n });
     white-space: nowrap;
     margin-inline-start: 0.1em;
   }
-  .cite a {
+  .cite a,
+  .cite__n {
     position: relative;
     display: inline-block;
     min-inline-size: 1.5em;
@@ -76,7 +92,7 @@ const label = t(ui.sourceN, locale, { n });
     text-decoration: none;
     white-space: nowrap;
   }
-  .cite-chip:hover {
+  a.cite-chip:hover {
     background: var(--accent);
     border-color: var(--accent);
     color: var(--on-accent);

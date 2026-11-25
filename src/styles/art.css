@@ -103,6 +103,10 @@
 }
 .a-led-red { fill: var(--art-red); }
 .a-led-green { fill: var(--art-green); }
+/* LED dots drawn as dashes (parts.ts ledDots): one near-zero dash per dot, capped round */
+.a-dots { fill: none; stroke-linecap: round; }
+.a-dots.a-led-red { fill: none; stroke: var(--art-red); }
+.a-dots.a-led-green { fill: none; stroke: var(--art-green); }
 .a-lamp-off { fill: var(--art-lamp-off); }
 .a-housing { fill: #0d1113; stroke: #3d474d; stroke-width: 1; }
 

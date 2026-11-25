@@ -19,6 +19,10 @@
 // Output:  public/share/<zh|en>/<id>.png      1200 × 630  (og:image)
 //          public/share/<zh|en>/<id>-sq.png   1080 × 1080 (LINE and other square previews)
 //          public/share/manifest.json         content hash per card, read by --check
+//
+// The PNGs are re-encoded with sharp as 8-bit palette PNGs before they are written (see pack()
+// below): about a third of the bytes, with no visible change. They stay PNG on purpose: every
+// link-preview consumer takes PNG, not all of them take WebP or AVIF, and JPEG smears the small type.
 
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -163,6 +167,24 @@ try {
   process.exit(1);
 }
 
+// The browser writes 24-bit PNGs quickly, not tightly. A card is a handful of flat colours and
+// their anti-aliased edges, so it is re-encoded as an 8-bit PNG (256-colour palette, no
+// dithering): still PNG, so every Open Graph consumer accepts it as before, at about a third of
+// the size. Measured against the browser's own file, a few thousand edge pixels move by at
+// most 16 levels in 255; nothing a reader can see. sharp is already in node_modules as a
+// dependency of Astro; without it the card is written as the browser made it.
+let sharp = null;
+try {
+  sharp = require('sharp');
+} catch {
+  console.warn('  ! sharp is not installed: cards are written unoptimised (about three times larger).');
+}
+const pack = async (png) => {
+  if (!sharp) return png;
+  const packed = await sharp(png).png({ palette: true, colours: 256, dither: 0, compressionLevel: 9, effort: 10 }).toBuffer();
+  return packed.length < png.length ? packed : png;
+};
+
 const todo = jobs.filter((j) => !only.length || only.some((o) => j.id.includes(o)));
 const tmp = mkdtempSync(join(tmpdir(), 'share-cards-'));
 const browser = await chromium.launch();
@@ -192,7 +214,8 @@ try {
         return k;
       });
       if (k <= 0.5) console.warn(`  ! ${key(job)} (${size}) is very long: type shrunk to ${Math.round(k * 100)}%`);
-      await page.screenshot({ path: join(OUT, job.dir, `${job.id}${size === 'square' ? '-sq' : ''}.png`), type: 'png' });
+      const shot = await page.screenshot({ type: 'png' });
+      writeFileSync(join(OUT, job.dir, `${job.id}${size === 'square' ? '-sq' : ''}.png`), await pack(shot));
       await page.close();
     }
     manifest.cards[key(job)] = hashOf(job);

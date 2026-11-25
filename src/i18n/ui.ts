@@ -7,6 +7,7 @@
 
 import type { L10n, Locale } from './index';
 import { confidenceLabels, evidenceLabels, evidenceTypes, type Evidence } from '../data/types.ts';
+import { facts } from '../data/facts.ts';
 
 /**
  * Reader-facing Chinese writes 台灣 / 台北; the registry writes 臺. Pass any registry string
@@ -52,6 +53,30 @@ export const footerNav: NavItem[] = [
   { path: '/about/', label: { 'zh-TW': '關於', en: 'About' } },
   { path: '/about/#corrections', label: { 'zh-TW': '修改紀錄', en: 'Corrections' } },
 ];
+
+/**
+ * A registry value for a shared string: the number is read from src/data when this module
+ * loads, so a corrected fact corrects every strip, page and share card that prints the line.
+ * Throws on a fact or key the registry does not hold. Marked pure so a client bundle that only
+ * wants `readerText` or a type does not pull the registry in.
+ */
+const registryNumber = (id: keyof typeof facts, key: string, scale = 1): L10n => {
+  const d = facts[id]?.data[key];
+  if (!d) throw new Error(`[ui strings] fact ${id} has no data.${key}`);
+  const v = +(d.value * scale).toFixed(6);
+  return { 'zh-TW': new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 2 }).format(v), en: new Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v) };
+};
+/** Fill {tokens} in both languages. Throws on a token with no value, so a typo cannot ship. */
+const filled = (l: L10n, vars: Record<string, L10n>): L10n => {
+  const f = (loc: Locale) =>
+    l[loc].replace(/\{(\w+)\}/g, (_m, k: string) => {
+      if (!vars[k]) throw new Error(`[ui strings] no value for {${k}} in: ${l[loc]}`);
+      return vars[k][loc];
+    });
+  return { 'zh-TW': f('zh-TW'), en: f('en') };
+};
+/** Minimum gap between the turn box and the crosswalk, in centimetres (MOTC marking rules). */
+const turnBoxGapCm = /* @__PURE__ */ registryNumber('marking-rules-turn-box', 'turnBoxGap', 100);
 
 export const ui = {
   skipToContent: { 'zh-TW': '跳到主要內容', en: 'Skip to content' },
@@ -186,7 +211,11 @@ export const chain = {
       pip: 'filled',
     },
     {
-      text: { 'zh-TW': '排氣管離地不到一公尺；標線規則只要求待轉區離斑馬線 50 公分。', en: 'The tailpipe is under a metre off the ground; the marking rules ask for 50 cm between the turn box and the crosswalk.' },
+      // {cm} is the registry's marking-rule minimum (facts['marking-rules-turn-box'].data.turnBoxGap), never typed here
+      text: /* @__PURE__ */ filled(
+        { 'zh-TW': '排氣管離地不到一公尺；標線規則只要求待轉區離斑馬線 {cm} 公分。', en: 'The tailpipe is under a metre off the ground; the marking rules ask for {cm} cm between the turn box and the crosswalk.' },
+        { cm: turnBoxGapCm },
+      ),
       badges: ['international', 'official-tw'],
       pip: 'filled',
     },
@@ -196,7 +225,13 @@ export const chain = {
       pip: 'open',
     },
     {
-      text: { 'zh-TW': '聞到味道，代表你站在廢氣裡；裡面的一氧化碳沒有味道，苯也聞不出來。', en: 'If you can smell it, you are standing in exhaust; the carbon monoxide in it has no smell, and you cannot smell the benzene.' },
+      // What the evidence supports (facts 'co-odourless', 'odour-thresholds'): carbon monoxide has no smell;
+      // benzene is smellable only at parts per million, so at roadside levels it is unlikely to be smelled.
+      // Never "cannot": nobody has measured benzene at a Taiwanese kerb.
+      text: {
+        'zh-TW': '聞到味道，代表你站在廢氣裡；裡面的一氧化碳沒有味道，路邊那種濃度的苯也不太可能聞得出來。',
+        en: 'If you can smell it, you are standing in exhaust; the carbon monoxide in it has no smell, and at roadside levels you are unlikely to smell the benzene.',
+      },
       badges: ['international'],
       pip: 'outline',
     },
@@ -259,6 +294,8 @@ export type ChainPip = 'filled' | 'outline' | 'open' | 'go';
 export const rail = {
   label: { 'zh-TW': '紅燈倒數與章節選單', en: 'Countdown and chapter menu' } as L10n,
   jump: { 'zh-TW': '跳到', en: 'Jump to' } as L10n,
+  /** The strip's label when no chapter is current: without JavaScript, and above the first chapter. */
+  menu: { 'zh-TW': '跳到章節', en: 'Jump to a chapter' } as L10n,
   idle: { 'zh-TW': '一個紅燈，90 秒', en: 'One red light, ninety seconds' } as L10n,
   secondsLeft: { 'zh-TW': '紅燈剩 {n} 秒', en: '{n} seconds of red left' } as L10n,
   paused: { 'zh-TW': '倒數暫停', en: 'Countdown paused' } as L10n,
