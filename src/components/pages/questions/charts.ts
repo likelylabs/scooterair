@@ -162,7 +162,7 @@ export function renderStroller(p: StrollerProps): ChartRender {
   const { locale, rows, band } = p;
   const vals = rows.flatMap((r) => [r.value, r.high, r.low]).filter((v): v is number => typeof v === 'number');
   const min = Math.min(-10, Math.floor(Math.min(...vals) / 10) * 10);
-  const max = Math.max(60, Math.ceil(Math.max(...vals) / 10) * 10);
+  const max = Math.max(60, Math.ceil((Math.max(...vals) + 5) / 10) * 10);
   const xp = (v: number) => at(v, min, max);
   const sign = (v: number) => (v > 0 ? '+' : v < 0 ? '−' : '') + fmt(locale, Math.abs(v), 0) + '%';
   const valueText = (r: StrollerProps['rows'][number]) =>
@@ -199,16 +199,15 @@ export function renderStroller(p: StrollerProps): ChartRender {
   o.push(`<line class="c-ref-line" x1="${xp(0)}%" x2="${xp(0)}%" y1="20" y2="${axisY}"/>`);
   o.push(...body);
   o.push(`<line class="c-axis" x1="0" x2="100%" y1="${axisY}" y2="${axisY}"/>`);
-  for (let t = min; t <= max; t += 10) {
-    if (t === 0) continue;
-    o.push(text('c-tick', `${xp(t)}%`, axisY + 17, sign(t), `text-anchor="${t === min ? 'start' : t === max ? 'end' : 'middle'}"`));
+  for (let t = 0; t <= max; t += 20) {
+    o.push(text('c-tick', `${xp(t)}%`, axisY + 17, t === 0 ? '0' : sign(t), `text-anchor="${t + 20 > max ? 'end' : 'middle'}"`));
   }
-  o.push(text('c-tick', `${xp(0)}%`, axisY + 17, `0 ${p.zeroLabel}`, 'text-anchor="middle"'));
-  o.push(text('c-label', 0, axisY + 46, p.footLabel));
+  o.push(text('c-tick', 0, axisY + 36, `0 = ${p.zeroLabel}`));
+  o.push(text('c-label', 0, axisY + 64, p.footLabel));
   return {
     kind: 'range',
     body: o.join(''),
-    height: axisY + 56,
+    height: axisY + 74,
     table: { head: [p.categoryLabel, p.valueLabel], rows: rows.map((r) => [r.label, valueText(r)]) },
   };
 }
@@ -235,7 +234,7 @@ export function renderShareLine(p: ShareLineProps): ChartRender {
   const x1 = Math.max(...years);
   const xp = (x: number) => at(x, x0, x1);
   const yp = (v: number) => TOP + H - (v / 100) * H;
-  const pct = (v: number) => `${fmt(locale, v, v < 10 && v % 1 ? 1 : 0)}%`;
+  const pct = (v: number) => `${fmt(locale, v, v % 1 ? 1 : 0)}%`;
   const o: string[] = [];
   [0, 25, 50, 75, 100].forEach((t, i) => {
     o.push(`<line class="${i === 0 ? 'c-axis' : 'c-grid'}" x1="0" x2="100%" y1="${yp(t)}" y2="${yp(t)}"/>`);

@@ -129,6 +129,7 @@ const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === 
         data={d.link1.figure.rows}
         unit="%"
         max={100}
+        reference={{ value: 100, label: t.link1.figure.whole }}
         decimals={1}
         tone="exhaust"
         categoryLabel={t.link1.figure.category}

@@ -31,6 +31,25 @@ export interface BreakEvenProps {
   height?: number;
   /** data-table header for the month column */
   xLabel: string;
+  /**
+   * Optional: the real cumulative totals, month 0..months (e.g. toBreakEven(e).series from the
+   * calculator engine, mapped to a and b). When given, the lines follow these values instead of
+   * straight lines from `upfront` and `monthly` (which are still used for the legend), so setup-fee
+   * renewals and temporary credits show where they happen and the chart cannot disagree with
+   * the engine.
+   */
+  series?: { a: number[]; b: number[] };
+  /**
+   * Optional, with `series`: the month the engine says the lines cross for good (toBreakEven's
+   * crossMonth), or null when it says they do not. The chart marks this month and never works
+   * out a crossing of its own.
+   */
+  crossMonth?: number | null;
+  /**
+   * Optional: one text for the reference label whichever branch is drawn (toBreakEven's
+   * chartLabels.breakEvenLabel, which is the engine's own answer).
+   */
+  answer?: string;
 }
 
 const TOP = 34;
@@ -49,8 +68,10 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   const { locale, a, b, prefix = 'NT$' } = p;
   const months = p.months ?? 60;
   const H = p.height ?? 230;
-  const at = (c: CostLine, m: number) => c.upfront + c.monthly * m;
-  const yMax = niceMax(Math.max(at(a, months), at(b, months)));
+  const real = p.series && p.series.a.length > months && p.series.b.length > months ? p.series : null;
+  const at = (c: CostLine, m: number) => (real ? (c === a ? real.a : real.b)[Math.round(m)] : c.upfront + c.monthly * m);
+  const peak = real ? Math.max(...real.a.slice(0, months + 1), ...real.b.slice(0, months + 1)) : Math.max(at(a, months), at(b, months));
+  const yMax = niceMax(peak);
   const yp = (v: number) => TOP + H - (v / yMax) * H;
   const xp = (m: number) => (m / months) * 100;
   const f = (v: number) => fmt(locale, Math.round(v));
@@ -72,9 +93,9 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
     if (m > 0 && m < months) o.push(`<line class="c-axis" x1="${xp(m)}%" x2="${xp(m)}%" y1="${TOP + H}" y2="${TOP + H + 4}"/>`);
   }
 
-  const cross = breakEvenMonth(a, b);
-  const inside = cross !== null && cross < months;
-  if (inside) {
+  const cross = real ? (p.crossMonth ?? null) : breakEvenMonth(a, b);
+  const inside = cross !== null && (real ? cross <= months : cross < months);
+  if (inside && !real) {
     // shade the saving that opens up after the crossing
     const cx = xp(cross!) * 10;
     const cy = yp(at(a, cross!));
@@ -82,10 +103,18 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
       `<svg class="c-stretch" x="0" y="0" width="100%" height="${TOP + H}" viewBox="0 0 1000 ${TOP + H}" preserveAspectRatio="none"><path class="c-area c-fill-${a.tone}" d="M${cx.toFixed(1)},${cy.toFixed(1)}L1000,${yp(at(a, months)).toFixed(1)}L1000,${yp(at(b, months)).toFixed(1)}Z"/></svg>`,
     );
   }
-  [b, a].forEach((c) => {
-    o.push(`<line class="c-line c-stroke-${c.tone}" x1="0" x2="100%" y1="${yp(c.upfront)}" y2="${yp(at(c, months))}"/>`);
-    o.push(`<circle class="c-dot c-fill-${c.tone}" cx="0" cy="${yp(c.upfront)}" r="5"/><circle class="c-dot c-fill-${c.tone}" cx="100%" cy="${yp(at(c, months))}" r="5"/>`);
-  });
+  if (real) {
+    // the engine's month-by-month totals, in a stretched inner SVG so paths can use plain numbers
+    const path = (vals: number[]) => vals.slice(0, months + 1).map((v, m) => `${m ? 'L' : 'M'}${(xp(m) * 10).toFixed(1)},${yp(v).toFixed(1)}`).join('');
+    const paths = [b, a].map((c) => `<path class="c-line c-stroke-${c.tone}" d="${path(c === a ? real.a : real.b)}" vector-effect="non-scaling-stroke"/>`).join('');
+    o.push(`<svg class="c-stretch" x="0" y="0" width="100%" height="${TOP + H}" viewBox="0 0 1000 ${TOP + H}" preserveAspectRatio="none">${paths}</svg>`);
+    [b, a].forEach((c) => o.push(`<circle class="c-dot c-fill-${c.tone}" cx="0" cy="${yp(at(c, 0))}" r="5"/><circle class="c-dot c-fill-${c.tone}" cx="100%" cy="${yp(at(c, months))}" r="5"/>`));
+  } else {
+    [b, a].forEach((c) => {
+      o.push(`<line class="c-line c-stroke-${c.tone}" x1="0" x2="100%" y1="${yp(c.upfront)}" y2="${yp(at(c, months))}"/>`);
+      o.push(`<circle class="c-dot c-fill-${c.tone}" cx="0" cy="${yp(c.upfront)}" r="5"/><circle class="c-dot c-fill-${c.tone}" cx="100%" cy="${yp(at(c, months))}" r="5"/>`);
+    });
+  }
 
   // end values on the right, kept apart
   const ends = [a, b].map((c) => ({ c, y: yp(at(c, months)) })).sort((u, v) => u.y - v.y);
@@ -100,13 +129,13 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   if (inside) {
     const x = xp(cross!);
     const y = yp(at(a, cross!));
-    const label = p.breakEvenLabel(Math.ceil(cross!));
+    const label = p.answer ?? p.breakEvenLabel(Math.ceil(cross!));
     o.push(`<line class="c-ref-line" x1="${x}%" x2="${x}%" y1="${TOP - 8}" y2="${TOP + H}"/>`);
     o.push(`<circle class="c-dot c-fill-ink" cx="${x}%" cy="${y}" r="6"/>`);
     o.push(text('c-ref', `${x}%`, TOP - 13, label, `text-anchor="${x < 30 ? 'start' : x > 70 ? 'end' : 'middle'}"`));
   } else {
-    const ahead = a.upfront <= b.upfront && a.monthly <= b.monthly;
-    o.push(text('c-ref', '100%', TOP - 12, ahead ? p.aheadLabel : p.noBreakEvenLabel, 'text-anchor="end"'));
+    const ahead = real ? at(a, 0) <= at(b, 0) && at(a, months) <= at(b, months) : a.upfront <= b.upfront && a.monthly <= b.monthly;
+    o.push(text('c-ref', '100%', TOP - 12, p.answer ?? (ahead ? p.aheadLabel : p.noBreakEvenLabel), 'text-anchor="end"'));
   }
   o.push(`<line class="c-cross" x1="0" x2="0" y1="${TOP}" y2="${TOP + H}" visibility="hidden"/>`);
 

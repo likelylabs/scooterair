@@ -17,6 +17,15 @@
  *   aheadLabel        shown when a is cheaper to buy AND to run (nothing to pay back)
  *   height            plot height in px (default 230)
  *   xLabel            data-table header for the time column
+ *   series            optional { a: number[]; b: number[] }: the real cumulative totals for
+ *                     months 0..months (the calculator's toBreakEven(e).series, mapped to a and b).
+ *                     The lines then follow them (setup-fee renewals and credits show where they
+ *                     happen) instead of straight lines; a and b still name and colour them.
+ *   crossMonth        optional, with series: the engine's crossing month (toBreakEven's
+ *                     crossMonth) or null. The chart marks only this month; it never works out
+ *                     a crossing of its own, so it cannot contradict the engine.
+ *   answer            optional: one label for whichever branch is drawn (toBreakEven's
+ *                     chartLabels.breakEvenLabel, the engine's own answer).
  *
  * breakEvenMonth(a, b) is exported from core/breakeven for use in result panels.
  */

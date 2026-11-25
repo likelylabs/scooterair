@@ -1,0 +1,496 @@
+---
+/**
+ * /act/ — 行動 / Take action (blueprint 4.6, Part 6; V6, V24, V19, V46).
+ *
+ * One section per role, in the priority order of Part 6: #walk · #buy · #keep · #parents ·
+ * #neighbourhood · #policy, then #asks (the six asks of government, each with the agency we
+ * propose) and #letter. Every action carries a label for how well supported it is: the badges of
+ * the registry facts behind it, 我們的推論, or 請求 (a plain request). No prices and no
+ * calculator button here: #buy links to /electric/ for the money (R9 spirit; blueprint 4.6).
+ *
+ * Copy: src/i18n/pages/act.ts. Numbers are filled from the registry.
+ */
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import Figure from '@/components/ui/Figure.astro';
+import Cite from '@/components/ui/Cite.astro';
+import Card from '@/components/ui/Card.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import Tag from '@/components/ui/Tag.astro';
+import MoneyBanner from '@/components/ui/MoneyBanner.astro';
+import SubsidyTimeline from '@/components/ui/SubsidyTimeline.astro';
+import WaffleChart from '@/components/charts/WaffleChart.astro';
+import ApproachPlan from '@/components/art/ApproachPlan.astro';
+import Act from '@/components/pages/action/Act.astro';
+import Claim from '@/components/pages/action/Claim.astro';
+import Composer from '@/components/pages/action/Composer.astro';
+import { badgesFor, count, datum, lf, lg, num, requiredCaveats, sourcesOf } from '@/components/pages/action/ev';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { snapshot } from '@/lib/site-state.data';
+import type { FactId } from '@/data';
+import act from '@/i18n/pages/act';
+import { fill, localize } from '@/i18n/pages/_copy';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const t = localize(act, locale);
+const R = t.roles;
+const nextYear = Number(snapshot.yearEnd.slice(0, 4)) + 1;
+const yearOf = (id: FactId) => Number(/\d{4}/.exec(lf(id, 'en').period)![0]);
+const abs = (v: number) => num(locale, Math.abs(v), 0);
+
+// ---- numbers from the registry
+const quiet = { benzene: abs(datum('wu2021-quiet-route', 'benzene')), pm25: abs(datum('wu2021-quiet-route', 'pm25')) };
+const stroller = {
+  low: num(locale, datum('stroller-height-review', 'kenagy2016Low'), 0),
+  high: num(locale, datum('stroller-height-review', 'kenagy2016High'), 0),
+  us: num(locale, datum('stroller-height-review', 'buzzard2009'), 0),
+  uk: num(locale, datum('pram-height-sharma2020', 'fineParticlesUpTo'), 0),
+  lower: abs(datum('stroller-height-review', 'kumar2017Morning')),
+};
+const per100 = { passed: datum('inspection-2025-per-100', 'passed'), failed: datum('inspection-2025-per-100', 'failed'), absent: datum('inspection-2025-per-100', 'absent') };
+const per100Total = per100.passed + per100.failed + per100.absent;
+const inspectYear = yearOf('inspection-2025-per-100');
+const twoStroke = count(locale, datum('two-stroke-remaining', 'y2024'));
+/** The net-zero milestone the ask quotes (blueprint ask 4: the 2030 target). */
+const TARGET_KEY = 'target2030';
+const evShare = { share: num(locale, datum('ev-share-2025', 'share'), 1), year: yearOf('ev-share-2025'), target: num(locale, datum('netzero-ev-sales-targets', TARGET_KEY), 0), targetYear: Number(TARGET_KEY.slice(-4)) };
+const turnGapCm = num(locale, datum('marking-rules-turn-box', 'turnBoxGap') * 100, 0);
+const siteUrl = new URL(href('/', locale), Astro.site).href;
+const lineText = fill(R.walk.line, { url: siteUrl });
+
+// ---- the six asks: numbers and the facts behind them
+const askFacts: FactId[][] = [[], [], ['inspection-2025-per-100', 'two-stroke-remaining'], ['ev-share-2025', 'netzero-ev-sales-targets'], [], []];
+const askUnconfirmed = [false, false, false, true, false, true];
+const askPosition = [false, false, false, false, false, true];
+const askVars = { nextYear, total: per100Total, absent: per100.absent, twoStroke, ...evShare };
+
+const roles = [
+  { id: 'walk', title: R.walk.title },
+  { id: 'buy', title: R.buy.title },
+  { id: 'keep', title: R.keep.title },
+  { id: 'parents', title: R.parents.title },
+  { id: 'neighbourhood', title: R.neighbourhood.title.replaceAll('|', '') },
+  { id: 'policy', title: R.policy.title },
+];
+const composerLabels = { subject: t.composer.subject, copied: t.composer.copied, failed: t.composer.failed, mail: t.composer.mail, noStore: t.composer.noStore };
+const waffleCaveats = requiredCaveats(['inspection-2025'], locale);
+const per100Fact = lf('inspection-2025-per-100', locale);
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description} share="brief" money>
+  <Section id="act" pad="normal" width="wide" class="act-hero">
+    <p class="eyebrow">{t.hero.eyebrow}</p>
+    <h1 class="display"><Phrased text={t.hero.title} /></h1>
+    <p class="lead act-deck">{t.hero.deck}</p>
+
+    <div class="legend" role="group" aria-labelledby="legend-t">
+      <h2 id="legend-t" class="legend__t">{t.labels.title}</h2>
+      <ul class="legend__list">
+        <li><span class="legend__b"><EvidenceBadge locale={locale} kind="measured-tw" /><EvidenceBadge locale={locale} kind="official-tw" /></span><span>{t.labels.evidence}</span></li>
+        <li><span class="legend__b"><EvidenceBadge locale={locale} kind="inference" /></span><span>{t.labels.inference}</span></li>
+        <li><span class="legend__b"><Tag>{t.labels.request}</Tag></span><span>{t.labels.requestHelp}</span></li>
+      </ul>
+    </div>
+
+    <nav class="jump" aria-label={t.hero.jump}>
+      <p class="jump__label" aria-hidden="true">{t.hero.jump}</p>
+      <ul>
+        {roles.map((r) => <li><a href={`#${r.id}`}>{r.title}</a></li>)}
+        <li><a href="#asks">{t.asks.eyebrow}</a></li>
+      </ul>
+    </nav>
+  </Section>
+
+  <!-- ============================================================== WALK -->
+  <Section id="walk" title={R.walk.title} lead={R.walk.lead} width="wide" rule>
+    <ol class="acts">
+      <Act locale={locale} n={1} label="request" text={R.walk.a1} link={{ href: href('/', locale) + '#brief', label: R.walk.a1Link }} />
+      <Act locale={locale} n={2} label="request" text={R.walk.a2} link={{ href: href('/unmeasured/#ask', locale), label: R.walk.a2Link }} />
+      <Act locale={locale} n={3} label="inference" text={R.walk.a3} why={R.walk.a3Why} whyFacts={['first-metre-sharma-kumar-2018']} />
+      <Act locale={locale} n={4} label="evidence" text={R.walk.a4} facts={['wu2021-quiet-route']} why={fill(R.walk.a4Why, quiet)} />
+      <Act locale={locale} n={5} label="evidence" text={R.walk.a5} facts={['mj-cohort-mortality-guo2021']} why={R.walk.a5Why} />
+    </ol>
+    <div class="tool" id="message">
+      <h3 class="tool__t">{R.walk.lineTitle}</h3>
+      <Composer
+        locale={locale}
+        id="line-message"
+        title={R.walk.lineName}
+        body={lineText}
+        labels={{ copy: R.walk.copy, copied: t.composer.copied, failed: t.composer.failed }}
+        share={{ href: `https://line.me/R/share?text=${encodeURIComponent(lineText)}`, label: R.walk.lineShare }}
+      />
+    </div>
+    <div class="tool">
+      <h3 class="tool__t">{R.walk.smokyTitle}</h3>
+      <Claim locale={locale} facts={['apca-inspection-and-reporting']} />
+      <p class="tool__p">{R.walk.smoky}</p>
+    </div>
+  </Section>
+
+  <!-- ============================================================== BUY -->
+  <Section id="buy" title={R.buy.title} lead={R.buy.lead} width="wide" tone="sunken" rule>
+    <ol class="acts">
+      <Act locale={locale} n={1} label="arithmetic" text={R.buy.a1} link={{ href: href('/electric/', locale), label: R.buy.a1Link }} />
+      <Act locale={locale} n={2} label="evidence" text={R.buy.a2} facts={['econ-taichung-subsidy-2026']} />
+      <Act locale={locale} n={3} label="evidence" text={R.buy.a3} facts={['econ-swap-vs-petrol-low-mileage']} />
+    </ol>
+    <p class="money-link"><a href={href('/electric/', locale)}>{t.money.link}<Icon name="arrow-right" size="1.05em" /></a></p>
+  </Section>
+
+  <!-- ============================================================== KEEP (not this year) -->
+  <Section id="keep" width="wide" rule>
+    <p class="eyebrow">{R.keep.title}</p>
+    <h2 class="h2 keep__h"><Phrased text={R.keep.headline} /></h2>
+    <p class="lead">{R.keep.lead}</p>
+    <ol class="acts">
+      <Act locale={locale} n={1} label="evidence" text={R.keep.a1} facts={['ef-older-phase-tsai2018', 'ef-mileage-co-tsai2018']} why={R.keep.a1Why} />
+      <Act locale={locale} n={2} label="evidence" text={R.keep.a2} facts={['two-stroke-idle-hc-lin2006', 'two-stroke-remaining']}>
+        <Fragment slot="why">
+          <Claim locale={locale} facts={['two-stroke-idle-hc-lin2006']} size="sm" />
+          <Claim locale={locale} facts={['two-stroke-remaining']} size="sm" />
+        </Fragment>
+      </Act>
+      <Act locale={locale} n={3} label="request" text={fill(R.keep.a3, { nextYear })} link={{ href: '#letter', label: R.keep.a3Link }} />
+      <Act locale={locale} n={4} label="evidence" text={R.keep.a4} facts={['idle-stop-mixed-evidence']}>
+        <Fragment slot="why"><Claim locale={locale} facts={['idle-stop-mixed-evidence']} size="sm" /></Fragment>
+      </Act>
+    </ol>
+
+    <Figure
+      locale={locale}
+      title={fill(R.keep.waffle.title, { total: per100Total, absent: per100.absent })}
+      subtitle={fill(R.keep.waffle.subtitle, { year: inspectYear, total: per100Total })}
+      badge="derived"
+      class="keep__fig"
+    >
+      <WaffleChart
+        locale={locale}
+        title={R.keep.waffle.chart}
+        desc={fill(R.keep.waffle.desc, { total: per100Total, ...per100 })}
+        parts={[
+          { value: per100.passed, label: R.keep.waffle.passed, tone: 'clean' },
+          { value: per100.failed, label: R.keep.waffle.failed, tone: 'exhaust' },
+        ]}
+        restLabel={R.keep.waffle.absent}
+        total={per100Total}
+        categoryLabel={R.keep.waffle.category}
+        valueLabel={fill(R.keep.waffle.value, { total: per100Total })}
+      />
+      <Fragment slot="caption">
+        {per100Fact.caveat}
+        {waffleCaveats.map((c) => <><br />{c.text}</>)}
+      </Fragment>
+      <Fragment slot="source">{sourcesOf(['inspection-2025-per-100', 'inspection-2025']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+
+    <div class="watch">
+      <h3 class="tool__t">{R.keep.watchTitle}</h3>
+      <p class="watch__status"><b>{R.keep.watchStatus}</b></p>
+      <MoneyBanner locale={locale} />
+      <SubsidyTimeline locale={locale} />
+      <p>{R.keep.watch}</p>
+    </div>
+  </Section>
+
+  <!-- ============================================================== PARENTS -->
+  <Section id="parents" title={R.parents.title} lead={R.parents.lead} width="wide" tone="sunken" rule>
+    <div class="known">
+      <h3 class="tool__t">{R.parents.known}</h3>
+      <Claim locale={locale} facts={['who-children-vulnerable']} />
+      <Claim locale={locale} text={fill(R.parents.stroller, stroller)} facts={['stroller-height-review', 'pram-height-sharma2020']} />
+      <Claim locale={locale} text={lg('gap-tw-child-height', locale).statement} gaps={['gap-tw-child-height']} />
+    </div>
+    <ol class="acts">
+      <Act locale={locale} n={1} label="inference" text={R.parents.a1} why={R.parents.a1Why} whyFacts={['first-metre-sharma-kumar-2018']} />
+      <Act locale={locale} n={2} label="inference" text={R.parents.a2}>
+        <Fragment slot="why"><Claim locale={locale} facts={['traffic-near-school-kumar2017-pram']} size="sm" /></Fragment>
+      </Act>
+      <Act locale={locale} n={3} label="request" text={R.parents.a3} link={{ href: href('/print/poster/', locale), label: R.parents.a3Link }} />
+      <Act locale={locale} n={4} label="evidence" text={R.parents.a4} facts={['econ-taichung-subsidy-2026']} link={{ href: href('/electric/', locale), label: R.parents.a4Link }} />
+    </ol>
+  </Section>
+
+  <!-- ============================================================== NEIGHBOURHOOD -->
+  <Section id="neighbourhood" title={R.neighbourhood.title} lead={R.neighbourhood.lead} width="wide" rule>
+    <ol class="acts">
+      <Act locale={locale} n={1} label="request" text={R.neighbourhood.a1} link={{ href: href('/unmeasured/#ask', locale), label: R.neighbourhood.a1Link }} />
+      <Act locale={locale} n={2} label="request" text={R.neighbourhood.a2}>
+        <Fragment slot="why">
+          <Claim locale={locale} facts={['pedestrian-facilities-act-2024']} size="sm" />
+          <Claim locale={locale} facts={['marking-rules-turn-box']} size="sm" />
+          <Claim locale={locale} facts={['iot-setback-measured']} size="sm" />
+        </Fragment>
+      </Act>
+      <Act locale={locale} n={3} label="request" text={R.neighbourhood.a3} facts={['two-stroke-remaining', 'inspection-2025']} />
+      <Act locale={locale} n={4} label="request" text={R.neighbourhood.a4} link={{ href: '#committee', label: R.neighbourhood.a4Link }} />
+    </ol>
+
+    <Figure
+      locale={locale}
+      title={fill(R.neighbourhood.plan.title, { gap: turnGapCm })}
+      subtitle={R.neighbourhood.plan.subtitle}
+      badge="official-tw"
+      frame="none"
+      class="plan-fig"
+    >
+      <ApproachPlan locale={locale} />
+      <Fragment slot="source">{sourcesOf(['marking-rules-turn-box']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+    </Figure>
+
+    <div class="cards">
+      <Card title={R.neighbourhood.posterTitle} href={href('/print/poster/', locale)} level={3}>
+        <p>{R.neighbourhood.posterBody}</p>
+      </Card>
+    </div>
+
+    <div class="tool" id="committee">
+      <h3 class="tool__t">{R.neighbourhood.noteTitle}</h3>
+      <p class="honest">{R.neighbourhood.noteHonest}</p>
+      <Composer
+        locale={locale}
+        id="committee-note"
+        title={R.neighbourhood.noteTitle}
+        fields={[
+          { key: 'building', label: R.neighbourhood.noteBuilding },
+          { key: 'name', label: R.neighbourhood.noteName },
+        ]}
+        subject={R.neighbourhood.noteSubject}
+        body={R.neighbourhood.note}
+        labels={{ ...composerLabels, copy: R.neighbourhood.noteCopy, fields: R.neighbourhood.noteFields }}
+      />
+    </div>
+  </Section>
+
+  <!-- ============================================================== POLICY -->
+  <Section id="policy" title={R.policy.title} lead={R.policy.lead} width="wide" tone="sunken" rule>
+    <ol class="acts">
+      <Act locale={locale} n={1} label="request" text={fill(R.policy.a1, { nextYear })} />
+      <Act locale={locale} n={2} label="request" text={R.policy.a2} link={{ href: href('/unmeasured/#plan', locale), label: R.policy.a2Link }} />
+      <Act locale={locale} n={3} label="evidence" text={R.policy.a3} facts={['apca-maintenance-zones', 'pedestrian-facilities-act-2024']} />
+    </ol>
+    <div class="watch">
+      <p class="watch__status"><b>{R.policy.status}</b></p>
+      <MoneyBanner locale={locale} />
+    </div>
+  </Section>
+
+  <Section id="asks" eyebrow={t.asks.eyebrow} title={t.asks.title} lead={t.asks.lead} width="wide" rule>
+    <ol class="asks">
+      {
+        t.asks.items.map((a, i) => {
+          const fs = askFacts[i];
+          return (
+            <li class="ask">
+              <span class="ask__n" aria-hidden="true">{i + 1}</span>
+              <div class="ask__body">
+                <p class="ask__text">
+                  {fill(a.ask, askVars)}
+                  {sourcesOf(fs).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}
+                </p>
+                <p class="ask__tags">
+                  <Tag>{t.labels.request}</Tag>
+                  {badgesFor(fs).map((b) => <EvidenceBadge locale={locale} kind={b.kind} secondary={b.secondary} />)}
+                  {askPosition[i] && <Tag tone="signal">{t.asks.position}</Tag>}
+                </p>
+                <p class="ask__to">
+                  <span class="ask__to-l">{t.asks.to}</span> {a.to}
+                  {askUnconfirmed[i] && <> <Tag tone="exhaust">{t.asks.unconfirmed}</Tag></>}
+                </p>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+
+    <div class="tool" id="letter">
+      <h3 class="tool__t">{t.letter.title}</h3>
+      <p>{t.letter.lead}</p>
+      <Composer
+        locale={locale}
+        id="councillor-letter"
+        title={t.letter.title}
+        fields={[
+          { key: 'name', label: t.letter.name },
+          { key: 'city', label: t.letter.city },
+        ]}
+        subject={fill(t.letter.subject, { nextYear })}
+        body={fill(t.letter.body, { nextYear })}
+        labels={{ ...composerLabels, copy: t.letter.copy, fields: t.letter.fields }}
+      />
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .act-deck {
+    max-inline-size: 40rem;
+  }
+  .act-hero :global(.display) {
+    margin-block: var(--sp-2) var(--sp-4);
+  }
+  .legend {
+    margin-block-start: var(--sp-6);
+    padding: var(--sp-4);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    max-inline-size: 44rem;
+  }
+  .legend__t {
+    font-size: var(--fs-md);
+    margin: 0 0 var(--sp-3);
+  }
+  .legend__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .legend__list li {
+    display: grid;
+    gap: var(--sp-1);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .legend__b {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-2);
+  }
+  .jump {
+    margin-block-start: var(--sp-5);
+  }
+  .jump__label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    margin: 0 0 var(--sp-2);
+  }
+  .jump ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+  .jump li {
+    flex: 1 1 9rem;
+    max-inline-size: 100%;
+  }
+  @media (min-width: 48em) {
+    .jump li {
+      flex: 0 1 auto;
+    }
+  }
+  .jump a {
+    block-size: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    min-block-size: 44px;
+    padding: var(--sp-2) var(--sp-3);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+    color: var(--ink);
+    line-height: var(--lh-snug);
+  }
+  .jump a:hover {
+    background: var(--bg-sunken);
+  }
+  .acts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .keep__h {
+    margin-block: var(--sp-2) var(--sp-3);
+  }
+  .tool,
+  .watch,
+  .known {
+    margin-block-start: var(--sp-6);
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .tool__t {
+    margin: 0;
+    font-size: var(--fs-lg);
+  }
+  .tool__p,
+  .watch p {
+    margin: 0;
+  }
+  .honest {
+    margin: 0;
+    font-weight: var(--fw-bold);
+  }
+  .money-link {
+    margin-block-start: var(--sp-4);
+    font-weight: var(--fw-bold);
+  }
+  .keep__fig,
+  .plan-fig {
+    margin-block-start: var(--sp-6);
+  }
+  .cards {
+    margin-block-start: var(--sp-6);
+    max-inline-size: 28rem;
+  }
+  .asks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .ask {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .ask__n {
+    font-family: var(--font-en-display, var(--font-heading));
+    font-weight: var(--fw-black);
+    font-size: var(--fs-2xl);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .ask__body {
+    display: grid;
+    gap: var(--sp-2);
+    min-inline-size: 0;
+  }
+  .ask__body p {
+    margin: 0;
+  }
+  .ask__text {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .ask__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-2);
+  }
+  .ask__to {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: var(--lh-snug);
+  }
+  .ask__to-l {
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+  }
+</style>

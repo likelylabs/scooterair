@@ -91,6 +91,8 @@ interface Line {
   facts?: FactId[];
   gaps?: GapId[];
   badge?: EvidenceKind | EvidenceKind[];
+  /** true when the figures right below carry the required caveats next to the numbers */
+  noCaveat?: boolean;
 }
 interface Action {
   text: L;
@@ -220,7 +222,7 @@ export default copy({
       link: 2,
     }),
     app: item({
-      q: { 'zh-TW': '空品 App 顯示「良好」，|是它錯了嗎？', en: 'The air-quality app says “Good”. |Is it wrong?' },
+      q: { 'zh-TW': '空品 App |顯示「良好」，|是它錯了嗎？', en: 'The air-quality app |says “Good”. |Is it wrong?' },
       answer: {
         'zh-TW': '它沒有錯。它報的是測站量到的空氣；你站的這個路口，沒有人量過。台北一項通勤研究裡，測站的數字跟得上 PM2.5，跟不上苯類。',
         en: 'It isn’t wrong. It reports the air measured at a station; the crossing you are standing at has not been measured. In one Taipei commuter study, station readings tracked PM2.5 and did not track the benzene family.',
@@ -233,7 +235,7 @@ export default copy({
       link: 3,
     }),
     'how-much': item({
-      q: { 'zh-TW': '我在路口|到底吸進多少？', en: 'How much do I actually |breathe at the crossing?' },
+      q: { 'zh-TW': '我在路口|到底|吸進多少？', en: 'How much do I actually |breathe |at the crossing?' },
       answer: {
         'zh-TW': '老實說：沒有人量過。這是整件事最大的空白。下面是離現場最近的幾項量測，每一項都寫明和現場差在哪。',
         en: 'Honestly: nobody has measured it. It is the biggest hole in the whole story. Below are the nearest measurements, each with how it differs from the scene.',
@@ -279,7 +281,7 @@ export default copy({
       link: 6,
     }),
     electric: item({
-      q: { 'zh-TW': '換成電動，|路口真的會比較乾淨嗎？', en: 'Would going electric really |make the crossing cleaner?' },
+      q: { 'zh-TW': '換成電動，|路口真的|會比較乾淨嗎？', en: 'Would going electric |really make |the crossing cleaner?' },
       answer: {
         'zh-TW': '電動機車沒有排氣管，在路口不排一氧化碳、油氣和苯。輪胎和煞車的粉塵還在，旁邊的汽車也還在。實際乾淨多少，台灣還沒有人量過。',
         en: 'An electric scooter has no tailpipe: no carbon monoxide, fuel vapour or benzene at the crossing. Tyre and brake dust remain, and so do the cars alongside. How much cleaner the air gets has not been measured in Taiwan.',
@@ -404,10 +406,13 @@ export default copy({
         iarc: {
           title: { 'zh-TW': '致癌分級，|照實寫', en: 'Cancer classifications, |as they are' },
           subtitle: { 'zh-TW': '國際癌症研究機構（IARC）的分級', en: 'Classifications by the International Agency for Research on Cancer (IARC)' },
-          caption: {
-            'zh-TW': '分級講的是會不會，不是吸多少會。汽油引擎廢氣整體是 2B 級，不是 1 級，我們不會把它講成 1 級；柴油列在這裡只是對照。',
-            en: 'A classification says whether, not how much. Gasoline engine exhaust as a whole is Group 2B, not Group 1, and we will not call it Group 1; diesel is listed for contrast only.',
-          },
+          caption: R(
+            {
+              'zh-TW': '分級講的是會不會，不是吸多少會。汽油引擎廢氣整體是 {g}，不是 {one}，我們不會把它講成 {one}；柴油列在這裡只是對照。',
+              en: 'A classification says whether, not how much. Gasoline engine exhaust as a whole is {g}, not {one}, and we will not call it {one}; diesel is listed for contrast only.',
+            },
+            { g: (loc) => facts['iarc-gasoline-exhaust-2b'].display[loc], one: (loc) => facts['iarc-benzene-group1'].display[loc] },
+          ),
           rowHeader: { 'zh-TW': '物質', en: 'Substance' },
           column: { 'zh-TW': 'IARC 分級', en: 'IARC group' },
           rows: {
@@ -425,8 +430,8 @@ export default copy({
       studies: ['scooter-exhaust-carbonyls', 'odour-thresholds', 'co-odourless', 'iarc-benzene-group1', 'iarc-gasoline-exhaust-2b'] as FactId[],
       studyTitles: {
         'co-odourless': { 'zh-TW': '一氧化碳：無色、無味', en: 'Carbon monoxide: colourless, odourless' },
-        'iarc-benzene-group1': { 'zh-TW': '苯：1 級致癌物', en: 'Benzene: Group 1' },
-        'iarc-gasoline-exhaust-2b': { 'zh-TW': '汽油引擎廢氣：2B 級', en: 'Gasoline engine exhaust: Group 2B' },
+        'iarc-benzene-group1': R({ 'zh-TW': '苯：{g}', en: 'Benzene: {g}' }, { g: (loc) => facts['iarc-benzene-group1'].display[loc] }),
+        'iarc-gasoline-exhaust-2b': R({ 'zh-TW': '汽油引擎廢氣：{g}', en: 'Gasoline engine exhaust: {g}' }, { g: (loc) => facts['iarc-gasoline-exhaust-2b'].display[loc] }),
       },
       next: ['how-much', 'electric'],
     },
@@ -564,7 +569,10 @@ export default copy({
             { 'zh-TW': '每 100 台接到通知的機車，|{absent} 台沒有來定檢', en: 'Of 100 scooters called for inspection, |{absent} did not come' },
             { absent: d('inspection-2025-per-100', 'absent') },
           ),
-          subtitle: { 'zh-TW': '2025 年四行程機車定檢，每一格是一台（本站依官方比例換算）', en: 'Four-stroke inspections in 2025, one cell per scooter (our arithmetic on official rates)' },
+          subtitle: R(
+            { 'zh-TW': '{yr}四行程機車定檢，每一格是一台（本站依官方比例換算）', en: 'Four-stroke inspections in {yr}, one cell per scooter (our arithmetic on official rates)' },
+            { yr: (loc) => facts['inspection-2025-per-100'].period[loc] },
+          ),
           chart: { 'zh-TW': '定檢結果方格圖', en: 'Waffle chart of inspection results' },
           passed: { 'zh-TW': '到檢合格', en: 'Came and passed' },
           failed: { 'zh-TW': '到檢不合格', en: 'Came and failed' },
@@ -693,8 +701,8 @@ export default copy({
           subtitle: { 'zh-TW': '台北市一般測站與交通測站的 PM2.5 年平均（µg/m³）', en: 'Annual mean PM2.5 at Taipei’s general and traffic stations (µg/m³)' },
           chart: { 'zh-TW': '台北一般測站與交通測站的 PM2.5 年平均比較圖', en: 'Chart comparing annual PM2.5 at Taipei’s general and traffic stations' },
           caption: {
-            'zh-TW': '每一列兩個點：左邊是一般測站，右邊是交通測站。兩點愈靠近，路邊和一般地方愈像。這就是為什麼 PM2.5 回答不了機車的問題。',
-            en: 'Two dots per row: general stations and traffic stations. The closer they are, the more the roadside reads like everywhere else. That is why PM2.5 cannot answer the scooter question.',
+            'zh-TW': '每一列兩個點，一個是一般測站，一個是交通測站（看圖例）。兩點愈靠近，路邊和一般地方愈像。這就是為什麼 PM2.5 回答不了機車的問題。',
+            en: 'Two dots per row, one for the general stations and one for the traffic stations (see the key). The closer they are, the more the roadside reads like everywhere else. That is why PM2.5 cannot answer the scooter question.',
           },
           year: { 'zh-TW': '年', en: 'Year' },
         },
@@ -722,6 +730,7 @@ export default copy({
           },
           facts: ['scooter-lane-btex-wu2021', 'commute-scooter-vs-subway-chuang2020', 'commute-walking-wang2021'],
           badge: 'measured-tw',
+          noCaveat: true,
         }),
       ],
       figure: {
@@ -870,8 +879,8 @@ export default copy({
           ),
         },
         ruler: {
-          'zh-TW': '注意這把尺。上面的研究量的都是整體車流，或所有來源的 PM2.5，也就是機車排得很少的那一種污染。沒有任何一項把機車廢氣單獨分出來。研究看到的是「有關」，不是「造成」。這兩個詞差很多，我們不會混著用。',
-          en: 'Mind the ruler. Every study above measured traffic as a whole or PM2.5 from all sources, the kind of pollution scooters make little of. Not one isolates scooter exhaust. And what they show is association, not cause. The two words are far apart and we will not mix them.',
+          'zh-TW': '上面的研究量的都是整體車流，或所有來源的 PM2.5，也就是機車排得很少的那一種污染。沒有任何一項把機車廢氣單獨分出來。研究看到的是「有關」，不是「造成」。這兩個詞差很多，我們不會混著用。',
+          en: 'Every study above measured traffic as a whole or PM2.5 from all sources, the kind of pollution scooters make little of. Not one isolates scooter exhaust. And what they show is association, not cause. The two words are far apart and we will not mix them.',
         },
         rulerLabel: { 'zh-TW': '注意這把尺', en: 'Mind the ruler' },
       },
@@ -1341,6 +1350,11 @@ export default copy({
         },
       },
       studies: ['teds13-electric-mc-pm25', 'scooter-lane-btex-wu2021', 'tsai2023-trend-2013-2021', 'ev-share-2025', 'netzero-ev-sales-targets'] as FactId[],
+      studyTitles: {
+        'teds13-electric-mc-pm25': { 'zh-TW': '電動機車的輪胎、煞車與揚塵', en: 'Electric scooters’ tyre, brake and road dust' },
+        'ev-share-2025': R({ 'zh-TW': '{y} 年的電動比例', en: 'The electric share in {y}' }, { y: sx('ev-share-new-registrations', 'actual', 'last') }),
+        'netzero-ev-sales-targets': { 'zh-TW': '淨零路徑的電動比例目標', en: 'Net-zero pathway targets for the electric share' },
+      },
       next: ['afford', 'how-much'],
     },
   },

@@ -1,0 +1,163 @@
+---
+/**
+ * SeriesFigure — one registry chart dataset in a Figure: its title (or the blueprint's, when
+ * the page passes one), what is plotted and in what unit, the chart(s) or table, the flags
+ * the source puts on individual points, the caveat (set right under the chart when the
+ * registry marks it required), the badge and citation chips, and a CSV download that works
+ * without JavaScript. The figure carries the anchor #data-<series id>.
+ *
+ * Props
+ *   locale    Locale
+ *   view      SeriesView from ./figures.ts
+ *   title     override the registry title (a sentence that says the finding)
+ *   subtitle  override the registry description
+ *   caption   the page's own reading line, shown before the caveat
+ *   level     heading level of the title (default 4)
+ *   tone      top rule colour
+ *   anchor    false to leave the anchor off (when the same dataset is drawn twice)
+ * Slots
+ *   before    content above the chart (e.g. a lead sentence)
+ */
+import type { Locale } from '@/i18n';
+import { evidenceBadge } from '@/i18n/ui';
+import Figure from '@/components/ui/Figure.astro';
+import Cite from '@/components/ui/Cite.astro';
+import evidenceCopy from '@/i18n/pages/evidence';
+import { localize } from '@/i18n/pages/_copy';
+import EvChart from './EvChart.astro';
+import { csvHref } from './charts';
+import Mixed from './Mixed.astro';
+import { cites, dataAnchor, seriesSources } from './ev';
+import type { SeriesView } from './figures';
+
+interface Props {
+  locale: Locale;
+  view: SeriesView;
+  title?: string;
+  subtitle?: string;
+  caption?: string;
+  level?: 2 | 3 | 4;
+  tone?: 'ink' | 'exhaust' | 'clean' | 'signal';
+  anchor?: boolean;
+}
+const { locale, view, title, subtitle, caption, level = 4, tone = 'ink', anchor = true } = Astro.props;
+const T = localize(evidenceCopy, locale);
+const { s, panels, table, notes } = view;
+/** Registry titles have no phrase marks: break after the first colon so a headline never splits mid-word. */
+const phrased = (t: string) => (t.includes('|') ? t : t.replace(/^([^：:]{2,24}[：:]\s?)(?=.)/, '$1|'));
+const end = (x: string) => (/[。.!?？）)」]$/.test(x) ? x : x + (locale === 'en' ? '.' : '。'));
+const badge = evidenceBadge(s.evidence, s.confidence);
+const kinds = [...new Set([badge.kind, ...s.datasets.map((d) => evidenceBadge(d.evidence).kind)])];
+const chips = cites(seriesSources(s.id));
+const tables = [...panels.map((p) => ({ ...p.render.table, label: p.label })), ...(table ? [table] : [])];
+const csv = csvHref({
+  head: tables[0]?.head ?? [],
+  rows: tables.flatMap((t, i) => (i === 0 ? t.rows : [t.head, ...t.rows]).map((r) => ('label' in t && t.label && panels.length > 1 ? [`${t.label} · ${r[0]}`, ...r.slice(1)] : r))),
+});
+const file = `${s.id}.csv`;
+---
+
+<Figure locale={locale} id={anchor ? dataAnchor(s.id) : undefined} title={phrased(title ?? s.title)} subtitle={subtitle ?? s.description} level={level} tone={tone} badge={kinds} secondary={s.confidence === 'secondary'} class="sfig">
+  <slot name="before" />
+  <div class:list={['sfig__panels', panels.length > 1 && 'sfig__panels--many']}>
+    {panels.map((p) => (
+      <div class="sfig__panel">
+        {p.label && panels.length > 1 && <p class="sfig__plabel">{p.label}</p>}
+        <EvChart render={p.render} title={p.title} desc={p.desc} locale={locale} />
+      </div>
+    ))}
+  </div>
+  {table && (
+    <div class="sfig__table" tabindex="0" role="region" aria-label={title ?? s.title}>
+      {table.note && <p class="sfig__tnote">{table.note}</p>}
+      <table>
+        <thead><tr>{table.head.map((h, i) => <th scope="col" class={i ? 'num' : undefined}>{h}</th>)}</tr></thead>
+        <tbody>{table.rows.map((r) => <tr>{r.map((c, i) => (i ? <td class="num">{c}</td> : <th scope="row">{c}</th>))}</tr>)}</tbody>
+      </table>
+    </div>
+  )}
+  <Fragment slot="caption">
+    {caption && <span class="sfig__line">{caption}</span>}
+    {s.caveat && (
+      <span class:list={['sfig__line', 'sfig__caveat', s.requiresCaveat && 'sfig__caveat--must']}>
+        <b>{T.columns.notShow}{locale === 'en' ? ': ' : '：'}</b><Mixed text={s.caveat} locale={locale} />
+      </span>
+    )}
+    {notes.length > 0 && (
+      <span class="sfig__line sfig__notes"><Mixed text={notes.map(end).join(' ')} locale={locale} /></span>
+    )}
+    <span class="sfig__line sfig__meta">
+      {s.period} · {s.place} ·{' '}
+      <a href={csv} download={file}>{T.chart.download}</a>
+    </span>
+  </Fragment>
+  <Fragment slot="source">{chips.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+</Figure>
+
+<style>
+  .sfig {
+    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+  }
+  .sfig__panels--many {
+    display: grid;
+    gap: var(--sp-6);
+  }
+  @media (min-width: 60em) {
+    .sfig__panels--many {
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    }
+  }
+  .sfig__plabel {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    margin-block-end: var(--sp-2);
+  }
+  .sfig__line {
+    display: block;
+  }
+  .sfig__line + .sfig__line {
+    margin-block-start: var(--sp-2);
+  }
+  .sfig__caveat b {
+    color: var(--ink);
+  }
+  .sfig__caveat--must {
+    padding-inline-start: var(--sp-3);
+    border-inline-start: 3px solid var(--exhaust);
+    color: var(--ink);
+  }
+  .sfig__meta a {
+    color: var(--accent);
+  }
+  .sfig__table {
+    overflow-x: auto;
+    max-inline-size: 100%;
+  }
+  .sfig__tnote {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    margin-block-end: var(--sp-2);
+  }
+  .sfig__table table {
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+    min-inline-size: 100%;
+  }
+  .sfig__table th,
+  .sfig__table td {
+    padding: var(--sp-1) var(--sp-2);
+    border-block-end: 1px solid var(--line);
+    text-align: start;
+    vertical-align: top;
+  }
+  .sfig__table thead th {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    border-block-end-color: var(--line-strong);
+  }
+  .sfig__table .num {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>

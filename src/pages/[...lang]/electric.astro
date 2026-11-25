@@ -1,0 +1,727 @@
+---
+/**
+ * /electric/ — 換電動，把帳攤開 / Going electric: the full bill (blueprint 4.3).
+ *
+ * The answer first, then the reader's own sums (#status, #calc, #result), worked examples that
+ * are complete results without JavaScript (#examples), how to get closer (#closer), the dated
+ * checklist (#checklist), running costs on their own (#monthly), the honest limits (#no-socket,
+ * #who, #risks), what to do if not this year (#not-yet), the 22 places (#cities), our asks
+ * (#asks), questions (#faq) and sources.
+ *
+ * Every number comes from the calculator engine (src/lib/calc) or the registry (src/data), via
+ * src/components/pages/electric/. Date-dependent copy follows src/lib/site-state.ts: each
+ * variant is printed with the phases it is true in (data-money-when), and the browser picks
+ * one from today's date; without JavaScript the "static" variants, true whenever read, show.
+ * Copy: src/i18n/pages/electric.ts (and ./money.ts for the shared banner and timeline).
+ */
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import Button from '@/components/ui/Button.astro';
+import Callout from '@/components/ui/Callout.astro';
+import Select from '@/components/ui/Select.astro';
+import MoneyBanner from '@/components/ui/MoneyBanner.astro';
+import SubsidyTimeline from '@/components/ui/SubsidyTimeline.astro';
+import Tabs from '@/components/ui/Tabs.astro';
+import TabPanel from '@/components/ui/TabPanel.astro';
+import Figure from '@/components/ui/Figure.astro';
+import CompareTable from '@/components/ui/CompareTable.astro';
+import TileMap from '@/components/ui/TileMap.astro';
+import Details from '@/components/ui/Details.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import Tag from '@/components/ui/Tag.astro';
+import RangePlot from '@/components/charts/RangePlot.astro';
+import GroupedBarChart from '@/components/charts/GroupedBarChart.astro';
+import Calculator from '@/components/pages/electric/Calculator.astro';
+import ElectricResult from '@/components/pages/electric/ElectricResult.astro';
+import { afterDate, cityDetails, citeMap, data, examples, F, factIds, factValue, flagsByCity, pageLinks, runningTables, seriesIds, surveyChart, today, yearEnd } from '@/components/pages/electric/electric-data';
+import { money } from '@/components/pages/electric/model';
+import { formatCitation, sourcesFor, sourceUrl } from '@/data';
+import { cityMoney, formatDate, snapshot } from '@/lib/site-state.data';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { readerText, ui, evidenceBadge, type EvidenceKind } from '@/i18n/ui';
+import electric from '@/i18n/pages/electric';
+import { fill, localize } from '@/i18n/pages/_copy';
+import type { JurisdictionId } from '@/data/econ/types';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const T = localize(electric, locale);
+const plain = (s: string) => s.replaceAll('|', '');
+const d = (iso: string) => formatDate(iso, locale, true);
+const deadline = d(yearEnd);
+const checked = d(data.meta.checkedOn);
+const filing = d(snapshot.filingEnd);
+const nf = (v: number, digits = 0) => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'zh-TW', { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(v);
+const perKm = (v: number) => `NT$ ${nf(v, 2)}`;
+const links = pageLinks(locale);
+
+// ---- city select (#status): every place with how far we could check it ----------------------
+const ids = Object.keys(data.jurisdictions) as JurisdictionId[];
+const statusWord = (id: JurisdictionId) => {
+  const j = data.jurisdictions[id];
+  const m = cityMoney(id, today, snapshot);
+  if (j.status !== 'not-verified' && m.status === 'exhausted') return T.status.cityStatus.exhausted;
+  if (j.status !== 'not-verified' && m.status === 'ended') return T.status.cityStatus.ended;
+  return T.status.cityStatus[j.status];
+};
+const cityOptions = [{ value: '', label: T.status.cityNone }, ...ids.map((id) => ({ value: id, label: `${readerText(data.jurisdictions[id].name[locale])}${locale === 'en' ? ' (' : '（'}${statusWord(id)}${locale === 'en' ? ')' : '）'}` }))];
+
+// ---- the calculator's settings ---------------------------------------------------------------
+const cfg = {
+  locale,
+  cites: citeMap(locale),
+  flags: flagsByCity(),
+  remote: Object.fromEntries(ids.map((id) => [id, data.jurisdictions[id].remoteDistricts ? readerText(data.jurisdictions[id].remoteDistricts![locale]) : ''])),
+  cityNames: Object.fromEntries(ids.map((id) => [id, readerText(data.jurisdictions[id].name[locale])])),
+  cityNotes: Object.fromEntries(ids.map((id) => [id, { note: readerText(data.jurisdictions[id].statusNote[locale]), links: data.jurisdictions[id].officialLinks.map((l) => ({ label: readerText(l.label[locale]), url: l.url })) }])),
+  links,
+  tableLabel: ui.dataTable[locale],
+  statusWords: T.status.moneyWords,
+  yearEnd,
+  text: {
+    working: T.result.working,
+    invalid: T.result.invalid,
+    dayCount: T.result.dayCount,
+    dayCountLast: T.result.dayCountLast,
+    dayCountNone: T.result.dayCountNone,
+    levers: T.closer.levers,
+    worth: T.closer.worth,
+    leverPlanNote: T.closer.leverPlanNote,
+    nothing: T.closer.nothing,
+    noCity: T.closer.noCity,
+    statusNote: T.status.statusNote,
+    officialLinks: T.status.officialLinks,
+  },
+};
+
+// ---- worked examples, running costs, cities, facts -------------------------------------------
+const ex = examples(locale);
+const run = runningTables(locale);
+const { cities, central } = cityDetails(locale);
+const survey = surveyChart(locale);
+const fx = Object.fromEntries(factIds.map((id) => [id, F(id, locale)])) as Record<(typeof factIds)[number], ReturnType<typeof F>>;
+const badgeOf = (id: (typeof factIds)[number]) => evidenceBadge(fx[id].evidence, fx[id].confidence);
+const factSources = (id: (typeof factIds)[number]) => fx[id].citations;
+const band = run.band;
+const share = factValue('econ-ev-brand-share-2026-07', 'gogoroShare');
+const stations = factValue('econ-gogoro-network', 'stations');
+const pageSources = sourcesFor({ facts: [...factIds], series: [...seriesIds] });
+
+// running-cost table: one row per distance, a column per way of powering it (CompareTable stacks on phones)
+const homeCols = run.homeModels.map((m) => ({ id: m.id, label: `${T.monthly.rows.home} · ${readerText(m.name[locale]).replace(/[（(].*$/, '')} · ${T.result.plate[m.plateClass]}` }));
+const monthlyLabels = [fill(T.monthly.rows.petrol, { model: run.gasModelName }), T.monthly.rows.sub, T.monthly.rows.payg, ...homeCols.map((c) => c.label)];
+// the examples' answers, for the "use this" buttons
+const useOf = (x: (typeof ex)[number]) => JSON.stringify({ ...x.answers, charge: x.charge });
+const notYetBadge = (k: string) => k as EvidenceKind;
+---
+
+<Base locale={locale} title={T.meta.title} description={T.meta.description} money>
+  <header class="el-head">
+    <div class="container container--wide el-head__inner">
+      <p class="eyebrow">{T.head.eyebrow}</p>
+      <h1 class="display el-title"><Phrased text={T.head.title} /></h1>
+      <p class="lead">{T.head.lead}</p>
+
+      <div class="el-answer-first" aria-labelledby="answer-title">
+        <h2 id="answer-title" class="el-answer-first__title">{T.answer.title}</h2>
+        <p>{T.answer.body}</p>
+        {band && <p data-money-when="A B C D static">{fill(T.answer.monthly, { low: nf(band.low), high: nf(band.high) })}</p>}
+        <p data-money-when="B C D" class="el-answer-first__after">{fill(T.answer.after, { deadline, checked })}</p>
+        <p data-money-when="static" class="el-answer-first__after">{fill(T.answer.staticNote, { deadline, checked })}</p>
+        <div data-money-when="A static">
+          <div class="el-actions">
+            <Button href="#calc" size="lg" data-js-only>{T.answer.calcLink}</Button>
+            <Button href="#examples" variant="secondary" size="lg">{T.answer.examplesLink}</Button>
+            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
+          </div>
+        </div>
+        <div data-money-when="B">
+          <div class="el-actions">
+            <Button href="#checklist" size="lg">{T.answer.boughtLink}</Button>
+            <Button href="#calc" variant="secondary" size="lg">{T.answer.noSubsidyLink}</Button>
+            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
+          </div>
+        </div>
+        <div data-money-when="C D">
+          <div class="el-actions">
+            <Button href={href('/act/#policy', locale)} size="lg">{T.answer.askLink}</Button>
+            <Button href="#calc" variant="secondary" size="lg">{T.answer.noSubsidyLink}</Button>
+            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. Is there money where you live? -->
+  <Section id="status" title={T.status.title} lead={T.status.lead} width="wide" pad="tight" tone="sunken">
+    <div class="el-status">
+      <div class="stack" style="--stack: var(--sp-4)">
+        <div data-js-only>
+          <Select id="el-city" label={T.status.cityLabel} options={cityOptions} value="" hint={T.status.cityHint} data-money-city />
+        </div>
+        <MoneyBanner locale={locale} tone="box" />
+        <div class="el-citynote" data-el-citynote hidden></div>
+      </div>
+      <SubsidyTimeline locale={locale} />
+    </div>
+  </Section>
+
+  <!-- 2–3. The calculator and the live result -->
+  <Section id="calc" title={T.calc.title} width="wide">
+    <p id="el-calc-lead" class="el-calc-lead" data-js-only>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[0]}<span data-money-fill="today">{d(today)}</span>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[1]}</p>
+    <div class="el-calc-grid">
+      <Calculator locale={locale} cfg={cfg} today={today} />
+    </div>
+  </Section>
+
+  <!-- Worked examples: complete results without JavaScript, on both sides of the deadline -->
+  <Section id="examples" title={T.examples.title} lead={T.examples.lead} width="wide" tone="sunken">
+    <Tabs label={T.examples.tabsLabel}>
+      {ex.map((x) => (
+        <TabPanel id={`example-${x.key}`} label={x.tab}>
+          <div class="el-example">
+            <p class="el-example__who">{x.who}</p>
+            {x.before && (
+              <div data-money-when="A static">
+                <div class="el-example__phase">
+                  <h4 class="el-example__when">{fill(T.examples.before, { deadline, checked })}</h4>
+                  <ElectricResult id={`ex-${x.key}-a`} locale={locale} rendered={x.before.rendered} city={x.answers.jurisdiction} />
+                </div>
+              </div>
+            )}
+            <div data-money-when={x.before ? 'B C D static' : 'A B C D static'}>
+              <div class="el-example__phase">
+                <h4 class="el-example__when">{fill(T.examples.after, { from: d(afterDate) })}</h4>
+                <ElectricResult id={`ex-${x.key}-c`} locale={locale} rendered={x.after.rendered} city={x.answers.jurisdiction} />
+              </div>
+            </div>
+            <p data-js-only><Button variant="secondary" data-el-use={useOf(x)}>{T.examples.useThis}</Button></p>
+          </div>
+        </TabPanel>
+      ))}
+    </Tabs>
+  </Section>
+
+  <!-- How to get closer: the levers for the chosen place, from the engine -->
+  <Section id="closer" title={T.closer.title} lead={T.closer.lead} width="wide">
+    <div class="el-two">
+      <div>
+        <p class="el-small" data-js-only>{T.closer.leverNote}</p>
+        <p class="el-small el-nojs">{T.closer.noJs}</p>
+        <p class="el-small" data-el-levers-empty data-js-only>{T.closer.noCity}</p>
+        <ol class="el-levers" data-el-levers hidden></ol>
+      </div>
+      <Callout tone="exhaust" label={T.closer.pitfallsTitle}>
+        <ul class="el-list">
+          {T.closer.pitfalls.map((p) => <li>{p}</li>)}
+        </ul>
+      </Callout>
+    </div>
+  </Section>
+
+  <!-- What to do next: the ordered, dated checklist -->
+  <Section id="checklist" title={T.checklist.title} lead={T.checklist.lead} width="wide" tone="sunken">
+    <p data-money-when="B" class="el-phase-note">{fill(T.checklist.phaseB, { deadline, filing })}</p>
+    <p data-money-when="C" class="el-phase-note">{T.checklist.phaseC}</p>
+    <ol class="el-steps">
+      {T.checklist.steps.map((s) => (
+        <li>
+          <h3 class="el-steps__title">{s.title}</h3>
+          <p>{s.body}</p>
+        </li>
+      ))}
+    </ol>
+    <h3 class="el-h3">{T.checklist.datesTitle}</h3>
+    <ul class="el-dates">
+      <li>{fill(T.checklist.dates.purchase, { date: deadline })}</li>
+      <li>{fill(T.checklist.dates.filing, { date: filing })}</li>
+      {data.programmes.flatMap((p) => p.conditions.flatMap((c) => (c.kind === 'applicant-deadline' ? [c.date] : []))).filter((x, i, a) => a.indexOf(x) === i).map((date) => <li>{fill(T.checklist.dates.foreign, { date: d(date) })}</li>)}
+      <li>{fill(T.checklist.dates.next, { date: checked })}</li>
+    </ul>
+    <p class="el-small">{T.checklist.yourDates}</p>
+    <p data-js-only><Button variant="secondary" data-el-print="checklist">{T.checklist.print}</Button></p>
+  </Section>
+
+  <!-- Running costs, on their own -->
+  <Section id="monthly" title={T.monthly.title} width="wide">
+    <p class="el-opener">{T.monthly.opener}</p>
+    <p class="lead">{T.monthly.lead}</p>
+
+    <Figure locale={locale} title={T.monthly.tableTitle} subtitle={T.monthly.tableSub} caption={fill(T.monthly.tableCaption, { checked })} badge={['derived', 'market-tw']} secondary>
+      <div class="el-kms">
+        {run.rows.map((r) => (
+          <section class="el-km">
+            <h4 class="el-km__title">{fill(T.monthly.km, { km: nf(r.km) })}</h4>
+            <dl class="el-km__list">
+              {monthlyLabels.map((label, i) => {
+                const b = [r.petrol, r.sub.cost, r.payg.cost, ...r.home.map((h) => h.cost)][i];
+                return (
+                  <div class:list={['el-km__row', i === 0 && 'el-km__row--petrol', i > 0 && b.typical > r.petrol.typical && 'el-km__row--dearer']}>
+                    <dt>{label}</dt>
+                    <dd><b>{money(locale, b.typical)}</b> <span>{fill(T.monthly.perKm, { v: perKm(b.typical / r.km) })}</span>{i > 0 && <span class="el-km__cmp">{b.typical > r.petrol.typical ? T.monthly.dearerThanPetrol : T.monthly.cheaperThanPetrol}</span>}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+            <p class="el-small">{fill(T.monthly.rows.subPlan, { plan: run.planName(r.sub.p) })}</p>
+          </section>
+        ))}
+      </div>
+    </Figure>
+
+    <div class="el-two">
+      <Figure locale={locale} title={T.monthly.rangeTitle} subtitle={`${T.monthly.rangeSub}; ${fill(T.monthly.rangeAt, { km: nf(run.REF) })}`} badge="derived" secondary>
+        <RangePlot
+          locale={locale}
+          title={plain(T.monthly.rangeTitle)}
+          data={run.range}
+          labels={{ min: T.monthly.rangeLabels.min, mid: T.monthly.rangeLabels.mid, max: T.monthly.rangeLabels.max }}
+          decimals={2}
+          unit="NT$/km"
+          categoryLabel={T.monthly.perKm}
+        />
+      </Figure>
+      <div class="stack" style="--stack: var(--sp-4)">
+        <h3 class="el-h3">{T.monthly.statementsTitle}</h3>
+        <ul class="el-facts">
+          <li><b>{T.monthly.statements.petrol}</b>{fx['econ-petrol-cost-per-km'].statement} <EvidenceBadge locale={locale} {...badgeOf('econ-petrol-cost-per-km')} variant="icon" /></li>
+          <li><b>{T.monthly.statements.swap}</b>{fx['econ-swap-vs-petrol-low-mileage'].statement} <EvidenceBadge locale={locale} {...badgeOf('econ-swap-vs-petrol-low-mileage')} variant="icon" /></li>
+          <li><b>{T.monthly.statements.payg}</b>{fx['econ-swap-vs-petrol-low-mileage'].caveat}</li>
+          <li><b>{T.monthly.statements.home}</b>{fx['econ-home-charging-cost-per-km'].statement} <EvidenceBadge locale={locale} {...badgeOf('econ-home-charging-cost-per-km')} variant="icon" /></li>
+        </ul>
+        <p class="el-small">{fx['econ-home-charging-cost-per-km'].caveat}</p>
+      </div>
+    </div>
+
+    <div class="el-two">
+      <div class="stack" style="--stack: var(--sp-3)">
+        <h3 class="el-h3">{T.monthly.whoTitle}</h3>
+        <p class="el-small">{T.monthly.whoLead}</p>
+        <ul class="el-list">
+          <li>{run.suitsFrom !== null ? fill(T.monthly.whoSuits, { km: nf(run.suitsFrom) }) : fill(T.monthly.whoSuitsNone, { km: nf(run.maxScan) })}</li>
+          {run.suitsFrom !== null && <li>{fill(T.monthly.whoNot, { km: nf(run.suitsFrom) })}</li>}
+        </ul>
+        <h3 class="el-h3">{T.monthly.smoothingTitle}</h3>
+        <p>{fill(T.monthly.smoothingBody, { km: nf(run.REF), delta: money(locale, run.smoothingDelta) })}</p>
+        <p class="el-small">{fx['econ-petrol-price-smoothing'].statement} {fx['econ-petrol-price-smoothing'].caveat}</p>
+        <p class="el-small">{run.smoothingMechanism}</p>
+        <p class="el-small"><b>{T.monthly.electricityNote}</b>{run.electricityNote}</p>
+      </div>
+      <div class="stack" style="--stack: var(--sp-3)">
+        <h3 class="el-h3">{T.monthly.fixedTitle}</h3>
+        <p class="el-small">{fill(T.monthly.fixedLead, { km: nf(run.REF) })}</p>
+        <CompareTable
+          caption={T.monthly.fixedTitle}
+          hideCaption
+          rowHeader={T.monthly.fixedCols.item}
+          columns={[{ label: T.monthly.fixedCols.ev, tone: 'clean' }, { label: T.monthly.fixedCols.gas, tone: 'exhaust' }]}
+          rows={run.fixed.map((f) => ({ label: f.label, values: [fill(T.monthly.perYear, { v: money(locale, f.ev) }), fill(T.monthly.perYear, { v: money(locale, f.gas) })], note: f.note.join(' ') }))}
+        />
+        <p class="el-small">{fx['econ-fixed-fees'].statement}</p>
+      </div>
+    </div>
+
+    <Figure locale={locale} title={survey.s.title} subtitle={T.monthly.surveySub} caption={survey.s.caveat} badge="official-tw" source={survey.s.citations.map((c) => c.short).join(' · ')}>
+      <GroupedBarChart
+        locale={locale}
+        title={survey.s.title}
+        desc={survey.s.description}
+        series={survey.m.columns.map((c, i) => ({ label: c.label, tone: (['exhaust', 'neutral', 'blue'] as const)[i] ?? 'neutral' }))}
+        groups={survey.m.rows.map((r) => ({ label: r.label, values: r.values.map((v) => v ?? 0) }))}
+        unit={T.monthly.unitYear}
+        categoryLabel={T.monthly.fixedCols.item}
+      />
+    </Figure>
+    <p class="el-small">{fx['econ-motc-annual-spend'].statement} {fx['econ-motc-annual-spend'].caveat}</p>
+  </Section>
+
+  <!-- No socket where you park -->
+  <Section id="no-socket" title={T.noSocket.title} width="wide" tone="sunken">
+    <p class="lead">{T.noSocket.body}</p>
+    <h3 class="el-h3">{T.noSocket.modelsTitle}</h3>
+    <p>{T.noSocket.modelsLead}</p>
+    <ul class="el-list">
+      {run.homeModels.map((m) => (
+        <li>
+          {fill(T.noSocket.modelLine, { name: readerText(m.name[locale]), maker: readerText(m.brand[locale]), plate: T.result.plate[m.plateClass], price: money(locale, m.listPrice.value), performance: readerText(m.performance.text[locale]) })}{' '}
+          <span class="el-small">{fill(T.noSocket.plateNote, { text: readerText(m.plateClassBasis.text[locale]) })}</span>
+          {m.plateClassBasis.confidence === 'secondary' && <Tag>{T.result.confidence.secondary}</Tag>}
+        </li>
+      ))}
+    </ul>
+    <p>{T.noSocket.swapNote}</p>
+    <p><a href={href('/act/', locale)}>{T.noSocket.askLink} →</a></p>
+  </Section>
+
+  <!-- Who it adds up for -->
+  <Section id="who" title={T.who.title} width="wide">
+    <CompareTable
+      caption={T.who.caption}
+      hideCaption
+      numeric={false}
+      rowHeader={T.who.rowHeader}
+      columns={[{ label: T.who.cols.good, tone: 'clean' }, { label: T.who.cols.bad, tone: 'exhaust' }]}
+      rows={T.who.rows.map((r) => ({ label: r.label, values: [r.good, r.bad] }))}
+    />
+    <p class="el-small">{T.who.note}</p>
+    <p><a href="#not-yet">{T.who.youLink} →</a></p>
+  </Section>
+
+  <!-- Before you buy -->
+  <Section id="risks" title={T.risks.title} width="wide" tone="sunken">
+    <ul class="el-facts">
+      <li>{T.risks.class}</li>
+      <li>
+        {fill(T.risks.network, { month: fx['econ-ev-brand-share-2026-07'].period, share: `${nf(share ?? 0, 0)}%`, stations: nf(stations ?? 0) })}
+        {' '}{fill(T.risks.networkTail, { checked })}
+        <EvidenceBadge locale={locale} {...badgeOf('econ-ev-brand-share-2026-07')} variant="icon" />
+        <span class="el-small">{[...factSources('econ-ev-brand-share-2026-07'), ...factSources('econ-gogoro-network')].map((c) => c.short).join(' · ')}</span>
+      </li>
+      <li>{T.risks.finance}</li>
+      <li>{T.risks.resale}</li>
+      <li><b>{T.risks.next}</b>{readerText(data.meta.nextYear[locale])} {fx['econ-no-2027-programme'].caveat}</li>
+    </ul>
+  </Section>
+
+  <!-- Not this year -->
+  <Section id="not-yet" title={T.notYet.title} lead={T.notYet.lead} width="wide">
+    <ul class="el-cards">
+      {T.notYet.items.map((it, i) => (
+        <li class="el-card">
+          <h3 class="el-card__title">{it.title}</h3>
+          <p>{it.body}</p>
+          <EvidenceBadge locale={locale} kind={notYetBadge(electric.notYet.items[i].badge)} />
+        </li>
+      ))}
+    </ul>
+    <p class="el-actions">
+      <Button href={href('/act/#keep', locale)} variant="secondary" arrow>{T.notYet.act}</Button>
+    </p>
+  </Section>
+
+  <!-- 22 places -->
+  <Section id="cities" title={T.cities.title} lead={T.cities.lead} width="wide" tone="sunken">
+    <TileMap locale={locale} name="el-city-tile">
+      {ids.map((id) => (
+        <Fragment slot={id}>
+          <p class="el-small">{cities[id].statusNote}</p>
+          {cities[id].lines.length ? (
+            <ul class="el-citylines">
+              {cities[id].lines.map((l) => (
+                <li>
+                  {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({l.side === 'gasoline' ? T.result.side.gasoline : T.result.side.electric}; {fill(T.cities.to, { date: l.to })}){!l.counted && ` ${T.cities.notCounted}`}</span>
+                  <br /><span class="el-small">{T.cities.quota}{l.quota}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="el-small">{T.cities.none}</p>
+          )}
+          <p class="el-small">{cities[id].links.map((l) => <a href={l.url} rel="noopener" target="_blank">{l.label}</a>)}</p>
+        </Fragment>
+      ))}
+    </TileMap>
+    <Details summary={T.cities.centralTitle}>
+      <ul class="el-citylines">
+        {central.map((l) => (
+          <li>
+            {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({fill(T.cities.to, { date: l.to })}){!l.counted && ` ${T.cities.notCounted}`}</span>
+            <br /><span class="el-small">{l.condition}</span>
+          </li>
+        ))}
+      </ul>
+    </Details>
+  </Section>
+
+  <!-- Our asks -->
+  <Section id="asks" title={T.asks.title} lead={T.asks.lead} width="wide">
+    <ol class="el-list">
+      {T.asks.items.map((a) => <li>{fill(a, { deadline })}</li>)}
+    </ol>
+    <EvidenceBadge locale={locale} kind="inference" />
+    <p class="el-actions"><Button href={href('/act/#policy', locale)} variant="secondary" arrow>{T.asks.link}</Button></p>
+  </Section>
+
+  <!-- Questions -->
+  <Section id="faq" title={T.faq.title} width="prose" tone="sunken">
+    {T.faq.items.map((f, i) => (
+      <Details summary={f.q} name="el-faq">
+        <p>{f.a}</p>
+        {i === T.faq.items.length - 1 && (
+          <ul class="el-list el-small">
+            {run.plans.map((p) => (
+              <li>
+                <b>{readerText(p.name[locale])}</b>{locale === 'en' ? ': ' : '：'}{readerText(p.terms[locale])}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Details>
+    ))}
+  </Section>
+
+  <Section id="sources" title={T.sources.title} lead={T.sources.lead} width="prose">
+    <ol class="el-sources">
+      {pageSources.map((s) => (
+        <li><a href={sourceUrl(s)} rel="noopener" target="_blank">{readerText(formatCitation(s, locale))}</a></li>
+      ))}
+    </ol>
+  </Section>
+</Base>
+
+<style>
+  .el-head {
+    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-6);
+  }
+  .el-head__inner {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .el-title {
+    max-inline-size: 18ch;
+  }
+  .el-answer-first {
+    display: grid;
+    gap: var(--sp-3);
+    margin-block-start: var(--sp-4);
+    padding: var(--sp-5);
+    border: var(--rule-paint) solid var(--ink);
+    max-inline-size: 46rem;
+  }
+  .el-answer-first__title {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-heading);
+  }
+  .el-answer-first__after {
+    border-inline-start: var(--rule-paint) solid var(--exhaust);
+    padding-inline-start: var(--sp-3);
+  }
+  .el-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-block-start: var(--sp-2);
+  }
+  .el-status {
+    display: grid;
+    gap: var(--sp-6);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    align-items: start;
+  }
+  .el-citynote {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .el-citynote[hidden] {
+    display: none;
+  }
+  .el-citynote :global(a) {
+    color: inherit;
+    overflow-wrap: anywhere;
+  }
+  .el-calc-lead {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    margin-block-end: var(--sp-5);
+    max-inline-size: var(--measure);
+  }
+  .el-calc-grid {
+    display: grid;
+    gap: var(--sp-7);
+  }
+  @media (min-width: 64em) {
+    .el-calc-grid :global(.el-calc) {
+      max-inline-size: 40rem;
+    }
+  }
+  .el-example {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .el-example__who {
+    font-weight: var(--fw-bold);
+    max-inline-size: var(--measure);
+  }
+  .el-example__phase {
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .el-example__when {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    color: var(--ink-2);
+  }
+  .el-two {
+    display: grid;
+    gap: var(--sp-6);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    align-items: start;
+    margin-block: var(--sp-6);
+  }
+  .el-small {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: var(--lh-snug);
+  }
+  .el-nojs {
+    display: block;
+  }
+  :global(html.js) .el-nojs {
+    display: none;
+  }
+  .el-levers {
+    list-style: none;
+    counter-reset: lever;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-2);
+    margin-block-start: var(--sp-3);
+  }
+  .el-levers[hidden] {
+    display: none;
+  }
+  .el-levers :global(li) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding-block: var(--sp-3);
+    border-block-end: 1px solid var(--line);
+  }
+  .el-levers :global(.el-lever__amt) {
+    flex: none;
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+  }
+  .el-list {
+    display: grid;
+    gap: var(--sp-2);
+    padding-inline-start: 1.2em;
+  }
+  .el-steps {
+    display: grid;
+    gap: var(--sp-4);
+    padding-inline-start: 1.4em;
+    max-inline-size: 46rem;
+  }
+  .el-steps__title,
+  .el-h3 {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-heading);
+  }
+  .el-h3 {
+    margin-block-start: var(--sp-5);
+  }
+  .el-dates {
+    display: grid;
+    gap: var(--sp-2);
+    padding-inline-start: 1.2em;
+    font-variant-numeric: tabular-nums;
+  }
+  .el-phase-note {
+    border-inline-start: var(--rule-stop) solid var(--exhaust);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--exhaust-wash);
+    margin-block-end: var(--sp-4);
+    max-inline-size: 46rem;
+  }
+  .el-kms {
+    display: grid;
+    gap: var(--sp-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+  .el-km {
+    border-block-start: var(--rule-paint) solid var(--ink);
+    padding-block-start: var(--sp-2);
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .el-km__title {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-black);
+  }
+  .el-km__list {
+    margin: 0;
+  }
+  .el-km__row {
+    display: grid;
+    gap: 0 var(--sp-3);
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: var(--sp-2);
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-sm);
+  }
+  .el-km__row dd {
+    margin: 0;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    display: grid;
+  }
+  .el-km__row dd span {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+  .el-km__row--petrol {
+    border-inline-start: var(--rule-paint) solid var(--exhaust);
+    padding-inline-start: var(--sp-2);
+  }
+  .el-km__row--dearer .el-km__cmp {
+    color: var(--exhaust-ink);
+    font-weight: var(--fw-bold);
+  }
+  .el-opener {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-black);
+  }
+  .el-facts {
+    display: grid;
+    gap: var(--sp-3);
+    padding-inline-start: 1.2em;
+    max-inline-size: var(--measure);
+  }
+  .el-cards {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+  .el-card {
+    display: grid;
+    gap: var(--sp-2);
+    align-content: start;
+    padding: var(--sp-4);
+    border: 1px solid var(--line);
+    border-block-start: var(--rule-paint) solid var(--ink);
+  }
+  .el-card__title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+  }
+  .el-citylines {
+    display: grid;
+    gap: var(--sp-2);
+    padding-inline-start: 1.1em;
+    font-size: var(--fs-sm);
+  }
+  .el-sources {
+    display: grid;
+    gap: var(--sp-2);
+    padding-inline-start: 1.4em;
+    font-size: var(--fs-sm);
+  }
+  .el-sources a {
+    color: inherit;
+    overflow-wrap: anywhere;
+  }
+  @media print {
+    :global(html[data-el-print='checklist'] main > *:not(#checklist):not(#result)) {
+      display: none !important;
+    }
+  }
+</style>

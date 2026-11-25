@@ -74,6 +74,7 @@ export default copy({
         en: 'PM2.5 {pm25}%, nitrogen oxides {nox}%, non-methane hydrocarbons {nmhc}%, carbon monoxide {co}%. None is a majority.',
       },
       scooters: { 'zh-TW': '燃油機車', en: 'Gasoline scooters' },
+      whole: { 'zh-TW': '全國排放量 100%', en: 'All national emissions, 100%' },
       category: { 'zh-TW': '污染物', en: 'Pollutant' },
     },
     caveat: {
@@ -484,6 +485,10 @@ export default copy({
       'zh-TW': '新台幣，以 {date} 的補助和價格計算；比的是試算工具裡最便宜的 125cc 燃油機車',
       en: 'NT$, at the subsidies and prices of {date}; compared with the cheapest 125cc gasoline scooter in the calculator',
     },
+    /** Short row names for the waterfall: the engine's long ones collide with the amounts at 320px. */
+    netEv: { 'zh-TW': '電動：實付', en: 'Electric: you pay' },
+    netGas: { 'zh-TW': '燃油：實付', en: 'Gasoline: you pay' },
+    gapShort: { 'zh-TW': '兩者差距', en: 'Difference' },
     chart: { 'zh-TW': '電動機車價格瀑布圖：建議售價、每一筆補助、實付價格，和燃油機車比', en: 'Waterfall of the electric scooter price: list price, each subsidy, what you pay, against the gasoline scooter' },
     caption: {
       'zh-TW': '每一筆補助都是試算工具依{city}的規定算的；燃油機車的價格也扣掉了它自己的優惠和稅減。',

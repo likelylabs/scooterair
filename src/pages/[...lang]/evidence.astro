@@ -1,0 +1,1043 @@
+---
+/**
+ * /evidence/ — 證據鏈，一環一環看 / The chain, link by link (blueprint 4.5, Part 5 V5, V9, V13,
+ * V17, V20–V26, V28–V34). The page a sceptic, a journalist or a scientist uses to check the
+ * site. Data register only: no scene art.
+ *
+ * Built from the registry: every fact, chart dataset and gap that evidenceForLink(n) returns for
+ * each link appears, strongest first, with its badge, citations and caveat. A fact appears in
+ * full once (anchor #<fact id>); where it also serves another link, that link points to it.
+ * Exceptions, by rule: the never-smoker figures (R14), the 94% day, the regional ranking and the
+ * single idle particle datum have their full rows in #not-used; the three-scooter case study is
+ * shown only in its own hatched panel (R13).
+ *
+ * Copy: src/i18n/pages/evidence.ts. Helpers and charts: src/components/pages/evidence/.
+ */
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import Callout from '@/components/ui/Callout.astro';
+import Card from '@/components/ui/Card.astro';
+import Cite from '@/components/ui/Cite.astro';
+import CompareTable from '@/components/ui/CompareTable.astro';
+import CountdownRail from '@/components/ui/CountdownRail.astro';
+import Details from '@/components/ui/Details.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import EvidenceChain from '@/components/ui/EvidenceChain.astro';
+import EvidenceLegend from '@/components/ui/EvidenceLegend.astro';
+import Figure from '@/components/ui/Figure.astro';
+import Icon from '@/components/ui/Icon.astro';
+import NotClaimedList from '@/components/ui/NotClaimedList.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import Stat from '@/components/ui/Stat.astro';
+import EvidenceMap from '@/components/pages/evidence/EvidenceMap.astro';
+import FactList from '@/components/pages/evidence/FactList.astro';
+import FactRow from '@/components/pages/evidence/FactRow.astro';
+import GapCard from '@/components/pages/evidence/GapCard.astro';
+import SeriesFigure from '@/components/pages/evidence/SeriesFigure.astro';
+import { seriesView, strollerView, sgn } from '@/components/pages/evidence/figures';
+import {
+  casePanelFacts,
+  casePanelSeries,
+  cites,
+  dataAnchor,
+  homeOf,
+  lf,
+  notUsedSeries,
+  readLabel,
+  sourceShort,
+  sourceUses,
+  totals,
+} from '@/components/pages/evidence/ev';
+import { href, localeFromParam, localeStaticPaths, htmlLang } from '@/i18n';
+import { chain, readerText } from '@/i18n/ui';
+import evidenceCopy from '@/i18n/pages/evidence';
+import { fill, localize } from '@/i18n/pages/_copy';
+import {
+  chainLinkLabels,
+  chainLinks,
+  claimRuleList,
+  claimRuleKindLabels,
+  claimRules,
+  contextItems,
+  facts,
+  factsForLink,
+  gapList,
+  gapsForLink,
+  getSource,
+  readLevelLabels,
+  readLevels,
+  seriesForLink,
+  sourceIds,
+  topicLabels,
+  type ChainLink,
+  type FactId,
+  type SeriesId,
+  type SourceId,
+} from '@/data';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const en = locale === 'en';
+const T = localize(evidenceCopy, locale);
+const plain = (s: string) => s.replaceAll('|', '');
+const colon = en ? ': ' : '：';
+const tot = totals();
+const nf = (v: number, d = 2) => new Intl.NumberFormat(en ? 'en' : 'zh-TW', { maximumFractionDigits: d }).format(v);
+const pct = (v: number, d = 0) => `${nf(v, d)}%`;
+const D = (id: FactId, key: string) => (facts[id].data as Record<string, { value: number }>)[key].value;
+
+// ---- per link -------------------------------------------------------------------------
+/** Charts drawn as the link's featured visuals (blueprint Part 5); the rest go behind a fold. */
+const featured: Record<ChainLink, SeriesId[]> = {
+  1: ['teds13-motorcycle-share', 'tunnel-co-by-vehicle-class-ting2023', 'tsai2023-benzene-by-class', 'tsai2023-hc-by-class', 'tsai2018-older-phase-excess', 'tsai2018-by-mileage', 'idle-test-limits-by-build-date', 'inspection-2025-per-100'],
+  2: ['wu2021-quiet-route'],
+  3: ['taipei-traffic-vs-general-stations', 'wu2021-station-correlation', 'scooter-lane-vs-cyclist-wu2021', 'commute-pm25-chuang2020', 'commute-pm25-wang2021'],
+  4: ['odour-thresholds'],
+  5: ['hei-sr23-outcomes', 'chuang2020-effects-per-iqr'],
+  6: ['stroller-height-studies'],
+  7: ['ev-share-new-registrations'],
+};
+/** The fact each link's summary line rests on (for the chain overview's citations). */
+const keyFacts: Record<ChainLink, FactId[]> = {
+  1: ['teds13-mc-pm25-share', 'teds13-mc-co-share'],
+  2: ['first-metre-sharma-kumar-2018', 'marking-rules-turn-box'],
+  3: ['wu2021-station-correlation'],
+  4: ['co-odourless', 'odour-thresholds'],
+  5: ['hei-sr23-trap-associations'],
+  6: ['commute-scooter-vs-subway-chuang2020', 'who-children-vulnerable'],
+  7: ['teds13-electric-mc-pm25'],
+};
+
+const links = chainLinks.map((n) => {
+  const all = factsForLink(n);
+  let own = all.filter((f) => f.chainLink === n && homeOf(f.id) === n && !casePanelFacts.includes(f.id)).map((f) => f.id);
+  // Link 5 leads with the international review (blueprint 3.7, 4.5)
+  if (n === 5) own = ['hei-sr23-trap-associations' as FactId, ...own.filter((id) => id !== 'hei-sr23-trap-associations')];
+  const pointers = all
+    .filter((f) => !own.includes(f.id) && !(n === 1 && casePanelFacts.includes(f.id)))
+    .map((f) => {
+      const home = homeOf(f.id);
+      return {
+        id: f.id,
+        display: lf(f.id, locale).display,
+        where: home === 'not-used' ? T.row.alsoNotUsed : fill(T.row.alsoIn, { n: home ?? '' }),
+      };
+    });
+  const series = seriesForLink(n, { primaryOnly: true }).map((s) => s.id);
+  const others = series.filter((id) => !featured[n].includes(id) && !notUsedSeries.includes(id) && !casePanelSeries.includes(id));
+  return {
+    n,
+    title: fill(T.links[n - 1].title, n === 2 ? { cm: nf(D('marking-rules-turn-box', 'turnBoxGap') * 100) } : {}),
+    question: readerText(chainLinkLabels[n].question[locale]),
+    own,
+    pointers,
+    others,
+    gaps: gapsForLink(n).map((g) => g.id),
+    counts: { facts: all.filter((f) => f.chainLink === n).length, series: series.length, gaps: gapsForLink(n).length },
+  };
+});
+const V = (id: SeriesId) => seriesView(id, locale, T);
+
+// ---- chain overview (V15) ---------------------------------------------------------------
+const chainItems = chainLinks.map((n) => {
+  const line = chain.summary[n - 1];
+  const srcs: SourceId[] = n === 3 ? ['wu-2021-trd', 'wang-2021-atmosphere'] : keyFacts[n].flatMap((f) => facts[f].sources);
+  return {
+    body: line.text[locale],
+    strength: line.badges.length ? line.badges : undefined,
+    href: `#${chain.anchor(n)}`,
+    cites: cites(srcs),
+  };
+});
+
+// ---- featured values -----------------------------------------------------------------
+const v21 = { benzene: `${sgn(locale, -D('tsai2023-trend-2013-2021', 'benzeneDrop'), 0)}%`, hc: `${sgn(locale, -D('tsai2023-trend-2013-2021', 'hcDrop'), 0)}%` };
+const fleetN = (n: number) => (en ? (n >= 1e6 ? { value: nf(n / 1e6, 2), unit: T.v34.unitBig } : { value: nf(n, 0), unit: '' }) : { value: nf(n / 1e4, 1), unit: T.v34.unitBig });
+const v34 = [
+  { id: 'fleet-registered-2024' as FactId, label: T.v34.registered, ...fleetN(D('fleet-registered-2024', 'total') * 1e6) },
+  { id: 'fleet-electric-registered-2024' as FactId, label: T.v34.electric, ...fleetN(D('fleet-electric-registered-2024', 'electric2024')), tone: 'clean' as const },
+  { id: 'two-stroke-remaining' as FactId, label: T.v34.twoStroke, prefix: T.v34.about, ...(en ? { value: nf(D('two-stroke-remaining', 'y2024'), 0), unit: T.v34.orFewer } : { value: nf(D('two-stroke-remaining', 'y2024') / 1e4, 1), unit: T.v34.orFewer }), tone: 'exhaust' as const },
+  { id: 'old-scooters-retired-2020-2023' as FactId, label: T.v34.retired, ...fleetN(D('old-scooters-retired-2020-2023', 'retired') * 1e6) },
+];
+const iarc = [
+  { id: 'iarc-benzene-group1' as FactId, label: T.v28.benzene },
+  { id: 'iarc-outdoor-air-pollution-group1' as FactId, label: T.v28.outdoor },
+  { id: 'iarc-diesel-exhaust-group1' as FactId, label: T.v28.diesel },
+  { id: 'iarc-gasoline-exhaust-2b' as FactId, label: T.v28.gasoline },
+];
+const strollerBand = { low: D('stroller-height-review', 'kenagy2016Low'), high: D('stroller-height-review', 'kenagy2016High') };
+const studies = D('hei-sr23-trap-associations', 'studies');
+const perHundred = seriesView('inspection-2025-per-100', locale, T);
+const perHundredTotal = perHundred.s.datasets.reduce((a, d) => a + (d.points[0].y ?? 0), 0);
+
+// ---- not used ---------------------------------------------------------------------------
+const NU = T.notUsed.items;
+const notUsedTokens = {
+  outlier: `${Math.floor(Math.abs(D('iot-scramble-outlier-day', 'allDay')))}%`,
+  typical: lf('iot-scramble-typical-range', locale).display,
+  share: pct(D('tseng2019-never-smokers', 'neverSmokedShare')),
+  // the target years are the registry's own keys (target2035, target2040)
+  y1: 'target2035'.slice('target'.length),
+  t1: pct(D('netzero-ev-sales-targets', 'target2035')),
+  y2: 'target2040'.slice('target'.length),
+  t2: pct(D('netzero-ev-sales-targets', 'target2040')),
+};
+
+// ---- not claimed (V33) ------------------------------------------------------------------
+const fiveRules = ['brief-exposures-not-established', 'gasoline-exhaust-is-2b', 'no-scooters-main-source', 'smell-is-not-dose', 'studies-do-not-isolate-scooters'] as const;
+const five = T.notClaimed.five.map((claim, i) => {
+  const r = claimRules[fiveRules[i]];
+  return { claim, why: readerText(r.why[locale]), instead: 'instead' in r && r.instead ? readerText((r.instead as { 'zh-TW': string; en: string })[locale]) : undefined };
+});
+const byTopic = (kind: 'do-not-claim' | 'qualifier' | 'correction') => {
+  const list = claimRuleList.filter((r) => r.kind === kind);
+  const topics = [...new Set(list.map((r) => r.topic))];
+  return topics.map((topic) => ({ topic, label: readerText(topicLabels[topic][locale]), rules: list.filter((r) => r.topic === topic) }));
+};
+const dnc = byTopic('do-not-claim');
+const qualifiers = claimRuleList.filter((r) => r.kind === 'qualifier');
+const corrections = claimRuleList.filter((r) => r.kind === 'correction');
+
+// ---- studies read in full ---------------------------------------------------------------
+const uses = sourceUses();
+const fullRead = sourceIds.filter((id) => getSource(id).readLevel === 'full-text-page-checked');
+
+// ---- method -----------------------------------------------------------------------------
+const readCounts = readLevels.map((lvl) => ({ lvl, label: readerText(readLevelLabels[lvl][locale]), n: sourceIds.filter((id) => getSource(id).readLevel === lvl).length })).filter((r) => r.n > 0);
+
+// ---- context outside the chain ----------------------------------------------------------
+const ctx = contextItems();
+
+const railItems = [
+  { href: '#map', label: T.rail.map },
+  { href: '#gaps', label: T.rail.gaps },
+  { href: '#not-used', label: T.rail.notUsed },
+  { href: href('/sources/', locale), label: T.rail.sources },
+];
+const toc = [
+  { href: '#chain', label: T.toc.chain },
+  { href: '#map', label: T.toc.map },
+  ...chainLinks.map((n) => ({ href: `#${chain.anchor(n)}`, label: `${fill(T.toc.linkN, { n })} · ${chain.links[n - 1][locale]}` })),
+  { href: '#studies', label: T.toc.studies },
+  { href: '#gaps', label: T.toc.gaps },
+  { href: '#not-claimed', label: T.toc.notClaimed },
+  { href: '#not-used', label: T.toc.notUsed },
+  { href: '#method', label: T.toc.method },
+];
+---
+
+<Base locale={locale} title={T.meta.title} description={T.meta.description} share="brief">
+  <CountdownRail slot="rail" locale={locale} page="/evidence/" items={railItems} />
+
+  <header class="ev-head" data-rail-chapter data-rail-label={T.head.kicker}>
+    <div class="container"><div class="ev-head__inner">
+      <p class="eyebrow">{T.head.kicker}</p>
+      <h1 class="display ev-title"><Phrased text={T.head.title} /></h1>
+      <p class="lead">{T.head.lead}</p>
+      <p class="ev-counts">{fill(T.head.counts, tot)}</p>
+      <nav class="ev-toc" aria-label={T.head.tocLabel}>
+        <h2 class="ev-toc__title">{T.head.tocLabel}</h2>
+        <ol>
+          {toc.map((it) => <li><a href={it.href}>{it.label}</a></li>)}
+        </ol>
+      </nav>
+      <div class="ev-howto">
+        <h2 class="ev-howto__title">{T.howTo.title}</h2>
+        <p>{T.howTo.body}</p>
+        <EvidenceLegend locale={locale} compact />
+      </div>
+    </div></div>
+  </header>
+
+  <!-- V15: the seven links -->
+  <div data-rail-chapter data-rail-label={T.toc.chain}>
+  <Section id="chain" title={T.chain.title} lead={T.chain.lead} tone="sunken" width="wide">
+    <EvidenceChain locale={locale} links={chainItems} label={T.chain.title} />
+    <ul class="ev-chaincounts">
+      {links.map((l) => (
+        <li><a href={`#${chain.anchor(l.n)}`}>{fill(T.toc.linkN, { n: l.n })}</a> <span>{fill(T.chain.counts, l.counts)}</span></li>
+      ))}
+    </ul>
+  </Section>
+  </div>
+
+  <!-- V30: the evidence map -->
+  <div data-rail-chapter data-rail-label={T.toc.map}>
+  <Section id="map" title={T.map.title} lead={T.map.lead}>
+    <EvidenceMap locale={locale} />
+  </Section>
+  </div>
+
+  {links.map((l, li) => (
+    <section id={chain.anchor(l.n)} class:list={['ev-link', li % 2 === 1 && 'tone-sunken']} aria-labelledby={`${chain.anchor(l.n)}-title`} data-rail-chapter data-link={l.n}>
+      <div class="container">
+        <header class="ev-link__head">
+          <p class="eyebrow">{fill(chain.linkOf[locale], { n: l.n, total: chain.links.length })} · {l.n === chain.links.length ? chain.breakable[locale] : chain.links[l.n - 1][locale]}</p>
+          <h2 class="h1 ev-link__title" id={`${chain.anchor(l.n)}-title`}><Phrased text={l.title} /></h2>
+          <p class="ev-link__q"><b>{T.link.question}</b> {l.question}</p>
+          <p class="ev-link__counts">{fill(T.link.counts, l.counts)}</p>
+        </header>
+
+        {l.n === 5 && (
+          <div class="ev-l5">
+            <Callout tone="note" label={T.link5.leadTitle}>
+              <p>{fill(T.link5.lead, { studies: nf(studies, 0) })}{cites(facts['hei-sr23-trap-associations'].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</p>
+            </Callout>
+            <Callout tone="exhaust" label={T.link5.rulerLabel}>
+              <p>{T.link5.ruler}</p>
+            </Callout>
+          </div>
+        )}
+
+        <h3 class="ev-sub">{T.link.visuals}</h3>
+        <div class="ev-visuals">
+          {l.n === 1 && (
+            <Fragment>
+              <SeriesFigure locale={locale} view={V('teds13-motorcycle-share')} title={T.v5.title} subtitle={T.v5.subtitle} caption={T.v5.caption} tone="exhaust" />
+              <figure class="ev-stats" aria-labelledby="v34-t">
+                <h4 class="ev-stats__title" id="v34-t">{T.v34.title}</h4>
+                <div class="ev-stats__grid">
+                  {v34.map((s) => {
+                    const f = lf(s.id, locale);
+                    return (
+                      <Stat locale={locale} label={s.label} value={s.value} unit={s.unit} prefix={'prefix' in s ? s.prefix : undefined} tone={'tone' in s ? s.tone : 'neutral'} size="md">
+                        {f.statement}{cites(facts[s.id].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)} <a href={`#${s.id}`} class="ev-stat__row">#</a>
+                      </Stat>
+                    );
+                  })}
+                </div>
+                <p class="ev-stats__src"><EvidenceBadge locale={locale} kind="official-tw" /></p>
+              </figure>
+              <SeriesFigure locale={locale} view={V('tunnel-co-by-vehicle-class-ting2023')} title={T.v20.title} subtitle={T.v20.subtitle} caption={T.v20.caption} />
+              <div class="ev-pair">
+                <p class="ev-pair__title">{fill(T.v21.title, v21).replaceAll('|', '')}</p>
+                <p class="ev-pair__sub">{T.v21.subtitle}</p>
+                <div class="ev-pair__grid">
+                  <SeriesFigure locale={locale} view={V('tsai2023-benzene-by-class')} caption={T.v21.caption} />
+                  <SeriesFigure locale={locale} view={V('tsai2023-hc-by-class')} />
+                </div>
+              </div>
+              <div class="ev-pair">
+                <p class="ev-pair__title">{T.v22.title}</p>
+                <div class="ev-pair__grid">
+                  <SeriesFigure locale={locale} view={V('tsai2018-older-phase-excess')} caption={T.v22.caption} />
+                  <SeriesFigure locale={locale} view={V('tsai2018-by-mileage')} />
+                </div>
+              </div>
+              <aside class="ev-case" aria-labelledby="case-title">
+                <p class="ev-case__tab">{T.casePanel.label}</p>
+                <div class="ev-case__inner">
+                  <h4 class="ev-case__title" id="case-title"><Phrased text={T.casePanel.title} /></h4>
+                  <p>{T.casePanel.lead}</p>
+                  <SeriesFigure locale={locale} view={V('tsai2026-three-scooter-case')} subtitle={T.casePanel.chartSub} tone="exhaust" />
+                  <FactRow locale={locale} id="tsai2026-three-scooter-case" as="div" />
+                </div>
+              </aside>
+              <SeriesFigure locale={locale} view={V('idle-test-limits-by-build-date')} title={T.v23.title} subtitle={T.v23.subtitle} caption={T.v23.caption} />
+              <SeriesFigure locale={locale} view={perHundred} title={fill(T.v24.title, { total: perHundredTotal })} subtitle={T.v24.subtitle} caption={T.v24.caption} />
+            </Fragment>
+          )}
+          {l.n === 2 && <SeriesFigure locale={locale} view={V('wu2021-quiet-route')} title={T.v32.title} subtitle={T.v32.subtitle} caption={T.v32.caption} />}
+          {l.n === 3 && (
+            <Fragment>
+              <SeriesFigure locale={locale} view={V('taipei-traffic-vs-general-stations')} title={T.v9.title} subtitle={T.v9.subtitle} caption={T.v9.caption} />
+              <SeriesFigure locale={locale} view={V('wu2021-station-correlation')} title={T.v25.title} subtitle={T.v25.subtitle} caption={T.v25.caption} />
+              <div class="ev-pair">
+                <p class="ev-pair__title">{T.v26.title}</p>
+                <p class="ev-pair__sub">{T.v26.subtitle}</p>
+                <div class="ev-pair__grid ev-pair__grid--3">
+                  <SeriesFigure locale={locale} view={V('scooter-lane-vs-cyclist-wu2021')} title={T.v26.a} caption={`${T.v26.diffLabel}${T.v26.aDiff}`} />
+                  <SeriesFigure locale={locale} view={V('commute-pm25-chuang2020')} title={T.v26.b} caption={`${T.v26.diffLabel}${T.v26.bDiff}`} />
+                  <SeriesFigure locale={locale} view={V('commute-pm25-wang2021')} title={T.v26.c} caption={`${T.v26.diffLabel}${T.v26.cDiff}`} />
+                </div>
+              </div>
+            </Fragment>
+          )}
+          {l.n === 4 && (
+            <Fragment>
+              <Figure locale={locale} title={T.v28.title} subtitle={T.v28.subtitle} level={4} badge="international">
+                <CompareTable caption={plain(T.v28.title)} hideCaption rowHeader={T.v28.item} columns={[{ label: T.v28.group }]} rows={iarc.map((r) => ({ label: r.label, values: [lf(r.id, locale).display] }))} numeric={false} />
+                <Fragment slot="caption">{T.v28.foot}</Fragment>
+                <Fragment slot="source">{cites(iarc.flatMap((r) => facts[r.id].sources)).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+              </Figure>
+              <SeriesFigure locale={locale} view={V('odour-thresholds')} />
+            </Fragment>
+          )}
+          {l.n === 5 && (
+            <Fragment>
+              <SeriesFigure locale={locale} view={V('hei-sr23-outcomes')} />
+              <SeriesFigure locale={locale} view={V('chuang2020-effects-per-iqr')} />
+            </Fragment>
+          )}
+          {l.n === 6 && (
+            <Fragment>
+              <SeriesFigure locale={locale} view={strollerView(locale, T, strollerBand)} title={T.v29.title} subtitle={T.v29.subtitle} caption={T.v29.caption} />
+              <SeriesFigure locale={locale} view={V('commute-pm25-chuang2020')} title={T.v13.title} subtitle={T.v13.subtitle} caption={T.v13.caption} anchor={false} />
+            </Fragment>
+          )}
+          {l.n === 7 && <SeriesFigure locale={locale} view={V('ev-share-new-registrations')} title={T.v17.title} subtitle={T.v17.subtitle} caption={T.v17.caption} tone="clean" />}
+        </div>
+
+        {l.others.length > 0 && (
+          <details class="ev-fold" data-ev-fold>
+            <summary><span>{fill(T.row.moreData, { n: l.n, count: l.others.length })}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+            <div class="ev-visuals ev-visuals--fold">
+              {l.others.map((id) => <SeriesFigure locale={locale} view={V(id)} />)}
+            </div>
+          </details>
+        )}
+
+        {l.gaps.length > 0 && (
+          <Fragment>
+            <h3 class="ev-sub">{T.link.gaps}</h3>
+            <div class="ev-gaps">
+              {l.gaps.map((g) => <GapCard locale={locale} id={g} level={4} />)}
+            </div>
+          </Fragment>
+        )}
+
+        <h3 class="ev-sub">{T.link.table}</h3>
+        <FactList locale={locale} ids={l.own} link={l.n} />
+
+        {l.pointers.length > 0 && (
+          <div class="ev-also">
+            <h4 class="ev-also__title">{T.row.alsoTitle}</h4>
+            <p class="ev-also__lead">{T.row.alsoLead}</p>
+            <ul>
+              {l.pointers.map((p) => (
+                <li><a href={`#${p.id}`}>{p.display}</a> <span>· {p.where}</span></li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <p class="ev-link__nav">
+          <a href="#chain">{T.link.top}</a>
+          {l.n < chain.links.length && <a href={`#${chain.anchor(l.n + 1)}`}>{T.link.next} →</a>}
+        </p>
+      </div>
+    </section>
+  ))}
+
+  <!-- Studies read in full -->
+  <div data-rail-chapter data-rail-label={T.toc.studies}>
+  <Section id="studies" title={T.studies.title} lead={T.studies.lead} tone="sunken">
+    <div class="grid ev-studies" style="--min: 18rem">
+      {fullRead.map((id) => {
+        const s = getSource(id);
+        const u = uses.get(id)!;
+        const n = cites([id])[0].n;
+        return (
+          <article class="ev-study" aria-labelledby={`study-${id}`}>
+            <h3 id={`study-${id}`} class="ev-study__who">[{n}] {sourceShort(id, locale)}</h3>
+            <p class="ev-study__title" lang={s.language !== locale ? htmlLang[s.language] : undefined}>{readerText(s.titleTranslated && s.language !== locale ? s.titleTranslated : s.title)}</p>
+            <p class="ev-study__read">{readLabel(s, locale)}</p>
+            <details class="ev-study__uses">
+              <summary>{fill(T.studies.uses, { n: u.facts.length + u.series.length })}</summary>
+              <ul>
+                {u.facts.map((f) => <li><a href={`#${f}`}>{lf(f, locale).display}</a></li>)}
+                {u.series.map((x) => <li><a href={`#${dataAnchor(x)}`}>{readerText(seriesView(x, locale, T).s.title)}</a></li>)}
+              </ul>
+            </details>
+            <p><a href={href(`/sources/#${id}`, locale)}>{T.studies.entry} →</a></p>
+          </article>
+        );
+      })}
+    </div>
+  </Section>
+  </div>
+
+  <!-- Gaps -->
+  <div data-rail-chapter data-rail-label={T.toc.gaps}>
+  <Section id="gaps" title={T.gaps.title} lead={T.gaps.lead}>
+    <div class="ev-gaps ev-gaps--all">
+      {gapList.map((g) => <GapCard locale={locale} id={g.id} full />)}
+    </div>
+    <p class="ev-more"><a href={href('/unmeasured/', locale)}>{T.cta.empty} →</a></p>
+  </Section>
+  </div>
+
+  <!-- V33: what we will not say -->
+  <div data-rail-chapter data-rail-label={T.toc.notClaimed}>
+  <Section id="not-claimed" title={T.notClaimed.title} lead={T.notClaimed.lead} tone="sunken" width="wide">
+    <NotClaimedList locale={locale} items={five} label={T.notClaimed.title} />
+    <h3 class="ev-sub">{T.notClaimed.fullTitle}</h3>
+    <p class="ev-note">{T.notClaimed.fullLead}</p>
+    <h4 class="ev-rules__kind">{claimRuleKindLabels['do-not-claim'][locale]}</h4>
+    {dnc.map((g) => (
+      <Details summary={`${g.label} · ${fill(T.notClaimed.groupCount, { n: g.rules.length })}`}>
+        <ul class="ev-rules">
+          {g.rules.map((r) => (
+            <li id={`rule-${r.id}`}>
+              <p class="ev-rules__rule">{readerText(r.rule[locale])}</p>
+              <p class="ev-rules__why"><b>{T.notClaimed.why}</b>{readerText(r.why[locale])}</p>
+              {r.instead && <p class="ev-rules__why"><b>{T.notClaimed.instead}</b>{readerText(r.instead[locale])}</p>}
+            </li>
+          ))}
+        </ul>
+      </Details>
+    ))}
+    <h4 class="ev-rules__kind">{claimRuleKindLabels.qualifier[locale]}</h4>
+    <Details summary={`${T.notClaimed.qualifiersTitle} · ${fill(T.notClaimed.groupCount, { n: qualifiers.length })}`}>
+      <ul class="ev-rules">
+        {qualifiers.map((r) => (
+          <li id={`rule-${r.id}`}>
+            <p class="ev-rules__rule">{readerText(r.rule[locale])}</p>
+            <p class="ev-rules__why"><b>{T.notClaimed.why}</b>{readerText(r.why[locale])}</p>
+            {r.instead && <p class="ev-rules__why"><b>{T.notClaimed.instead}</b>{readerText(r.instead[locale])}</p>}
+          </li>
+        ))}
+      </ul>
+    </Details>
+    <h4 class="ev-rules__kind">{claimRuleKindLabels.correction[locale]}</h4>
+    <Details summary={`${T.notClaimed.correctionsTitle} · ${fill(T.notClaimed.groupCount, { n: corrections.length })}`}>
+      <ul class="ev-rules">
+        {corrections.map((r) => (
+          <li id={`rule-${r.id}`}>
+            <p class="ev-rules__rule">{readerText(r.rule[locale])}</p>
+            <p class="ev-rules__why"><b>{T.notClaimed.why}</b>{readerText(r.why[locale])}</p>
+            {r.instead && <p class="ev-rules__why"><b>{T.notClaimed.instead}</b>{readerText(r.instead[locale])}</p>}
+          </li>
+        ))}
+      </ul>
+    </Details>
+  </Section>
+  </div>
+
+  <!-- #not-used: figures we do not use that way (R14, V31) -->
+  <div data-rail-chapter data-rail-label={T.toc.notUsed}>
+  <Section id="not-used" title={T.notUsed.title} lead={T.notUsed.lead}>
+    <div class="ev-nu">
+      <article class="ev-nu__item" aria-labelledby="nu-scramble">
+        <h3 class="ev-nu__quote" id="nu-scramble"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.scramble.quote, notUsedTokens)}</s></h3>
+        <p><b>{T.notUsed.actually}{colon}</b>{fill(NU.scramble.actually, notUsedTokens)}</p>
+        <p><b>{T.notUsed.weSay}{colon}</b>{fill(NU.scramble.weSay, notUsedTokens)}</p>
+        <p class="ev-note">{NU.scramble.recheck}</p>
+        <SeriesFigure locale={locale} view={V('iot-scramble-summary')} title={fill(NU.scramble.stripTitle, notUsedTokens)} subtitle={NU.scramble.stripSub} caption={NU.scramble.stripCaption} tone="exhaust" />
+        <SeriesFigure locale={locale} view={V('iot-scramble-by-day')} />
+        <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
+        <FactRow locale={locale} id="iot-scramble-outlier-day" as="div" />
+        <p class="ev-note"><a href="#iot-scramble-typical-range">{lf('iot-scramble-typical-range', locale).display}</a> · {fill(T.row.alsoIn, { n: 3 })}</p>
+      </article>
+
+      <article class="ev-nu__item" aria-labelledby="nu-smokers">
+        <h3 class="ev-nu__quote" id="nu-smokers"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.neverSmokers.quote, notUsedTokens)}</s></h3>
+        <p><b>{T.notUsed.actually}{colon}</b>{NU.neverSmokers.actually}</p>
+        <p><b>{T.notUsed.weSay}{colon}</b>{NU.neverSmokers.weSay}</p>
+        <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
+        <FactRow locale={locale} id="tseng2019-never-smokers" as="div" />
+        <FactRow locale={locale} id="huang2021-never-smoker-lung-cancer" as="div" />
+        <FactRow locale={locale} id="mohw-lung-cancer-2025" as="div" />
+      </article>
+
+      <article class="ev-nu__item" aria-labelledby="nu-density">
+        <h3 class="ev-nu__quote" id="nu-density"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.density.quote}</s></h3>
+        <p><b>{T.notUsed.actually}{colon}</b>{NU.density.actually}</p>
+        <p><b>{T.notUsed.weSay}{colon}</b>{NU.density.weSay}</p>
+        <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
+        <FactRow locale={locale} id="fleet-regional-ranking" as="div" />
+        <p class="ev-note"><a href="#fleet-density-per-100">{lf('fleet-density-per-100', locale).display}</a> · {fill(T.row.alsoIn, { n: 1 })}</p>
+      </article>
+
+      <article class="ev-nu__item" aria-labelledby="nu-case">
+        <h3 class="ev-nu__quote" id="nu-case"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.caseStudy.quote}</s></h3>
+        <p><b>{T.notUsed.actually}{colon}</b>{NU.caseStudy.actually}</p>
+        <p><b>{T.notUsed.weSay}{colon}</b>{NU.caseStudy.weSay}</p>
+        <p><a href="#case-title">{NU.caseStudy.go} →</a></p>
+      </article>
+
+      <article class="ev-nu__item" aria-labelledby="nu-idle">
+        <h3 class="ev-nu__quote" id="nu-idle"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.idling.quote}</s></h3>
+        <p><b>{T.notUsed.actually}{colon}</b>{NU.idling.actually}</p>
+        <p><b>{T.notUsed.weSay}{colon}</b>{NU.idling.weSay}</p>
+        <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
+        <FactRow locale={locale} id="idle-pn-chien-huang-2010" as="div" />
+        <p class="ev-note">
+          <a href="#signal-cycle-peaks-international">{lf('signal-cycle-peaks-international', locale).display}</a> · {fill(T.row.alsoIn, { n: 2 })}<br />
+          <a href="#gap-pull-away-spike">{readerText(gapList.find((g) => g.id === 'gap-pull-away-spike')!.title[locale])}</a>
+        </p>
+      </article>
+
+      <article class="ev-nu__item" aria-labelledby="nu-2035">
+        <h3 class="ev-nu__quote" id="nu-2035"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.target2035.quote}</s></h3>
+        <p><b>{T.notUsed.actually}{colon}</b>{fill(NU.target2035.actually, notUsedTokens)}<Cite locale={locale} id={facts['netzero-ev-sales-targets'].sources[0]} n={cites(facts['netzero-ev-sales-targets'].sources)[0].n} /></p>
+        <p><b>{T.notUsed.weSay}{colon}</b>{NU.target2035.weSay}</p>
+        <p class="ev-note"><a href="#netzero-ev-sales-targets">{lf('netzero-ev-sales-targets', locale).display}</a> · {fill(T.row.alsoIn, { n: 7 })}</p>
+      </article>
+    </div>
+  </Section>
+  </div>
+
+  <!-- Background outside the chain -->
+  <div data-rail-chapter data-rail-label={T.context.title}>
+  <Section id="context" title={T.context.title} lead={T.context.lead} tone="sunken" pad="tight">
+    <Details summary={`${T.context.title} · ${fill(T.row.rows, { count: ctx.facts.length + ctx.series.length })}`}>
+      <div class="ev-visuals">
+        {ctx.series.map((s) => <SeriesFigure locale={locale} view={V(s.id)} level={3} />)}
+      </div>
+      <FactList locale={locale} ids={ctx.facts.map((f) => f.id)} visible={ctx.facts.length} />
+    </Details>
+  </Section>
+  </div>
+
+  <!-- How we checked -->
+  <div data-rail-chapter data-rail-label={T.toc.method}>
+  <Section id="method" title={T.method.title}>
+    <div class="ev-method">
+      <div class="prose">
+        {T.method.body.map((p) => <p>{p}</p>)}
+        <p>{T.method.wrong}</p>
+        <p class="ev-method__links">
+          <a href={href('/about/#corrections', locale)}>{T.method.corrections} →</a>
+          <a href={href('/about/', locale)}>{T.method.contact} →</a>
+        </p>
+      </div>
+      <div class="stack">
+        <h3 class="ev-sub">{T.method.badges}</h3>
+        <EvidenceLegend locale={locale} lines title={T.method.badges} />
+        <h3 class="ev-sub">{T.method.readLevels}</h3>
+        <ul class="ev-reads">
+          {readCounts.map((r) => <li><span>{r.label}</span><b>{fill(T.method.readCount, { n: r.n })}</b></li>)}
+        </ul>
+      </div>
+    </div>
+  </Section>
+  </div>
+
+  <Section id="next" title={T.cta.title} tone="sunken" pad="tight">
+    <div class="grid" style="--min: 16rem">
+      <Card title={T.cta.empty} href={href('/unmeasured/', locale)} tone="surface"><p>{T.cta.emptyBody}</p></Card>
+      <Card title={T.cta.sources} href={href('/sources/', locale)} tone="surface"><p>{T.cta.sourcesBody}</p></Card>
+      <Card title={T.cta.questions} href={href('/questions/', locale)} tone="surface"><p>{T.cta.questionsBody}</p></Card>
+    </div>
+  </Section>
+</Base>
+
+<script>
+  // A link to a row inside a closed fold opens the fold (current browsers do this natively;
+  // this covers the rest) and brings the row into view.
+  const open = () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (!el) return;
+    let p: HTMLElement | null = el.parentElement;
+    let changed = false;
+    while (p) {
+      if (p instanceof HTMLDetailsElement && !p.open) {
+        p.open = true;
+        changed = true;
+      }
+      p = p.parentElement;
+    }
+    if (changed) el.scrollIntoView({ block: 'start' });
+  };
+  window.addEventListener('hashchange', open);
+  open();
+</script>
+
+<style>
+  .ev-head {
+    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-7);
+  }
+  .ev-head__inner {
+    display: grid;
+    gap: var(--sp-4);
+    max-inline-size: 60rem;
+  }
+  .ev-title {
+    max-inline-size: 20ch;
+  }
+  .ev-counts {
+    font-weight: var(--fw-bold);
+  }
+  .ev-toc {
+    padding: var(--sp-4);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+  }
+  .ev-toc__title,
+  .ev-howto__title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    margin-block-end: var(--sp-2);
+  }
+  .ev-toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0 var(--sp-5);
+  }
+  @media (min-width: 40em) {
+    .ev-toc ol {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .ev-toc a {
+    display: block;
+    padding-block: var(--sp-2);
+    min-block-size: var(--tap, 44px);
+    box-sizing: border-box;
+    line-height: var(--lh-snug);
+    border-block-end: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .ev-howto {
+    display: grid;
+    gap: var(--sp-3);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-chaincounts {
+    list-style: none;
+    padding: 0;
+    margin: var(--sp-5) 0 0;
+    display: grid;
+    gap: var(--sp-1);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-chaincounts a {
+    font-weight: var(--fw-bold);
+  }
+  .ev-link {
+    padding-block: var(--section-y, 4rem);
+    border-block-start: var(--rule-stop, 6px) solid var(--ink);
+    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h));
+  }
+  .ev-link__head {
+    display: grid;
+    gap: var(--sp-3);
+    max-inline-size: 48rem;
+    margin-block-end: var(--sp-6);
+  }
+  .ev-link__title {
+    text-wrap: balance;
+  }
+  .ev-link__q {
+    font-size: var(--fs-md);
+    line-height: var(--lh-snug);
+  }
+  .ev-link__counts {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-l5 {
+    display: grid;
+    gap: var(--sp-5);
+    max-inline-size: 48rem;
+    margin-block-end: var(--sp-6);
+  }
+  .ev-sub {
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
+    margin-block: var(--sp-7) var(--sp-4);
+  }
+  .ev-visuals {
+    display: grid;
+    gap: var(--sp-8);
+    align-items: start;
+  }
+  @media (min-width: 60em) {
+    .ev-visuals {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--sp-8);
+    }
+    .ev-visuals > .ev-pair,
+    .ev-visuals > .ev-case,
+    .ev-visuals > .ev-stats {
+      grid-column: 1 / -1;
+    }
+  }
+  .ev-visuals--fold {
+    padding-block: var(--sp-5);
+  }
+  .ev-pair {
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .ev-pair__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .ev-pair__sub {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-pair__grid {
+    display: grid;
+    gap: var(--sp-7);
+    align-items: start;
+    margin-block-start: var(--sp-3);
+  }
+  @media (min-width: 60em) {
+    .ev-pair__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--sp-8);
+    }
+    .ev-pair__grid--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .ev-stats {
+    margin: 0;
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .ev-stats__title {
+    font-size: var(--fs-lg);
+  }
+  .ev-stats__grid {
+    display: grid;
+    gap: var(--sp-6);
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .ev-stat__row {
+    color: var(--ink-3);
+    text-decoration: none;
+    font-weight: var(--fw-bold);
+  }
+  .ev-stats__src {
+    font-size: var(--fs-xs);
+  }
+  /* R13: the three-scooter case study, in its own hatched panel */
+  .ev-case {
+    position: relative;
+    padding: var(--sp-3);
+    border: 2px solid var(--exhaust);
+    border-radius: var(--radius-2);
+    background: repeating-linear-gradient(135deg, transparent 0 7px, color-mix(in srgb, var(--exhaust) 22%, transparent) 7px 9px);
+  }
+  .ev-case__tab {
+    display: inline-block;
+    margin: calc(var(--sp-3) * -1 - 0.85em) 0 var(--sp-2);
+    padding: 0.15em 0.6em;
+    background: var(--exhaust);
+    color: var(--on-accent, #fff);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    border-radius: var(--radius-1);
+  }
+  .ev-case__inner {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-4);
+    background: var(--bg);
+    border-radius: var(--radius-1);
+  }
+  .tone-sunken .ev-case__inner {
+    background: var(--bg-sunken);
+  }
+  .ev-case__title {
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
+  }
+  .ev-fold {
+    margin-block-start: var(--sp-7);
+    border-block: 1px solid var(--line-strong);
+  }
+  .ev-fold > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap, 44px);
+    padding-block: var(--sp-3);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    cursor: pointer;
+    list-style: none;
+  }
+  .ev-fold > summary::-webkit-details-marker {
+    display: none;
+  }
+  .ev-fold[open] > summary :global(svg) {
+    transform: rotate(180deg);
+  }
+  .ev-gaps {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  @media (min-width: 48em) {
+    .ev-gaps {
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    }
+  }
+  .ev-also {
+    margin-block-start: var(--sp-6);
+    padding: var(--sp-4);
+    border-radius: var(--radius-2);
+    background: var(--bg-sunken);
+    font-size: var(--fs-sm);
+  }
+  .tone-sunken .ev-also {
+    background: var(--bg);
+  }
+  .ev-also__title {
+    font-size: var(--fs-base);
+  }
+  .ev-also__lead {
+    color: var(--ink-2);
+    margin-block: var(--sp-1) var(--sp-3);
+  }
+  .ev-also ul {
+    margin: 0;
+    padding-inline-start: 1.2em;
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .ev-also span {
+    color: var(--ink-2);
+  }
+  .ev-link__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-block-start: var(--sp-7);
+    font-weight: var(--fw-bold);
+  }
+  .ev-link__nav a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 44px);
+  }
+  .ev-study {
+    display: grid;
+    gap: var(--sp-2);
+    align-content: start;
+    padding: var(--sp-4);
+    border-radius: var(--radius-2);
+    background: var(--bg);
+    font-size: var(--fs-sm);
+    min-inline-size: 0;
+  }
+  .ev-study__who {
+    font-size: var(--fs-md);
+  }
+  .ev-study__title {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    overflow-wrap: anywhere;
+  }
+  .ev-study__read {
+    color: var(--ink-2);
+  }
+  .ev-study__uses summary {
+    cursor: pointer;
+    color: var(--accent);
+    min-block-size: var(--tap, 44px);
+    display: flex;
+    align-items: center;
+  }
+  .ev-study__uses ul {
+    margin: 0 0 var(--sp-2);
+    padding-inline-start: 1.2em;
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .ev-more {
+    margin-block-start: var(--sp-6);
+    font-weight: var(--fw-bold);
+  }
+  .ev-note {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    max-inline-size: 44rem;
+  }
+  .ev-rules__kind {
+    margin-block: var(--sp-6) var(--sp-2);
+    font-size: var(--fs-base);
+  }
+  .ev-rules {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .ev-rules li {
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+  }
+  .ev-rules__rule {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .ev-rules__why {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    margin-block-start: var(--sp-1);
+  }
+  .ev-rules__why b {
+    color: var(--ink);
+  }
+  .ev-nu {
+    display: grid;
+    gap: var(--sp-8);
+  }
+  .ev-nu__item {
+    display: grid;
+    gap: var(--sp-3);
+    padding-block-start: var(--sp-5);
+    border-block-start: 2px solid var(--ink);
+    min-inline-size: 0;
+  }
+  .ev-nu__label {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+    margin-block-end: var(--sp-1);
+  }
+  .ev-nu__quote {
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
+  }
+  .ev-nu__quote s {
+    text-decoration-thickness: 2px;
+  }
+  .ev-nu__item > p b {
+    margin-inline-end: 0.2em;
+  }
+  .ev-nu__rows {
+    font-size: var(--fs-base);
+    margin-block-start: var(--sp-3);
+  }
+  .ev-method {
+    display: grid;
+    gap: var(--sp-7);
+  }
+  @media (min-width: 60em) {
+    .ev-method {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    }
+  }
+  .ev-method__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+    font-weight: var(--fw-bold);
+  }
+  .ev-reads {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--fs-sm);
+  }
+  .ev-reads li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding-block: var(--sp-2);
+    border-block-end: 1px solid var(--line);
+  }
+  .ev-reads b {
+    font-variant-numeric: tabular-nums;
+  }
+</style>

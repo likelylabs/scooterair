@@ -1,0 +1,248 @@
+---
+/**
+ * /print/brief/ — 一張紙的量測需求 / the measurement brief on one page (blueprint V47).
+ * The empty chart, the central gap, the proposal (V35, the art layer's MeasurementDiagram),
+ * who could do it and our promise, laid out for one A4 page. On screen it is a preview with a
+ * print button; in print only the sheet is printed.
+ *
+ * Copy: src/i18n/pages/unmeasured.ts (`brief`, `plan`, `promise`). The gap comes from the registry.
+ */
+import Base from '@/layouts/Base.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import Button from '@/components/ui/Button.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import EmptyChart from '@/components/charts/EmptyChart.astro';
+import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
+import { lg, sourcesOf } from '@/components/pages/action/ev';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { site } from '@/i18n/ui';
+import { gapList } from '@/data';
+import { formatDate } from '@/lib/site-state.data';
+import unmeasured from '@/i18n/pages/unmeasured';
+import { fill, localize } from '@/i18n/pages/_copy';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const t = localize(unmeasured, locale);
+const b = t.brief;
+const gap = lg('gap-pedestrian-red-light-exposure', locale);
+const pageUrl = new URL(href('/unmeasured/', locale), Astro.site).href.replace(/\/$/, '/');
+const shortUrl = pageUrl.replace(/^https?:\/\//, '');
+const checked = formatDate(gapList.map((g) => g.searchedOn).sort().at(-1)!, locale, true);
+const cites = sourcesOf([], ['gap-pedestrian-red-light-exposure']);
+---
+
+<Base locale={locale} title={b.metaTitle} description={b.metaDescription} noindex>
+  <!-- A print page is paper: show it in the light theme (not stored, so the reader's choice stands elsewhere). -->
+  <script is:inline>document.documentElement.dataset.theme = 'light';</script>
+  <div class="container print-ui">
+    <p>{b.screenNote}</p>
+    <p class="print-ui__row">
+      <Button data-print data-js-only>{b.printButton}</Button>
+      <a href={href('/unmeasured/', locale)}>{b.back}</a>
+    </p>
+  </div>
+
+  <article class="sheet" aria-labelledby="brief-t">
+    <header class="sheet__head">
+      <p class="sheet__kicker">{b.kicker}</p>
+      <h1 id="brief-t" class="sheet__title"><Phrased text={b.title} /></h1>
+    </header>
+
+    <div class="sheet__cols">
+      <div class="sheet__left">
+        <section>
+          <h2 class="sheet__h"><EvidenceBadge locale={locale} kind="gap" /> <span>{b.gapLabel}</span></h2>
+          <p>{gap.statement}{cites.length > 0 && <sup class="sheet__cite">[{cites.map((c) => c.n).join(', ')}]</sup>}</p>
+        </section>
+        <div class="sheet__chart">
+          <EmptyChart locale={locale} title={t.hero.figure.chart} desc={t.hero.figure.desc} panelHeight={34} />
+        </div>
+        <section>
+          <h2 class="sheet__h">{b.whoLabel}</h2>
+          <p>{gap.whoCouldMeasure}</p>
+        </section>
+        <section>
+          <h2 class="sheet__h">{b.promiseLabel}</h2>
+          <p>{t.promise.pledge}</p>
+          <p>{t.promise.small}</p>
+        </section>
+      </div>
+      <div class="sheet__right">
+        <h2 class="sheet__h">{b.proposalLabel}</h2>
+        <MeasurementDiagram locale={locale} />
+        <p class="sheet__small">{t.plan.howLong}</p>
+        <p class="sheet__small">{t.plan.stamp}</p>
+      </div>
+    </div>
+
+    <footer class="sheet__foot">
+      <p><b>{site.name[locale]}</b> · {site.tagline[locale]}</p>
+      <p>{b.more} <span class="sheet__url">{shortUrl}</span></p>
+      <p>{fill(b.checked, { date: checked })}</p>
+    </footer>
+  </article>
+</Base>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .print-ui {
+    padding-block: var(--sp-5) var(--sp-4);
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .print-ui p {
+    margin: 0;
+  }
+  .print-ui__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+    align-items: center;
+  }
+  /* The sheet: an A4 page on screen, and the only thing that prints. */
+  .sheet {
+    box-sizing: border-box;
+    inline-size: min(210mm, calc(100% - 2 * var(--gutter, 16px)));
+    margin: 0 auto var(--sp-8);
+    padding: 12mm;
+    background: #fff;
+    color: #111;
+    border: 1px solid #c9cfcc;
+    box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+    display: grid;
+    gap: 5mm;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    /* print colours in both themes: the sheet is paper */
+    --ink: #111;
+    --ink-2: #333;
+    --ink-3: #555;
+    --bg: #fff;
+    --surface: #fff;
+    --line: #c9cfcc;
+    --line-strong: #8a938f;
+    color-scheme: light;
+  }
+  .sheet p {
+    margin: 0;
+  }
+  .sheet__kicker {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #333;
+  }
+  .sheet__title {
+    font-family: var(--font-heading);
+    font-weight: var(--fw-black);
+    font-size: 22pt;
+    line-height: 1.2;
+    margin: 1mm 0 0;
+  }
+  .sheet__cols {
+    display: grid;
+    gap: 6mm;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 70mm), 1fr));
+    align-items: start;
+  }
+  .sheet__left,
+  .sheet__right {
+    display: grid;
+    gap: 4mm;
+    min-inline-size: 0;
+  }
+  .sheet__left section {
+    display: grid;
+    gap: 1.5mm;
+  }
+  .sheet__h {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2mm;
+    align-items: center;
+    font-size: 11pt;
+    margin: 0;
+    padding-block-end: 1mm;
+    border-block-end: 1.5px solid #111;
+  }
+  .sheet__cite {
+    font-size: 7pt;
+  }
+  .sheet__chart :global(.chart) {
+    margin: 0;
+  }
+  .sheet__small {
+    font-size: 9pt;
+    color: #333;
+  }
+  .sheet__right :global(.measure) {
+    padding: 3mm;
+    gap: 3mm;
+  }
+  .sheet__foot {
+    border-block-start: 1.5px solid #111;
+    padding-block-start: 2mm;
+    display: grid;
+    gap: 1mm;
+    font-size: 9pt;
+  }
+  .sheet__url {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  @media print {
+    :global(.site-header),
+    :global(.site-footer),
+    :global(.skip-link),
+    .print-ui {
+      display: none !important;
+    }
+    :global(html),
+    :global(body) {
+      background: #fff !important;
+    }
+    .sheet {
+      inline-size: 210mm;
+      min-block-size: 0;
+      margin: 0;
+      border: 0;
+      box-shadow: none;
+      break-inside: avoid;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .sheet {
+      padding: 10mm 11mm;
+      gap: 3.5mm;
+      font-size: 9.5pt;
+      line-height: 1.45;
+    }
+    .sheet__title {
+      font-size: 20pt;
+    }
+    .sheet__cols {
+      grid-template-columns: 1fr 1.15fr;
+      gap: 5mm;
+    }
+    .sheet__right :global(.measure__grid) {
+      grid-template-columns: 1fr 1fr;
+      gap: 3mm;
+    }
+    .sheet__right :global(.measure__heights svg) {
+      max-block-size: 28mm;
+    }
+    /* the data table toggle is not useful on paper */
+  }
+  /* a print piece: the data-table toggle is not useful on paper or in the preview */
+  .sheet :global(details) {
+    display: none;
+  }
+</style>

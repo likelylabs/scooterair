@@ -404,7 +404,10 @@ export function homeData(locale: Locale) {
       subtitle: fill(t.money.subtitle, { date: formatDate(evalDate, locale, true) }),
       caption: fill(t.money.caption, { city: cityName }),
       status,
-      waterfall: toWaterfall(e, locale),
+      waterfall: (() => {
+        const w = toWaterfall(e, locale);
+        return { ...w, totalLabel: t.money.netEv, compare: { ...w.compare, label: t.money.netGas }, gapLabel: t.money.gapShort };
+      })(),
       cites: c.sources(sources),
     };
   };

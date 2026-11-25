@@ -24,7 +24,7 @@ import StreetScene from '@/components/art/StreetScene.astro';
 import SceneCompare from '@/components/art/SceneCompare.astro';
 import QChart from './QChart.astro';
 import { renderCorrelation } from './charts';
-import { catLabel, lg, ls, points, seriesCites, sourcesOf, type Slug } from './q';
+import { catLabel, lg, ls, points, requiredCaveats, seriesCites, sourcesOf, type Slug } from './q';
 import questions from '@/i18n/pages/questions';
 import { localize } from '@/i18n/pages/_copy';
 import { units } from '@/i18n/ui';
@@ -114,6 +114,9 @@ const pedGap = slug === 'how-much' ? lg('gap-pedestrian-red-light-exposure', loc
     <Callout label={all.pages['one-red-light'].figure.rulerLabel} class="q-ruler">
       <p>{all.pages['one-red-light'].figure.ruler}</p>
     </Callout>
+    <Fragment slot="caption">
+      {requiredCaveats(['chuang2020-cardiovascular-association', 'mccreanor2007-london-walk', 'mj-cohort-mortality-guo2021'], locale).map((n) => <p>{n.text}</p>)}
+    </Fragment>
     <Fragment slot="source">{C(['chuang2020-cardiovascular-association', 'mccreanor2007-london-walk', 'mj-cohort-mortality-guo2021'], ['gap-brief-exposure-harm']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
   </Figure>
 )}

@@ -1,0 +1,208 @@
+---
+/**
+ * /print/poster/ — 校門口海報 / the school-gate poster (blueprint V46), A4, one per language.
+ * The empty chart, small; the headline; one request; a QR code to /unmeasured/#ask (drawn at
+ * build time by components/pages/action/qr.ts, with the address printed beside it); and the
+ * smaller second line, which says it is a request and not a measured effect.
+ *
+ * Copy: src/i18n/pages/act.ts (`poster`).
+ */
+import Base from '@/layouts/Base.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import Button from '@/components/ui/Button.astro';
+import EmptyChart from '@/components/charts/EmptyChart.astro';
+import { qrSvg } from '@/components/pages/action/qr';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { site } from '@/i18n/ui';
+import act from '@/i18n/pages/act';
+import unmeasured from '@/i18n/pages/unmeasured';
+import { fill, localize } from '@/i18n/pages/_copy';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const p = localize(act, locale).poster;
+const u = localize(unmeasured, locale);
+const target = new URL(href('/unmeasured/', locale), Astro.site).href + '#ask';
+const shortUrl = target.replace(/^https?:\/\//, '');
+const qr = qrSvg(target, fill(p.qrAlt, { url: shortUrl }));
+---
+
+<Base locale={locale} title={p.metaTitle} description={p.metaDescription} noindex>
+  <!-- A print page is paper: show it in the light theme (not stored, so the reader's choice stands elsewhere). -->
+  <script is:inline>document.documentElement.dataset.theme = 'light';</script>
+  <div class="container print-ui">
+    <p>{p.screenNote}</p>
+    <p class="print-ui__row">
+      <Button data-print data-js-only>{p.printButton}</Button>
+      <a href={href('/act/#neighbourhood', locale)}>{p.back}</a>
+    </p>
+  </div>
+
+  <article class="poster" aria-labelledby="poster-t">
+    <p class="poster__kicker">{p.kicker}</p>
+    <h1 id="poster-t" class="poster__title"><Phrased text={p.title} /></h1>
+    <div class="poster__chart">
+      <EmptyChart locale={locale} title={u.hero.figure.chart} desc={u.hero.figure.desc} panelHeight={44} />
+      <p class="poster__caption">{p.chartCaption}</p>
+    </div>
+    <div class="poster__ask">
+      <p class="poster__request">{p.ask}</p>
+      <div class="poster__qr">
+        <div class="poster__code" set:html={qr} />
+        <div>
+          <p class="poster__qrlabel">{p.qr}</p>
+          <p class="poster__url">{shortUrl}</p>
+        </div>
+      </div>
+    </div>
+    <p class="poster__engine">{p.engine}</p>
+    <p class="poster__site"><b>{site.name[locale]}</b> · {site.tagline[locale]}</p>
+  </article>
+</Base>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .print-ui {
+    padding-block: var(--sp-5) var(--sp-4);
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .print-ui p {
+    margin: 0;
+  }
+  .print-ui__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+    align-items: center;
+  }
+  .poster {
+    box-sizing: border-box;
+    inline-size: min(210mm, calc(100% - 2 * var(--gutter, 16px)));
+    margin: 0 auto var(--sp-8);
+    padding: 14mm;
+    background: #fff;
+    color: #111;
+    border: 1px solid #c9cfcc;
+    box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+    display: grid;
+    gap: 7mm;
+    align-content: start;
+    border-block-start: 10mm solid #111;
+  }
+  .poster p {
+    margin: 0;
+  }
+  .poster__kicker {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #333;
+  }
+  .poster__title {
+    font-family: var(--font-heading);
+    font-weight: var(--fw-black);
+    font-size: clamp(22pt, 7vw, 40pt);
+    line-height: 1.15;
+    margin: 0;
+  }
+  .poster__chart {
+    display: grid;
+    gap: 2mm;
+  }
+  .poster__caption {
+    font-weight: 700;
+    font-size: 12pt;
+  }
+  .poster__ask {
+    display: grid;
+    gap: 5mm;
+    padding: 6mm;
+    border: 3px solid #111;
+  }
+  .poster__request {
+    font-family: var(--font-heading);
+    font-weight: var(--fw-black);
+    font-size: clamp(16pt, 5vw, 24pt);
+    line-height: 1.3;
+  }
+  .poster__qr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5mm;
+    align-items: center;
+  }
+  .poster__code {
+    inline-size: 38mm;
+    flex: none;
+  }
+  .poster__code :global(svg) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+  .poster__qrlabel {
+    font-weight: 700;
+    font-size: 13pt;
+  }
+  .poster__url {
+    font-size: 10pt;
+    overflow-wrap: anywhere;
+    color: #333;
+  }
+  .poster__engine {
+    font-size: 11pt;
+    color: #333;
+    padding-block-start: 3mm;
+    border-block-start: 1.5px solid #8a938f;
+  }
+  .poster__site {
+    font-size: 10pt;
+    color: #333;
+  }
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  @media print {
+    :global(.site-header),
+    :global(.site-footer),
+    :global(.skip-link),
+    .print-ui {
+      display: none !important;
+    }
+    :global(html),
+    :global(body) {
+      background: #fff !important;
+    }
+    .poster {
+      inline-size: 210mm;
+      block-size: 297mm;
+      margin: 0;
+      border-inline: 0;
+      border-block-end: 0;
+      box-shadow: none;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .poster__title {
+      font-size: 34pt;
+    }
+    .poster__title:lang(en) {
+      font-size: 30pt;
+    }
+    .poster__request {
+      font-size: 22pt;
+    }
+    .poster {
+      padding: 12mm 14mm;
+      gap: 6mm;
+      overflow: hidden;
+    }
+  }
+  .poster :global(details) {
+    display: none;
+  }
+</style>

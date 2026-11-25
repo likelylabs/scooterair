@@ -68,7 +68,7 @@ const take = (_text: string, fs: readonly FactId[] = [], gs: readonly GapId[] = 
 const answer = take(item.answer, pg.answerFacts, pg.answerGaps);
 const answerNotes = requiredCaveats(answer.caveats, locale);
 const answerGaps = answer.gapNotes.map((g) => lg(g, locale));
-const measured = tp.measured.map((l, i) => ({ ...l, ...take(l.text, pg.measured[i].facts, pg.measured[i].gaps) }));
+const measured = tp.measured.map((l, i) => ({ ...l, ...take(l.text, pg.measured[i].facts, pg.measured[i].gaps, !('noCaveat' in pg.measured[i] && pg.measured[i].noCaveat)) }));
 const notShown = tp.notShown.map((l, i) => ({ ...l, ...take(l.text, pg.notShown[i].facts, pg.notShown[i].gaps, false) }));
 
 // ---- next questions: [same part of the story, the other half] ----
@@ -119,9 +119,7 @@ const one = slug === 'one-red-light' ? t.pages['one-red-light'] : undefined;
     <header class="q-head">
       <div class="container container--prose q-head__inner">
         <p class="eyebrow q-eyebrow">
-          <a href={href('/questions/', locale)}>{t.index.title}</a>
-          <span aria-hidden="true"> · </span>
-          <span>{fill(P.linkWithName, { n: raw.link, name: linkLabel })}</span>
+          <span class="q-eyebrow__text"><a href={href('/questions/', locale)}>{plain(t.index.title)}</a><span aria-hidden="true"> · </span>{fill(P.linkWithName, { n: raw.link, name: linkLabel })}</span>
         </p>
         <h1 id="q-title" class="display q-title"><Phrased text={item.q} /></h1>
         <section class="q-answer" aria-labelledby="q-answer-label">
@@ -241,6 +239,9 @@ const one = slug === 'one-red-light' ? t.pages['one-red-light'] : undefined;
   }
   .q-eyebrow a {
     color: inherit;
+  }
+  .q-eyebrow__text {
+    display: inline;
   }
   .q-title {
     font-size: clamp(2rem, 8.5vw, 3.75rem);

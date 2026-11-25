@@ -1,0 +1,327 @@
+---
+/**
+ * Calculator — the /electric/ questions (#calc) and the live result (#result).
+ *
+ * The form needs JavaScript (the engine runs in the browser); without it the form is hidden
+ * and a note points to the worked examples, each a complete result. The city comes from the
+ * <select id="el-city" data-money-city> in #status, so the banner, the timeline and the
+ * calculator always talk about the same place.
+ *
+ * The engine, the dataset and the renderer load as one chunk on first use (or when the
+ * browser is idle); ./calc.client.ts does the wiring.
+ *
+ * Props
+ *   locale  Locale
+ *   cfg     JSON-serialisable settings from the page (citations, household questions per
+ *           place, remote-district names, links, status words)
+ */
+import type { Locale } from '@/i18n';
+import Select from '@/components/ui/Select.astro';
+import RadioGroup from '@/components/ui/RadioGroup.astro';
+import Range from '@/components/ui/Range.astro';
+import Callout from '@/components/ui/Callout.astro';
+import electric from '@/i18n/pages/electric';
+import { localize } from '@/i18n/pages/_copy';
+import { readerText } from '@/i18n/ui';
+import { econData } from '@/data/econ';
+import ElectricResult from './ElectricResult.astro';
+
+interface Props {
+  locale: Locale;
+  cfg: Record<string, unknown>;
+  today: string;
+}
+const { locale, cfg, today } = Astro.props;
+const T = localize(electric, locale);
+const C = T.calc;
+const year = Number(today.slice(0, 4));
+const years = Array.from({ length: 45 }, (_, i) => String(year - i));
+const months = Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1).padStart(2, '0'), label: locale === 'en' ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i] : String(i + 1) }));
+const flagKeys = ['childUnder12', 'schoolChild', 'deliveryRider', 'indigenous', 'medicalWorker', 'neighbourhoodWatch', 'disasterAffected', 'remoteDistrict', 'previousLocalSubsidy', 'foreignNational'] as const;
+const evOptions = [
+  { value: '', label: C.advanced.evAuto },
+  ...econData.evModels
+    .filter((m) => m.calculator === true)
+    .flatMap((m) =>
+      m.plans
+        .filter((p) => econData.plans.find((x) => x.id === p)?.calculator === true)
+        .map((p) => ({ value: `${m.id}::${p}`, label: `${readerText(m.name[locale])} — ${readerText(econData.plans.find((x) => x.id === p)!.name[locale])}` })),
+    ),
+];
+const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasModels.filter((m) => m.calculator === true).map((m) => ({ value: m.id, label: `${readerText(m.brand[locale])} ${readerText(m.name[locale])}` }))];
+---
+
+<div class="el-calc" data-el-calc>
+  <div class="el-calc__noscript" data-el-noscript>
+    <Callout tone="note" label={T.result.title}>
+      <p>{C.noscript}</p>
+    </Callout>
+  </div>
+
+  <form class="el-form" data-js-only onsubmit="return false" aria-describedby="el-calc-lead" novalidate>
+    <fieldset class="el-q">
+      <legend class="el-q__n"><span class="el-num" aria-hidden="true">1</span>{C.q1}</legend>
+      <p class="el-q__city"><output data-el-cityname for="el-city"></output> <a href="#status">{C.q1Change}</a></p>
+      <p class="el-hint">{C.q1Hint}</p>
+    </fieldset>
+
+    <fieldset class="el-q">
+      <legend class="el-q__n"><span class="el-num" aria-hidden="true">2</span>{C.q2.legend}</legend>
+      <p class="el-hint">{C.q2.hint}</p>
+      <RadioGroup name="el-scrap" legend={C.q2.legend} options={[{ value: 'no', label: C.q2.no }, { value: 'yes', label: C.q2.yes }]} value="no" class="el-vh-legend" />
+      <div class="el-sub" data-el-if="scrap" hidden>
+        <div class="el-pair">
+          <Select id="el-year" label={C.q2.year} options={years.map((y) => ({ value: y, label: y }))} value={String(year - 12)} />
+          <Select id="el-month" label={C.q2.month} options={months} value="06" />
+        </div>
+        <p class="el-hint">{C.q2.builtHint}</p>
+        <RadioGroup name="el-engine" legend={C.q2.engine} options={[{ value: 'four-stroke', label: C.q2.fourStroke }, { value: 'two-stroke', label: C.q2.twoStroke }]} value="four-stroke" hint={C.q2.engineHint} />
+      </div>
+    </fieldset>
+
+    <fieldset class="el-q">
+      <legend class="el-q__n"><span class="el-num" aria-hidden="true">3</span>{C.q3.legend}</legend>
+      <p class="el-hint" data-el-hhint data-template={C.q3.hint}>{C.q3.hintNoCity}</p>
+      <ul class="el-checks">
+        {flagKeys.map((k) => (
+          <li data-flag={k} hidden>
+            <label class="el-check">
+              <input type="checkbox" name={`el-${k}`} value="1" data-el-flag={k} />
+              <span data-template={k === 'remoteDistrict' ? C.q3.flags[k] : undefined}>{C.q3.flags[k]}</span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      <div data-flag="income" hidden>
+        <RadioGroup name="el-income" legend={C.q3.income} options={[{ value: 'none', label: C.q3.incomeNone }, { value: 'middle-low', label: C.q3.incomeMiddle }, { value: 'low', label: C.q3.incomeLow }]} value="none" />
+      </div>
+      <div class="el-age" data-flag="age" hidden>
+        <label for="el-age">{C.q3.age}</label>
+        <p class="el-hint" id="el-age-hint" data-template={C.q3.ageHint}></p>
+        <span class="el-age__row"><input id="el-age" name="el-age" type="number" inputmode="numeric" min="0" max="120" step="1" aria-describedby="el-age-hint" /> <span>{C.q3.ageUnit}</span></span>
+      </div>
+    </fieldset>
+
+    <fieldset class="el-q">
+      <legend class="el-q__n"><span class="el-num" aria-hidden="true">4</span>{C.q4.label}</legend>
+      <Range id="el-km" label={C.q4.label} min={50} max={3000} step={50} value={400} unit={C.q4.unit} hint={C.q4.hint} class="el-vh-label" />
+    </fieldset>
+
+    <fieldset class="el-q">
+      <legend class="el-q__n"><span class="el-num" aria-hidden="true">5</span>{C.q5.legend}</legend>
+      <RadioGroup name="el-charge" legend={C.q5.legend} options={[{ value: 'no', label: C.q5.no }, { value: 'yes', label: C.q5.yes }]} value="no" hint={C.q5.noHint} class="el-vh-legend" />
+      <p class="el-hint el-nosocket" data-el-if="nosocket">{C.q5.noSocket} <a href="#no-socket">→</a></p>
+      <RadioGroup
+        name="el-power"
+        variant="stack"
+        legend={C.q5.power}
+        options={[
+          { value: 'subscription', label: C.q5.sub, hint: C.q5.subHint },
+          { value: 'payg', label: C.q5.payg, hint: C.q5.paygHint },
+          { value: 'home', label: C.q5.home, hint: C.q5.homeHint },
+        ]}
+        value="subscription"
+      />
+      <RadioGroup
+        name="el-plate"
+        variant="stack"
+        legend={C.q5.plate}
+        options={[
+          { value: 'heavy', label: C.q5.heavy, hint: C.q5.heavyHint },
+          { value: 'any', label: C.q5.light, hint: C.q5.lightHint },
+        ]}
+        value="heavy"
+      />
+    </fieldset>
+
+    <details class="el-adv">
+      <summary>{C.advanced.summary}</summary>
+      <div class="el-adv__body">
+        <Select id="el-ev" label={C.advanced.ev} options={evOptions} value="" />
+        <Select id="el-gas" label={C.advanced.gas} options={gasOptions} value="" />
+        <p class="el-hint">{C.advanced.note}</p>
+      </div>
+    </details>
+  </form>
+</div>
+
+<section id="result" class="el-live" aria-labelledby="result-title" data-js-only>
+  <h2 id="result-title" class="el-live__title">{T.result.title}</h2>
+  <p class="el-live__placeholder" data-el-placeholder>{T.result.placeholder}</p>
+  <p class="el-live__status" data-el-status role="status" aria-live="polite"></p>
+  <ElectricResult id="el-live" locale={locale} hidden />
+</section>
+
+<script type="application/json" id="el-calc-data" set:html={JSON.stringify(cfg)} />
+
+<script>
+  import './calc.client';
+</script>
+
+<style>
+  .el-calc__noscript {
+    display: block;
+  }
+  :global(html.js) .el-calc__noscript {
+    display: none;
+  }
+  .el-form {
+    display: grid;
+    gap: var(--sp-6);
+  }
+  .el-q {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--sp-3);
+    min-inline-size: 0;
+  }
+  .el-q__n {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-heading);
+    padding: 0;
+    margin-block-end: var(--sp-2);
+  }
+  .el-num {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border: var(--rule-paint) solid var(--ink);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--fs-sm);
+  }
+  .el-hint {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: var(--lh-snug);
+    max-inline-size: var(--measure);
+  }
+  .el-q__city {
+    font-weight: var(--fw-bold);
+  }
+  .el-q__city output:empty::before {
+    content: '—';
+  }
+  .el-sub {
+    display: grid;
+    gap: var(--sp-3);
+    padding-inline-start: var(--sp-4);
+    border-inline-start: var(--rule-paint) solid var(--line);
+  }
+  .el-sub[hidden],
+  [data-flag][hidden] {
+    display: none;
+  }
+  .el-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-3);
+  }
+  .el-checks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .el-check {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    cursor: pointer;
+  }
+  .el-check input {
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    flex: none;
+    accent-color: var(--accent);
+  }
+  .el-age {
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .el-age label {
+    font-weight: var(--fw-bold);
+  }
+  .el-age__row {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .el-age input {
+    inline-size: 6rem;
+    min-block-size: var(--tap);
+    padding: 0 var(--sp-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+  }
+  .el-adv > summary {
+    cursor: pointer;
+    font-weight: var(--fw-bold);
+    min-block-size: var(--tap);
+    display: flex;
+    align-items: center;
+  }
+  .el-adv__body {
+    display: grid;
+    gap: var(--sp-4);
+    padding-block-start: var(--sp-3);
+  }
+  .el-adv__body :global(select) {
+    max-inline-size: 100%;
+  }
+  .el-nosocket[hidden] {
+    display: none;
+  }
+  :global(.el-vh-legend legend),
+  :global(.el-vh-label > label),
+  :global(.el-vh-label label:first-child) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .el-live {
+    display: grid;
+    gap: var(--sp-4);
+    scroll-margin-block-start: calc(var(--header-h, 3.5rem) + var(--sp-4));
+  }
+  .el-live__title {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-black);
+  }
+  .el-live__placeholder {
+    padding: var(--sp-5);
+    border: 1px dashed var(--line-strong);
+    color: var(--ink-2);
+  }
+  .el-live__placeholder[hidden] {
+    display: none;
+  }
+  .el-live__status {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    min-block-size: 1.2em;
+  }
+  .el-live[aria-busy='true'] :global(.el-result) {
+    opacity: 0.55;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .el-live :global(.el-result) {
+      transition: opacity var(--dur-2) var(--ease-out);
+    }
+  }
+</style>
