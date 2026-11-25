@@ -156,7 +156,7 @@ export default copy({
     measured: { 'zh-TW': '誰量了什麼', en: 'What was measured, and by whom' },
     note: { 'zh-TW': '附註', en: 'Note' },
     gapWho: { 'zh-TW': '誰量得出來', en: 'Who could measure it' },
-    gapClose: { 'zh-TW': '要怎麼量', en: 'What it would take' },
+    gapClose: { 'zh-TW': '要怎麼補上', en: 'What would settle it' },
     caveat: { 'zh-TW': '這一段沒有說的事', en: 'What this does not say' },
     action: { 'zh-TW': '你現在可以做的', en: 'What you can do now' },
     chain: { 'zh-TW': '這一題在證據鏈的哪裡', en: 'Where this sits in the chain' },
@@ -466,6 +466,7 @@ export default copy({
             { min: d('idling-regulation', 'minutes') },
           ),
           facts: ['idling-regulation'],
+          gaps: ['gap-idling-rule-scooters'],
           badge: 'official-tw',
         }),
         line({
@@ -498,6 +499,13 @@ export default copy({
             en: '“Under a metre” comes from an international review describing vehicles in general, not from measuring scooters.',
           },
           facts: ['first-metre-sharma-kumar-2018'],
+        }),
+        line({
+          text: {
+            'zh-TW': '這條規定管不管機車、等紅燈算不算「停車等候」，我們沒有找到官方的解釋。',
+            en: 'Whether the rule reaches scooters at all, and whether waiting at a signal counts as waiting while stopped, we found no official interpretation.',
+          },
+          gaps: ['gap-idling-rule-scooters'],
         }),
         line({
           text: {

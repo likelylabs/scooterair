@@ -119,4 +119,10 @@ const items = chainOrder.map((slug) => ({
     min-block-size: 2.75rem;
     font-weight: var(--fw-bold);
   }
+  /* Chinese titles wrap between phrases (after punctuation), never inside 「良好」 */
+  :is(.qi-list, .qi-other) :global(.card__title:lang(zh-Hant-TW)) {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
 </style>

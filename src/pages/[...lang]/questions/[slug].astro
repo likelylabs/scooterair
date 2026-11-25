@@ -54,8 +54,12 @@ const plain = (s: string) => s.replaceAll('|', '');
 // ---- where each required caveat and each gap's "who could measure it" first appears ----
 const shownCaveat = new Set<FactId>();
 const shownGap = new Set<GapId>();
+// The idling rule's registry caveat is written as an instruction to editors ("never write
+// legal or illegal"); the page states the same limit in reader-facing words through the gap
+// gap-idling-rule-scooters instead (see the questions report).
+const editorVoiced = new Set<FactId>(['idling-regulation']);
 const take = (_text: string, fs: readonly FactId[] = [], gs: readonly GapId[] = [], withCaveats = true) => {
-  const caveats = withCaveats ? fs.filter((f) => facts[f].requiresCaveat && !shownCaveat.has(f)) : [];
+  const caveats = withCaveats ? fs.filter((f) => facts[f].requiresCaveat && !editorVoiced.has(f) && !shownCaveat.has(f)) : [];
   caveats.forEach((f) => shownCaveat.add(f));
   const gapNotes = gs.filter((g) => !shownGap.has(g));
   gapNotes.forEach((g) => shownGap.add(g));
@@ -352,5 +356,11 @@ const one = slug === 'one-red-light' ? t.pages['one-red-light'] : undefined;
     font-size: var(--fs-sm);
     line-height: var(--lh-snug);
     overflow-wrap: anywhere;
+  }
+  /* Chinese titles wrap between phrases (after punctuation), never inside 「良好」 */
+  :is(.q-next) :global(.card__title:lang(zh-Hant-TW)) {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
   }
 </style>
