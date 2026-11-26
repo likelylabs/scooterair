@@ -2,9 +2,9 @@
 // the evidence was gathered and checked, the badges, the rules the site holds itself to, how to
 // report an error, and the corrections log (#corrections, linked from the footer).
 //
-// THE OWNER'S STATEMENT IS NOT WRITTEN YET. `owner` below is a visibly unfinished placeholder;
-// src/components/pages/action/owner.ts makes the build print a warning while it is in place.
-// Do not fill it with an invented organisation, funder or address.
+// The owner's statement is the maker's credit only (handle and link in
+// src/components/pages/action/owner.ts). Do not add an organisation, funder or address the
+// owner has not supplied.
 
 import { copy } from './_copy.ts';
 
@@ -26,27 +26,9 @@ export default copy({
     toc: { 'zh-TW': '這一頁', en: 'On this page' },
   },
   owner: {
-    flag: { 'zh-TW': '待補・尚未定稿', en: 'Placeholder · not final copy' },
-    title: { 'zh-TW': '誰做的、誰出錢', en: 'Who made this site, and who pays for it' },
-    body: {
-      'zh-TW': '〔這一段還沒有寫。網站擁有者還沒有提供下面這些說明。請不要把這一格當成網站的立場或事實。〕',
-      en: '[This section has not been written. The site’s owner has not yet supplied the statements below. Do not read this box as the site’s position or as fact.]',
-    },
-    needs: { 'zh-TW': '這裡要寫明：', en: 'What goes here:' },
-    items: [
-      { 'zh-TW': '誰製作這個網站。', en: 'Who made the site.' },
-      { 'zh-TW': '誰出錢；或者寫明沒有任何資助。', en: 'Who pays for it, or a plain statement that nobody does.' },
-      { 'zh-TW': '和任何機車廠、電池或換電業者有沒有關係。有就寫出來；沒有，也要寫明沒有。', en: 'Any relationship with a scooter maker or a battery or swapping network, or a plain statement that there is none.' },
-      { 'zh-TW': '有哪些部分經過人工審閱，由誰審閱。', en: 'Which parts were reviewed by people, and by whom.' },
-      { 'zh-TW': '網站會不會自己出錢委託紅燈旁的量測。', en: 'Whether the campaign will commission the red-light measurement itself.' },
-      { 'zh-TW': '補助資料多久重新查一次。', en: 'How often the subsidy data is re-checked.' },
-      { 'zh-TW': '圖表和分享圖的轉載授權。', en: 'The reuse licence for charts and share cards.' },
-      { 'zh-TW': '聯絡方式。', en: 'How to contact us.' },
-    ],
-    until: {
-      'zh-TW': '這一段補上之前，請把這個網站當成還沒有完成。',
-      en: 'Until this is filled in, treat the site as unfinished.',
-    },
+    title: { 'zh-TW': '誰做的', en: 'Who made this site' },
+    madeBy: { 'zh-TW': '製作：', en: 'Made by ' },
+    onX: { 'zh-TW': '（X）', en: ' (X)' },
   },
   what: {
     eyebrow: { 'zh-TW': '是什麼', en: 'What it is' },
@@ -159,10 +141,7 @@ export default copy({
       'zh-TW': '告訴我們是哪一頁、哪一句，還有你手上的出處怎麼說。我們會去查；改了，就寫進下面的修改紀錄，附上日期和原因。',
       en: 'Tell us which page and which sentence, and what your source says. We will check it, and if we change anything it goes into the corrections log below, with the date and the reason.',
     },
-    contact: {
-      'zh-TW': '〔聯絡方式待補：站方還沒有提供信箱或表單。〕',
-      en: '[Contact details to come: the site’s owner has not yet supplied an address or form.]',
-    },
+    contact: { 'zh-TW': '請在 X 上告訴我們：', en: 'Tell us on X: ' },
   },
   corrections: {
     eyebrow: { 'zh-TW': '修改紀錄', en: 'Corrections' },

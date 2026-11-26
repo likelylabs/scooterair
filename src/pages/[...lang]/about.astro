@@ -2,14 +2,13 @@
 /**
  * /about/ — 關於 / About (blueprint 4.9; Appendix B item 1).
  *
- *   #who          the owner's statement — NOT SUPPLIED: a visibly unfinished placeholder, and the
- *                 build prints a warning while it is here (components/pages/action/owner.ts)
+ *   #who          who made the site (components/pages/action/owner.ts)
  *   #what         what the site is and is not; the scene is illustration, the charts are data
  *   #method       how the evidence was gathered and checked, including the automated part
  *   #badges       the eight evidence badges and how each is drawn on the chain
  *   #rules        the wording rules, the promise to publish any result, what would change our mind
  *   #update       how subsidy figures date
- *   #report       how to report an error (contact still to come)
+ *   #report       how to report an error
  *   #corrections  the corrections log, linked from the footer
  *
  * Copy: src/i18n/pages/about.ts. Counts, dates and the corrections' wording come from the data.
@@ -26,7 +25,7 @@ import StanceBox from '@/components/ui/StanceBox.astro';
 import Claim from '@/components/pages/action/Claim.astro';
 import { lf, rule } from '@/components/pages/action/ev';
 import { corrections } from '@/components/pages/action/corrections';
-import { OWNER_STATEMENT_SUPPLIED, warnIfPlaceholder } from '@/components/pages/action/owner';
+import { OWNER, warnIfPlaceholder } from '@/components/pages/action/owner';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { readerText } from '@/i18n/ui';
 import { confidenceLabels, factList, gapList, sourceIds, type FactId } from '@/data';
@@ -66,25 +65,14 @@ const log = corrections.map((c) => {
     </nav>
   </Section>
 
-  <!-- ===================================================== WHO (placeholder) -->
+  <!-- ===================================================== WHO -->
   <Section id="who" width="wide" pad="tight">
-    {
-      !OWNER_STATEMENT_SUPPLIED && (
-        <div class="placeholder" data-placeholder="owner-statement">
-          <p class="placeholder__flag">
-            <Icon name="alert" size="1.2em" />
-            {t.owner.flag}
-          </p>
-          <h2 class="placeholder__t">{t.owner.title}</h2>
-          <p class="placeholder__body">{t.owner.body}</p>
-          <p class="placeholder__needs">{t.owner.needs}</p>
-          <ul class="placeholder__list">
-            {t.owner.items.map((i) => <li>{i}</li>)}
-          </ul>
-          <p class="placeholder__until">{t.owner.until}</p>
-        </div>
-      )
-    }
+    <div class="maker">
+      <h2 class="maker__t">{t.owner.title}</h2>
+      <p class="maker__body">
+        {t.owner.madeBy}<a href={OWNER.url} rel="me noopener">{OWNER.handle}</a>{t.owner.onX}
+      </p>
+    </div>
   </Section>
 
   <!-- ===================================================== WHAT -->
@@ -162,7 +150,7 @@ const log = corrections.map((c) => {
   <!-- ===================================================== REPORT -->
   <Section id="report" eyebrow={t.report.eyebrow} title={t.report.title} width="wide" tone="sunken" rule>
     <p class="prose">{t.report.body}</p>
-    <p class="contact-placeholder" data-placeholder="contact">{t.report.contact}</p>
+    <p class="contact">{t.report.contact}<a href={OWNER.url} rel="noopener">{OWNER.handle}</a></p>
   </Section>
 
   <!-- ===================================================== CORRECTIONS -->
@@ -221,55 +209,25 @@ const log = corrections.map((c) => {
     color: var(--ink);
     text-decoration: none;
   }
-  /* The placeholder must be impossible to mistake for final copy: hazard stripes, a flag,
-     square brackets, and the same look in both themes and in print. */
-  .placeholder {
-    position: relative;
-    padding: var(--sp-5) var(--sp-4) var(--sp-4);
-    border: 4px dashed var(--signal-red-ink);
-    background: repeating-linear-gradient(-45deg, var(--signal-red-wash) 0 14px, var(--bg) 14px 28px);
+  .maker {
     display: grid;
-    gap: var(--sp-3);
-  }
-  .placeholder > * {
-    margin: 0;
-    background: var(--bg);
-    padding: var(--sp-2) var(--sp-3);
-  }
-  .placeholder__flag {
-    display: inline-flex;
     gap: var(--sp-2);
-    align-items: center;
-    justify-self: start;
-    color: var(--signal-red-ink);
-    font-weight: var(--fw-black);
-    letter-spacing: 0.08em;
-    border: 2px solid var(--signal-red-ink);
+    padding-block: var(--sp-4);
+    border-block: 1px solid var(--line);
   }
-  .placeholder__flag:lang(en) {
-    text-transform: uppercase;
-  }
-  .placeholder__t {
-    font-size: var(--fs-xl);
-    color: var(--ink-2);
-  }
-  .placeholder__t::before {
-    content: '〔';
-  }
-  .placeholder__t::after {
-    content: '〕';
-  }
-  .placeholder__body,
-  .placeholder__until {
+  .maker__t {
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
-    color: var(--signal-red-ink);
-  }
-  .placeholder__list {
-    padding-inline-start: 2em !important;
     color: var(--ink-2);
   }
-  .placeholder__list li + li {
-    margin-block-start: var(--sp-1);
+  .maker__body {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+  }
+  .maker__body a,
+  .contact a {
+    display: inline-block;
+    padding-block: 0.6em;
   }
   .isnot {
     display: grid;
@@ -325,11 +283,8 @@ const log = corrections.map((c) => {
     font-size: var(--fs-lg);
     margin: 0 0 var(--sp-3);
   }
-  .contact-placeholder {
+  .contact {
     margin-block-start: var(--sp-4);
-    padding: var(--sp-3);
-    border: 3px dashed var(--signal-red-ink);
-    color: var(--signal-red-ink);
     font-weight: var(--fw-bold);
   }
   .log {
