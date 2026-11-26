@@ -1,0 +1,83 @@
+---
+/**
+ * /questions/mask/ — 口罩擋得住廢氣嗎？ (new; brief 7.5 and amendment 12.2)
+ * Built only from research/masks/VERIFIED.json and the nine registry facts made from it.
+ *   1  G17, the face with a mask and the four-way switch. Rings (carbon monoxide) pass through
+ *      all four.
+ *   2  The four-row table, with the two Taiwanese tests and the other studies in its sheet.
+ * Never: "masks are useless", a filter percentage as protection as worn, that a carbon mask
+ * stops exhaust or carbon monoxide, advice to put an N95 on a child (the file's must-not-say list).
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { art } from '@/i18n/art';
+import Screen from '@/components/ui/Screen.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import NextButton from '@/components/ui/NextButton.astro';
+import Segmented from '@/components/ui/Segmented.astro';
+import MaskScene from '@/components/art/MaskScene.astro';
+import { MASK_CHOICES } from '@/components/art/parts';
+import MaskTable from './MaskTable.astro';
+import { fact } from '@/data/facts';
+import questions from '@/i18n/pages/questions';
+import { filler } from './q';
+
+interface Props {
+  locale: Locale;
+  next: { label: string; href: string; primary?: boolean };
+}
+const { locale, next } = Astro.props;
+const f = filler(locale);
+const s1 = questions.mask.s1;
+const s2 = questions.mask.s2;
+const tableFacts = ['mask-asworn-vandersande', 'mask-carbon-mol-2005', 'mask-ilosh-taiwan', 'mask-carbon-breakthrough', 'mask-ultrafine-su', 'mask-fit-cherrie', 'mask-cloth-rengasamy', 'mask-respirator-benefit-langrish', 'mask-niosh-no-gas'] as const;
+const testChips = [fact('mask-asworn-vandersande'), fact('mask-carbon-mol-2005'), fact('mask-ilosh-taiwan')];
+---
+
+<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
+  <MaskScene slot="picture" locale={locale} />
+  <Segmented slot="controls" name="mask" legend={s1.switch[locale]} value="surgical" options={MASK_CHOICES.map((m) => ({ value: m, label: art.mask.names[m][locale] }))} />
+  <Fragment slot="chips">
+    <KindChip locale={locale} of={fact('mask-niosh-no-gas')} />
+    <KindChip locale={locale} of={fact('mask-asworn-vandersande')} />
+  </Fragment>
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="official" facts={['mask-niosh-no-gas']} primary={{ href: href('/evidence/#link-3', locale) }}>
+    <p slot="block1">{f(s1.sheet.b1[locale])}</p>
+    <p slot="block2">{f(s1.sheet.b2[locale])}</p>
+    <p slot="block3">{f(s1.sheet.b3[locale])}</p>
+  </HowSheet>
+</Screen>
+
+<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={f(s2.quiet[locale])} next={next}>
+  <MaskTable slot="picture" locale={locale} class="q-plate" />
+  <KindChip slot="chips" locale={locale} kind="study" />
+  <HowSheet slot="sheet" id="how-2" locale={locale} kind="study" title={s2.sheet.title[locale]} facts={[...tableFacts]} primary={{ href: href('/evidence/#link-3', locale) }}>
+    <p slot="block1">{f(s2.sheet.b1[locale])}</p>
+    <ul slot="block2" class="q-tests">
+      {s2.sheet.tests.map((x, i) => (
+        <li>
+          <KindChip locale={locale} of={testChips[i]} size="sm" />
+          <span>{f(x[locale])}</span>
+        </li>
+      ))}
+    </ul>
+    <p slot="block3">{f(s2.sheet.b3[locale])}</p>
+  </HowSheet>
+  <NextButton slot="actions" href={href('/act/#walk', locale)} arrow="right">{s2.act[locale]}</NextButton>
+</Screen>
+
+<style>
+  .q-tests {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .q-tests li {
+    display: grid;
+    gap: 0.3rem;
+    justify-items: start;
+  }
+</style>

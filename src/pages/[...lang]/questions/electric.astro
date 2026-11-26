@@ -1,0 +1,15 @@
+---
+/**
+ * /questions/electric/ moved to /electric/ (redesign brief, section 2): one cost story, not
+ * two. Kept as a redirect in both languages so old links and shares still land; its share card
+ * stays in public/share/ so an old share still shows a picture.
+ */
+import Redirect from '@/layouts/Redirect.astro';
+import { localeFromParam, localeStaticPaths } from '@/i18n';
+import questions from '@/i18n/pages/questions';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+---
+
+<Redirect locale={locale} to="/electric/" label={questions.page.moved.electric[locale]} />

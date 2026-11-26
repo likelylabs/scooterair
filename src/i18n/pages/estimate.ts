@@ -12,7 +12,7 @@ export default copy({
     title: { 'zh-TW': '怎麼算的', en: 'How we worked it out' },
     description: {
       'zh-TW': '紅燈時，一排機車讓路邊多了多少廢氣？本站的推估、一步一步的算法、每個數字的出處，以及它和運研所量到的數字比起來怎麼樣。',
-      en: 'How much exhaust does a row of idling scooters add at the kerb? Our estimate, the working step by step, the source of every input, and how it compares with the Institute of Transportation’s readings.',
+      en: 'How much exhaust does a row of scooters, engines running, add at the kerb? Our estimate, the working step by step, the source of every input, and how it compares with the Institute of Transportation’s readings.',
     },
   },
 
@@ -86,7 +86,7 @@ export default copy({
       en: 'Nobody can put an instrument in front of every nose, so we simulate the red light on a computer: where the scooters stop, how much each gives off, and where the wind carries it. Each run draws a new wind, a new set of scooters and a new place to stand: {runs} runs for each case.',
     },
     flowTitle: { 'zh-TW': '四個步驟', en: 'Four steps' },
-    inputsTitle: { 'zh-TW': '用到的數字，每一個都有出處', en: 'The inputs, each with its source' },
+    inputsTitle: { 'zh-TW': '用到的數字，|每一個都有出處', en: 'The inputs, each with its source' },
     source: { 'zh-TW': '出處', en: 'Source' },
     inputs: {
       readings: {
@@ -98,7 +98,7 @@ export default copy({
         },
       },
       fuel: {
-        name: { 'zh-TW': '機車怠速時，每小時燒多少汽油', en: 'How much petrol an idling scooter burns an hour' },
+        name: { 'zh-TW': '機車停著、引擎沒熄火，每小時燒多少汽油', en: 'How much petrol a stopped scooter burns an hour, engine running' },
         value: { 'zh-TW': '約 {lo} 到 {hi} 公克', en: 'about {lo} to {hi} g' },
         note: {
           'zh-TW': '越南的實驗室量的。台灣沒有這種量測，這是最該在台灣量的一個數字：它一變，每一種廢氣都跟著變。',
@@ -120,7 +120,7 @@ export default copy({
         },
       },
     },
-    resultTitle: { 'zh-TW': '算出來：一輛機車怠速，每小時排的一氧化碳', en: 'Result: the carbon monoxide one idling scooter gives off in an hour' },
+    resultTitle: { 'zh-TW': '算出來：|一輛機車停著、引擎沒熄火，|每小時排的一氧化碳', en: 'Result: the carbon monoxide one stopped scooter gives off in an hour, engine running' },
     perRedTitle: { 'zh-TW': '等一個紅燈呢？', en: 'And through one red light?' },
     perRedNote: {
       'zh-TW': '一小時有 {reds} 個 {red} 秒，所以除以 {reds}。換成氣體來看，大約可以裝滿一個 {ml} 毫升的鋁罐。',
@@ -138,7 +138,7 @@ export default copy({
     },
     count: { 'zh-TW': '{lo} 到 {hi} 輛', en: '{lo} to {hi} scooters' },
     nearest: { 'zh-TW': '最近的排氣管：{lo} 到 {hi} 公尺', en: 'Nearest tailpipe: {lo} to {hi} m' },
-    busiestTitle: { 'zh-TW': '最忙的路口，一個紅燈停幾輛', en: 'The busiest junction: how many stop at one red' },
+    busiestTitle: { 'zh-TW': '最忙的路口，|一個紅燈停幾輛', en: 'The busiest junction: how many stop at one red' },
     busiestNote: {
       'zh-TW': '這是把一小時的車流平均分給每個紅燈，不是真的去數一個紅燈。實際的路口，有時多、有時少。',
       en: 'This spreads an hour of traffic evenly over the red lights; it is not a count of one red. Real junctions have more at some reds and fewer at others.',
@@ -159,7 +159,7 @@ export default copy({
     coTitle: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
     observed: { 'zh-TW': '運研所量到：最忙的路口，最高那一分鐘比測站高', en: 'Measured by the Institute: at the busiest junction, the highest minute above the station' },
     model: { 'zh-TW': '我們的算法，放在那支儀器的位置和當時的風', en: 'Our method, run at that sensor’s position and that day’s wind' },
-    pmTitle: { 'zh-TW': '細懸浮微粒（PM2.5）', en: 'Fine particles (PM2.5)' },
+    pmTitle: { 'zh-TW': '細懸浮微粒|（PM2.5）', en: 'Fine particles |(PM2.5)' },
     pmMeasured: {
       'zh-TW': '運研所在等候區量到的 PM2.5，是每立方公尺 {lo} 到 {hi} 微克，看不出機車讓它變多。',
       en: 'The PM2.5 the Institute measured in the waiting areas was {lo} to {hi} µg/m³, with no visible rise from the scooters.',
@@ -204,7 +204,7 @@ export default copy({
       'zh-TW': '風的影響最大，所以同一個路口，今天和明天可以差好幾倍。',
       en: 'The wind matters most, so the same junction can differ several-fold from one day to the next.',
     },
-    confidenceTitle: { 'zh-TW': '每一種廢氣，可以信多少', en: 'How far to trust each pollutant' },
+    confidenceTitle: { 'zh-TW': '每一種廢氣，|可以信多少', en: 'How far to trust each pollutant' },
     pollutants: {
       co: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
       benzene: { 'zh-TW': '苯', en: 'Benzene' },
@@ -257,7 +257,7 @@ export default copy({
       'zh-TW': '不算綠燈起步的那一陣，也不算紅燈裡每一秒怎麼變。',
       en: 'Not the burst when the scooters pull away at green, and not how the air changes second by second.',
     },
-    heightTitle: { 'zh-TW': '小孩和嬰兒車的高度呢？', en: 'What about a child’s or a pushchair’s height?' },
+    heightTitle: { 'zh-TW': '小孩和嬰兒車的|高度呢？', en: 'What about a child’s or a pushchair’s height?' },
     health: {
       'zh-TW': '想知道廢氣和身體的關係，請看證據頁的第 5 環。',
       en: 'For what traffic exhaust has to do with health, see link 5 on the evidence page.',
@@ -287,7 +287,7 @@ export default copy({
       en: 'When a real measurement comes in, we will put it beside the estimate, and the old estimate will stay on this page.',
     },
     planTitle: { 'zh-TW': '建議怎麼量', en: 'How we suggest measuring it' },
-    letterTitle: { 'zh-TW': '寫信請環保局來量', en: 'A letter asking your environmental bureau to measure' },
+    letterTitle: { 'zh-TW': '寫信|請環保局來量', en: 'A letter asking your environmental bureau to measure' },
     letterLead: {
       'zh-TW': '填上空格，複製下來，貼到縣市環保局的線上信箱，或用你的電子郵件寄。機關收到署名、有地址和聯絡方式的信，才會回覆。',
       en: 'Fill in the blanks, copy the letter, and paste it into your city or county environmental bureau’s online form, or send it from your own email. An agency answers a letter that is signed and gives an address and a way to reach you.',
@@ -307,7 +307,7 @@ export default copy({
     },
     body: {
       'zh-TW':
-        '{agency}您好：\n\n我住在{address}。{place}這個路口，紅燈時常常停滿機車，引擎沒熄火，等過馬路的人就站在旁邊。\n\n交通部運輸研究所在 {sites} 個路口的行人等候區，量過一氧化碳和 PM2.5。「行人呼吸」網站用這些資料和全國的機車定檢讀數做了推估，算法和出處都公開在網站上。\n\n照網站的算法，旁邊停了十來輛機車時，大人鼻子高度的一氧化碳，紅燈 {red} 秒的平均會增加{coAdd}。這個數字要靠實際量測來確認。\n\n想請貴局在這個路口量測：\n1. 在行人等候區，量大人和嬰兒車兩個高度。\n2. 量一氧化碳、苯和超細微粒，紅燈和綠燈分開記錄，也記下每個紅燈停了幾輛機車。\n3. 在離路口遠一點的地方，放一個對照點。\n4. 公開原始資料。\n\n不管結果是高是低，都請讓大家知道。謝謝您。\n\n{sender} 敬上\n地址：{address}\n聯絡方式：{contact}',
+        '{agency}承辦人員好：\n\n我住在{address}。{place}這個路口，紅燈時常常停滿機車，引擎沒熄火，等過馬路的人就站在旁邊。\n\n交通部運輸研究所在 {sites} 個路口的行人等候區，量過一氧化碳和 PM2.5。「行人呼吸」網站用這些資料和全國的機車定檢讀數做了推估，算法和出處都公開在網站上。\n\n照網站的算法，旁邊停了十來輛機車時，大人鼻子高度的一氧化碳，紅燈 {red} 秒的平均會增加{coAdd}。這個數字要靠實際量測來確認。\n\n想請貴局在這個路口量測：\n1. 在行人等候區，量大人和嬰兒車兩個高度。\n2. 量一氧化碳、苯和超細微粒，紅燈和綠燈分開記錄，也記下每個紅燈停了幾輛機車。\n3. 在離路口遠一點的地方，放一個對照點。\n4. 公開原始資料。\n\n不管結果是高是低，都請讓大家知道。謝謝。\n\n{sender} 敬上\n地址：{address}\n聯絡方式：{contact}',
       en:
         'Dear {agency},\n\nI live in {address}. At the junction of {place}, the stop box often fills with scooters at a red light, engines running, while people waiting to cross stand right beside them.\n\nTaiwan’s Institute of Transportation has measured carbon monoxide and PM2.5 in the pedestrian waiting areas of {sites} junctions. The ScooterAir website has used those readings and the national scooter-inspection readings to work out what a pedestrian breathes, and publishes its method and sources.\n\nBy the website’s working, with a dozen or so scooters beside you, carbon monoxide at an adult’s nose rises by {coAdd} over a {red}-second red. That figure needs a real measurement to confirm it.\n\nI would like to ask your bureau to measure at this junction:\n1. In the pedestrian waiting area, at an adult’s height and a pushchair’s height.\n2. Carbon monoxide, benzene and ultrafine particles, recording red and green separately, with the number of scooters waiting at each red.\n3. With a comparison point a little way from the junction.\n4. And to publish the raw data.\n\nWhatever the result, high or low, please let the public know. Thank you.\n\nYours sincerely,\n{sender}\nAddress: {address}\nContact: {contact}',
     },

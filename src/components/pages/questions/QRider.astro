@@ -1,0 +1,50 @@
+---
+/**
+ * /questions/rider/ — 騎車的人呢？ (brief 7.5; home screen 9)
+ *   1  G9, the rider in the second row. 這不是誰的錯. Riders are never said to breathe "the
+ *      most": scooter and walking did not differ significantly.
+ *   2  The five commute bars, labelled 平均・各種來源・早上一小時.
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import Screen from '@/components/ui/Screen.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import HowButton from '@/components/ui/HowButton.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import NextButton from '@/components/ui/NextButton.astro';
+import RiderScene from '@/components/art/RiderScene.astro';
+import CommuteBars from './CommuteBars.astro';
+import { fact } from '@/data/facts';
+import questions from '@/i18n/pages/questions';
+import { filler, questionNumbers } from './q';
+
+interface Props {
+  locale: Locale;
+  next: { label: string; href: string; primary?: boolean };
+}
+const { locale, next } = Astro.props;
+const f = filler(locale);
+const nums = questionNumbers(locale);
+const s1 = questions.rider.s1;
+const s2 = questions.rider.s2;
+const chuang = fact('commute-scooter-vs-subway-chuang2020');
+---
+
+<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
+  <RiderScene slot="picture" locale={locale} />
+  <KindChip slot="chips" locale={locale} of={chuang} />
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="measured" facts="commute-scooter-vs-subway-chuang2020" primary={{ href: href('/evidence/#link-6', locale) }}>
+    <p slot="block1">{f(s1.sheet.b1[locale], { year: nums.chuangYear })}</p>
+    <p slot="block2">{f(s1.sheet.b2[locale])}</p>
+    <p slot="block3">{f(s1.sheet.b3[locale])}</p>
+  </HowSheet>
+</Screen>
+
+<Screen locale={locale} n={2} total={1} id="more" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={f(s2.quiet[locale])} next={next}>
+  <CommuteBars slot="picture" locale={locale} class="q-plate" />
+  <Fragment slot="chips">
+    <KindChip locale={locale} of={chuang} />
+    <HowButton locale={locale} sheet="how-1" />
+  </Fragment>
+  <NextButton slot="actions" href={href('/act/#ride', locale)} arrow="right">{s2.act[locale]}</NextButton>
+</Screen>

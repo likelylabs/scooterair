@@ -36,13 +36,13 @@ const bg = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
   <p class="nbox__title" id="nbox-title">{title}</p>
   <div class="nbox__row">
     <p class="nbox__label">{estimateText.alreadyThere[locale]}</p>
-    <p class="nbox__val"><span class="nbox__num">{bg}</span> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} /></p>
+    <div class="nbox__val"><span class="nbox__num">{bg}</span> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} /></div>
   </div>
   <div class="nbox__row nbox__row--est">
     <p class="nbox__label">{estimateText.addedByPack[locale]}</p>
     <div class="nbox__val"><EstimateValue locale={locale} slotId={`co.${scenario}.add`} sheet={sheet} size="lg" /></div>
   </div>
-  <p class="nbox__gloss">{estimateText.ppmGloss[locale]}</p>
+  <p class="nbox__note">{estimateText.ppmGloss[locale]}</p>
 </div>
 
 <style>
@@ -91,7 +91,7 @@ const bg = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
-  .nbox__gloss {
+  .nbox__note {
     padding-block-start: var(--sp-2);
     border-block-start: 1px solid var(--line);
     font-size: var(--fs-xs);

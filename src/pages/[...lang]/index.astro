@@ -1,616 +1,491 @@
 ---
 /**
- * Home — one red light, ninety seconds (blueprint Part 3, chapters 3.1–3.13).
+ * Home — one red light in fifteen screens (docs/redesign-brief.md section 3, with amendment
+ * 12.2: the masks screen is the tenth; the rail is red to screen 12 and green from 13).
  *
- * Copy: src/i18n/pages/home.ts (never inline here). Numbers, badges, citation numbers and the
- * two worked buyers: src/components/pages/home/home-data.ts, computed at build time from the
- * fact registry and the calculator engine. Chapter ids follow chain.anchors: the prologue is the
- * page top (Base already puts id="top" on <html>), then brief, link-1 … link-6, green, connect,
- * link-7, money, next.
+ * Each screen is one <Screen> (lane B): one picture, one headline, at most two sentences, an
+ * optional quiet line, the sheet behind 怎麼知道的？ and a next button whose words are the
+ * question the next screen answers. Scrolling is ordinary scrolling; from 900 px a screen is a
+ * two-column row. Pictures are lane C's scenes and lane D's charts.
  *
- * Rules kept here: the scene never shares a frame with a health number (link 5 has no art);
- * no price or purchase button before the money chapter (R9); the site's own inference is closed
- * by default and wears the inference badge; money copy that depends on the date is gated on the
- * site-state utility (data-money-when / data-money-if), with a static variant for no JavaScript.
+ * Where things come from
+ *   words     src/i18n/pages/home.ts (never inline here); the estimate's own sentences from
+ *             src/data/estimate.ts; the K sentences and chip names from src/i18n/ui.ts; the
+ *             money headlines and rule-chosen money sentences from src/i18n/pages/electric.ts
+ *   numbers   the estimate slots (EstimateValue, formatEstimate), the registry
+ *             (./home-figures.ts) and the calculator's tables (./money-view.ts). None is typed
+ *   rules     screen 4's second sentence: kerbSentence(); screen 5's headline: checkHeadline()
+ *             and farBelowWho(); screens 13 and 14: lane I's buyHeadline / monthHeadline /
+ *             monthLine; the pins of screen 6 and the quiet line of screen 2 ship only while
+ *             their registry facts are verified
  *
- * Wave 2 (blueprint 3.0): at 960px and wider the scene is pinned in a left column and the text
- * reads in a right one. That layout is src/components/pages/home/PinnedScene.astro; this page
- * only marks where it applies, with .pin-run (the hero, and a <div> around each stretch of
- * chapters that have a frame) and .pin-frame (the box holding a chapter's frame). Under 960px,
- * and with JavaScript off, those classes do nothing.
+ * Without JavaScript every screen shows its picture, its words and its sheet (an open block
+ * under it); the money screens show the default case (新北市, a scooter to scrap, 300 km).
  */
+import '@/styles/charts.css';
+import '@/components/pages/home/home.css';
 import Base from '@/layouts/Base.astro';
-import Button from '@/components/ui/Button.astro';
-import Callout from '@/components/ui/Callout.astro';
-import Card from '@/components/ui/Card.astro';
-import ChainStrip from '@/components/ui/ChainStrip.astro';
-import Chapter from '@/components/ui/Chapter.astro';
-import Cite from '@/components/ui/Cite.astro';
-import CountdownRail from '@/components/ui/CountdownRail.astro';
-import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
-import EvidenceChain from '@/components/ui/EvidenceChain.astro';
-import Figure from '@/components/ui/Figure.astro';
-import Icon from '@/components/ui/Icon.astro';
-import MoneyBanner from '@/components/ui/MoneyBanner.astro';
-import Phrased from '@/components/ui/Phrased.astro';
-import PullQuote from '@/components/ui/PullQuote.astro';
-import QuestionChips from '@/components/ui/QuestionChips.astro';
-import Section from '@/components/ui/Section.astro';
-import Select from '@/components/ui/Select.astro';
-import StanceBox from '@/components/ui/StanceBox.astro';
-import SubsidyTimeline from '@/components/ui/SubsidyTimeline.astro';
-import TimeLadder from '@/components/ui/TimeLadder.astro';
-import BarChart from '@/components/charts/BarChart.astro';
-import BeforeAfterChart from '@/components/charts/BeforeAfterChart.astro';
-import EmptyChart from '@/components/charts/EmptyChart.astro';
-import WaterfallChart from '@/components/charts/WaterfallChart.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import IllustrationTag from '@/components/ui/IllustrationTag.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import NextButton from '@/components/ui/NextButton.astro';
+import ScenarioSwitch from '@/components/ui/ScenarioSwitch.astro';
+import Screen from '@/components/ui/Screen.astro';
+import ScreenRail from '@/components/ui/ScreenRail.astro';
+import Segmented from '@/components/ui/Segmented.astro';
+import AirKey from '@/components/art/AirKey.astro';
+import AirRange from '@/components/art/AirRange.astro';
 import ApproachPlan from '@/components/art/ApproachPlan.astro';
-import PollutantKey from '@/components/art/PollutantKey.astro';
-import SceneCompare from '@/components/art/SceneCompare.astro';
-import SignalCycle from '@/components/art/SignalCycle.astro';
-import Signal from '@/components/art/Signal.astro';
-import SmellStrip from '@/components/art/SmellStrip.astro';
-import StreetScene from '@/components/art/StreetScene.astro';
-import Ev from '@/components/pages/home/Ev.astro';
-import Notes from '@/components/pages/home/Notes.astro';
-import PinnedScene from '@/components/pages/home/PinnedScene.astro';
-import EvShareChart from '@/components/pages/home/EvShareChart.astro';
-import RedLightYear from '@/components/pages/home/RedLightYear.astro';
-import { homeData, type Evidence } from '@/components/pages/home/home-data';
-import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { chain, questions, rail, t as tr, type EvidenceKind } from '@/i18n/ui';
-import { art } from '@/i18n/art';
-import film from '@/i18n/pages/film';
-import { shareCard } from '@/lib/share-cards';
+import BodyFigure from '@/components/art/BodyFigure.astro';
+import BodyPins from '@/components/art/BodyPins.astro';
+import FixButton from '@/components/art/FixButton.astro';
+import HeightsScene from '@/components/art/HeightsScene.astro';
+import HeroStreet from '@/components/art/HeroStreet.astro';
+import KerbScene from '@/components/art/KerbScene.astro';
+import MaskScene from '@/components/art/MaskScene.astro';
+import RiderScene from '@/components/art/RiderScene.astro';
+import RoadOfTime from '@/components/art/RoadOfTime.astro';
+import SwapControl from '@/components/art/SwapControl.astro';
+import SwapScene from '@/components/art/SwapScene.astro';
+import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
+import TenScooters from '@/components/art/TenScooters.astro';
+import ChartTable from '@/components/charts/ChartTable.astro';
+import MeasuredVsEstimate from '@/components/charts/MeasuredVsEstimate.astro';
+import PriceBars from '@/components/charts/PriceBars.astro';
+import WorkingSum from '@/components/charts/WorkingSum.astro';
+import { mveModel } from '@/components/charts/core/estimateCharts';
+import { monthlyBarsTitle, renderMonthlyBars } from '@/components/charts/core/monthlyBars';
+import { workingHoursPerYear, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
+import { openingData } from '@/components/pages/electric/opening-data';
+import { tableOn, type OpenText } from '@/components/pages/electric/opening-view';
+import { filmLength, homeFigures, verified } from '@/components/pages/home/home-figures';
+import * as V from '@/components/pages/home/money-view';
+import { checkHeadline, defaultRedsPerDay, est, estimateText, farBelowWho, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
+import { fact } from '@/data/facts';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { homeMoney } from '@/lib/home-money';
+import { formatDate } from '@/lib/site-state';
+import electric from '@/i18n/pages/electric';
+import home from '@/i18n/pages/home';
+import { fill, localize } from '@/i18n/pages/_copy';
+import { chipWhere, how, kSentences, num, site } from '@/i18n/ui';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
-const d = homeData(locale);
-const { t } = d;
-const ev = (e: Evidence) => ({ badge: e.badges.map((b) => b.kind) as EvidenceKind[], secondary: e.badges.some((b) => b.secondary) });
-const more = (n: number) => href(`/evidence/#link-${n}`, locale);
-const prologueCount = chain.countdown.prologue;
-const keyItems = (['fumes', 'co', 'ufp'] as const).map((kind) => ({ kind, title: art.key[kind].title[locale], body: kind === 'ufp' ? t.link4.keyUfp : art.key[kind].body[locale] }));
-const briefCard = shareCard('brief', locale);
-const roles = [
-  { id: 'walk', r: t.next.roles.walk, b1: null, b2: null },
-  { id: 'keep', r: t.next.roles.ride, b1: d.next.rideEv, b2: d.next.twoStrokeEv },
-  { id: 'parents', r: t.next.roles.parents, b1: 'inference', b2: 'inference' },
-  { id: 'neighbourhood', r: t.next.roles.neighbourhood, b1: null, b2: null },
-  { id: 'policy', r: { ...t.next.roles.policy, a1: d.next.policy }, b1: null, b2: null },
-] as const;
-const roleBadges = (b: Evidence | 'inference' | null): EvidenceKind[] => (b === null ? [] : b === 'inference' ? ['inference'] : b.badges.map((x) => x.kind));
+const t = localize(home, locale);
+const zh = locale === 'zh-TW';
+const sp = zh ? '' : ' '; // between two sentences: nothing in Chinese, a space in English
+const TOTAL = 15;
+const F = homeFigures(locale);
+const evidence = (n: number) => href(`/evidence/#link-${n}`, locale);
+
+// ---- screen 1 --------------------------------------------------------------------------------
+const filmHref = href('/90/', locale);
+const filmLabel = fill(t.common.film, { length: filmLength(t.common) });
+
+// ---- screen 5: the headline is chosen by the written rule; mark where its line may break ------
+const phraseAfterQuestion = (s: string) => (zh ? s.replace('？', '？|') : s.replace('? ', '? |'));
+const s5Headline = phraseAfterQuestion(checkHeadline(locale));
+const mve = mveModel(locale);
+// the cross-check paragraph: its first sentence is the measured rise, the rest is our working
+const crossCheck = estimateText.crossCheck[locale];
+const crossCut = crossCheck.indexOf(zh ? '。' : '. ') + 1;
+const crossMeasured = crossCheck.slice(0, crossCut).trim();
+const crossOurs = crossCheck.slice(crossCut).trim();
+
+// ---- screen 6: a pin ships only with its verified fact ----------------------------------------
+const pinFacts = { nose: 'route-irritant-vapour', lungs: 'route-particles-deep-lung', blood: 'route-co-blood' } as const;
+const pins = (['nose', 'lungs', 'blood'] as const).filter((p) => verified(pinFacts[p]));
+
+// ---- screen 7 --------------------------------------------------------------------------------
+const posts: [any, any, any] = [
+  { when: t.s7.posts.minutes.when, text: t.s7.posts.minutes.text, kind: 'study', where: chipWhere.taiwan[locale] },
+  { when: fill(t.s7.posts.hours.when, { h: F.walkHours }), text: t.s7.posts.hours.text, kind: 'study', where: chipWhere.abroad[locale] },
+  { when: t.s7.posts.years.when, text: fill(t.s7.posts.years.text, { n: F.studies }), kind: 'study', where: chipWhere.international[locale] },
+];
+
+// ---- screen 10: the four masks, in the order of research/masks/VERIFIED.json → tableRows -------
+const maskOrder = ['cloth', 'surgical', 'carbon', 'n95'] as const;
+
+// ---- screens 13 and 14: the calculator's own tables (lane I) ---------------------------------
+const D = openingData(locale);
+// the day the prices were checked: without the year while it is this year's
+const checkedOn = homeMoney(D.built).checkedOn;
+const checkedDate = formatDate(checkedOn, locale, checkedOn.slice(0, 4) !== D.built.slice(0, 4));
+const T = localize(electric, locale).open as unknown as OpenText;
+const H: V.HomeMoneyText = {
+  bodyClass: t.s13.bodyClass,
+  bodyKm: t.s14.bodyKm,
+  swapDearer: t.s14.swapDearer,
+  swapCheaper: t.s14.swapCheaper,
+  sheetElectric: t.s13.sheet.electric,
+  sheetPetrol: t.s13.sheet.petrol,
+  sheetList: t.s13.sheet.list,
+  sheetPaid: t.s13.sheet.paid,
+  sheetNone: t.s13.sheet.none,
+  sheetUpTo: t.s13.sheet.upTo,
+  figWho: t.s13.figWho,
+  checked: fill(t.common.checked, { date: checkedDate }),
+  monthHead: t.s14.headline,
+};
+const P: V.HomeMoneyPayload = { D, T, H, calc: href('/electric/', locale) };
+const table = tableOn(D, D.built);
+const choice: V.HomeChoice = { county: D.defaults.county, scrap: D.defaults.scrap, km: D.defaults.km };
+const calc = V.calcHref(P.calc, choice);
+const countyName = D.counties.find((c) => c.id === choice.county)!.name;
+const price = V.priceBarsProps(P, table, choice);
+
+// ---- screen 15 -------------------------------------------------------------------------------
+const pageUrl = new URL(href('/', locale), Astro.site).href;
+const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}`;
 ---
 
-<Base locale={locale} title={t.meta.title} description={t.meta.description} home money share="home">
-  <PinnedScene slot="head" />
-  <CountdownRail slot="rail" locale={locale} />
+<Base locale={locale} title={t.meta.title} description={t.meta.description} home share="home">
+  <ScreenRail slot="rail" locale={locale} total={TOTAL} chapter={t.s1.chapter} />
 
-  <!-- 3.1 Prologue ======================================================================== -->
-  <section
-    class="hero pin-run"
-    aria-labelledby="hero-title"
-    data-rail-chapter
-    data-phase="red"
-    data-count-from={prologueCount[0]}
-    data-count-to={prologueCount[1]}
-    data-rail-label={rail.idle[locale]}
-  >
-    <div class="container hero__text">
-      <p class="eyebrow hero__kicker">
-        <Signal state="red" size="2.25rem" label={tr(chain.kickerRed, locale, { n: prologueCount[0] })} />
-        <span>{t.prologue.kicker}</span>
-      </p>
-      <h1 id="hero-title" class="display hero__title"><Phrased text={t.prologue.title} /></h1>
-      <p class="lead">{t.prologue.deck}</p>
-      <p class="hero__rider">{t.prologue.rider}</p>
-      <Button href={href('/90/', locale)} variant="secondary" class="hero__play">
-        <svg viewBox="0 0 24 24" width="1.1em" height="1.1em" style="margin-inline-end:0.4em;vertical-align:-0.15em" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"></path></svg>{film.hero.play[locale]}
-      </Button>
-    </div>
-    <div class="hero__scene pin-frame">
-      <StreetScene locale={locale} frame="empty" count={prologueCount[0]} />
-    </div>
-    <div class="container hero__after">
-      <p class="hero__disclosure"><b>{t.prologue.disclosureLabel}</b> {t.prologue.disclosure}</p>
-      <p class="meta hero__micro">{t.prologue.microcopy}</p>
-      <p class="handoff"><Icon name="arrow-down" size="1.25em" /><a href="#brief">{t.prologue.handoff}</a></p>
-    </div>
-  </section>
+  <div class="h-home">
+    <h1 class="vh">{site.name[locale]}{zh ? '：' : ': '}{site.tagline[locale]}</h1>
 
-  <!-- 3.2 The 30-second version ============================================================= -->
-  <Section id="brief" tone="sunken" title={chain.summaryTitle[locale]} rule>
-    <div class="brief">
-      <ChainStrip locale={locale} />
-      <p class="brief__under">{chain.summaryUnder[locale]}</p>
-      <QuestionChips locale={locale}>
-        <a slot="after" href={href(questions.askMeasurePath, locale)}>{questions.askMeasure[locale]}<Icon name="arrow-right" size="1.05em" /></a>
-      </QuestionChips>
-      <p class="handoff"><Icon name="arrow-down" size="1.25em" /><span>{t.brief.handoff}</span></p>
-    </div>
-  </Section>
-
-  <!-- 3.3 Link 1 ============================================================================ -->
-  <div class="pin-run">
-  <Chapter locale={locale} id="link-1" link={1} haze title={t.link1.title} lead={d.link1.deck} moreHref={more(1)} handoff={t.link1.handoff}>
-    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="pack" /></div>
-    <Figure slot="visual" locale={locale} title={t.link1.figure.title} subtitle={d.link1.figure.subtitle} caption={d.link1.figure.caption} tone="exhaust" {...ev(d.link1.figure.ev)}>
-      <BarChart
-        locale={locale}
-        title={t.link1.figure.chart}
-        desc={d.link1.figure.desc}
-        data={d.link1.figure.rows}
-        unit="%"
-        max={100}
-        reference={{ value: 100, label: t.link1.figure.whole }}
-        decimals={1}
-        tone="exhaust"
-        categoryLabel={t.link1.figure.category}
-        valueLabel={t.link1.figure.scooters}
-      />
-      <Fragment slot="source">{d.link1.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-    <div class="prose">
-      {d.link1.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
-    </div>
-    <Fragment slot="caveat">
-      <p>{d.link1.caveat}<Ev locale={locale} ev={d.link1.caveatEv} /></p>
-      <Notes locale={locale} notes={d.link1.caveatEv.notes} />
-    </Fragment>
-    <Fragment slot="action">
-      <p>{t.link1.action}<Ev locale={locale} ev={d.link1.actionEv} /></p>
-    </Fragment>
-  </Chapter>
-
-  <!-- 3.4 Link 2 ============================================================================ -->
-  <Chapter locale={locale} id="link-2" link={2} haze title={d.link2.title} lead={d.link2.deck} actionBadge="inference" action={t.link2.action} moreHref={more(2)} handoff={t.link2.handoff}>
-    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="kerb" emphasis="heights" /></div>
-    <Figure slot="visual" locale={locale} title={d.link2.figure.title} subtitle={t.link2.figure.subtitle} frame="none" {...ev(d.link2.figure.ev)}>
-      <ApproachPlan locale={locale} />
-      <Fragment slot="source">{d.link2.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-    <div class="prose">
-      {d.link2.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
-      <Notes locale={locale} notes={d.link2.body.flatMap((p) => p.ev.notes)} />
-    </div>
-    <Fragment slot="caveat">
-      <p>{t.link2.caveat}<Ev locale={locale} ev={d.link2.caveatEv} /></p>
-      {d.link2.who && <p class="who"><b>{t.meta.who}</b>{d.link2.who}</p>}
-    </Fragment>
-  </Chapter>
-
-  <!-- 3.5 Link 3: the centre of the page ===================================================== -->
-  <Chapter locale={locale} id="link-3" link={3} tone="night" haze title={t.link3.title} lead={t.link3.deck} moreHref={more(3)} handoff={t.link3.handoff} class="chapter--centre">
-    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="paused" /></div>
-    <div slot="visual" class="empty-room">
-      <Figure locale={locale} empty title={t.link3.figure.title} subtitle={t.link3.figure.subtitle} level={3}>
-        <EmptyChart locale={locale} title={t.link3.figure.chart} desc={t.link3.figure.desc} panelHeight={96} />
-        <Fragment slot="who">{d.link3.who} <a href={href(questions.askMeasurePath, locale)}>{t.link3.actionLink}</a></Fragment>
-      </Figure>
-    </div>
-    <div class="prose">
-      {d.link3.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
-    </div>
-    <Figure locale={locale} title={t.link3.small.title} subtitle={d.link3.small.subtitle} caption={d.link3.small.caption} {...ev(d.link3.small.ev)} class="small-fig">
-      <BeforeAfterChart
-        locale={locale}
-        title={t.link3.small.chart}
-        desc={d.link3.small.desc}
-        data={d.link3.small.rows}
-        beforeLabel={d.link3.small.before}
-        afterLabel={d.link3.small.after}
-        beforeTone="neutral"
-        afterTone="ink"
-        unit="µg/m³"
-        decimals={1}
-        categoryLabel={t.link3.small.category}
-      />
-      <Fragment slot="source">{d.link3.small.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-    <PullQuote>
-      {t.link3.pledge}
-      <Fragment slot="attribution">{t.link3.pledgeBy}</Fragment>
-    </PullQuote>
-    <Fragment slot="caveat">
-      <p>{t.link3.caveat}<Ev locale={locale} ev={d.link3.caveatEv} /></p>
-    </Fragment>
-    <Fragment slot="action">
-      <p>{t.link3.action}<a href={href(questions.askMeasurePath, locale)}>{t.link3.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
-    </Fragment>
-  </Chapter>
-
-  <!-- 3.6 Link 4 ============================================================================ -->
-  <Chapter locale={locale} id="link-4" link={4} haze title={t.link4.title} lead={t.link4.deck} moreHref={more(4)} handoff={t.link4.handoff}>
-    <div slot="art" class="art-with-key pin-frame">
-      <StreetScene locale={locale} frame="kerb" emphasis="fumes" />
-      <div class="container"><PollutantKey locale={locale} layers={['fumes', 'co', 'ufp']} items={keyItems} /></div>
-    </div>
-    <Figure slot="visual" locale={locale} title={t.link4.figure.title} frame="none" {...ev(d.link4.smellEv)}>
-      <SmellStrip locale={locale}>
-        <Fragment slot="can">{t.link4.smell.can}</Fragment>
-        <Fragment slot="cannot">{t.link4.smell.cannot}</Fragment>
-      </SmellStrip>
-      <Fragment slot="source">{d.link4.smellEv.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-    <div class="prose">
-      {d.link4.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
-      {d.link4.gapWho && <p class="who"><b>{t.meta.who}</b>{d.link4.gapWho}</p>}
-      <Notes locale={locale} notes={d.link4.body.flatMap((p) => p.ev.notes)} />
-    </div>
-    <Callout label={t.link4.marker.label}>
-      <p>{t.link4.marker.text}<Ev locale={locale} ev={d.link4.markerEv} /></p>
-    </Callout>
-    <Fragment slot="caveat"><p>{t.link4.caveat}</p></Fragment>
-    <Fragment slot="action">
-      <p>{t.link4.action}</p>
-      <p><a href={href(questions.chips[0].path, locale)}>{t.link4.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
-    </Fragment>
-  </Chapter>
-  </div>
-
-  <!-- 3.7 Link 5: no scene colour, no figures beside a number ================================= -->
-  <Chapter locale={locale} id="link-5" link={5} tone="sunken" title={t.link5.title} lead={t.link5.deck} moreHref={more(5)} handoff={t.link5.handoff}>
-    <div class="stack-l">
-      <div class="prose">
-        {d.link5.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
-      </div>
-      <TimeLadder
-        locale={locale}
-        stops={d.link5.ladder.map((s) => ({
-          time: s.time,
-          ...('empty' in s ? { empty: true } : { body: s.body, scope: s.scope }),
-          badge: s.ev.badges.map((b) => b.kind),
-          secondary: s.ev.badges.some((b) => b.secondary),
-        }))}
-      />
-      <p class="meta ladder-cites">
-        {d.link5.ladder.map((s) => s.ev.cites.length > 0 && (<span class="ladder-cites__item">{s.time}{s.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</span>))}
-      </p>
-      <Callout tone="signal" label={t.link5.ruler.label}>
-        <p>{t.link5.ruler.text}<Ev locale={locale} ev={d.link5.gapEv} /></p>
-      </Callout>
-      <Notes locale={locale} notes={d.link5.ladder.flatMap((s) => s.ev.notes)} />
-      <Callout tone="clean" label={t.link5.walk.label}>
-        <p>{t.link5.walk.text}<Ev locale={locale} ev={d.link5.walkEv} /></p>
-      </Callout>
-      <RedLightYear locale={locale} />
-    </div>
-    <Fragment slot="caveat"><p>{t.link5.caveat}</p></Fragment>
-    <Fragment slot="action"><p>{d.link5.action}<Ev locale={locale} ev={d.link5.actionEv} /></p></Fragment>
-  </Chapter>
-
-  <!-- 3.8 Link 6 ============================================================================ -->
-  <div class="pin-run">
-  <Chapter locale={locale} id="link-6" link={6} haze title={t.link6.title} lead={t.link6.deck} actionBadge="inference" action={t.link6.action} moreHref={more(6)} handoff={t.link6.handoff}>
-    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="kerb" emphasis="heights" /></div>
-    <Figure slot="visual" locale={locale} title={t.link6.figure.title} subtitle={d.link6.figure.subtitle} caption={d.link6.figure.caption} {...ev(d.link6.figure.ev)} class="small-fig">
-      <BarChart locale={locale} title={t.link6.figure.chart} desc={d.link6.figure.desc} data={d.link6.figure.data} unit="µg/m³" decimals={1} emphasis categoryLabel={t.link6.figure.category} valueLabel={t.link6.figure.value} />
-      <Fragment slot="source">{d.link6.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-    <div class="prose">
-      {d.link6.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
-      <p class="who"><b>{t.meta.who}</b><a href={href('/unmeasured/', locale)}>{t.meta.askPage}<Icon name="arrow-right" size="1.05em" /></a></p>
-      <Notes locale={locale} notes={d.link6.body.flatMap((p) => p.ev.notes)} />
-    </div>
-    <Fragment slot="caveat"><p>{t.link6.caveat}<Ev locale={locale} ev={d.link6.caveatEv} /></p></Fragment>
-  </Chapter>
-
-  <!-- 3.9 Green ============================================================================= -->
-  <Chapter locale={locale} id="green" phase="green" haze size="auto" title={t.green.title} lead={t.green.deck} handoff={t.green.handoff}>
-    <div slot="art" class="pin-frame"><StreetScene locale={locale} frame="green" /></div>
-    <Figure slot="visual" locale={locale} title={t.green.figure.title} subtitle={t.green.figure.subtitle} frame="none" {...ev(d.green.deckEv)}>
-      <SignalCycle locale={locale}>
-        <EvidenceBadge slot="badge" locale={locale} kind="international" />
-        <EvidenceBadge slot="gap" locale={locale} kind="gap" />
-      </SignalCycle>
-      <Fragment slot="source">{d.green.deckEv.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-    <div class="prose">
-      {t.green.body.map((p) => <p>{p}</p>)}
-      <Notes locale={locale} notes={d.green.deckEv.notes} />
-    </div>
-    <Fragment slot="caveat"><p>{t.green.caveat}<Ev locale={locale} ev={d.green.gapEv} /></p></Fragment>
-  </Chapter>
-  </div>
-
-  <!-- 3.10 Joining it up ==================================================================== -->
-  <Chapter locale={locale} id="connect" count={0} tone="sunken" size="auto" title={t.connect.title} lead={t.connect.deck} handoff={t.connect.handoff}>
-    <EvidenceChain locale={locale} links={d.connect.links} question={t.connect.question} collapseSources>
-      <Fragment slot="reveal"><p>{t.connect.reveal}</p></Fragment>
-      <Fragment slot="boxes">
-        <StanceBox locale={locale} kind="not-saying" items={t.connect.notSaying} />
-        <StanceBox locale={locale} kind="change-mind"><p>{t.connect.changeMind}</p></StanceBox>
+    <!-- 1 · 紅燈亮了 ====================================================================== -->
+    <Screen locale={locale} n={1} total={TOTAL} chapter={t.s1.chapter} headline={t.s1.headline} body={fill(t.s1.body, { s: F.red })} illustration next={{ label: t.s1.next }}>
+      <HeroStreet slot="picture" locale={locale} />
+      <Fragment slot="chips">
+        <KindChip locale={locale} of={fact('iot-pedestrian-wait')} where="" />
+        <KindChip locale={locale} kind="estimate" />
       </Fragment>
-    </EvidenceChain>
-  </Chapter>
+      <a slot="actions" class="h-act h-act--film" href={filmHref}>
+        <svg class="h-act__play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"></path></svg>
+        <span>{filmLabel}</span>
+      </a>
+      <HowSheet slot="sheet" id="how-1" locale={locale} kind="official" title={fill(t.s1.sheet.title, { s: F.red, n: F.drawn })} facts="iot-pedestrian-wait" primary={{ href: evidence(2) }} secondary={{ href: href('/estimate/#count', locale), label: t.s1.sheet.count }}>
+        <p slot="block1">{t.s1.sheet.who}</p>
+        <p slot="block2">{fill(t.s1.sheet.what, { s: F.red, lo: F.wait.lo, hi: F.wait.hi })}</p>
+        <p slot="block3">{fill(t.s1.sheet.care, { n: F.drawn, name: F.dozen.name[locale], clo: F.dozen.count.lo, chi: F.dozen.count.hi })}</p>
+      </HowSheet>
+    </Screen>
 
-  <!-- 3.11 Link 7 =========================================================================== -->
-  <div class="pin-run">
-  <Chapter locale={locale} id="link-7" link={7} tone="clear" title={t.link7.title} lead={t.link7.deck} moreHref={more(7)} handoff={t.link7.handoff}>
-    <SceneCompare slot="art" locale={locale} name="home-compare" count={chain.countdown.links[6][0]} class="pin-frame" />
-    <Figure slot="visual" locale={locale} title={t.link7.figure.title} subtitle={d.link7.figure.subtitle} caption={t.link7.figure.caption} tone="clean" {...ev(d.link7.figure.ev)}>
-      <EvShareChart
-        locale={locale}
-        title={t.link7.figure.chart}
-        desc={d.link7.figure.desc}
-        years={d.link7.chart.years}
-        actual={d.link7.chart.actual}
-        targets={d.link7.chart.targets}
-        labels={d.link7.chart.labels}
-        format={d.link7.chart.fmt}
-        names={{ actual: t.link7.figure.actual, target: t.link7.figure.target, year: t.link7.figure.year }}
-      />
-      <Fragment slot="source">{d.link7.figure.ev.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-    <div class="prose">
-      {d.link7.body.map((p) => <p>{p.text}<Ev locale={locale} ev={p.ev} /></p>)}
-      <Notes locale={locale} notes={[...d.link7.figure.ev.notes, ...d.link7.body.flatMap((p) => p.ev?.notes ?? [])]} />
-    </div>
-    <Fragment slot="caveat">
-      <p>{t.link7.caveat}<Ev locale={locale} ev={d.link7.caveatEv} /></p>
-      <Notes locale={locale} notes={d.link7.caveatEv.notes} />
-    </Fragment>
-    <Fragment slot="action">
-      <p>{t.link7.action}<a href={href('/act/#keep', locale)}>{t.link7.actionLink}<Icon name="arrow-right" size="1.05em" /></a></p>
-    </Fragment>
-  </Chapter>
+    <!-- 2 · 排出什麼 ====================================================================== -->
+    <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={t.s2.headline} body={t.s2.body} quiet={verified('who-benzene-no-safe-level') ? t.s2.quiet : undefined} next={{ label: t.s2.next }}>
+      <div slot="picture" class="h-pic">
+        <div class="h-crop" style="--crop:8">
+          <TailpipeMarks locale={locale}>
+            <EstimateValue slot="chip" locale={locale} slotId="emit.co.perRed_can" label={t.s2.canLabel} sheet="how-2" />
+          </TailpipeMarks>
+        </div>
+        <IllustrationTag locale={locale} />
+        <div class="h-pic__ctl"><AirKey locale={locale} tap layout="row" class="h-key" /></div>
+      </div>
+      <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="recipe" title={t.s2.sheet.title} facts={['iarc-benzene-group1', 'who-benzene-no-safe-level', 'co-odourless']}>
+        <p slot="block1">{fill(t.s2.sheet.measured, { readings: F.readings })}</p>
+        <Fragment slot="block2">
+          <WorkingSum locale={locale} {...workingPerRed(locale)} />
+          <WorkingSum locale={locale} {...workingPerRedCan(locale)} />
+          <p>{fill(t.s2.sheet.can, { litres: formatEstimate('emit.co.perRed_L', locale).text, ml: F.canMl, cans: est.emit.co.canWords[locale] })}</p>
+        </Fragment>
+        <p slot="block3">{t.s2.sheet.care}</p>
+      </HowSheet>
+    </Screen>
+
+    <!-- 3 · 排在哪裡 ====================================================================== -->
+    <Screen locale={locale} n={3} total={TOTAL} chapter={t.s3.chapter} headline={t.s3.headline} body={fill(t.s3.body, { h: F.tailpipeCm, gap: F.gapCm })} illustration next={{ label: t.s3.next }}>
+      <ApproachPlan slot="picture" locale={locale} />
+      <Fragment slot="chips">
+        <KindChip locale={locale} of={fact('marking-rules-turn-box')} where="" />
+        <KindChip locale={locale} of={fact('iot-exhaust-height-assumption')} where="" />
+      </Fragment>
+      <HowSheet slot="sheet" id="how-3" locale={locale} kind="official" title={fill(t.s3.sheet.title, { gap: F.gapCm })} facts={['marking-rules-turn-box', 'iot-exhaust-height-assumption', 'idling-regulation']} primary={{ href: evidence(2) }}>
+        <p slot="block1">{t.s3.sheet.who}</p>
+        <p slot="block2">{fill(t.s3.sheet.what, { h: F.tailpipeCm, gap: F.gapCm })}</p>
+        <p slot="block3">{fill(t.s3.sheet.care, { gap: F.gapCm, min: F.idleMinutes })}</p>
+      </HowSheet>
+    </Screen>
+
+    <!-- 4 · 吸進多少 ====================================================================== -->
+    <Screen locale={locale} n={4} total={TOTAL} chapter={t.s4.chapter} headline={t.s4.headline} quiet={t.s4.quiet} next={{ label: t.s4.next }} class="h-s4">
+      <div slot="picture" class="h-pic">
+        <div class="h-box">
+          <div class="h-box__row">
+            <span class="h-box__what">{estimateText.alreadyThere[locale]}</span>
+            <span class="h-box__val"><b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} where="" size="sm" /></span>
+          </div>
+          <div class="h-box__row h-box__row--est">
+            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" data-when-scenario={s} />)}
+          </div>
+          <p class="h-box__gloss"><b>{t.s4.box}</b><span aria-hidden="true">｜</span>{estimateText.ppmGloss[locale]}</p>
+        </div>
+        <KerbScene locale={locale} />
+        <IllustrationTag locale={locale} />
+        <div class="h-pic__ctl"><ScenarioSwitch locale={locale} /></div>
+      </div>
+      <p slot="body">{est.meta.gloss[locale]}{sp}{scenarioKeys.map((s) => <span data-when-scenario={s}>{kerbSentence(s, locale)}</span>)}</p>
+      <HowSheet slot="sheet" id="how-4" locale={locale} kind="estimate" pollutant="co" anchor="recipe" title={t.s4.sheet.title} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']}>
+        <p slot="block1">{fill(t.s4.sheet.measured, { sites: F.sites, n: F.peakSites, lo: F.peakLo, hi: F.peakHi })}</p>
+        <WorkingSum slot="block2" locale={locale} {...workingKerbFlow(locale)} />
+        <Fragment slot="block3">
+          <p>{est.meta.appliesTo[locale]}{sp}{t.s4.sheet.care}</p>
+          <AirRange locale={locale} scenario="dozen" />
+        </Fragment>
+      </HowSheet>
+    </Screen>
+
+    <!-- 5 · 量到的，和算的 ================================================================= -->
+    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={s5Headline} quiet={estimateText.coTracksVapour[locale]} next={{ label: t.s5.next }}>
+      <MeasuredVsEstimate slot="picture" locale={locale} sheet="how-5" table={false} compact />
+      <p slot="body">{fill(t.s5.bodySensors, { sites: F.sites })}{farBelowWho() && <Fragment>{sp}{t.s5.bodyFarBelow}</Fragment>}</p>
+      <HowSheet slot="sheet" id="how-5" locale={locale} kind="measured" where={chipWhere.taiwan[locale]} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']} primary={{ href: evidence(3) }} secondary={{ href: href('/estimate/#check', locale), label: how.fullMethod[locale] }}>
+        <p slot="block1">{t.s5.sheet.who}</p>
+        <Fragment slot="block2">
+          <p>{crossMeasured}</p>
+          <p>{crossOurs}</p>
+        </Fragment>
+        <p slot="block3">{estimateText.whoAveraging[locale]}</p>
+        <ChartTable table={mve.table} caption={t.s5.sheet.table} />
+      </HowSheet>
+    </Screen>
+
+    <!-- 6 · 吸進去以後 ==================================================================== -->
+    <Screen locale={locale} n={6} total={TOTAL} chapter={t.s6.chapter} headline={t.s6.headline} body={fill(t.s6.body, { n: F.studies })} quiet={kSentences.K5[locale]} next={{ label: t.s6.next }} class="h-s6">
+      <div slot="picture" class="h-pic">
+        <BodyFigure locale={locale} pins={[...pins]} />
+        <IllustrationTag locale={locale} kind="body" />
+        <div class="h-pic__ctl h-pins" aria-live="polite">
+          {pins.length > 0 && <p class="h-pins__hint" data-js-only>{t.s6.hint}</p>}
+          <BodyPins locale={locale} items={pins.map((pin) => ({ pin, text: t.s6.pins[pin] }))} />
+        </div>
+      </div>
+      <KindChip slot="chips" locale={locale} kind="study" where={chipWhere.longTermAllTraffic[locale]} fact="hei-sr23-trap-associations" size="sm" />
+      <HowSheet slot="sheet" id="how-6" locale={locale} kind="study" where={chipWhere.international[locale]} facts={['hei-sr23-trap-associations', ...pins.map((p) => pinFacts[p])]} primary={{ href: evidence(5) }}>
+        <p slot="block1">{fill(t.s6.sheet.who, { n: F.studies })}</p>
+        <p slot="block2">{t.s6.sheet.what}</p>
+        <Fragment slot="block3">
+          <p>{t.s6.sheet.care}</p>
+          {pins.length > 0 && <p>{t.s6.sheet.routes}</p>}
+        </Fragment>
+      </HowSheet>
+    </Screen>
+
+    <!-- 7 · 天天等 ======================================================================== -->
+    <Screen locale={locale} n={7} total={TOTAL} chapter={t.s7.chapter} headline={t.s7.headline} quiet={t.s7.quiet} next={{ label: t.s7.next }}>
+      <div slot="picture" class="h-pic">
+        <RoadOfTime locale={locale} posts={posts} />
+        <div class="h-pic__ctl"><Segmented name="reds" legend={t.s7.stepper} hideLegend value={String(defaultRedsPerDay)} options={redsPerDayOptions.map((n) => ({ value: String(n), label: fill(t.s7.stepperOption, { n }) }))} /></div>
+      </div>
+      <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={String(n)}>{t.s7.body[n]}</span>)}</p>
+      <KindChip slot="chips" locale={locale} kind="derived" />
+      <HowSheet slot="sheet" id="how-7" locale={locale} kind="study" heads={t.s7.sheet.heads as [string, string, string]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: evidence(5) }}>
+        <ul slot="block1">
+          <li>{t.s7.sheet.minutes}</li>
+          <li>{fill(t.s7.sheet.hours, { h: F.walkHours, people: F.walkPeople })}</li>
+          <li>{fill(t.s7.sheet.years, { n: F.studies })}</li>
+        </ul>
+        <Fragment slot="block2">
+          <WorkingSum locale={locale} {...workingHoursPerYear(defaultRedsPerDay, locale)} />
+          <p>{fill(t.s7.sheet.dose, { pct: F.dosePct })}</p>
+        </Fragment>
+        <p slot="block3">{t.s7.sheet.workers}</p>
+      </HowSheet>
+    </Screen>
+
+    <!-- 8 · 誰最近 ======================================================================== -->
+    <Screen locale={locale} n={8} total={TOTAL} chapter={t.s8.chapter} headline={t.s8.headline} body={fill(t.s8.body, { lo: F.child.lo, hi: F.child.hi })} quiet={kSentences.K4[locale]} illustration next={{ label: t.s8.next }}>
+      <HeightsScene slot="picture" locale={locale} />
+      <KindChip slot="chips" locale={locale} of={fact('child-air-per-kg')} />
+      <HowSheet slot="sheet" id="how-8" locale={locale} kind="study" where={chipWhere.international[locale]} facts="child-air-per-kg" primary={{ href: evidence(6) }}>
+        <p slot="block1">{t.s8.sheet.who}</p>
+        <p slot="block2">{fill(t.s8.sheet.what, { lo: F.child.lo, hi: F.child.hi })}</p>
+        <p slot="block3">{t.s8.sheet.care}</p>
+      </HowSheet>
+    </Screen>
+
+    <!-- 9 · 騎士也在裡面 ================================================================== -->
+    <Screen locale={locale} n={9} total={TOTAL} chapter={t.s9.chapter} headline={t.s9.headline} body={t.s9.body} quiet={t.s9.quiet} illustration next={{ label: t.s9.next }}>
+      <RiderScene slot="picture" locale={locale} />
+      <KindChip slot="chips" locale={locale} of={fact('commute-scooter-vs-subway-chuang2020')} />
+      <HowSheet slot="sheet" id="how-9" locale={locale} kind="measured" where={chipWhere.taiwan[locale]} facts="commute-scooter-vs-subway-chuang2020" primary={{ href: evidence(6) }}>
+        <p slot="block1">{t.s9.sheet.who}</p>
+        <Fragment slot="block2">
+          <p>{t.s9.sheet.what}</p>
+          <ul class="h-modes">
+            {(['scooter', 'walking', 'bus', 'car', 'metro'] as const).map((m) => <li><span>{t.s9.sheet.modes[m]}</span><span class="h-modes__n">{F.commute[m]} {t.common.ugm3}</span></li>)}
+          </ul>
+        </Fragment>
+        <p slot="block3">{t.s9.sheet.care}</p>
+      </HowSheet>
+    </Screen>
+
+    <!-- 10 · 口罩擋得住嗎 ================================================================= -->
+    <Screen locale={locale} n={10} total={TOTAL} chapter={t.s10.chapter} headline={t.s10.headline} body={t.s10.body} quiet={t.s10.quiet} next={{ label: t.s10.next }}>
+      <div slot="picture" class="h-pic">
+        <MaskScene locale={locale} />
+        <IllustrationTag locale={locale} />
+        <div class="h-pic__ctl"><Segmented name="mask" legend={t.s10.switch} value="surgical" columns={4} options={maskOrder.map((m) => ({ value: m, label: t.s10.masks[m].label, sub: t.s10.masks[m].sub }))} class="h-masks" /></div>
+      </div>
+      <Fragment slot="chips">
+        <KindChip locale={locale} of={fact('mask-niosh-no-gas')} where="" />
+        <KindChip locale={locale} of={fact('mask-asworn-vandersande')} where="" />
+      </Fragment>
+      <HowSheet slot="sheet" id="how-10" locale={locale} kind="official" where={chipWhere.abroad[locale]} heads={t.s10.sheet.heads as [string, string, string]} facts={['mask-niosh-no-gas', 'mask-asworn-vandersande', 'mask-ultrafine-su', 'mask-cloth-rengasamy', 'mask-fit-cherrie', 'mask-carbon-breakthrough', 'mask-carbon-mol-2005', 'mask-ilosh-taiwan', 'mask-respirator-benefit-langrish']} primary={{ href: href('/questions/mask/', locale), label: t.s10.sheet.more }}>
+        <p slot="block1">{t.s10.sheet.who}</p>
+        <Fragment slot="block2">
+          <table class="h-masktable">
+            <thead>
+              <tr><th scope="col">{t.s10.sheet.cols.mask}</th><th scope="col">{t.s10.sheet.cols.gases}</th><th scope="col">{t.s10.sheet.cols.ultrafine}</th><th scope="col">{t.s10.sheet.cols.pm25}</th></tr>
+            </thead>
+            <tbody>
+              {maskOrder.map((m) => (
+                <tr>
+                  <th scope="row">{t.s10.sheet.rows[m].mask}</th>
+                  <td data-col={t.s10.sheet.cols.gases}>{t.s10.sheet.rows[m].gases}</td>
+                  <td data-col={t.s10.sheet.cols.ultrafine}>{t.s10.sheet.rows[m].ultrafine}</td>
+                  <td data-col={t.s10.sheet.cols.pm25}>{t.s10.sheet.rows[m].pm25}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p class="h-sub">{t.s10.sheet.taiwan}</p>
+          <ul>
+            <li>{fill(t.s10.sheet.mol, { tested: F.mask.tested, min: F.mask.minutes, result: F.mask.passed === 0 ? t.s10.sheet.molNone : fill(t.s10.sheet.molSome, { passed: F.mask.passed }) })}</li>
+            <li>{fill(t.s10.sheet.ilosh, { people: F.mask.people, n95: F.mask.n95, medical: F.mask.medical })}</li>
+          </ul>
+        </Fragment>
+        <p slot="block3">{t.s10.sheet.care}</p>
+      </HowSheet>
+    </Screen>
+
+    <!-- 11 · 換掉 ========================================================================= -->
+    <Screen locale={locale} n={11} total={TOTAL} chapter={t.s11.chapter} headline={t.s11.headline} body={t.s11.body} next={{ label: t.s11.next }}>
+      <div slot="picture" class="h-pic">
+        <SwapScene locale={locale} />
+        <IllustrationTag locale={locale} />
+        <div class="h-pic__ctl">
+          <SwapControl locale={locale} />
+          <div class="h-swapnote">
+            <span class="h-swapnote__n">{t.s11.chipBefore}<b data-swap-out="pct">100</b>{t.s11.chipAfter}</span>
+            <KindChip locale={locale} kind="derived" size="sm" />
+            <span class="h-swapnote__if">{t.s11.assume}</span>
+          </div>
+        </div>
+      </div>
+      <HowSheet slot="sheet" id="how-11" locale={locale} kind="derived" facts={verified('liou-wu-2021-electric-scooter-benefit') ? 'liou-wu-2021-electric-scooter-benefit' : undefined} primary={{ href: evidence(7) }} secondary={{ href: calc, label: how.myTerms[locale] }}>
+        <p slot="block1">{fill(t.s11.sheet.used, { total: 10 })}</p>
+        <p slot="block2">{t.s11.sheet.how}</p>
+        <Fragment slot="block3">
+          <p>{t.s11.sheet.care}</p>
+          {verified('liou-wu-2021-electric-scooter-benefit') && <p>{fill(t.s11.sheet.national, F.national)} <KindChip locale={locale} of={fact('liou-wu-2021-electric-scooter-benefit')} size="sm" /></p>}
+        </Fragment>
+      </HowSheet>
+    </Screen>
+
+    <!-- 12 · 還沒要換車 =================================================================== -->
+    <Screen locale={locale} n={12} total={TOTAL} chapter={t.s12.chapter} headline={t.s12.headline} body={t.s12.body} next={{ label: t.s12.next }}>
+      <div slot="picture" class="h-pic">
+        <TenScooters locale={locale} />
+        <IllustrationTag locale={locale} />
+        <div class="h-pic__ctl"><FixButton locale={locale} /></div>
+      </div>
+      <Fragment slot="chips">
+        <KindChip locale={locale} of={fact('inspection-top-tenth-co-share')} size="sm" />
+        <span class="h-chipnote">{formatEstimate('inspect.top10share', locale).text}</span>
+      </Fragment>
+      <HowSheet slot="sheet" id="how-12" locale={locale} kind="derived" facts="inspection-top-tenth-co-share" primary={{ href: evidence(1) }} secondary={{ href: href('/act/#ride', locale), label: t.s12.sheet.ride }}>
+        <p slot="block1">{fill(t.s12.sheet.used, { readings: F.readings })}</p>
+        <p slot="block2">{fill(t.s12.sheet.how, { share: formatEstimate('inspect.top10share', locale).text })}</p>
+        <p slot="block3">{t.s12.sheet.care}</p>
+      </HowSheet>
+    </Screen>
+
+    <!-- 13 · 買的那天 ===================================================================== -->
+    <Screen locale={locale} n={13} total={TOTAL} phase="green" chapter={t.s13.chapter} headline={V.buyHead(P, table, choice)} next={{ label: t.s13.next }}>
+      <div slot="above" class="h-pick">
+        <div class="h-pick__county" data-js-only>
+          <label class="h-pick__label" for="hm-county">{t.s13.county}</label>
+          <select id="hm-county" class="h-select" data-hm-county autocomplete="off">
+            {D.counties.map((c) => <option value={c.id} selected={c.id === choice.county}>{c.name}</option>)}
+          </select>
+        </div>
+        <div data-js-only>
+          <Segmented name="scrap" legend={t.s13.scrap} hideLegend value={choice.scrap} options={[{ value: 'yes', label: t.s13.scrapYes, sub: t.s13.scrapYesSub }, { value: 'no', label: t.s13.scrapNo, sub: t.s13.scrapNoSub }]} />
+        </div>
+        <p class="h-pick__fixed">{fill(t.s13.fixed, { county: countyName, scrap: choice.scrap === 'yes' ? T.caseScrapYes : T.caseScrapNo })}</p>
+      </div>
+      <div slot="picture" class="h-pic h-pic--chart">
+        <div class="h-fig" data-hm-fig aria-live="polite" set:html={V.figureHtml(P, table, choice)} />
+        <PriceBars locale={locale} id="hm-price" petrol={price.petrol} electric={price.electric} plate={price.plate} table={false} />
+      </div>
+      <p slot="body" data-hm-body13>{V.buyBody(P, table)}</p>
+      <p class="h-deadline-note" data-hm-strip>{V.stripOf(P, table, choice)}</p>
+      <Fragment slot="chips">
+        <KindChip locale={locale} kind="derived" />
+        <span class="h-chipnote">{H.checked}</span>
+      </Fragment>
+      <HowSheet slot="sheet" id="how-13" locale={locale} kind="derived" title={t.s13.sheet.title} primary={{ href: calc, label: how.myTerms[locale] }} secondary={{ href: href('/electric/#examples', locale), label: T.examplesLink }}>
+        <p slot="block1">{t.s13.sheet.used}</p>
+        <div slot="block2" class="h-work" data-hm-lines set:html={V.buyLinesHtml(P, table, choice)} />
+        <Fragment slot="block3">
+          <p>{t.s13.sheet.care}</p>
+          <p class="h-chipnote">{H.checked}</p>
+        </Fragment>
+      </HowSheet>
+    </Screen>
+
+    <!-- 14 · 每個月 ======================================================================= -->
+    <Screen locale={locale} n={14} total={TOTAL} phase="green" chapter={t.s14.chapter} headline={V.monthHead(P, table, choice.km)}>
+      <div slot="picture" class="h-pic h-pic--chart">
+        <div class="h-pic__ctl" data-js-only>
+          <Segmented name="km" legend={t.s14.km} hideLegend value={String(choice.km)} columns={4} options={D.km.map((k) => ({ value: String(k), label: num(k, locale), sub: t.s14.kmUnit }))} />
+        </div>
+        <div id="hm-month" class="chart hc hc-monthlybars" data-chart="monthly-bars" data-grow="" role="group" aria-label={monthlyBarsTitle(locale, choice.km)} set:html={renderMonthlyBars(V.monthlyBarsProps(P, table, choice.km))} />
+        <p class="h-under-note" data-hm-under aria-live="polite">{V.monthUnder(P, table, choice)}</p>
+      </div>
+      <p slot="body" data-hm-body14>{V.monthBody(P, table, choice.km)}</p>
+      <KindChip slot="chips" locale={locale} kind="derived" />
+      <div slot="actions" class="h-two">
+        <NextButton href="#s-15">{t.s14.next}</NextButton>
+        <NextButton href={calc} variant="primary">{t.s14.mine}</NextButton>
+      </div>
+      <HowSheet slot="sheet" id="how-14" locale={locale} kind="derived" title={t.s14.sheet.title} primary={{ href: calc, label: how.myTerms[locale] }}>
+        <p slot="block1">{t.s14.sheet.used}</p>
+        <p slot="block2">{t.s14.sheet.how}</p>
+        <Fragment slot="block3">
+          <p>{fill(T.monthNote, { km: num(choice.km, locale) })}</p>
+          <p>{T.beNote}</p>
+        </Fragment>
+      </HowSheet>
+    </Screen>
+
+    <!-- 15 · 下一個紅燈 =================================================================== -->
+    <Screen locale={locale} n={15} total={TOTAL} phase="green" chapter={t.s15.chapter} headline={t.s15.headline} body={t.s15.body}>
+      <div slot="picture" class="h-pic">
+        <div class="h-crop" style="--crop:11"><HeroStreet locale={locale} phase="green" /></div>
+        <IllustrationTag locale={locale} />
+      </div>
+      <div slot="actions" class="h-end">
+        <NextButton href={calc} variant="primary">{t.s15.start}</NextButton>
+        <ul class="h-end__grid" aria-label={t.s15.more}>
+          <li>
+            <a class="h-act" href={filmHref}>
+              <svg class="h-act__play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"></path></svg>
+              <span>{t.common.filmShort}</span>
+            </a>
+          </li>
+          <li><a class="h-act" href={lineHref} target="_blank" rel="noopener noreferrer"><span set:html={V.phrasedHtml(t.s15.line)} /></a></li>
+          <li><a class="h-act" href={href('/act/', locale)}><span set:html={V.phrasedHtml(t.s15.act)} /></a></li>
+          <li><a class="h-act" href={href('/estimate/#measure', locale)}><span>{how.toMeasure[locale]}</span></a></li>
+        </ul>
+      </div>
+      <HowSheet slot="sheet" id="how-15" locale={locale} kind="derived" title={t.s15.sheet.title} primary={{ href: href('/estimate/#drawing', locale), label: how.fullMethod[locale] }}>
+        <p slot="block1">{fill(t.s15.sheet.used, { n: F.drawn })}</p>
+        <p slot="block2">{t.s15.sheet.how}</p>
+        <p slot="block3">{t.s15.sheet.care}</p>
+      </HowSheet>
+    </Screen>
   </div>
 
-  <!-- 3.12 The money ======================================================================== -->
-  <Chapter locale={locale} id="money" budget={false} title={d.money.title} lead={d.money.deck}>
-    <div class="stack-l">
-      <div class="prose">
-        <p>{d.money.body}<Ev locale={locale} ev={d.money.bodyEv} /></p>
-        {
-          d.money.nothingConfirmed && (
-            <p class="money-next" data-money-when="A B" data-money-if="nothingConfirmed">
-              {d.money.next2027}
-              <Ev locale={locale} ev={d.money.next2027Ev} />
-            </p>
-          )
-        }
-      </div>
-
-      <div class="money-city">
-        <Select id="home-money-city" label={t.money.cityLabel} options={d.money.cityOptions} value="" hint={t.money.cityHint} data-money-city />
-        <MoneyBanner locale={locale} tone="box" />
-      </div>
-
-      <section class="personas" aria-labelledby="personas-title">
-        <h3 id="personas-title" class="personas__title">{t.money.personasLabel}</h3>
-        <p class="personas__intro">{t.money.personasIntro}</p>
-        <div class="personas__grid">
-          {
-            d.money.personas.map((p) => (
-              <Figure locale={locale} title={p.title} subtitle={p.subtitle} tone={p.parity ? 'clean' : 'exhaust'} badge={['derived', 'market-tw']} level={4}>
-                <p class="persona__who">{p.who}</p>
-                <WaterfallChart {...p.waterfall} title={t.money.chart} />
-                <Fragment slot="caption">
-                  {p.status && <span class="persona__status">{p.status} </span>}
-                  {p.caption}
-                </Fragment>
-                <Fragment slot="source">{p.cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-              </Figure>
-            ))
-          }
-        </div>
-        <p class="money-past" data-money-when="B C D">{d.money.pastNote}</p>
-      </section>
-
-      <SubsidyTimeline locale={locale} />
-
-      <div class="cluster money-actions" data-money-when="static A B D">
-        <Button href={href('/electric/#calc', locale)} size="lg" arrow>{t.money.calc}</Button>
-        <Button href={href('/act/#keep', locale)} size="lg" variant="secondary">{t.money.keep}</Button>
-      </div>
-      <div class="cluster money-actions" data-money-when="C">
-        <Button href={href('/act/#policy', locale)} size="lg" arrow>{d.money.askPolicy}</Button>
-        <Button href={href('/electric/', locale)} size="lg" variant="secondary">{t.money.noSubsidy}</Button>
-      </div>
-    </div>
-    <Fragment slot="caveat">
-      <p>{t.money.caveat}<Ev locale={locale} ev={d.money.caveatEv} /></p>
-      <Notes locale={locale} notes={d.money.caveatEv.notes} />
-    </Fragment>
-  </Chapter>
-
-  <!-- 3.13 The next red light =============================================================== -->
-  <Chapter locale={locale} id="next" size="auto" title={t.next.title} lead={t.next.deck}>
-    <div class="stack-l">
-      <div class="next-scene"><StreetScene locale={locale} frame="empty" variant="compact" labels={false} /></div>
-      <h3 class="roles__title">{t.next.rolesLabel}</h3>
-      <div class="roles">
-        {
-          roles.map((role) => (
-            <Card title={role.r.title} href={href(`/act/#${role.id}`, locale)} level={4}>
-              <ul class="roles__list">
-                <li>
-                  {role.r.a1}
-                  {roleBadges(role.b1).map((k) => <EvidenceBadge locale={locale} kind={k} />)}
-                </li>
-                <li>
-                  {role.r.a2}
-                  {roleBadges(role.b2).map((k) => <EvidenceBadge locale={locale} kind={k} />)}
-                </li>
-              </ul>
-            </Card>
-          ))
-        }
-      </div>
-      <ul class="next-links">
-        <li><a href={asset(briefCard.wide)}>{t.next.share}<Icon name="arrow-right" size="1.05em" /></a> <span class="meta">{t.next.shareNote}</span></li>
-        <li><a href={href('/sources/', locale)}>{t.next.sources}<Icon name="arrow-right" size="1.05em" /></a></li>
-      </ul>
-      <p class="next-corrections">{t.next.corrections} <a href={href('/about/#corrections', locale)}>{t.next.correctionsLink}</a></p>
-    </div>
-  </Chapter>
+  <script type="application/json" id="hm-data" set:html={JSON.stringify(P)} />
 </Base>
 
-<style>
-  /* ---- prologue ---- */
-  .hero {
-    display: grid;
-    gap: var(--sp-5);
-    padding-block: clamp(1.5rem, 5vw, 4rem) var(--sp-6);
-  }
-  .hero__text {
-    display: grid;
-    gap: var(--sp-4);
-    justify-items: start;
-  }
-  .hero__kicker {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-3);
-    color: var(--signal-red-ink);
-  }
-  .hero__kicker::before {
-    display: none;
-  }
-  .hero__title {
-    max-inline-size: 14em;
-  }
-  .hero__rider {
-    max-inline-size: var(--measure);
-    color: var(--ink-2);
-  }
-  .hero__scene {
-    max-inline-size: 110rem;
-    inline-size: 100%;
-    margin-inline: auto;
-  }
-  .hero__after {
-    display: grid;
-    gap: var(--sp-3);
-  }
-  .hero__disclosure {
-    max-inline-size: 46rem;
-    padding: var(--sp-3) var(--sp-4);
-    border-inline-start: var(--rule-paint, 4px) solid var(--ink);
-    background: var(--bg-sunken);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-  }
-  .hero__disclosure b {
-    margin-inline-end: 0.4em;
-  }
-  .handoff {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-    font-weight: var(--fw-bold);
-  }
-
-  /* ---- brief ---- */
-  .brief {
-    display: grid;
-    gap: var(--sp-5);
-  }
-  .brief__under {
-    font-weight: var(--fw-medium);
-    max-inline-size: var(--measure);
-  }
-
-  /* ---- shared chapter pieces ---- */
-  .who {
-    font-size: var(--fs-sm);
-  }
-  .stack-l {
-    display: grid;
-    gap: var(--sp-6);
-    min-inline-size: 0;
-  }
-  .small-fig {
-    max-inline-size: 40rem;
-  }
-  .art-with-key {
-    display: grid;
-    gap: var(--sp-4);
-  }
-
-  /* link 3: the centre of the page — give the empty chart room */
-  .empty-room {
-    padding-block: var(--sp-5) var(--sp-6);
-  }
-  :global(.chapter--centre) .empty-room :global(.chart) {
-    margin-block: var(--sp-3);
-  }
-
-  .ladder-cites {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-4);
-    margin-block-start: calc(-1 * var(--sp-4));
-  }
-
-  /* ---- money ---- */
-  .money-next {
-    font-weight: var(--fw-bold);
-  }
-  .money-city {
-    display: grid;
-    gap: var(--sp-4);
-    max-inline-size: 40rem;
-  }
-  .personas {
-    display: grid;
-    gap: var(--sp-4);
-  }
-  .personas__title {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-black);
-  }
-  .personas__intro {
-    color: var(--ink-2);
-    max-inline-size: var(--measure);
-  }
-  .personas__grid {
-    display: grid;
-    gap: var(--sp-7) var(--sp-6);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
-    align-items: start;
-  }
-  .persona__who {
-    font-weight: var(--fw-bold);
-    margin-block-end: var(--sp-3);
-  }
-  .persona__status {
-    font-weight: var(--fw-bold);
-  }
-  .money-actions {
-    --cluster: var(--sp-3);
-  }
-
-  /* ---- close ---- */
-  .next-scene {
-    max-inline-size: 36rem;
-  }
-  .roles__title {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-black);
-  }
-  .roles {
-    display: grid;
-    gap: var(--sp-4);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-  }
-  .roles__list {
-    display: grid;
-    gap: var(--sp-2);
-    padding-inline-start: 1.1em;
-    margin: 0;
-  }
-  .roles__list :global(.ev-wrap) {
-    margin-inline-start: 0.4em;
-  }
-  .next-links {
-    display: grid;
-    gap: var(--sp-2);
-    padding: 0;
-    list-style: none;
-    font-weight: var(--fw-bold);
-  }
-  .next-corrections {
-    max-inline-size: var(--measure);
-  }
-</style>
+<script>
+  import '@/components/charts/core/grow';
+  import '@/components/pages/home/home.client';
+</script>

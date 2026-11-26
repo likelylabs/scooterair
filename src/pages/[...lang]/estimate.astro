@@ -183,7 +183,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     <p class="es-lead">{t.hero.lead}</p>
 
     <NumberBox locale={locale} title={t.hero.boxTitle} sheet="how-est" />
-    <p class="es-where">{est.meta.appliesTo[locale]}</p>
+    <p class="es-where es-note">{est.meta.appliesTo[locale]}</p>
 
     <div class="es-k">
       <p class="es-k__strong">{t.hero.notMeasured}</p>
@@ -218,7 +218,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     <p class="es-p es-gloss">{est.meta.gloss[locale]}</p>
     <EstimateTable locale={locale} id="numbers-table" />
     <div class="es-ufp">
-      <h3 class="es-h3">{t.numbers.ultrafineTitle}</h3>
+      <h3 class="es-h3"><Phrased text={t.numbers.ultrafineTitle} /></h3>
       <p class="es-p">{kSentences.K2[locale]}{en ? ' ' : ''}{kSentences.K3[locale]}</p>
       <p class="es-p">{t.numbers.ultrafineWhy}</p>
     </div>
@@ -235,10 +235,10 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
 
   <!-- ===================================================== 2 RECIPE -->
   <Section id="recipe" eyebrow={t.recipe.eyebrow} title={t.recipe.title} lead={fill(t.recipe.lead, { runs: nf(est.meta.runs, 0) })} width="wide" rule>
-    <h3 class="es-h3">{t.recipe.flowTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.recipe.flowTitle} /></h3>
     <WorkingSum {...workingKerbFlow(locale)} />
 
-    <h3 class="es-h3">{t.recipe.inputsTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.recipe.inputsTitle} /></h3>
     <ol class="es-inputs">
       {inputs.map((x) => (
         <li class="es-input" id={`input-${x.key}`}>
@@ -261,18 +261,18 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
             )}
           </div>
           <p class="es-input__note">{x.note}</p>
-          <p class="es-input__src">
+          <div class="es-input__src">
             <span>{t.recipe.source}{colon}</span>
             {x.sources.map((s) => <a href={srcLink(s).href}>{srcLink(s).label}</a>)}
-          </p>
+          </div>
         </li>
       ))}
     </ol>
 
     <div class="es-result">
-      <h3 class="es-h3">{t.recipe.resultTitle}</h3>
+      <h3 class="es-h3"><Phrased text={t.recipe.resultTitle} /></h3>
       <EstimateValue locale={locale} slotId="emit.co.gPerHour" unitStyle="words" size="lg" anchor="recipe" />
-      <h3 class="es-h3">{t.recipe.perRedTitle}</h3>
+      <h3 class="es-h3"><Phrased text={t.recipe.perRedTitle} /></h3>
       <p class="es-p">{perRedNote}</p>
       <WorkingSum {...workingPerRed(locale)} />
       <WorkingSum {...workingPerRedCan(locale)} />
@@ -286,24 +286,24 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
         <li class:list={['es-scn__card', c.s === 'dozen' && 'es-scn__card--main']}>
           <p class="es-scn__name">{c.name}</p>
           <p class="es-scn__count">{c.count}</p>
-          <p class="es-scn__near">{c.nearest}</p>
-          <p class="es-scn__basis">{c.basis}</p>
+          <p class="es-scn__near es-note">{c.nearest}</p>
+          <p class="es-scn__basis es-note">{c.basis}</p>
         </li>
       ))}
     </ol>
-    <h3 class="es-h3">{t.count.busiestTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.count.busiestTitle} /></h3>
     <WorkingSum {...workingBusiest(locale)} />
     <p class="es-p es-quietp">{t.count.busiestNote}</p>
-    <p class="es-p es-wait">{wait} <KindChip locale={locale} kind="official" where={en ? 'Taiwan' : '台灣'} /></p>
+    <div class="es-withchip"><p class="es-p">{wait}</p><KindChip locale={locale} kind="official" where={en ? 'Taiwan' : '台灣'} /></div>
   </Section>
 
   <!-- ===================================================== 4 CHECK -->
   <Section id="check" eyebrow={t.check.eyebrow} title={t.check.title} lead={checkLead} width="wide" rule>
-    <h3 class="es-h3">{t.check.coTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.check.coTitle} /></h3>
     <div class="es-pair">
       <div class="es-pair__cell">
         <p class="es-pair__label">{t.check.observed}</p>
-        <p class="es-pair__val"><span class="es-pair__num">{observed}</span> <KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></p>
+        <div class="es-pair__val"><span class="es-pair__num">{observed}</span> <KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></div>
       </div>
       <div class="es-pair__cell es-pair__cell--est">
         <p class="es-pair__label">{t.check.model}</p>
@@ -314,26 +314,26 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
       {crossSentences.map((s) => <li>{s}</li>)}
     </ul>
 
-    <h3 class="es-h3">{t.check.pmTitle}</h3>
-    <p class="es-p">{pmMeasured} <KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></p>
+    <h3 class="es-h3"><Phrased text={t.check.pmTitle} /></h3>
+    <div class="es-withchip"><p class="es-p">{pmMeasured}</p><KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></div>
     <p class="es-p">{t.check.pmOurs}</p>
 
-    <h3 class="es-h3">{t.check.taipeiTitle}</h3>
-    <p class="es-p">{taipei} <KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></p>
+    <h3 class="es-h3"><Phrased text={t.check.taipeiTitle} /></h3>
+    <div class="es-withchip"><p class="es-p">{taipei}</p><KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></div>
     <div class="es-inline">
       <p class="es-p">{t.check.taipeiOurs}</p>
       <EstimateValue locale={locale} slotId="co.dozen.total" anchor="check" />
     </div>
     <p class="es-p">{t.check.taipeiSame}</p>
 
-    <h3 class="es-h3">{t.check.benzeneTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.check.benzeneTitle} /></h3>
     <p class="es-p">{t.check.benzene}</p>
   </Section>
 
   <!-- ===================================================== 5 RANGE -->
   <Section id="range" eyebrow={t.range.eyebrow} title={t.range.title} lead={t.range.lead} width="wide" tone="sunken" rule>
     <SpreadBars locale={locale} labels={t.range.spread} times={t.range.times} caption={t.range.spreadCaption} />
-    <h3 class="es-h3">{t.range.confidenceTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.range.confidenceTitle} /></h3>
     <dl class="es-conf">
       {confidence.map((c) => (
         <div class:list={['es-conf__row', `es-conf__row--${c.level}`]}>
@@ -366,7 +366,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
       </div>
     </div>
 
-    <h3 class="es-h3">{t.drawing.rangeTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.drawing.rangeTitle} /></h3>
     <AirRange locale={locale} scenario="dozen" />
   </Section>
 
@@ -376,9 +376,10 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
       {estimateText.limits.map((l) => <li>{l[locale]}</li>)}
       <li>{t.limits.more}</li>
     </ul>
-    <h3 class="es-h3">{t.limits.heightTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.limits.heightTitle} /></h3>
     <p class="es-p">{kSentences.K4[locale]}</p>
-    <p class="es-p">{t.limits.health} <a class="es-inlink" href={href('/evidence/#link-5', locale)}>{t.limits.healthLink}<Icon name="arrow-right" size="1em" /></a></p>
+    <p class="es-p">{t.limits.health}</p>
+    <div><a class="es-inlink" href={href('/evidence/#link-5', locale)}>{t.limits.healthLink}<Icon name="arrow-right" size="1em" /></a></div>
   </Section>
 
   <!-- ===================================================== 8 ANSWERS -->
@@ -396,10 +397,10 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     <p class="es-promise">{t.measure.promise}</p>
     <p class="es-p es-quietp">{t.measure.replace}</p>
 
-    <h3 class="es-h3">{t.measure.planTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.measure.planTitle} /></h3>
     <MeasurementDiagram locale={locale} level={4} />
 
-    <h3 class="es-h3" id="letter">{t.measure.letterTitle}</h3>
+    <h3 class="es-h3" id="letter"><Phrased text={t.measure.letterTitle} /></h3>
     <p class="es-p">{t.measure.letterLead}</p>
     <noscript><p class="es-p es-noscript">{t.measure.noScript}</p></noscript>
     <Composer
@@ -418,12 +419,12 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
       labels={{ ...t.measure.composer, fields: t.measure.fields }}
     />
 
-    <h3 class="es-h3">{t.measure.toWhomTitle}</h3>
+    <h3 class="es-h3"><Phrased text={t.measure.toWhomTitle} /></h3>
     <p class="es-p">{t.measure.toWhom}</p>
-    <p class="es-btns">
+    <div class="es-btns">
       <a class="es-btn" href={href('/print/brief/', locale)}>{t.measure.brief}<Icon name="arrow-right" size="1.05em" /></a>
       <a class="es-btn es-btn--quiet" href={href('/act/', locale)}>{t.measure.act}<Icon name="arrow-right" size="1.05em" /></a>
-    </p>
+    </div>
   </Section>
 
   <!-- ===================================================== VERSION -->
@@ -495,7 +496,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0 var(--sp-5);
+    gap: var(--tap-gap) var(--sp-5);
   }
   @media (min-width: 40em) {
     .es-toc ol {
@@ -629,7 +630,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0 var(--sp-3);
+    gap: var(--tap-gap) var(--sp-3);
     font-size: var(--fs-sm);
     color: var(--ink-2);
   }
@@ -714,11 +715,15 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     line-height: var(--lh-read);
     color: var(--ink-2);
   }
-  .es-wait {
+  .es-withchip {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--sp-2);
+    gap: 0 var(--sp-3);
+    max-inline-size: 42rem;
+  }
+  .es-withchip .es-p {
+    margin-block: var(--sp-2);
   }
 
   .es-pair {

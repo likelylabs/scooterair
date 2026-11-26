@@ -1,9 +1,11 @@
 ---
 /**
- * EvidenceMap — V30. Rows: the seven links. Columns: the kinds of evidence, then 沒人量過.
- * Each cell lists the sources that link uses for that kind, as numbered chips that go to the
- * source's entry on /sources/; an empty cell stays empty. The gap cell of link 3 (pedestrians
- * at the crossing, the central gap) is outlined in the gap style.
+ * EvidenceMap — V30. Rows: the seven links. Columns: the kinds of evidence, then 推估 (brief 7.3:
+ * the old 沒人量過 column is gone). Each cell lists the sources that link uses for that kind, as
+ * numbered chips that go to the source's entry on /sources/; an empty cell stays empty. The 推估
+ * cell lists this site's own estimates for that link (the kerbside estimate on link 3, and every
+ * answer carrying the 推估 chip), each a link to its working on /estimate/. Link 3 is whole: its
+ * 推估 cell is drawn with a dashed outline beside the solid measured cell.
  *
  * A real <table> on wide screens; below 60em each row becomes a block, with the column name
  * printed beside each cell. Explicit roles keep the table semantics when the display changes.
@@ -14,11 +16,12 @@
 import type { Locale } from '@/i18n';
 import { href } from '@/i18n';
 import { chain, evidence } from '@/i18n/ui';
-import { chainLinks, factsForLink, gapBadge, gapsForLink, seriesForLink, type Evidence, type SourceId } from '@/data';
+import { answersForLink, chainLinks, factsForLink, localizeAnswer, seriesForLink, type Evidence, type SourceId } from '@/data';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import KindChip from '@/components/ui/KindChip.astro';
 import evidenceCopy from '@/i18n/pages/evidence';
 import { fill, localize } from '@/i18n/pages/_copy';
-import { citeN, kindOf, lg, seriesSources, sourceShort } from './ev';
+import { citeN, kindOf, seriesSources, sourceShort } from './ev';
 
 interface Props {
   locale: Locale;
@@ -37,7 +40,15 @@ const rows = chainLinks.map((n) => {
     return [...ids].sort((a, b) => citeN(a) - citeN(b));
   });
   // link 7 is named as its eyebrow names it everywhere on the page
-  return { n, name: n === chain.links.length ? chain.breakable[locale] : chain.links[n - 1][locale], cells, gaps: gapsForLink(n).map((g) => lg(g.id, locale)) };
+  // this site's own estimates for the link: the kerbside estimate (link 3) and every answer with the 推估 chip
+  const ests = answersForLink(n)
+    .filter((a) => a.chips.some((c) => c.kind === 'estimate'))
+    .map((a) => {
+      const l = localizeAnswer(a, locale);
+      return { href: a.anchor ? href(`/estimate/#${a.anchor}`, locale) : `#${a.id}`, label: l.question };
+    });
+  if (n === 3) ests.unshift({ href: href('/estimate/', locale), label: M.estimateKerb });
+  return { n, name: n === chain.links.length ? chain.breakable[locale] : chain.links[n - 1][locale], cells, ests };
 });
 const usedCols = cols.filter((_, i) => rows.some((r) => r.cells[i].length > 0));
 const colIdx = usedCols.map((c) => cols.indexOf(c));
@@ -49,7 +60,7 @@ const colIdx = usedCols.map((c) => cols.indexOf(c));
       <tr role="row">
         <th scope="col" role="columnheader">{M.linkColumn}</th>
         {usedCols.map((c) => <th scope="col" role="columnheader"><EvidenceBadge locale={locale} kind={kindOf(c)} /></th>)}
-        <th scope="col" role="columnheader"><EvidenceBadge locale={locale} kind="gap" label={gapBadge[locale]} /></th>
+        <th scope="col" role="columnheader"><KindChip locale={locale} kind="estimate" size="sm" /></th>
       </tr>
     </thead>
     <tbody role="rowgroup">
@@ -78,14 +89,13 @@ const colIdx = usedCols.map((c) => cols.indexOf(c));
               )}
             </td>
           ))}
-          <td role="cell" class:list={['emap__cell', 'emap__gapcell', r.n === 3 && 'emap__gapcell--central', r.gaps.length === 0 && 'emap__cell--empty']}>
-            <span class="emap__label" aria-hidden="true">{M.gapColumn}</span>
-            {r.n === 3 && <span class="emap__ped">{M.pedestrians}</span>}
-            {r.gaps.length === 0 ? (
+          <td role="cell" class:list={['emap__cell', 'emap__gapcell', r.n === 3 && 'emap__gapcell--central', r.ests.length === 0 && 'emap__cell--empty']}>
+            <span class="emap__label" aria-hidden="true">{M.estimateColumn}</span>
+            {r.ests.length === 0 ? (
               <span class="emap__none"><span class="vh">{M.none}</span></span>
             ) : (
               <ul class="emap__gaps">
-                {r.gaps.map((g) => <li><a href={`#${g.id}`}>{g.title}</a></li>)}
+                {r.ests.map((g) => <li><a href={g.href}>{g.label}</a></li>)}
               </ul>
             )}
           </td>
@@ -177,7 +187,7 @@ const colIdx = usedCols.map((c) => cols.indexOf(c));
     margin-block-end: var(--sp-1);
   }
   .emap__gapcell--central {
-    outline: 2px dashed var(--ink);
+    outline: 2px dashed var(--estimate);
     outline-offset: -4px;
   }
   .emap__caption {

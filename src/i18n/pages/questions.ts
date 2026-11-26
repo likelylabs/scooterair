@@ -71,7 +71,7 @@ export default copy({
       card: { 'zh-TW': '離排氣管遠一點，通常比較淡；差多少，本站不印數字。', en: 'Further from the tailpipe it is usually thinner. We print no figure for how much.' },
     },
     app: {
-      q: { 'zh-TW': '空氣品質 App|為什麼看不出來？', en: 'Why doesn’t the |air-quality app show it?' },
+      q: { 'zh-TW': '空氣品質 App |為什麼看不出來？', en: 'Why doesn’t the |air-quality app show it?' },
       card: {
         'zh-TW': '測站在高處，一小時報一次；紅燈只有 {red} 秒，廢氣排在腳邊。',
         en: 'Stations sit high up and report once an hour. A red light lasts {red} seconds, and the exhaust comes out by your feet.',
@@ -197,6 +197,7 @@ export default copy({
     },
     s2: {
       chapter: { 'zh-TW': '多了多少', en: 'How much more' },
+      box: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
       headline: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
       quiet: {
         'zh-TW': '圈圈越密＝一氧化碳越多。到處都有的稀疏圈圈，是街上原本就有的。',
@@ -265,7 +266,7 @@ export default copy({
       chapter: { 'zh-TW': '天天等', en: 'Every day' },
       headline: { 'zh-TW': '一個紅燈很短，|可是天天都要等', en: 'One red light is short. |But you wait at one every day' },
       stepper: { 'zh-TW': '一天等幾個紅燈？', en: 'How many red lights a day?' },
-      stepperUnit: { 'zh-TW': '個', en: 'a day' },
+      stepperOption: { 'zh-TW': '{n} 個', en: '{n}' },
       body: {
         reds2: {
           'zh-TW': '一天等兩個紅燈，一年就在路邊站了約 {lo} 到 {hi} 小時。',
@@ -443,7 +444,7 @@ export default copy({
       chart: {
         title: { 'zh-TW': '通勤一小時吸到的 PM2.5', en: 'PM2.5 breathed over a one-hour commute' },
         sub: { 'zh-TW': '平均・各種來源・早上一小時', en: 'Average · all sources · one morning hour' },
-        unit: { 'zh-TW': '微克／立方公尺', en: 'µg/m³' },
+        unitLine: { 'zh-TW': '單位：微克／立方公尺', en: 'In µg/m³' },
         modes: {
           scooter: { 'zh-TW': '騎燃油機車', en: 'Petrol scooter' },
           walking: { 'zh-TW': '走路', en: 'Walking' },
@@ -506,6 +507,12 @@ export default copy({
         gases: { 'zh-TW': '氣體（一氧化碳、油氣）', en: 'Gases (carbon monoxide, fuel vapour)' },
         ultrafine: { 'zh-TW': '很小的微粒（超細微粒）', en: 'The smallest particles (ultrafine)' },
         pm25: { 'zh-TW': '細懸浮微粒（PM2.5）', en: 'Fine particles (PM2.5)' },
+        /** The same three columns, in a word or two: the label beside each line on a phone. */
+        short: {
+          gases: { 'zh-TW': '氣體', en: 'Gases' },
+          ultrafine: { 'zh-TW': '超細微粒', en: 'Ultrafine' },
+          pm25: { 'zh-TW': 'PM2.5', en: 'PM2.5' },
+        },
         /** One row per entry of research/masks/VERIFIED.json → tableRows, in the same order.
          *  The English is that file's own wording; the page stops the build if it differs. */
         rows: [

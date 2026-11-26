@@ -1,0 +1,33 @@
+---
+/**
+ * CardPicture — the picture on an index card of /questions/: the same scene that leads the
+ * question's own page, at rest. One scene per question (brief 7.5).
+ *
+ * Props
+ *   locale  Locale
+ *   slug    which question
+ */
+import type { Locale } from '@/i18n';
+import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
+import ApproachPlan from '@/components/art/ApproachPlan.astro';
+import StationScene from '@/components/art/StationScene.astro';
+import BodyFigure from '@/components/art/BodyFigure.astro';
+import HeightsScene from '@/components/art/HeightsScene.astro';
+import RiderScene from '@/components/art/RiderScene.astro';
+import MaskScene from '@/components/art/MaskScene.astro';
+import type { Slug } from './q';
+
+interface Props {
+  locale: Locale;
+  slug: Slug;
+}
+const { locale, slug } = Astro.props;
+---
+
+{slug === 'smell' && <TailpipeMarks locale={locale} can={false} />}
+{slug === 'beside-me' && <ApproachPlan locale={locale} inset={false} />}
+{slug === 'app' && <StationScene locale={locale} />}
+{slug === 'one-red-light' && <BodyFigure locale={locale} pins={[]} />}
+{slug === 'my-child' && <HeightsScene locale={locale} />}
+{slug === 'rider' && <RiderScene locale={locale} />}
+{slug === 'mask' && <MaskScene locale={locale} says={false} />}

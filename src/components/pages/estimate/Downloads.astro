@@ -39,10 +39,10 @@ const uri = (type: string, body: string) => `data:${type};charset=utf-8,${encode
 
 <div class="dl">
   <p class="dl__title">{labels.title}</p>
-  <p class="dl__links">
+  <div class="dl__links">
     <a href={uri('text/csv', csv)} download={`${file}.csv`} type="text/csv"><Icon name="arrow-down" size="1.1em" />{labels.csv}</a>
     <a href={uri('application/json', json)} download={`${file}.json`} type="application/json"><Icon name="arrow-down" size="1.1em" />{labels.json}</a>
-  </p>
+  </div>
   <p class="dl__note">{labels.note}</p>
 </div>
 
@@ -51,7 +51,8 @@ const uri = (type: string, body: string) => `data:${type};charset=utf-8,${encode
     display: grid;
     gap: var(--sp-2);
   }
-  .dl p {
+  .dl p,
+  .dl div {
     margin: 0;
   }
   .dl__title {

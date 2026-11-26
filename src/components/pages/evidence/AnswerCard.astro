@@ -87,11 +87,11 @@ const evidenceLabel = en ? `Evidence for link ${a.chainLink}` : `第 ${a.chainLi
       <dd>{a.caveat}</dd>
     </div>
   </dl>
-  {kText && <p class="ans__k">{kText}</p>}
-  <p class="ans__links">
+  {kText && <p class="ans__k ans__note">{kText}</p>}
+  <div class="ans__links">
     {working && <a href={working}>{W.working}<Icon name="arrow-right" size="1em" /></a>}
     <a href={evidence}>{evidenceLabel}<Icon name="arrow-right" size="1em" /></a>
-  </p>
+  </div>
 </article>
 
 <style>

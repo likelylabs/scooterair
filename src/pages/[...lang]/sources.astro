@@ -1,30 +1,33 @@
 ---
 /**
- * /sources/ — 資料來源 / Sources (blueprint 4.8). The full bibliography from the registry: every
+ * /sources/ — 資料來源 / Sources (redesign brief 7.4; blueprint 4.8). A reference list only,
+ * reached from the footer and from /evidence/. The full bibliography from the registry: every
  * source with its stable number, its citation in the reader's language, a working link (DOI or
- * URL), how far it was read, and every fact, chart dataset, gap and writing rule that cites it.
+ * URL), how far it was read, and every fact, chart dataset and answer that cites it. Sources the
+ * site's own estimate rests on (estimateSourceIds) say so and link to /estimate/#recipe; the
+ * mask facts' sources are ordinary entries (link 3). The old gap section is gone.
  * Citation markers across the site link to /sources/#<source id>.
  *
  * The filter (by link of the chain and by kind of source) is two groups of radio buttons and
  * CSS :has(), so it works without JavaScript; a short script only updates the count. Where :has()
- * is not supported, every source stays listed. Research gaps are entries too (#<gap id>).
+ * is not supported, every source stays listed.
  *
  * Copy: src/i18n/pages/sources.ts.
  */
 import Base from '@/layouts/Base.astro';
-import Section from '@/components/ui/Section.astro';
 import Phrased from '@/components/ui/Phrased.astro';
 import Tag from '@/components/ui/Tag.astro';
-import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import KindChip from '@/components/ui/KindChip.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Mixed from '@/components/pages/evidence/Mixed.astro';
-import { citeN, dataAnchor, lf, lg, ls, neverSmokerFacts, readLabel, sourceShort, sourceUses } from '@/components/pages/evidence/ev';
+import { citeN, dataAnchor, lf, ls, neverSmokerFacts, readLabel, sourceShort, sourceUses } from '@/components/pages/evidence/ev';
 import evidenceCopy from '@/i18n/pages/evidence';
 import { href, htmlLang, localeFromParam, localeStaticPaths } from '@/i18n';
 import { readerText, ui } from '@/i18n/ui';
 import sourcesCopy from '@/i18n/pages/sources';
 import { fill, localize } from '@/i18n/pages/_copy';
-import { chainLinks, claimRules, formatCitation, gapList, getSource, readLevelLabels, readLevels, sourceIds, sourceKindLabels, sourceKinds, sourceUrl, type ClaimRuleId } from '@/data';
+import { answerList, chainLinks, facts, formatCitation, getSource, localizeAnswer, readLevelLabels, readLevels, sourceIds, sourceKindLabels, sourceKinds, sourceUrl, type AnswerId, type SourceId } from '@/data';
+import { estimateSourceIds } from '@/data/estimate';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -41,8 +44,13 @@ const readableUrl = (u: string) => {
 };
 const total = sourceIds.length;
 
-/** Rules that govern only how pages are built are not on the public list, so they are not linked here either. */
-const isPublicRule = (id: string) => !(claimRules[id as ClaimRuleId] as { internal?: boolean }).internal;
+/** The answers (former gaps) that rest on a source, through their facts or their own sources. */
+const answersBySource = new Map<SourceId, AnswerId[]>();
+for (const a of answerList) {
+  const srcs = new Set<SourceId>([...(a.sources ?? []), ...a.facts.flatMap((f) => facts[f].sources)]);
+  for (const id of srcs) answersBySource.set(id, [...(answersBySource.get(id) ?? []), a.id]);
+}
+const estimateSet = new Set<string>(estimateSourceIds);
 /**
  * The citation is written in the reader's language; only the original title (and the journal or
  * series name) are in the source's. Split those out so each part carries the right lang (WCAG 3.1.2).
@@ -69,13 +77,15 @@ const entries = sourceIds.map((id) => {
     id,
     n: citeN(id),
     s,
-    u: { ...u, rules: u.rules.filter(isPublicRule) },
+    u,
+    answers: answersBySource.get(id) ?? [],
+    estimate: estimateSet.has(id),
     citation,
     parts: citeParts(citation, s),
     url: sourceUrl(id),
     kind: readerText(sourceKindLabels[s.kind][locale]),
     read: readLabel(s, locale),
-    count: u.facts.length + u.series.length + u.gaps.length + u.rules.filter(isPublicRule).length,
+    count: u.facts.length + u.series.length + (answersBySource.get(id)?.length ?? 0),
   };
 });
 const kindsUsed = sourceKinds.filter((k) => entries.some((e) => e.s.kind === k));
@@ -86,10 +96,10 @@ const readCounts = readLevels.map((lvl) => ({ label: readerText(readLevelLabels[
 const css = [
   ...chainLinks.map((n) => `.sx:has(#sx-l-${n}:checked) .sx-src:not([data-l${n}]){display:none}`),
   `.sx:has(#sx-l-0:checked) .sx-src:not([data-l0]){display:none}`,
+  `.sx:has(#sx-l-est:checked) .sx-src:not([data-est]){display:none}`,
   ...kindsUsed.map((k) => `.sx:has(#sx-k-${k}:checked) .sx-src:not([data-kind="${k}"]){display:none}`),
   `.sx .sx-src:target{display:grid !important}`,
 ].join('');
-const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[locale]);
 ---
 
 <Base locale={locale} title={T.meta.title} description={T.meta.description} share="brief">
@@ -99,7 +109,8 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
       <p class="eyebrow">{T.head.kicker}</p>
       <h1 class="display"><Phrased text={T.head.title} /></h1>
       <p class="lead">{fill(T.head.lead, { n: total })}</p>
-      <p>{T.head.evidence} <a href={href('/evidence/', locale)}>{T.head.evidenceLink} →</a></p>
+      <p>{T.head.evidence}</p>
+      <div><a class="sx-go" href={href('/evidence/', locale)}>{T.head.evidenceLink}<Icon name="arrow-right" size="1.05em" /></a></div>
       <details class="sx-reads">
         <summary><span>{T.reads.title}</span><Icon name="chevron-down" size="1.25rem" /></summary>
         <p>{T.reads.lead}</p>
@@ -122,6 +133,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
             <span class="sx-chip"><input type="radio" name="link" id={`sx-l-${n}`} value={String(n)} /><label for={`sx-l-${n}`}>{fill(T.filter.linkN, { n })} <span>{linkCount(n)}</span></label></span>
           ))}
           <span class="sx-chip"><input type="radio" name="link" id="sx-l-0" value="0" /><label for="sx-l-0">{T.filter.none} <span>{linkCount(0)}</span></label></span>
+          <span class="sx-chip"><input type="radio" name="link" id="sx-l-est" value="est" /><label for="sx-l-est">{T.filter.estimate} <span>{entries.filter((e) => e.estimate).length}</span></label></span>
         </div>
       </fieldset>
       <fieldset>
@@ -151,6 +163,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
             data-l5={e.u.links.includes(5) ? '' : undefined}
             data-l6={e.u.links.includes(6) ? '' : undefined}
             data-l7={e.u.links.includes(7) ? '' : undefined}
+            data-est={e.estimate ? '' : undefined}
           >
             <p class="sx-src__n"><span class="vh">{fill(T.entry.number, { n: '' }).trim()} </span>{e.n}</p>
             <div class="sx-src__body">
@@ -158,17 +171,19 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
                 <Tag>{e.kind}</Tag>
                 <span class="sx-src__read"><span class="vh">{T.entry.read} </span>{e.read}</span>
                 {e.s.titleIsDescriptive && <Tag tone="signal">{T.entry.descriptive}</Tag>}
+                {e.estimate && <KindChip locale={locale} kind="estimate" size="sm" />}
               </p>
               <p class="sx-src__cite">{e.parts.map((p) => (p.lang ? <span lang={p.lang}>{p.text}</span> : p.text))}</p>
-              {e.s.titleIsDescriptive && <p class="sx-src__help">{T.entry.descriptiveHelp}</p>}
-              <p class="sx-src__actions">
+              {e.s.titleIsDescriptive && <p class="sx-src__hint">{T.entry.descriptiveHelp}</p>}
+              <div class="sx-src__actions">
                 <a href={e.url} rel="noopener noreferrer" target="_blank">{e.s.doi && !e.s.url ? `${T.entry.doi} ${e.s.doi}` : T.entry.open}<span class="vh">{locale === 'en' ? ': ' : '：'}{sourceShort(e.id, locale)} {ui.externalLink[locale]}</span> ↗</a>
                 <span class="sx-src__checked">{fill(T.entry.checked, { date: e.s.accessed })}</span>
-              </p>
-              <p class="sx-src__links">
+              </div>
+              <div class="sx-src__links">
                 <b>{T.entry.links}</b>
-                {e.u.links.length ? e.u.links.map((n, i) => <Fragment>{i > 0 && ' · '}<a href={href(`/evidence/#link-${n}`, locale)}>{fill(T.entry.linkN, { n })}</a></Fragment>) : T.entry.noLink}
-              </p>
+                {e.u.links.length ? e.u.links.map((n) => <a href={href(`/evidence/#link-${n}`, locale)}>{fill(T.entry.linkN, { n })}</a>) : !e.estimate && <span>{T.entry.noLink}</span>}
+                {e.estimate && <a href={href('/estimate/#recipe', locale)}>{T.entry.estimate}</a>}
+              </div>
               {e.count > 0 && (
                 <details class="sx-src__uses">
                   <summary>{fill(T.entry.uses, { n: e.count })}</summary>
@@ -180,7 +195,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
                           const x = lf(f, locale);
                           // R14: the never-smoker figures are printed only on /evidence/#not-used
                           if (neverSmokerFacts.includes(f)) return <li><a href={href(`/evidence/#${f}`, locale)}>{evidenceCopy.row.neverSmokerPointer[locale]}</a> <span class="sx-src__st">{evidenceCopy.row.alsoNotUsed[locale]}</span></li>;
-                          return <li><a href={href(`/evidence/#${f}`, locale)}>{x.display}</a> <EvidenceBadge locale={locale} kind={x.evidence} variant="icon" /> <span class="sx-src__st"><Mixed text={x.statement} locale={locale} /></span></li>;
+                          return <li><a href={href(`/evidence/#${f}`, locale)}>{x.display}</a> <KindChip locale={locale} kind={x.evidence} size="sm" /> <span class="sx-src__st"><Mixed text={x.statement} locale={locale} /></span></li>;
                         })}
                       </ul>
                     </Fragment>
@@ -191,16 +206,10 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
                       <ul>{e.u.series.map((x) => <li><a href={href(`/evidence/#${dataAnchor(x)}`, locale)}>{ls(x, locale).title}</a></li>)}</ul>
                     </Fragment>
                   )}
-                  {e.u.gaps.length > 0 && (
+                  {e.answers.length > 0 && (
                     <Fragment>
-                      <p class="sx-src__ulabel">{T.entry.gaps}</p>
-                      <ul>{e.u.gaps.map((g) => <li><a href={`#${g}`}>{lg(g, locale).title}</a></li>)}</ul>
-                    </Fragment>
-                  )}
-                  {e.u.rules.length > 0 && (
-                    <Fragment>
-                      <p class="sx-src__ulabel">{T.entry.rules}</p>
-                      <ul>{e.u.rules.map((r) => <li><a href={href(`/evidence/#rule-${r}`, locale)}>{ruleText(r)}</a></li>)}</ul>
+                      <p class="sx-src__ulabel">{T.entry.answers}</p>
+                      <ul>{e.answers.map((a) => <li><a href={href(`/evidence/#${a}`, locale)}>{localizeAnswer(a, locale).question}</a></li>)}</ul>
                     </Fragment>
                   )}
                 </details>
@@ -209,26 +218,10 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
           </li>
         ))}
       </ol>
-      <p class="sx-top"><a href="#filter">{T.top}</a></p>
+      <div class="sx-top"><a href="#filter">{T.top}</a></div>
     </div>
   </div>
 
-  <Section id="gaps" title={T.gaps.title} lead={T.gaps.lead} tone="sunken">
-    <ol class="sx-gaps">
-      {gapList.map((g) => {
-        const x = lg(g.id, locale);
-        return (
-          <li id={g.id} class="sx-gap">
-            <p class="sx-src__tags"><EvidenceBadge locale={locale} kind="gap" label={x.badge} /> <span class="sx-src__checked">{fill(T.gaps.searched, { date: x.searchedOn })}</span></p>
-            <h3 class="sx-gap__title">{x.title}</h3>
-            <p>{x.statement}</p>
-            {x.whoCouldMeasure && <p class="sx-gap__who"><b>{x.whoLabel}{locale === 'en' ? ': ' : '：'}</b>{x.whoCouldMeasure}</p>}
-            <p><a class="sx-gap__more" href={href(`/evidence/#${g.id}`, locale)}>{T.gaps.more}<span class="vh">{locale === 'en' ? ': ' : '：'}{x.title}</span> →</a></p>
-          </li>
-        );
-      })}
-    </ol>
-  </Section>
 </Base>
 
 <script>
@@ -341,7 +334,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
     border-radius: var(--radius-pill);
     font-size: var(--fs-sm);
     cursor: pointer;
-    white-space: nowrap;
+    max-inline-size: 100%;
   }
   .sx-chip label span {
     font-size: var(--fs-xs);
@@ -396,6 +389,16 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
     gap: var(--sp-2);
     min-inline-size: 0;
   }
+  .sx-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+  }
+  .sx-src__tags :global(.tag) {
+    white-space: normal;
+  }
   .sx-src__tags {
     display: flex;
     flex-wrap: wrap;
@@ -412,7 +415,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
     line-height: var(--lh-body);
     overflow-wrap: anywhere;
   }
-  .sx-src__help {
+  .sx-src__hint {
     font-size: var(--fs-xs);
     color: var(--ink-2);
     padding-inline-start: var(--sp-3);
@@ -438,10 +441,17 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
     color: var(--ink-2);
   }
   .sx-src__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap) var(--sp-3);
     font-size: var(--fs-sm);
   }
-  .sx-src__links b {
-    margin-inline-end: 0.3em;
+  .sx-src__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    min-inline-size: var(--tap);
   }
   .sx-src__uses {
     font-size: var(--fs-sm);
@@ -477,6 +487,11 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
   .sx-top {
     padding-block: var(--sp-5);
     font-weight: var(--fw-bold);
+  }
+  .sx-top a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
   }
   .sx-gaps {
     list-style: none;

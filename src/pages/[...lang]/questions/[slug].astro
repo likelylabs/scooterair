@@ -1,41 +1,33 @@
 ---
 /**
- * /questions/<slug>/ — one question at the crossing (blueprint 4.2). Eight pages, one shape,
- * each written to stand alone for a reader who arrives from a LINE share and reads nothing
- * else:
+ * /questions/<slug>/ — one question at the crossing (redesign brief 7.5). Seven pages, one
+ * shape, each written to stand alone for a reader who arrives from a LINE share:
  *
- *   1 the question (h1)            5 the caveat, and what this does not show
- *   2 the short answer + badge     6 what you can do now
- *   3 what was measured, by whom   7 where it sits in the chain (the seven lines, this one lit)
- *   4 the lead visual              8 more pictures, how each study was done, two next questions
- *                                  9 the share card (caveat inside the image)
+ *   the question (h1)  →  one picture  →  the answer in one sentence (large)  →  at most two
+ *   more sentences and one quiet line  →  怎麼知道的？ (the sheet)  →  at most two more pictures
+ *   →  the next question  →  the share block
  *
- * Copy: src/i18n/pages/questions.ts (numbers in it are filled from the registry). Visuals and
- * helpers: src/components/pages/questions/. Only the `electric` page carries a calculator
- * button (R9).
+ * Each page is its own component in src/components/pages/questions/ (QSmell, QBesideMe, …),
+ * built from lane B's <Screen>, lane C's scenes and lane D's charts. Copy:
+ * src/i18n/pages/questions.ts; every number is filled from the estimate or the registry by
+ * questionNumbers() in src/components/pages/questions/q.ts.
+ *
+ * /questions/how-much/ and /questions/electric/ moved: they are redirect pages beside this file.
  */
 import Base from '@/layouts/Base.astro';
-import Section from '@/components/ui/Section.astro';
-import Callout from '@/components/ui/Callout.astro';
-import Card from '@/components/ui/Card.astro';
-import Button from '@/components/ui/Button.astro';
-import ChainStrip from '@/components/ui/ChainStrip.astro';
-import Details from '@/components/ui/Details.astro';
-import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
-import Icon from '@/components/ui/Icon.astro';
 import Phrased from '@/components/ui/Phrased.astro';
-import Claim from '@/components/pages/questions/Claim.astro';
-import LeadVisual from '@/components/pages/questions/LeadVisual.astro';
-import MoreVisuals from '@/components/pages/questions/MoreVisuals.astro';
-import StudyList from '@/components/pages/questions/StudyList.astro';
+import QSmell from '@/components/pages/questions/QSmell.astro';
+import QBesideMe from '@/components/pages/questions/QBesideMe.astro';
+import QApp from '@/components/pages/questions/QApp.astro';
+import QOneRedLight from '@/components/pages/questions/QOneRedLight.astro';
+import QMyChild from '@/components/pages/questions/QMyChild.astro';
+import QRider from '@/components/pages/questions/QRider.astro';
+import QMask from '@/components/pages/questions/QMask.astro';
 import ShareBlock from '@/components/pages/questions/ShareBlock.astro';
-import { lg, requiredCaveats, slugs, type Slug } from '@/components/pages/questions/q';
+import { filler, nextQuestion, plain, slugs, type Slug } from '@/components/pages/questions/q';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { chain, readerText } from '@/i18n/ui';
-import { facts, formatCitation, sourcesFor, type FactId, type GapId, type SeriesId } from '@/data';
+import { colon, typeset } from '@/i18n/ui';
 import questions from '@/i18n/pages/questions';
-import { fill, localize } from '@/i18n/pages/_copy';
-import { citeN } from '@/components/pages/questions/q';
 
 export function getStaticPaths() {
   return localeStaticPaths().flatMap(({ params }) => slugs.map((slug) => ({ params: { ...params, slug } })));
@@ -43,325 +35,103 @@ export function getStaticPaths() {
 
 const locale = localeFromParam(Astro.params.lang);
 const slug = Astro.params.slug as Slug;
-const t = localize(questions, locale);
-const P = t.page;
-const item = t.items[slug];
-const raw = questions.items[slug];
-const pg = questions.pages[slug];
-const tp = t.pages[slug];
-const plain = (s: string) => s.replaceAll('|', '');
-
-// ---- where each required caveat and each gap's "who could measure it" first appears ----
-const shownCaveat = new Set<FactId>();
-const shownGap = new Set<GapId>();
-// The idling rule's registry caveat is written as an instruction to editors ("never write
-// legal or illegal"); the page states the same limit in reader-facing words through the gap
-// gap-idling-rule-scooters instead (see the questions report).
-const editorVoiced = new Set<FactId>(['idling-regulation']);
-const take = (_text: string, fs: readonly FactId[] = [], gs: readonly GapId[] = [], withCaveats = true) => {
-  const caveats = withCaveats ? fs.filter((f) => facts[f].requiresCaveat && !editorVoiced.has(f) && !shownCaveat.has(f)) : [];
-  caveats.forEach((f) => shownCaveat.add(f));
-  const gapNotes = gs.filter((g) => !shownGap.has(g));
-  gapNotes.forEach((g) => shownGap.add(g));
-  return { caveats, gapNotes };
-};
-const answer = take(item.answer, pg.answerFacts, pg.answerGaps);
-const answerNotes = requiredCaveats(answer.caveats, locale);
-const answerGaps = answer.gapNotes.map((g) => lg(g, locale));
-const measured = tp.measured.map((l, i) => ({ ...l, ...take(l.text, pg.measured[i].facts, pg.measured[i].gaps, !('noCaveat' in pg.measured[i] && pg.measured[i].noCaveat)) }));
-const notShown = tp.notShown.map((l, i) => ({ ...l, ...take(l.text, pg.notShown[i].facts, pg.notShown[i].gaps, false) }));
-
-// ---- next questions: [same part of the story, the other half] ----
-const nextCard = (key: string) => {
-  if (key === 'afford') return { href: href('/electric/', locale), q: t.index.afford.q, answer: t.index.afford.answer, badges: [] as const, eyebrow: t.index.afford.more };
-  if (key === 'evidence') return { href: href('/evidence/', locale), q: t.index.evidence.q, answer: t.index.evidence.answer, badges: [] as const, eyebrow: t.index.evidence.more };
-  const s = key as Slug;
-  return { href: href(`/questions/${s}/`, locale), q: plain(t.items[s].q), answer: t.items[s].answer, badges: questions.items[s].badges, eyebrow: fill(t.index.linkN, { n: questions.items[s].link }) };
-};
-const next = pg.next.map((k, i) => ({ ...nextCard(k), tag: i === 0 ? P.nextSame : P.nextOther }));
-
-// ---- every source this page cites, for the reference list ----
-const seriesUsed: Record<Slug, SeriesId[]> = {
-  smell: ['odour-thresholds'],
-  'beside-me': ['idle-test-limits-by-build-date'],
-  app: ['wu2021-station-correlation', 'taipei-traffic-vs-general-stations'],
-  'how-much': ['scooter-lane-vs-cyclist-wu2021', 'commute-pm25-chuang2020', 'commute-pm25-wang2021'],
-  'one-red-light': ['wu2021-quiet-route'],
-  'my-child': ['stroller-height-studies'],
-  rider: ['commute-pm25-chuang2020', 'commute-pm25-wang2021', 'scooter-lane-vs-cyclist-wu2021'],
-  electric: ['ev-share-new-registrations', 'tsai2023-benzene-by-class'],
-};
-const extraFacts: Partial<Record<Slug, FactId[]>> = {
-  smell: ['who-benzene-no-safe-level', 'iarc-outdoor-air-pollution-group1', 'iarc-diesel-exhaust-group1'],
-  'beside-me': ['inspection-2025-per-100'],
-  'one-red-light': ['chuang2020-cardiovascular-association', 'mccreanor2007-london-walk', 'mj-cohort-mortality-guo2021'],
-};
-const pageFacts = [
-  ...pg.answerFacts,
-  ...pg.measured.flatMap((l) => l.facts ?? []),
-  ...pg.notShown.flatMap((l) => l.facts ?? []),
-  ...pg.actions.flatMap((a) => a.facts ?? []),
-  ...pg.studies,
-  ...(extraFacts[slug] ?? []),
-];
-const pageGaps = [...pg.answerGaps, ...pg.measured.flatMap((l) => l.gaps ?? []), ...pg.notShown.flatMap((l) => l.gaps ?? [])];
-const refs = sourcesFor({ facts: [...new Set(pageFacts)], gaps: [...new Set(pageGaps)], series: seriesUsed[slug] })
-  .filter((s) => !(slug === 'my-child' && s.id === 'harr-2022-uclim'))
-  .map((s) => ({ id: s.id, n: citeN(s.id), text: readerText(formatCitation(s.id, locale)) }))
-  .sort((a, b) => a.n - b.n);
-
-const linkLabel = chain.links[raw.link - 1][locale];
-const one = slug === 'one-red-light' ? t.pages['one-red-light'] : undefined;
+const item = questions.items[slug];
+const P = questions.page;
+const f = filler(locale);
+const next = nextQuestion(slug, locale);
+const pages = { smell: QSmell, 'beside-me': QBesideMe, app: QApp, 'one-red-light': QOneRedLight, 'my-child': QMyChild, rider: QRider, mask: QMask } satisfies Record<Slug, unknown>;
+const Page = pages[slug];
 ---
 
-<Base locale={locale} title={plain(item.q)} description={item.answer} share={slug}>
-  <article class="q" aria-labelledby="q-title">
-    <header class="q-head">
-      <div class="container container--prose q-head__inner">
-        <p class="eyebrow q-eyebrow">
-          <span class="q-eyebrow__text"><a href={href('/questions/', locale)}>{plain(t.index.title)}</a><span aria-hidden="true"> · </span>{fill(P.linkWithName, { n: raw.link, name: linkLabel })}</span>
-        </p>
-        <h1 id="q-title" class="display q-title"><Phrased text={item.q} /></h1>
-        <section class="q-answer" aria-labelledby="q-answer-label">
-          <h2 id="q-answer-label" class="q-answer__label">{t.index.answerLabel}</h2>
-          <p class="q-answer__text">{item.answer}</p>
-          <p class="q-answer__badges">{raw.badges.map((k) => <EvidenceBadge locale={locale} kind={k} />)}</p>
-          {answerNotes.map((n) => <p class="q-note"><b>{P.note}</b> {n.text}</p>)}
-          {answerGaps.map((g) => (
-            <p class="q-note q-note--gap">
-              {g.whoCouldMeasure && <span><b>{P.gapWho}</b> {g.whoCouldMeasure}</span>}
-              <span><b>{P.gapClose}</b> {g.wouldClose}</span>
-            </p>
-          ))}
-        </section>
-      </div>
+<Base locale={locale} title={typeset(plain(item.q[locale]), locale)} description={f(item.card[locale])} share={slug}>
+  <div class="qp">
+    <header class="qp-head">
+      <a class="qp-back" href={href('/questions/', locale)}><svg class="qp-back__arrow" viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" /></svg>{P.back[locale]}</a>
+      <h1 class="qp-q"><span class="vh">{P.questionLabel[locale]}{colon(locale)}</span><Phrased text={typeset(item.q[locale], locale)} locale={locale} /></h1>
     </header>
 
-    <Section id="measured" title={P.measured} width="prose" pad="tight">
-      <div class="q-claims">
-        {measured.map((l, i) => <Claim locale={locale} text={l.text} facts={pg.measured[i].facts} gaps={pg.measured[i].gaps} badge={pg.measured[i].badge} caveats={l.caveats} gapNotes={l.gapNotes} />)}
-      </div>
-    </Section>
+    <Page locale={locale} next={next} />
 
-    <div class="container container--wide q-lead">
-      <LeadVisual locale={locale} slug={slug} />
-    </div>
-
-    {one && (
-      <div class="container container--prose q-callouts">
-        <Callout tone="note" label={one.keepWalking.label}>
-          <p>{one.keepWalking.text}</p>
-        </Callout>
-        <div class="q-inference">
-          <p>{one.inference}</p>
-          <EvidenceBadge locale={locale} kind="inference" />
-        </div>
-      </div>
-    )}
-
-    <Section id="caveat" width="prose" pad="tight">
-      <Callout tone="exhaust" label={P.caveat} title={item.caveat}>
-        <ul class="q-list">
-          {notShown.map((l, i) => <Claim as="li" locale={locale} text={l.text} facts={pg.notShown[i].facts} gaps={pg.notShown[i].gaps} gapNotes={l.gapNotes} badges={false} />)}
-        </ul>
-      </Callout>
-    </Section>
-
-    <Section id="action" width="prose" pad="tight">
-      <Callout tone="clean" label={P.action}>
-        <ul class="q-list q-actions">
-          {tp.actions.map((a, i) => (
-            <li>
-              <p>{a.text}</p>
-              {(pg.actions[i].badge || pg.actions[i].path) && (
-                <p class="q-actions__row">
-                  {pg.actions[i].badge && <EvidenceBadge locale={locale} kind={pg.actions[i].badge!} />}
-                  {pg.actions[i].path && a.linkText && (pg.actions[i].path === '/electric/#calc' ? (
-                    <Button href={href(pg.actions[i].path!, locale)} arrow>{a.linkText}</Button>
-                  ) : (
-                    <a class="q-link" href={pg.actions[i].path!.startsWith('#') ? pg.actions[i].path : href(pg.actions[i].path!, locale)}>{a.linkText}<Icon name="arrow-right" size="1.05em" /></a>
-                  ))}
-                </p>
-              )}
-            </li>
-          ))}
-        </ul>
-      </Callout>
-    </Section>
-
-    <Section id="chain" title={P.chain} width="prose" pad="tight" tone="sunken">
-      <p class="q-chain-lead">{fill(P.chainLead, { n: raw.link })}</p>
-      <ChainStrip locale={locale} variant="collapsed" current={raw.link} />
-    </Section>
-
-    <Section id="more" title={slug === 'how-much' ? t.pages['how-much'].nearest.title : P.moreMany} width="wide" pad="tight">
-      <div class="q-more">
-        <MoreVisuals locale={locale} slug={slug} />
-      </div>
-      <h3 class="q-h3">{P.studies}</h3>
-      <StudyList locale={locale} facts={pg.studies} titles={'studyTitles' in tp ? (tp.studyTitles as Record<string, string>) : undefined} name={`studies-${slug}`} />
-    </Section>
-
-    <Section id="next" title={P.next} width="wide" pad="tight">
-      <div class="grid q-next">
-        {next.map((n) => (
-          <Card title={n.q} href={n.href} eyebrow={`${n.tag} · ${n.eyebrow}`} level={3}>
-            <p>{n.answer}</p>
-            {n.badges.length > 0 && <Fragment slot="footer">{n.badges.map((k) => <EvidenceBadge locale={locale} kind={k} />)}</Fragment>}
-          </Card>
-        ))}
-      </div>
-      <p class="q-all"><a class="q-link" href={href('/questions/', locale)}>{P.allQuestions}<Icon name="arrow-right" size="1.05em" /></a></p>
-    </Section>
-
-    <Section id="share" title={P.share} width="wide" pad="tight" tone="sunken">
-      <ShareBlock locale={locale} id={slug} />
-    </Section>
-
-    <Section id="sources" width="prose" pad="tight">
-      <Details summary={fill(P.sourcesN, { n: refs.length })}>
-        <ol class="q-refs">
-          {refs.map((r) => <li id={`ref-${r.id}`} value={r.n}>{r.text}</li>)}
-        </ol>
-        <p><a class="q-link" href={href('/sources/', locale)}>{P.sourcesAll}<Icon name="arrow-right" size="1.05em" /></a></p>
-      </Details>
-    </Section>
-  </article>
+    <ShareBlock locale={locale} id={slug} />
+  </div>
 </Base>
 
 <style>
-  .q-head {
-    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-5);
+  .qp {
+    padding-block-end: var(--sp-7);
   }
-  .q-head__inner {
-    display: grid;
-    gap: var(--sp-4);
-  }
-  .q-eyebrow a {
-    color: inherit;
-  }
-  .q-eyebrow__text {
-    display: inline;
-  }
-  .q-title {
-    font-size: clamp(2rem, 8.5vw, 3.75rem);
-    line-height: 1.12;
-    text-wrap: balance;
-  }
-  .q-answer {
-    display: grid;
-    gap: var(--sp-3);
-    justify-items: start;
-    padding: var(--sp-4) var(--sp-4) var(--sp-5);
-    border: var(--rule-paint, 4px) solid var(--ink);
-    border-radius: var(--radius-1);
-    background: var(--surface);
-  }
-  .q-answer__label {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-black);
-    letter-spacing: 0.04em;
-    margin: 0;
-  }
-  .q-answer__text {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-bold);
-    line-height: 1.6;
-  }
-  .q-answer__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-2);
-  }
-  .q-note {
+  /* the question: above the picture, in the same column as the screens below it */
+  .qp-head {
     display: grid;
     gap: var(--sp-1);
-    padding-inline-start: var(--sp-3);
-    border-inline-start: 2px solid var(--line-strong);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-    color: var(--ink-2);
-  }
-  .q-note--gap {
-    border-inline-start-style: dashed;
-  }
-  .q-note b {
-    color: var(--ink);
-    margin-inline-end: 0.25em;
-  }
-  .q-claims {
-    display: grid;
-    gap: var(--sp-5);
-  }
-  .q-lead {
-    padding-block: var(--sp-5) var(--sp-6);
-  }
-  .q-callouts {
-    display: grid;
-    gap: var(--sp-5);
-    padding-block-end: var(--sp-5);
-  }
-  .q-inference {
-    display: grid;
-    gap: var(--sp-2);
     justify-items: start;
-    padding: var(--sp-4);
-    border: 2px dashed var(--line-strong);
-    border-radius: var(--radius-1);
+    inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
+    margin-inline: auto;
+    padding-block: var(--sp-2) var(--sp-3);
   }
-  .q-list {
-    display: grid;
-    gap: var(--sp-4);
-    margin: 0;
-    padding-inline-start: 1.1em;
-  }
-  .q-actions {
-    list-style: none;
-    padding: 0;
-  }
-  .q-actions__row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--sp-2) var(--sp-4);
-    margin-block-start: var(--sp-2);
-  }
-  .q-link {
+  .qp-back {
     display: inline-flex;
     align-items: center;
-    gap: 0.3em;
-    min-block-size: 2.75rem;
-    font-weight: var(--fw-bold);
-  }
-  .q-chain-lead {
-    margin-block-end: var(--sp-4);
-  }
-  .q-more {
-    display: grid;
-    gap: var(--sp-8);
-  }
-  .q-h3 {
-    margin-block: var(--sp-8) var(--sp-3);
-    font-size: var(--fs-lg);
-  }
-  .q-next {
-    --min: 17rem;
-  }
-  .q-all {
-    margin-block-start: var(--sp-4);
-  }
-  .q-refs {
-    display: grid;
-    gap: var(--sp-2);
-    padding-inline-start: 2.5em;
+    gap: 0.35em;
+    min-block-size: var(--tap);
+    min-inline-size: var(--tap);
     font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-    overflow-wrap: anywhere;
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+    text-decoration: none;
   }
-  /* Chinese titles wrap between phrases (after punctuation), never inside 「良好」 */
-  :is(.q-next) :global(.card__title:lang(zh-Hant-TW)) {
-    word-break: keep-all;
-    overflow-wrap: anywhere;
+  .qp-back:hover {
+    text-decoration: underline;
+  }
+  .qp-q {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    line-height: 1.3;
+    letter-spacing: 0;
     text-wrap: balance;
+  }
+  /* a small signal lamp before the question, so it reads as "the question", the answer follows */
+  .qp-q::before {
+    content: '';
+    display: inline-block;
+    inline-size: 0.6em;
+    block-size: 0.6em;
+    margin-inline-end: 0.45em;
+    border-radius: 50%;
+    background: var(--signal-red);
+    vertical-align: 0.05em;
+  }
+
+  /* pictures that are not drawings (a chart, a table, the smell strip): keep the page's gutter
+     on a phone, where a drawing runs edge to edge */
+  .qp :global(.q-plate) {
+    box-sizing: border-box;
+    padding: var(--sp-3) var(--gutter) 0;
+  }
+  /* a screen that borrows another screen's sheet puts its own 怎麼知道的？ beside the chip:
+     keep the button at the end of the row, where every other screen has it */
+  .qp :global(.screen__chips:has(> .howbtn)) {
+    flex: 1 1 auto;
+  }
+  .qp :global(.screen__chips > .howbtn) {
+    margin-inline-start: auto;
+  }
+  @media (min-width: 56.25em) {
+    .qp-head {
+      padding-block: var(--sp-5) 0;
+    }
+    .qp-q {
+      font-size: 1.5rem;
+    }
+    .qp :global(.q-plate) {
+      padding: 0;
+    }
+    /* the second and third pictures are part of the same answer: no rule between them */
+    .qp :global(.screen + .screen) {
+      border-block-start: 0;
+      padding-block-start: var(--sp-3);
+    }
   }
 </style>

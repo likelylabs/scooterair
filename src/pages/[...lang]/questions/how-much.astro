@@ -1,0 +1,15 @@
+---
+/**
+ * /questions/how-much/ moved to /estimate/ (redesign brief, section 2): the estimate answers
+ * it. Kept as a redirect in both languages so old links and shares still land; its share card
+ * stays in public/share/ so an old share still shows a picture.
+ */
+import Redirect from '@/layouts/Redirect.astro';
+import { localeFromParam, localeStaticPaths } from '@/i18n';
+import questions from '@/i18n/pages/questions';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+---
+
+<Redirect locale={locale} to="/estimate/" label={questions.page.moved.howMuch[locale]} />

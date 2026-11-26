@@ -1,0 +1,101 @@
+---
+/**
+ * /questions/my-child/ — 我的小孩呢？ (brief 7.5; home screen 8)
+ *   1  G8, the heights. The number is a breathing-rate fact (air per kilogram), never a number
+ *      for child height; K4 is the quiet line.
+ *   +  The back-seat answer, marked as measured abroad and as our inference for Taiwan.
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { kSentences } from '@/i18n/ui';
+import Screen from '@/components/ui/Screen.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import HowButton from '@/components/ui/HowButton.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import NextButton from '@/components/ui/NextButton.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import HeightsScene from '@/components/art/HeightsScene.astro';
+import { fact } from '@/data/facts';
+import questions from '@/i18n/pages/questions';
+import { factText, filler, questionNumbers } from './q';
+
+interface Props {
+  locale: Locale;
+  next: { label: string; href: string; primary?: boolean };
+}
+const { locale, next } = Astro.props;
+const f = filler(locale);
+const nums = questionNumbers(locale);
+const child = { lo: nums.childLo, hi: nums.childHi };
+const s1 = questions.myChild.s1;
+const back = questions.myChild.backSeat;
+const air = factText('child-air-per-kg', locale);
+const carson = factText('child-commute-scooter-carson2026', locale);
+---
+
+<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale], child)} quiet={kSentences.K4[locale]} illustration>
+  <HeightsScene slot="picture" locale={locale} />
+  <KindChip slot="chips" locale={locale} of={fact('child-air-per-kg')} />
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="study" facts="child-air-per-kg" primary={{ href: href('/evidence/#link-6', locale) }}>
+    <p slot="block1">{f(s1.sheet.b1[locale])}</p>
+    <p slot="block2">{air.statement}</p>
+    <p slot="block3">{air.caveat}</p>
+  </HowSheet>
+</Screen>
+
+<section class="q-also" id="back-seat" aria-labelledby="back-seat-h">
+  <h2 class="q-also__q" id="back-seat-h"><Phrased text={back.q[locale]} locale={locale} /></h2>
+  <p class="q-also__a">{f(back.answer[locale])}</p>
+  <div class="q-also__foot">
+    <KindChip locale={locale} of={fact('child-commute-scooter-carson2026')} />
+    <HowButton locale={locale} sheet="how-2" />
+  </div>
+  <HowSheet id="how-2" locale={locale} kind="measured" facts="child-commute-scooter-carson2026" primary={{ href: href('/evidence/#link-6', locale) }}>
+    <p slot="block1">{f(back.sheet.b1[locale], { year: nums.carsonYear })}</p>
+    <p slot="block2">{f(back.sheet.b2[locale])}</p>
+    <p slot="block3">{carson.caveat}</p>
+  </HowSheet>
+  <div class="q-also__go">
+    <NextButton href={next.href} variant={next.primary ? 'primary' : 'next'}>{next.label}</NextButton>
+  </div>
+</section>
+
+<style>
+  /* the second question on this page: a card in the same column as the screen above it */
+  .q-also {
+    display: grid;
+    gap: var(--sp-3);
+    inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
+    margin: var(--sp-5) auto 0;
+  }
+  .q-also__q {
+    margin: 0;
+    padding-block-start: var(--sp-5);
+    border-block-start: 1px solid var(--line);
+    font-family: var(--font-heading);
+    font-size: clamp(1.375rem, 6.9vw, var(--fs-headline));
+    font-weight: var(--fw-black);
+    line-height: var(--lh-headline);
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+  .q-also__a {
+    margin: 0;
+    max-inline-size: 40rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+  .q-also__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tap-gap) var(--sp-3);
+    max-inline-size: 40rem;
+  }
+  .q-also__go {
+    max-inline-size: 40rem;
+    margin-block-start: var(--sp-2);
+  }
+</style>

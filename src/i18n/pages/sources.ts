@@ -1,4 +1,4 @@
-// Copy for /sources/ (blueprint 4.8): the full bibliography from the registry. Every count is
+// Copy for /sources/ (redesign brief 7.4; blueprint 4.8): the reference list. Every count is
 // filled in at render time from src/data. See ./_copy.ts.
 
 import { copy } from './_copy.ts';
@@ -15,10 +15,10 @@ export default copy({
     kicker: { 'zh-TW': '資料來源', en: 'Sources' },
     title: { 'zh-TW': '每一個數字，|都從這裡來', en: 'Every number |starts here' },
     lead: {
-      'zh-TW': '這裡列出網站用到的全部 {n} 個來源。每一個有固定的編號，網站上的來源標記都連到這裡。每一筆都寫著我們讀到哪裡，以及網站用它說了什麼。',
-      en: 'Here are all {n} sources the site uses. Each has a fixed number, and every citation marker on the site links here. Each entry says how far we read it and what the site says on the strength of it.',
+      'zh-TW': '這裡列出網站用到的全部 {n} 個來源，包括本站推估和口罩說明用到的。每一個有固定的編號，網站上的來源標記都連到這裡。每一筆都寫著我們讀到哪裡，以及網站用它說了什麼。',
+      en: 'Here are all {n} sources the site uses, including those behind our estimate and the mask facts. Each has a fixed number, and every citation marker on the site links here. Each entry says how far we read it and what the site says on the strength of it.',
     },
-    evidence: { 'zh-TW': '想看每一項證據怎麼接起來，請到證據鏈。', en: 'To see how each piece of evidence fits together, go to the chain.' },
+    evidence: { 'zh-TW': '想看每一項證據怎麼接起來，請到證據頁。', en: 'To see how each piece of evidence fits together, go to the evidence page.' },
     evidenceLink: { 'zh-TW': '證據鏈，一環一環看', en: 'The chain, link by link' },
   },
   reads: {
@@ -35,6 +35,7 @@ export default copy({
     kind: { 'zh-TW': '來源類型', en: 'Kind of source' },
     all: { 'zh-TW': '全部', en: 'All' },
     none: { 'zh-TW': '不在鏈上', en: 'Outside the chain' },
+    estimate: { 'zh-TW': '推估用到的', en: 'Used by our estimate' },
     linkN: { 'zh-TW': '第 {n} 環', en: 'Link {n}' },
     showing: { 'zh-TW': '顯示 {n} 個來源，共 {total} 個', en: 'Showing {n} of {total} sources' },
     hint: {
@@ -55,23 +56,13 @@ export default copy({
     },
     links: { 'zh-TW': '用在：', en: 'Used in:' },
     linkN: { 'zh-TW': '第 {n} 環', en: 'link {n}' },
-    noLink: { 'zh-TW': '寫作規則與背景', en: 'writing rules and background' },
+    noLink: { 'zh-TW': '背景資料', en: 'background' },
     uses: { 'zh-TW': '網站用它說的事（{n}）', en: 'What the site says on its strength ({n})' },
     facts: { 'zh-TW': '事實', en: 'Facts' },
     series: { 'zh-TW': '圖表資料', en: 'Chart data' },
-    gaps: { 'zh-TW': '證據缺口', en: 'Evidence gaps' },
-    rules: { 'zh-TW': '寫作規則（我們不會說的話）', en: 'Writing rules (what we will not say)' },
+    answers: { 'zh-TW': '回答了哪些問題', en: 'Questions it helps answer' },
+    estimate: { 'zh-TW': '本站的推估', en: 'Our estimate' },
     number: { 'zh-TW': '來源 {n}', en: 'Source {n}' },
-  },
-  gaps: {
-    title: { 'zh-TW': '證據缺口', en: 'Gaps in the evidence' },
-    lead: {
-      'zh-TW': '證據缺口也是一筆可以引用的紀錄。下面每一筆寫著已經有什麼、還缺什麼、我們最後一次搜尋的日期，以及我們提議誰來做。',
-      en: 'A gap in the evidence is a record you can cite too. Each entry says what exists, what is missing, when we last searched, and who we propose could do the work.',
-    },
-    searched: { 'zh-TW': '搜尋日期：{date}', en: 'Last searched: {date}' },
-    who: { 'zh-TW': '誰量得出來：', en: 'Who could measure it: ' },
-    more: { 'zh-TW': '在證據鏈上看這一格', en: 'See this gap on the chain' },
   },
   top: { 'zh-TW': '回到篩選', en: 'Back to the filter' },
 });

@@ -1,10 +1,19 @@
 ---
 /**
- * /evidence/ — 證據鏈，一環一環看 / The chain, link by link (blueprint 4.5, Part 5 V5, V9, V13,
- * V17, V20–V26, V28–V34). The page a sceptic, a journalist or a scientist uses to check the
- * site. Data register only: no scene art.
+ * /evidence/ — 證據 / Evidence (redesign brief 7.3; blueprint 4.5, Part 5 V5, V9, V13, V17,
+ * V20–V26, V28–V34). The adults' page: the one a sceptic, a journalist or a scientist uses to
+ * check the site. Data register only: no scene art.
  *
- * Built from the registry: every fact, chart dataset and gap that evidenceForLink(n) returns for
+ *   top            the seven-line connect board, each line with its chip(s) (chain.summary)
+ *   #map           the evidence map: kinds of evidence × links, and a 推估 column
+ *   #link-1 … 7    charts, then the answers for that link (AnswerCard, former gap ids kept as
+ *                  anchors), then the evidence table; link 3 carries the estimate and K2 and the
+ *                  mask line, link 5 carries K5
+ *   #answers       (also #gaps) where the former gap list went
+ *   #not-claimed   what we will not say (brief 4.6) and what would change our mind
+ *   #not-used, #studies, #context, #method
+ *
+ * Built from the registry: every fact and chart dataset that evidenceForLink(n) returns for
  * each link appears, ordered by kind of evidence (Taiwan measurements first; src/data/chain.ts),
  * with its badge, citations and caveat. A fact appears in
  * full once (anchor #<fact id>); where it also serves another link, that link points to it.
@@ -20,20 +29,19 @@ import Callout from '@/components/ui/Callout.astro';
 import Card from '@/components/ui/Card.astro';
 import Cite from '@/components/ui/Cite.astro';
 import CompareTable from '@/components/ui/CompareTable.astro';
-import CountdownRail from '@/components/ui/CountdownRail.astro';
 import Details from '@/components/ui/Details.astro';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
-import EvidenceChain from '@/components/ui/EvidenceChain.astro';
 import EvidenceLegend from '@/components/ui/EvidenceLegend.astro';
 import Figure from '@/components/ui/Figure.astro';
 import Icon from '@/components/ui/Icon.astro';
-import NotClaimedList from '@/components/ui/NotClaimedList.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
 import Phrased from '@/components/ui/Phrased.astro';
 import Stat from '@/components/ui/Stat.astro';
 import EvidenceMap from '@/components/pages/evidence/EvidenceMap.astro';
 import FactList from '@/components/pages/evidence/FactList.astro';
 import FactRow from '@/components/pages/evidence/FactRow.astro';
-import GapCard from '@/components/pages/evidence/GapCard.astro';
+import AnswerCard from '@/components/pages/evidence/AnswerCard.astro';
 import SeriesFigure from '@/components/pages/evidence/SeriesFigure.astro';
 import { seriesView, strollerView, sgn } from '@/components/pages/evidence/figures';
 import {
@@ -48,29 +56,28 @@ import {
   readLabel,
   sourceShort,
   sourceUses,
-  totals,
 } from '@/components/pages/evidence/ev';
 import { href, localeFromParam, localeStaticPaths, htmlLang } from '@/i18n';
-import { chain, readerText } from '@/i18n/ui';
+import { chain, kSentences, readerText } from '@/i18n/ui';
+import { estimateText } from '@/data/estimate';
 import evidenceCopy from '@/i18n/pages/evidence';
 import { fill, localize } from '@/i18n/pages/_copy';
 import {
+  answerList,
+  answersForLink,
   chainLinkLabels,
   chainLinks,
-  claimRuleList,
-  claimRuleKindLabels,
-  claimRules,
   contextItems,
   facts,
   factsForLink,
-  gapList,
-  gapsForLink,
   getSource,
+  localizeAnswer,
+  readerKindLabels,
+  readerKinds,
   readLevelLabels,
   readLevels,
   seriesForLink,
   sourceIds,
-  topicLabels,
   type ChainLink,
   type FactId,
   type SeriesId,
@@ -83,7 +90,6 @@ const en = locale === 'en';
 const T = localize(evidenceCopy, locale);
 const plain = (s: string) => s.replaceAll('|', '');
 const colon = en ? ': ' : '：';
-const tot = totals();
 const nf = (v: number, d = 2) => new Intl.NumberFormat(en ? 'en' : 'zh-TW', { maximumFractionDigits: d }).format(v);
 const pct = (v: number, d = 0) => `${nf(v, d)}%`;
 const D = (id: FactId, key: string) => (facts[id].data as Record<string, { value: number }>)[key].value;
@@ -141,22 +147,18 @@ const links = chainLinks.map((n) => {
     own,
     pointers,
     others,
-    gaps: gapsForLink(n).map((g) => g.id),
-    counts: { facts: all.filter((f) => f.chainLink === n).length, series: series.length, gaps: gapsForLink(n).length },
+    answers: answersForLink(n).map((a) => a.id),
   };
 });
 const V = (id: SeriesId) => seriesView(id, locale, T);
+/** Charts each link keeps behind its fold (the hand-placed ones below the lead chart), plus the rest of its data. */
+const foldFigures: Record<ChainLink, number> = { 1: 9, 2: 0, 3: 4, 4: 1, 5: 1, 6: 1, 7: 0 };
+const foldCount = (n: ChainLink, others: number) => foldFigures[n] + others;
 
-// ---- chain overview (V15) ---------------------------------------------------------------
-const chainItems = chainLinks.map((n) => {
+// ---- the connect board: seven lines, each with its chip(s) (brief 7.3) -------------------------
+const board = chainLinks.map((n) => {
   const line = chain.summary[n - 1];
-  const srcs: SourceId[] = n === 3 ? ['wu-2021-trd', 'wang-2021-atmosphere'] : keyFacts[n].flatMap((f) => facts[f].sources);
-  return {
-    body: line.text[locale],
-    strength: line.badges.length ? line.badges : undefined,
-    href: `#${chain.anchor(n)}`,
-    cites: cites(srcs),
-  };
+  return { n, name: linkName(n), text: line.text[locale], chips: line.chips };
 });
 
 // ---- featured values -----------------------------------------------------------------
@@ -192,24 +194,6 @@ const notUsedTokens = {
   t2: pct(D('netzero-ev-sales-targets', 'target2040')),
 };
 
-// ---- not claimed (V33) ------------------------------------------------------------------
-const fiveRules = ['brief-exposures-not-established', 'gasoline-exhaust-is-2b', 'no-scooters-main-source', 'smell-is-not-dose', 'studies-do-not-isolate-scooters'] as const;
-const five = T.notClaimed.five.map((claim, i) => {
-  const r = claimRules[fiveRules[i]];
-  return { claim, why: readerText(r.why[locale]), instead: 'instead' in r && r.instead ? readerText((r.instead as { 'zh-TW': string; en: string })[locale]) : undefined };
-});
-/** The public list leaves out rules that govern only how pages are built (ClaimRule.internal). */
-const publicRules = claimRuleList.filter((r) => !('internal' in r && r.internal));
-const ruleCount = (n: number) => fill(n === 1 ? T.notClaimed.groupCountOne : T.notClaimed.groupCount, { n });
-const byTopic = (kind: 'do-not-claim' | 'qualifier' | 'correction') => {
-  const list = publicRules.filter((r) => r.kind === kind);
-  const topics = [...new Set(list.map((r) => r.topic))];
-  return topics.map((topic) => ({ topic, label: readerText(topicLabels[topic][locale]), rules: list.filter((r) => r.topic === topic) }));
-};
-const dnc = byTopic('do-not-claim');
-const qualifiers = publicRules.filter((r) => r.kind === 'qualifier');
-const corrections = publicRules.filter((r) => r.kind === 'correction');
-
 // ---- studies read in full ---------------------------------------------------------------
 const uses = sourceUses();
 const fullRead = sourceIds.filter((id) => getSource(id).readLevel === 'full-text-page-checked');
@@ -220,34 +204,26 @@ const readCounts = readLevels.map((lvl) => ({ lvl, label: readerText(readLevelLa
 // ---- context outside the chain ----------------------------------------------------------
 const ctx = contextItems();
 
-const railItems = [
-  { href: '#map', label: T.rail.map },
-  { href: '#gaps', label: T.rail.gaps },
-  { href: '#not-used', label: T.rail.notUsed },
-  { href: href('/sources/', locale), label: T.rail.sources },
-];
 const toc = [
   { href: '#chain', label: T.toc.chain },
   { href: '#map', label: T.toc.map },
   ...chainLinks.map((n) => ({ href: `#${chain.anchor(n)}`, label: `${fill(T.toc.linkN, { n })} · ${linkName(n)}` })),
-  { href: '#studies', label: T.toc.studies },
-  { href: '#gaps', label: T.toc.gaps },
+  { href: '#answers', label: T.toc.answers },
   { href: '#not-claimed', label: T.toc.notClaimed },
+  { href: '#change-mind', label: T.toc.changeMind },
+  { href: '#studies', label: T.toc.studies },
   { href: '#not-used', label: T.toc.notUsed },
   { href: '#method', label: T.toc.method },
 ];
 ---
 
 <Base locale={locale} title={T.meta.title} description={T.meta.description} share="brief">
-  <CountdownRail slot="rail" locale={locale} page="/evidence/" items={railItems} />
-
-  <!-- Each rail chapter carries its own id: the rail tells chapters apart by id (a missing id made them all one) -->
-  <header class="ev-head" id="ev-top" data-rail-chapter data-rail-label={T.head.kicker}>
+  <header class="ev-head" id="ev-top">
     <div class="container"><div class="ev-head__inner">
       <p class="eyebrow">{T.head.kicker}</p>
       <h1 class="display ev-title"><Phrased text={T.head.title} /></h1>
       <p class="lead">{T.head.lead}</p>
-      <p class="ev-counts">{fill(T.head.counts, tot)}</p>
+      <p class="ev-est"><a href={href('/estimate/', locale)}>{T.head.estimate}<Icon name="arrow-right" size="1.05em" /></a></p>
       <nav class="ev-toc" aria-label={T.head.tocLabel}>
         <h2 class="ev-toc__title">{T.head.tocLabel}</h2>
         <ol>
@@ -257,44 +233,75 @@ const toc = [
       <div class="ev-howto">
         <h2 class="ev-howto__title">{T.howTo.title}</h2>
         <p>{T.howTo.body}</p>
-        <EvidenceLegend locale={locale} compact />
+        <ul class="ev-chips">
+          {readerKinds.map((k) => <li><KindChip locale={locale} kind={k} /> <span>{readerKindLabels[k].meaning[locale]}</span></li>)}
+        </ul>
       </div>
     </div></div>
   </header>
 
-  <!-- V15: the seven links -->
-  <div id="rail-chain" data-rail-chapter data-rail-label={T.toc.chain}>
+  <!-- The connect board: seven lines, each with its chip(s) -->
   <Section id="chain" title={T.chain.title} lead={T.chain.lead} tone="sunken" width="wide">
-    <EvidenceChain locale={locale} links={chainItems} label={T.chain.title} />
-    <ul class="ev-chaincounts">
-      {links.map((l) => (
-        <li><a href={`#${chain.anchor(l.n)}`}>{fill(T.toc.linkN, { n: l.n })}</a> <span>{fill(T.chain.counts, l.counts)}</span></li>
+    <ol class="ev-board">
+      {board.map((b) => (
+        <li class="ev-board__row">
+          <a class="ev-board__link" href={`#${chain.anchor(b.n)}`}>
+            <span class="ev-board__n" aria-hidden="true">{b.n}</span>
+            <span class="ev-board__body">
+              <span class="ev-board__name">{fill(T.toc.linkN, { n: b.n })}　{b.name}</span>
+              <span class="ev-board__text">{b.text}</span>
+            </span>
+          </a>
+          <span class="ev-board__chips">
+            {b.chips.length ? b.chips.map((c) => <KindChip locale={locale} kind={c} size="sm" />) : <span class="ev-board__machine">{chain.noBadge[locale]}</span>}
+          </span>
+        </li>
       ))}
-    </ul>
+    </ol>
   </Section>
-  </div>
 
   <!-- V30: the evidence map -->
-  <div id="rail-map" data-rail-chapter data-rail-label={T.toc.map}>
   <Section id="map" title={T.map.title} lead={T.map.lead}>
-    <EvidenceMap locale={locale} />
+    <details class="ev-fold ev-fold--map" data-ev-fold>
+      <summary><span>{T.map.open}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <EvidenceMap locale={locale} />
+    </details>
   </Section>
-  </div>
 
   {links.map((l, li) => (
-    <section id={chain.anchor(l.n)} class:list={['ev-link', li % 2 === 1 && 'tone-sunken']} aria-labelledby={`${chain.anchor(l.n)}-title`} data-rail-chapter data-link={l.n}>
+    <section id={chain.anchor(l.n)} class:list={['ev-link', li % 2 === 1 && 'tone-sunken']} aria-labelledby={`${chain.anchor(l.n)}-title`} data-link={l.n}>
       <div class="container">
         <header class="ev-link__head">
           <p class="eyebrow">{fill(chain.linkOf[locale], { n: l.n, total: chain.links.length })} · {l.n === chain.links.length ? chain.breakable[locale] : chain.links[l.n - 1][locale]}</p>
           <h2 class="h1 ev-link__title" id={`${chain.anchor(l.n)}-title`}><Phrased text={l.title} /></h2>
           <p class="ev-link__q"><b>{T.link.question}</b> {l.question}</p>
-          <p class="ev-link__counts">{fill(T.link.counts, l.counts)}</p>
         </header>
+
+        {l.n === 3 && (
+          <div class="ev-l3">
+            <div class="ev-l3__est">
+              <h3 class="ev-sub ev-sub--first">{T.link3.estTitle}</h3>
+              <p class="ev-l3__p">{T.link3.estLead}</p>
+              <div class="ev-l3__row">
+                <span class="ev-l3__label">{estimateText.addedByPack[locale]}</span>
+                <EstimateValue locale={locale} slotId="co.dozen.add" />
+              </div>
+              <p class="ev-l3__p">{kSentences.K2[locale]}</p>
+              <div><a class="ev-go" href={href('/estimate/', locale)}>{T.link3.estMore}<Icon name="arrow-right" size="1.05em" /></a></div>
+            </div>
+            <div class="ev-l3__mask">
+              <h3 class="ev-sub ev-sub--first">{T.link3.masksTitle}</h3>
+              <p class="ev-l3__p">{T.link3.masks}</p>
+              <div><a class="ev-go" href={href('/questions/mask/', locale)}>{T.link3.masksLink}<Icon name="arrow-right" size="1.05em" /></a></div>
+            </div>
+          </div>
+        )}
 
         {l.n === 5 && (
           <div class="ev-l5">
             <Callout tone="note" label={T.link5.leadTitle}>
-              <p>{fill(T.link5.lead, { studies: nf(studies, 0) })}{cites(facts['hei-sr23-trap-associations'].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</p>
+              <p>{fill(T.link5.lead, { studies: nf(studies, 0) })}</p>
+              <p><b>{kSentences.K5[locale]}</b></p>
             </Callout>
             <Callout tone="exhaust" label={T.link5.rulerLabel}>
               <p>{T.link5.ruler}</p>
@@ -304,9 +311,33 @@ const toc = [
 
         <h3 class="ev-sub">{T.link.visuals}</h3>
         <div class="ev-visuals">
+          {l.n === 1 && <SeriesFigure locale={locale} view={V('teds13-motorcycle-share')} title={T.v5.title} subtitle={T.v5.subtitle} caption={T.v5.caption} tone="exhaust" />}
+          {l.n === 2 && <SeriesFigure locale={locale} view={V('wu2021-quiet-route')} title={T.v32.title} subtitle={T.v32.subtitle} caption={T.v32.caption} />}
+          {l.n === 3 && <SeriesFigure locale={locale} view={V('taipei-traffic-vs-general-stations')} title={T.v9.title} subtitle={T.v9.subtitle} caption={T.v9.caption} />}
+          {l.n === 4 && <SeriesFigure locale={locale} view={V('odour-thresholds')} />}
+          {l.n === 5 && <SeriesFigure locale={locale} view={V('hei-sr23-outcomes')} />}
+          {l.n === 6 && <SeriesFigure locale={locale} view={strollerView(locale, T, strollerBand)} title={T.v29.title} subtitle={T.v29.subtitle} caption={T.v29.caption} />}
+          {l.n === 7 && <SeriesFigure locale={locale} view={V('ev-share-new-registrations')} title={T.v17.title} subtitle={T.v17.subtitle} caption={T.v17.caption} tone="clean" />}
+        </div>
+
+        {l.answers.length > 0 && (
+          <Fragment>
+            <h3 class="ev-sub">{T.link.answers}</h3>
+            <div class="ev-gaps">
+              {l.answers.map((a) => <AnswerCard locale={locale} id={a} level={4} k={['K5']} legacy />)}
+            </div>
+          </Fragment>
+        )}
+
+        <h3 class="ev-sub">{l.n === 5 ? T.link.table5 : T.link.table}</h3>
+        <FactList locale={locale} ids={l.own} link={l.n} visible={3} />
+
+        {foldCount(l.n, l.others.length) > 0 && (
+          <details class="ev-fold" data-ev-fold>
+            <summary><span>{fill(T.row.moreData, { n: l.n, count: foldCount(l.n, l.others.length) })}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+            <div class="ev-visuals ev-visuals--fold">
           {l.n === 1 && (
             <Fragment>
-              <SeriesFigure locale={locale} view={V('teds13-motorcycle-share')} title={T.v5.title} subtitle={T.v5.subtitle} caption={T.v5.caption} tone="exhaust" />
               <figure class="ev-stats" aria-labelledby="v34-t">
                 <h4 class="ev-stats__title" id="v34-t">{T.v34.title}</h4>
                 <div class="ev-stats__grid">
@@ -350,10 +381,8 @@ const toc = [
               <SeriesFigure locale={locale} view={perHundred} title={fill(T.v24.title, { total: perHundredTotal })} subtitle={T.v24.subtitle} caption={T.v24.caption} />
             </Fragment>
           )}
-          {l.n === 2 && <SeriesFigure locale={locale} view={V('wu2021-quiet-route')} title={T.v32.title} subtitle={T.v32.subtitle} caption={T.v32.caption} />}
           {l.n === 3 && (
             <Fragment>
-              <SeriesFigure locale={locale} view={V('taipei-traffic-vs-general-stations')} title={T.v9.title} subtitle={T.v9.subtitle} caption={T.v9.caption} />
               <SeriesFigure locale={locale} view={V('wu2021-station-correlation')} title={T.v25.title} subtitle={T.v25.subtitle} caption={T.v25.caption} />
               <div class="ev-pair">
                 <p class="ev-pair__title">{T.v26.title}</p>
@@ -373,49 +402,32 @@ const toc = [
                 <Fragment slot="caption">{T.v28.foot}</Fragment>
                 <Fragment slot="source">{cites(iarc.flatMap((r) => facts[r.id].sources)).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
               </Figure>
-              <SeriesFigure locale={locale} view={V('odour-thresholds')} />
             </Fragment>
           )}
           {l.n === 5 && (
             <Fragment>
-              <SeriesFigure locale={locale} view={V('hei-sr23-outcomes')} />
               <SeriesFigure locale={locale} view={V('chuang2020-effects-per-iqr')} />
             </Fragment>
           )}
           {l.n === 6 && (
             <Fragment>
-              <SeriesFigure locale={locale} view={strollerView(locale, T, strollerBand)} title={T.v29.title} subtitle={T.v29.subtitle} caption={T.v29.caption} />
               <SeriesFigure locale={locale} view={V('commute-pm25-chuang2020')} title={T.v13.title} subtitle={T.v13.subtitle} caption={T.v13.caption} anchor={false} />
             </Fragment>
           )}
-          {l.n === 7 && <SeriesFigure locale={locale} view={V('ev-share-new-registrations')} title={T.v17.title} subtitle={T.v17.subtitle} caption={T.v17.caption} tone="clean" />}
-        </div>
-
-        {l.others.length > 0 && (
-          <details class="ev-fold" data-ev-fold>
-            <summary><span>{fill(T.row.moreData, { n: l.n, count: l.others.length })}</span><Icon name="chevron-down" size="1.25rem" /></summary>
-            <div class="ev-visuals ev-visuals--fold">
-              {l.others.map((id) => <SeriesFigure locale={locale} view={V(id)} />)}
             </div>
+
+            {l.others.length > 0 && (
+              <div class="ev-visuals ev-visuals--fold">
+                {l.others.map((id) => <SeriesFigure locale={locale} view={V(id)} />)}
+              </div>
+            )}
           </details>
         )}
-
-        {l.gaps.length > 0 && (
-          <Fragment>
-            <h3 class="ev-sub">{T.link.gaps}</h3>
-            <div class="ev-gaps">
-              {l.gaps.map((g) => <GapCard locale={locale} id={g} level={4} />)}
-            </div>
-          </Fragment>
-        )}
-
-        <h3 class="ev-sub">{l.n === 5 ? T.link.table5 : T.link.table}</h3>
-        <FactList locale={locale} ids={l.own} link={l.n} />
 
         {l.pointers.length > 0 && (
           <div class="ev-also">
             <h4 class="ev-also__title">{T.row.alsoTitle}</h4>
-            <p class="ev-also__lead">{T.row.alsoLead}</p>
+            <p class="ev-also__lead ev-note">{T.row.alsoLead}</p>
             <ul>
               {l.pointers.map((p) => (
                 <li><a href={`#${p.id}`}>{p.display}</a> <span>· {p.where}</span></li>
@@ -424,17 +436,18 @@ const toc = [
           </div>
         )}
 
-        <p class="ev-link__nav">
+        <div class="ev-link__nav">
           <a href="#chain">{T.link.top}</a>
           {l.n < chain.links.length && <a href={`#${chain.anchor(l.n + 1)}`}>{T.link.next}<span class="vh">{colon}{fill(T.toc.linkN, { n: l.n + 1 })} · {linkName(l.n + 1)}</span> →</a>}
-        </p>
+        </div>
       </div>
     </section>
   ))}
 
   <!-- Studies read in full -->
-  <div id="rail-studies" data-rail-chapter data-rail-label={T.toc.studies}>
   <Section id="studies" title={T.studies.title} lead={T.studies.lead} tone="sunken">
+    <details class="ev-fold" data-ev-fold>
+      <summary><span>{fill(T.studies.open, { n: fullRead.length })}</span><Icon name="chevron-down" size="1.25rem" /></summary>
     <div class="grid ev-studies" style="--min: 18rem">
       {fullRead.map((id) => {
         const s = getSource(id);
@@ -454,77 +467,45 @@ const toc = [
                 {u.series.map((x) => <li><a href={`#${dataAnchor(x)}`}>{readerText(seriesView(x, locale, T).s.title)}</a></li>)}
               </ul>
             </details>
-            <p><a class="ev-study__entry" href={href(`/sources/#${id}`, locale)}>{T.studies.entry}<span class="vh">{colon}[{n}] {sourceShort(id, locale)}</span> →</a></p>
+            <div><a class="ev-study__entry" href={href(`/sources/#${id}`, locale)}>{T.studies.entry}<span class="vh">{colon}[{n}] {sourceShort(id, locale)}</span> →</a></div>
           </article>
         );
       })}
     </div>
+    </details>
   </Section>
-  </div>
 
-  <!-- Gaps -->
-  <div id="rail-gaps" data-rail-chapter data-rail-label={T.toc.gaps}>
-  <Section id="gaps" title={T.gaps.title} lead={T.gaps.lead}>
-    <div class="ev-gaps ev-gaps--all">
-      {gapList.map((g) => <GapCard locale={locale} id={g.id} full />)}
-    </div>
-    <p class="ev-more"><a href={href('/unmeasured/', locale)}>{T.cta.empty} →</a></p>
+  <!-- The former gap list: each answer is under its link; all of them on /estimate/#answers -->
+  <Section id="answers" title={T.answers.title} lead={fill(T.answers.lead, { n: answerList.length })} width="wide" pad="tight">
+    <span id="gaps" class="ev-alias" aria-hidden="true"></span>
+    <ul class="ev-anslist">
+      {answerList.map((a) => <li><a href={`#${a.id}`}>{localizeAnswer(a, locale).question}</a> <span>· {fill(T.toc.linkN, { n: a.chainLink })}</span></li>)}
+    </ul>
+    <div><a class="ev-go" href={href('/estimate/#answers', locale)}>{fill(T.answers.all, { n: answerList.length })}<Icon name="arrow-right" size="1.05em" /></a></div>
   </Section>
-  </div>
 
-  <!-- V33: what we will not say -->
-  <div id="rail-not-claimed" data-rail-chapter data-rail-label={T.toc.notClaimed}>
+  <!-- What we will not say (brief 4.6), and what would change our mind -->
   <Section id="not-claimed" title={T.notClaimed.title} lead={T.notClaimed.lead} tone="sunken" width="wide">
-    <NotClaimedList locale={locale} items={five} label={T.notClaimed.title} />
-    <h3 class="ev-sub">{T.notClaimed.fullTitle}</h3>
-    <p class="ev-note">{T.notClaimed.fullLead}</p>
-    <h4 class="ev-rules__kind">{claimRuleKindLabels['do-not-claim'][locale]}</h4>
-    {dnc.map((g) => (
-      <Details summary={`${g.label} · ${ruleCount(g.rules.length)}`}>
-        <ul class="ev-rules">
-          {g.rules.map((r) => (
-            <li id={`rule-${r.id}`}>
-              <p class="ev-rules__rule">{readerText(r.rule[locale])}</p>
-              <p class="ev-rules__why"><b>{T.notClaimed.why}</b>{readerText(r.why[locale])}</p>
-              {r.instead && <p class="ev-rules__why"><b>{T.notClaimed.instead}</b>{readerText(r.instead[locale])}</p>}
-            </li>
-          ))}
-        </ul>
-      </Details>
-    ))}
-    <h4 class="ev-rules__kind">{claimRuleKindLabels.qualifier[locale]}</h4>
-    <Details summary={`${T.notClaimed.qualifiersTitle} · ${ruleCount(qualifiers.length)}`}>
-      <ul class="ev-rules">
-        {qualifiers.map((r) => (
-          <li id={`rule-${r.id}`}>
-            <p class="ev-rules__rule">{readerText(r.rule[locale])}</p>
-            <p class="ev-rules__why"><b>{T.notClaimed.why}</b>{readerText(r.why[locale])}</p>
-            {r.instead && <p class="ev-rules__why"><b>{T.notClaimed.instead}</b>{readerText(r.instead[locale])}</p>}
-          </li>
-        ))}
-      </ul>
-    </Details>
-    <h4 class="ev-rules__kind">{claimRuleKindLabels.correction[locale]}</h4>
-    <Details summary={`${T.notClaimed.correctionsTitle} · ${ruleCount(corrections.length)}`}>
-      <ul class="ev-rules">
-        {corrections.map((r) => (
-          <li id={`rule-${r.id}`}>
-            <p class="ev-rules__rule">{readerText(r.rule[locale])}</p>
-            <p class="ev-rules__why"><b>{T.notClaimed.why}</b>{readerText(r.why[locale])}</p>
-            {r.instead && <p class="ev-rules__why"><b>{T.notClaimed.instead}</b>{readerText(r.instead[locale])}</p>}
-          </li>
-        ))}
-      </ul>
-    </Details>
+    <ul class="ev-nc">
+      {T.notClaimed.items.map((x) => (
+        <li class="ev-nc__item">
+          <div class="ev-nc__no"><span class="ev-nc__tag">{T.notClaimed.noLabel}</span><s>{x.no}</s></div>
+          <div class="ev-nc__yes"><span class="ev-nc__tag ev-nc__tag--yes">{T.notClaimed.insteadLabel}</span>{x.instead}</div>
+        </li>
+      ))}
+    </ul>
+    <h3 class="ev-sub" id="change-mind">{T.notClaimed.changeMindTitle}</h3>
+    <p class="ev-note">{T.notClaimed.changeMindLead}</p>
+    <ul class="ev-cm">
+      {T.notClaimed.changeMind.map((x) => <li>{x}</li>)}
+    </ul>
   </Section>
-  </div>
 
   <!-- #not-used: figures we do not use that way (R14, V31) -->
-  <div id="rail-not-used" data-rail-chapter data-rail-label={T.toc.notUsed}>
   <Section id="not-used" title={T.notUsed.title} lead={T.notUsed.lead}>
     <div class="ev-nu">
-      <article class="ev-nu__item" aria-labelledby="nu-scramble">
-        <h3 class="ev-nu__quote" id="nu-scramble"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.scramble.quote, notUsedTokens)}</s></h3>
+      <details class="ev-nu__item" data-ev-fold>
+        <summary class="ev-nu__quote" id="nu-scramble"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.scramble.quote, notUsedTokens)}</s><Icon name="chevron-down" size="1.25rem" /></summary>
         <p><b>{T.notUsed.actually}{colon}</b>{fill(NU.scramble.actually, notUsedTokens)}</p>
         <p><b>{T.notUsed.weSay}{colon}</b>{fill(NU.scramble.weSay, notUsedTokens)}</p>
         <SeriesFigure locale={locale} view={V('iot-scramble-summary')} title={fill(NU.scramble.stripTitle, notUsedTokens)} subtitle={NU.scramble.stripSub} caption={NU.scramble.stripCaption} tone="exhaust" />
@@ -532,58 +513,56 @@ const toc = [
         <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
         <FactRow locale={locale} id="iot-scramble-outlier-day" as="div" />
         <p class="ev-note"><a href="#iot-scramble-typical-range">{lf('iot-scramble-typical-range', locale).display}</a> · {fill(T.row.alsoIn, { n: 3 })}</p>
-      </article>
+      </details>
 
-      <article class="ev-nu__item" aria-labelledby="nu-smokers">
-        <h3 class="ev-nu__quote" id="nu-smokers"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.neverSmokers.quote, notUsedTokens)}</s></h3>
+      <details class="ev-nu__item" data-ev-fold>
+        <summary class="ev-nu__quote" id="nu-smokers"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.neverSmokers.quote, notUsedTokens)}</s><Icon name="chevron-down" size="1.25rem" /></summary>
         <p><b>{T.notUsed.actually}{colon}</b>{NU.neverSmokers.actually}</p>
         <p><b>{T.notUsed.weSay}{colon}</b>{NU.neverSmokers.weSay}</p>
         <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
         <FactRow locale={locale} id="tseng2019-never-smokers" as="div" />
         <FactRow locale={locale} id="huang2021-never-smoker-lung-cancer" as="div" />
         <FactRow locale={locale} id="mohw-lung-cancer-2025" as="div" />
-      </article>
+      </details>
 
-      <article class="ev-nu__item" aria-labelledby="nu-density">
-        <h3 class="ev-nu__quote" id="nu-density"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.density.quote}</s></h3>
+      <details class="ev-nu__item" data-ev-fold>
+        <summary class="ev-nu__quote" id="nu-density"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.density.quote}</s><Icon name="chevron-down" size="1.25rem" /></summary>
         <p><b>{T.notUsed.actually}{colon}</b>{NU.density.actually}</p>
         <p><b>{T.notUsed.weSay}{colon}</b>{NU.density.weSay}</p>
         <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
         <FactRow locale={locale} id="fleet-regional-ranking" as="div" />
         <p class="ev-note"><a href="#fleet-density-per-100">{lf('fleet-density-per-100', locale).display}</a> · {fill(T.row.alsoIn, { n: 1 })}</p>
-      </article>
+      </details>
 
-      <article class="ev-nu__item" aria-labelledby="nu-case">
-        <h3 class="ev-nu__quote" id="nu-case"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.caseStudy.quote}</s></h3>
+      <details class="ev-nu__item" data-ev-fold>
+        <summary class="ev-nu__quote" id="nu-case"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.caseStudy.quote}</s><Icon name="chevron-down" size="1.25rem" /></summary>
         <p><b>{T.notUsed.actually}{colon}</b>{NU.caseStudy.actually}</p>
         <p><b>{T.notUsed.weSay}{colon}</b>{NU.caseStudy.weSay}</p>
         <p><a href="#case-title">{NU.caseStudy.go} →</a></p>
-      </article>
+      </details>
 
-      <article class="ev-nu__item" aria-labelledby="nu-idle">
-        <h3 class="ev-nu__quote" id="nu-idle"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.idling.quote}</s></h3>
+      <details class="ev-nu__item" data-ev-fold>
+        <summary class="ev-nu__quote" id="nu-idle"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.idling.quote}</s><Icon name="chevron-down" size="1.25rem" /></summary>
         <p><b>{T.notUsed.actually}{colon}</b>{NU.idling.actually}</p>
         <p><b>{T.notUsed.weSay}{colon}</b>{NU.idling.weSay}</p>
         <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
         <FactRow locale={locale} id="idle-pn-chien-huang-2010" as="div" />
         <p class="ev-note">
           <a href="#signal-cycle-peaks-international">{lf('signal-cycle-peaks-international', locale).display}</a> · {fill(T.row.alsoIn, { n: 2 })}<br />
-          <a href="#gap-pull-away-spike">{readerText(gapList.find((g) => g.id === 'gap-pull-away-spike')!.title[locale])}</a>
+          <a href="#answer-pull-away-spike">{localizeAnswer('answer-pull-away-spike', locale).question}</a>
         </p>
-      </article>
+      </details>
 
-      <article class="ev-nu__item" aria-labelledby="nu-2035">
-        <h3 class="ev-nu__quote" id="nu-2035"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.target2035.quote}</s></h3>
+      <details class="ev-nu__item" data-ev-fold>
+        <summary class="ev-nu__quote" id="nu-2035"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{NU.target2035.quote}</s><Icon name="chevron-down" size="1.25rem" /></summary>
         <p><b>{T.notUsed.actually}{colon}</b>{fill(NU.target2035.actually, notUsedTokens)}<Cite locale={locale} id={facts['netzero-ev-sales-targets'].sources[0]} n={cites(facts['netzero-ev-sales-targets'].sources)[0].n} /></p>
         <p><b>{T.notUsed.weSay}{colon}</b>{NU.target2035.weSay}</p>
         <p class="ev-note"><a href="#netzero-ev-sales-targets">{lf('netzero-ev-sales-targets', locale).display}</a> · {fill(T.row.alsoIn, { n: 7 })}</p>
-      </article>
+      </details>
     </div>
   </Section>
-  </div>
 
   <!-- Background outside the chain -->
-  <div id="rail-context" data-rail-chapter data-rail-label={T.context.title}>
   <Section id="context" title={T.context.title} lead={T.context.lead} tone="sunken" pad="tight">
     <Details summary={`${T.context.title} · ${fill(T.row.rows, { count: ctx.facts.length + ctx.series.length })}`}>
       <div class="ev-visuals">
@@ -592,19 +571,17 @@ const toc = [
       <FactList locale={locale} ids={ctx.facts.map((f) => f.id)} visible={ctx.facts.length} />
     </Details>
   </Section>
-  </div>
 
   <!-- How we checked -->
-  <div id="rail-method" data-rail-chapter data-rail-label={T.toc.method}>
   <Section id="method" title={T.method.title}>
     <div class="ev-method">
       <div class="prose">
         {T.method.body.map((p) => <p>{p}</p>)}
         <p>{T.method.wrong}</p>
-        <p class="ev-method__links">
+        <div class="ev-method__links">
           <a href={href('/about/#corrections', locale)}>{T.method.corrections} →</a>
           <a href={href('/about/', locale)}>{T.method.contact} →</a>
-        </p>
+        </div>
       </div>
       <div class="stack">
         <h3 class="ev-sub">{T.method.badges}</h3>
@@ -616,14 +593,13 @@ const toc = [
       </div>
     </div>
   </Section>
-  </div>
 
   <Section id="next" title={T.cta.title} tone="sunken" pad="tight">
-    <div class="grid" style="--min: 16rem">
-      <Card title={T.cta.empty} href={href('/unmeasured/', locale)} tone="surface"><p>{T.cta.emptyBody}</p></Card>
-      <Card title={T.cta.sources} href={href('/sources/', locale)} tone="surface"><p>{T.cta.sourcesBody}</p></Card>
-      <Card title={T.cta.questions} href={href('/questions/', locale)} tone="surface"><p>{T.cta.questionsBody}</p></Card>
-    </div>
+    <ul class="ev-next">
+      <li><a href={href('/estimate/', locale)}><b>{T.cta.estimate}</b><span>{T.cta.estimateBody}</span></a></li>
+      <li><a href={href('/sources/', locale)}><b>{T.cta.sources}</b><span>{T.cta.sourcesBody}</span></a></li>
+      <li><a href={href('/questions/', locale)}><b>{T.cta.questions}</b><span>{T.cta.questionsBody}</span></a></li>
+    </ul>
   </Section>
 </Base>
 
@@ -682,7 +658,7 @@ const toc = [
     padding: 0;
     list-style: none;
     display: grid;
-    gap: 0 var(--sp-5);
+    gap: var(--tap-gap) var(--sp-5);
   }
   @media (min-width: 40em) {
     .ev-toc ol {
@@ -719,7 +695,7 @@ const toc = [
   .ev-link {
     padding-block: var(--section-y, 4rem);
     border-block-start: var(--rule-stop, 6px) solid var(--ink);
-    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h));
+    scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
   }
   .ev-link__head {
     display: grid;
@@ -908,7 +884,12 @@ const toc = [
     margin: 0;
     padding-inline-start: 1.2em;
     display: grid;
-    gap: var(--sp-2);
+    gap: var(--tap-gap);
+  }
+  .ev-also li > a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
   }
   .ev-also span {
     color: var(--ink-2);
@@ -992,7 +973,7 @@ const toc = [
   .ev-rules li {
     padding-block-start: var(--sp-3);
     border-block-start: 1px solid var(--line);
-    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+    scroll-margin-block-start: calc(var(--header-h) + var(--sp-5));
   }
   .ev-rules__rule {
     font-weight: var(--fw-bold);
@@ -1011,11 +992,32 @@ const toc = [
     gap: var(--sp-8);
   }
   .ev-nu__item {
-    display: grid;
-    gap: var(--sp-3);
-    padding-block-start: var(--sp-5);
+    display: block;
+    padding-block: var(--sp-2);
     border-block-start: 2px solid var(--ink);
     min-inline-size: 0;
+  }
+  .ev-nu__item > :global(*:not(summary)) {
+    margin-block: var(--sp-3);
+  }
+  .ev-nu__item > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    cursor: pointer;
+    list-style: none;
+  }
+  .ev-nu__item > summary::-webkit-details-marker {
+    display: none;
+  }
+  .ev-nu__item > summary :global(svg) {
+    flex: none;
+    color: var(--accent);
+  }
+  .ev-nu__item[open] > summary :global(svg) {
+    transform: rotate(180deg);
   }
   .ev-nu__label {
     display: block;
@@ -1027,6 +1029,7 @@ const toc = [
   }
   .ev-nu__quote {
     font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
     line-height: var(--lh-snug);
   }
   .ev-nu__quote s {
@@ -1054,7 +1057,7 @@ const toc = [
   .ev-method__links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 var(--sp-4);
+    gap: var(--tap-gap) var(--sp-4);
     font-weight: var(--fw-bold);
   }
   .ev-method__links a,
@@ -1078,5 +1081,243 @@ const toc = [
   }
   .ev-reads b {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- redesign (brief 7.3) ---- */
+  .ev-est a,
+  .ev-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-btn);
+  }
+  .ev-chips {
+    list-style: none;
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .ev-chips li {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: var(--sp-3);
+    align-items: center;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-board {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .ev-board__row {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  @media (min-width: 48em) {
+    .ev-board__row {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+  .ev-board__link {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: flex-start;
+    color: var(--ink);
+    text-decoration: none;
+    min-block-size: var(--tap);
+  }
+  .ev-board__link:hover .ev-board__text {
+    text-decoration: underline;
+  }
+  .ev-board__n {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: var(--fw-black);
+    font-variant-numeric: tabular-nums;
+  }
+  .ev-board__body {
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .ev-board__name {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .ev-board__text {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .ev-board__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    padding-inline-start: calc(2rem + var(--sp-3));
+  }
+  @media (min-width: 48em) {
+    .ev-board__chips {
+      padding-inline-start: 0;
+      justify-content: flex-end;
+    }
+  }
+  .ev-board__machine {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-l3 {
+    display: grid;
+    gap: var(--sp-4);
+    margin-block: var(--sp-5);
+  }
+  @media (min-width: 56em) {
+    .ev-l3 {
+      grid-template-columns: 1.3fr 1fr;
+    }
+  }
+  .ev-l3__est,
+  .ev-l3__mask {
+    padding: var(--sp-4);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .ev-l3__est {
+    border: 2px dashed var(--estimate);
+  }
+  .ev-l3__mask {
+    border: 1.5px solid var(--line-strong);
+  }
+  .ev-l3 p {
+    margin-block: var(--sp-2);
+  }
+  .ev-l3__p {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .ev-l3__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
+    margin-block: var(--sp-2);
+  }
+  .ev-l3__label {
+    font-weight: var(--fw-bold);
+  }
+  .ev-sub--first {
+    margin-block-start: 0;
+  }
+  .ev-alias {
+    display: block;
+    scroll-margin-block-start: calc(var(--header-h) + var(--sp-5));
+  }
+  .ev-anslist {
+    margin: 0 0 var(--sp-3);
+    padding-inline-start: 1.2em;
+    display: grid;
+    gap: var(--tap-gap);
+  }
+  .ev-anslist a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+  }
+  .ev-anslist span {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-nc {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .ev-nc__item {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .ev-nc__item > div {
+    line-height: var(--lh-read);
+  }
+  .ev-nc__no s {
+    text-decoration-thickness: 2px;
+    color: var(--ink-2);
+  }
+  .ev-nc__tag {
+    display: inline-block;
+    margin-inline-end: var(--sp-2);
+    padding: 0 var(--sp-2);
+    border-radius: var(--radius-1);
+    border: 1.5px solid var(--ink-2);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .ev-nc__tag--yes {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .ev-cm {
+    margin: 0;
+    padding-inline-start: 1.2em;
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 44rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .ev-next {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+  .ev-next a {
+    display: grid;
+    gap: var(--sp-1);
+    block-size: 100%;
+    padding: var(--sp-4);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .ev-next a:hover {
+    border-color: var(--ink);
+  }
+  .ev-next b {
+    font-size: var(--fs-md);
+    color: var(--accent);
+  }
+  .ev-next span {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: var(--lh-read);
   }
 </style>

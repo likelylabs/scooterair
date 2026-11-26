@@ -38,7 +38,6 @@ export default copy({
     minute: { 'zh-TW': '1 分鐘', en: '1 minute' },
     halfMinutes: { 'zh-TW': '{n} 分半', en: '{n}½ minutes' },
     checked: { 'zh-TW': '價格和補助 {date} 查', en: 'Prices and subsidies checked {date}' },
-    mine: { 'zh-TW': '用我的條件算', en: 'Work it out for me' },
     ugm3: { 'zh-TW': '微克／立方公尺', en: 'µg/m³' },
   },
 
@@ -224,9 +223,9 @@ export default copy({
       4: { 'zh-TW': '一天等四個紅燈，一年就在路邊站了一天到一天半。', en: 'Four red lights a day add up to a day to a day and a half a year at the kerb.' },
       6: { 'zh-TW': '一天等六個紅燈，一年就在路邊站了一天半到兩天多。', en: 'Six red lights a day add up to a day and a half to more than two days a year at the kerb.' },
     },
-    quiet: { 'zh-TW': '這些研究量的是各種來源的髒空氣，不是只有機車。', en: 'These studies measured dirty air from all sources, not scooters alone.' },
+    quiet: { 'zh-TW': '這些研究量的是各種來源的髒空氣，不只機車。', en: 'These studies measured dirty air from all sources, not scooters alone.' },
     stepper: { 'zh-TW': '一天等幾個紅燈？', en: 'How many red lights a day?' },
-    stepperUnit: { 'zh-TW': '個', en: 'a day' },
+    stepperOption: { 'zh-TW': '一天 {n} 個', en: '{n} a day' },
     posts: {
       minutes: {
         when: { 'zh-TW': '5 分鐘', en: '5 minutes' },
@@ -396,9 +395,11 @@ export default copy({
       taiwan: { 'zh-TW': '台灣做過的兩個測試', en: 'Two tests done in Taiwan' },
       /** Always with its year (must-not-say: never as if it described today's products). */
       mol: {
-        'zh-TW': '2005 年，勞委會的勞工安全衛生研究所測了 {tested} 款拋棄式活性碳口罩：國家標準要求擋得住有機溶劑的蒸氣 {min} 分鐘，{passed} 款做到。',
-        en: 'In 2005 the labour ministry’s occupational-safety institute tested {tested} disposable activated-carbon masks against the national standard of {min} minutes’ protection from organic solvent vapour: {passed} met it.',
+        'zh-TW': '2005 年，勞委會的勞工安全衛生研究所測了 {tested} 款拋棄式活性碳口罩：國家標準要求擋得住有機溶劑的蒸氣 {min} 分鐘，{result}。',
+        en: 'In 2005 the labour ministry’s occupational-safety institute tested {tested} disposable activated-carbon masks against the national standard of {min} minutes’ protection from organic solvent vapour: {result}.',
       },
+      molNone: { 'zh-TW': '沒有一款做到', en: 'none met it' },
+      molSome: { 'zh-TW': '有 {passed} 款做到', en: '{passed} met it' },
       /** A comparison between masks, never a percentage. */
       ilosh: {
         'zh-TW': '勞動部的研究所找 {people} 位大人實測，給每種口罩一個防護分數：頭帶式 N95 是 {n95}，一般醫用口罩是 {medical}。這是拿來互相比較的分數，不是百分比。',
@@ -421,8 +422,8 @@ export default copy({
       'zh-TW': '電動機車沒有排氣管。輪胎和煞車的粉塵還在，旁邊的汽車也還在。',
       en: 'An electric scooter has no tailpipe. Tyre and brake dust stay, and so do the cars beside it.',
     },
-    quiet: { 'zh-TW': '假設每輛機車排得一樣多。', en: 'Assuming every scooter emits the same.' },
-    /** The chip under the slider; {pct} is rewritten by the slider (n × 10). */
+    /** The chip under the slider: the number is rewritten by the slider (n × 10); then the label 本站計算 and the assumption. */
+    assume: { 'zh-TW': '假設每輛機車排得一樣多', en: 'assuming every scooter emits the same' },
     chipBefore: { 'zh-TW': '機車排的廢氣：少 ', en: 'Scooter exhaust: ' },
     chipAfter: { 'zh-TW': '%', en: '% less' },
     sheet: {
@@ -480,9 +481,13 @@ export default copy({
   s13: {
     chapter: { 'zh-TW': '買的那天', en: 'The day you buy' },
     county: { 'zh-TW': '縣市', en: 'Place' },
+    /** In front of the big figure: 電動機車 少付 2,120 元 / The electric scooter costs NT$2,120 less. */
+    figWho: { 'zh-TW': '電動機車', en: 'The electric scooter costs' },
     scrap: { 'zh-TW': '有沒有滿 10 年的機車可以報廢？', en: 'A scooter ten or more years old to scrap?' },
-    scrapYes: { 'zh-TW': '有，可以報廢', en: 'Yes' },
-    scrapNo: { 'zh-TW': '沒有', en: 'No' },
+    scrapYes: { 'zh-TW': '有機車可報廢', en: 'One to scrap' },
+    scrapYesSub: { 'zh-TW': '出廠滿 10 年', en: '10 or more years old' },
+    scrapNo: { 'zh-TW': '沒有', en: 'Nothing' },
+    scrapNoSub: { 'zh-TW': '可報廢的機車', en: 'to scrap' },
     /** Without scripting the page shows the default case only. */
     fixed: { 'zh-TW': '{county}・{scrap}', en: '{county}, {scrap}' },
     bodyClass: {
@@ -513,6 +518,8 @@ export default copy({
   s14: {
     chapter: { 'zh-TW': '每個月', en: 'Each month' },
     km: { 'zh-TW': '每個月騎多遠？', en: 'How far do you ride a month?' },
+    /** Assembled from the slots: {home} is 「約 22 到 28 元」, {petrol} 「194 元」. The screen's name and its body say it is per month. */
+    headline: { 'zh-TW': '在家充電|{home}，|加油約 {petrol}', en: 'Charging at home: |{home} a month. |Petrol: about {petrol}' },
     kmUnit: { 'zh-TW': '公里', en: 'km' },
     bodyKm: { 'zh-TW': '這是每月騎 {km} 公里的算法。', en: 'This is for {km} km a month.' },
     /** Chosen by rule: the cheapest way to swap against the petrol bill. */
@@ -536,7 +543,7 @@ export default copy({
       },
     },
     mine: { 'zh-TW': '算我自己的', en: 'Work out mine' },
-    next: { 'zh-TW': '那下一個紅燈呢？', en: 'And the next red light?' },
+    next: { 'zh-TW': '然後呢？', en: 'And then?' },
   },
 
   // 15 ────────────────────────────────────────────────────────────────────────────────────────
@@ -548,9 +555,9 @@ export default copy({
       en: 'The only difference is whether the row beside you has tailpipes. Pick your county and in half a minute you will know what a switch costs.',
     },
     start: { 'zh-TW': '開始算', en: 'Work it out' },
-    line: { 'zh-TW': '傳給家人（LINE）', en: 'Send to family (LINE)' },
-    act: { 'zh-TW': '還不換車，可以做什麼', en: 'Not switching? What you can do' },
-    measure: { 'zh-TW': '把推估換成實測', en: 'Replace the estimate with a measurement' },
+    /** '|' marks where a button's words may break. */
+    line: { 'zh-TW': '傳給家人|（LINE）', en: 'Send to family |(LINE)' },
+    act: { 'zh-TW': '還不換車，|可以做什麼', en: 'Not switching? |What you can do' },
     more: { 'zh-TW': '看完以後', en: 'After the story' },
     sheet: {
       title: { 'zh-TW': '這張圖，|是怎麼畫的', en: 'How this picture |was drawn' },

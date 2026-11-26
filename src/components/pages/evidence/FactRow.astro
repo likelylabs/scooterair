@@ -19,8 +19,10 @@ import type { Locale } from '@/i18n';
 import { href } from '@/i18n';
 import { evidenceBadge } from '@/i18n/ui';
 import { facts, getSource, type FactId } from '@/data';
-import Cite from '@/components/ui/Cite.astro';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import { readerKind, readerPlace } from '@/data';
+import { chipWhere } from '@/i18n/ui';
 import evidenceCopy from '@/i18n/pages/evidence';
 import { localize } from '@/i18n/pages/_copy';
 import { cites, lf, readLabel, sourceShort } from './ev';
@@ -37,7 +39,11 @@ const C = T.columns;
 const f = lf(id, locale);
 const b = evidenceBadge(f.evidence, f.confidence);
 const srcs = cites(facts[id].sources);
-const notShow = f.caveat ?? T.row.noCaveat[f.evidence];
+const notShow = f.caveat ?? (T.row.noCaveat as Record<string, string>)[f.evidence];
+// the reader's chip (brief 4.1), with the finer registry type beside it (allowed on /evidence/)
+const fact = facts[id];
+const place = readerPlace(fact);
+const placeWord = place ? { tw: chipWhere.taiwan, abroad: chipWhere.abroad, international: chipWhere.international, twModel: chipWhere.taiwanModel }[place]?.[locale] : undefined;
 const colon = locale === 'en' ? ': ' : '：';
 const Tag = as;
 ---
@@ -48,7 +54,7 @@ const Tag = as;
       <div class="frow__cell frow__say">
         <dt class="frow__dt">{C.say}</dt>
         <dd id={`${id}-say`}>
-          <Mixed text={f.statement} locale={locale} />{srcs.map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}
+          <Mixed text={f.statement} locale={locale} />
         </dd>
       </div>
       <div class="frow__cell frow__num">
@@ -72,7 +78,7 @@ const Tag = as;
       </div>
       <div class="frow__cell frow__kind">
         <dt class="frow__dt">{C.kind}</dt>
-        <dd><EvidenceBadge locale={locale} kind={b.kind} secondary={b.secondary} /></dd>
+        <dd class="frow__chips"><KindChip locale={locale} kind={readerKind(fact)} where={placeWord} />{(b.secondary || f.evidence === 'market-tw') && <EvidenceBadge locale={locale} kind={b.kind} secondary={b.secondary} />}</dd>
       </div>
       <div class="frow__cell frow__not">
         <dt class="frow__dt">{C.notShow}</dt>
@@ -144,11 +150,14 @@ const Tag = as;
     padding: 0;
     margin: 0 0 var(--sp-1);
     display: grid;
-    gap: var(--sp-1);
+    gap: var(--tap-gap);
     font-size: var(--fs-sm);
     line-height: var(--lh-snug);
   }
   .frow__srcs a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
     color: var(--accent);
     font-weight: var(--fw-bold);
   }
@@ -216,5 +225,11 @@ const Tag = as;
     .frow__display {
       font-size: var(--fs-base);
     }
+  }
+  .frow__chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
   }
 </style>

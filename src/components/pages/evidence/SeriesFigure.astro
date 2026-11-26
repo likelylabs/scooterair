@@ -93,17 +93,27 @@ const file = `${s.id}.csv`;
     {notes.length > 0 && (
       <span class="sfig__line sfig__notes"><Mixed text={notes.map(end).join(' ')} locale={locale} /></span>
     )}
-    <span class="sfig__line sfig__meta">
-      {s.period} · {s.place} ·{' '}
-      <a href={csv} download={file}>{T.chart.download}</a>
-    </span>
+    <span class="sfig__line sfig__meta">{s.period} · {s.place}</span>
+    <span class="sfig__line sfig__dl"><a href={csv} download={file}>{T.chart.download}</a></span>
   </Fragment>
   <Fragment slot="source">{chips.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
 </Figure>
 
 <style>
+  .sfig__dl a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+  }
+  :global(figure.sfig p.fig__source) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap);
+  }
   .sfig {
-    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+    scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
   }
   .sfig__panels--many {
     display: grid;
