@@ -27,6 +27,17 @@ export function sgn(locale: Locale, v: number, d = 1): string {
   return (v < 0 ? MINUS : v > 0 ? '+' : '') + s;
 }
 /** Number with up to d decimals, trailing zeros dropped. */
+/**
+ * A table whose last column holds notes: kept only when every row has one. Otherwise the column is
+ * dropped and each note goes in brackets after its row's label, so no cell is left empty.
+ */
+function noteColumn(head: string[], rows: string[][], locale: Locale): { head: string[]; rows: string[][] } {
+  const last = head.length - 1;
+  if (rows.every((r) => r[last])) return { head, rows };
+  const [o, c] = locale === 'en' ? [' (', ')'] : ['（', '）'];
+  return { head: head.slice(0, last), rows: rows.map((r) => [r[0] + (r[last] ? `${o}${r[last]}${c}` : ''), ...r.slice(1, last)]) };
+}
+
 export const nf = (locale: Locale, v: number, d = 2) => new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-TW', { maximumFractionDigits: d }).format(v);
 
 /** A clean step for ticks between min and max. */
@@ -156,7 +167,7 @@ export function renderSigned(p: SignedProps): ChartRender {
   let i = 0;
   groups.forEach((g) =>
     g.rows.forEach((r) => {
-      rows.push([g.label ? `${g.label} · ${r.label}` : r.label, valueText(r), (p.notes?.[i] ?? []).join('、')]);
+      rows.push([g.label ? `${g.label} · ${r.label}` : r.label, valueText(r), (p.notes?.[i] ?? []).join(locale === 'en' ? ', ' : '、')]);
       i++;
     }),
   );
@@ -165,7 +176,7 @@ export function renderSigned(p: SignedProps): ChartRender {
     body: o.join(''),
     height: h + 4,
     legend: p.legend,
-    table: { head: [p.categoryLabel, p.valueLabel, p.noteLabel], rows },
+    table: noteColumn([p.categoryLabel, p.valueLabel, p.noteLabel], rows, locale),
   };
 }
 
@@ -329,10 +340,9 @@ export function renderSpans(p: SpanProps): ChartRender {
     kind: 'evc-span',
     body: o.join(''),
     height: axisY + 26,
-    table: {
-      head: [p.categoryLabel, p.valueLabel, ...(p.noteLabel ? [p.noteLabel] : [])],
-      rows: rows.map((r) => [r.label, vt(r), ...(p.noteLabel ? [r.note ?? ''] : [])]),
-    },
+    table: p.noteLabel
+      ? noteColumn([p.categoryLabel, p.valueLabel, p.noteLabel], rows.map((r) => [r.label, vt(r), r.note ?? '']), locale)
+      : { head: [p.categoryLabel, p.valueLabel], rows: rows.map((r) => [r.label, vt(r)]) },
   };
 }
 
@@ -466,9 +476,14 @@ export function renderTime(p: TimeProps): ChartRender {
     });
   }
   const head = [p.xLabel, ...series.map((s) => s.label)];
+  // a year a line has no point for says why, in words, never a lone dash
+  const zh = p.locale !== 'en';
+  const lastSeen = (s: (typeof series)[number]) => Math.max(...s.points.filter((q) => q.y !== null && q.y !== undefined).map((q) => q.x));
+  const blank = (s: (typeof series)[number], x: number) =>
+    s.target ? (zh ? '這年沒有目標' : 'no target for this year') : x > lastSeen(s) ? (zh ? '還沒到這一年' : 'year not reached yet') : zh ? '這年沒有統計' : 'not counted that year';
   const rows = xs.map((x) => [String(x), ...series.map((s) => {
     const v = s.points.find((q) => q.x === x)?.y;
-    return v === undefined || v === null ? '–' : f(v);
+    return v === undefined || v === null ? blank(s, x) : f(v);
   })]);
   return {
     kind: 'evc-time',

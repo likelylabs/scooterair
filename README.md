@@ -245,8 +245,19 @@ When a subsidy changes (an amount, a quota running out, a new programme, a deadl
    the home page's money section for that city.
 4. Push to `main`. The daily build picks up dates by itself, but not new facts.
 
+Where a place's programme could not be read (on 26 November 2026: Hualien, Taitung, Penghu and
+Lienchiang), the place is `not-verified`: the calculator counts central money only, and its
+status note says so in plain words and names who to phone. Keep that note helpful (what central
+money still gives, and the bureau's number or site) rather than blank. A finding that rests only on
+a news report is entered with `confidence: 'secondary'` or named with its date in the status note,
+never as the county's own figure.
+
 ### By hand on fixed dates
 
+- **30 November and 15 December 2026.** Keelung's and Kinmen's local subsidies require the scooter
+  to be bought, plated and scrapped by 30 November, with papers in by 15 December
+  (`programmes/counties-r2.ts`, `programmes/counties.ts`). The engine closes them by date; nothing to
+  edit unless either county extends.
 - **1 December 2026.** The scooter makers' own purchase credits recorded in
   `src/data/econ/vehicles.ts` run to 30 November 2026. The daily build stops counting them from
   1 December, but check the makers' pages for extensions or new offers and update the file.

@@ -82,7 +82,7 @@ export const reasonText: Record<ExclusionReason, L10n> = {
   'secondary-only': t('只見於新聞稿或媒體報導', 'Only in a press release or media report'),
   ambiguous: t('規定不明確，未計入', 'Rule unclear, not counted'),
   'requirement-not-met': t('須先申請另一項目', 'Requires another item first'),
-  'model-unknown': t('車款資料不足', 'Model details unknown'),
+  'model-unknown': t('車款資料不足', 'Model details not confirmed'),
 };
 
 export const ui = {

@@ -463,7 +463,7 @@ function monthlyHtml(e: Evaluation, ctx: RenderCtx): string {
   const order = ['energy', 'plan-fee', 'setup-fee', 'plan-credit', 'maintenance', 'road-fee', 'licence-tax', 'insurance', 'inspection'] as const;
   // NT$ once per cell; the likely range sits under it as plain numbers, free to wrap
   const cell = (b?: { low: number; typical: number; high: number }) => {
-    if (!b) return '—';
+    if (!b) return esc(T.monthlyTable.none);
     const sign = b.typical < 0 ? '−' : '';
     const mid = `${sign}${money(locale, b.typical)}`;
     return b.low !== b.high ? `${mid}<span class="el-range">${esc(fill(T.monthlyTable.range, { low: nf(locale, Math.abs(b.low)), high: nf(locale, Math.abs(b.high)) }))}</span>` : mid;

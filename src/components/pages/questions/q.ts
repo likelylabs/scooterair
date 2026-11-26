@@ -94,8 +94,8 @@ export function questionNumbers(locale: Locale): Record<string, string> {
     // the smell: the threshold is held in ppm; the page says parts in a billion
     acetaldehyde: n(datum('odour-thresholds', 'acetaldehyde') * 1000),
     // time
-    minutes: n(stated('lung2025-peaks-hrv', /(\d+)分鐘的PM2\.5高峰/)),
-    people: n(stated('lung2025-peaks-hrv', /高雄（(\d+)人）/)),
+    minutes: n(stated('lung2025-peaks-hrv', /(\d+)\s*分鐘的\s*PM2\.5\s*高峰/)),
+    people: n(stated('lung2025-peaks-hrv', /高雄（(\d+)\s*人）/)),
     hours: n(datum('mccreanor2007-london-walk', 'exposureHours')),
     asthma: n(datum('mccreanor2007-london-walk', 'participants')),
     studies: n(datum('hei-sr23-trap-associations', 'studies')),

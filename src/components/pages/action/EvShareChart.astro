@@ -79,9 +79,11 @@ render.hover = {
 render.table = {
   head: [names.year, locale === 'en' ? `${names.actual} (%)` : `${names.actual}（%）`, locale === 'en' ? `${names.target} (%)` : `${names.target}（%）`],
   rows: years
-    .map((y, i) => [String(y), actual[i] !== null ? format(actual[i] as number) : '–', targetAt(y) !== null ? format(targetAt(y) as number) : '–'])
-    // a year with neither a verified figure nor a target is left out, never printed as a dash
-    .filter((r) => (r[1] !== '–' || r[2] !== '–') && (Number(r[0]) <= labels.last.x || r[2] !== '–')),
+    .map((y, i) => [String(y), actual[i] !== null ? format(actual[i] as number) : '', targetAt(y) !== null ? format(targetAt(y) as number) : ''])
+    // a year with neither a verified figure nor a target is left out
+    .filter((r) => (r[1] !== '' || r[2] !== '') && (Number(r[0]) <= labels.last.x || r[2] !== ''))
+    // an empty cell says why in words, never a lone dash
+    .map((r) => [r[0], r[1] || (Number(r[0]) > labels.last.x ? (locale === 'en' ? 'year not reached yet' : '還沒到這一年') : locale === 'en' ? 'not counted that year' : '這年沒有統計'), r[2] || (locale === 'en' ? 'no target for this year' : '這年沒有目標')]),
 };
 render.padRight = Math.max(render.padRight ?? 0, 18);
 ---

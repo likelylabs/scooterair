@@ -244,5 +244,9 @@ const tagText = illustration.tag[locale];
     .card__pic {
       max-block-size: 52vh;
     }
+    /* leave room under the drawing for the scene's own 示意圖 tag, which sits below the svg */
+    .card__pic .scene {
+      inline-size: min(100cqw, calc((100cqh - 88px) * var(--ar, 1)));
+    }
   }
 </style>

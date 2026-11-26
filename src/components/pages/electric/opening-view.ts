@@ -207,17 +207,6 @@ export function monthHeadline(d: OpenData, T: OpenText, m: OpenMonth): string {
   return fill(T.monthHead, { home: g(home), petrol: g(yuan(d.locale, m.petrol)) });
 }
 
-/**
- * The note under the month bars, first sentence only (what is counted). Its second sentence said
- * the swap rows are "the cheapest plans of any make", which stopped being true when the rows became
- * the shown scooter's own plans; the scooter and plan are named under each row instead.
- * (Copy change requested from the owner of src/i18n/pages/electric.ts: open.monthNote.)
- */
-const firstSentence = (s: string): string => {
-  const m = s.match(/^.*?(。|\.(?=\s|$))/);
-  return m ? m[0] : s;
-};
-
 /** The swap rows of a month card: the scooter's own plans (group ≥ 0) or the cheapest of any make (−1). */
 export function swapOf(t: OpenTable, group: number, km: number): OpenSwap {
   if (group >= 0) return t.swap[group].km[km];
@@ -263,7 +252,7 @@ ${swaps.map((x) => row('op-mbar--swap', x.label, x.v, yuan(loc, x.v), max, '', x
   });
   return `${headHtml(monthHeadline(d, T, m))}
 ${sets.join('\n')}
-<p class="op-small">${esc(firstSentence(fill(T.monthNote, { km: num(loc, km) })))}</p>`;
+<p class="op-small">${esc(fill(T.monthNote, { km: num(loc, km) }))}</p>`;
 }
 
 /** The line under the bars (screen 13's rule), for one county, scrapping answer, distance and charging answer. */

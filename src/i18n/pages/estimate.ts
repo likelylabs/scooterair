@@ -265,8 +265,8 @@ export default copy({
     },
     heightTitle: { 'zh-TW': '小孩和嬰兒車的|高度呢？', en: 'What about a child’s or a pushchair’s height?' },
     health: {
-      'zh-TW': '想知道廢氣和身體的關係，請看證據頁的第 5 環。',
-      en: 'For what traffic exhaust has to do with health, see link 5 on the evidence page.',
+      'zh-TW': '想知道廢氣和身體的關係，請看證據頁「吸廢氣的人怎麼了」那一環。',
+      en: 'For what traffic exhaust has to do with health, see “What happens to people who breathe it” on the evidence page.',
     },
     healthLink: { 'zh-TW': '證據：吸車子廢氣的人怎麼了', en: 'Evidence: what happens to people who breathe traffic exhaust' },
   },

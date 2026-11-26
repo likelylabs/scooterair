@@ -12,8 +12,8 @@ import { notSubsidisedInWindow, age, builtBy, fixed, flag, heavy, lightOrSmall, 
 const MEID = ['meid-lev-2026-subsidy-table'] as const;
 const NONE_2027 = t('未見 2027 年方案。', 'No 2027 programme seen.');
 const slots = (total: number, asOf = '2026-07-21') =>
-  quota('limited', asOf, t(`官方表列每年${total.toLocaleString('en')}輛，剩餘名額未查證，可能已用完。`, `The official table lists ${total.toLocaleString('en')} places a year; remaining places were not checked and may be gone.`), { total });
-const unknownQuota = quota('unknown', '2026-07-21', t('名額與剩餘額度未公布。', 'Quota and remaining funds not published.'));
+  quota('limited', asOf, t(`官方表列每年${total.toLocaleString('en')}輛；還剩多少沒有公布，可能已經用完，申請前請先打電話問環保局。`, `The official table lists ${total.toLocaleString('en')} places a year; places left are not published and may be gone, so phone the bureau before you apply.`), { total });
+const unknownQuota = quota('unknown', '2026-07-21', t('沒有公布名額和還剩多少錢；申請前請先打電話問環保局。', 'No number of places or remaining money is published; phone the bureau before you apply.'));
 
 type Base = Partial<Programme> & Pick<Programme, 'id' | 'jurisdiction' | 'name' | 'amount' | 'conditions' | 'conditionText' | 'research' | 'payerName'>;
 const p = (x: Base): Programme => ({
@@ -33,10 +33,14 @@ const r = (id: string) => `counties-north-central-r2#${id}`;
 
 // ---------------------------------------------------------------- Keelung (to 2026-11-30)
 const KL = t('基隆市環境保護局', 'Keelung City Environmental Protection Bureau');
-const klGeneral: Condition[] = [residency(), rocNational];
+// keelung-epb-2026-plan: 年滿18歲、113年12月31日前設籍本市、中華民國國民身分證; buy and plate (and scrap)
+// by 2026-11-30, documents posted by 2026-12-15; old scooter 1~4期 (built by 2007-06-30).
+const klGeneral: Condition[] = [residency(undefined, '2024-12-31'), age(18), rocNational];
 const klOld: Condition[] = [scrap, builtBy('2007-06-30')];
-const KL_TEXT = '設籍基隆市（外籍人士不適用）；補助期間至 2026 年 11 月 30 日，名額很少。';
-const KL_TEXT_EN = 'Registered in Keelung (foreign nationals excluded); runs to 30 November 2026 with very few places.';
+const KL_TEXT = '年滿18歲、2024 年 12 月 31 日前設籍基隆市的中華民國國民；買車、掛牌（和報廢）都要在 2026 年 11 月 30 日前完成，12 月 15 日前由車行把文件寄到環保局；名額很少，買車前請先打 02-24660327 問。';
+const KL_TEXT_EN = 'ROC nationals aged 18+ registered in Keelung by 31 December 2024; buy and plate (and scrap) by 30 November 2026, and the dealer posts the papers to the bureau by 15 December; places are very few, so phone (02) 2466-0327 before you buy.';
+const klQuota = (total: number) =>
+  quota('limited', '2026-11-26', t(`計畫寫每年${total.toLocaleString('en')}輛，依補助序號先後發，額滿或經費用完就停；還剩多少沒有公布，請打 02-24660327 問。`, `The plan sets ${total.toLocaleString('en')} places a year, paid in order of application until full or the money runs out; places left are not published, so phone (02) 2466-0327.`), { total, sources: ['keelung-epb-2026-plan'] });
 const kl = (id: string, name: [string, string], value: number, conds: Condition[], total: number, research: string, old = true): Programme =>
   p({
     id,
@@ -47,7 +51,10 @@ const kl = (id: string, name: [string, string], value: number, conds: Condition[
     conditions: [...klGeneral, ...(old ? klOld : []), ...conds],
     conditionText: t(`${KL_TEXT}${old ? '要報廢的機車須是 2007 年（民國 96 年）6 月 30 日以前出廠。' : ''}`, `${KL_TEXT_EN}${old ? ' The scooter you scrap must have been built by 30 June 2007.' : ''}`),
     validTo: '2026-11-30',
-    quota: slots(total),
+    validToRule: t('買車、掛牌和報廢回收都要在這天以前完成；2026 年 12 月 15 日前把文件寄到環保局。', 'Buy, plate, and scrap and recycle the scooter you scrap by this date; post the papers to the bureau by 15 December 2026.'),
+    applicationDeadline: '2026-12-15',
+    quota: klQuota(total),
+    sources: ['keelung-epb-2026-plan', ...MEID],
     exclusiveGroups: ['keelung-base'],
     research: [r(research)],
   });
@@ -81,7 +88,9 @@ const HCC = t('新竹縣政府環境保護局', 'Hsinchu County Environmental Pr
 
 // ---------------------------------------------------------------- Changhua, Nantou, Miaoli, Yunlin, Yilan
 const CH = t('彰化縣環境保護局', 'Changhua County Environmental Protection Bureau');
+const chQuota = quota('unknown', '2026-11-26', t('計畫沒有定名額，照申請先後發，預算用完就停；還剩多少沒有公布，請問彰化縣環保局。', 'The plan sets no number of places: money is paid in order of application until the budget runs out. What is left is not published; ask the Changhua EPB.'), { sources: ['changhua-epb-2026-plan'] });
 const NT = t('南投縣政府環境保護局', 'Nantou County Environmental Protection Bureau');
+const ntQuota = quota('unknown', '2026-11-26', t('環保局沒有公布名額；還剩多少請打 049-2237530 問。', 'The bureau has not published a number of places; phone (049) 223-7530 to ask what is left.'));
 const ML = t('苗栗縣政府環境保護局', 'Miaoli County Environmental Protection Bureau');
 const YL = t('雲林縣環境保護局', 'Yunlin County Environmental Protection Bureau');
 const IL = t('宜蘭縣政府環境保護局', 'Yilan County Environmental Protection Bureau');
@@ -160,14 +169,17 @@ export const countyR2Programmes: Programme[] = [
   p({ id: 'miaoli-swap-topup', jurisdiction: 'miaoli', payerName: ML, name: t('苗栗縣汰舊換購加碼（海盛發電捐贈）', 'Miaoli scrap-and-replace top-up (donated by Hai Sheng)'), kind: 'scrap-bonus', amount: fixed(2500), conditions: [residency(), scrap, scrapAge(10)], conditionText: t('淘汰出廠滿10年的燃油機車並換購電動機車；中央補助另向環境部平臺申請。', 'Scrap a gasoline scooter at least 10 years old and buy electric; central money is claimed separately on the MOENV platform.'), quota: slots(400, '2026-07-09'), sources: [...MEID], research: [r('miaoli-topup-2500-v3')] }),
 
   // Changhua
-  p({ id: 'changhua-swap', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣汰舊換購電動機車', 'Changhua scrap-and-replace'), amount: fixed(12000), conditions: [residency(), scrap, builtBy('2016-12-31'), { kind: 'scrap-registered-locally', minYears: 1 }], conditionText: t('要報廢的機車須是 2016 年（民國 105 年）底以前出廠、設籍彰化縣滿1年的燃油機車；全程線上申請，2027 年 1 月 10 日前。', 'The scooter you scrap must be a gasoline scooter built by the end of 2016 and registered in Changhua for at least a year; online applications by 10 January 2027.'), applicationDeadline: '2027-01-10', exclusiveGroups: ['changhua-base'], research: [r('changhua-swap-v3')] }),
-  p({ id: 'changhua-new', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣新購電動機車', 'Changhua new electric scooter'), amount: fixed(5000), conditions: [residency()], conditionText: t('設籍彰化縣；2027 年 1 月 10 日前線上申請。', 'Registered in Changhua; apply online by 10 January 2027.'), applicationDeadline: '2027-01-10', exclusiveGroups: ['changhua-base'], research: [r('changhua-new-purchase-v3')] }),
-  { ...p({ id: 'changhua-scrap-only-two-stroke', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣純報廢二行程機車', 'Changhua scrap a two-stroke only'), kind: 'scrap-only-bonus', amount: fixed(3000), conditions: [residency(), scrap, twoStroke, builtBy('2003-12-31'), { kind: 'scrap-registered-locally', minYears: 1 }], conditionText: t('2003 年（民國 92 年）底以前出廠的二行程機車，設籍彰化縣滿1年。', 'A two-stroke built by the end of 2003, registered in Changhua for at least a year.'), exclusiveGroups: ['county-scrap-only'], research: [r('changhua-scrap-only-v3')] }), side: 'gasoline' as const },
-  { ...p({ id: 'changhua-scrap-only', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣純報廢老舊機車', 'Changhua: scrap a qualifying scooter only'), kind: 'scrap-only-bonus', amount: fixed(1500), conditions: [residency(), scrap, builtBy('2016-12-31'), { kind: 'scrap-registered-locally', minYears: 1 }], conditionText: t('2016 年（民國 105 年）底以前出廠的燃油機車，設籍彰化縣滿1年。', 'A gasoline scooter built by the end of 2016, registered in Changhua for at least a year.'), exclusiveGroups: ['county-scrap-only'], research: [r('changhua-scrap-only-v3')] }), side: 'gasoline' as const },
+  // changhua-epb-2026-plan (re-read 2026-11-26): applicant 18+ and registered in Changhua for 1+ year;
+  // the scrapped scooter and its owner registered there 1+ year (two-stroke scrap-only: 5+ years);
+  // scrap, buy and plate within 2026; claims to 2027-01-10; paid in order until the budget runs out.
+  p({ id: 'changhua-swap', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣汰舊換購電動機車', 'Changhua scrap-and-replace'), amount: fixed(12000), conditions: [residency(1), age(18), scrap, builtBy('2016-12-31'), { kind: 'scrap-registered-locally', minYears: 1 }], conditionText: t('年滿18歲、設籍彰化縣滿1年；要報廢的機車須是 2016 年（民國 105 年）底以前出廠、在彰化縣登記滿1年的燃油機車；報廢、買車和掛牌都在 2026 年內完成，2027 年 1 月 10 日前線上或紙本申請；要報廢的機車和新車的車主不同人時，限配偶或三等親。', 'Aged 18+ and registered in Changhua for at least a year; the scooter you scrap must be a gasoline scooter built by the end of 2016 and registered in Changhua for at least a year; scrap, buy and plate within 2026 and apply online or on paper by 10 January 2027; if the owners of the scooter you scrap and the new one differ, they must be spouses or close relatives.'), applicationDeadline: '2027-01-10', quota: chQuota, exclusiveGroups: ['changhua-base'], sources: ['changhua-epb-2026-plan', ...MEID], research: [r('changhua-swap-v3')] }),
+  p({ id: 'changhua-new', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣新購電動機車', 'Changhua new electric scooter'), amount: fixed(5000), conditions: [residency(1), age(18)], conditionText: t('年滿18歲、設籍彰化縣滿1年；新車在 2026 年內買、在彰化縣掛牌；2027 年 1 月 10 日前線上或紙本申請。', 'Aged 18+ and registered in Changhua for at least a year; buy within 2026 and plate the scooter in Changhua; apply online or on paper by 10 January 2027.'), applicationDeadline: '2027-01-10', quota: chQuota, exclusiveGroups: ['changhua-base'], sources: ['changhua-epb-2026-plan', ...MEID], research: [r('changhua-new-purchase-v3')] }),
+  { ...p({ id: 'changhua-scrap-only-two-stroke', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣純報廢二行程機車', 'Changhua scrap a two-stroke only'), kind: 'scrap-only-bonus', amount: fixed(3000), conditions: [residency(5), scrap, twoStroke, builtBy('2003-12-31'), { kind: 'scrap-registered-locally', minYears: 5 }], conditionText: t('2003 年（民國 92 年）底以前出廠的二行程機車，在 2026 年內報廢；機車和車主都在彰化縣登記滿5年。', 'A two-stroke built by the end of 2003, scrapped within 2026; the scooter and its owner registered in Changhua for at least 5 years.'), applicationDeadline: '2027-01-10', quota: chQuota, exclusiveGroups: ['county-scrap-only'], sources: ['changhua-epb-2026-plan', ...MEID], research: [r('changhua-scrap-only-v3')] }), side: 'gasoline' as const },
+  { ...p({ id: 'changhua-scrap-only', jurisdiction: 'changhua', payerName: CH, name: t('彰化縣純報廢老舊機車', 'Changhua: scrap a qualifying scooter only'), kind: 'scrap-only-bonus', amount: fixed(1500), conditions: [residency(1), scrap, builtBy('2016-12-31'), { kind: 'scrap-registered-locally', minYears: 1 }], conditionText: t('2016 年（民國 105 年）底以前出廠的燃油機車，在 2026 年內報廢；機車和車主都在彰化縣登記滿1年。', 'A gasoline scooter built by the end of 2016, scrapped within 2026; the scooter and its owner registered in Changhua for at least a year.'), applicationDeadline: '2027-01-10', quota: chQuota, exclusiveGroups: ['county-scrap-only'], sources: ['changhua-epb-2026-plan', ...MEID], research: [r('changhua-scrap-only-v3')] }), side: 'gasoline' as const },
 
   // Nantou
-  p({ id: 'nantou-swap', jurisdiction: 'nantou', payerName: NT, name: t('南投縣汰舊換購電動機車', 'Nantou scrap-and-replace'), amount: fixed(16000), conditions: [residency(), scrap, builtBy('2007-06-30')], conditionText: t('要報廢的機車須是 2007 年（民國 96 年）6 月 30 日以前出廠的燃油機車；外籍人士可申請；申請期限與名額未查到。', 'The scooter you scrap must be a gasoline scooter built by 30 June 2007; foreign nationals may apply; deadline and quota not found.'), exclusiveGroups: ['nantou-base'], sources: [...MEID], research: [r('nantou-swap-v3')] }),
-  p({ id: 'nantou-new', jurisdiction: 'nantou', payerName: NT, name: t('南投縣新購電動機車', 'Nantou new electric scooter'), amount: fixed(5000), conditions: [residency()], conditionText: t('設籍南投縣；申請期限與名額未查到。', 'Registered in Nantou; deadline and quota not found.'), exclusiveGroups: ['nantou-base'], research: [r('nantou-new-purchase-v3')] }),
+  p({ id: 'nantou-swap', jurisdiction: 'nantou', payerName: NT, name: t('南投縣汰舊換購電動機車', 'Nantou scrap-and-replace'), amount: fixed(16000), conditions: [residency(), scrap, builtBy('2007-06-30')], conditionText: t('要報廢的機車須是 2007 年（民國 96 年）6 月 30 日以前出廠的燃油機車；外籍人士可申請；環保局沒有公布申請期限和名額，申請前請打 049-2237530 問。', 'The scooter you scrap must be a gasoline scooter built by 30 June 2007; foreign nationals may apply; the bureau has not published a deadline or number of places, so phone (049) 223-7530 before you apply.'), quota: ntQuota, exclusiveGroups: ['nantou-base'], sources: ['nantou-epb-2026-news', ...MEID], research: [r('nantou-swap-v3')] }),
+  p({ id: 'nantou-new', jurisdiction: 'nantou', payerName: NT, name: t('南投縣新購電動機車', 'Nantou new electric scooter'), amount: fixed(5000), conditions: [residency()], conditionText: t('設籍南投縣；環保局沒有公布申請期限和名額，申請前請打 049-2237530 問。', 'Registered in Nantou; the bureau has not published a deadline or number of places, so phone (049) 223-7530 before you apply.'), quota: ntQuota, exclusiveGroups: ['nantou-base'], sources: ['nantou-epb-2026-news', ...MEID], research: [r('nantou-new-purchase-v3')] }),
   {
     // Listed, not counted: the MEID table gives the amount but no finding records the old-scooter
     // age limit or other conditions (nantou-swap-v3's 2007-06-30 cut-off covers scrap-and-replace only).
@@ -179,11 +191,13 @@ export const countyR2Programmes: Programme[] = [
       kind: 'scrap-only-bonus',
       amount: fixed(2500),
       conditions: [residency(), scrap],
-      conditionText: t('淘汰老舊機車、不換購電動機車；要報廢機車的車齡等條件未查到。', 'Scrap a qualifying scooter without buying an electric one; the old-scooter age limit and other conditions were not found.'),
+      conditionText: t('淘汰老舊機車、不換購電動機車；二行程、四行程都是2,500元。要報廢的機車須多老，環保局沒有寫，請打 049-2237530 問。', 'Scrap a qualifying scooter without buying an electric one; NT$2,500 for two- and four-strokes alike. The bureau does not say how old the scooter must be, so phone (049) 223-7530.'),
+      quota: ntQuota,
+      sources: ['nantou-epb-2026-news', ...MEID],
       exclusiveGroups: ['county-scrap-only'],
       research: [r('nantou-new-purchase-v3')],
       calculator: {
-        excluded: t('經濟部產業發展署補助表列出南投縣純淘汰2,500元，但要報廢機車的車齡等條件未查到；請洽南投縣環保局049-2238573。', 'The MEID subsidy table lists a Nantou scrap-only payment of NT$2,500, but the old-scooter age limit and other conditions were not found; ask the Nantou EPB on 049-2238573.'),
+        excluded: t('環保局寫了單純報廢2,500元，但沒寫要報廢的機車須多老，所以試算沒有算進去；請打 049-2237530 問南投縣環保局。', 'The bureau gives NT$2,500 for scrapping only but does not say how old the scooter must be, so the calculator leaves it out; phone the Nantou EPB on (049) 223-7530.'),
         reason: 'not-published',
       },
     }),

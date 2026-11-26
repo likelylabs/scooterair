@@ -8,7 +8,7 @@ import { notSubsidisedInWindow, age, builtBetween, builtBy, fixed, flag, heavyOr
 
 const MEID = ['meid-lev-subsidy-portal', 'meid-lev-2026-subsidy-table'] as const;
 const ANNUAL_2027 = t('年度方案，未見 2027 年公告。', 'An annual programme; no 2027 announcement seen.');
-const untilUsed = (asOf: string) => quota('unknown', asOf, t('依申請順序核定，經費用罄為止；剩餘額度未公布。', 'Approved in order of application until the money runs out; remaining funds not published.'));
+const untilUsed = (asOf: string) => quota('unknown', asOf, t('依申請順序核定，經費用完為止；還剩多少沒有公布，申請前請先打電話問環保局。', 'Approved in order of application until the money runs out; what is left is not published, so phone the bureau before you apply.'));
 
 // ---------------------------------------------------------------- Kinmen
 const KINMEN = t('金門縣環境保護局', 'Kinmen County Environmental Protection Bureau');
@@ -109,7 +109,7 @@ export const countyProgrammes: Programme[] = [
     conditions: [...kinmenSwapGeneral, heavyOrLight, scrap, builtBy('2007-06-30'), { kind: 'scrap-registered-locally', byDate: '2024-12-31' }],
     conditionText: t(`${KG}${KG_SWAP}${KOLD}重型、輕型同為20,000元。`, `${KG_EN} ${KG_SWAP_EN} ${KOLD_EN} NT$20,000 for heavy and light alike.`),
     exclusiveGroups: ['kinmen-base', 'kinmen-vs-moenv'],
-    quota: kinmenBudget(['換購預算320萬元（約160輛）；剩餘額度未公布。', 'Replacement budget NT$3.2 million (about 160 scooters); remaining funds not published.']),
+    quota: kinmenBudget(['換購預算320萬元（約160輛）；還剩多少沒有公布，請打 082-336823 問環保局。', 'Replacement budget NT$3.2 million (about 160 scooters); what is left is not published, so phone the bureau on 082-336823.']),
     research: ['counties-south-east-islands#kinmen-swap-heavy', 'counties-south-east-islands#kinmen-swap-light', 'counties-south-east-islands#kinmen-deadline-quota'],
   }),
   kinmen({
@@ -119,7 +119,7 @@ export const countyProgrammes: Programme[] = [
     conditions: [...kinmenGeneral, heavyOrLight],
     conditionText: t(`${KG}重型、輕型同為10,000元。`, `${KG_EN} NT$10,000 for heavy and light alike.`),
     exclusiveGroups: ['kinmen-base', 'kinmen-vs-moenv'],
-    quota: kinmenBudget(['新購與單純淘汰共用90萬元預算；剩餘額度未公布。', 'New purchases and scrap-only share a NT$900,000 budget; remaining funds not published.']),
+    quota: kinmenBudget(['新購與單純淘汰共用90萬元預算；還剩多少沒有公布，請打 082-336823 問環保局。', 'New purchases and scrap-only share a NT$900,000 budget; what is left is not published, so phone the bureau on 082-336823.']),
     research: ['counties-south-east-islands#kinmen-new-heavy', 'counties-south-east-islands#kinmen-new-light', 'counties-south-east-islands#kinmen-deadline-quota'],
   }),
   kinmen({
@@ -202,7 +202,7 @@ export const countyProgrammes: Programme[] = [
     exclusiveGroups: ['pingtung-base'],
     sources: ['nownews-2026-subsidy-roundup'],
     confidence: 'secondary',
-    calculator: { excluded: t('只見於媒體引述的縣府圖卡，偏鄉鄉鎮名單與文件不明，無法判斷誰符合資格。', 'Seen only in a media report of a county graphic; the list of remote townships and the documents required are unknown, so eligibility cannot be judged.'), reason: 'secondary-only' },
+    calculator: { excluded: t('只見於媒體引述的縣府圖卡；我們找不到哪些鄉鎮算偏鄉、要準備哪些文件，所以沒辦法算。住在偏遠鄉鎮的人，請打 08-7352068 問。', 'Seen only in a media report of a county graphic; we could not find which townships count as remote or which papers are needed, so it cannot be worked out here. If you live in a remote township, phone 08-7352068.'), reason: 'secondary-only' },
   }),
   {
     ...table('pingtung', PT, 'pingtung-scrap-only', ['屏東縣單純淘汰老舊機車', 'Pingtung: scrap a qualifying scooter only (no electric purchase)'], 1500, [residency(), scrap, builtBy('2007-06-30')], ['要報廢的機車須是 2007 年（民國 96 年）6 月 30 日以前出廠的1至4期燃油機車。', 'The scooter you scrap must be a phase 1–4 gasoline scooter built by 30 June 2007.'], 'pingtung-scrap', {

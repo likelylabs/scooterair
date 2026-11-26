@@ -12,7 +12,7 @@ const MOF = t('財政部（貨物稅）', 'Ministry of Finance (goods tax)');
 const MOEA_SRC = ['meid-lev-subsidy-portal', 'meid-lev-2026-subsidy-table'] as const;
 const PDF = ['meid-lev-2026-subsidy-table'] as const;
 
-const moeaQuota = quota('unknown', '2026-11-25', t('未公布名額；補助期間至 2026 年 12 月 31 日。', 'No quota published; the programme runs to 31 December 2026.'));
+const moeaQuota = quota('unknown', '2026-11-25', t('沒有公布名額，補助期間到 2026 年 12 月 31 日。', 'No limit on places is published; the programme runs to 31 December 2026.'));
 const MOEA_2027 = t('未見 2027 年方案；補助要點效期至 2026 年 12 月 31 日。', 'No 2027 programme found; the scheme runs to 31 December 2026.');
 // The MOEA portal: "可適用於外籍人士 (請於115/12/10前提出申請)". A foreign national buying after
 // 10 December can no longer apply; everyone else keeps the 31 December purchase window.
@@ -267,7 +267,7 @@ export const centralProgrammes: Programme[] = [
     validFrom: '2026-01-01',
     validTo: '2026-12-31',
     validToRule: t('要報廢的機車須在這天以前完成報廢回收。', 'Scrap and recycle the scooter you are replacing by this date.'),
-    quota: quota('unknown', '2026-06-01', t('未公布名額。', 'No quota published.')),
+    quota: quota('unknown', '2026-06-01', t('沒有公布名額。', 'No limit on places is published.')),
     status2027: t('2027 年是否續辦未查證。', 'Whether it continues in 2027 was not checked.'),
     sources: ['taipei-dep-ev-subsidy-plan', 'tvbs-health-2026-01-subsidy', 'tcnews-2026-02-moenv-release', 'taichung-epb-2026-amount-table'],
     confidence: 'verified',
@@ -295,7 +295,7 @@ export const centralProgrammes: Programme[] = [
     validFrom: '2026-01-01',
     validTo: '2026-12-31',
     validToRule: t('兩台要報廢的機車都須在這天以前完成報廢回收。', 'Scrap and recycle both scooters by this date.'),
-    quota: quota('unknown', '2026-06-01', t('未公布名額。', 'No quota published.')),
+    quota: quota('unknown', '2026-06-01', t('沒有公布名額。', 'No limit on places is published.')),
     status2027: t('2027 年是否續辦未查證。', 'Whether it continues in 2027 was not checked.'),
     sources: ['tvbs-health-2026-01-subsidy'],
     confidence: 'secondary',

@@ -104,7 +104,7 @@ export default copy({
       'zh-TW': '長條圖，每月騎 {km} 公里：加油 {petrol}；在家充電 {home}；換電最便宜的月租 {plan}；換電用多少付多少 {payg}。',
       en: 'Bar chart, {km} km a month: petrol {petrol}; charging at home {home}; battery swap, cheapest monthly plan {plan}; pay as you go {payg}.',
     },
-    monthNote: { 'zh-TW': '每月騎 {km} 公里，只算油錢或電錢；保養、保險和牌照稅不在裡面，新車的換電優惠也不算。換電的兩行，是各家方案裡最便宜的，車款和方案寫在名字下面；下面的試算會用你選的車款和方案算。', en: '{km} km a month, fuel or power only; servicing, insurance, licence tax and new-scooter swap discounts are not included. The two swap rows are the cheapest plans of any make, named under each; the calculator below uses the scooter and plan you choose.' },
+    monthNote: { 'zh-TW': '每月騎 {km} 公里，只算油錢或電錢；保養、保險和牌照稅不在裡面，新車的換電優惠也不算。換電那幾行，每一行都寫著是哪一款車、哪一個方案；下面的試算會用你選的車款和方案算。', en: '{km} km a month, fuel or power only; servicing, insurance, licence tax and new-scooter swap discounts are not included. Each swap row names its scooter and plan; the calculator below uses the scooter and plan you choose.' },
     swapDearer: { 'zh-TW': '只能換電池的話，最便宜的換電方式每月 {n}，比油錢多 {diff}。', en: 'If you can only swap batteries, the cheapest way costs {n} a month, {diff} more than petrol.' },
     swapCheaper: { 'zh-TW': '只能換電池的話，最便宜的換電方式每月 {n}，比油錢少 {diff}。', en: 'If you can only swap batteries, the cheapest way costs {n} a month, {diff} less than petrol.' },
     beCheaper: { 'zh-TW': '能在家充電、最便宜的是 {model}：買的時候就比較便宜，之後每個月再省約 {save}。', en: 'The cheapest scooter you can charge at home, the {model}, is cheaper on the day you buy, then about {save} less each month.' },
@@ -442,6 +442,7 @@ export default copy({
     },
     monthlyTable: {
       item: { 'zh-TW': '每個月', en: 'Each month' },
+      none: { 'zh-TW': '不用付', en: 'nothing to pay' },
       total: { 'zh-TW': '合計（上面各列加起來）', en: 'Total of the rows above' },
       average: { 'zh-TW': '{h}平均，每個月', en: 'Monthly average over {h}' },
       averageNote: { 'zh-TW': '平均那一列把優惠到期和設定費都算進去，結論和打平的圖用的就是它。', en: 'The average row counts the discount ending and the setup fee; the verdict and the break-even chart use it.' },

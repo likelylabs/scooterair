@@ -334,7 +334,7 @@ export const redlightSeries = {
     evidence: 'measured-tw',
     caveat: t(
       '兩組的單位不同，不能放在同一個刻度上比。這是推算出來的值，論文沒說「±」是什麼；機車假設全部燒汽油。同一個隧道裡，機車排的微粒是三類車裡最少的。',
-      'Different units, which cannot be read against one scale. Regression estimates with an undefined "±"; all motorcycles assumed gasoline. In the same tunnel motorcycles had the lowest particle emissions of the three classes.',
+      'Different units, which cannot be read against one scale. Regression estimates whose "±" the paper does not explain; all motorcycles assumed gasoline. In the same tunnel motorcycles had the lowest particle emissions of the three classes.',
     ),
     requiresCaveat: true,
     relatedFacts: ['tunnel-co-by-vehicle-class-ting2023', 'tunnel-particles-heavy-vehicles-ting2023'],

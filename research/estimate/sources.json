@@ -164,11 +164,11 @@
   },
   {
    "id": "chang-chang-2014",
-   "citation": "Chang & Chang (2014). 交通學報 14(1) (review of 許添本 & 王義川 2001 on scooter space use).",
-   "url": null,
+   "citation": "張勝雄、張耕碩 (Chang S-H, Chang K-S) (2014). 臺灣機車交通工程設計之回顧與檢討 (A Critical Review on Traffic Engineering Designs for Motorcycles in Taiwan). 交通學報 (Journal of Traffic Science) 14(1):59-80. Literature review of 許添本 & 王義川 (2001), 運輸學刊 13(2):27-56.",
+   "url": "https://ts.cpu.edu.tw/var/file/20/1020/attach/87/pta_24337_9386910_46324.pdf",
    "doi": null,
-   "verified": false,
-   "supplied": "2.2-3.2 m2 per stopped scooter; scooter width 0.8 m (secondary)."
+   "verified": true,
+   "supplied": "Net area of one stopped motorcycle 2.2 m2; riders want about 3.2 m2 on average (the 2.2-3.2 m2 range spans the two); typical width 0.8 m. Secondary (review). Re-opened 2026-11-26; registry id chang-chang-2014-jts."
   },
   {
    "id": "lan-chang-2015",
@@ -228,11 +228,11 @@
   },
   {
    "id": "ncku-thesis-hap",
-   "citation": "National Cheng Kung University master's thesis on ten years of Taiwanese hazardous-air-pollutant monitoring (title and author not yet confirmed).",
-   "url": "https://thesis.lib.ncku.edu.tw/thesis/detail/5e2db97f10546bf7fd23b16486abccfe",
+   "citation": "洪子晽 (Hong T-J) (2017). 臺灣大氣環境有害空氣污染物濃度特徵及潛在影響評估 (Airborne Air Toxics Characterization and the Potential Impact in Taiwan). Master's thesis, National Cheng Kung University (supervisor 蔡俊鴻).",
+   "url": "https://researchoutput.ncku.edu.tw/zh/studentTheses/臺灣大氣環境有害空氣污染物濃度特徵及潛在影響評估",
    "doi": null,
-   "verified": false,
-   "supplied": "National annual mean benzene ~0.55 ppbv (2012) -> 0.51 ppbv (2016), urban > non-urban (search-result excerpt only; page returned HTTP 503). Lower end of benzene background. needsManualFetch."
+   "verified": true,
+   "supplied": "National annual mean benzene 0.55 ppbv (2012) -> 0.51 ppbv (2016), urban > non-urban (abstract, re-opened 2026-11-26). Lower end of benzene background. Registry id hong-2017-ncku-thesis."
   },
   {
    "id": "who-2021-aqg",
@@ -268,7 +268,6 @@
   }
  ],
  "needsManualFetch": [
-  "https://thesis.lib.ncku.edu.tw/thesis/detail/5e2db97f10546bf7fd23b16486abccfe (Taiwan HAP benzene annual means; HTTP 503 on 2026-11-26)",
   "MOENV PAMS hourly benzene for urban stations (e.g. Wanhua), data.moenv.gov.tw (API key) - to replace the wide benzene background",
   "IOT-113-TB006 Figs 3.3.2-1 to -11 (1-min CO series, images) or raw data from IOT - would show whether the kerb sensors resolve an increment at all",
   "https://oehha.ca.gov/air/crnr/notice-adoption-revised-reference-exposure-levels-benzene (benzene acute REL and its averaging time; not used)",
