@@ -42,7 +42,7 @@ export default copy({
   /** /electric/ and the old /questions/electric/ address: the money card. */
   money: {
     kicker: { 'zh-TW': '換電動', en: 'Go electric' },
-    title: { 'zh-TW': '換一輛電動機車，|要多少錢？', en: 'What does an electric |scooter cost?' },
+    title: { 'zh-TW': '電動機車|要多少錢？', en: 'What does an electric |scooter cost?' },
     cheaper: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，比買新的燃油機車少付 {amount}。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one costs {amount} less than a new petrol one.' },
     same: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，和買新的燃油機車差不多錢。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one costs about the same as a new petrol one.' },
     dearer: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，還是比燃油機車多付 {amount}。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one still costs {amount} more than a petrol one.' },
@@ -64,7 +64,7 @@ export default copy({
       },
     },
     app: {
-      title: { 'zh-TW': '空氣品質 App|為什麼看不出來？', en: 'Why doesn’t |the air app show it?' },
+      title: { 'zh-TW': '空氣品質 App|為什麼|看不出來？', en: 'Why doesn’t |the air app show it?' },
       line: {
         'zh-TW': '測站的進氣口比人高，一小時才報一次；紅燈只有 {red} 秒，廢氣排在一公尺以下。',
         en: 'Station inlets sit above head height and report once an hour; a red light lasts {red} seconds, and the exhaust comes out below a metre.',
@@ -93,7 +93,7 @@ export default copy({
       },
     },
     'how-much': {
-      title: { 'zh-TW': '旁邊停一排機車，|路邊多多少？', en: 'How much does a row |of scooters add?' },
+      title: { 'zh-TW': '旁邊停|一排機車，|路邊多多少？', en: 'How much does a row |of scooters add?' },
       line: { 'zh-TW': '這排機車多出來的一氧化碳', en: 'Carbon monoxide added by these scooters' },
     },
   },

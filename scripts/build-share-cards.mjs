@@ -179,7 +179,9 @@ try {
       const k = await page.evaluate(async () => {
         const card = document.querySelector('.card');
         const text = document.querySelector('.card__text');
-        let k = 1;
+        // the square card is seen smaller (LINE): start larger and shrink to fit
+        let k = innerHeight > innerWidth * 0.8 ? 1.45 : 1;
+        card.style.setProperty('--k', String(k));
         const over = () => text.scrollHeight > text.clientHeight + 1 || text.scrollWidth > text.clientWidth + 1;
         while (over() && k > 0.55) card.style.setProperty('--k', String((k -= 0.03)));
         await document.fonts.ready;

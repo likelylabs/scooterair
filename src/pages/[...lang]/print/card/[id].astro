@@ -48,7 +48,10 @@ const tagText = illustration.tag[locale];
       var svg = document.querySelector('.card__pic svg[viewBox]');
       if (!svg) return;
       var v = svg.getAttribute('viewBox').split(/[\s,]+/).map(Number);
-      document.querySelector('.card__pic').style.setProperty('--ar', String(v[2] / v[3]));
+      var ar = v[2] / v[3];
+      document.querySelector('.card__pic').style.setProperty('--ar', String(ar));
+      // a long, low picture (the heights) goes across the top of the wide card instead of beside the words
+      if (ar > 1.8) document.querySelector('.card').classList.add('card--strip');
     });
   </script>
   <div class="card" data-card={id} style="--k:1">
@@ -203,6 +206,20 @@ const tagText = illustration.tag[locale];
     }
     .card__fit {
       align-content: center;
+    }
+  }
+  @media (min-aspect-ratio: 3/2) {
+    .card.card--strip {
+      grid-template-columns: none;
+      grid-template-rows: 44% minmax(0, 1fr);
+    }
+    .card--strip .card__text {
+      grid-template-rows: auto minmax(0, 1fr);
+      padding: 18px 56px 24px;
+      gap: 6px;
+    }
+    .card--strip .card__fit {
+      align-content: start;
     }
   }
   /* the square card (1080 × 1080): picture on top */
