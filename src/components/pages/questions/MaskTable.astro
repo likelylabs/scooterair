@@ -152,6 +152,14 @@ const h = (s: string) => langHtml(typeset(s, locale), locale);
     }
   }
 
+  /* very little room (a 320 px phone at 大 or 特大): the label sits above its line, so the
+     line keeps the whole width instead of wrapping every five characters */
+  @container (max-width: 17rem) {
+    td {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
   /* wider: an ordinary table */
   @container (min-width: 40rem) {
     .mask-table__label {

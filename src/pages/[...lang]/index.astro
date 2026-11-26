@@ -76,6 +76,11 @@ const locale = localeFromParam(Astro.params.lang);
 const t = localize(home, locale);
 const zh = locale === 'zh-TW';
 const sp = zh ? '' : ' '; // between two sentences: nothing in Chinese, a space in English
+/** Headlines: '|' marks phrases for Chinese, which has no spaces. English breaks between words by
+ *  itself, and a long English phrase kept whole would take a line of its own, so the marks go. */
+const hl = (s: string) => V.headlineMarks(s, locale);
+/** The chips beside 怎麼知道的？: English chip words are longer, so they are set at the 14 px step */
+const chipSize = zh ? 'md' : 'sm';
 const TOTAL = 15;
 const F = homeFigures(locale);
 const evidence = (n: number) => href(`/evidence/#link-${n}`, locale);
@@ -148,11 +153,11 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     <h1 class="vh">{site.name[locale]}{zh ? '：' : ': '}{site.tagline[locale]}</h1>
 
     <!-- 1 · 紅燈亮了 ====================================================================== -->
-    <Screen locale={locale} n={1} total={TOTAL} chapter={t.s1.chapter} headline={t.s1.headline} body={fill(t.s1.body, { s: F.red })} illustration next={{ label: t.s1.next }}>
+    <Screen locale={locale} n={1} total={TOTAL} chapter={t.s1.chapter} headline={hl(t.s1.headline)} body={fill(t.s1.body, { s: F.red })} illustration next={{ label: t.s1.next }}>
       <HeroStreet slot="picture" locale={locale} />
       <Fragment slot="chips">
-        <KindChip locale={locale} of={fact('iot-pedestrian-wait')} where="" />
-        <KindChip locale={locale} kind="estimate" />
+        <KindChip size={chipSize} locale={locale} of={fact('iot-pedestrian-wait')} where="" />
+        <KindChip size={chipSize} locale={locale} kind="estimate" />
       </Fragment>
       <a slot="actions" class="h-act h-act--film" href={filmHref}>
         <svg class="h-act__play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"></path></svg>
@@ -166,7 +171,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 2 · 排出什麼 ====================================================================== -->
-    <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={t.s2.headline} body={t.s2.body} quiet={verified('who-benzene-no-safe-level') ? t.s2.quiet : undefined} next={{ label: t.s2.next }}>
+    <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={hl(t.s2.headline)} body={t.s2.body} quiet={verified('who-benzene-no-safe-level') ? t.s2.quiet : undefined} next={{ label: t.s2.next }}>
       <div slot="picture" class="h-pic">
         <div class="h-crop" style="--crop:8">
           <TailpipeMarks locale={locale}>
@@ -188,11 +193,11 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 3 · 排在哪裡 ====================================================================== -->
-    <Screen locale={locale} n={3} total={TOTAL} chapter={t.s3.chapter} headline={t.s3.headline} body={fill(t.s3.body, { h: F.tailpipeCm, gap: F.gapCm })} illustration next={{ label: t.s3.next }}>
+    <Screen locale={locale} n={3} total={TOTAL} chapter={t.s3.chapter} headline={hl(t.s3.headline)} body={fill(t.s3.body, { h: F.tailpipeCm, gap: F.gapCm })} illustration next={{ label: t.s3.next }}>
       <ApproachPlan slot="picture" locale={locale} />
       <Fragment slot="chips">
-        <KindChip locale={locale} of={fact('marking-rules-turn-box')} where="" />
-        <KindChip locale={locale} of={fact('iot-exhaust-height-assumption')} where="" />
+        <KindChip size={chipSize} locale={locale} of={fact('marking-rules-turn-box')} where="" />
+        <KindChip size={chipSize} locale={locale} of={fact('iot-exhaust-height-assumption')} where="" />
       </Fragment>
       <HowSheet slot="sheet" id="how-3" locale={locale} kind="official" title={fill(t.s3.sheet.title, { gap: F.gapCm })} facts={['marking-rules-turn-box', 'iot-exhaust-height-assumption', 'idling-regulation']} primary={{ href: evidence(2) }}>
         <p slot="block1">{t.s3.sheet.who}</p>
@@ -202,7 +207,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 4 · 吸進多少 ====================================================================== -->
-    <Screen locale={locale} n={4} total={TOTAL} chapter={t.s4.chapter} headline={t.s4.headline} quiet={t.s4.quiet} next={{ label: t.s4.next }} class="h-s4">
+    <Screen locale={locale} n={4} total={TOTAL} chapter={t.s4.chapter} headline={hl(t.s4.headline)} quiet={t.s4.quiet} next={{ label: t.s4.next }} class="h-s4">
       <div slot="picture" class="h-pic">
         <div class="h-box">
           <div class="h-box__row">
@@ -230,8 +235,8 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 5 · 量到的，和算的 ================================================================= -->
-    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={s5Headline} quiet={estimateText.coTracksVapour[locale]} next={{ label: t.s5.next }}>
-      <MeasuredVsEstimate slot="picture" locale={locale} sheet="how-5" table={false} compact />
+    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} quiet={estimateText.coTracksVapour[locale]} next={{ label: t.s5.next }}>
+      <div slot="picture" class="h-pic h-pic--chart h-pic--mve"><MeasuredVsEstimate locale={locale} sheet="how-5" table={false} compact /></div>
       <p slot="body">{fill(t.s5.bodySensors, { sites: F.sites })}{farBelowWho() && <Fragment>{sp}{t.s5.bodyFarBelow}</Fragment>}</p>
       <HowSheet slot="sheet" id="how-5" locale={locale} kind="measured" where={chipWhere.taiwan[locale]} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']} primary={{ href: evidence(3) }} secondary={{ href: href('/estimate/#check', locale), label: how.fullMethod[locale] }}>
         <p slot="block1">{t.s5.sheet.who}</p>
@@ -245,7 +250,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 6 · 吸進去以後 ==================================================================== -->
-    <Screen locale={locale} n={6} total={TOTAL} chapter={t.s6.chapter} headline={t.s6.headline} body={fill(t.s6.body, { n: F.studies })} quiet={kSentences.K5[locale]} next={{ label: t.s6.next }} class="h-s6">
+    <Screen locale={locale} n={6} total={TOTAL} chapter={t.s6.chapter} headline={hl(t.s6.headline)} body={fill(t.s6.body, { n: F.studies })} quiet={kSentences.K5[locale]} next={{ label: t.s6.next }} class="h-s6">
       <div slot="picture" class="h-pic">
         <BodyFigure locale={locale} pins={[...pins]} />
         <IllustrationTag locale={locale} kind="body" />
@@ -254,7 +259,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
           <BodyPins locale={locale} items={pins.map((pin) => ({ pin, text: t.s6.pins[pin] }))} />
         </div>
       </div>
-      <KindChip slot="chips" locale={locale} kind="study" where={chipWhere.longTermAllTraffic[locale]} fact="hei-sr23-trap-associations" size="sm" />
+      <KindChip size={chipSize} slot="chips" locale={locale} kind="study" where={chipWhere.longTermAllTraffic[locale]} fact="hei-sr23-trap-associations" />
       <HowSheet slot="sheet" id="how-6" locale={locale} kind="study" where={chipWhere.international[locale]} facts={['hei-sr23-trap-associations', ...pins.map((p) => pinFacts[p])]} primary={{ href: evidence(5) }}>
         <p slot="block1">{fill(t.s6.sheet.who, { n: F.studies })}</p>
         <p slot="block2">{t.s6.sheet.what}</p>
@@ -266,13 +271,13 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 7 · 天天等 ======================================================================== -->
-    <Screen locale={locale} n={7} total={TOTAL} chapter={t.s7.chapter} headline={t.s7.headline} quiet={t.s7.quiet} next={{ label: t.s7.next }}>
+    <Screen locale={locale} n={7} total={TOTAL} chapter={t.s7.chapter} headline={hl(t.s7.headline)} quiet={t.s7.quiet} next={{ label: t.s7.next }}>
       <div slot="picture" class="h-pic">
         <RoadOfTime locale={locale} posts={posts} />
         <div class="h-pic__ctl"><Segmented name="reds" legend={t.s7.stepper} hideLegend value={String(defaultRedsPerDay)} options={redsPerDayOptions.map((n) => ({ value: String(n), label: fill(t.s7.stepperOption, { n }) }))} /></div>
       </div>
       <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={String(n)}>{t.s7.body[n]}</span>)}</p>
-      <KindChip slot="chips" locale={locale} kind="derived" />
+      <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
       <HowSheet slot="sheet" id="how-7" locale={locale} kind="study" heads={t.s7.sheet.heads as [string, string, string]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: evidence(5) }}>
         <ul slot="block1">
           <li>{t.s7.sheet.minutes}</li>
@@ -288,9 +293,9 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 8 · 誰最近 ======================================================================== -->
-    <Screen locale={locale} n={8} total={TOTAL} chapter={t.s8.chapter} headline={t.s8.headline} body={fill(t.s8.body, { lo: F.child.lo, hi: F.child.hi })} quiet={kSentences.K4[locale]} illustration next={{ label: t.s8.next }}>
+    <Screen locale={locale} n={8} total={TOTAL} chapter={t.s8.chapter} headline={hl(t.s8.headline)} body={fill(t.s8.body, { lo: F.child.lo, hi: F.child.hi })} quiet={kSentences.K4[locale]} illustration next={{ label: t.s8.next }}>
       <HeightsScene slot="picture" locale={locale} />
-      <KindChip slot="chips" locale={locale} of={fact('child-air-per-kg')} />
+      <KindChip size={chipSize} slot="chips" locale={locale} of={fact('child-air-per-kg')} />
       <HowSheet slot="sheet" id="how-8" locale={locale} kind="study" where={chipWhere.international[locale]} facts="child-air-per-kg" primary={{ href: evidence(6) }}>
         <p slot="block1">{t.s8.sheet.who}</p>
         <p slot="block2">{fill(t.s8.sheet.what, { lo: F.child.lo, hi: F.child.hi })}</p>
@@ -299,9 +304,9 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 9 · 騎士也在裡面 ================================================================== -->
-    <Screen locale={locale} n={9} total={TOTAL} chapter={t.s9.chapter} headline={t.s9.headline} body={t.s9.body} quiet={t.s9.quiet} illustration next={{ label: t.s9.next }}>
+    <Screen locale={locale} n={9} total={TOTAL} chapter={t.s9.chapter} headline={hl(t.s9.headline)} body={t.s9.body} quiet={t.s9.quiet} illustration next={{ label: t.s9.next }}>
       <RiderScene slot="picture" locale={locale} />
-      <KindChip slot="chips" locale={locale} of={fact('commute-scooter-vs-subway-chuang2020')} />
+      <KindChip size={chipSize} slot="chips" locale={locale} of={fact('commute-scooter-vs-subway-chuang2020')} />
       <HowSheet slot="sheet" id="how-9" locale={locale} kind="measured" where={chipWhere.taiwan[locale]} facts="commute-scooter-vs-subway-chuang2020" primary={{ href: evidence(6) }}>
         <p slot="block1">{t.s9.sheet.who}</p>
         <Fragment slot="block2">
@@ -315,15 +320,15 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 10 · 口罩擋得住嗎 ================================================================= -->
-    <Screen locale={locale} n={10} total={TOTAL} chapter={t.s10.chapter} headline={t.s10.headline} body={t.s10.body} quiet={t.s10.quiet} next={{ label: t.s10.next }}>
+    <Screen locale={locale} n={10} total={TOTAL} chapter={t.s10.chapter} headline={hl(t.s10.headline)} body={t.s10.body} quiet={t.s10.quiet} next={{ label: t.s10.next }}>
       <div slot="picture" class="h-pic">
         <MaskScene locale={locale} />
         <IllustrationTag locale={locale} />
-        <div class="h-pic__ctl"><Segmented name="mask" legend={t.s10.switch} value="surgical" columns={4} options={maskOrder.map((m) => ({ value: m, label: t.s10.masks[m].label, sub: t.s10.masks[m].sub }))} class="h-masks" /></div>
+        <div class="h-pic__ctl"><Segmented name="mask" legend={t.s10.switch} value="surgical" columns={zh ? 4 : 2} options={maskOrder.map((m) => (zh ? { value: m, label: t.s10.masks[m].label, sub: t.s10.masks[m].sub } : { value: m, label: `${t.s10.masks[m].label} ${t.s10.masks[m].sub}` }))} class="h-masks" /></div>
       </div>
       <Fragment slot="chips">
-        <KindChip locale={locale} of={fact('mask-niosh-no-gas')} where="" />
-        <KindChip locale={locale} of={fact('mask-asworn-vandersande')} where="" />
+        <KindChip size={chipSize} locale={locale} of={fact('mask-niosh-no-gas')} where="" />
+        <KindChip size={chipSize} locale={locale} of={fact('mask-asworn-vandersande')} where="" />
       </Fragment>
       <HowSheet slot="sheet" id="how-10" locale={locale} kind="official" where={chipWhere.abroad[locale]} heads={t.s10.sheet.heads as [string, string, string]} facts={['mask-niosh-no-gas', 'mask-asworn-vandersande', 'mask-ultrafine-su', 'mask-cloth-rengasamy', 'mask-fit-cherrie', 'mask-carbon-breakthrough', 'mask-carbon-mol-2005', 'mask-ilosh-taiwan', 'mask-respirator-benefit-langrish']} primary={{ href: href('/questions/mask/', locale), label: t.s10.sheet.more }}>
         <p slot="block1">{t.s10.sheet.who}</p>
@@ -354,7 +359,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 11 · 換掉 ========================================================================= -->
-    <Screen locale={locale} n={11} total={TOTAL} chapter={t.s11.chapter} headline={t.s11.headline} body={t.s11.body} next={{ label: t.s11.next }}>
+    <Screen locale={locale} n={11} total={TOTAL} chapter={t.s11.chapter} headline={hl(t.s11.headline)} body={t.s11.body} next={{ label: t.s11.next }}>
       <div slot="picture" class="h-pic">
         <SwapScene locale={locale} />
         <IllustrationTag locale={locale} />
@@ -378,15 +383,15 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 12 · 還沒要換車 =================================================================== -->
-    <Screen locale={locale} n={12} total={TOTAL} chapter={t.s12.chapter} headline={t.s12.headline} body={t.s12.body} next={{ label: t.s12.next }}>
+    <Screen locale={locale} n={12} total={TOTAL} chapter={t.s12.chapter} headline={hl(t.s12.headline)} body={t.s12.body} next={{ label: t.s12.next }}>
       <div slot="picture" class="h-pic">
         <TenScooters locale={locale} />
         <IllustrationTag locale={locale} />
         <div class="h-pic__ctl"><FixButton locale={locale} /></div>
       </div>
       <Fragment slot="chips">
-        <KindChip locale={locale} of={fact('inspection-top-tenth-co-share')} size="sm" />
-        <span class="h-chipnote">{formatEstimate('inspect.top10share', locale).text}</span>
+        <KindChip size={chipSize} locale={locale} of={fact('inspection-top-tenth-co-share')} />
+        <span class="h-chipnote h-chipnote--one">{formatEstimate('inspect.top10share', locale).text}</span>
       </Fragment>
       <HowSheet slot="sheet" id="how-12" locale={locale} kind="derived" facts="inspection-top-tenth-co-share" primary={{ href: evidence(1) }} secondary={{ href: href('/act/#ride', locale), label: t.s12.sheet.ride }}>
         <p slot="block1">{fill(t.s12.sheet.used, { readings: F.readings })}</p>
@@ -396,7 +401,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 13 · 買的那天 ===================================================================== -->
-    <Screen locale={locale} n={13} total={TOTAL} phase="green" chapter={t.s13.chapter} headline={V.buyHead(P, table, choice)} next={{ label: t.s13.next }}>
+    <Screen locale={locale} n={13} total={TOTAL} phase="green" chapter={t.s13.chapter} headline={hl(V.buyHead(P, table, choice))} next={{ label: t.s13.next }}>
       <div slot="above" class="h-pick">
         <div class="h-pick__county" data-js-only>
           <label class="h-pick__label" for="hm-county">{t.s13.county}</label>
@@ -415,10 +420,8 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       </div>
       <p slot="body" data-hm-body13>{V.buyBody(P, table)}</p>
       <p class="h-deadline-note" data-hm-strip>{V.stripOf(P, table, choice)}</p>
-      <Fragment slot="chips">
-        <KindChip locale={locale} kind="derived" />
-        <span class="h-chipnote">{H.checked}</span>
-      </Fragment>
+      <p class="h-checked-note">{H.checked}</p>
+      <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
       <HowSheet slot="sheet" id="how-13" locale={locale} kind="derived" title={t.s13.sheet.title} primary={{ href: calc, label: how.myTerms[locale] }} secondary={{ href: href('/electric/#examples', locale), label: T.examplesLink }}>
         <p slot="block1">{t.s13.sheet.used}</p>
         <div slot="block2" class="h-work" data-hm-lines set:html={V.buyLinesHtml(P, table, choice)} />
@@ -430,7 +433,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 14 · 每個月 ======================================================================= -->
-    <Screen locale={locale} n={14} total={TOTAL} phase="green" chapter={t.s14.chapter} headline={V.monthHead(P, table, choice.km)}>
+    <Screen locale={locale} n={14} total={TOTAL} phase="green" chapter={t.s14.chapter} headline={hl(V.monthHead(P, table, choice.km))}>
       <div slot="picture" class="h-pic h-pic--chart">
         <div class="h-pic__ctl" data-js-only>
           <Segmented name="km" legend={t.s14.km} hideLegend value={String(choice.km)} columns={4} options={D.km.map((k) => ({ value: String(k), label: num(k, locale), sub: t.s14.kmUnit }))} />
@@ -439,7 +442,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <p class="h-under-note" data-hm-under aria-live="polite">{V.monthUnder(P, table, choice)}</p>
       </div>
       <p slot="body" data-hm-body14>{V.monthBody(P, table, choice.km)}</p>
-      <KindChip slot="chips" locale={locale} kind="derived" />
+      <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
       <div slot="actions" class="h-two">
         <NextButton href="#s-15">{t.s14.next}</NextButton>
         <NextButton href={calc} variant="primary">{t.s14.mine}</NextButton>
@@ -455,7 +458,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 15 · 下一個紅燈 =================================================================== -->
-    <Screen locale={locale} n={15} total={TOTAL} phase="green" chapter={t.s15.chapter} headline={t.s15.headline} body={t.s15.body}>
+    <Screen locale={locale} n={15} total={TOTAL} phase="green" chapter={t.s15.chapter} headline={hl(t.s15.headline)} body={t.s15.body}>
       <div slot="picture" class="h-pic">
         <div class="h-crop" style="--crop:11"><HeroStreet locale={locale} phase="green" /></div>
         <IllustrationTag locale={locale} />

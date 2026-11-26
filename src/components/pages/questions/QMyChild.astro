@@ -30,7 +30,6 @@ const child = { lo: nums.childLo, hi: nums.childHi };
 const s1 = questions.myChild.s1;
 const back = questions.myChild.backSeat;
 const air = factText('child-air-per-kg', locale);
-const carson = factText('child-commute-scooter-carson2026', locale);
 ---
 
 <Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale], child)} quiet={kSentences.K4[locale]} illustration>
@@ -53,7 +52,6 @@ const carson = factText('child-commute-scooter-carson2026', locale);
   <HowSheet id="how-2" locale={locale} kind="measured" facts="child-commute-scooter-carson2026" primary={{ href: href('/evidence/#link-6', locale) }}>
     <p slot="block1">{f(back.sheet.b1[locale], { year: nums.carsonYear })}</p>
     <p slot="block2">{f(back.sheet.b2[locale])}</p>
-    <p slot="block3">{carson.caveat}</p>
   </HowSheet>
   <div class="q-also__go">
     <NextButton href={next.href} variant={next.primary ? 'primary' : 'next'}>{next.label}</NextButton>

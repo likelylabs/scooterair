@@ -82,16 +82,16 @@ export default copy({
     sheet: {
       title: { 'zh-TW': '一個鋁罐的一氧化碳，|怎麼來的', en: 'A drinks can of carbon monoxide: |where it comes from' },
       measured: {
-        'zh-TW': '環境部的機車定檢，一年大約 {readings} 萬筆怠速讀數。苯是國際癌症研究機構認定會致癌的東西。',
-        en: 'Taiwan’s scooter inspections: about {readings} million idle readings a year. Benzene is classed as a cause of cancer by the International Agency for Research on Cancer.',
+        'zh-TW': '環境部的機車定檢，一年大約 {readings} 萬筆一氧化碳讀數。苯是國際癌症研究機構認定會致癌的東西。',
+        en: 'Taiwan’s scooter inspections: about {readings} million carbon monoxide readings a year. The International Agency for Research on Cancer classes benzene as carcinogenic to humans.',
       },
       can: {
         'zh-TW': '常溫下這些一氧化碳{litres}，一個鋁罐是 {ml} 毫升，所以是{cans}。',
         en: 'At room temperature that carbon monoxide takes up {litres}. A drinks can holds {ml} mL, so it is {cans}.',
       },
       care: {
-        'zh-TW': '這是全台灣機車的平均，新車排得少，舊車排得多。苯會致癌，講的是長年吸進去，不是等一個紅燈。',
-        en: 'This is an average over Taiwan’s scooters: new ones give off less, old ones more. Benzene causing cancer is about years of breathing it, not one red light.',
+        'zh-TW': '這是全台灣機車的平均：新車排得少，騎了很多年的車排得多。苯會致癌，講的是長年吸進去，不是等一個紅燈。',
+        en: 'This is an average over Taiwan’s scooters: new ones give off less, ones ridden for many years more. When we say benzene gives people cancer, we mean years of breathing it, not one red light.',
       },
     },
     next: { 'zh-TW': '排出來以後，去哪裡？', en: 'Where does it go?' },
@@ -199,7 +199,7 @@ export default copy({
       },
       care: {
         'zh-TW': '這是「有關」，研究沒有判定因果。講的是所有車輛，不只機車，而且大多在歐美做的。',
-        en: 'This is a link; the review did not settle cause. It covers all traffic, not scooters alone, and most of the studies were done in Europe and North America.',
+        en: 'This is a link; the review did not decide whether exhaust is the reason. It covers all traffic, not scooters alone, and most of the studies were done in Europe and North America.',
       },
       /** Printed with the pins that ship: what the three routes do and do not say. */
       routes: {
@@ -290,7 +290,7 @@ export default copy({
       },
       care: {
         'zh-TW': '這是一整天的平均，用美國的資料算的，不是在路口量的。它說的是小孩照體重吸得比較多，不是小孩那個高度的空氣比較髒。',
-        en: 'These are whole-day averages from US data, not measured at a junction. They say children take in more air for their weight, not that the air at a child’s height is dirtier.',
+        en: 'These are whole-day averages from US data, not readings taken at a junction. They say children take in more air for their weight, not that the air at a child’s height is dirtier.',
       },
     },
     next: { 'zh-TW': '那騎車的人呢？', en: 'And the rider?' },
@@ -356,7 +356,7 @@ export default copy({
         { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
       ],
       who: {
-        'zh-TW': '美國職業安全衛生研究所說明：N95 這類口罩只過濾微粒，擋不住一氧化碳這類氣體，也擋不住汽油的蒸氣。醫用口罩和布口罩，一樣沒有吸附氣體的材料。',
+        'zh-TW': '美國職業安全衛生研究所說明：一氧化碳這類氣體和汽油的蒸氣，連 N95 都擋不住，它只過濾微粒。醫用口罩和布口罩，一樣沒有吸附氣體的材料。',
         en: 'The US occupational-safety institute, NIOSH, states that N95-type respirators filter particles only: they do not stop gases such as carbon monoxide, or petrol vapour. Surgical and cloth masks have no gas-absorbing layer either.',
       },
       cols: {
@@ -406,8 +406,8 @@ export default copy({
         en: 'The labour ministry’s institute tested {people} adults and gave each mask a protection score: {n95} for a headband N95, {medical} for an ordinary medical mask. The scores compare masks with each other; they are not percentages.',
       },
       care: {
-        'zh-TW': '口罩不是沒用：防感冒、流感有用，戴得貼合的 N95 也能少吸一些微粒。只是日常戴的口罩，都擋不住廢氣裡的氣體。',
-        en: 'Masks are not useless: they help against colds and flu, and an N95 that fits cuts the particles you breathe. But no everyday mask stops the gases in exhaust.',
+        'zh-TW': '口罩防感冒、流感還是有用，戴得貼合的 N95 也能少吸一些微粒。只是日常戴的口罩，都擋不住廢氣裡的氣體。',
+        en: 'Masks still help against colds and flu, and an N95 that fits cuts the particles you breathe. But no everyday mask stops the gases in exhaust.',
       },
       more: { 'zh-TW': '口罩的完整說明', en: 'More about masks' },
     },
@@ -459,7 +459,7 @@ export default copy({
     },
     sheet: {
       used: {
-        'zh-TW': '環境部的機車定檢紀錄：一年大約 {readings} 萬筆怠速的一氧化碳讀數。',
+        'zh-TW': '環境部的機車定檢紀錄：一年大約 {readings} 萬筆一氧化碳讀數。',
         en: 'The environment ministry’s scooter inspection records: about {readings} million idle carbon monoxide readings a year.',
       },
       how: {
@@ -484,8 +484,8 @@ export default copy({
     /** In front of the big figure: 電動機車 少付 2,120 元 / The electric scooter costs NT$2,120 less. */
     figWho: { 'zh-TW': '電動機車', en: 'The electric scooter costs' },
     scrap: { 'zh-TW': '有沒有滿 10 年的機車可以報廢？', en: 'A scooter ten or more years old to scrap?' },
-    scrapYes: { 'zh-TW': '有機車可報廢', en: 'One to scrap' },
-    scrapYesSub: { 'zh-TW': '出廠滿 10 年', en: '10 or more years old' },
+    scrapYes: { 'zh-TW': '可報廢', en: 'One to scrap' },
+    scrapYesSub: { 'zh-TW': '有滿 10 年的機車', en: '10 or more years old' },
     scrapNo: { 'zh-TW': '沒有', en: 'Nothing' },
     scrapNoSub: { 'zh-TW': '可報廢的機車', en: 'to scrap' },
     /** Without scripting the page shows the default case only. */
@@ -572,37 +572,6 @@ export default copy({
       care: {
         'zh-TW': '這是示意圖，不是預測：要每一輛都換，才是圖上的樣子。發電也有排放，只是不在路口。',
         en: 'This is an illustration, not a forecast: it looks like this only when every scooter has switched. Generating the electricity has emissions too, but not at the junction.',
-      },
-    },
-  },
-
-  // ───────────────────────────────────────────────────────────────────────────────────────────
-  // Kept only so the old film page (src/components/pages/film/Film.astro) still builds until the
-  // film lane's port replaces it; the new home page reads none of these. Delete with that import.
-  /** @deprecated read by the old film page only */
-  prologue: {
-    kicker: { 'zh-TW': '那個味道，你也聞過。', en: 'You know that smell.' },
-    title: { 'zh-TW': '一個紅燈，|90 秒', en: 'One red light. |Ninety seconds.' },
-    disclosure: {
-      'zh-TW': '畫面是示意圖，廢氣其實大多看不見；它不會隨著倒數變多。90 秒是常見的紅燈長度。',
-      en: 'The picture is an illustration: real exhaust is mostly invisible, and it does not grow as the clock runs. Ninety seconds is a common length for a red light.',
-    },
-  },
-  /** @deprecated read by the old film page only */
-  connect: {
-    question: { 'zh-TW': '所以，這 90 秒裡，站在旁邊的人吸進了什麼？', en: 'So what did the person standing beside it breathe in these ninety seconds?' },
-  },
-  /** @deprecated read by the old film page only */
-  link6: {
-    handoff: { 'zh-TW': '剩 5 秒。', en: 'Five seconds.' },
-  },
-  /** @deprecated read by the old film page only */
-  link3: {
-    figure: {
-      chart: { 'zh-TW': '紅燈倒數期間，路口行人高度的三種污染物', en: 'Three pollutants at pedestrian height through the red-light countdown' },
-      desc: {
-        'zh-TW': '三個面板分別是一氧化碳、苯和超細微粒，橫軸是紅燈倒數 90 到 0 秒，接著是綠燈。',
-        en: 'Three panels for carbon monoxide, benzene and ultrafine particles; the x axis is the red-light countdown from 90 to 0 seconds, then green.',
       },
     },
   },

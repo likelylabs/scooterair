@@ -75,7 +75,7 @@ if (raw) {
 
   function draw(c: V.HomeChoice) {
     // 13 · the day you buy
-    setHtml('#s-13-h', V.phrasedHtml(V.buyHead(P, table, c)));
+    setHtml('#s-13-h', V.phrasedHtml(V.headlineMarks(V.buyHead(P, table, c), D.locale)));
     setHtml('[data-hm-fig]', V.figureHtml(P, table, c));
     const price = $('#hm-price');
     if (price) updateHtmlChart(price, renderPriceBars(V.priceBarsProps(P, table, c)));
@@ -83,7 +83,7 @@ if (raw) {
     setText('[data-hm-strip]', V.stripOf(P, table, c));
     setHtml('[data-hm-lines]', V.buyLinesHtml(P, table, c));
     // 14 · each month
-    setHtml('#s-14-h', V.phrasedHtml(V.monthHead(P, table, c.km)));
+    setHtml('#s-14-h', V.phrasedHtml(V.headlineMarks(V.monthHead(P, table, c.km), D.locale)));
     const month = $('#hm-month');
     if (month) {
       updateHtmlChart(month, renderMonthlyBars(V.monthlyBarsProps(P, table, c.km)));

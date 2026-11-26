@@ -1,45 +1,38 @@
 ---
 /**
- * /90/ — the film (blueprint 4.7, V45; wave 2). One red light against a real countdown.
+ * /90/ — the film (redesign brief, section 8). Menu name 短片 / Film. The address stays /90/
+ * because it has been shared.
  *
- * Copy: src/i18n/pages/film.ts (what the film adds) and chain.summary in ui.ts (the seven lines).
- * The sequence: src/components/pages/film/timeline.ts. The player and the still presentation:
- * src/components/pages/film/Film.astro.
- *
- * Its share card is rendered by src/components/pages/film/build-film-card.mjs (the site's own
- * generator, pointed at this card) into public/share/{zh,en}/film.png and film-sq.png.
+ * Copy: src/i18n/pages/film.ts. The clock: src/components/pages/film/timeline.ts. The picture:
+ * scene.ts. The page (player, stills, transcript, sheets): Film.astro.
+ * Its share card is lane J's (`share="film"`: src/lib/share-cards.ts). The vertical MP4 is
+ * rendered from this same page by scripts/film-export.mjs into public/film/.
  */
 import Base from '@/layouts/Base.astro';
 import Film from '@/components/pages/film/Film.astro';
-import { asset, localeFromParam, localeStaticPaths } from '@/i18n';
+import { localeFromParam, localeStaticPaths } from '@/i18n';
 import { localize } from '@/i18n/pages/_copy';
 import film from '@/i18n/pages/film';
-import { filmCard } from '@/components/pages/film/card';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(film, locale);
-const card = filmCard(locale);
-const abs = (p: string) => new URL(asset(p), Astro.site).href;
 ---
 
-<Base locale={locale} title={t.meta.title} description={t.meta.description} ogImage={card.wide}>
+<Base locale={locale} title={t.meta.title} description={t.meta.description} share="film">
   <Fragment slot="head">
-    {/* Base prints the wide image; these complete it: its alt text, then the square for LINE. */}
-    <meta property="og:image:alt" content={card.alt} />
-    <meta property="og:image" content={abs(card.square)} />
-    <meta property="og:image:width" content="1080" />
-    <meta property="og:image:height" content="1080" />
-    <meta property="og:image:alt" content={card.alt} />
-    <meta name="twitter:image:alt" content={card.alt} />
     <script is:inline>
-      // Before first paint: lay the film out as a stage unless the reader asked for less motion.
-      // If the player script never arrives, fall back to the frames laid out in order.
+      // Before first paint: lay the film out as a stage, unless the reader asked for less motion
+      // (the system setting, or the 動畫 switch in the menu). If the player script never arrives,
+      // fall back to the frames laid out in order.
       (function () {
         var d = document.documentElement;
         try {
-          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          var m = d.getAttribute('data-motion');
+          var exporting = /[?&]export\b/.test(location.search);
+          if (!exporting && (m === 'off' || (m !== 'on' && window.matchMedia('(prefers-reduced-motion: reduce)').matches))) return;
           d.classList.add('film-live');
+          if (exporting) d.classList.add('film-export');
           setTimeout(function () {
             if (!d.hasAttribute('data-film-ready')) d.classList.remove('film-live');
           }, 8000);

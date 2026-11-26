@@ -1,895 +1,1591 @@
 ---
 /**
- * Film — /90/ (blueprint 4.7, V45). One red light, played against a real countdown.
+ * Film — /90/ (redesign brief, section 8 and amendment 12.2): one red light as an animation.
  *
- * It is a page, not a video file: the six scene frames the home page uses (<StreetScene> with
- * `frame` and `count`), the empty chart, a card for the pause and an end card, sequenced by
- * ./timeline.ts and driven by ./film.client.ts.
+ * It is a page, not a video file: one continuous scene (./scene.ts) driven by one clock
+ * (./timeline.ts), drawn with the site's own drawing kit and its one rule for air
+ * (src/components/art/parts.ts, air.ts), so the film and the home page share one picture
+ * grammar. Its words are src/i18n/pages/film.ts; its numbers are the estimate slots and the
+ * money module, joined in ./film-data.ts. A stand-in digit cannot ship: a missing slot, a
+ * caption that outgrows its time on screen, a pack that is not scn.dozen.drawn scooters, or a
+ * NaN in a still, stops the build here.
  *
  * ONE DOCUMENT, TWO PRESENTATIONS
- *   The markup is an ordered list of beats: each one a frame (drawn once, where it first
- *   appears) and its caption. With JavaScript off, or with reduced motion on, that list is what
- *   the reader sees: the frames in order with their captions. Otherwise <html> gets
- *   .film-live before first paint (the inline script in 90.astro) and the same list is stacked into a
- *   stage with a clock, a play button and a scrubber. Nothing plays until the reader asks.
+ *   With JavaScript off, with reduced motion, or in print, the reader sees the film laid out
+ *   as stills with their captions, then the transcript. Otherwise <html> gets .film-live before
+ *   first paint (the inline script in 90.astro) and the stage takes their place: a poster with a
+ *   Play button, captions, a scrubber. Nothing plays until the reader asks.
  *
- * RULES KEPT HERE
- *   - The label 示意圖｜多濃沒人量過 is inside every frame (a strip under the picture, with a
- *     swatch of the hatching as its key: it is a legend, never a band of its own).
- *   - Frames cut; nothing cross-fades, so the hatched band is never drawn at a second density.
- *   - The long-term health line sits on a card with no scene in it.
- *   - The captions are chain.summary; no line of the chain is retyped here.
+ * The same page is what scripts/film-export.mjs photographs, frame by frame, for the MP4.
  *
  * Props
  *   locale  Locale
  */
-import type { Locale } from '@/i18n';
-import { href } from '@/i18n';
-import { chain, emptyData, rail, site, t as fill, type EvidenceKind } from '@/i18n/ui';
-import { localize } from '@/i18n/pages/_copy';
+import '@/styles/art.css';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { asset, href, type Locale } from '@/i18n';
+import { localize, fill } from '@/i18n/pages/_copy';
 import filmCopy from '@/i18n/pages/film';
-import homeCopy from '@/i18n/pages/home';
-import StreetScene from '@/components/art/StreetScene.astro';
-import EmptyChart from '@/components/charts/EmptyChart.astro';
-import Button from '@/components/ui/Button.astro';
-import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
-import Phrased from '@/components/ui/Phrased.astro';
-import { ledDigit } from '@/components/art/parts';
-import LedTable from './LedTable.astro';
-import { BEATS, DURATION, FRAME_ORDER, STARTS, checkTimeline, clockTime, type Beat, type FrameId } from './timeline';
+import { chipWhere, illustration, kSentences, site } from '@/i18n/ui';
+import { est, estimateText } from '@/data/estimate';
+import { fact } from '@/data';
+import { AIR_EXTRA } from '@/components/art/air-slots';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import HowButton from '@/components/ui/HowButton.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import IllustrationTag from '@/components/ui/IllustrationTag.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import { createFilm, SVG_LAYERS } from './scene';
+import { hudHTML } from './hud';
+import { signGlyphs } from './glyphs';
+import { BEATS, DURATION, DURATION_MINUTES, POSTER_T, beatAt, clock, cueAt, type CueId } from './timeline';
+import { filmData, filmLengthLabel, filmPeriods } from './film-data';
 
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
 const t = localize(filmCopy, locale);
-const home = localize(homeCopy, locale);
-checkTimeline(chain.countdown);
+const en = locale === 'en';
+const d = filmData(locale);
+const asChecked = filmData(locale, { asChecked: true });
+const periods = filmPeriods(locale);
+const text = { ...d.text, panel: { ...d.text.panel, howHref: href(d.text.panel.howHref, locale) } };
+const glyphs = await signGlyphs();
+const drawn = est.scn.dozen.drawn;
+const make = (id: string, withGlyphs = false) => createFilm({ locale, aspect: 4 / 3, px: 360, id, text, extra: AIR_EXTRA, drawn, glyphs: withGlyphs ? glyphs : undefined });
+const shared = make('s', true);
+const captionOf = (id: CueId) => d.captions.find((c) => c.id === id)!;
 
-const plain = (s: string) => s.replaceAll('|', '');
-const line = (n: number) => chain.summary[n - 1];
-const linkName = (n: number) => (n === chain.links.length ? chain.breakable[locale] : chain.links[n - 1][locale]);
-const clockLabel = (b: Beat, count: number) =>
-  b.phase === 'paused' ? chain.kickerPaused[locale] : b.phase === 'green' ? chain.kickerGreen[locale] : fill(b.id === 'l7' && count === b.count[0] ? chain.kickerReset : chain.kickerRed, locale, { n: count });
-
-/** What each beat says. The seven lines come from chain.summary; the rest from home.ts and ui.ts. */
-const say: Record<string, { kicker: string; line: string; then?: string; badges?: EvidenceKind[] }> = {
-  title: { kicker: home.prologue.kicker, line: plain(home.prologue.title) },
-  ask: { kicker: t.beats.ask, line: t.beats.askLine },
-  open: { kicker: t.beats.open, line: home.connect.question, badges: ['gap'] },
-  five: { kicker: t.beats.five, line: home.link6.handoff },
-  green: { kicker: rail.green[locale], line: t.beats.green },
-};
-const beats = BEATS.map((b, i) => {
-  const s = b.link
-    ? { kicker: `${fill(chain.linkN, locale, { n: b.link })} · ${b.link === 7 ? t.beats.replay : linkName(b.link)}`, line: line(b.link).text[locale], then: b.cue ? emptyData.caption[locale] : undefined, badges: line(b.link).badges }
-    : say[b.id];
-  const frameN = FRAME_ORDER.indexOf(b.frame) + 1;
+// ---- stills: the film laid out frame by frame --------------------------------------------
+const stillTimes = BEATS.flatMap((b) => b.stills.map((time) => ({ time, beat: b })));
+const stills = stillTimes.map(({ time, beat }, i) => {
+  const f = make(`s${i}`);
+  const r = f.renderStatic(time);
+  const hud = f.hud(time);
+  const all = Object.values(r).join('');
+  if (/NaN|undefined/.test(all)) throw new Error(`film: the still at ${time} s has a broken value (${all.match(/.{40}(?:NaN|undefined).{20}/)?.[0]})`);
+  const cue = captionOf(cueAt(time).id);
+  const line = cue.main + (cue.note ? (en ? ' ' : '') + (en ? `(${cue.note})` : `（${cue.note}）`) : '');
+  const scene = hud.tag !== 'none';
   return {
-    ...b,
-    ...s,
-    badges: s.badges ?? [],
-    start: STARTS[i],
-    time: clockTime(STARTS[i]),
-    clock: clockLabel(b, b.count[0]),
-    frameN,
-    /** true where this beat is the first to use its frame: the frame is drawn here. */
-    draws: BEATS.findIndex((x) => x.frame === b.frame) === i,
+    n: i + 1,
+    time,
+    beat,
+    r,
+    hud: hudHTML(text, hud, { link: false }),
+    tag: hud.tag,
+    cue,
+    scene,
+    alt: fill(t.still.alt, { n: i + 1, line }) + (scene ? (en ? ' ' : '') + (hud.tag === 'body' ? illustration.body[locale] : illustration.altNote[locale]) : ''),
   };
 });
 
-const min = Math.floor(DURATION / 60);
-const sec = DURATION % 60;
-const length = fill(filmCopy.player.length, locale, { min, sec });
-const lengthNote = fill(filmCopy.notes.length, locale, { min, sec });
-const total = clockTime(DURATION);
+// ---- the MP4, when it has been exported (scripts/film-export.mjs writes the manifest) ------
+type Manifest = { files?: Record<string, { file: string; bytes: number }> };
+const manifestPath = join(process.cwd(), 'public/film/manifest.json');
+const manifest: Manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
+const mp4 = manifest.files?.[locale];
+const mp4Href = mp4 && existsSync(join(process.cwd(), 'public/film', mp4.file)) ? asset(`/film/${mp4.file}`) : null;
+const mp4Size = mp4 ? (mp4.bytes / 1e6).toFixed(1) : '';
 
-/** Strings and templates the player needs at run time. */
-const text = {
-  play: t.player.play,
-  pause: t.player.pause,
-  restart: t.player.restart,
-  ended: t.player.ended,
-  position: t.player.position,
-  red: chain.kickerRed[locale],
-  reset: chain.kickerReset[locale],
-  paused: chain.kickerPaused[locale],
-  green: chain.kickerGreen[locale],
-  total,
+const pageUrl = new URL(href('/90/', locale), Astro.site).href;
+const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(fill(t.player.lineText, { min: DURATION_MINUTES }))}`;
+
+// ---- transcript: every cue, what the picture adds to it, and what it rests on --------------
+type Ref = { chip?: { fact?: string; kind?: string; where?: string }; href?: string; sheet?: string; estimate?: boolean };
+const dr = t.transcript.drawn;
+const m = d.money.money;
+const tagLine = (g: (typeof m.tags)[number]) => fill(dr.tag, { where: g.where, plate: g.plate, sum: [g.before, g.amount, g.after].filter(Boolean).join(' ') });
+const extra: Partial<Record<CueId, string[]>> = {
+  arrive: [fill(dr.pack, { scenario: d.slots.scenario, n: d.slots.drawn })],
+  howMuch: [fill(dr.street, { label: text.panel.street, value: text.panel.streetValue })],
+  under: [fill(dr.ruler, { lo: d.slots.band.lo, hi: d.slots.band.hi })],
+  thins: [dr.burst, kSentences.K6[locale]],
+  electric: [fill(dr.zero, { label: text.panel.addedElectric, value: text.panel.zero })],
+  tags: [...m.tags.map(tagLine), m.chip],
+  monthly: [m.perMonth, ...m.bars.map((b) => fill(dr.bar, { label: b.label, value: b.value }))],
+};
+const refs: Partial<Record<CueId, Ref>> = {
+  smell: { chip: { fact: 'iot-pedestrian-wait' }, href: '/estimate/#count' },
+  arrive: { chip: { kind: 'estimate' }, href: '/estimate/#count' },
+  knee: { chip: { fact: 'iot-exhaust-height-assumption' }, href: '/evidence/#link-2' },
+  howMuch: { estimate: true, chip: { fact: 'moenv-co-stations-2025' }, sheet: 'how-film-estimate' },
+  co: { chip: { fact: 'co-odourless' }, href: '/evidence/#link-4' },
+  fuel: { chip: { fact: 'iarc-benzene-group1' }, href: '/evidence/#link-4' },
+  specks: { chip: { fact: 'route-particles-deep-lung' }, href: '/evidence/#link-4' },
+  mask: { chip: { fact: 'mask-niosh-no-gas' }, href: '/questions/mask/' },
+  under: { chip: { fact: 'iot-exhaust-height-assumption' }, sheet: 'how-film-heights' },
+  child: { chip: { fact: 'child-air-per-kg' }, sheet: 'how-film-heights' },
+  rider: { chip: { fact: 'commute-scooter-vs-subway-chuang2020' }, href: '/questions/rider/' },
+  daily: { chip: { kind: 'derived' }, href: '/questions/one-red-light/' },
+  years: { chip: { kind: 'study', where: chipWhere.longTermAllTraffic[locale] }, sheet: 'how-film-health' },
+  linked: { chip: { kind: 'study', where: chipWhere.longTermAllTraffic[locale] }, sheet: 'how-film-health' },
+  thins: { href: '/estimate/#answers' },
+  noLayer: { href: '/evidence/#link-7' },
+  tags: { chip: { kind: 'derived' }, href: '/electric/' },
+  monthly: { chip: { kind: 'derived' }, href: '/electric/' },
+};
+const rows = d.captions.map((c, i) => ({ ...c, beat: beatAt(c.t), head: i === 0 || beatAt(c.t) !== beatAt(d.captions[i - 1].t), extra: extra[c.id] ?? [], ref: refs[c.id] }));
+
+// ---- sheets --------------------------------------------------------------------------------
+const hei = fact('hei-sr23-trap-associations');
+const heightFact = fact('iot-exhaust-height-assumption');
+const datum = (f: { data?: Record<string, { value: number } | number> }, key: string): number => {
+  const v = f.data?.[key];
+  const n = typeof v === 'number' ? v : v?.value;
+  if (typeof n !== 'number' || !Number.isFinite(n)) throw new Error(`film: the registry fact has no data "${key}"`);
+  return n;
+};
+const sheet = {
+  estimate: {
+    title: fill(t.sheets.estimate.title, { range: d.slots.coAdded }),
+    measured: fill(t.sheets.estimate.measured, { street: d.slots.coStreet, peaks: est.meas.iot.co.peaks.join(en ? ', ' : '、') }),
+  },
+  heights: fill(t.sheets.heights.what, { pipe: Math.round(datum(heightFact, 'exhaustHeight') * 100), lo: d.slots.band.lo, hi: d.slots.band.hi, airLo: est.child.airPerKg.lo, airHi: est.child.airPerKg.hi }),
+  health: {
+    who: fill(t.sheets.health.who, { n: datum(hei, 'studies') }),
+    care: fill(t.sheets.health.care, { k5: kSentences.K5[locale] }),
+  },
 };
 
-const digits = '0123456789'.split('');
-type SceneProps = { frame: 'empty' | 'pack' | 'kerb' | 'paused' | 'green' | 'clean'; count?: number; emphasis?: 'heights' | 'fumes'; labels?: boolean };
-/** The StreetScene behind each frame id. `count` is the count at which the frame first appears. */
-const scene = (f: FrameId, count: number): SceneProps | undefined =>
-  f === 'empty' || f === 'pack' || f === 'clean'
-    ? { frame: f, count }
-    : f === 'heights' || f === 'fumes'
-      ? { frame: 'kerb', emphasis: f }
-      : f === 'paused'
-        ? { frame: 'paused', count, labels: false } // K3 without its "countdown paused" chip: here the clock is still running
-        : f === 'green'
-          ? { frame: 'green' }
-          : undefined;
+const pageData = {
+  text,
+  captions: d.captions,
+  periods: periods.map((p) => ({ from: p.from, money: p.part.money, cues: p.part.cues })),
+  asChecked: { money: asChecked.money.money, cues: asChecked.money.cues },
+  extra: AIR_EXTRA,
+  drawn,
+  ui: { play: t.player.play, pause: t.player.pause, position: t.player.position },
+};
+const label = `${t.player.kicker}${en ? ': ' : '：'}${t.player.title}`;
+const VB = `0 0 ${shared.VW} ${shared.VH}`;
 ---
 
-<section class="film" data-film data-text={JSON.stringify(text)} aria-labelledby="film-title">
-  <header class="container film__head">
-    <p class="eyebrow">{t.head.kicker}</p>
-    <h1 id="film-title" class="film__title">{t.head.title}</h1>
-    <p class="film__deck">{t.head.deck}</p>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs set:html={shared.defs()} /></svg>
+
+<section class="film" data-film data-locale={locale} aria-label={label}>
+  <header class="film__head">
+    <p class="film__kicker">{t.player.kicker}</p>
+    <h1 class="film__h1">{t.player.title}</h1>
+    <p class="film__deck">{filmLengthLabel(locale)}</p>
   </header>
 
-  <div class="film__wrap">
-    <p class="film__still-note">
-      <span>{t.still.note}</span>
-      <button type="button" class="film__optin" data-film-optin hidden>{t.still.optIn}</button>
-    </p>
-
-    {/* Read before the picture; shown under the stage while it is a player. */}
-    <aside class="film__notes" aria-labelledby="film-notes">
-      <p id="film-notes" class="film__notes-label">{t.notes.title}</p>
-      <p>{home.prologue.disclosure}</p>
-      <p>{lengthNote}</p>
-      <p>{t.notes.cuts}</p>
-      <p class="film__keys">{t.player.keys}</p>
-    </aside>
-
-    <div class="film__stage" role="group" aria-label={t.player.label} data-film-stage>
-      <div class="film__inner">
-        <!-- the clock: the signal's own countdown, large. Not a live region. -->
-        <div class="film__bar">
-          <span class="film__led" data-film-led data-phase="red" aria-hidden="true">
-            <svg viewBox="0 0 26 18" focusable="false">
-              {[0, 1].map((pos) => (
-                <g data-led={pos}>
-                  <path class="film__dash" d={`M${3 + pos * 12},9h6`} />
-                  {digits.map((d) => <path class="film__digit" d={ledDigit(d, 2, 0.8, 2 + pos * 12, 3)} data-d={d} data-on={'90'[pos] === d ? '' : undefined} />)}
-                </g>
-              ))}
-            </svg>
-          </span>
-          <span class="film__clock" data-film-clock>{beats[0].clock}</span>
-          <span class="film__time"><span data-film-time>0:00</span><span class="film__total">{` / ${total}`}</span></span>
+  <div class="film__stage" data-stage role="group" aria-label={label}>
+    <div class="film__pic" data-pic data-tag="street">
+      {SVG_LAYERS.map((k) => <svg class="film__layer" data-layer={k} aria-hidden="true" focusable="false"></svg>)}
+      <div class="film__over" data-over aria-hidden="true"></div>
+      <div class="hud" data-hud></div>
+      <IllustrationTag locale={locale} overlay class="film__tag film__tag--street" />
+      <IllustrationTag locale={locale} kind="body" overlay class="film__tag film__tag--body" />
+      <div class="film__poster" data-poster>
+        <p class="film__kicker">{t.player.kicker}</p>
+        <p class="film__title" aria-hidden="true">{t.player.title}</p>
+        <button type="button" class="film__big" data-film-big><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z"></path></svg>{t.player.play}</button>
+        <p class="film__len">{filmLengthLabel(locale)}</p>
+      </div>
+      <div class="film__end" data-end>
+        <p class="film__end-title">{t.end.title}</p>
+        <a class="film__cta film__cta--primary" href={href('/electric/', locale)}>{t.end.calc} →</a>
+        <div class="film__end-grid">
+          <button type="button" class="film__cta" data-film-again>{t.end.again}</button>
+          <a class="film__cta" href={lineHref} target="_blank" rel="noopener">{t.player.line}</a>
+          <a class="film__cta" href={href('/evidence/', locale)}>{t.end.evidence}</a>
+          {mp4Href && <a class="film__cta" href={mp4Href} download>{t.player.download}</a>}
         </div>
-
-        <ol class="film__beats">
-          {beats.map((b, i) => (
-            <li class="beat" data-beat={b.id} data-i={i}>
-              {b.draws && (
-                <div class:list={['beat__frame', `beat__frame--${b.frame}`]} data-frame-el={b.frame} data-count={scene(b.frame, b.count[0])?.count} data-on={i === 0 ? '' : undefined}>
-                  <div class="frame__pic">
-                    {scene(b.frame, b.count[0]) && <StreetScene locale={locale} {...scene(b.frame, b.count[0])!} />}
-                    {b.frame === 'chart' && (
-                      <Fragment>
-                        <EmptyChart locale={locale} title={home.link3.figure.chart} desc={home.link3.figure.desc} panelHeight={18} seriesLabel="" class="film-chart film-chart--s" />
-                        <EmptyChart locale={locale} title={home.link3.figure.chart} desc={home.link3.figure.desc} panelHeight={44} class="film-chart film-chart--l" />
-                      </Fragment>
-                    )}
-                    {b.frame === 'card' && (
-                      <div class="film-card">
-                        <svg class="film-card__pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="3" y="2.5" width="3.6" height="11" /><rect x="9.4" y="2.5" width="3.6" height="11" /></svg>
-                        <p class="film-card__title"><Phrased text={t.card.title} /></p>
-                        <p class="film-card__body">{t.card.body}</p>
-                      </div>
-                    )}
-                  </div>
-                  <p class="frame__slate"><span class="frame__swatch" aria-hidden="true"></span><span>{t.slate}</span></p>
-                </div>
-              )}
-              <div class:list={['beat__cap', b.frame === 'chart' && 'beat__cap--chart']} data-cap data-on={i === 0 ? '' : undefined}>
-                <p class="beat__when">
-                  <span class="beat__n">{fill(filmCopy.still.frameN, locale, { n: i + 1 })}</span>
-                  <span>{b.time}</span>
-                  <span>{b.clock}</span>
-                  {!b.draws && <span class="beat__same">{fill(filmCopy.still.sameFrame, locale, { n: beats.findIndex((x) => x.frame === b.frame) + 1 })}</span>}
-                </p>
-                <p class="beat__kicker">{b.kicker}</p>
-                <p class="beat__line">{b.line}</p>
-                {b.then && <p class="beat__line beat__line--then" data-cue={b.cue}>{b.then}</p>}
-                {b.badges.length > 0 && <p class="beat__badges">{b.badges.map((k) => <EvidenceBadge locale={locale} kind={k} />)}</p>}
-                {b.link === 7 && <p class="beat__nobadge">{chain.noBadge[locale]}</p>}
-              </div>
-            </li>
-          ))}
-          <li class="beat beat--end" data-beat="end">
-            <div class="beat__end" data-end>
-              <p class="eyebrow">{t.end.kicker}</p>
-              <p class="beat__sentence">{t.end.sentence}</p>
-              <p class="beat__site">{site.name[locale]}</p>
-              <p class="beat__choose">{t.end.choose}</p>
-              <div class="beat__choices">
-                <Button href={href('/', locale)} variant="secondary" size="lg" arrow>{t.end.evidence}</Button>
-                <Button href={href('/electric/#calc', locale)} variant="secondary" size="lg" arrow>{t.end.money}</Button>
-              </div>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="film__big" data-film-big>
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" /></svg>
-          <span class="film__big-label">{t.player.play}</span>
-          <span class="film__big-len">{length}</span>
-        </button>
-
-        <div class="film__controls">
-          <button type="button" class="film__btn" data-film-toggle aria-label={t.player.play}>
-            <svg class="film__ico film__ico--play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" /></svg>
-            <svg class="film__ico film__ico--pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z" /></svg>
-          </button>
-          <button type="button" class="film__btn" data-film-restart aria-label={t.player.restart}>
-            <svg class="film__ico film__ico--line" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12a7 7 0 1 0 2.2-5.1M4.5 4.5v4h4" /></svg>
-          </button>
-          <input class="film__seek" type="range" min="0" max={DURATION} step="1" value="0" aria-label={t.player.seek} data-film-seek />
-        </div>
-        <p class="vh" aria-live="polite" data-film-say></p>
-        <LedTable counts={beats.filter((b) => b.draws && scene(b.frame, b.count[0])?.count !== undefined).map((b) => b.count[0])}>
-          {(n: number) => <StreetScene locale={locale} frame="empty" count={n} labels={false} />}
-        </LedTable>
+        <a class="film__cta film__cta--quiet" href={href('/estimate/#measure', locale)}>{t.end.measure}</a>
       </div>
     </div>
+    <div class="film__caption" aria-hidden="true"><div data-capbox><p class="cap__main" data-cap data-headline-dynamic></p><p class="cap__note" data-note></p></div><p class="film__mark"><b>{site.name[locale]}</b><span>{label}</span></p></div>
+    <div class="film__controls">
+      <button type="button" class="film__btn" data-film-toggle aria-label={t.player.play}><svg class="ico--play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z"></path></svg><svg class="ico--pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z"></path></svg></button>
+      <button type="button" class="film__btn" data-film-restart aria-label={t.player.restart}><svg class="ico--line" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12a7 7 0 1 0 2.2-5.1M4.5 4.5v4h4"></path></svg></button>
+      <input class="film__seek" type="range" min="0" max={DURATION} step="0.1" value="0" aria-label={t.player.seek} data-film-seek />
+      <span class="film__time"><span data-film-time>0:00</span> / {clock(DURATION)}</span>
+      <button type="button" class="film__speed" data-film-speed aria-pressed="false" aria-label={`${t.player.speed.label}${en ? ': ' : '：'}${t.player.speed.slow}`}>{t.player.speed.slow}</button>
+    </div>
+    <p class="vh" aria-live="polite" data-film-say></p>
+  </div>
 
-    <div class="film__after">
-      <section class="film__transcript" aria-labelledby="film-transcript">
-        <h2 id="film-transcript" class="film__h2">{t.transcript.title}</h2>
-        <p class="film__transcript-intro">{t.transcript.intro}</p>
-        <ol class="film__lines">
-          {beats.map((b) => (
-            <li>
-              <button type="button" class="film__jump" data-film-jump={b.start} aria-label={fill(filmCopy.transcript.jump, locale, { time: b.time })}>{b.time}</button>
-              <div>
-                <p class="film__line-meta">{b.clock} · {b.kicker}</p>
-                {b.frame === 'card' && <p class="film__line-card">{plain(t.card.title)}{locale === 'en' ? ' ' : ''}{t.card.body}</p>}
-                <p class="film__line-text">{b.line}</p>
-                {b.then && <p class="film__line-text">{b.then}</p>}
+  <div class="film__under">
+    <p class="film__notes">{fill(t.player.notes, { red: d.slots.red })} <a class="film__inline" href={text.panel.howHref}>{t.player.how} →</a></p>
+    <p class="film__notes film__keys">{t.player.keys}</p>
+    <p class="film__share">
+      <a class="film__cta" href={lineHref} target="_blank" rel="noopener">{t.player.line}</a>
+      {mp4Href && <a class="film__cta" href={mp4Href} download>{t.player.download}</a>}
+      {mp4Href && <span class="film__share-note">{fill(t.player.downloadNote, { size: mp4Size })}</span>}
+    </p>
+    <p class="film__stills-note">{t.still.note} <button type="button" class="film__optin" data-film-optin hidden>{t.still.optIn}</button></p>
+    <ol class="film__stills">
+      {stills.map((s) => (
+        <li>
+          <figure class="still">
+            <div class="still__pic" data-tag={s.tag} role="img" aria-label={s.alt} data-scene={s.scene ? '' : undefined}>
+              {SVG_LAYERS.map((k) => s.r[k] && <svg class="film__layer" viewBox={VB} aria-hidden="true" focusable="false" set:html={s.r[k]} />)}
+              <div class="film__over" aria-hidden="true" set:html={s.r.over} />
+              <div class="hud" aria-hidden="true" set:html={s.hud} />
+              {s.tag === 'street' && <IllustrationTag locale={locale} overlay class="film__tag" />}
+              {s.tag === 'body' && <IllustrationTag locale={locale} kind="body" overlay class="film__tag" />}
+            </div>
+            <figcaption>
+              <p class="still__when">{fill(t.still.frameN, { n: s.n })} · {clock(s.time)} · {t.beats[s.beat.id]}</p>
+              <p class="still__line">{s.cue.main}</p>
+              {s.cue.note && <p class="still__note">{s.cue.note}{s.cue.chip && <Fragment> <KindChip locale={locale} kind={s.cue.chip.kind} size="sm" /></Fragment>}</p>}
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ol>
+
+    <section class="film__transcript" aria-labelledby="film-transcript" data-transcript id="transcript">
+      <h2 id="film-transcript">{t.transcript.title}</h2>
+      <p class="film__notes">{t.transcript.intro}</p>
+      <ol class="film__lines">
+        {rows.map((c) => (
+          <Fragment>
+            {c.head && <li class="film__lines-head"><h3>{t.beats[c.beat.id]}</h3></li>}
+            <li data-line={c.id}>
+              <button type="button" class="film__jump" data-film-jump={c.t} aria-label={fill(t.transcript.jump, { time: clock(c.t) })}>{clock(c.t)}</button>
+              <div class="film__line">
+                <p class="film__line-text">{c.main}</p>
+                {c.note && <p class="film__line-note">{c.note}</p>}
+                {c.extra.map((x) => <p class="film__line-note">{x}</p>)}
+                {c.ref && (
+                  <p class="film__line-source">
+                    {c.ref.estimate && <EstimateValue locale={locale} slotId="co.dozen.add" label={text.panel.added} sheet={c.ref.sheet} />}
+                    {c.ref.chip && (c.ref.chip.fact ? <KindChip locale={locale} of={fact(c.ref.chip.fact)} /> : <KindChip locale={locale} kind={c.ref.chip.kind} where={c.ref.chip.where} />)}
+                    {c.ref.sheet && !c.ref.estimate && <HowButton locale={locale} sheet={c.ref.sheet} />}
+                    {c.ref.href && <a class="film__source" href={href(c.ref.href, locale)}>{t.transcript.source} →</a>}
+                  </p>
+                )}
               </div>
             </li>
-          ))}
-          <li>
-            <button type="button" class="film__jump" data-film-jump={DURATION} aria-label={fill(filmCopy.transcript.jump, locale, { time: total })}>{total}</button>
-            <div>
-              <p class="film__line-meta">{t.player.ended}</p>
-              <p class="film__line-text">{t.end.sentence}</p>
-            </div>
-          </li>
-        </ol>
-      </section>
-    </div>
+          </Fragment>
+        ))}
+      </ol>
+    </section>
+
+    <HowSheet id="how-film-estimate" locale={locale} kind="estimate" title={sheet.estimate.title} pollutant="co" anchor="numbers" facts={['moenv-co-stations-2025']}>
+      <p slot="block1">{sheet.estimate.measured}</p>
+      <ol slot="block2" class="film__flow">{estimateText.flow.map((s) => <li>{s[locale]}</li>)}</ol>
+      <p slot="block3">{t.sheets.estimate.care} {est.meta.gloss[locale]}</p>
+    </HowSheet>
+    <HowSheet id="how-film-heights" locale={locale} kind="study" title={t.sheets.heights.title} facts={['iot-exhaust-height-assumption', 'child-air-per-kg']} primary={{ href: href('/evidence/#link-6', locale) }}>
+      <p slot="block1">{t.sheets.heights.who}</p>
+      <p slot="block2">{sheet.heights}</p>
+      <p slot="block3">{t.sheets.heights.care}</p>
+    </HowSheet>
+    <HowSheet id="how-film-health" locale={locale} kind="study" where={chipWhere.longTermAllTraffic[locale]} title={t.sheets.health.title} facts={['hei-sr23-trap-associations']} primary={{ href: href('/evidence/#link-5', locale) }}>
+      <p slot="block1">{sheet.health.who}</p>
+      <p slot="block2">{t.sheets.health.what}</p>
+      <p slot="block3">{sheet.health.care}</p>
+    </HowSheet>
   </div>
+
+  <script type="application/json" data-film-data set:html={JSON.stringify(pageData).replace(/</g, '\\u003c')} />
 </section>
-
-<style>
-  .film {
-    padding-block: clamp(1rem, 3vw, 2.5rem) var(--section-y);
-  }
-  .film__head {
-    display: grid;
-    gap: var(--sp-1);
-    margin-block-end: var(--sp-4);
-  }
-  .film__title {
-    font-size: var(--fs-2xl);
-    font-weight: var(--fw-black);
-    font-stretch: var(--display-stretch);
-    line-height: var(--lh-heading);
-  }
-  .film__deck {
-    color: var(--ink-2);
-    max-inline-size: var(--measure);
-  }
-  .film__wrap {
-    display: flex;
-    flex-direction: column;
-    inline-size: min(100%, 68rem);
-    margin-inline: auto;
-  }
-  .film__stage {
-    container: film / inline-size;
-  }
-  .film__inner {
-    position: relative;
-    /* On a phone the scenes are short and the empty chart is tall. The picture row is sized for
-       the scenes; the chart runs past it into the caption row, and its own (short) caption
-       starts lower by the difference. One stage height either way, so nothing shifts. */
-    --pic-h: 15rem;
-    --chart-h: 18rem;
-    --slate-h: 1.625rem;
-    --bar-h: 2.75rem;
-  }
-  @container film (min-width: 30rem) {
-    .film__inner {
-      --pic-h: 22rem;
-      --chart-h: 22rem;
-    }
-  }
-  @container film (min-width: 44rem) {
-    .film__inner {
-      --pic-h: 25rem;
-      --chart-h: 25rem;
-      --bar-h: 3.25rem;
-      --big-at: 0.45;
-    }
-  }
-
-  /* ---- shared pieces: the frame, its label, the caption ---- */
-  .film__beats {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .frame__pic :global(.film-chart) {
-    inline-size: 100%;
-    margin-inline: auto;
-    padding-inline: var(--sp-4);
-  }
-  .frame__pic :global(.film-chart--l),
-  .frame__pic :global(.chart__data) {
-    display: none;
-  }
-  @container film (min-width: 44rem) {
-    .frame__pic :global(.film-chart--s) {
-      display: none;
-    }
-    .frame__pic :global(.film-chart--l) {
-      display: block;
-    }
-  }
-  .frame__slate {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-    box-sizing: border-box;
-    min-block-size: var(--slate-h);
-    padding: 0 var(--sp-4);
-    white-space: nowrap;
-    overflow: hidden;
-    border-block: 1px solid var(--line-strong);
-    background: var(--bg-sunken);
-    color: var(--exhaust-ink);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    letter-spacing: 0.04em;
-    line-height: 1.3;
-  }
-  .frame__swatch {
-    flex: none;
-    inline-size: 1.75rem;
-    block-size: 0.8rem;
-    border: 1px solid var(--art-haze);
-    background: repeating-linear-gradient(-55deg, var(--art-haze) 0 1.5px, transparent 1.5px 5px);
-  }
-  .film-card {
-    display: grid;
-    gap: var(--sp-3);
-    justify-items: start;
-    align-content: center;
-    block-size: 100%;
-    padding: var(--sp-5) var(--sp-4);
-    background: var(--bg-sunken);
-  }
-  .film-card__pause {
-    inline-size: 2.5rem;
-    block-size: 2.5rem;
-    fill: var(--ink-2);
-  }
-  .film-card__title {
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-black);
-    line-height: var(--lh-heading);
-  }
-  .film-card__body {
-    max-inline-size: var(--measure);
-    color: var(--ink-2);
-  }
-  .beat__cap {
-    display: grid;
-    gap: 0.4rem;
-    align-content: start;
-    padding: var(--sp-2) var(--sp-4) var(--sp-3);
-  }
-  .beat__when {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--sp-3);
-    color: var(--ink-3);
-    font-size: var(--fs-xs);
-    font-variant-numeric: tabular-nums;
-  }
-  .beat__n {
-    font-weight: var(--fw-bold);
-    color: var(--ink-2);
-  }
-  .beat__kicker {
-    color: var(--ink-2);
-    line-height: 1.35;
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    letter-spacing: 0.04em;
-  }
-  .beat__line {
-    max-inline-size: 40em;
-    font-size: var(--fs-base);
-    font-weight: var(--fw-bold);
-    line-height: var(--lh-snug);
-    text-wrap: pretty;
-  }
-  .beat__line--then {
-    color: var(--exhaust-ink);
-    font-size: var(--fs-sm);
-  }
-  /* English runs longer: on a phone it steps down a size so the controls stay on screen */
-  .beat__line:lang(en) {
-    font-size: var(--fs-sm);
-  }
-  @container film (min-width: 30rem) {
-    .beat__line,
-    .beat__line:lang(en) {
-      font-size: var(--fs-md);
-    }
-    .beat__line--then,
-    .beat__line--then:lang(en) {
-      font-size: var(--fs-base);
-    }
-    .beat__cap {
-      gap: var(--sp-2);
-      padding-block: var(--sp-3) var(--sp-4);
-    }
-    :global(html.film-live) .beat__cap--chart {
-      padding-block-start: var(--sp-3);
-    }
-  }
-  .beat__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-2);
-  }
-  .beat__nobadge {
-    color: var(--ink-3);
-    font-size: var(--fs-xs);
-  }
-  .beat__end {
-    display: grid;
-    gap: var(--sp-3);
-    align-content: center;
-    justify-items: start;
-    padding: var(--sp-5) var(--sp-4);
-    background: var(--bg);
-  }
-  .beat__sentence {
-    max-inline-size: 22em;
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-black);
-    line-height: var(--lh-heading);
-    text-wrap: balance;
-  }
-  .beat__site {
-    color: var(--ink-2);
-    font-weight: var(--fw-bold);
-    letter-spacing: 0.04em;
-  }
-  .beat__choose {
-    margin-block-start: var(--sp-3);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-  }
-  /* two choices of equal weight: the same button, the same width */
-  .beat__choices {
-    display: grid;
-    gap: var(--sp-3);
-    inline-size: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-    grid-auto-rows: 1fr;
-    max-inline-size: 48rem;
-  }
-  .beat__choices :global(.btn) {
-    inline-size: 100%;
-  }
-
-  /* ---- the still presentation (default): the frames in order with their captions ---- */
-  .film__bar,
-  .film__big,
-  .film__controls,
-  .film__transcript,
-  .film__keys {
-    display: none;
-  }
-  .film__still-note {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--sp-2) var(--sp-4);
-    margin: 0 var(--gutter) var(--sp-5);
-    color: var(--ink-2);
-    font-size: var(--fs-sm);
-  }
-  .film__optin {
-    min-block-size: var(--tap);
-    padding: 0.4em 1em;
-    border: 2px solid var(--ink);
-    border-radius: var(--radius-2);
-    background: none;
-    color: var(--ink);
-    font: inherit;
-    font-weight: var(--fw-bold);
-    cursor: pointer;
-  }
-  .film__optin[hidden] {
-    display: none;
-  }
-  .beat {
-    border-block-start: var(--rule-paint) solid var(--ink);
-    margin-block-end: var(--sp-6);
-  }
-  .beat__frame {
-    border-block-end: 1px solid var(--line);
-  }
-  .film__after {
-    margin: var(--sp-7) var(--gutter) 0;
-  }
-  .film__notes {
-    display: grid;
-    gap: var(--sp-2);
-    max-inline-size: 46rem;
-    margin: 0 var(--gutter) var(--sp-6);
-    padding: var(--sp-3) var(--sp-4);
-    border-inline-start: var(--rule-paint) solid var(--ink);
-    background: var(--bg-sunken);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-  }
-  .film__notes-label {
-    font-weight: var(--fw-bold);
-  }
-
-  /* ---- the playing presentation: the same list, stacked into a stage ---- */
-  @media screen {
-    :global(html.film-live) .film__still-note,
-    :global(html.film-live) .beat__when {
-      display: none;
-    }
-    :global(html.film-live) .film__stage {
-      order: 1;
-      border-block: var(--rule-paint) solid var(--ink);
-      background: var(--bg);
-    }
-    :global(html.film-live) .film__notes {
-      order: 2;
-      margin-block: var(--sp-6) 0;
-    }
-    :global(html.film-live) .film__after {
-      order: 3;
-    }
-    :global(html.film-live) .film__bar {
-      display: flex;
-      align-items: center;
-      gap: var(--sp-3);
-      block-size: var(--bar-h);
-      padding-inline: var(--sp-4);
-      border-block-end: 1px solid var(--line);
-    }
-    :global(html.film-live) .film__beats {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: calc(var(--pic-h) + var(--slate-h)) auto;
-    }
-    :global(html.film-live) .beat {
-      display: contents;
-    }
-    :global(html.film-live) .beat__frame {
-      grid-area: 1 / 1;
-      align-self: start;
-      border: 0;
-      visibility: hidden;
-      cursor: pointer;
-    }
-    :global(html.film-live) .frame__slate {
-      block-size: var(--slate-h);
-    }
-    :global(html.film-live) .frame__pic {
-      display: grid;
-      align-content: end;
-      block-size: var(--pic-h);
-      overflow: hidden;
-    }
-    :global(html.film-live) .beat__frame--chart .frame__pic {
-      align-content: center;
-      block-size: var(--chart-h);
-    }
-    :global(html.film-live) .beat__cap--chart {
-      padding-block-start: calc(var(--chart-h) - var(--pic-h) + var(--sp-2));
-    }
-    :global(html.film-live) .beat__frame--card .frame__pic {
-      align-content: stretch;
-    }
-    :global(html.film-live) .beat__cap {
-      grid-area: 2 / 1;
-      visibility: hidden;
-    }
-    :global(html.film-live) .beat__frame[data-on],
-    :global(html.film-live) .beat__cap[data-on] {
-      visibility: visible;
-    }
-    :global(html.film-live) .beat__line--then {
-      visibility: hidden;
-    }
-    :global(html.film-live) .beat__cap[data-on] .beat__line--then[data-shown] {
-      visibility: visible;
-    }
-    :global(html.film-live) .beat__end {
-      grid-area: 1 / 1 / 3 / 2;
-      z-index: 2;
-      visibility: hidden;
-    }
-    :global(html.film-live) .beat__end[data-on] {
-      visibility: visible;
-    }
-    :global(html.film-live) .film__big {
-      position: absolute;
-      inset-block-start: calc(var(--bar-h) + var(--pic-h) * var(--big-at, 0.3));
-      inset-inline-start: 50%;
-      z-index: 3;
-      display: grid;
-      grid-template-columns: auto auto;
-      align-items: center;
-      gap: 0 var(--sp-3);
-      padding: var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-4);
-      border: 2px solid var(--ink);
-      border-radius: var(--radius-2);
-      background: var(--ink);
-      color: var(--bg);
-      font: inherit;
-      text-align: start;
-      white-space: nowrap;
-      cursor: pointer;
-      transform: translate(-50%, -50%);
-    }
-    :global(html.film-live) .film__big[hidden] {
-      display: none;
-    }
-    :global(html.film-live) .film__controls {
-      display: flex;
-      align-items: center;
-      gap: var(--sp-2);
-      padding: var(--sp-1) var(--sp-3);
-      border-block-start: 1px solid var(--line-strong);
-    }
-    :global(html.film-live) .film__transcript {
-      display: block;
-    }
-    :global(html.film-live) .film__keys {
-      display: block;
-      color: var(--ink-2);
-    }
-    @media (hover: none) {
-      :global(html.film-live) .film__keys {
-        display: none;
-      }
-    }
-  }
-  .film__big svg {
-    grid-row: 1 / 3;
-    inline-size: 2.25rem;
-    block-size: 2.25rem;
-    fill: currentColor;
-  }
-  .film__big-label {
-    font-size: var(--fs-md);
-    font-weight: var(--fw-black);
-    line-height: 1.2;
-  }
-  .film__big-len {
-    font-size: var(--fs-xs);
-    line-height: 1.3;
-    opacity: 0.85;
-  }
-  .film__big:hover {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--on-accent);
-  }
-
-  /* the clock */
-  .film__led {
-    flex: none;
-    display: grid;
-    place-items: center;
-    block-size: calc(var(--bar-h) - 0.6rem);
-    aspect-ratio: 26 / 19;
-    border-radius: var(--radius-1);
-    background: var(--asphalt-950);
-  }
-  .film__led svg {
-    inline-size: 100%;
-    block-size: auto;
-  }
-  .film__digit,
-  .film__dash {
-    visibility: hidden;
-  }
-  .film__digit {
-    fill: var(--signal-red-led);
-  }
-  .film__dash {
-    fill: none;
-    stroke: var(--asphalt-600);
-    stroke-width: 1.6;
-    stroke-linecap: round;
-  }
-  .film__led [data-on] {
-    visibility: visible;
-  }
-  .film__led[data-phase='green'] .film__digit {
-    fill: var(--signal-green-led);
-  }
-  .film__led[data-phase='paused'] .film__digit {
-    fill: var(--asphalt-300);
-  }
-  .film__clock {
-    flex: 1;
-    min-inline-size: 0;
-    font-weight: var(--fw-bold);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.15;
-    text-wrap: balance;
-  }
-  .film__total {
-    display: none;
-  }
-  @container film (min-width: 30rem) {
-    .film__total {
-      display: inline;
-    }
-  }
-  .film__time {
-    flex: none;
-    color: var(--ink-2);
-    font-size: var(--fs-sm);
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* the controls */
-  .film__btn {
-    flex: none;
-    display: grid;
-    place-items: center;
-    inline-size: var(--tap);
-    block-size: var(--tap);
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-2);
-    background: none;
-    color: var(--ink);
-    cursor: pointer;
-  }
-  .film__btn:hover {
-    background: var(--bg-sunken);
-  }
-  .film__ico {
-    inline-size: 1.6rem;
-    block-size: 1.6rem;
-    fill: currentColor;
-  }
-  .film__ico--line {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .film__ico--pause,
-  .film[data-playing] .film__ico--play {
-    display: none;
-  }
-  .film[data-playing] .film__ico--pause {
-    display: block;
-  }
-  .film__seek {
-    flex: 1;
-    min-inline-size: 0;
-    block-size: var(--tap);
-    margin: 0 var(--sp-2) 0 var(--sp-1);
-    accent-color: var(--accent);
-    cursor: pointer;
-  }
-
-  /* the transcript */
-  .film__h2 {
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-black);
-  }
-  .film__transcript-intro {
-    margin-block: var(--sp-2) var(--sp-4);
-    color: var(--ink-2);
-    font-size: var(--fs-sm);
-  }
-  .film__lines {
-    display: grid;
-    margin: 0;
-    padding: 0;
-    max-inline-size: 46rem;
-    list-style: none;
-  }
-  .film__lines li {
-    display: grid;
-    grid-template-columns: 4rem minmax(0, 1fr);
-    gap: var(--sp-3);
-    align-items: start;
-    padding-block: var(--sp-2);
-    border-block-start: 1px solid var(--line);
-  }
-  .film__lines li[data-now] {
-    box-shadow: inset 3px 0 0 var(--signal-red);
-  }
-  .film__jump {
-    min-block-size: var(--tap);
-    padding: 0 var(--sp-2);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-2);
-    background: none;
-    color: var(--accent);
-    font: inherit;
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    font-variant-numeric: tabular-nums;
-    cursor: pointer;
-  }
-  .film__jump:hover {
-    border-color: var(--accent);
-  }
-  .film__line-meta {
-    color: var(--ink-3);
-    font-size: var(--fs-xs);
-    font-variant-numeric: tabular-nums;
-  }
-  .film__line-card {
-    color: var(--ink-2);
-    font-size: var(--fs-sm);
-  }
-  .film__line-text {
-    font-weight: var(--fw-medium);
-  }
-
-  @container film (min-width: 44rem) {
-    .beat__line,
-    .beat__line:lang(en) {
-      font-size: var(--fs-lg);
-    }
-    .beat__line--then,
-    .beat__line--then:lang(en) {
-      font-size: var(--fs-md);
-    }
-    .beat__cap,
-    .beat__end {
-      padding-inline: var(--sp-5);
-    }
-    .frame__slate {
-      padding-inline: var(--sp-5);
-    }
-    .film-card {
-      padding-inline: var(--sp-7);
-    }
-    .beat__end {
-      padding-inline: var(--sp-7);
-    }
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    :global(html.film-live) .film[data-playing] .beat__cap[data-on] > :is(.beat__kicker, .beat__line:not(.beat__line--then), .beat__badges) {
-      animation: film-cap var(--dur-2) var(--ease-out);
-    }
-    @keyframes film-cap {
-      from {
-        opacity: 0;
-      }
-    }
-  }
-  @media print {
-    .film__still-note,
-    .film__notes .film__keys {
-      display: none;
-    }
-  }
-</style>
 
 <script>
   import './film.client.ts';
 </script>
+
+<style is:global>
+  /*
+   * The stage, the HUD, the captions, the controls, the stills, the transcript, and the film's
+   * own drawing classes (.f-* in the SVG, .fo-* in the HTML over it). Colours are the site's
+   * tokens and the .a-* / .air-* classes of art.css.
+   *
+   * RULE FOR .f-* AND .fo-* CLASSES: never set `opacity`, `transform` or `display` on an
+   * element the timeline drives. The timeline writes those (as SVG attributes, or as inline
+   * styles on the HTML layer), and a declaration here would fight it. Use fill-opacity and
+   * stroke-opacity when a class needs to be pale.
+   */
+  .film {
+    --cap-h: 6.25rem;
+    /* two rows of controls on a phone: the scrubber, then the buttons */
+    --ctl-h: 6.75rem;
+    /* room for the picture: the viewport less the site header, the caption band and the controls */
+    /* (the header's own height plus its 1 px bottom rule) */
+    --avail: calc(100svh - var(--header-h) - 1px - var(--cap-h) - var(--ctl-h));
+    --pic-h: clamp(10rem, var(--avail), 40rem);
+    --film-ink: #f3f5f3;
+    --film-quiet: #c3cbcb;
+    --film-line: #2a3237;
+  }
+  @media (min-width: 40em) {
+    .film {
+      --cap-h: 6rem;
+      --ctl-h: 3.5rem;
+    }
+  }
+  .film .vh {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* the page's heading: on the poster when the film can play, above the stills when it cannot */
+  .film__head {
+    inline-size: min(100%, 44rem);
+    margin-inline: auto;
+    padding: var(--sp-5) var(--gutter) var(--sp-2);
+  }
+  .film-live .film__head {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .film__h1 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: var(--fs-headline);
+    font-weight: 900;
+    line-height: var(--lh-headline);
+  }
+  .film__deck {
+    margin: 0.25rem 0 0;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .film__stage {
+    display: none;
+    container-type: inline-size;
+    /* never wider than about twice its picture's height: on a laptop a wide film frame, on a phone a square */
+    inline-size: min(100%, calc(var(--pic-h) * 1.9));
+    margin-inline: auto;
+    background: var(--asphalt-900);
+  }
+  .film-live .film__stage {
+    display: block;
+  }
+  .film-live .film__stills,
+  .film-live .film__stills-note {
+    display: none;
+  }
+  .film__pic {
+    --here: var(--bg);
+    position: relative;
+    overflow: hidden;
+    block-size: min(var(--pic-h), 100cqi);
+    background: var(--bg);
+    cursor: pointer;
+    /* the picture is its own world for layout and paint: nothing in it can reflow the page */
+    contain: strict;
+    container-type: size;
+  }
+  .film__layer {
+    position: absolute;
+    inset: 0;
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    /* each layer is its own compositor layer: when only the air moves, the street is not repainted */
+    will-change: transform;
+  }
+  /* the scenario steps of art.css fade with a CSS transition; in the film the timeline alone decides */
+  /* a ring or dot carries its light halo as its own stroke, painted under the fill (scene.ts, oneMark) */
+  .film :is([class~='air-ring'], [class~='air-dot'])[stroke-width] {
+    stroke: var(--air-halo, var(--here, var(--bg)));
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
+  .film :is(.air-b, .air-wash) {
+    transition: none;
+  }
+
+  /* ---- words over the picture (HTML, never SVG text) ------------------------------------- */
+  .film__over {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    color: var(--ink);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .film__over > *,
+  .fo-box > * {
+    position: absolute;
+    margin: 0;
+  }
+  .film__over p {
+    margin: 0;
+  }
+  .fo-ruler {
+    translate: -100% -50%;
+    font-family: var(--font-latin), sans-serif;
+    font-size: clamp(0.875rem, 4cqw, 1.375rem);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    /* a paper edge keeps the figures readable over the pavement */
+    text-shadow: 0 0 2px var(--here), 0 0 2px var(--here), 0 0 3px var(--here);
+  }
+  .fo-ruler--unit {
+    font-family: inherit;
+    font-size: clamp(0.875rem, 3.6cqw, 1.125rem);
+    color: var(--ink-2);
+  }
+  .fo-side {
+    inset-block-end: 14%;
+    padding: 0.2em 0.6em;
+    font-size: clamp(0.875rem, 4.2cqw, 1.375rem);
+    font-weight: 800;
+    white-space: nowrap;
+    color: #fff;
+    border-radius: var(--radius-1);
+  }
+  .fo-side--petrol {
+    background: var(--exhaust-600);
+  }
+  .fo-side--electric {
+    background: var(--clean-600);
+  }
+  /* the 4:3 box every card is drawn in (scene.ts fit(400, 300, 0.98)) */
+  .fo-box {
+    inset-inline-start: 50%;
+    inset-block-start: 50%;
+    inline-size: calc(min(100cqw, 100cqh * 4 / 3) * 0.98);
+    aspect-ratio: 4 / 3;
+    translate: -50% -50%;
+    container-type: size;
+  }
+  .fo-pin {
+    translate: -50% -50%;
+  }
+  .fo-pin b {
+    display: grid;
+    place-items: center;
+    inline-size: clamp(1.75rem, 9cqw, 3.25rem);
+    aspect-ratio: 1;
+    font-family: var(--font-latin), sans-serif;
+    font-size: clamp(0.9375rem, 5cqw, 1.75rem);
+    font-weight: 800;
+    color: var(--bg);
+    background: var(--ink);
+    border: 2px solid var(--bg);
+    border-radius: 50%;
+  }
+  .fo-name {
+    translate: -50% 0;
+    font-size: clamp(0.9375rem, 5cqw, 1.75rem);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .fo-name--e {
+    color: var(--clean-ink);
+  }
+  /* the two price tags and their chip: one column, so a longer English line makes a taller tag, never an overlap */
+  /* the two tags and their chip, centred on the card (the paper is theirs alone while they are up) */
+  .fo-stack {
+    inset: 50% 5% auto;
+    translate: 0 -50%;
+    display: grid;
+    gap: 0.45rem;
+    justify-items: center;
+  }
+  .fo-tag {
+    position: relative;
+    display: grid;
+    gap: 0.1em;
+    inline-size: 100%;
+    padding: 0.4em 0.7em 0.45em 1.9em;
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    border-radius: 0.5em;
+    font-size: clamp(0.875rem, 4.3cqw, 1.5rem);
+    transform-origin: 1em 50%;
+    box-shadow: 0 2px 0 color-mix(in srgb, var(--ink) 25%, transparent);
+  }
+  /* the hole a price tag hangs by */
+  .fo-tag::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.6em;
+    inset-block-start: 50%;
+    inline-size: 0.7em;
+    aspect-ratio: 1;
+    translate: 0 -50%;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .fo-tag__where {
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .fo-tag__sum {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.35em;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+  .fo-tag__sum b {
+    font-family: var(--font-latin), var(--font-body);
+    font-size: 1.7em;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .fo-tag--less .fo-tag__sum {
+    color: var(--clean-ink);
+  }
+  .fo-tag--more .fo-tag__sum {
+    color: var(--exhaust-ink);
+  }
+  /* 綠牌 / 白牌, drawn like the plate itself */
+  .fo-plate {
+    margin-inline-start: auto;
+    padding: 0.05em 0.5em;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1.5px solid var(--ink);
+    border-radius: 0.25em;
+  }
+  .fo-plate--light {
+    color: #fff;
+    background: var(--clean-600);
+    border-color: var(--clean-600);
+  }
+  .fo-plate--heavy {
+    color: #101416;
+    background: #fff;
+  }
+  .fo-chip {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    max-inline-size: 100%;
+    padding: 0.15em 0.7em;
+    font-size: clamp(0.875rem, 3.7cqw, 1.125rem);
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 1em;
+  }
+  .fo-chip__g {
+    flex: none;
+    inline-size: 1em;
+    block-size: 1em;
+  }
+  .fo-permonth {
+    translate: -50% 0;
+    font-size: clamp(0.9375rem, 4.6cqw, 1.5rem);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .fo-bar {
+    display: grid;
+    gap: 0.2em;
+    inline-size: 74%;
+    font-size: clamp(0.9375rem, 4.6cqw, 1.5rem);
+    line-height: 1.2;
+  }
+  .fo-bar__label {
+    font-weight: 700;
+  }
+  .fo-bar__value {
+    font-family: var(--font-latin), var(--font-body);
+    font-size: 1.2em;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .fo-bar__track {
+    display: block;
+    block-size: clamp(1rem, 7.6cqw, 2.5rem);
+  }
+  .fo-bar__track i {
+    display: block;
+    block-size: 100%;
+    min-inline-size: 4px;
+    transform-origin: 0 50%;
+    border-radius: 0 0.25em 0.25em 0;
+    background: var(--chart-exhaust);
+  }
+  .fo-bar--e .fo-bar__track i {
+    background: var(--chart-clean);
+  }
+  .fo-bar--e .fo-bar__value {
+    color: var(--clean-ink);
+  }
+  .fo-bar--p .fo-bar__value {
+    color: var(--exhaust-ink);
+  }
+
+  /* ---- the illustration tag: on in every street shot; the body card has its own; none on money */
+  .film__pic .film__tag,
+  .still__pic .film__tag {
+    z-index: 1;
+  }
+  .film__pic[data-tag='street'] .film__tag--body,
+  .film__pic[data-tag='body'] .film__tag--street,
+  .film__pic[data-tag='none'] .film__tag,
+  .film:not([data-begun]) .film__pic .film__tag {
+    display: none;
+  }
+
+  /* ---- HUD -------------------------------------------------------------------------------- */
+  .hud {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    pointer-events: none;
+    font-size: clamp(0.875rem, 1.75cqw, 1.125rem);
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .hud__left {
+    position: relative;
+    min-inline-size: 0;
+  }
+  .hud__count {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    margin: 0;
+    padding: 0.25em 0.7em 0.25em 0.5em;
+    white-space: nowrap;
+    font-size: 1.07em;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-pill);
+  }
+  .hud__sc {
+    inline-size: 1.9em;
+    block-size: 1.2em;
+  }
+  .hud__panel {
+    display: grid;
+    inline-size: max-content;
+    max-inline-size: calc(100cqw - 1rem);
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-2);
+    overflow: hidden;
+  }
+  .hud__row {
+    display: grid;
+    gap: 0.05em;
+    margin: 0;
+    padding: 0.35em 0.65em 0.4em;
+    color: inherit;
+    text-decoration: none;
+  }
+  .hud__row[hidden] {
+    display: none;
+  }
+  .hud__row--est {
+    pointer-events: auto;
+    min-block-size: var(--tap);
+    align-content: center;
+    background: var(--estimate-wash);
+  }
+  .hud__row--street {
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    align-items: baseline;
+    column-gap: 0.8em;
+    border-block-start: 1px solid var(--line-strong);
+  }
+  .hud__name {
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .hud__val {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+    white-space: nowrap;
+  }
+  .hud__val b {
+    font-family: var(--font-latin), var(--font-body);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  /* brief 8.2, change 2: the one number, 20 px or more */
+  .hud__row--est .hud__val b,
+  .hud__row--zero .hud__val b {
+    font-size: max(1.25rem, 1.45em);
+    line-height: 1.2;
+  }
+  .hud__kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .hud__kind .chip-glyph {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+  .hud__kind--est {
+    padding: 0 0.5em;
+    color: var(--estimate-ink);
+    border: 1.5px dashed var(--estimate);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+  }
+  .hud__clock {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.25em 0.45em;
+    background: #0d1113;
+    border: 1px solid #3d474d;
+    border-radius: var(--radius-2);
+  }
+  .hud__clock svg {
+    display: block;
+    inline-size: 3em;
+    block-size: 2.08em;
+  }
+  .hud__led {
+    fill: none;
+    stroke: var(--signal-red-led);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 0.01 1.99;
+  }
+  .hud__clock[data-lamp='green'] .hud__led {
+    stroke: var(--signal-green-led);
+  }
+  .hud__ff {
+    display: none;
+    align-items: center;
+    gap: 0.3em;
+    color: #f2c230;
+    font-weight: 700;
+  }
+  .hud__ff i {
+    font-style: normal;
+  }
+  .hud__ff-a {
+    font-family: var(--font-latin), sans-serif;
+    letter-spacing: -0.12em;
+  }
+  .hud__ff[data-on^='ff'],
+  .hud__ff[data-on='hold'] {
+    display: flex;
+  }
+  .hud__ff:not([data-on='hold']) .hud__ff-b,
+  .hud__ff[data-on='hold'] :is(.hud__ff-a, .hud__ff-w),
+  .hud__ff:not([data-on='ff word']) .hud__ff-w {
+    display: none;
+  }
+
+  /* nothing sits over the poster but its own title and button */
+  .film:not([data-begun]) .film__pic .hud {
+    display: none;
+  }
+
+  /* ---- poster and end card ------------------------------------------------------------------ */
+  .film__poster,
+  .film__end {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    padding: 0.75rem;
+    text-align: center;
+    color: var(--ink);
+  }
+  .film__poster {
+    gap: 0.35rem;
+    /* the ruler shot shows through, paler where the words are */
+    background: radial-gradient(ellipse 62% 48% at 50% 50%, color-mix(in srgb, var(--bg) 92%, transparent), color-mix(in srgb, var(--bg) 62%, transparent));
+  }
+  .film__poster[hidden] {
+    display: none;
+  }
+  .film__kicker {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: var(--ls-caps);
+    color: var(--exhaust-ink);
+  }
+  .film__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 8cqw, 3rem);
+    font-weight: 900;
+    font-stretch: var(--display-stretch);
+    line-height: var(--lh-heading);
+  }
+  .film__big {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-block-size: 3.5rem;
+    margin-block-start: 0.5rem;
+    padding: 0.6rem 1.5rem 0.6rem 1.1rem;
+    font: inherit;
+    font-size: var(--fs-md);
+    font-weight: 800;
+    color: var(--on-accent);
+    background: var(--accent);
+    border: 0;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+  }
+  .film__big svg {
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    fill: currentColor;
+  }
+  .film__big:hover {
+    background: var(--accent-hover);
+  }
+  .film__len {
+    margin: 0.2rem 0 0;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .film__end {
+    gap: 0.5rem;
+    align-content: center;
+    justify-items: stretch;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    opacity: 0;
+    visibility: hidden;
+    cursor: default;
+    overflow-y: auto;
+  }
+  .film__end > * {
+    inline-size: min(100%, 26rem);
+    margin-inline: auto;
+  }
+  .film__end[data-on] {
+    visibility: visible;
+  }
+  .film__end > .film__end-title {
+    inline-size: min(100%, 44rem);
+  }
+  .film__end-title {
+    margin: 0 0 0.2rem;
+    font-family: var(--font-heading);
+    font-size: clamp(1.125rem, 5.4cqw, 1.875rem);
+    font-weight: 900;
+    line-height: var(--lh-heading);
+    text-wrap: balance;
+  }
+  .film__end-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .film__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--tap);
+    padding: 0.35rem 0.9rem;
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+  }
+  .film__cta--primary {
+    font-size: var(--fs-btn);
+    font-weight: 800;
+    color: var(--on-accent);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .film__cta--quiet {
+    color: var(--accent);
+    background: none;
+    border-color: transparent;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  /* a short picture (a small phone, or 特大 text): the end card keeps its buttons and drops its sentence */
+  @container (max-height: 21rem) {
+    .film__end-title {
+      display: none;
+    }
+  }
+
+  /* ---- captions ----------------------------------------------------------------------------- */
+  .film__caption {
+    display: grid;
+    align-content: center;
+    block-size: var(--cap-h);
+    padding: 0.3rem 0.75rem;
+    overflow: hidden;
+    text-align: center;
+    color: var(--film-ink);
+  }
+  .cap__main {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 6.1cqw, 2.125rem);
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: var(--ls-heading);
+    text-wrap: balance;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  :lang(en) .cap__main {
+    font-size: clamp(1.1875rem, 5.4cqw, 2rem);
+    font-stretch: 88%;
+    line-height: 1.15;
+  }
+  /* brief 8.2, change 15: quiet lines at 15 px or more */
+  .cap__note {
+    margin: 0.2rem 0 0;
+    font-size: clamp(0.9375rem, 2.6cqw, 1.25rem);
+    line-height: 1.3;
+    color: var(--film-quiet);
+    text-wrap: balance;
+  }
+  .cap__note:empty {
+    display: none;
+  }
+  .cap__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    padding: 0 0.5em;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill);
+    vertical-align: 0.05em;
+  }
+  .cap__chip .chip-glyph {
+    inline-size: 0.9em;
+    block-size: 0.9em;
+  }
+
+  /* ---- controls: every one a 48 px target, 8 px apart ------------------------------------------ */
+  .film__controls {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-areas: 'seek seek seek seek' 'play again time speed';
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    block-size: var(--ctl-h);
+    padding: 0.25rem 0.5rem;
+    color: var(--film-ink);
+    border-block-start: 1px solid var(--film-line);
+  }
+  @media (min-width: 40em) {
+    .film__controls {
+      grid-template-columns: auto auto 1fr auto auto;
+      grid-template-areas: 'play again seek time speed';
+    }
+  }
+  .film__btn,
+  .film__speed {
+    display: grid;
+    place-items: center;
+    min-inline-size: var(--tap);
+    block-size: var(--tap);
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+  }
+  .film__btn[data-film-toggle] {
+    grid-area: play;
+  }
+  .film__btn[data-film-restart] {
+    grid-area: again;
+  }
+  .film__btn:hover,
+  .film__speed:hover {
+    background: var(--film-line);
+  }
+  .film__btn svg {
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    fill: currentColor;
+  }
+  .film__btn .ico--line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .film .ico--pause,
+  .film[data-playing] .ico--play {
+    display: none;
+  }
+  .film[data-playing] .ico--pause {
+    display: block;
+  }
+  .film__speed {
+    grid-area: speed;
+    padding-inline: 0.9rem;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    border: 1.5px solid #66737a;
+    border-radius: var(--radius-pill);
+  }
+  .film__speed[aria-pressed='true'] {
+    color: #101416;
+    background: #4fd1ba;
+    border-color: #4fd1ba;
+  }
+  .film__seek {
+    --pct: 0%;
+    grid-area: seek;
+    min-inline-size: 0;
+    inline-size: 100%;
+    block-size: var(--tap);
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    cursor: pointer;
+  }
+  .film__seek::-webkit-slider-runnable-track {
+    block-size: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #4fd1ba var(--pct), #47525a var(--pct));
+  }
+  .film__seek::-moz-range-track {
+    block-size: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #4fd1ba var(--pct), #47525a var(--pct));
+  }
+  .film__seek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    inline-size: 24px;
+    block-size: 24px;
+    margin-block-start: -8px;
+    border-radius: 50%;
+    background: var(--film-ink);
+    border: 0;
+  }
+  .film__seek::-moz-range-thumb {
+    inline-size: 24px;
+    block-size: 24px;
+    border-radius: 50%;
+    background: var(--film-ink);
+    border: 0;
+  }
+  .film__time {
+    grid-area: time;
+    justify-self: start;
+    font-family: var(--font-latin), sans-serif;
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--film-quiet);
+    white-space: nowrap;
+  }
+  .film__stage :is(button, a, input):focus-visible {
+    outline: 3px solid #f2c230;
+    outline-offset: 2px;
+  }
+
+  /* ---- under the stage: notes, sharing, stills, transcript ---------------------------------- */
+  .film__under {
+    inline-size: min(100%, 44rem);
+    margin-inline: auto;
+    padding: var(--sp-5) var(--gutter) var(--sp-8);
+  }
+  .film__under h2 {
+    margin: var(--sp-6) 0 var(--sp-2);
+    font-family: var(--font-heading);
+    font-size: var(--fs-lg);
+    font-weight: 900;
+    line-height: var(--lh-heading);
+    /* break at the commas, never inside a word (一公|尺) */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+  .film__under p {
+    margin: 0 0 var(--sp-3);
+  }
+  .film__notes,
+  .film__stills-note {
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+  }
+  .film__inline,
+  .film__source {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    padding-inline: 0.25rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  html:not(.film-live) .film__keys {
+    display: none;
+  }
+  .film__share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap) 0.75rem;
+  }
+  .film__share-note {
+    flex-basis: 100%;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .film__optin {
+    min-block-size: var(--tap);
+    padding: 0.4rem 1rem;
+    font: inherit;
+    font-weight: 700;
+    color: var(--accent);
+    background: none;
+    border: 1.5px solid currentColor;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+  }
+  .film__stills {
+    display: grid;
+    gap: var(--sp-5);
+    margin: var(--sp-4) 0;
+    padding: 0;
+    list-style: none;
+  }
+  .still {
+    margin: 0;
+  }
+  .still__pic {
+    --here: var(--bg);
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    container-type: size;
+  }
+  .still__pic .film__layer {
+    will-change: auto;
+  }
+  .still__pic .hud__row--est {
+    pointer-events: none;
+  }
+  .still figcaption {
+    padding-block-start: var(--sp-2);
+  }
+  .still__when {
+    margin: 0;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .still__line {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: var(--fs-lg);
+    font-weight: 900;
+    line-height: var(--lh-heading);
+  }
+  .still__note {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .film__lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .film__lines li {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+    padding-block: 0.5rem;
+    border-block-start: 1px solid var(--line);
+  }
+  .film__lines li[data-now] {
+    background: var(--mark-bg);
+  }
+  .film__lines .film__lines-head {
+    display: block;
+    padding-block: 0.9rem 0.3rem;
+    border: 0;
+  }
+  .film__lines h3 {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+  }
+  .film__jump {
+    min-inline-size: var(--tap);
+    min-block-size: var(--tap);
+    padding: 0;
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  html:not(.film-live) .film__jump {
+    text-decoration: none;
+    color: var(--ink-2);
+    pointer-events: none;
+  }
+  .film__under .film__line-text {
+    margin: 0;
+    padding-block-start: 0.55rem;
+    font-size: var(--fs-base);
+    font-weight: 700;
+    line-height: var(--lh-read);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .film__under .film__line-note {
+    margin: 0;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+  }
+  .film__under .film__line-source {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap) 0.75rem;
+    margin: 0.25rem 0 0;
+    font-size: var(--fs-sm);
+  }
+  .film__flow {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .film__flow li + li::before {
+    content: '↓';
+    display: block;
+    color: var(--ink-2);
+  }
+
+  /* ---- the film's drawing classes ---------------------------------------------------------- */
+  .f-sky {
+    fill: var(--bg);
+  }
+  .f-wall {
+    fill: var(--art-fill);
+    fill-opacity: 0.5;
+  }
+  .f-win {
+    fill: var(--bg);
+    stroke: var(--art-line);
+    stroke-width: 1.5;
+  }
+  .f-sign {
+    fill: var(--art-line);
+  }
+  .f-yellow {
+    fill: none;
+    stroke: var(--art-yellow);
+    stroke-width: 2.4;
+    stroke-opacity: 0.85;
+  }
+  .f-kerbline {
+    fill: none;
+    stroke: var(--art-line);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .f-cloud {
+    fill: var(--art-paint);
+    fill-opacity: 0.9;
+  }
+  .f-led-amber {
+    fill: var(--paint-yellow);
+  }
+  .f-stop-r {
+    stop-color: var(--art-red);
+  }
+  .f-stop-g {
+    stop-color: var(--art-green);
+  }
+  /* a paper edge on the figures that stand in front of the air (no filter: these move every frame) */
+  .f-halo :is(.a-ink, .a-far, .a-yellow) {
+    stroke: var(--here);
+    stroke-width: 2;
+    paint-order: stroke;
+  }
+  /* a puff leaving a tailpipe: the colour of the core it gathers into */
+  .f-puff {
+    fill: var(--air-core-mid);
+  }
+  /* who is closest */
+  .f-stroller-band {
+    fill: var(--ink);
+    fill-opacity: 0.14;
+  }
+  .f-stroller-edge {
+    fill: none;
+    stroke: var(--ink-2);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 4;
+  }
+  .f-level {
+    fill: none;
+    stroke: var(--exhaust-ink);
+    stroke-width: 2.4;
+    stroke-dasharray: 9 7;
+    stroke-linecap: round;
+  }
+  .f-ruler {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .f-breath {
+    fill: none;
+    stroke: var(--signal-red);
+    stroke-width: 3.2;
+  }
+  .f-breath--quiet {
+    stroke: var(--ink-2);
+    stroke-width: 2.2;
+  }
+  /* inside the layer */
+  .f-wash {
+    fill: var(--exhaust-wash);
+  }
+  .f-inwave {
+    fill: none;
+    stroke: var(--air-wash);
+    stroke-opacity: 0.2;
+    stroke-linecap: round;
+  }
+  .f-drop {
+    fill: var(--air-rib);
+  }
+  .f-drop-hi {
+    fill: none;
+    stroke: var(--exhaust-wash);
+    stroke-width: 3.4;
+    stroke-linecap: round;
+  }
+  .f-lens-g {
+    fill: var(--bg);
+    fill-opacity: 0.88;
+  }
+  .f-lens-r {
+    fill: none;
+    stroke: var(--art-ink);
+    stroke-width: 6;
+  }
+  .f-lens-h {
+    fill: none;
+    stroke: var(--art-ink);
+    stroke-width: 13;
+    stroke-linecap: round;
+  }
+  .f-dots {
+    fill: var(--air-dot);
+  }
+  /* the freeze and its two cards */
+  .f-freeze {
+    fill: var(--bg);
+    fill-opacity: 0.92;
+  }
+  .f-freeze--solid {
+    fill-opacity: 1;
+  }
+  .f-sheet {
+    fill: var(--surface);
+    stroke: var(--line-strong);
+    stroke-width: 1.5;
+  }
+  .f-sheet-top {
+    fill: var(--art-ink);
+  }
+  .f-day {
+    fill: var(--bg-sunken);
+  }
+  /* rewind */
+  .f-night {
+    fill: var(--bg);
+  }
+  .f-rew {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 7;
+    stroke-linecap: round;
+  }
+  .f-rew-h {
+    fill: var(--ink-3);
+  }
+  .f-ground {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  /* money */
+  .f-paper {
+    fill: var(--bg);
+  }
+  /* the lamp changes */
+  .f-flash-r {
+    fill: var(--art-red);
+  }
+  .f-flash-g {
+    fill: var(--art-green);
+  }
+  /* the comparison */
+  .f-divider {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 4;
+  }
+  .f-knob {
+    fill: var(--ink);
+  }
+  .f-knob-a {
+    fill: none;
+    stroke: var(--bg);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* a phone held sideways: a shorter caption band, one row of controls, a wider frame */
+  @media (max-height: 30rem) and (orientation: landscape) {
+    .film {
+      --cap-h: 4.5rem;
+      --ctl-h: 3.25rem;
+      --pic-h: clamp(8rem, var(--avail), 40rem);
+    }
+    .film__stage {
+      inline-size: min(100%, calc(var(--pic-h) * 2.6));
+    }
+    .film__controls {
+      grid-template-columns: auto auto 1fr auto auto;
+      grid-template-areas: 'play again seek time speed';
+    }
+    .cap__main,
+    :lang(en) .cap__main {
+      font-size: 1.25rem;
+    }
+    .cap__note {
+      margin-block-start: 0.1rem;
+    }
+  }
+
+  /* ---- the MP4: the stage alone, filling a 9:16 window (scripts/film-export.mjs) ----------- */
+  .film__mark {
+    display: none;
+  }
+  .film-export body {
+    overflow: hidden;
+    background: var(--asphalt-900);
+  }
+  .film-export :is(.site-header, .site-footer, .skip-link, .film__under, .film__head, .film__controls, .film__poster, .film__end) {
+    display: none !important;
+  }
+  .film-export .film {
+    /* a strip with the site's name, the picture, the captions */
+    --bar-h: 3.5rem;
+    --cap-h: 11.25rem;
+    --pic-h: calc(100svh - var(--bar-h) - var(--cap-h));
+  }
+  .film-export .film__stage {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    inline-size: 100%;
+    padding-block-start: var(--bar-h);
+  }
+  .film-export .film__pic {
+    block-size: var(--pic-h);
+    cursor: default;
+  }
+  .film-export .film__caption {
+    padding-inline: 1.1rem;
+  }
+  .film-export .cap__main {
+    font-size: 1.875rem;
+  }
+  .film-export :lang(en) .cap__main {
+    font-size: 1.5625rem;
+  }
+  .film-export .cap__note {
+    margin-block-start: 0.45rem;
+    font-size: 1.125rem;
+  }
+  .film-export .film__mark {
+    position: fixed;
+    inset: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    block-size: var(--bar-h);
+    margin: 0;
+    padding-inline: 1.1rem;
+    font-size: 1rem;
+    color: var(--film-quiet);
+  }
+  .film-export .film__mark b {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--film-ink);
+  }
+
+  @media print {
+    .film__stage {
+      display: none !important;
+    }
+    .film__stills,
+    .film__stills-note {
+      display: grid !important;
+    }
+  }
+</style>

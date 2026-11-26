@@ -68,7 +68,14 @@ export function phrasedHtml(text: string): string {
     .join('');
 }
 
-export const caseOf = (t: OpenTable, c: HomeChoice): OpenCase => {
+/**
+ * A headline's phrase marks for its language. Chinese keeps them (it has no spaces to break at).
+ * English drops them: it breaks between words by itself, and a long English phrase kept whole
+ * would take a line of its own (each phrase is an inline block).
+ */
+export const headlineMarks = (text: string, locale: string): string => (locale === 'en' ? text.replace(/\s*\|\s*/g, (m) => (/\s/.test(m) ? ' ' : '')) : text);
+
+export const caseOf =(t: OpenTable, c: HomeChoice): OpenCase => {
   const row = t.buy[c.county]?.[c.scrap];
   if (!row) throw new Error(`home money: no price for ${c.county} / ${c.scrap}`);
   return row;

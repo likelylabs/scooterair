@@ -13,20 +13,42 @@
     padding-block-end: var(--sp-4);
   }
   .h-home article .screen__text {
+    gap: 0.625rem;
     padding-block-start: var(--sp-3);
   }
   .h-home article .screen__foot {
-    margin-block-start: var(--sp-1);
+    margin-block-start: 0;
   }
 }
-/* the chips share foot row 1 with 怎麼知道的？: they take the room that is left and wrap inside it */
-.h-home .screen__chips {
+/* a tablet held upright: one column, kept to a phone-and-a-half wide so a picture does not fill
+   a whole screen by itself and a line of text stays easy to follow */
+@media (min-width: 40em) and (max-width: 56.24em) {
+  .h-home article.screen {
+    max-inline-size: 36rem;
+    margin-inline: auto;
+  }
+}
+/* the chips share foot row 1 with 怎麼知道的？: they take the room that is left and wrap among
+   themselves there; a chip is never cut (when even one chip does not fit beside the button, the
+   button moves to a line of its own) */
+.h-home article .screen__foot {
+  column-gap: var(--tap-gap);
+}
+.h-home article .screen__chips {
   flex: 1 1 0%;
+  min-inline-size: min-content;
+}
+/* a chip that is one word or two keeps them on one line (a chip with a place after it may wrap) */
+.h-home article .screen__chips > .chip:not(:has(.chip__where)) {
+  min-inline-size: max-content;
 }
 .h-chipnote {
   font-size: var(--fs-sm);
   line-height: 1.4;
   color: var(--ink-2);
+}
+.h-chipnote--one {
+  white-space: nowrap;
 }
 
 /* ---- a picture with its own control ---- */
@@ -192,7 +214,7 @@
 
 /* ---- screen 6: with scripting the pins' sentences show one at a time, in a box that keeps its height ---- */
 .h-pins {
-  min-block-size: 4rem;
+  min-block-size: calc(2 * var(--lh-read) * var(--fs-sm) + var(--sp-2));
 }
 .h-pins__hint {
   margin: 0;
@@ -207,6 +229,13 @@ html.js .h-s6[data-pick-pin='nose'] .body-pins__item:not([data-pin-item='nose'])
 html.js .h-s6[data-pick-pin='lungs'] .body-pins__item:not([data-pin-item='lungs']),
 html.js .h-s6[data-pick-pin='blood'] .body-pins__item:not([data-pin-item='blood']) {
   display: none;
+}
+
+/* ---- screen 10: four masks in one row; two rows when the text is enlarged on a narrow phone ---- */
+@media (max-width: 29.99em) {
+  html[data-text] .h-masks .seg__row {
+    --cols: 2 !important;
+  }
 }
 
 /* ---- screen 11: what the slider says, under it ---- */
@@ -250,8 +279,10 @@ html.js .h-s6[data-pick-pin='blood'] .body-pins__item:not([data-pin-item='blood'
   color: var(--ink-2);
 }
 .h-select {
-  flex: 1 1 auto;
+  flex: 1 1 0%;
+  inline-size: 0;
   min-inline-size: 0;
+  max-inline-size: 100%;
   min-block-size: var(--tap);
   padding: 0 var(--sp-3);
   border: 2px solid var(--ink);
@@ -330,6 +361,12 @@ html.js .h-pick__fixed {
   font-weight: var(--fw-bold);
   line-height: 1.5;
 }
+.h-checked-note {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
 .h-under-note {
   margin: 0;
   font-size: var(--fs-sm);
@@ -342,11 +379,16 @@ html.js .h-pick__fixed {
 /* a drawing with spare road at its bottom edge, trimmed on a phone so the screen fits (the
    words laid over the drawing keep their places: the figure itself is not resized) */
 .h-crop {
-  overflow: hidden;
+  container-type: inline-size;
 }
 @media (max-width: 56.24em) {
+  /* the cut is painted off (paint containment), so nothing scrolls or hides: below the cut
+     there is only road, no words */
+  .h-home .h-crop {
+    contain: paint;
+  }
   .h-home .h-crop > figure.scene {
-    margin-block-end: calc(var(--crop, 0) * -1%);
+    margin-block-end: calc(var(--crop, 0) * -1cqi);
   }
 }
 .h-end {
@@ -478,4 +520,9 @@ html.js .h-pick__fixed {
 .h-work__paid {
   font-weight: var(--fw-black);
   border-block-end: 0;
+}
+
+/* ---- screen 5: the chart sits on the page's gutters, with air above it ---- */
+.h-pic--mve {
+  padding-block-start: var(--sp-3);
 }

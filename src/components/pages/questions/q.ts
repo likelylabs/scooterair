@@ -34,7 +34,7 @@ export const cardChip: Record<Slug, { kind: ChipKind; fact?: FactId }> = {
   'one-red-light': { kind: 'derived' },
   'my-child': { kind: 'study', fact: 'child-air-per-kg' },
   rider: { kind: 'measured', fact: 'commute-scooter-vs-subway-chuang2020' },
-  mask: { kind: 'official', fact: 'mask-niosh-no-gas' },
+  mask: { kind: 'study', fact: 'mask-asworn-vandersande' },
 };
 
 export const plain = (s: string): string => s.replaceAll('|', '');
@@ -83,7 +83,7 @@ export function questionNumbers(locale: Locale): Record<string, string> {
     red: n(est.signal.redLength_s),
     inletLo: n(datum('taipei-roadside-co-2024', 'inletLow')),
     inletHi: n(datum('taipei-roadside-co-2024', 'inletHigh')),
-    coYear: String(est.meas.taipei.co.roadside.year),
+    coYear: String(est.meas.taipei.co.year),
     pmLo: n(est.meas.iot.pm25.lo),
     pmHi: n(est.meas.iot.pm25.hi),
     pmBg: n(est.bg.pm25.shown),
@@ -138,7 +138,7 @@ export function filler(locale: Locale) {
     const vars: Record<string, string | number> = { ...base, ...extra };
     const out = text.replace(/\{(\w+)\}/g, (_m, k: string) => {
       const v = vars[k];
-      if (v === undefined || v === '') throw new Error(`[questions] no value for {${k}} in: ${text}`);
+      if (v === undefined || v === '' || /undefined|NaN/.test(String(v))) throw new Error(`[questions] no value for {${k}} in: ${text}`);
       return String(v);
     });
     return typeset(out, locale);

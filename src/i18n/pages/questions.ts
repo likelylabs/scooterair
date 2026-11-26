@@ -145,7 +145,7 @@ export default copy({
       headline: { 'zh-TW': '聞不到，|不代表沒有', en: 'No smell |does not mean none is there' },
       body: {
         'zh-TW': '一氧化碳沒有味道，微粒也聞不到。油氣裡還有苯（ㄅㄣˇ），是確定會致癌的東西。',
-        en: 'Carbon monoxide has no smell, and neither do particles. The vapour also carries benzene, a proven cause of cancer.',
+        en: 'Carbon monoxide has no smell, and neither do particles. The vapour also carries benzene, a proven carcinogen.',
       },
       quiet: { 'zh-TW': '世界衛生組織說，苯找不到安全的量。', en: 'The WHO says no safe level of benzene can be recommended.' },
       sheet: {
@@ -154,8 +154,8 @@ export default copy({
           en: 'The World Health Organization (WHO) and its International Agency for Research on Cancer (IARC).',
         },
         b2: {
-          'zh-TW': '一氧化碳沒有顏色，也沒有味道。苯列在「確定會讓人得癌症」的那一級，會造成一種血癌；世界衛生組織說，找不到可以建議的安全量。',
-          en: 'Carbon monoxide has no colour and no smell. Benzene is classed as “carcinogenic to humans” and causes a kind of leukaemia; the WHO says no safe level of exposure can be recommended.',
+          'zh-TW': '一氧化碳沒有顏色，也沒有味道。苯列在「確定會讓人得癌症」的那一級，會讓人得一種血癌；世界衛生組織說，找不到可以建議的安全量。',
+          en: 'Carbon monoxide has no colour and no smell. Benzene is classed as “carcinogenic to humans” and can give people a kind of leukaemia; the WHO says no safe level of exposure can be recommended.',
         },
         b3: {
           'zh-TW': '這說的是苯這種東西本身，講的是長年一直吸。只等一個紅燈會怎麼樣，不能拿它來算。',
@@ -220,7 +220,7 @@ export default copy({
       chapter: { 'zh-TW': '空氣 App', en: 'The air app' },
       headline: { 'zh-TW': '測站量的是高處的平均，|不是路口那 {red} 秒', en: 'A station reads an average high up, |not {red} seconds at the kerb' },
       body: {
-        'zh-TW': '測站的進氣口在 {lo} 到 {hi} 公尺高，一小時報一次；紅燈只有 {red} 秒，排氣管不到一公尺高。路口的 PM2.5 和測站差不多，App 看不出來。',
+        'zh-TW': '測站的進氣口在 {lo} 到 {hi} 公尺高，一小時報一次；紅燈 {red} 秒，排氣管不到一公尺高。路口的 PM2.5 和測站差不多，App 看不出來。',
         en: 'A station’s inlet is {lo} to {hi} m up and it reports once an hour; a red light lasts {red} seconds and a tailpipe is under a metre high. PM2.5 at the junction is about the same as at the station, so the app shows nothing.',
       },
       quiet: {
@@ -319,7 +319,7 @@ export default copy({
           },
           {
             'zh-TW': '{studies} 篇長期研究：長年吸車子廢氣的人，氣喘、心臟病、肺癌比較多。這是「有關」，研究沒有判定因果。',
-            en: '{studies} long-term studies: people who breathe traffic exhaust for years have more asthma, heart disease and lung cancer. This is a link; the studies did not settle cause.',
+            en: '{studies} long-term studies: people who breathe traffic exhaust for years have more asthma, heart disease and lung cancer. This is a link the studies found, not proof of what brings it about.',
           },
         ],
       },
@@ -353,7 +353,7 @@ export default copy({
         },
         b3: {
           'zh-TW': '這是「有關」，研究沒有判定因果。研究大多在歐洲和北美做，講的是所有車輛的廢氣，不只機車。',
-          en: 'This is a link; the studies did not settle cause. Most were done in Europe and North America, and they cover exhaust from all traffic, not scooters alone.',
+          en: 'This is a link the studies found, not proof of what brings it about. Most were done in Europe and North America, and they cover exhaust from all traffic, not scooters alone.',
         },
         routes: {
           'zh-TW': '圖上三條路線，講的是這些東西本身的性質；路口的量，比會讓人馬上不舒服的量低很多。',
@@ -425,8 +425,8 @@ export default copy({
           en: 'Mean PM2.5 over the hour, in µg/m³: petrol scooter {scooter}, walking {walking}, bus {bus}, car {car}, metro {metro}.',
         },
         b3: {
-          'zh-TW': '這是各種來源的 PM2.5，只量早上一小時。騎機車和走路都明顯比搭捷運、開車多；這兩種之間差多少，統計上分不出來。量的是騎士自己吸到的，沒有量一氧化碳或苯。',
-          en: 'This is PM2.5 from all sources, over one morning hour only. Scooter and walking were clearly higher than metro and car, but did not differ significantly from each other. It is what the riders themselves breathed, and carbon monoxide and benzene were not measured.',
+          'zh-TW': '這是各種來源的 PM2.5，只量早上一小時。騎機車和走路都明顯比搭捷運、開車多；這兩種之間差多少，統計上分不出來。量的是每個人自己吸到的；這項研究只量 PM2.5，不包括一氧化碳和苯。',
+          en: 'This is PM2.5 from all sources, over one morning hour only. Scooter and walking were clearly higher than metro and car, but did not differ significantly from each other. It is what each person breathed; the study covered PM2.5 only, not carbon monoxide or benzene.',
         },
       },
     },
@@ -438,8 +438,8 @@ export default copy({
         en: 'This is the mean PM2.5 from all sources over a one-hour morning commute in a Taipei study. Scooter and walking did not differ significantly.',
       },
       quiet: {
-        'zh-TW': '量的是騎士自己吸到的，不是站在機車旁邊的行人。',
-        en: 'It is what the riders themselves breathed, not a pedestrian standing beside the scooters.',
+        'zh-TW': '量的是通勤的人自己吸到的，不是紅燈時機車旁邊的空氣。',
+        en: 'It is what each commuter breathed on the way, not the air beside the scooters at a red light.',
       },
       chart: {
         title: { 'zh-TW': '通勤一小時吸到的 PM2.5', en: 'PM2.5 breathed over a one-hour commute' },
@@ -483,7 +483,7 @@ export default copy({
           en: 'The US National Institute for Occupational Safety and Health (NIOSH), the body that certifies N95 respirators.',
         },
         b2: {
-          'zh-TW': 'N95 這類口罩只過濾微粒，擋不住一氧化碳這類氣體，也擋不住汽油的蒸氣。醫用口罩和布口罩也一樣：裡面沒有能吸住氣體的材料。',
+          'zh-TW': '一氧化碳這類氣體和汽油的蒸氣，N95 這類口罩都擋不住，因為它只過濾微粒。醫用口罩和布口罩也一樣：裡面沒有能吸住氣體的材料。',
           en: 'N95-type respirators filter particles only: they do not stop gases such as carbon monoxide, or petrol vapour. Surgical and cloth masks are the same: nothing in them can hold a gas.',
         },
         b3: {
