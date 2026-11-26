@@ -41,7 +41,7 @@ const words = { red: screenText.red[locale], green: screenText.green[locale], po
   <div class="container screen-rail__row">
     <span class="screen-rail__lamp" aria-hidden="true"></span>
     <span class="screen-rail__phase" data-rail-phase>{words[phase]}</span>
-    <span class="screen-rail__sep" aria-hidden="true">｜</span>
+    <span class="screen-rail__sep" aria-hidden="true"></span>
     <span class="screen-rail__name" data-rail-name>{chapter}</span>
     <span class="screen-rail__pos" data-rail-pos>{fill(screenText.position, locale, { n: 1, total })}</span>
   </div>
@@ -67,7 +67,10 @@ const words = { red: screenText.red[locale], green: screenText.green[locale], po
     align-items: center;
     gap: 0.35em;
     block-size: var(--rail-h);
-    font-size: var(--fs-sm);
+    /* 15 px, growing with 字大 only as far as the width allows (16 px at 320, 18 px at 360, all of
+       特大 from 390), never under the 14 px floor: at 特大 on a 320 px phone a 19-letter English
+       chapter name was cut to "The light tur…". The floor is in px: rem would grow with 字大 */
+    font-size: clamp(14px, 5vw, var(--fs-sm));
     font-weight: var(--fw-bold);
     line-height: 1.2;
     white-space: nowrap;
@@ -84,11 +87,12 @@ const words = { red: screenText.red[locale], green: screenText.green[locale], po
     flex: none;
     color: var(--word);
   }
+  /* a drawn rule, not a ｜ glyph: as text it would have to pass 4.5:1 (site check 14) and it is only a divider */
   .screen-rail__sep {
     flex: none;
-    margin-inline: -0.2em;
-    color: var(--line-strong);
-    font-weight: var(--fw-regular);
+    block-size: 1.1em;
+    margin-inline: 0.3em;
+    border-inline-start: 1px solid var(--line-strong); /* a border, so it survives forced colours */
   }
   .screen-rail__name {
     min-inline-size: 0;

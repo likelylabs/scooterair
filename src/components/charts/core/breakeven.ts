@@ -115,9 +115,12 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   });
   o.push(text('c-tick', 0, 9, prefix, `dx="${-padLeft}"`));
   const firstW = px(p.tickLabel(0), 14);
+  // the plot inside a padded panel on a 320px phone: about 254px less the tick labels on the
+  // left and the end values on the right (both set at the 14px floor)
+  const tight = Math.max(120, 254 - padLeft - 14 - px(f(peak), 14));
   for (let m = 0; m <= months; m += 12) {
     // on narrow charts only every other year is labelled, and nothing crowds the first or the last label
-    const clearOfFirst = m === 0 || (xp(m) / 100) * NARROW - px(p.tickLabel(m), 14) / 2 > firstW + 8;
+    const clearOfFirst = m === 0 || (xp(m) / 100) * tight - px(p.tickLabel(m), 14) / 2 > firstW + 8;
     const always = m === 0 || m === months || (m % 24 === 0 && months - m >= 24 && clearOfFirst);
     o.push(text(always ? 'c-tick' : 'c-tick c-wideonly', `${xp(m)}%`, TOP + H + 18, p.tickLabel(m), `text-anchor="${m === 0 ? 'start' : m === months ? 'end' : 'middle'}"`));
     if (m > 0 && m < months) o.push(`<line class="c-axis" x1="${xp(m)}%" x2="${xp(m)}%" y1="${TOP + H}" y2="${TOP + H + 4}"/>`);

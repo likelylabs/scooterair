@@ -990,6 +990,33 @@ export const longterm = {
     editorNote: 'Do not mix with the 2018 "7 million" (outdoor plus household).',
     research: 'redlight/long-term-traffic#who-ambient-burden-4-2m-2019',
   },
+  'roadside-ldsa-traffic-share-chang2022': {
+    data: {
+      trafficShareAll: v(57, 'percent', { note: 'share of LDSA attributed to traffic over the whole study (PMF + multi-linear regression)' }),
+      trafficShareRush: v(74, 'percent', { note: 'rush hour' }),
+      motorcycleFractionRush: v(0.83, 'ratio', { note: 'motorcycle fraction of traffic at rush hour' }),
+    },
+    display: t('路邊肺部沉積微粒約 57% 來自交通（尖峰 74%）', 'about 57% of roadside lung-deposited particle surface from traffic (74% at rush hour)'),
+    statement: t(
+      '台灣北部一處市區路邊測站的研究（Chang 等，2022）發現，吸進肺裡會沉積下來的微粒表面積，整段研究期間約57%來自交通；上下班尖峰時，車流裡機車的比例升到0.83，來自交通的比例也升到74%。',
+      'A study at an urban roadside station in northern Taiwan (Chang et al., 2022) attributed about 57% of the lung-deposited surface area of particles to traffic over the whole study; at rush hour, when motorcycles made up 0.83 of the traffic, the traffic share rose to 74%.',
+    ),
+    period: t('2022年發表', 'Published 2022'),
+    place: t('台灣北部（市區路邊測站）', 'Northern Taiwan (urban roadside station)'),
+    sources: ['chang-2022-jhazmat-ldsa'],
+    locator: 'Abstract: "we attributed 57% of LDSA to traffic emissions over the entire study. During rush hour, the motorcycle fraction increased to 0.83 … while 74% of LDSA was attributed to traffic."',
+    confidence: 'verified',
+    evidence: 'measured-tw',
+    caveat: t(
+      '所有車輛，不只機車：這是整體交通的占比，是用統計方法從一個路邊測站的量測拆出來的，沒有單獨量機車。它說的是空氣裡有多少來自交通，不是健康影響。' + ABSTRACT_ONLY['zh-TW'],
+      'All traffic, not scooters alone: this is the share for traffic as a whole, split out statistically from readings at one roadside station; scooters were not measured on their own. It describes where the air came from, not a health effect. ' + ABSTRACT_ONLY.en,
+    ),
+    requiresCaveat: true,
+    chainLink: 5,
+    editorNote:
+      'Abstract opened on 2026-11-26 by lane A (Europe PMC REST, PMID 35007803); full text is subscription-only. The brief (7.2, former gap "Taiwanese health studies of scooters alone") puts this study under /evidence/#link-5 with its caveat. The abstract also gives a particle-number peak and a lifetime excess-cancer figure computed from LDSA with assumed unit risk: print neither (brief-no-ultrafine-number, brief-no-cancer-risk).',
+    research: 'estimate/gap-answers-b#gap-tw-health-isolating-scooters',
+  },
 } satisfies Record<string, FactInput>;
 
 // ---------------------------------------------------------------------------

@@ -1398,7 +1398,7 @@ export const claimRules = {
     rule: t("寫「減稅」，不寫「稅減」。", "Write 減稅, not 稅減."),
     instead: t("減稅", "減稅"),
     why: t("稅減不是台灣的說法。", "稅減 is not how Taiwan says it."),
-    patterns: { 'zh-TW': ["稅減"] },
+    patterns: { 'zh-TW': ["(?<!貨物)稅減"] },
     research: 'docs/redesign-brief.md §4.6, §6.6, §12.2; research/estimate/METHOD.md §8–§9; research/masks/VERIFIED.json mustNotSay',
   },
   "brief-no-long-limits": {

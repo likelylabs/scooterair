@@ -36,10 +36,10 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
 <PrintPage locale={locale} title={p.metaTitle} description={p.metaDescription}>
   <div class="toolbar">
     <p>{p.screenNote}</p>
-    <p class="toolbar__row">
+    <div class="toolbar__row">
       <button type="button" class="toolbar__btn" data-print hidden>{p.printButton}</button>
       <a class="toolbar__link" href={href('/act/#community', locale)}>{p.back}</a>
-    </p>
+    </div>
   </div>
 
   <article class="poster" aria-labelledby="poster-t">
@@ -49,7 +49,7 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
     </header>
 
     <div class="poster__numbers">
-      <p class="poster__co">{p.co}</p>
+      <p class="poster__label-co">{p.co}</p>
       <div class="poster__row">
         <span class="poster__label">{estimateText.alreadyThere[locale]}</span>
         <span class="poster__value">{street}</span>
@@ -59,10 +59,10 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
         <span class="poster__label">{estimateText.addedByPack[locale]}</span>
         <EstimateValue locale={locale} slotId="co.dozen.add" class="poster__est" />
       </div>
-      <p class="poster__gloss"><span>{estimateText.ppmGloss[locale]}</span> <span>{est.meta.gloss[locale]}</span></p>
+      <div class="poster__gloss"><span>{estimateText.ppmGloss[locale]}</span> <span>{est.meta.gloss[locale]}</span></div>
     </div>
 
-    <div class="poster__pic">
+    <div class="poster__pic" data-fit>
       <Picture locale={locale} kind="kerb" scenario="dozen" />
     </div>
 
@@ -84,6 +84,11 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
 </PrintPage>
 
 <script>
+  // print: size each picture by its height (its shape comes from the svg's viewBox)
+  for (const box of document.querySelectorAll<HTMLElement>('[data-fit]')) {
+    const v = box.querySelector('svg.scene__art')?.getAttribute('viewBox')?.split(/[\s,]+/).map(Number);
+    if (v && v[3]) box.style.setProperty('--ar', String(v[2] / v[3]));
+  }
   const b = document.querySelector<HTMLButtonElement>('[data-print]');
   if (b) {
     b.hidden = false;
@@ -169,7 +174,7 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
     border: 2px solid var(--ink);
     border-radius: 6px;
   }
-  .poster__co {
+  .poster__label-co {
     font-weight: var(--fw-bold);
     font-size: var(--fs-sm);
   }
@@ -191,6 +196,9 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
   }
   .poster__row--est :global(.poster__est) {
     font-size: 1.25rem;
+  }
+  .poster :global(.est__go) {
+    display: none;
   }
   .poster__gloss {
     display: grid;
@@ -275,9 +283,17 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
     .poster__title:lang(en) {
       font-size: 26pt;
     }
-    .poster__pic :global(.scene__art) {
-      max-block-size: 98mm;
-      inline-size: auto;
+    :global(html:lang(en)) {
+      font-size: 92%;
+    }
+    .poster__pic {
+      --fit-h: 92mm;
+    }
+    .poster:lang(en) .poster__pic {
+      --fit-h: 82mm;
+    }
+    [data-fit] :global(.scene) {
+      inline-size: min(100%, calc(var(--fit-h) * var(--ar, 1.3)));
       margin-inline: auto;
     }
     .poster__sentence {

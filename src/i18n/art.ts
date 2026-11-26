@@ -21,7 +21,7 @@
 // alt text ends with live in ui.ts (`illustration`), shared with the film.
 //
 // The groups from `illustration` down to `cycle` serve the old scenes
-// (StreetScene, PollutantKey, SceneCompare, SignalCycle, SmellStrip). They go
+// (StreetScene, PollutantKey, SceneCompare, SignalCycle). They go
 // when those components are deleted (brief 5.4, phase 3). New strings are in
 // `alt2`, `marks` and `range`, then one group per scene (`words` to
 // `measure2`), directly below.
@@ -169,7 +169,13 @@ export const art = {
       'zh-TW': '一把從地面量到 {top} 公分的尺。同一條地面上有四個人：嬰兒車裡的寶寶、戴黃帽的小學生、大人，還有坐在機車上的騎士。嬰兒車的高度（{lo} 到 {hi} 公分）塗了一條顏色；機車的排氣管做了記號，它和寶寶都不到一公尺高。每個人的鼻子前面有一個呼吸的圈，小孩的動得比較快。廢氣從地面到大人頭頂以上畫得一樣多，沒有分層。',
       en: 'A ruler from the ground to {top} cm. Four people stand on one ground line: a baby in a pushchair, a schoolchild in a yellow cap, an adult, and a rider seated on a scooter. The pushchair height ({lo} to {hi} cm) is shaded; the scooter’s tailpipe is marked, and both it and the baby are less than a metre off the ground. A breathing ring sits at each nose; the child’s moves faster. The exhaust is drawn evenly from the ground to above the adult’s head, with no bands by height.',
     } as L10n,
-    band: { 'zh-TW': '嬰兒車 {lo} 到 {hi} 公分', en: 'Pushchair: {lo} to {hi} cm' } as L10n,
+    /** Short names under the four figures: they must fit side by side on a 320 px phone. */
+    names: {
+      pushchair: { 'zh-TW': '嬰兒車', en: 'Baby' } as L10n,
+      schoolchild: { 'zh-TW': '小學生', en: 'Child' } as L10n,
+      adult: { 'zh-TW': '大人', en: 'Adult' } as L10n,
+      rider: { 'zh-TW': '騎士', en: 'Rider' } as L10n,
+    },
   },
 
   /** G9: the rider. */
@@ -231,7 +237,7 @@ export const art = {
       'zh-TW': '路邊的一個空氣品質測站：一個箱子，進氣口在一根高高的管子頂端，標著「{inlet}」。旁邊的路邊，小學生和推嬰兒車的大人站在一輛機車的車尾後面；那一團深色的廢氣貼著地面，遠遠低於進氣口。',
       en: 'An air-quality station beside the road: a cabinet whose inlet is at the top of a tall pipe, marked “{inlet}”. At the kerb beside it, a schoolchild and an adult with a pushchair stand behind the tail of a scooter; its dark patch of exhaust stays near the ground, far below the inlet.',
     } as L10n,
-    inlet: { 'zh-TW': '進氣口', en: 'Inlet' } as L10n,
+    inletRange: { 'zh-TW': '進氣口：{lo} 到 {hi} 公尺高', en: 'Inlet: {lo} to {hi} m up' } as L10n,
     cabinet: { 'zh-TW': '測站', en: 'Station' } as L10n,
   },
 
@@ -250,7 +256,7 @@ export const art = {
   /** The hatched band. Two parts, shown either side of a bar (or on two lines when narrow). */
   band: {
     present: { 'zh-TW': '有廢氣', en: 'exhaust present' } as L10n,
-    unknown: { 'zh-TW': '多濃沒人量過', en: 'amount not measured' } as L10n,
+    unknown: { 'zh-TW': '示意', en: 'illustrative' } as L10n,
   },
 
   /** StreetScene: accessible descriptions, one per frame. */
@@ -260,20 +266,20 @@ export const art = {
       en: 'Side view of a crossing, illustrative. The signal is red, countdown {count}. The stop box and the turn box are empty. On the corner stand a schoolchild in a yellow cap and an older woman with a cane; an adult pushes a stroller toward the crosswalk.',
     } as L10n,
     pack: {
-      'zh-TW': '同一個路口，紅燈，倒數 {count}。機車停滿了停等區，待轉區也有幾台，車尾朝著斑馬線；前排一位騎士把鏡片掀起來，看得到臉。行人從車陣前面走過斑馬線。路面到大約一公尺高畫了一層斜線，標示「有廢氣，多濃沒人量過」；暖色波紋只畫在每一根排氣管口。',
-      en: 'The same crossing at red, countdown {count}. Scooters fill the stop box and a few wait in the turn box with their tails toward the crosswalk; one front-row rider has the visor up and a visible face. People cross in front of the pack. A hatched band from the road to about one metre is labelled “exhaust present, amount not measured”; warm ribbons are drawn only at each tailpipe mouth.',
+      'zh-TW': '同一個路口，紅燈，倒數 {count}。機車停滿了停等區，待轉區也有幾台，車尾朝著斑馬線；前排一位騎士把鏡片掀起來，看得到臉。行人從車陣前面走過斑馬線。路面到大約一公尺高畫了一層斜線，標示這一層有廢氣；暖色波紋只畫在每一根排氣管口。',
+      en: 'The same crossing at red, countdown {count}. Scooters fill the stop box and a few wait in the turn box with their tails toward the crosswalk; one front-row rider has the visor up and a visible face. People cross in front of the pack. A hatched band from the road to about one metre marks where the exhaust is; warm ribbons are drawn only at each tailpipe mouth.',
     } as L10n,
     kerb: {
       'zh-TW': '從路緣高度看的示意圖。一把 0 到 180 公分的尺；第一公尺畫上斜線，標示「排氣管在這一公尺裡」；嬰兒車的高度 55 到 85 公分用括號標出。小學生和大人的口鼻高度是尺上的小刻度，標明是示意。小學生比嬰兒車那一段高。',
       en: 'Kerb-level view, illustrative. A ruler from 0 to 180 cm; the first metre is hatched and labelled “tailpipes are in this first metre”; the stroller band from 55 to 85 cm is bracketed. The schoolchild’s and the adults’ mouth heights are small ticks on the ruler, marked as illustrative. The schoolchild stands above the stroller band.',
     } as L10n,
     paused: {
-      'zh-TW': '同一個紅燈的畫面，淡化處理，倒數暫停在 {count}。',
-      en: 'The same red light, dimmed, with the countdown paused at {count}.',
+      'zh-TW': '同一個紅燈的畫面，淡化處理，號誌停在 {count}。',
+      en: 'The same red light, dimmed, with the signal held at {count}.',
     } as L10n,
     green: {
-      'zh-TW': '同一個路口，號誌轉綠。前排的機車已經過了斑馬線；戴黃帽的小學生一隻腳踏下路緣。斜線那一層和紅燈時畫得一樣。停止線旁的標籤寫著：起步那一下，國外量的是汽車和柴油車；機車，沒人量過。',
-      en: 'The same crossing as the signal turns green. The front scooters are past the crosswalk; the schoolchild in the yellow cap has one foot off the kerb. The hatched band is drawn exactly as at red. A tag at the stop line reads: pull-away has been measured abroad for cars and diesel vehicles; for scooters, nobody has measured it.',
+      'zh-TW': '同一個路口，號誌轉綠。前排的機車已經過了斑馬線；戴黃帽的小學生一隻腳踏下路緣。斜線那一層和紅燈時畫得一樣。停止線旁的標籤寫著：起步那一下，國外量的是汽車和柴油車；機車的，本站不印倍數。',
+      en: 'The same crossing as the signal turns green. The front scooters are past the crosswalk; the schoolchild in the yellow cap has one foot off the kerb. The hatched band is drawn exactly as at red. A tag at the stop line reads: pull-away has been measured abroad for cars and diesel vehicles; for scooters this site prints no multiplier.',
     } as L10n,
     clean: {
       'zh-TW': '同一個路口、同一個紅燈，倒數 {count}，車陣換成電動機車。機車後面沒有波紋、沒有圓圈，也沒有斜線那一層。細點和之前一樣。遠處車道有一台汽車，排氣管口還有一小段波紋：其他車流還在。',
@@ -282,11 +288,11 @@ export const art = {
   },
 
   scene: {
-    paused: { 'zh-TW': '倒數暫停', en: 'Countdown paused' } as L10n,
+    paused: { 'zh-TW': '靜止畫面', en: 'Still frame' } as L10n,
     /** K4 tag at the stop line. Lines are separate so they can stack. */
     pullAway: {
-      'zh-TW': ['起步那一下：', '國外量的是汽車和柴油車。', '機車，沒人量過'],
-      en: ['Pulling away: measured abroad', 'for cars and diesel vehicles.', 'For scooters, nobody has.'],
+      'zh-TW': ['起步那一下：', '國外量的是汽車和柴油車。', '機車的，本站不印倍數'],
+      en: ['Pulling away: measured abroad', 'for cars and diesel vehicles.', 'For scooters, no multiplier here.'],
     } as L10n<string[]>,
     otherTraffic: { 'zh-TW': '其他車流還在', en: 'Other traffic remains' } as L10n,
     noTailpipes: { 'zh-TW': '這一排沒有排氣管', en: 'This row has no tailpipes' } as L10n,
@@ -337,10 +343,10 @@ export const art = {
       en: 'These four marks are drawn the same in every frame. They do not change with the countdown and they do not show a concentration.',
     } as L10n,
     hatch: {
-      title: { 'zh-TW': '斜線：有廢氣，多濃沒人量過', en: 'Hatching: exhaust present, amount not measured' } as L10n,
+      title: { 'zh-TW': '斜線：這一層有廢氣', en: 'Hatching: where the exhaust is' } as L10n,
       body: {
-        'zh-TW': '路面到大約一公尺，排氣管都在這裡。畫成斜線，是因為台灣沒有人量過這一層有多濃。',
-        en: 'From the road to about one metre, where the tailpipes are. It is hatched because nobody in Taiwan has measured how dense this layer is.',
+        'zh-TW': '路面到大約一公尺，排氣管都在這裡。有多少，看本站的推估。',
+        en: 'From the road to about one metre, where the tailpipes are. For how much, see this site’s estimate.',
       } as L10n,
     },
     fumes: {
@@ -366,38 +372,17 @@ export const art = {
     },
   },
 
-  /** ApproachPlan (V6) */
-  plan: {
-    alt: {
-      'zh-TW': '一個路口臨近路段的俯視示意圖，車行方向由左到右。機車停滿停止線後方的機慢車停等區；停止線前面是行人穿越道，有人正在走；穿越道再往前是待轉區，裡面的機車車尾朝著穿越道，後緣和穿越道之間標著「50 公分以上」。轉角站著一個戴黃帽的小學生，等著過另一條街。每一台機車只在車尾畫了一個廢氣色的記號。',
-      en: 'Plan of one approach to a junction, illustrative, traffic running left to right. Scooters fill the stop box behind the stop line; ahead of the line is the crosswalk, with people on it; beyond the crosswalk is the two-stage turn box, whose scooters have their tails toward the crosswalk, with “50 cm or more” marked between its rear edge and the crosswalk. On the corner a schoolchild in a yellow cap waits to cross the other street. Each scooter carries one exhaust-coloured mark, at its tail.',
-    } as L10n,
-    stopBox: { 'zh-TW': '停等區', en: 'Stop box' } as L10n,
-    stopBoxDepth: { 'zh-TW': '2.5–6 公尺', en: '2.5–6 m' } as L10n,
-    stopLine: { 'zh-TW': '停止線', en: 'Stop line' } as L10n,
-    crosswalk: { 'zh-TW': '斑馬線', en: 'Crosswalk' } as L10n,
-    turnBox: { 'zh-TW': '待轉區', en: 'Turn box' } as L10n,
-    gap: { 'zh-TW': '≥ 50 公分', en: '≥ 50 cm' } as L10n,
-    corner: { 'zh-TW': '小黃帽在這裡等', en: 'The yellow cap waits here' } as L10n,
-    travel: { 'zh-TW': '車行方向', en: 'Direction of travel' } as L10n,
-    caption: {
-      'zh-TW': '50 公分是規定的下限；實際距離每個路口不同。',
-      en: 'Fifty centimetres is the minimum the rule sets; the real distance differs at every crossing.',
-    } as L10n,
-    tails: { 'zh-TW': '排氣管口', en: 'Tailpipe mouth' } as L10n,
-  },
-
   /** SmellStrip (V10) */
   smell: {
     canTitle: { 'zh-TW': '聞得到', en: 'You can smell' } as L10n,
     canBody: {
-      'zh-TW': '你站在廢氣裡。可能是醛類；是哪幾種，沒有人鑑定過。',
-      en: 'You are standing in exhaust. Probably aldehydes; which ones, nobody has identified.',
+      'zh-TW': '你站在廢氣裡。臭的是沒燒完的汽油，和刺鼻的醛類。',
+      en: 'You are standing in exhaust. The smell is unburnt petrol and sharp aldehydes.',
     } as L10n,
     cannotTitle: { 'zh-TW': '聞不到', en: 'You cannot smell' } as L10n,
     cannotBody: {
-      'zh-TW': '一氧化碳：沒有味道。苯：路邊那種濃度，不太可能聞得到。',
-      en: 'Carbon monoxide: no smell. Benzene: unlikely to be smelled at roadside levels.',
+      'zh-TW': '一氧化碳和微粒：沒有味道。',
+      en: 'Carbon monoxide and particles: no smell.',
     } as L10n,
     footer: { 'zh-TW': '味道是警報，不是量表。', en: 'Smell is an alarm, not a gauge.' } as L10n,
   },
@@ -416,17 +401,13 @@ export const art = {
       en: 'Pull-away: where particle peaks were measured abroad (cars and diesel vehicles)',
     } as L10n,
     badge: { 'zh-TW': '國際證據', en: 'International evidence' } as L10n,
-    gap: { 'zh-TW': '機車、台灣：沒人量過', en: 'Scooters, Taiwan: nobody has measured this' } as L10n,
+    gap: { 'zh-TW': '機車、台灣：本站不印數字', en: 'Scooters, Taiwan: no figure printed here' } as L10n,
     time: { 'zh-TW': '時間', en: 'Time' } as L10n,
   },
 
   /** MeasurementDiagram (V35) */
   measure: {
     stamp: { 'zh-TW': '本站提議', en: 'Our proposal' } as L10n,
-    alt: {
-      'zh-TW': '量測建議的示意圖。同一張路口平面圖上標了四個放儀器的位置：轉角、待轉區旁、停等區旁，以及一個離路口遠的對照點。',
-      en: 'Diagram of a proposed measurement, illustrative. The same plan of the approach with four instrument positions: on the corner, beside the turn box, beside the stop box, and at a control point away from the junction.',
-    } as L10n,
     whereTitle: { 'zh-TW': '放在哪裡', en: 'Where' } as L10n,
     points: [
       { 'zh-TW': '轉角，行人等綠燈的地方', en: 'On the corner, where people wait for the green' },
@@ -440,12 +421,12 @@ export const art = {
     whatTitle: { 'zh-TW': '量什麼', en: 'What' } as L10n,
     what: [
       { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
-      { 'zh-TW': '苯類（BTEX）', en: 'Benzene-family compounds (BTEX)' },
-      { 'zh-TW': '超細微粒數量', en: 'Ultrafine particle number' },
+      { 'zh-TW': '苯和它的同類（BTEX）', en: 'Benzene and its relatives (BTEX)' },
+      { 'zh-TW': '超細微粒有幾顆', en: 'Ultrafine particle number' },
     ] as L10n[],
     clockTitle: { 'zh-TW': '怎麼記錄', en: 'How' } as L10n,
     clock: {
-      'zh-TW': '逐秒記錄，對上紅燈和綠燈；同時數每個時相停了幾台機車；公開原始數據。',
+      'zh-TW': '一秒記一筆，對上紅燈和綠燈；同時數每個紅燈停了幾輛機車；公開原始資料。',
       en: 'Second by second, matched to red and green; count the scooters waiting in each phase; publish the raw data.',
     } as L10n,
     control: { 'zh-TW': '對照點', en: 'Control' } as L10n,

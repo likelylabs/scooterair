@@ -133,11 +133,15 @@ const css = [
     justify-content: center;
     gap: 0.05em;
     min-block-size: var(--tap);
-    padding: 0.3em 0.35em;
+    /* less side padding on a phone: three segments at 320 px and 特大 are 84 px each */
+    padding: 0.3em clamp(2px, 1.2vw, 0.35em);
     border-radius: var(--radius-3);
     color: var(--ink);
     text-align: center;
     line-height: 1.25;
+    /* a short Chinese name stays whole (十來輛, not 十來 / 輛); it breaks only when it cannot fit */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
   .seg__label {
     font-size: var(--fs-btn);

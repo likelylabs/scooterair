@@ -26,7 +26,7 @@ export interface PriceSide {
   net: number;
   /** the list price, NT$ (≥ net) */
   list: number;
-  /** what the difference is made of, in words: 「補助」「車廠折扣和減稅」 (see offWords) */
+  /** what the difference is made of, in words: 「補助」「車廠折扣和減稅」 (see offWords). Left out, the chart prints the amount only */
   offWhat?: string;
 }
 
@@ -108,7 +108,9 @@ export function renderPriceBars(p: PriceBarsProps): string {
   ];
   const subOf = (s: PriceSide) => {
     const off = Math.round(s.list - s.net);
-    return off > 0 ? fill(T.listLess, locale, { list: yuan(s.list, locale), off: yuan(off, locale), what: s.offWhat ?? T.what.subsidy[locale] }) : fill(T.listOnly, locale, { list: yuan(s.list, locale) });
+    if (off <= 0) return fill(T.listOnly, locale, { list: yuan(s.list, locale) });
+    // without the words for what came off, the sentence does not guess: it gives the amount only
+    return s.offWhat ? fill(T.listLess, locale, { list: yuan(s.list, locale), off: yuan(off, locale), what: s.offWhat }) : fill(T.listLessPlain, locale, { list: yuan(s.list, locale), off: yuan(off, locale) });
   };
   const head = (o: (typeof sides)[number]) =>
     `<div class="hc-row__head"><span class="hc-row__label">${esc(o.label)}</span><span class="hc-row__value">${esc(yuan(o.s.net, locale))}</span></div>` +
@@ -143,7 +145,7 @@ export function renderPriceBars(p: PriceBarsProps): string {
     const name = o.s.name ?? '';
     const txt =
       off > 0
-        ? fill(T.sumSide, locale, { label: o.label, name, list: yuan(o.s.list, locale), off: yuan(off, locale), what: o.s.offWhat ?? T.what.subsidy[locale], net: yuan(o.s.net, locale) })
+        ? fill(o.s.offWhat ? T.sumSide : T.sumSidePlain, locale, { label: o.label, name, list: yuan(o.s.list, locale), off: yuan(off, locale), what: o.s.offWhat ?? '', net: yuan(o.s.net, locale) })
         : fill(T.sumSideNoOff, locale, { label: o.label, name, net: yuan(o.s.net, locale) });
     // without a model name, drop the empty slot and its separator
     return name ? txt : txt.replace(/：，|: , /, locale === 'en' ? ': ' : '：');
@@ -151,10 +153,14 @@ export function renderPriceBars(p: PriceBarsProps): string {
   const end = locale === 'en' ? '. ' : '。';
   const summary = `${sumSide(sides[0])}${locale === 'en' ? ' ' : ''}${sumSide(sides[1])}${locale === 'en' ? ' ' : ''}${gapText}${end.trim()}`;
 
+  const short = (o: (typeof sides)[number]) => o.label.split(/[・:：]/)[0].trim();
   const table: ChartTable = {
-    head: [T.tableWhat[locale], T.tableList[locale], T.tableOff[locale], T.tableNet[locale]],
+    head: [T.tableWhat[locale], ...sides.map(short)],
     rows: [
-      ...sides.map((o) => [o.s.name ? `${o.label}${locale === 'en' ? ' (' : '（'}${o.s.name}${locale === 'en' ? ')' : '）'}` : o.label, yuan(o.s.list, locale), yuan(Math.round(o.s.list - o.s.net), locale), yuan(o.s.net, locale)]),
+      ...(sides.some((o) => o.s.name) ? [[T.tableModel[locale], ...sides.map((o) => o.s.name ?? '')]] : []),
+      [T.tableList[locale], ...sides.map((o) => yuan(o.s.list, locale))],
+      [T.tableOff[locale], ...sides.map((o) => yuan(Math.round(o.s.list - o.s.net), locale))],
+      [T.tableNet[locale], ...sides.map((o) => yuan(o.s.net, locale))],
     ],
     caption: gapText,
   };

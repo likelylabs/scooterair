@@ -5,6 +5,7 @@
  * then two rows of controls. Replaces Chapter.astro.
  *
  *   ┌ picture (slot `picture`; full-bleed on a phone) ───────────────┐
+ *   │ the tag 示意圖｜… on a line of its own under the drawing          │
  *   │ slot `above`  — HTML over the picture: the number box           │
  *   │ slot `controls` — under the picture: a switch                    │
  *   ├ headline  27 px, weight 900, two lines, 22 Chinese characters ─┤
@@ -33,8 +34,11 @@
  *   as            'h2' (default) | 'h1' (a question page's one screen)
  *   body          the body text; or slot `body` when it needs markup (it is counted the same)
  *   quiet         the quiet line; or slot `quiet`
- *   illustration  true = print the tag 示意圖｜廢氣其實大多看不見 on the picture (brief 5.1).
- *                 'body' prints 示意圖・不是醫學圖. Scene components do not print it themselves
+ *   illustration  true = print the tag 示意圖｜廢氣其實大多看不見 with the picture (brief 5.1).
+ *                 'body' prints 示意圖・不是醫學圖. Scene components do not print it themselves.
+ *                 The tag is the last line of the picture's box (.screen__pic), under the
+ *                 drawing: laid over a corner it covered the scenes' own words at 320 px and
+ *                 at 特大, where it is up to 300 × 60 px
  *   how           id of the sheet in the `sheet` slot (default `how-${n}`)
  *   next          { label, href?, primary? } — the question the next screen answers.
  *                 href defaults to `#s-${n + 1}`. Omit on the last screen
@@ -109,7 +113,7 @@ const position = fill(screenText.position, locale, { n, total });
     {hasAbove && <div class="screen__above"><slot name="above" /></div>}
     <div class="screen__pic">
       <slot name="picture" />
-      {illustration && <IllustrationTag locale={locale} kind={illustration === 'body' ? 'body' : 'street'} overlay />}
+      {illustration && <IllustrationTag locale={locale} kind={illustration === 'body' ? 'body' : 'street'} />}
     </div>
     {hasControls && <div class="screen__controls"><slot name="controls" /></div>}
   </div>
@@ -190,6 +194,15 @@ const position = fill(screenText.position, locale, { n, total });
     max-inline-size: none;
     block-size: auto;
     margin: 0;
+  }
+  /* the tag: one quiet line under the drawing, still inside the picture's box. Never laid over
+     the drawing, so it cannot cover a scene's words at any width, language or text size */
+  .screen__pic > :global(.ill-tag) {
+    display: block;
+    padding: 0.2rem var(--pad) 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
   }
 
   /* ---- the words ---- */
@@ -309,8 +322,10 @@ const position = fill(screenText.position, locale, { n, total });
       padding-block: var(--sp-7);
       scroll-margin-block-start: 0;
     }
-    .screen__pic {
+    /* the drawing is rounded, not the box: the tag's line sits under it */
+    .screen__pic > :global(:first-child) {
       border-radius: var(--radius-3);
+      overflow: hidden;
     }
     .screen__text {
       padding-block-start: 0;

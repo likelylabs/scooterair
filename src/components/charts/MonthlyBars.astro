@@ -46,7 +46,8 @@ if (!month && !months) throw new Error('MonthlyBars: pass `month` (a MonthCase f
 const set = months ? Object.values(months).map((m) => monthlyBarsFromCase(m, locale, { table })) : [];
 const max = sharedScale && set.length ? monthlyBarsMax(set) : undefined;
 const single = month ? monthlyBarsFromCase(month, locale, { table }) : undefined;
-const bad = [...set, ...(single ? [single] : [])].find((c) => [c.petrol, c.home, c.swapPlan, c.swapPayg].some((b) => !Number.isFinite(b.hi) || b.hi <= 0));
+const hi = (b: number | { hi: number }) => (typeof b === 'number' ? b : b.hi);
+const bad = [...set, ...(single ? [single] : [])].find((c) => [c.petrol, c.home, c.swapPlan, c.swapPayg].some((b) => !Number.isFinite(hi(b)) || hi(b) <= 0));
 if (bad) throw new Error(`MonthlyBars: a figure is missing at ${bad.km} km. A chart is never drawn empty.`);
 ---
 

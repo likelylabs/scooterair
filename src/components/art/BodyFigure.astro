@@ -44,7 +44,8 @@ interface Props {
 }
 const { locale, pins = ['nose', 'lungs', 'blood'], pinHref = {}, tag = false, id, class: cls } = Astro.props;
 
-const VB: Box = { x: -150, y: -322, w: 360, h: 340 };
+const VB: Box = { x: -150, y: -302, w: 360, h: 358 };
+const BELOW = VB.y + VB.h; // the chest runs on to the bottom edge, so the tag does not sit on the pins
 const upp = 1;
 const r = rng(61);
 const split = { x: 0, y: -134 }; // where the windpipe divides
@@ -76,7 +77,7 @@ const ringAt: [number, number, number][] = [
 const rings = ringAt.map(([x, y, i]) => airRing(x, y, upp, { size: 0.8, cls: 'sa-go', attrs: go(i, x, y, x > 80 ? outside : y > -130 ? split : BODY.nose) })).join('');
 
 const scene = [
-  `<g class="a-figure">${bodyFigure()}</g>`,
+  `<g class="a-figure"><rect class="a-ink" x="-114" y="-2" width="228" height="${BELOW + 6}"/>${bodyFigure()}<path class="a-heart-s" stroke-width="6" d="M17,-2V${BELOW + 4}"/></g>`,
   `<g class="tm-lane tm-lane--dot">${dots}</g>`,
   `<g class="tm-lane tm-lane--ring">${rings}</g>`,
   `<g class="tm-lane tm-lane--ribbon">${ribbons}</g>`,

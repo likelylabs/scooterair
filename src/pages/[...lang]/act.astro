@@ -20,7 +20,7 @@ import EvShareChart from '@/components/pages/action/EvShareChart.astro';
 import Composer from '@/components/pages/action/Composer.astro';
 import { datum, lf, num, requiredCaveats, sourcesOf } from '@/components/pages/action/ev';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { kSentences, readerDate, site } from '@/i18n/ui';
+import { chipWhere, kSentences, readerDate, site } from '@/i18n/ui';
 import { est, formatEstimate } from '@/data/estimate';
 import { facts, localizeSeries, type FactId } from '@/data';
 import { snapshot } from '@/lib/site-state.data';
@@ -50,7 +50,7 @@ const evTargetKey = `target${evYear}`;
 const evShare = { year: evYear, share: num(locale, datum('ev-share-2025', 'share'), 1), target: num(locale, datum('netzero-ev-sales-targets', evTargetKey), 0) };
 const deadline = en ? readerDate(snapshot.yearEnd, locale).replace(/ \d{4}$/, '') : readerDate(snapshot.yearEnd, locale).replace(/^\d{4} 年 /, '');
 const askVars = { nextYear, deadline, total: per100Total, absent: per100.absent, ...evShare };
-const askFacts: FactId[][] = [['econ-no-2027-programme'], [], ['inspection-2025-per-100', 'two-stroke-remaining'], ['ev-share-2025', 'netzero-ev-sales-targets'], ['marking-rules-turn-box'], []];
+const askFacts: FactId[][] = [[], [], ['inspection-2025-per-100', 'two-stroke-remaining'], ['ev-share-2025', 'netzero-ev-sales-targets'], ['marking-rules-turn-box'], []];
 const fact = (id: FactId) => facts[id];
 
 // ---- the EV-share chart (moved here from the old home page, brief 5.4)
@@ -91,6 +91,7 @@ const cards = [
 ];
 const quietRoute = lf('wu2021-quiet-route', locale);
 const guo = lf('mj-cohort-mortality-guo2021', locale);
+const idle = lf('idle-stop-mixed-evidence', locale);
 ---
 
 <Base locale={locale} title={t.meta.title} description={t.meta.description} share="act" money>
@@ -119,35 +120,23 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
       <section class="card" id="walk" aria-labelledby="walk-t">
         <h2 class="card__t" id="walk-t">{t.walk.title}</h2>
         <div class="first">
-          <p class="first__k">{t.first}</p>
+          <p class="first__kicker">{t.first}</p>
           <p class="first__do">{t.walk.top}</p>
-          <p class="first__why">
-            {fill(t.walk.topWhy, { cm: tailpipeCm })}
-            <KindChip locale={locale} of={fact('iot-exhaust-height-assumption')} size="sm" />
-          </p>
-          <p class="first__mask">
-            <span>{t.walk.mask}</span>
-            <KindChip locale={locale} of={fact('mask-niosh-no-gas')} size="sm" />
-          </p>
+          <div class="first__why has-chip"><p>{fill(t.walk.topWhy, { cm: tailpipeCm })}</p><KindChip locale={locale} of={fact('iot-exhaust-height-assumption')} size="sm" /></div>
+          <div class="first__mask has-chip"><p><span>{t.walk.mask}</span></p><KindChip locale={locale} of={fact('mask-niosh-no-gas')} size="sm" /></div>
           <a class="card__link" href={href('/questions/mask/', locale)}>{t.walk.maskLink}<Icon name="arrow-right" size="1.05em" /></a>
         </div>
         <h3 class="more__t">{t.more}</h3>
         <ul class="more">
           <li>
             <p class="more__do">{t.walk.route}</p>
-            <p class="more__why">
-              {fill(t.walk.routeWhy, quiet)}
-              <KindChip locale={locale} of={fact('wu2021-quiet-route')} size="sm" />
-            </p>
-            {quietRoute.caveat && <p class="more__caveat">{quietRoute.caveat}</p>}
+            <div class="more__why has-chip"><p>{fill(t.walk.routeWhy, quiet)}</p><KindChip locale={locale} of={fact('wu2021-quiet-route')} size="sm" /></div>
+            {quietRoute.caveat && <details class="careful" data-sheet><summary>{t.careful}</summary><p>{quietRoute.caveat}</p></details>}
           </li>
           <li>
             <p class="more__do">{t.walk.keepWalking}</p>
-            <p class="more__why">
-              {t.walk.keepWalkingWhy}
-              <KindChip locale={locale} of={fact('mj-cohort-mortality-guo2021')} size="sm" />
-            </p>
-            {guo.caveat && <p class="more__caveat">{guo.caveat}</p>}
+            <div class="more__why has-chip"><p>{t.walk.keepWalkingWhy}</p><KindChip locale={locale} kind="study" where={chipWhere.taiwan[locale]} size="sm" /></div>
+            {guo.caveat && <details class="careful" data-sheet><summary>{t.careful}</summary><p>{guo.caveat}</p></details>}
           </li>
           <li>
             <p class="more__do">{t.walk.smoky}</p>
@@ -173,12 +162,9 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
       <section class="card" id="parents" aria-labelledby="parents-t">
         <h2 class="card__t" id="parents-t">{t.parents.title}</h2>
         <div class="first">
-          <p class="first__k">{t.first}</p>
+          <p class="first__kicker">{t.first}</p>
           <p class="first__do">{t.parents.top}</p>
-          <p class="first__why">
-            {fill(t.parents.topWhy, { lo: child.lo, hi: child.hi })}
-            <KindChip locale={locale} of={fact('child-air-per-kg')} size="sm" />
-          </p>
+          <div class="first__why has-chip"><p>{fill(t.parents.topWhy, { lo: child.lo, hi: child.hi })}</p><KindChip locale={locale} of={fact('child-air-per-kg')} size="sm" /></div>
         </div>
         <h3 class="more__t">{t.more}</h3>
         <ul class="more">
@@ -201,27 +187,19 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
       <section class="card" id="ride" aria-labelledby="ride-t">
         <h2 class="card__t" id="ride-t">{t.ride.title}</h2>
         <div class="first">
-          <p class="first__k">{t.first}</p>
+          <p class="first__kicker">{t.first}</p>
           <p class="first__do">{t.ride.top}</p>
-          <p class="first__why">
-            {fill(t.ride.topWhy, { share: top10.text })}
-            <KindChip locale={locale} kind="derived" size="sm" />
-          </p>
+          <div class="first__why has-chip"><p>{fill(t.ride.topWhy, { share: top10.text })}</p><KindChip locale={locale} kind="derived" size="sm" /></div>
           <a class="card__link card__link--primary" href={href('/electric/', locale)}>{t.ride.calcLink}<Icon name="arrow-right" size="1.05em" /></a>
         </div>
         <h3 class="more__t">{t.more}</h3>
         <ul class="more">
           <li>
-            <p class="more__do">
-              {fill(t.ride.twoStroke, twoStroke)}
-              <KindChip locale={locale} of={fact('two-stroke-remaining')} size="sm" />
-            </p>
+            <div class="more__do has-chip"><p>{fill(t.ride.twoStroke, twoStroke)}</p><KindChip locale={locale} of={fact('two-stroke-remaining')} size="sm" /></div>
           </li>
           <li>
-            <p class="more__do">
-              {t.ride.idle}
-              <KindChip locale={locale} of={fact('idle-stop-mixed-evidence')} size="sm" />
-            </p>
+            <div class="more__do has-chip"><p>{t.ride.idle}</p><KindChip locale={locale} of={fact('idle-stop-mixed-evidence')} size="sm" /></div>
+            {idle.caveat && <details class="careful" data-sheet><summary>{t.careful}</summary><p>{idle.caveat}</p></details>}
           </li>
           <li>
             <p class="more__do">{t.ride.rider}</p>
@@ -234,7 +212,7 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
       <section class="card" id="community" aria-labelledby="community-t">
         <h2 class="card__t" id="community-t">{t.community.title}</h2>
         <div class="first">
-          <p class="first__k">{t.first}</p>
+          <p class="first__kicker">{t.first}</p>
           <p class="first__do">{t.community.top}</p>
           <a class="card__link card__link--primary" href={href('/print/poster/', locale)}>{t.community.topLink}<Icon name="arrow-right" size="1.05em" /></a>
         </div>
@@ -246,10 +224,7 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
           </li>
           <li>
             <p class="more__do">{t.community.crossing}</p>
-            <p class="more__why">
-              {fill(t.community.crossingWhy, { gap: turnGapCm })}
-              <KindChip locale={locale} of={fact('marking-rules-turn-box')} size="sm" />
-            </p>
+            <div class="more__why has-chip"><p>{fill(t.community.crossingWhy, { gap: turnGapCm })}</p><KindChip locale={locale} of={fact('marking-rules-turn-box')} size="sm" /></div>
           </li>
           <li>
             <p class="more__do">{t.community.notice}</p>
@@ -261,11 +236,10 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
       <section class="card card--wide" id="policy" aria-labelledby="policy-t">
         <h2 class="card__t" id="policy-t">{t.policy.title}</h2>
         <div class="first">
-          <p class="first__k">{t.first}</p>
+          <p class="first__kicker">{t.first}</p>
           <p class="first__do">{fill(t.policy.top, { nextYear })}</p>
           <p class="first__why">
-            {lf('econ-no-2027-programme', locale).statement}
-            <KindChip locale={locale} of={fact('econ-no-2027-programme')} size="sm" />
+            {fill(t.policy.topWhy, { nextYear })}
           </p>
         </div>
 
@@ -276,15 +250,15 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
             <li class="ask">
               <span class="ask__n" aria-hidden="true">{i + 1}</span>
               <div class="ask__body">
-                <p class="ask__text">
-                  {fill(a.ask, askVars)}
+                <div class="ask__text has-chip">
+                  <p>{fill(a.ask, askVars)}</p>
                   {askFacts[i].length > 0 && <KindChip locale={locale} of={fact(askFacts[i][0])} size="sm" />}
-                </p>
-                <p class="ask__to">
-                  <span class="ask__to-l">{t.policy.to}</span>
+                </div>
+                <p class="ask__label">
+                  <span class="ask__label-l">{t.policy.to}</span>
                   {a.to}
                 </p>
-                {i === 5 && <p class="ask__to">{t.policy.position}</p>}
+                {i === 5 && <p class="ask__label">{t.policy.position}</p>}
               </div>
             </li>
           ))}
@@ -465,10 +439,10 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
     background: var(--bg-sunken);
     border-inline-start: 6px solid var(--clean);
   }
-  .first__k {
+  .first__kicker {
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
-    color: var(--clean-ink, var(--ink-2));
+    color: var(--ink);
   }
   .first__do {
     font-size: 1.3125rem;
@@ -487,13 +461,15 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
     border-block-start: 1px solid var(--line);
     font-weight: var(--fw-bold);
   }
-  .first__why :global(.chip),
-  .first__mask :global(.chip),
-  .more__why :global(.chip),
-  .more__do :global(.chip),
-  .ask__text :global(.chip) {
-    margin-inline-start: 0.35em;
-    vertical-align: 0.1em;
+  .has-chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+  .has-chip > p {
+    flex: 1 1 100%;
+    margin: 0;
   }
   .card__link {
     justify-self: start;
@@ -550,10 +526,39 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
   .more__why {
     color: var(--ink);
   }
-  .more__caveat {
+  .careful summary {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    list-style: none;
+    min-block-size: var(--tap, 3rem);
     font-size: var(--fs-sm);
-    color: var(--ink-2);
-    line-height: 1.55;
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .careful summary::-webkit-details-marker {
+    display: none;
+  }
+  .careful summary::before {
+    content: '';
+    inline-size: 0.5em;
+    block-size: 0.5em;
+    border-inline-end: 2px solid currentColor;
+    border-block-end: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 0.15s;
+  }
+  .careful[open] summary::before {
+    transform: rotate(45deg);
+  }
+  .careful p {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
+    color: var(--ink);
+  }
+  .ev-fig :global(.cite-chip) {
+    margin: 4px;
   }
   .msg {
     display: grid;
@@ -600,12 +605,12 @@ const guo = lf('mj-cohort-mortality-guo2021', locale);
     font-weight: var(--fw-bold);
     line-height: 1.55;
   }
-  .ask__to {
+  .ask__label {
     font-size: var(--fs-sm);
     color: var(--ink-2);
     line-height: 1.5;
   }
-  .ask__to-l {
+  .ask__label-l {
     font-weight: var(--fw-bold);
     color: var(--ink);
     margin-inline-end: 0.4em;

@@ -32,10 +32,11 @@ export interface MonthlyBarsProps {
   locale: Loc;
   /** km a month, for the chart's name */
   km: number;
-  petrol: MonthBar;
-  home: MonthBar;
-  swapPlan: MonthBar;
-  swapPayg: MonthBar;
+  /** each bar: a MonthBar, or just the figure in NT$ a month */
+  petrol: MonthBar | number;
+  home: MonthBar | number;
+  swapPlan: MonthBar | number;
+  swapPayg: MonthBar | number;
   /** axis end, NT$: pass one value to several charts to draw them to the same scale. Default: this chart's largest figure */
   max?: number;
   /** print the data table toggle (default true) */
@@ -52,19 +53,22 @@ interface OptionLike {
 export interface MonthCaseLike {
   km: number;
   petrol: { name: L; monthly: { low: number; typical: number; high: number } };
-  home: { typical: { lo: number; hi: number } };
+  home: { typical: { lo: number; hi: number }; options?: OptionLike[] };
   swapPlan: OptionLike;
   swapPayg: OptionLike;
 }
 
 /** MonthlyBars props from one of lane I's month cases (the `typical` figures, as the page prints them). */
 export function monthlyBarsFromCase(m: MonthCaseLike, locale: Loc, extra: Partial<MonthlyBarsProps> = {}): MonthlyBarsProps {
-  const one = (o: OptionLike): MonthBar => ({ lo: o.monthly.typical, hi: o.monthly.typical, note: [o.name[locale], o.planName?.[locale]].filter(Boolean).join(locale === 'en' ? ', ' : '・') });
+  // registry names reach a reader here: 台 not 臺, and a space between a figure and a Chinese word
+  const tidy = (t: string) => (locale === 'en' ? t : t.replaceAll('臺', '台').replace(/(\d)([\u4e00-\u9fff])/g, '$1 $2'));
+  const one = (o: OptionLike): MonthBar => ({ lo: o.monthly.typical, hi: o.monthly.typical, note: tidy([o.name[locale], o.planName?.[locale]].filter(Boolean).join(locale === 'en' ? ', ' : '・')) });
+  const homeNames = [...new Set((m.home.options ?? []).map((o) => o.name[locale]))];
   return {
     locale,
     km: m.km,
-    petrol: { lo: m.petrol.monthly.typical, hi: m.petrol.monthly.typical, note: m.petrol.name[locale] },
-    home: { lo: m.home.typical.lo, hi: m.home.typical.hi },
+    petrol: { lo: m.petrol.monthly.typical, hi: m.petrol.monthly.typical, note: tidy(m.petrol.name[locale]) },
+    home: { lo: m.home.typical.lo, hi: m.home.typical.hi, note: homeNames.length ? tidy(homeNames.join(locale === 'en' ? ', ' : '、')) : undefined },
     swapPlan: one(m.swapPlan),
     swapPayg: one(m.swapPayg),
     ...extra,
@@ -74,7 +78,8 @@ export function monthlyBarsFromCase(m: MonthCaseLike, locale: Loc, extra: Partia
 export const monthlyBarsTitle = (locale: Loc, km: number): string => fill(chartText.month.title, locale, { km });
 
 /** The largest figure a set of month cases draws: a shared axis end for the four distances. */
-export const monthlyBarsMax = (cases: MonthlyBarsProps[]): number => Math.max(1, ...cases.flatMap((c) => [c.petrol.hi, c.home.hi, c.swapPlan.hi, c.swapPayg.hi]));
+const bar = (b: MonthBar | number): MonthBar => (typeof b === 'number' ? { lo: b, hi: b } : b);
+export const monthlyBarsMax = (cases: MonthlyBarsProps[]): number => Math.max(1, ...cases.flatMap((c) => [c.petrol, c.home, c.swapPlan, c.swapPayg].map((b) => bar(b).hi)));
 
 const THICK = 28;
 const THIN = 14;
@@ -82,17 +87,21 @@ const THIN = 14;
 export function renderMonthlyBars(p: MonthlyBarsProps): string {
   const { locale } = p;
   const T = chartText.month;
-  const max = p.max ?? Math.max(1, p.petrol.hi, p.home.hi, p.swapPlan.hi, p.swapPayg.hi);
+  const petrol = bar(p.petrol);
+  const home = bar(p.home);
+  const swapPlan = bar(p.swapPlan);
+  const swapPayg = bar(p.swapPayg);
+  const max = p.max ?? Math.max(1, petrol.hi, home.hi, swapPlan.hi, swapPayg.hi);
   const x = (v: number) => Math.min(100, (v / max) * 100);
   const amount = (b: MonthBar) => {
     const s = yuanRange(b.lo, b.hi, locale);
     return b.about === false ? s : about(s, locale);
   };
   const rows = [
-    { key: 'petrol', b: p.petrol, label: p.petrol.label ?? T.petrol[locale], tone: 'exhaust', thick: true },
-    { key: 'home', b: p.home, label: p.home.label ?? T.home[locale], tone: 'clean', thick: true },
-    { key: 'swap-plan', b: p.swapPlan, label: p.swapPlan.label ?? T.swapPlan[locale], tone: 'clean', thick: false },
-    { key: 'swap-payg', b: p.swapPayg, label: p.swapPayg.label ?? T.swapPayg[locale], tone: 'clean', thick: false },
+    { key: 'petrol', b: petrol, label: petrol.label ?? T.petrol[locale], tone: 'exhaust', thick: true },
+    { key: 'home', b: home, label: home.label ?? T.home[locale], tone: 'clean', thick: true },
+    { key: 'swap-plan', b: swapPlan, label: swapPlan.label ?? T.swapPlan[locale], tone: 'clean', thick: false },
+    { key: 'swap-payg', b: swapPayg, label: swapPayg.label ?? T.swapPayg[locale], tone: 'clean', thick: false },
   ];
   const row = (r: (typeof rows)[number]) => {
     const w = x(r.b.hi);
@@ -118,7 +127,8 @@ export function renderMonthlyBars(p: MonthlyBarsProps): string {
     `</div>`;
 
   const summary = fill(T.sum, locale, { km: p.km, rows: rows.map((r) => fill(T.sumRow, locale, { label: r.label, v: amount(r.b) })).join(T.sumJoin[locale]) });
-  const hasNotes = rows.some((r) => r.b.note);
+  // never an empty cell: the notes column is printed only when every row has a note
+  const hasNotes = rows.every((r) => r.b.note);
   const num = (b: MonthBar) => (Math.round(b.lo) === Math.round(b.hi) ? yuan(b.lo, locale) : yuanRange(b.lo, b.hi, locale));
   const table: ChartTable = {
     head: [T.tableWhat[locale], T.tableValue[locale], ...(hasNotes ? [T.tableNote[locale]] : [])],

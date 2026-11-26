@@ -89,7 +89,7 @@ export function workingPerRed(locale: Loc): WorkingSumProps {
     locale,
     mode: 'sum',
     steps: [
-      { value: about(withUnit(n(rate.mid, locale, 'integer'), g, locale), locale), label: fill(T.perRed.rate, locale, { lo: n(rate.lo, locale), hi: n(rate.hi, locale) }) },
+      { value: about(withUnit(n(rate.mid, locale, 'integer'), g, locale), locale), label: fill(T.perRed.rate, locale, { lo: n(rate.lo, locale), hi: n(rate.hi, locale) }), chip: rate.kind },
       { op: '÷', value: n(est.emit.co.perRedSum.reds, locale), label: fill(T.perRed.reds, locale, { n: est.emit.co.perRedSum.reds, s: est.signal.redLength_s }) },
     ],
     result: { value: about(withUnit(n(red.mid, locale), g, locale), locale), label: fill(T.perRed.result, locale, { lo: n(red.lo, locale), hi: n(red.hi, locale) }), kind: 'estimate' },
@@ -110,7 +110,7 @@ export function workingPerRedCan(locale: Loc): WorkingSumProps {
     locale,
     mode: 'sum',
     steps: [
-      { value: about(withUnit(n(L.mid, locale), litres, locale), locale), label: fill(T.can.volume, locale, { g: n(est.emit.co.perRed_g.mid, locale), lo: n(L.lo, locale), hi: n(L.hi, locale) }) },
+      { value: about(withUnit(n(L.mid, locale), litres, locale), locale), label: fill(T.can.volume, locale, { g: n(est.emit.co.perRed_g.mid, locale), lo: n(L.lo, locale), hi: n(L.hi, locale) }), chip: L.kind },
       { op: '÷', value: withUnit(n(sum.canMl / 1000, locale), litres, locale), label: fill(T.can.can, locale, { ml: sum.canMl }) },
     ],
     result: { value: cans.charAt(0).toUpperCase() + cans.slice(1), label: T.can.result[locale], kind: 'estimate' },

@@ -498,8 +498,11 @@ export const chipWhere = {
  * The chip for a chip id, or for any registry evidence id (`fact.evidence`, through the
  * registry's own `readerKind`). Throws on anything else: the old gap and inference badges have
  * no chip, so a page that still asks for one fails the build.
+ * `arithmetic` is accepted as another name for `derived` (本站計算): the first draft of this
+ * lane's contract called the chip that, and the money lane's contract still does.
  */
 export function chipKindOf(kind: string): ChipKind {
+  if (kind === 'arithmetic') return 'derived';
   if ((chipKinds as readonly string[]).includes(kind)) return kind as ChipKind;
   if ((evidenceTypes as readonly string[]).includes(kind)) return readerKind(kind as Evidence);
   throw new Error(`[ui strings] "${kind}" has no reader chip (brief 4.1 has five: ${readerKinds.join(', ')}).`);
@@ -745,7 +748,8 @@ export function t(value: L10n, locale: Locale, vars?: Record<string, string | nu
 //   Colons    after a label: zh 「：」 (full width, no space), en ': '. Use `colon(locale)`.
 //   Brackets  zh copy uses full-width （）「」 and ／ between Chinese words.
 //   Numbers   grouped with commas (20,980). Decimals as the source prints them.
-//   Money     NT$20,980 — no space after NT$, either language (`money()`).
+//   Money     zh 「20,980 元」 (a no-break space before 元), en 'NT$20,980' (no space after NT$).
+//             Never 元 and NT$ in one language (brief 6.6). Use `money()`.
 //   Ranges    two numbers joined by an en dash with no spaces: 4–14, 0.67–0.86 (`range()`).
 //             zh prose may write 「4 到 14」 instead; never a hyphen.
 //   Negatives a true minus sign (U+2212): −40%.
@@ -795,8 +799,15 @@ export function langHtml(s: string, locale: Locale): string {
 export const num = (n: number, locale: Locale, maxDecimals = 2): string =>
   new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: maxDecimals }).format(n).replace('-', '−');
 
-/** Money: NT$20,980, no space, either language. */
-export const money = (n: number, locale: Locale): string => `${n < 0 ? '−' : ''}${units.ntd}${num(Math.abs(n), locale, 0)}`;
+/**
+ * Money, one way per language (brief 6.6): 「20,980 元」 in Chinese, 'NT$20,980' in English; never
+ * both in one language. The Chinese space is a no-break space, so the number and 元 stay on
+ * one line (the same output as the calculator's own `money()` in pages/electric/model.ts).
+ */
+export const money = (n: number, locale: Locale): string => {
+  const amount = num(Math.abs(n), locale, 0);
+  return `${n < 0 ? '−' : ''}${locale === 'en' ? `${units.ntd}${amount}` : `${amount} 元`}`;
+};
 
 /** A numeric range: 4–14 (en dash, no spaces). */
 export const range = (a: number | string, b: number | string, locale: Locale): string =>

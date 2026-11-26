@@ -39,10 +39,10 @@ const pollutants = [
 <PrintPage locale={locale} title={b.metaTitle} description={b.metaDescription}>
   <div class="toolbar">
     <p>{b.screenNote}</p>
-    <p class="toolbar__row">
+    <div class="toolbar__row">
       <button type="button" class="toolbar__btn" data-print hidden>{b.printButton}</button>
       <a class="toolbar__link" href={href('/act/#policy', locale)}>{b.back}</a>
-    </p>
+    </div>
   </div>
 
   <article class="sheet" aria-labelledby="brief-t">
@@ -55,10 +55,10 @@ const pollutants = [
       <div class="sheet__col">
         <section class="blk">
           <h2 class="blk__h">{b.kerbHead}</h2>
-          <Picture locale={locale} kind="kerb" scenario="dozen" />
+          <div class="pic" data-fit><Picture locale={locale} kind="kerb" scenario="dozen" /></div>
           <div class="kv">
-            <p class="kv__row"><span class="kv__k">{estimateText.alreadyThere[locale]}</span><span class="kv__v">{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</span><KindChip locale={locale} kind="measured" size="sm" /></p>
-            <div class="kv__row"><span class="kv__k">{estimateText.addedByPack[locale]}</span><EstimateValue locale={locale} slotId="co.dozen.add" /></div>
+            <div class="kv__row"><span class="kv__label">{estimateText.alreadyThere[locale]}</span><span class="kv__v">{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</span><KindChip locale={locale} kind="measured" size="sm" /></div>
+            <div class="kv__row"><span class="kv__label">{estimateText.addedByPack[locale]}</span><EstimateValue locale={locale} slotId="co.dozen.add" /></div>
             <p class="kv__note">{estimateText.ppmGloss[locale]}</p>
           </div>
         </section>
@@ -73,7 +73,7 @@ const pollutants = [
       <div class="sheet__col">
         <section class="blk">
           <h2 class="blk__h">{b.tableHead}</h2>
-          <table class="nt">
+          <div class="nt-wrap"><table class="nt">
             <thead>
               <tr>
                 <th scope="col">{b.tableScenario}</th>
@@ -103,17 +103,17 @@ const pollutants = [
                 {pollutants.map((p) => <td>{p.conf}</td>)}
               </tr>
             </tbody>
-          </table>
+          </table></div>
           <p class="blk__small">{b.tableNote}</p>
         </section>
 
         <section class="blk">
           <h2 class="blk__h">{b.heightsHead}</h2>
-          <Picture locale={locale} kind="heights" />
-          <p class="blk__p">
-            {fill(b.heightsBody, { lo: child.lo, hi: child.hi })}
+          <div class="pic" data-fit><Picture locale={locale} kind="heights" /></div>
+          <div class="blk__p has-chip">
+            <p>{fill(b.heightsBody, { lo: child.lo, hi: child.hi })}</p>
             <KindChip locale={locale} kind="study" size="sm" />
-          </p>
+          </div>
         </section>
 
         <section class="blk blk--ask">
@@ -134,6 +134,11 @@ const pollutants = [
 </PrintPage>
 
 <script>
+  // print: size each picture by its height (its shape comes from the svg's viewBox)
+  for (const box of document.querySelectorAll<HTMLElement>('[data-fit]')) {
+    const v = box.querySelector('svg.scene__art')?.getAttribute('viewBox')?.split(/[\s,]+/).map(Number);
+    if (v && v[3]) box.style.setProperty('--ar', String(v[2] / v[3]));
+  }
   const btn = document.querySelector<HTMLButtonElement>('[data-print]');
   if (btn) {
     btn.hidden = false;
@@ -193,6 +198,7 @@ const pollutants = [
     display: grid;
     gap: 14px;
     border-block-start: 6mm solid var(--signal-red, #c62828);
+    overflow-x: clip;
   }
   .sheet p,
   .sheet h2 {
@@ -213,11 +219,12 @@ const pollutants = [
   }
   .sheet__cols {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
   @media (min-width: 46em) {
     .sheet__cols {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 7mm;
     }
   }
@@ -239,9 +246,15 @@ const pollutants = [
     padding-block-start: 6px;
     border-block-start: 2px solid var(--ink);
   }
+  .has-chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+  }
   .blk__p,
   .blk__ask {
-    font-size: var(--fs-sm);
+    font-size: var(--fs-base);
     line-height: 1.55;
   }
   .blk__p :global(.chip) {
@@ -257,7 +270,7 @@ const pollutants = [
     line-height: 1.5;
   }
   .blk__k1 {
-    font-size: var(--fs-sm);
+    font-size: var(--fs-base);
     line-height: 1.55;
     padding: 8px 10px;
     background: var(--bg-sunken);
@@ -274,7 +287,7 @@ const pollutants = [
     gap: 2px 10px;
     font-size: var(--fs-sm);
   }
-  .kv__k {
+  .kv__label {
     flex: 1 1 8em;
     font-weight: var(--fw-bold);
   }
@@ -286,8 +299,14 @@ const pollutants = [
     font-size: var(--fs-xs);
     color: var(--ink-2);
   }
+  .nt-wrap {
+    position: relative;
+    overflow-x: auto;
+  }
+
   .nt {
     inline-size: 100%;
+    min-inline-size: 34rem;
     border-collapse: collapse;
     font-size: var(--fs-xs);
     line-height: 1.35;
@@ -295,7 +314,7 @@ const pollutants = [
   }
   .nt th,
   .nt td {
-    padding: 4px 3px;
+    padding: 6px 5px;
     border-block-end: 1px solid var(--line);
     text-align: start;
     vertical-align: top;
@@ -316,12 +335,19 @@ const pollutants = [
   .nt__conf td {
     color: var(--ink-2);
   }
-  /* on paper an estimate is text with its chip: no tap target, no arrow */
-  .sheet :global(.est) {
-    min-block-size: 0;
+  /* in the table an estimate is text with its chip; on paper, everywhere: no tap target, no arrow */
+  .nt :global(.est) {
+    min-block-size: var(--tap, 3rem);
     padding: 0;
     margin: 0;
     font-size: inherit;
+  }
+  @media print {
+    .sheet :global(.est) {
+      min-block-size: 0;
+      padding: 0;
+      margin: 0;
+    }
   }
   .sheet :global(.est__go) {
     display: none;
@@ -366,15 +392,30 @@ const pollutants = [
       grid-template-columns: 1fr 1fr;
       gap: 6mm;
     }
+    .nt {
+      min-inline-size: 0;
+    }
     .sheet__col {
       gap: 3mm;
     }
     .sheet__title {
       font-size: 19pt;
     }
-    .sheet :global(.scene__art) {
-      max-block-size: 52mm;
-      inline-size: auto;
+    /* paper is read at arm's length, not on a phone: the whole sheet at 10pt body */
+    :global(html) {
+      font-size: 72%;
+    }
+    :global(html:lang(en)) {
+      font-size: 68%;
+    }
+    .pic {
+      --fit-h: 58mm;
+    }
+    .sheet:lang(en) .pic {
+      --fit-h: 50mm;
+    }
+    [data-fit] :global(.scene) {
+      inline-size: min(100%, calc(var(--fit-h) * var(--ar, 1.3)));
       margin-inline: auto;
     }
   }

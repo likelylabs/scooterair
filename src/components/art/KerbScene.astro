@@ -74,10 +74,11 @@ const stepped = (html: string) => (scenario === 'all' ? stepSources(html, steps)
 
 const street = [
   shopfronts({ x0: -10, x1: 460, base: 0, top: -340, bay: 196, shift: 96 }),
-  // the road, the kerb the people stand on, and the first bars of the crossing
+  // the road and the kerb the people stand on
   '<rect class="a-road" x="-10" y="0" width="470" height="90"/>',
   `<path class="a-kerb" d="M-10,-1H${front.x - 14}V13H-10Z"/>`,
-  '<path class="a-paint" d="M-10,34H120V48H-10ZM-10,62H120V76H-10Z" opacity="0.9"/>',
+  // a lane line on the road, clear of the corner where the tag sits
+  `<path class="a-paint" opacity="0.8" d="M${front.x + 10},44H460V54H${front.x + 10}Z"/>`,
 ].join('');
 const far =
   `<g class="${scenario === 'all' ? 'air-steps' : ''}">` +

@@ -551,6 +551,24 @@ a.hc-row__link .hc-row__n {
   block-size: 1em;
 }
 
+/* a chart on a home screen, where every pixel of height is counted */
+.hc--compact {
+  gap: 0.45rem;
+}
+.hc--compact .hc-rows {
+  gap: 0.3rem;
+}
+.hc--compact :is(.hc-row, .hc-row__text, a.hc-row__link) {
+  gap: 0.1rem;
+}
+.hc--compact .hc-zoom {
+  margin-block-start: -0.3rem;
+  gap: 0.15rem;
+}
+.hc--compact .hc-zoom__labels {
+  gap: 0.1rem;
+}
+
 /* ---- plots ------------------------------------------------------------------------------------ */
 .hc-plot {
   display: block;
@@ -580,8 +598,10 @@ a.hc-row__link .hc-row__n {
 .hc-dot,
 .hc-square {
   fill: var(--chart-ink);
-  stroke: var(--here, var(--bg));
-  stroke-width: 2;
+}
+/* the ring is its own shape under the mark, so the mark's paint is its fill and nothing else */
+.hc-ring {
+  fill: var(--here, var(--bg));
 }
 .hc-solid {
   fill: var(--chart-ink);
@@ -1231,7 +1251,9 @@ a.hc-row__link .hc-row__n {
   .hc-dot,
   .hc-square {
     fill: CanvasText;
-    stroke: Canvas;
+  }
+  .hc-ring {
+    fill: Canvas;
   }
   .hc-solid,
   .hc-zoom__block {
@@ -1266,4 +1288,9 @@ a.hc-row__link .hc-row__n {
     box-shadow: none;
     outline: 1px solid CanvasText;
   }
+}
+
+/* a figure that opens a box starts with a capital in English ("About 15 g") */
+.hc-sum__v::first-letter {
+  text-transform: uppercase;
 }

@@ -1,0 +1,52 @@
+---
+/**
+ * SwapControl — the slider of G10: 10 輛裡，換幾輛電動機車？ Ten stops, with
+ * a minus and a plus button beside it, each 48 px, so nothing depends on a
+ * precise drag (brief 6.3). Put it in the same <Screen> as <SwapScene> (the
+ * `controls` slot); the picture follows it.
+ *
+ * It also fills the host's chip: any element in the same Screen marked
+ *   data-swap-out="pct"   the share swapped, in percent (n ÷ total × 100)
+ *   data-swap-out="n"     how many are electric      data-swap-out="rest"  how many are not
+ * is rewritten on every change. Write the resting value in the markup.
+ * Without scripting the control is hidden and the picture shows its resting state.
+ *
+ * Props
+ *   locale  Locale
+ *   value   where it rests: 0–10 (default 10; the same as SwapScene's `value`)
+ *   total   number of scooters (default 10: SwapScene draws ten)
+ *   class
+ *
+ *   <SwapControl slot="controls" locale={locale} />
+ *   <p slot="chips">機車排的廢氣：少 <b data-swap-out="pct">100</b>%</p>
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art, fill } from '@/i18n/art';
+import { uid } from '@/components/uid';
+
+interface Props {
+  locale: Locale;
+  value?: number;
+  total?: number;
+  class?: string;
+}
+const { locale, total = 10, class: cls } = Astro.props;
+const value = Math.max(0, Math.min(total, Math.round(Astro.props.value ?? total)));
+const id = uid('swap');
+const text = (n: number) => fill(art.swap.value, locale, { n, rest: total - n });
+---
+
+<div class:list={['swapctl', cls]} data-swap-control data-total={total} data-value={value} data-js-only>
+  <label class="swapctl__q" for={id}>{fill(art.swap.question, locale, { total })}</label>
+  <div class="swapctl__row">
+    <button type="button" class="swapctl__btn" data-step="-1" aria-label={art.swap.fewer[locale]} disabled={value <= 0}><span aria-hidden="true">−</span></button>
+    <input class="swapctl__range" id={id} type="range" min="0" max={total} step="1" value={value} style={`--fill:${(value / total) * 100}%`} aria-describedby={`${id}-out`} />
+    <button type="button" class="swapctl__btn" data-step="1" aria-label={art.swap.more[locale]} disabled={value >= total}><span aria-hidden="true">＋</span></button>
+  </div>
+  <p class="swapctl__out" id={`${id}-out`} aria-live="polite"><span data-swap-text data-template={art.swap.value[locale]}>{text(value)}</span></p>
+</div>
+
+<script>
+  import './swap.client';
+</script>

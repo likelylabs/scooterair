@@ -89,7 +89,7 @@ const log = corrections
     <div class="prose">
       <p class="ab-p ab-k1">{kSentences.K1[locale]}</p>
       <p class="ab-p">{t.estimate.p1}</p>
-      <p><a class="ab-btn" href={href('/estimate/', locale)}>{t.estimate.link}<Icon name="arrow-right" size="1.05em" /></a></p>
+      <div><a class="ab-btn" href={href('/estimate/', locale)}>{t.estimate.link}<Icon name="arrow-right" size="1.05em" /></a></div>
     </div>
   </Section>
 
@@ -126,7 +126,7 @@ const log = corrections
         ))}
       </dl>
       <p class="ab-quiet">{fill(t.method.checked, { money: formatDate(snapshot.checkedOn, locale, true) })}</p>
-      <p><a class="ab-btn" href={href('/sources/', locale)}>{t.method.sources}<Icon name="arrow-right" size="1.05em" /></a></p>
+      <div><a class="ab-btn" href={href('/sources/', locale)}>{t.method.sources}<Icon name="arrow-right" size="1.05em" /></a></div>
     </div>
   </Section>
 
@@ -151,15 +151,14 @@ const log = corrections
               <time datetime={e.date}>{formatDate(e.date, locale, true)}</time>
               <span class="log__own">{e.own ? t.corrections.ours : t.corrections.common}</span>
             </p>
-            <p class="log__said">
-              <span class="log__l">{t.corrections.said}</span>
-              <span class="vh">{t.corrections.saidSr}</span>
-              <s>{e.said}</s>
-            </p>
-            <p class="log__instead">
-              <span class="log__l">{t.corrections.instead}</span>
-              {e.instead}
-            </p>
+            <div class="log__said">
+              <span class="log__label">{t.corrections.said}</span>
+              <p><span class="vh">{t.corrections.saidSr}</span><s>{e.said}</s></p>
+            </div>
+            <div class="log__instead">
+              <span class="log__label">{t.corrections.instead}</span>
+              <p>{e.instead}</p>
+            </div>
             <Details summary={`${t.corrections.why} · ${t.corrections.basis}`}>
               <div class="log__why">
                 <p>{e.why}</p>
@@ -256,6 +255,10 @@ const log = corrections
     display: inline-flex;
     align-items: center;
     min-block-size: var(--tap, 3rem);
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
   }
   .chips {
     margin: 0;
@@ -340,7 +343,7 @@ const log = corrections
   .log__own {
     font-weight: var(--fw-bold);
   }
-  .log__l {
+  .log__label {
     display: block;
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);

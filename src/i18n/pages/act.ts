@@ -29,6 +29,7 @@ export default copy({
   first: { 'zh-TW': '先做這一件', en: 'Do this first' },
   more: { 'zh-TW': '還可以做', en: 'You can also' },
   why: { 'zh-TW': '為什麼', en: 'Why' },
+  careful: { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
 
   walk: {
     title: { 'zh-TW': '我走路', en: 'I walk' },
@@ -139,6 +140,10 @@ export default copy({
     title: { 'zh-TW': '我是民意代表或公務員', en: 'I’m a councillor or an official' },
     jump: { 'zh-TW': '民意代表或公務員', en: 'A councillor or official' },
     top: { 'zh-TW': '公布 {nextYear} 年的補助方案，一次講清楚好幾年。', en: 'Publish the {nextYear} subsidy programme, setting out several years at a time.' },
+    topWhy: {
+      'zh-TW': '{nextYear} 年的補助，還沒有一項定案；環境部只預告了一份草案。想換車的人，要等得到數字才能算。',
+      en: 'Nothing is confirmed for {nextYear} yet; the environment ministry has only pre-announced a draft. People thinking of switching need the figures before they can do the sums.',
+    },
     asksTitle: { 'zh-TW': '我們對政府的六個要求', en: 'Six asks of government' },
     asksLead: {
       'zh-TW': '依急迫程度排列。每一項後面，是我們建議負責的機關。',

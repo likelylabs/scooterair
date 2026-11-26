@@ -123,15 +123,16 @@ export function mveModel(locale: Loc, scenario: ScenarioKey = 'dozen'): MveModel
   ].join(locale === 'en' ? ' ' : '');
 
   const paren = (a: string, b: string) => (locale === 'en' ? `${a} (${b})` : `${a}（${b}）`);
-  const chip = (k: ReaderKind) => chipWord(k, locale);
+  // two columns, so the table fits a 320px phone: each figure is followed by what kind of figure it is
+  const withKind = (v: string, k: ReaderKind) => paren(v, chipWord(k, locale));
   const table: ChartTable = {
-    head: [T.tableWhere[locale], T.tableValue[locale], T.tableKind[locale]],
+    head: [T.tableWhere[locale], T.tableValue[locale]],
     rows: [
-      [paren(rows[0].label, roadSub), num(bg.shown, locale), chip(rows[0].kind)],
+      [paren(rows[0].label, roadSub), withKind(num(bg.shown, locale), rows[0].kind)],
       // the table gives the readings as the report prints them
-      [paren(rows[1].label, waitSub), list(peaks.map((v) => num(v, locale)), locale), chip('measured')],
-      [paren(rows[2].label, estSub), f.textNoUnit, chip(total.kind)],
-      [T.zoomWho[locale], about(num(who.value, locale), locale), chip(who.kind)],
+      [paren(rows[1].label, waitSub), withKind(list(peaks.map((v) => num(v, locale)), locale), 'measured')],
+      [paren(rows[2].label, estSub), withKind(f.textNoUnit, total.kind)],
+      [T.zoomWho[locale], withKind(about(num(who.value, locale), locale), who.kind)],
     ],
   };
 
@@ -275,8 +276,8 @@ export function bandsModel(pollutant: Pollutant, locale: Loc, opts: { zhuyin?: b
   ].join(sp);
 
   const table: ChartTable = {
-    head: [name, `${T.addedHead[locale]}${locale === 'en' ? ' / ' : '／'}${street}`, T.tableMark[locale]],
-    rows: rows.map((r) => [r.sub ? (locale === 'en' ? `${r.label} (${r.sub})` : `${r.label}（${r.sub}）`) : r.label, r.value, chipWord(r.kind, locale)]),
+    head: [name, `${T.addedHead[locale]}${locale === 'en' ? ' / ' : '／'}${T.compare[locale]}`],
+    rows: rows.map((r) => [r.sub ? (locale === 'en' ? `${r.label} (${r.sub})` : `${r.label}（${r.sub}）`) : r.label, locale === 'en' ? `${r.value} (${chipWord(r.kind, locale)})` : `${r.value}（${chipWord(r.kind, locale)}）`]),
   };
 
   return {

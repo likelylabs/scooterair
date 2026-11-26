@@ -253,36 +253,6 @@
   stroke-width: 2;
 }
 
-/* ---- plan view (ApproachPlan, MeasurementDiagram) ------------------------- */
-.plan-box {
-  fill: none;
-  stroke: var(--art-paint);
-  stroke-width: 5;
-}
-.plan-yellow {
-  fill: none;
-  stroke: var(--art-yellow);
-  stroke-width: 3;
-}
-.plan-lane {
-  fill: none;
-  stroke: var(--art-paint);
-  stroke-width: 4;
-  stroke-dasharray: 22 18;
-}
-.a-ribbon-s {
-  fill: none;
-  stroke: var(--art-haze);
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-.plan-n {
-  font-family: var(--font-body);
-  font-size: 20px;
-  font-weight: 900;
-  fill: var(--ink);
-}
-
 /* ==== The air rule (src/components/art/air.ts; redesign brief 5.1) ==========
  *
  * Three kinds of mark, three layers:
@@ -603,7 +573,7 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:c
 /* ---- AirKey ------------------------------------------------------------------ */
 .air-key {
   display: grid;
-  gap: 0.25rem;
+  gap: 0.5rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -761,3 +731,357 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='cloth']:chec
 html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='surgical']:checked) .mk-on-surgical,
 html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='carbon']:checked) .mk-on-carbon,
 html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checked) .mk-on-n95 { visibility: visible; opacity: 1; }
+
+/* ---- G8 HeightsScene and the breathing rings ---------------------------------- */
+.hs-band { fill: var(--art-yellow); opacity: 0.34; }
+.hs-band-edge { fill: none; stroke: var(--ink-2); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.hs-metre { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-dasharray: 9 6; }
+.hs-pipe { fill: none; stroke: var(--air-rib); stroke-width: 2.6; }
+.scene--heights .hs-num { font-variant-numeric: tabular-nums; font-weight: 600; }
+.scene--heights .hs-pipe-label { color: var(--exhaust-ink); }
+/* one breath in and out: an adult about every four seconds, a child faster */
+@keyframes hs-breathe {
+  0%, 100% { transform: scale(0.82); opacity: 0.7; }
+  45% { transform: scale(1.2); opacity: 1; }
+}
+.hs-breath { transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion='off']) .hs-breath { animation: hs-breathe 4.2s ease-in-out infinite; }
+  html:not([data-motion='off']) .hs-breath--fast { animation-duration: 2.6s; }
+}
+html[data-motion='on'] .hs-breath { animation: hs-breathe 4.2s ease-in-out infinite; }
+html[data-motion='on'] .hs-breath--fast { animation-duration: 2.6s; }
+
+/* ---- G10 SwapScene and SwapControl -------------------------------------------- */
+.swap-gas,
+.swap-ev {
+  transition: opacity 0.45s ease;
+}
+.swap-gas.is-off,
+.swap-ev:not(.is-on) {
+  opacity: 0;
+}
+@media screen {
+  /* waiting to play: all ten are petrol */
+  .scene--swap.is-armed .swap-gas { opacity: 1; }
+  .scene--swap.is-armed .swap-ev { opacity: 0; }
+}
+html:not(.js) [data-js-only] { display: none; }
+.swapctl {
+  display: grid;
+  gap: 0.375rem;
+}
+.swapctl__q {
+  font-size: var(--fs-sm, 0.9375rem);
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.swapctl__row {
+  display: grid;
+  grid-template-columns: var(--tap, 3rem) minmax(0, 1fr) var(--tap, 3rem);
+  align-items: center;
+  gap: 0.5rem;
+}
+.swapctl__btn {
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap, 3rem);
+  block-size: var(--tap, 3rem);
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.swapctl__btn:disabled {
+  border-color: var(--line-strong, var(--ink-3));
+  color: var(--ink-3);
+  cursor: default;
+}
+.swapctl__btn:focus-visible,
+.swapctl__range:focus-visible {
+  outline: 3px solid var(--focus, var(--accent));
+  outline-offset: 2px;
+}
+.swapctl__range {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 100%;
+  block-size: var(--tap, 3rem);
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.swapctl__range::-webkit-slider-runnable-track {
+  block-size: 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--clean) var(--fill, 100%), var(--exhaust) var(--fill, 100%));
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.swapctl__range::-moz-range-track {
+  block-size: 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--clean) var(--fill, 100%), var(--exhaust) var(--fill, 100%));
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.swapctl__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  inline-size: 2rem;
+  block-size: 2rem;
+  margin-block-start: -0.625rem;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+}
+.swapctl__range::-moz-range-thumb {
+  inline-size: 1.625rem;
+  block-size: 1.625rem;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.swapctl__out {
+  margin: 0;
+  font-size: var(--fs-sm, 0.9375rem);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- G11 TenScooters and FixButton -------------------------------------------- */
+.ten-big,
+.ten-fixed {
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.ten-fixed { opacity: 0; }
+.scene--ten[data-fixed] .ten-big,
+[data-fixed] .scene--ten .ten-big,
+[data-pick-scope]:has(input[data-fix]:checked) .scene--ten .ten-big {
+  opacity: 0;
+  transform: scale(0.3);
+}
+.scene--ten[data-fixed] .ten-fixed,
+[data-fixed] .scene--ten .ten-fixed,
+[data-pick-scope]:has(input[data-fix]:checked) .scene--ten .ten-fixed {
+  opacity: 1;
+}
+.fixbtn {
+  position: relative;
+  display: block;
+}
+.fixbtn__box {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.fixbtn__face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: var(--tap, 3rem);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-3, 10px);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--fs-btn, 1.0625rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+.fixbtn__icon {
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  flex: none;
+  fill: currentColor;
+}
+.fixbtn__undo { display: none; }
+.fixbtn__box:checked + .fixbtn__face {
+  background: var(--surface);
+  color: var(--ink);
+}
+.fixbtn__box:checked + .fixbtn__face .fixbtn__do { display: none; }
+.fixbtn__box:checked + .fixbtn__face .fixbtn__undo { display: inline; }
+.fixbtn__box:checked + .fixbtn__face .fixbtn__icon { display: none; }
+.fixbtn__box:focus-visible + .fixbtn__face {
+  outline: 3px solid var(--focus, var(--accent));
+  outline-offset: 2px;
+}
+
+/* ---- G3 ApproachPlan (plan-view.ts) --------------------------------------------- */
+.plan3-yellow { fill: none; stroke: var(--art-yellow); stroke-width: 6; }
+.plan3-box { fill: none; stroke: var(--art-paint); stroke-width: 9; stroke-linejoin: round; }
+.plan3-dim { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.plan3-inset-bg { fill: var(--here, var(--bg)); stroke: var(--ink); stroke-width: 3; }
+.scene--plan .plan3-gap {
+  font-size: var(--fs-lg, 1.25rem);
+  font-weight: 900;
+  line-height: 1.2;
+  background: var(--here, var(--bg));
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.scene--plan .hs-pipe-label { color: var(--exhaust-ink); }
+@keyframes plan3-slide {
+  from { opacity: 0; transform: translateX(170px); }
+}
+@media screen {
+  .scene--plan.is-armed :is(.plan3-slide, .air-srcs, .air-kerb, .air-wash) { opacity: 0; }
+  .scene--plan.is-arrived .plan3-slide { animation: plan3-slide 1.7s cubic-bezier(0.2, 0.7, 0.3, 1) 0.2s backwards; }
+  .scene--plan.is-arrived :is(.air-srcs, .air-kerb, .air-wash) { animation: sa-fade-in 1s ease-out 1.6s backwards; }
+}
+
+/* ---- G7 RoadOfTime ------------------------------------------------------------- */
+.road {
+  margin: 0;
+  padding: 0.75rem 1rem 0.5rem;
+  background: var(--bg-sunken, var(--art-fill));
+  --here: var(--bg-sunken, var(--art-fill));
+}
+/* inside a Screen that prints the tag, leave the tag its corner */
+.road:has(+ [data-illustration-tag]) { padding-block-end: 2.75rem; }
+.road__posts {
+  position: relative;
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* the road: a grey band under the signposts with a dashed centre line */
+.road__posts::before {
+  content: '';
+  position: absolute;
+  inset-block: -0.75rem -0.25rem;
+  inset-inline-start: 1.125rem;
+  inline-size: 2.25rem;
+  background:
+    repeating-linear-gradient(to bottom, var(--art-paint) 0 0.75rem, transparent 0.75rem 1.75rem) center / 0.25rem 100% no-repeat,
+    var(--art-road);
+}
+.road__post {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+.road__sign {
+  display: block;
+  inline-size: 4.5rem;
+  block-size: auto;
+}
+.road-board { fill: var(--surface, var(--bg)); stroke: var(--ink); stroke-width: 2.5; }
+.road-post { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.road-trace { fill: none; stroke: var(--signal-red); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.road-ink { fill: var(--ink); }
+.road-ink-s { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.road-cut { fill: none; stroke: var(--surface, var(--bg)); stroke-width: 2.5; }
+.road-paper { fill: var(--surface, var(--bg)); }
+.road__words {
+  display: grid;
+  justify-items: start;
+  gap: 0.125rem;
+  min-inline-size: 0;
+}
+.road__when {
+  font-size: var(--fs-btn, 1.0625rem);
+  font-weight: 900;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.road__text {
+  font-size: var(--fs-sm, 0.9375rem);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.road__year {
+  position: relative;
+  margin-block-start: 0.5rem;
+  padding-block-start: 0.5rem;
+  border-block-start: 2px solid var(--ink);
+}
+.road__sum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.125rem 0.75rem;
+  margin: 0 0 0.25rem;
+  font-size: var(--fs-xs, 0.875rem);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.road__sum b {
+  font-size: var(--fs-btn, 1.0625rem);
+  font-weight: 900;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.road__strip { position: relative; padding-block-end: 1.375rem; }
+.road__strip svg { display: block; inline-size: 100%; block-size: auto; }
+.road-days circle { fill: var(--ink); }
+.road-bar-track { fill: var(--chart-track, var(--line)); }
+.road-bar { fill: var(--ink); }
+.road-bar--range { opacity: 0.45; }
+.road-tick { fill: none; stroke: var(--ink-2); stroke-width: 1.5; }
+.road__ticks span {
+  position: absolute;
+  inset-block-end: 0;
+  translate: -50% 0;
+  font-size: var(--fs-xs, 0.875rem);
+  line-height: 1.3;
+  color: var(--ink-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.road__ticks span:first-child { translate: 0 0; }
+/* which year strip shows: the first choice, then whatever the Screen's switch says */
+.road-v { display: none; }
+.road-v.is-first { display: block; }
+[data-pick-reds='2'] .road-v[data-when-reds='2'],
+[data-pick-reds='4'] .road-v[data-when-reds='4'],
+[data-pick-reds='6'] .road-v[data-when-reds='6'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds'][value='2']:checked) .road-v[data-when-reds='2'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds'][value='4']:checked) .road-v[data-when-reds='4'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds'][value='6']:checked) .road-v[data-when-reds='6'] {
+  display: block;
+}
+[data-pick-reds]:not([data-pick-reds='2']) .road-v[data-when-reds='2'],
+[data-pick-reds]:not([data-pick-reds='4']) .road-v[data-when-reds='4'],
+[data-pick-reds]:not([data-pick-reds='6']) .road-v[data-when-reds='6'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value='2'])) .road-v[data-when-reds='2'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value='4'])) .road-v[data-when-reds='4'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value='6'])) .road-v[data-when-reds='6'] {
+  display: none;
+}
+
+/* ---- MeasurementDiagram: numbered instrument positions --------------------------- */
+.scene__label.measure-n {
+  display: grid;
+  place-items: center;
+  inline-size: 1.875rem;
+  block-size: 1.875rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--here, var(--bg));
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- StationScene ---------------------------------------------------------------- */
+.st-cabinet { fill: var(--art-paint); stroke: var(--art-ink); stroke-width: 3; }
+.scene--station .st-name { color: #14191c; text-shadow: none; }

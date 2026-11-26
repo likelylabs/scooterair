@@ -38,7 +38,7 @@ import SceneLabel from './SceneLabel.astro';
 import { air, type Box } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { CAR_TAILPIPE, artId, car, figureBoxes, person } from './parts';
-import { SIGNAL_HEAD, indexSources, pedSignal, pickSources, placed, put, riderNoseOf, shopfronts, tailOf, tyreOf, withoutSources, type Placed } from './kit';
+import { SIGNAL_HEAD, indexSources, pedSignal, pickSources, placed, put, shopfronts, tailOf, tyreOf, withoutSources, type Placed } from './kit';
 import { sceneAlt } from './scene';
 
 interface Props {
@@ -79,7 +79,6 @@ const people = { elder: 40, parent: 100, child: 222 };
 const childKind = red ? 'schoolchild-cover' : 'schoolchild-step';
 const SIG = { x: 28, y: -656, scale: 2.9 };
 const sigBox: Box = { x: SIG.x - 8, y: SIG.y - 8, w: SIGNAL_HEAD.w * SIG.scale + 16, h: SIGNAL_HEAD.h * SIG.scale + 16 };
-const face = riderNoseOf(pack[faceIdx]);
 const carAt = { x: 372, y: FAR + 4, s: 0.6 };
 const labelAt = { x: pack[faceIdx].x + 74, y: 30 };
 

@@ -1,0 +1,91 @@
+---
+/**
+ * StationScene — why an air-quality app does not show a red light
+ * (/questions/app/, brief 7.5).
+ *
+ * The kerb beside an air-quality station: a cabinet whose inlet stands on a
+ * tall pipe, between 2.5 and 3.5 m up (registry fact
+ * `taipei-roadside-co-2024`: inletLow, inletHigh), with that range marked on
+ * a ruler. Beside it a parent with a pushchair and a schoolchild stand behind
+ * the tail of a scooter; its dark core lies on the ground, far below the
+ * inlet. The same three layers of air.ts as every street scene.
+ *
+ * Props
+ *   locale      Locale
+ *   inletLabel  the words at the inlet (default from the registry: 進氣口 2.5 到 3.5 公尺)
+ *   tag         false (default; <Screen illustration> prints it) | 'street'
+ *   id, class
+ *
+ *   <StationScene slot="picture" locale={locale} />
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art, fill } from '@/i18n/art';
+import { est } from '@/data/estimate';
+import { fact } from '@/data/facts';
+import SceneFrame from './SceneFrame.astro';
+import SceneLabel from './SceneLabel.astro';
+import { air, type Box } from './air';
+import { AIR_EXTRA } from './air-slots';
+import { TAILPIPE, artId, figureBoxes, person } from './parts';
+import { placed, put, shopfronts, tailOf, type Placed } from './kit';
+import { sceneAlt } from './scene';
+
+interface Props {
+  locale: Locale;
+  inletLabel?: string;
+  tag?: false | 'street';
+  id?: string;
+  class?: string;
+}
+const { locale, tag = false, id, class: cls } = Astro.props;
+const data = fact('taipei-roadside-co-2024').data as Record<string, { value: number; unit: string }>;
+if (data.inletLow?.unit !== 'metres' || data.inletHigh?.unit !== 'metres') throw new Error('StationScene: taipei-roadside-co-2024 must carry inletLow and inletHigh in metres');
+const lo = data.inletLow.value;
+const hi = data.inletHigh.value;
+const inletLabel = Astro.props.inletLabel ?? fill(art.station.inletRange, locale, { lo, hi });
+
+const VB: Box = { x: 0, y: -420, w: 520, h: 492 };
+const parent = 24;
+const child = 168;
+const front: Placed = { x: 232, lift: 0, s: 1, row: 1 };
+const ST = { x: 420, w: 88, h: 156 }; // the cabinet
+const pipeX = ST.x + ST.w / 2;
+const inletY = -((lo + hi) / 2) * 100;
+
+const a = air({
+  frame: VB,
+  seed: 27,
+  id: artId('air'),
+  scenario: 'dozen',
+  extra: AIR_EXTRA,
+  kerb: { x0: 6, x1: front.x - 8, sourceX: front.x + TAILPIPE.x },
+  tailpipes: [tailOf(front)],
+  avoid: [...figureBoxes('stroller', parent), ...figureBoxes('schoolchild-cover', child), ...figureBoxes('scooter', front.x), { x: ST.x - 70, y: inletY - 70, w: 170, h: 130 }, { x: ST.x - 6, y: -ST.h - 6, w: ST.w + 12, h: ST.h + 6 }],
+});
+const station = [
+  // the range the inlet may stand in, then the pipe, the inlet and the cabinet
+  `<rect class="hs-band" x="${pipeX - 34}" y="${-hi * 100}" width="68" height="${(hi - lo) * 100}"/>`,
+  `<path class="hs-band-edge" d="M${pipeX - 34},${-hi * 100}h68M${pipeX - 34},${-lo * 100}h68"/>`,
+  `<path class="a-metal-s" stroke-width="7" d="M${pipeX},${-ST.h}V${inletY + 10}"/>`,
+  `<path class="a-ink" d="M${pipeX - 22},${inletY + 12}h44l-8,-20h-28Z"/><path class="a-ink-s" stroke-width="5" d="M${pipeX - 26},${inletY - 12}h52"/>`,
+  `<rect class="st-cabinet" x="${ST.x}" y="${-ST.h}" width="${ST.w}" height="${ST.h}" rx="5"/>`,
+  `<path class="a-line" stroke-width="2" d="M${ST.x + 10},${-ST.h + 24}h${ST.w - 20}M${ST.x + 10},${-ST.h + 40}h${ST.w - 20}M${ST.x + 10},${-ST.h + 56}h${ST.w - 20}"/>`,
+  `<circle class="a-led-green" cx="${ST.x + ST.w - 14}" cy="${-ST.h + 76}" r="4"/>`,
+].join('');
+const street = [
+  shopfronts({ x0: -10, x1: 530, base: 0, top: VB.y, bay: 210, shift: 40 }),
+  '<rect class="a-road" x="-10" y="0" width="540" height="80"/>',
+  `<path class="a-kerb" d="M-10,-1H${front.x - 14}V13H-10ZM${ST.x - 26},-1H530V13H${ST.x - 26}Z"/>`,
+].join('');
+const fg = put(parent, 0, person('stroller'), { cls: 'a-figure' }) + put(child, 0, person('schoolchild-cover'), { cls: 'a-figure' }) + placed(front, 'gas', { face: true, cls: 'a-figure' });
+const alt = sceneAlt(locale, fill(art.station.alt, locale, { inlet: inletLabel }), { scenario: 'dozen', count: est.scn.dozen.count });
+---
+
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--station', cls].filter(Boolean).join(' ')}>
+  <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + station + fg} />
+  <Fragment slot="labels">
+    <SceneLabel box={VB} x={pipeX - 44} y={inletY} anchor="end middle" plate max={46}>{inletLabel}</SceneLabel>
+    <SceneLabel box={VB} x={pipeX} y={-44} anchor="center middle" class="st-name">{art.station.cabinet[locale]}</SceneLabel>
+  </Fragment>
+</SceneFrame>

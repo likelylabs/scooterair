@@ -26,7 +26,7 @@ const figureCol = t.head.map((_, i) => i > 0 && t.rows.filter((row) => isFigure(
 const shortCol = shortColumns(t, figureCol);
 ---
 
-<div id={id} class:list={['chart__table', 'chart__table--open', cls]} tabindex="0" role="group" aria-label={caption}>
+<div id={id} class:list={['chart__table', 'chart__table--open', cls]} data-chart="table" tabindex="0" role="group" aria-label={caption}>
   <table>
     {caption && <caption class="chart__caption">{caption}</caption>}
     <thead>

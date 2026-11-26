@@ -33,7 +33,9 @@ const { locale, value = defaultScenario, legend = scenarioText.legend[locale], c
 const options = scenarioKeys.map((s) => {
   const c = est.scn[s]?.count;
   if (!c || !Number.isFinite(c.lo) || !Number.isFinite(c.hi)) throw new Error(`ScenarioSwitch: the estimate has no count for "${s}" (est.scn.${s}.count).`);
-  return { value: s, label: est.scn[s].name[locale], sub: fill(scenarioText.count, locale, { range: range(c.lo, c.hi, locale) }) };
+  // 「25–45 輛」 keeps its counter on the same line (a no-break space): a segment is 84 px wide at 320 px and 特大
+  const count = fill(scenarioText.count, locale, { range: range(c.lo, c.hi, locale) }).replace(/(\d) (?=\p{Script=Han})/u, '$1\u00a0');
+  return { value: s, label: est.scn[s].name[locale], sub: count };
 });
 ---
 

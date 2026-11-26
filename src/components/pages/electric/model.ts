@@ -183,7 +183,8 @@ export function nearMiss(e: Evaluation, data: EconDataset, locale: Locale): Near
     if (!p) continue;
     for (const c of p.conditions) {
       if (c.kind === 'scrap-min-age' && x.failedCondition === 'scrap-min-age' && fullYears(built, s.date) < c.years) fails.set(c.years, (fails.get(c.years) ?? 0) + 1);
-      if (c.kind === 'scrap-built' && x.failedCondition === 'scrap-built' && c.onOrBefore) {
+      // the cut-off this scooter actually fails (a programme can carry more than one build rule)
+      if (c.kind === 'scrap-built' && x.failedCondition === 'scrap-built' && c.onOrBefore && built > c.onOrBefore) {
         const name = readerText(p.name[locale]);
         if (!cutoffs.some((k) => k.name === name)) cutoffs.push({ name, date: c.onOrBefore });
       }
@@ -191,8 +192,9 @@ export function nearMiss(e: Evaluation, data: EconDataset, locale: Locale): Near
   }
   // the age rule most of the missed programmes use (the data says which: usually ten years)
   const years = [...fails.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0]?.[0] ?? null;
-  if (years === null && !cutoffs.length) return null;
-  if (years === null) return { years: 0, on: '', months: 0, cutoffs };
+  // A build-date cut-off alone is not a near miss: waiting never changes when a scooter was built,
+  // and those programmes are already listed with their reason among what was not counted.
+  if (years === null) return null;
   const [y, m, d] = built.split('-').map(Number);
   const on = `${y + years}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
   const [ty, tm] = s.date.split('-').map(Number);

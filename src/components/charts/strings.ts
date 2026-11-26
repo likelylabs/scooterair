@@ -103,6 +103,7 @@ export const chartText = {
     petrol: t('125cc 燃油機車・實付', '125 cc petrol scooter: you pay'),
     electric: t('電動機車（{plate}）・實付', 'Electric scooter ({plate}): you pay'),
     listLess: t('定價 {list}，扣掉{what} {off}', 'List price {list}, less {off} in {what}'),
+    listLessPlain: t('定價 {list}，扣掉 {off}', 'List price {list}, less {off}'),
     listOnly: t('定價 {list}，這個條件下沒有可以扣的', 'List price {list}; nothing comes off on these terms'),
     what: {
       subsidy: t('補助', 'subsidies'),
@@ -117,10 +118,12 @@ export const chartText = {
     even: t('兩種一樣多', 'The two cost the same'),
     key: t('虛線＝定價裡扣掉的部分', 'Dashed = the part of the list price that comes off'),
     tableWhat: t('項目', 'Item'),
+    tableModel: t('車款', 'Model'),
     tableList: t('定價', 'List price'),
     tableOff: t('扣掉', 'Taken off'),
     tableNet: t('實付', 'You pay'),
     sumSide: t('{label}：{name}，定價 {list}，扣掉{what} {off}，實付 {net}。', '{label}: {name}, list price {list}, less {off} in {what}, you pay {net}.'),
+    sumSidePlain: t('{label}：{name}，定價 {list}，扣掉 {off}，實付 {net}。', '{label}: {name}, list price {list}, less {off}, you pay {net}.'),
     sumSideNoOff: t('{label}：{name}，定價和實付都是 {net}。', '{label}: {name}, list price and price paid are both {net}.'),
   },
 
@@ -153,7 +156,7 @@ export const chartText = {
     },
     // presets (numbers come from src/data/estimate.ts)
     perRed: {
-      rate: t('一輛機車引擎沒熄火，一小時排的一氧化碳（{lo} 到 {hi} 公克）', 'Carbon monoxide from one idling scooter in an hour ({lo} to {hi} g)'),
+      rate: t('一輛機車引擎沒熄火，一小時排的一氧化碳（{lo} 到 {hi} 公克）', 'Carbon monoxide from one scooter standing with its engine on, in an hour ({lo} to {hi} g)'),
       reds: t('一小時有 {n} 個 {s} 秒的紅燈', 'An hour holds {n} reds of {s} seconds'),
       result: t('一輛機車等一個紅燈排出的（{lo} 到 {hi} 公克）', 'One scooter through one red light ({lo} to {hi} g)'),
     },

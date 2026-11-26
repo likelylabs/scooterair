@@ -77,15 +77,19 @@ const target = sheet ? `#${sheet}` : full;
 ---
 
 <a class:list={['est', `est--${size}`, cls]} href={target} data-kind="estimate" data-slot={slotId} data-how={full} data-sheet-open={sheet} {...rest}>
-  {label && <span class="est__label">{label}</span>}
+  {/* a real space after each part (the label, the phrase, the chip): flex lays the parts out, the
+      spaces keep them separate words for a screen reader, a copy-paste and the site check */}
+  {label && <Fragment><span class="est__label">{label}</span>{' '}</Fragment>}
   <span class="est__line">
     {/* one text run with real spaces, so it reads, copies and underlines as one phrase */}
     <span class="est__value">{lead && <Fragment><span class="est__word">{lead}</span>{' '}</Fragment>}<span class="est__n">{f.lo}</span>{' '}<span class="est__word">{mid}</span>{' '}<span class="est__end"><span class="est__n">{f.hi}</span>{f.unit && <Fragment>{f.unit === '%' ? '' : ' '}<span class="est__unit">{f.unit}</span></Fragment>}</span></span>
+    {' '}
     <span class="est__tail">
       <KindChip locale={locale} kind="estimate" />
       <span class="est__go" aria-hidden="true"><Icon name="arrow-right" size="1em" /></span>
     </span>
   </span>
+  {' '}
   <span class="vh">{how.button[locale]}</span>
 </a>
 

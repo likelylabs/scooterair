@@ -100,6 +100,8 @@ const tagText = illustration.tag[locale];
     display: grid;
     place-items: center;
     overflow: hidden;
+    padding: 16px 28px;
+    box-sizing: border-box;
     background: var(--bg-sunken);
   }
   .card__pic {
@@ -117,7 +119,7 @@ const tagText = illustration.tag[locale];
     block-size: auto;
   }
   .card__pic .scene__label {
-    font-size: 20px;
+    font-size: 17px;
   }
   .card__pic .ill-tag,
   .card__pic [class*='tag'] {
@@ -211,12 +213,12 @@ const tagText = illustration.tag[locale];
   @media (min-aspect-ratio: 3/2) {
     .card.card--strip {
       grid-template-columns: none;
-      grid-template-rows: 44% minmax(0, 1fr);
+      grid-template-rows: 40% minmax(0, 1fr);
     }
     .card--strip .card__text {
       grid-template-rows: auto minmax(0, 1fr);
-      padding: 18px 56px 24px;
-      gap: 6px;
+      padding: 14px 56px 16px;
+      gap: 4px;
     }
     .card--strip .card__fit {
       align-content: start;

@@ -74,7 +74,7 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
   },
   'modelled-tw': {
     label: t('台灣模式推估', 'Modelled for Taiwan'),
-    description: t('以電腦模式或推估方法針對台灣計算，並非直接量測。', 'Calculated for Taiwan with a computer model or estimation method, not measured directly.'),
+    description: t('以電腦模式或推估方法針對台灣計算，並非直接量測。', 'Calculated for Taiwan with a computer model or estimation method rather than read directly off an instrument.'),
   },
   international: {
     label: t('國際證據', 'International evidence'),
@@ -95,7 +95,7 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
     label: t('本站推估', 'Our estimate'),
     description: t(
       '我們用有出處的數字算出來的，不是量的，所以一定附範圍和算法。',
-      'Worked out by us from sourced figures, not measured, so it always comes with a range and the working.',
+      'Worked out by us from sourced figures rather than read off an instrument, so it always comes with a range and the working.',
     ),
   },
 };

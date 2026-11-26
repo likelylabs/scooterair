@@ -121,7 +121,13 @@ export function caseText(d: OpenData, T: OpenText, s: OpenState, withCharge = fa
 // ---------------------------------------------------------------------------------------------
 // the day you buy (home screen 12)
 
-/** Screen 12's headline rule, from the difference. */
+/** A headline whose '|' marks where it may break (each phrase stays whole in Chinese). */
+export const headHtml = (text: string) =>
+  text.includes('|')
+    ? `<h3 class="op-head op-head--phrased">${text.split('|').map((x) => `<span>${esc(x.trimEnd())}</span>${x.endsWith(' ') ? ' ' : ''}`).join('')}</h3>`
+    : `<h3 class="op-head">${esc(text)}</h3>`;
+
+/** Screen 12's headline rule, from the difference ('|' marks phrase breaks). */
 export function buyHeadline(T: OpenText, c: OpenCase, scrap: Scrap): string {
   if (c.v === 'dearer') return T.headDearer;
   if (c.v === 'about-same') return c.sub ? T.headSame : T.headSameNoSub;
@@ -163,7 +169,7 @@ ${bar('op-bar--ev', fill(T.barEv, { plate: W(c.p) }), c.e, c.el, max, loc, T, tr
   const side = (title: string, model: string, list: number, lines: OpenCase['eLines'], paid: number) =>
     `<div class="op-work__side"><p class="op-work__title">${esc(title)}<span>${esc(model)}</span></p><ul class="op-work__lines"><li><span>${esc(T.workList)}</span><span class="op-amt">${esc(yuan(loc, list))}</span></li>${lines.map(line).join('')}${lines.length ? '' : `<li><span>${esc(T.workNone)}</span><span class="op-amt">−${esc(yuan(loc, 0))}</span></li>`}<li class="op-work__paid"><span>${esc(T.workPaid)}</span><span class="op-amt">${esc(yuan(loc, paid))}</span></li></ul></div>`;
   const working = `<details class="op-work"><summary>${esc(T.workSummary)}</summary><div class="op-work__body">${side(fill(T.barEv, { plate: W(c.p) }), W(c.en), c.el, c.eLines, c.e)}${side(T.barPetrol, W(c.gn), c.gl, c.gLines, c.g)}<p class="op-small">${esc(T.workNote)}</p></div></details>`;
-  return `<h3 class="op-head">${esc(buyHeadline(T, c, scrap))}</h3>
+  return `${headHtml(buyHeadline(T, c, scrap))}
 ${figure}
 ${bars}
 <p class="op-body">${esc(fill(T.bodyClass, { model: shortName(W(c.en)) }))}${esc(worst)}</p>
@@ -190,7 +196,7 @@ export function monthHtml(d: OpenData, T: OpenText, t: OpenTable, km: number): s
     `<div class="op-mbar ${cls}"><p class="op-mbar__label">${esc(label)}</p><div class="op-mbar__track" aria-hidden="true"><span class="op-mbar__fill" style="inline-size:${w(v)}"></span>${extra}</div><p class="op-mbar__value"><b>${esc(text)}</b></p></div>`;
   const homeText = m.homeLo === m.homeHi ? yuan(loc, m.homeLo) : fill(T.rangeShort, { lo: loc === 'en' ? `NT$${num(loc, m.homeLo)}` : num(loc, m.homeLo), hi: yuan(loc, m.homeHi) });
   const homeExtra = m.homeHi > m.homeLo ? `<span class="op-mbar__more" style="inline-size:${((100 * (m.homeHi - m.homeLo)) / max).toFixed(2)}%"></span>` : '';
-  return `<h3 class="op-head op-head--phrased">${monthHeadline(d, T, m).split('|').map((x) => `<span>${esc(x.trimEnd())}</span>${x.endsWith(' ') ? ' ' : ''}`).join('')}</h3>
+  return `${headHtml(monthHeadline(d, T, m))}
 <div class="op-mbars" role="img" aria-label="${esc(fill(T.monthAlt, { km: num(loc, km), petrol: yuan(loc, m.petrol), home: homeText, plan: yuan(loc, m.plan), payg: yuan(loc, m.payg) }))}">
 ${row('op-mbar--petrol', T.mPetrol, m.petrol, yuan(loc, m.petrol))}
 ${row('op-mbar--home', T.mHome, m.homeLo, homeText, homeExtra)}

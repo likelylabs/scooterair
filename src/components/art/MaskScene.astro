@@ -35,7 +35,7 @@ import { art } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
 import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
-import { MASK_CHOICES as MASKS, MASK_FACE, artId, maskHead, maskOn, rng, type MaskChoice } from './parts';
+import { MASK_CHOICES as MASKS, MASK_FACE, artId, maskHead, maskOn, type MaskChoice } from './parts';
 
 interface Props {
   locale: Locale;
@@ -58,7 +58,6 @@ const front = TX + MASK_FACE.front.x * K - 3;
 const gapNose = F(MASK_FACE.gaps.nose);
 const gapCheek = F(MASK_FACE.gaps.cheek);
 const PIPE = { x: 22, y: -62 };
-const r = rng(88);
 
 const on = (...kinds: MaskChoice[]) => 'mk-v ' + kinds.map((k) => `mk-on-${k}`).join(' ');
 const go = (i: number, x: number, y: number) => ` style="--i:${i};--dx:${((PIPE.x - x) * 0.5).toFixed(1)}px;--dy:${((PIPE.y - y) * 0.5).toFixed(1)}px"`;

@@ -288,7 +288,7 @@ export const answers = {
     caveat: t('所有車輛，不只機車；這是「有關」，研究沒有判定因果。', 'All traffic, not scooters alone; these are links, and the studies did not establish cause.'),
     chips: [chip('study', 'international')],
     facts: ['hei-sr23-trap-associations', 'pan2021-truck-traffic-cvd'],
-    editorNote: 'The brief gives no chip (—) because the answer is folded into the caveat 所有車輛，不只機車; the card still names the review it rests on, so it carries 研究・國際. The 2022 northern-Taiwan roadside LDSA study (Chang et al., J Hazard Mater 427:128188) is NOT entered: it could not be opened on 2026-11-26 (PubMed cookie wall, Europe PMC 503), so /evidence/#link-5 cannot carry it yet.',
+    editorNote: 'The brief gives no chip (—) because the answer is folded into the caveat 所有車輛，不只機車; the card still names the review it rests on, so it carries 研究・國際. The 2022 northern-Taiwan roadside LDSA study (Chang et al., J Hazard Mater 427:128188) is entered as fact roadside-ldsa-traffic-share-chang2022 (chainLink 5, abstract opened 2026-11-26 on a second try); per the brief it goes under /evidence/#link-5 with its caveat, not on this card.',
     research: 'estimate/gap-answers-b#gap-tw-health-isolating-scooters',
   },
   'answer-idling-rule-scooters': {
