@@ -71,19 +71,20 @@ const readerDate = (iso: string, locale: Locale) => {
 const estimateCaveat = (locale: Locale) => L(share.film.caveat, locale);
 
 /**
- * The money card's line, chosen by rule from the money engine (screen 12's rule): the default
- * case first, then the least favourable case, so the unfavourable figure always travels with
- * the favourable one. Uses the prices' check date, not today's, so the card only changes when
- * the prices are re-checked (the money tables change on fixed dates; the card names its date).
+ * The money card, chosen by rule from the money engine (screen 13's rule): the headline is the
+ * default case's result, the one line under it the least favourable case, so the unfavourable
+ * figure always travels with the favourable one. The kicker names the case (place, and a scooter
+ * built 10 or more years ago to scrap). Uses the prices' check date, not today's, so the card
+ * only changes when the prices are re-checked; the card names that date in small print.
  */
-function moneyLine(locale: Locale): { line: string; caveat: string } {
+function moneyCard(locale: Locale): { kicker: string; title: string; line: string; caveat: string } {
   const m = homeMoney(homeMoney().checkedOn);
   const c = m.buy[m.defaults.county][m.defaults.scrap];
   const county = L(c.countyName as L10n, locale);
   const t = share.money;
-  const first = c.verdict === 'cheaper' ? fill(L(t.cheaper, locale), { county, amount: ntd(-c.difference, locale) }) : c.verdict === 'dearer' ? fill(L(t.dearer, locale), { county, amount: ntd(c.difference, locale) }) : fill(L(t.same, locale), { county });
-  const worst = m.worst.difference > 0 ? fill(L(t.worst, locale), { amount: ntd(m.worst.difference, locale) }) : '';
-  return { line: [first, worst].filter(Boolean).join(locale === 'en' ? ' ' : ''), caveat: fill(L(t.caveat, locale), { date: readerDate(m.checkedOn, locale) }) };
+  const title = c.verdict === 'cheaper' ? fill(L(t.cheaper, locale), { amount: ntd(-c.difference, locale) }) : c.verdict === 'dearer' ? fill(L(t.dearer, locale), { amount: ntd(c.difference, locale) }) : L(t.same, locale);
+  const line = m.worst.difference > 0 ? fill(L(t.worst, locale), { amount: ntd(m.worst.difference, locale) }) : L(t.best, locale);
+  return { kicker: fill(L(t.kicker, locale), { county }), title, line, caveat: fill(L(t.caveat, locale), { date: readerDate(m.checkedOn, locale) }) };
 }
 
 /** Everything that is drawn on a card, in one language. */
@@ -100,8 +101,8 @@ export function shareCardContent(id: ShareCardId, locale: Locale): ShareCardCont
       return { id, picture: 'film', kicker: L(share.film.kicker, locale), title: L(share.film.title, locale), line: L(share.film.line, locale), caveat: L(share.film.caveat, locale) };
     case 'money':
     case 'electric': {
-      const { line, caveat } = moneyLine(locale);
-      return { id, picture: 'kerb-electric', kicker: L(share.money.kicker, locale), title: L(share.money.title, locale), line, chip: 'derived', caveat };
+      const { kicker, title, line, caveat } = moneyCard(locale);
+      return { id, picture: 'kerb-electric', kicker, title, line, chip: 'derived', caveat };
     }
   }
   const q = share.questions[id];
@@ -134,7 +135,8 @@ export function shareCardContent(id: ShareCardId, locale: Locale): ShareCardCont
 /** The alt text of a card (brief 5.1): what it says, its caveat, and that the picture is an illustration. */
 export function shareCardAlt(c: ShareCardContent, locale: Locale): string {
   const en = locale === 'en';
-  const title = plain(c.title);
+  // the money card's kicker names the case its headline is for, so the alt text keeps it
+  const title = c.id === 'money' || c.id === 'electric' ? `${c.kicker}${en ? ': ' : '：'}${plain(c.title)}` : plain(c.title);
   const stop = /[？?。.！]$/.test(title) ? '' : en ? '.' : '。';
   const line = c.estimate ? `${c.line}${en ? ': ' : '：'}${c.estimate.text}${en ? ' (estimate)' : '（推估）'}${en ? '.' : '。'}` : c.line;
   const note = c.picture === 'kerb-electric' ? L(art.alt2.electric, locale) : c.picture === 'body' || c.picture === 'mask' || c.picture === 'smell' ? L(art.alt2.plain, locale) : L(illustration.altNote, locale);

@@ -11,7 +11,7 @@ import { formatDate } from '../../../lib/site-state.ts';
 import { readerText } from '../../../i18n/ui.ts';
 import type { Locale } from '../../../i18n/pages/_copy.ts';
 import type { JurisdictionId } from '../../../data/econ/types.ts';
-import type { OpenCase, OpenData, OpenTable } from './opening-view.ts';
+import { shortName, type OpenCase, type OpenData, type OpenTable } from './opening-view.ts';
 
 /** A cached page must still be right this many days after the build (the site rebuilds nightly). */
 const LOOK_AHEAD_DAYS = 45;
@@ -19,6 +19,24 @@ const LOOK_AHEAD_DAYS = 45;
 const addDays = (iso: string, n: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
 
 function table(m: HomeMoney, locale: Locale, word: (s: string) => number): OpenTable {
+  // the swap-only scooters on show, each with the cheapest plans IT can use (home-money's swapByModel)
+  const swap: OpenTable['swap'] = [];
+  const swapIndex = (c: BuyCase): number => {
+    if (!c.swapOnly) return -1;
+    const id = c.electric.model;
+    let i = swap.findIndex((x) => x.id === id);
+    if (i < 0) {
+      const km = {} as OpenTable['swap'][number]['km'];
+      for (const k of HOME_KM) {
+        const own = m.month[k].swapByModel[id];
+        if (!own) throw new Error(`[electric opening] no swap plans for ${id} at ${k} km`);
+        const named = (o: NonNullable<typeof own.plan>): [number, number] => [o.monthly.typical, word(readerText(`${shortName(o.name[locale])} · ${o.planName[locale]}`))];
+        km[k] = { plan: own.plan ? named(own.plan) : null, payg: own.payg ? named(own.payg) : null };
+      }
+      i = swap.push({ id, km }) - 1;
+    }
+    return i;
+  };
   const caseOf = (c: BuyCase): OpenCase => ({
     e: c.electric.net,
     el: c.electric.listPrice,
@@ -34,6 +52,7 @@ function table(m: HomeMoney, locale: Locale, word: (s: string) => number): OpenT
     eLines: c.electric.lines.map((l) => [word(readerText(l.label[locale])), l.amount, l.isMaximum ? 1 : 0]),
     gLines: c.gasoline.lines.map((l) => [word(readerText(l.label[locale])), l.amount, l.isMaximum ? 1 : 0]),
     strip: word(stripText(stripOf(c), locale)),
+    sm: swapIndex(c),
   });
   const ids = m.counties.map((c) => c.id);
   const buy = {} as OpenTable['buy'];
@@ -56,12 +75,13 @@ function table(m: HomeMoney, locale: Locale, word: (s: string) => number): OpenT
       homeHi: x.home.typical.hi,
       plan: x.swapPlan.monthly.typical,
       payg: x.swapPayg.monthly.typical,
-      planN: word(readerText(`${x.swapPlan.name[locale]} · ${x.swapPlan.planName[locale]}`)),
-      paygN: word(readerText(`${x.swapPayg.name[locale]} · ${x.swapPayg.planName[locale]}`)),
+      planN: word(readerText(`${shortName(x.swapPlan.name[locale])} · ${x.swapPlan.planName[locale]}`)),
+      paygN: word(readerText(`${shortName(x.swapPayg.name[locale])} · ${x.swapPayg.planName[locale]}`)),
     };
   }
   return {
     buy,
+    swap,
     be,
     month,
     worst: { county: m.worst.county, scrap: m.worst.scrap, plate: word(plateName(m.worst.plate, locale)), d: m.worst.difference },

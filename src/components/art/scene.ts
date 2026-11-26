@@ -44,3 +44,20 @@ export function sceneAlt(
   parts.push(art.alt2[kind][locale]);
   return parts.join(locale === 'en' ? ' ' : '');
 }
+
+/**
+ * Screen-reader users should hear the long closing sentence of sceneAlt() (what is estimated and
+ * what is drawn for the eye, or the street's own air) once per page, not on every scene. This
+ * returns which closing sentence an alt ends with and the same alt ending with the short
+ * 「這是示意圖。」 / "This is an illustration." instead (so it still says it is an illustration:
+ * acceptance check 17), or null for an alt with no long closing sentence. SceneFrame prints both;
+ * ./alt-once.client.ts keeps the long one on the first scene of the page, in document order, and
+ * gives the later scenes the short one. Without JavaScript every scene keeps the long one.
+ */
+export function shortSceneAlt(alt: string, locale: Locale): { note: 'pack' | 'electric'; short: string } | null {
+  for (const note of ['pack', 'electric'] as const) {
+    const long = art.alt2[note][locale];
+    if (alt.endsWith(long)) return { note, short: alt.slice(0, alt.length - long.length) + art.alt2.plain[locale] };
+  }
+  return null;
+}

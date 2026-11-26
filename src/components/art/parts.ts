@@ -42,8 +42,14 @@ const n = (v: number) => +v.toFixed(1);
 
 export type ScooterKind = 'gas' | 'electric';
 
-/** Where the tailpipe opens, in scooter-local coordinates (gas only). */
-export const TAILPIPE = { x: 4, y: -33 };
+/**
+ * Where the tailpipe opens, in scooter-local coordinates (gas only).
+ * 50 cm off the ground: the registry's one height for scooter exhaust
+ * (`iot-exhaust-height-assumption`, 0.5 m, a model setting), so the drawing,
+ * the ruler of the heights scene and every 「約 50 公分」 label agree.
+ * The muffler sweeps up behind the rear wheel to reach it.
+ */
+export const TAILPIPE = { x: 4, y: -50 };
 /** Overall length of a scooter, for spacing a queue. */
 export const SCOOTER_LENGTH = 184;
 /** Nose and mouth of the seated rider, in scooter-local coordinates: riders breathe here too. */
@@ -107,7 +113,8 @@ export function scooter(opts: { kind?: ScooterKind; rider?: boolean; tail?: bool
   if (gas) {
     // engine / transmission case, then the muffler: the source
     p.push('<path class="a-deep-s" stroke-width="17" d="M42,-25 L88,-30"/>');
-    p.push('<path class="a-metal-s" stroke-width="13" d="M12,-34 L60,-23"/>');
+    p.push('<path class="a-metal-s" stroke-width="13" d="M17,-43 L60,-24"/>');
+    p.push(`<path class="a-metal-s" stroke-width="6" d="M18,-45 L${TAILPIPE.x + 3},${TAILPIPE.y - 1}"/>`);
     p.push(`<circle class="a-exh" cx="${TAILPIPE.x + 2}" cy="${TAILPIPE.y - 2}" r="4.5"/>`);
     // tail body sweeping over the rear wheel
     p.push(

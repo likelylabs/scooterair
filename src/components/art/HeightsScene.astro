@@ -5,7 +5,8 @@
  * A ruler in centimetres and four whole figures to scale on one ground line:
  * a baby in a pushchair (the 55 to 85 cm band shaded), a schoolchild, an
  * adult, and a rider seated on a scooter. A dashed line marks one metre: the
- * tailpipe and the baby are both under it. A breathing ring pulses at each
+ * tailpipe (on the 50 cm mark: `iot-exhaust-height-assumption`) and the baby
+ * are both under it. A breathing ring pulses at each
  * nose, the child's and the baby's faster. The exhaust is drawn evenly from
  * the ground to above the adult's head: no bands by height, because the
  * estimate has no number for child height (brief 4.6).
@@ -101,7 +102,8 @@ const scene = [
   `<rect class="a-road" x="${VB.x}" y="0" width="${VB.w}" height="${VB.y + VB.h}"/>`,
   a.defs + a.wash + bandArt + metre + a.cores + a.marks + ruler,
   figures.map((w) => draw[w]).join(''),
-  has('rider') ? `<path class="a-leader" d="M${pipe.x},${pipe.y + 8}V40"/><circle class="hs-pipe" cx="${pipe.x + 2}" cy="${pipe.y - 2}" r="9"/>` : '',
+  // the tailpipe sits on the ruler's 50 cm mark (registry: about 0.5 m); a dashed guide joins them
+  has('rider') ? `<path style="fill:none;stroke:var(--air-rib);stroke-width:2;stroke-dasharray:2 5;stroke-linecap:round" d="M${RULER},${pipe.y}H${pipe.x - 10}"/><path class="a-leader" d="M${pipe.x},${pipe.y + 8}V40"/><circle class="hs-pipe" cx="${pipe.x + 2}" cy="${pipe.y - 2}" r="9"/>` : '',
   rings,
 ].join('');
 const names: Record<Who, string> = { pushchair: art.heights.names.pushchair[locale], schoolchild: art.heights.names.schoolchild[locale], adult: art.heights.names.adult[locale], rider: art.heights.names.rider[locale] };

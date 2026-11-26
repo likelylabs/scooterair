@@ -16,6 +16,8 @@
  *   alt       the description. Must contain 示意圖 / "illustration". Build it
  *             with sceneAlt() from ./scene.ts so it names the scenario and
  *             ends with the shared sentence about what is and is not estimated.
+ *             That sentence is read out once per page: on later scenes of the
+ *             same page it is shortened to 「這是示意圖。」 (alt-once.client.ts).
  *   tag       false (default) | 'street' | 'body'. On the home page
  *             <Screen illustration> prints the tag, so leave this off there;
  *             anywhere else (a question page, the poster, /estimate/) set it.
@@ -45,7 +47,7 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import IllustrationTag from '@/components/ui/IllustrationTag.astro';
 import { AIR, type AirScenario, type Box } from './air';
-import { assertSceneAlt } from './scene';
+import { assertSceneAlt, shortSceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
@@ -61,6 +63,9 @@ interface Props {
 }
 const { locale, box, alt, tag = false, scenario, drift = false, arrive = false, id, class: cls, ...rest } = Astro.props;
 assertSceneAlt(alt, locale);
+// the long closing sentence (estimate / street's own air) is read once per page: later scenes end
+// with the short 「這是示意圖。」 (still says 示意圖: check 17) — see ./alt-once.client.ts. The tag stays visible.
+const once = shortSceneAlt(alt, locale);
 const n = (v: number) => +v.toFixed(2);
 ---
 
@@ -72,6 +77,8 @@ const n = (v: number) => +v.toFixed(2);
       viewBox={`${n(box.x)} ${n(box.y)} ${n(box.w)} ${n(box.h)}`}
       role="img"
       aria-label={alt}
+      data-alt-note={once?.note}
+      data-alt-short={once?.short}
       data-air-scn={scenario}
       style={`--air-upp:${n(box.w / AIR.refWidth)}`}
       focusable="false"
@@ -97,4 +104,5 @@ const n = (v: number) => +v.toFixed(2);
 
 <script>
   import './arrive.client';
+  import './alt-once.client';
 </script>

@@ -50,20 +50,23 @@ if (!of && !Astro.props.kind) throw new Error('KindChip: pass `kind` or `of`.');
 const kind = of ? readerKind(of) : chipKindOf(Astro.props.kind!);
 const place = of ? readerPlace(of) : undefined;
 const where = Astro.props.where ?? (place ? readerPlaceLabels[place][locale] : undefined);
+// the dot stays with the chip's word, so a chip that must wrap breaks after it, never inside a phrase
 const dot = locale === 'en' ? ' · ' : '・';
 const factIds = [...new Set([of?.id, ...[Astro.props.fact ?? []].flat()].filter(Boolean))].join(' ') || undefined;
 ---
 
 <span class:list={['chip', `chip--${kind}`, size === 'sm' && 'chip--sm', cls]} data-chip={kind} data-fact={factIds}>
   <Fragment set:html={chipGlyphSvg(kind)} />
-  <span class="chip__text"><span class="chip__label">{chips[kind].label[locale]}</span>{where && <span class="chip__where">{dot}{where}</span>}</span>
+  <span class="chip__text"><span class="chip__label">{chips[kind].label[locale]}{where && dot}</span>{where && <span class="chip__where">{where}</span>}</span>
 </span>
 
 <style>
   .chip {
     --b: 2px;
     display: inline-flex;
-    align-items: center;
+    /* a chip on two lines (研究・長期・所有車輛 beside a button at 320 px): the glyph sits on the
+       first line and the lines get room between them */
+    align-items: flex-start;
     gap: 0.35em;
     max-inline-size: 100%;
     padding: 0.14em 0.6em 0.14em 0.45em;
@@ -84,12 +87,27 @@ const factIds = [...new Set([of?.id, ...[Astro.props.fact ?? []].flat()].filter(
     flex: none;
     inline-size: 1em;
     block-size: 1em;
+    /* centred on the first line: (line-height − 1em) / 2 */
+    margin-block-start: 0.225em;
+  }
+  /* the word and the place are two pieces that each stay whole: a long chip wraps between them
+     (Study · / long-term, all traffic), never in the middle of 「所有車輛」 or "long-term" */
+  .chip__text {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 0.15em;
+    min-inline-size: 0;
+  }
+  .chip__text:lang(en) {
+    column-gap: 0.3em;
   }
   .chip__label {
     white-space: nowrap;
   }
   .chip__where {
     font-weight: var(--fw-medium);
+    white-space: nowrap;
   }
   /* measured: the one filled chip — a reading is the most solid thing on the page */
   .chip--measured {

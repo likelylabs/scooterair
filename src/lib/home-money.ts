@@ -179,6 +179,13 @@ export interface MonthCase {
   swapPlan: MonthOption;
   /** The cheapest pay-as-you-go swap plan (no monthly fee; setup fee spread over the contract). */
   swapPayg: MonthOption;
+  /**
+   * Per battery-swap scooter (by model id): the cheapest plan with a monthly fee and the cheapest
+   * pay-as-you-go plan THAT SCOOTER CAN USE (the engine's plans per model), or null when its make
+   * has no plan of that kind. `swapPlan` and `swapPayg` above are the cheapest of any make; a page
+   * that names one scooter (the /electric/ opening) prints that scooter's own plans from here.
+   */
+  swapByModel: Record<string, { plan: MonthOption | null; payg: MonthOption | null }>;
 }
 
 export type BreakevenKind =
@@ -439,6 +446,13 @@ export function monthCase(km: number, opts: { date?: string; gasolineModel?: str
   };
   const home = options.filter((o) => o.system === 'home');
   if (!home.length) throw new Error('[home-money] no scooter that charges at home is available in the calculator');
+  const swapByModel: MonthCase['swapByModel'] = {};
+  for (const id of [...new Set(options.filter((o) => o.system !== 'home').map((o) => o.model))]) {
+    const own = options.filter((o) => o.model === id && o.system !== 'home');
+    const fee = own.filter((o) => o.monthlyFee > 0);
+    const payg = own.filter((o) => o.monthlyFee === 0);
+    swapByModel[id] = { plan: fee.length ? cheapest(fee) : null, payg: payg.length ? cheapest(payg) : null };
+  }
   const typ = home.map((o) => o.monthly.typical);
   return {
     km,
@@ -451,6 +465,7 @@ export function monthCase(km: number, opts: { date?: string; gasolineModel?: str
     },
     swapPlan: cheapest(options.filter((o) => o.system !== 'home' && o.monthlyFee > 0)),
     swapPayg: cheapest(options.filter((o) => o.system !== 'home' && o.monthlyFee === 0)),
+    swapByModel,
   };
 }
 

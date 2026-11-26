@@ -35,6 +35,12 @@ export interface OpenCase {
   gLines: [number, number, 0 | 1][];
   /** word id of the deadline strip for this case */
   strip: number;
+  /**
+   * Which battery-swap plans the month card shows for this case: an index into OpenTable.swap
+   * (the plans THIS scooter can use), or -1 when the scooter charges at home (the card then shows
+   * the cheapest swap plans of any make, each named with its scooter).
+   */
+  sm: number;
 }
 export interface OpenBe {
   k: BeKind;
@@ -54,8 +60,15 @@ export interface OpenMonth {
   planN: number;
   paygN: number;
 }
+/** One scooter's own cheapest swap plans at one distance: [元 a month, word id of "scooter · plan"]; null when its make has none of that kind. */
+export interface OpenSwap {
+  plan: [number, number] | null;
+  payg: [number, number] | null;
+}
 export interface OpenTable {
   buy: Record<string, Record<Scrap, OpenCase>>;
+  /** Per swap-only scooter shown in `buy` (OpenCase.sm): its own cheapest plans at each distance. */
+  swap: { id: string; km: Record<number, OpenSwap> }[];
   be: Record<string, Record<Scrap, Record<number, OpenBe>>>;
   month: Record<number, OpenMonth>;
   worst: { county: string; scrap: Scrap; plate: number; d: number };
@@ -175,7 +188,8 @@ ${bar('op-bar--ev', fill(T.barEv, { plate: W(c.p) }), c.e, c.el, max, loc, T, tr
   const side = (title: string, model: string, list: number, lines: OpenCase['eLines'], paid: number) =>
     `<div class="op-work__side"><p class="op-work__title">${esc(title)}<span>${esc(model)}</span></p><ul class="op-work__lines"><li><span>${esc(T.workList)}</span><span class="op-amt">${esc(yuan(loc, list))}</span></li>${lines.map(line).join('')}${lines.length ? '' : `<li><span>${esc(T.workNone)}</span><span class="op-amt">−${esc(yuan(loc, 0))}</span></li>`}<li class="op-work__paid"><span>${esc(T.workPaid)}</span><span class="op-amt">${esc(yuan(loc, paid))}</span></li></ul></div>`;
   const working = `<details class="op-work"><summary>${esc(T.workSummary)}</summary><div class="op-work__body">${side(fill(T.barEv, { plate: W(c.p) }), W(c.en), c.el, c.eLines, c.e)}${side(T.barPetrol, W(c.gn), c.gl, c.gLines, c.g)}<p class="op-small">${esc(T.workNote)}</p></div></details>`;
-  return `${headHtml(buyHeadline(T, c, scrap))}
+  // tells the month card which scooter's swap plans to show (CSS in ElectricOpening.astro)
+  return `<span class="op-sm" data-op-shows="${c.sm}" hidden></span>${headHtml(buyHeadline(T, c, scrap))}
 ${figure}
 ${bars}
 <p class="op-body">${esc(fill(T.bodyClass, { model: shortName(W(c.en)) }))}${c.sw ? esc(T.swapOnly) : ''}${esc(worst)}</p>
@@ -193,24 +207,63 @@ export function monthHeadline(d: OpenData, T: OpenText, m: OpenMonth): string {
   return fill(T.monthHead, { home: g(home), petrol: g(yuan(d.locale, m.petrol)) });
 }
 
+/**
+ * The note under the month bars, first sentence only (what is counted). Its second sentence said
+ * the swap rows are "the cheapest plans of any make", which stopped being true when the rows became
+ * the shown scooter's own plans; the scooter and plan are named under each row instead.
+ * (Copy change requested from the owner of src/i18n/pages/electric.ts: open.monthNote.)
+ */
+const firstSentence = (s: string): string => {
+  const m = s.match(/^.*?(。|\.(?=\s|$))/);
+  return m ? m[0] : s;
+};
+
+/** The swap rows of a month card: the scooter's own plans (group ≥ 0) or the cheapest of any make (−1). */
+export function swapOf(t: OpenTable, group: number, km: number): OpenSwap {
+  if (group >= 0) return t.swap[group].km[km];
+  const m = t.month[km];
+  return { plan: [m.plan, m.planN], payg: [m.payg, m.paygN] };
+}
+
+/** The swap group of a county and scrapping answer (see OpenCase.sm). */
+export const swapGroup = (t: OpenTable, county: string, scrap: Scrap): number => t.buy[county]?.[scrap]?.sm ?? -1;
+
+/**
+ * Each month: the headline, then one set of bars per swap group (−1 and every index of t.swap);
+ * the page shows the set whose group matches the scooter of the buy card on show (CSS reads the
+ * buy card's `data-op-shows`), so the battery-swap rows are always plans that scooter can use.
+ */
 export function monthHtml(d: OpenData, T: OpenText, t: OpenTable, km: number): string {
   const loc = d.locale;
   const m = t.month[km];
-  const max = Math.max(m.petrol, m.homeHi, m.plan, m.payg);
-  const w = (v: number) => `${Math.max(0.8, (100 * v) / max).toFixed(2)}%`;
-  const row = (cls: string, label: string, v: number, text: string, extra = '', sub = '') =>
-    `<div class="op-mbar ${cls}"><p class="op-mbar__label">${esc(label)}${sub ? `<span class="op-mbar__sub">${esc(sub)}</span>` : ''}</p><div class="op-mbar__track" aria-hidden="true"><span class="op-mbar__fill" style="inline-size:${w(v)}"></span>${extra}</div><p class="op-mbar__value"><b>${esc(text)}</b></p></div>`;
+  const sep = loc === 'en' ? '; ' : '；';
+  const row = (cls: string, label: string, v: number, text: string, max: number, extra = '', sub = '') =>
+    `<div class="op-mbar ${cls}"><p class="op-mbar__label">${esc(label)}${sub ? `<span class="op-mbar__sub">${esc(sub)}</span>` : ''}</p><div class="op-mbar__track" aria-hidden="true"><span class="op-mbar__fill" style="inline-size:${Math.max(0.8, (100 * v) / max).toFixed(2)}%"></span>${extra}</div><p class="op-mbar__value"><b>${esc(text)}</b></p></div>`;
   const homeText = m.homeLo === m.homeHi ? yuan(loc, m.homeLo) : fill(T.rangeShort, { lo: loc === 'en' ? `NT$${num(loc, m.homeLo)}` : num(loc, m.homeLo), hi: yuan(loc, m.homeHi) });
-  const homeExtra = m.homeHi > m.homeLo ? `<span class="op-mbar__more" style="inline-size:${((100 * (m.homeHi - m.homeLo)) / max).toFixed(2)}%"></span>` : '';
-  return `${headHtml(monthHeadline(d, T, m))}
-<div class="op-mbars" role="img" aria-label="${esc(fill(T.monthAlt, { km: num(loc, km), petrol: yuan(loc, m.petrol), home: homeText, plan: yuan(loc, m.plan), payg: yuan(loc, m.payg) }))}">
-${row('op-mbar--petrol', T.mPetrol, m.petrol, yuan(loc, m.petrol))}
-${row('op-mbar--home', T.mHome, m.homeLo, homeText, homeExtra)}
+  const groups = [-1, ...t.swap.map((_, i) => i)];
+  const sets = groups.map((g) => {
+    const sw = swapOf(t, g, km);
+    const max = Math.max(m.petrol, m.homeHi, sw.plan?.[0] ?? 0, sw.payg?.[0] ?? 0);
+    const homeExtra = m.homeHi > m.homeLo ? `<span class="op-mbar__more" style="inline-size:${((100 * (m.homeHi - m.homeLo)) / max).toFixed(2)}%"></span>` : '';
+    const swaps = [
+      sw.plan && { label: T.mPlan, v: sw.plan[0], n: d.words[sw.plan[1]] },
+      sw.payg && { label: T.mPayg, v: sw.payg[0], n: d.words[sw.payg[1]] },
+    ].filter((x): x is { label: string; v: number; n: string } => !!x);
+    // the alt names every bar with its own label, and each swap row with its scooter and plan
+    const alt =
+      `${fill(T.caseKm, { km: num(loc, km) })}${loc === 'en' ? ': ' : '：'}` +
+      [`${T.mPetrol} ${yuan(loc, m.petrol)}`, `${T.mHome} ${homeText}`, ...swaps.map((x) => `${x.label}${loc === 'en' ? ` (${x.n})` : `（${x.n}）`} ${yuan(loc, x.v)}`)].join(sep) +
+      (loc === 'en' ? '.' : '。');
+    return `<div class="op-mbars op-swap" data-op-sm="${g}" role="img" aria-label="${esc(alt)}">
+${row('op-mbar--petrol', T.mPetrol, m.petrol, yuan(loc, m.petrol), max)}
+${row('op-mbar--home', T.mHome, m.homeLo, homeText, max, homeExtra)}
 <p class="op-divider">${esc(T.mDivider)}</p>
-${row('op-mbar--swap', T.mPlan, m.plan, yuan(loc, m.plan), '', d.words[m.planN])}
-${row('op-mbar--swap', T.mPayg, m.payg, yuan(loc, m.payg), '', d.words[m.paygN])}
-</div>
-<p class="op-small">${esc(fill(T.monthNote, { km: num(loc, km) }))}</p>`;
+${swaps.map((x) => row('op-mbar--swap', x.label, x.v, yuan(loc, x.v), max, '', x.n)).join('\n')}
+</div>`;
+  });
+  return `${headHtml(monthHeadline(d, T, m))}
+${sets.join('\n')}
+<p class="op-small">${esc(firstSentence(fill(T.monthNote, { km: num(loc, km) })))}</p>`;
 }
 
 /** The line under the bars (screen 13's rule), for one county, scrapping answer, distance and charging answer. */
@@ -218,7 +271,9 @@ export function monthLine(d: OpenData, T: OpenText, t: OpenTable, s: OpenState):
   const loc = d.locale;
   const m = t.month[s.km];
   if (s.charge === 'no') {
-    const swap = Math.min(m.plan, m.payg);
+    // the scooter on show: its own cheapest way to swap (or, for a home-charging scooter, any make's)
+    const sw = swapOf(t, swapGroup(t, s.county, s.scrap), s.km);
+    const swap = Math.min(...[sw.plan?.[0], sw.payg?.[0]].filter((x): x is number => x !== undefined));
     const diff = swap - m.petrol;
     return fill(diff > 0 ? T.swapDearer : T.swapCheaper, { n: yuan(loc, swap), diff: yuan(loc, diff) });
   }

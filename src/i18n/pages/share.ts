@@ -39,15 +39,20 @@ export default copy({
       en: 'The picture is an illustration. How much is added follows this site’s estimate, not a measurement.',
     },
   },
-  /** /electric/ and the old /questions/electric/ address: the money card. */
+  /**
+   * /electric/ and the old /questions/electric/ address: the money card. One picture, one
+   * headline (the default case's result), one line (the least favourable case, so the
+   * unfavourable figure always travels with the favourable one), and the check date in small
+   * print. The kicker names the case the headline is for.
+   */
   money: {
-    kicker: { 'zh-TW': '換電動', en: 'Go electric' },
-    title: { 'zh-TW': '電動機車|要多少錢？', en: 'What does an electric |scooter cost?' },
-    cheaper: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，比買新的燃油機車少付 {amount}。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one costs {amount} less than a new petrol one.' },
-    same: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，和買新的燃油機車差不多錢。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one costs about the same as a new petrol one.' },
-    dearer: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，還是比燃油機車多付 {amount}。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one still costs {amount} more than a petrol one.' },
-    worst: { 'zh-TW': '條件不同，也有人多付 {amount}。', en: 'On other terms, some pay {amount} more.' },
-    caveat: { 'zh-TW': '價格和補助是 {date}查的。用網站上的計算機，算你自己的。', en: 'Prices and subsidies checked {date}. Work out your own on the site.' },
+    kicker: { 'zh-TW': '{county}・報廢出廠滿 10 年的機車', en: '{county} · scrapping a scooter 10+ years old' },
+    cheaper: { 'zh-TW': '換電動，|比燃油機車|少付 {amount}', en: 'Electric costs |{amount} less |than petrol' },
+    same: { 'zh-TW': '換電動，|和燃油機車|差不多錢', en: 'Electric costs |about the same |as petrol' },
+    dearer: { 'zh-TW': '換電動，|比燃油機車|多付 {amount}', en: 'Electric costs |{amount} more |than petrol' },
+    worst: { 'zh-TW': '最不划算的情況，多付 {amount}。', en: 'Worst case: {amount} more.' },
+    best: { 'zh-TW': '我們算的每個縣市，電動機車都不比較貴。', en: 'In every place we worked out, electric costs no more.' },
+    caveat: { 'zh-TW': '價格和補助是 {date}查的。', en: 'Prices and subsidies checked {date}.' },
   },
   questionKicker: { 'zh-TW': '問題', en: 'Questions' },
   /** The question pages (brief 7.5). Titles are the questions; the line is the one-sentence answer. */

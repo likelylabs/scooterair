@@ -35,7 +35,26 @@ const scraps: Scrap[] = ['yes', 'no'];
 const charges: Charge[] = ['no', 'yes'];
 const countyName = D.counties.find((c) => c.id === def.county)!.name;
 const chosen = fill(T.chosenDefault, { case: caseText(D, T, def) });
+
+// The month card prints one set of bars per swap group (opening-view monthHtml): −1 (a scooter
+// that charges at home: the cheapest swap plans of any make) and one per swap-only scooter on
+// show. The set shown is the one whose group the buy card on show names (its hidden
+// [data-op-shows]), for the scrapping answer that is checked; the client redraws the buy card
+// per county, so this follows the county too. Without :has(), the any-make set shows.
+const groups = Math.max(0, ...D.tables.map((x) => x.swap.length));
+const swapCss =
+  '[data-op] .op-swap{display:none!important}' +
+  '@supports not selector(:has(*)){[data-op] .op-swap[data-op-sm="-1"]{display:grid!important}}' +
+  scraps
+    .flatMap((s) =>
+      [-1, ...Array.from({ length: groups }, (_, i) => i)].map(
+        (g) => `[data-op]:has([data-pick-input="scrap"][value="${s}"]:checked):has([data-op-buy="${s}"] [data-op-shows="${g}"]) .op-swap[data-op-sm="${g}"]{display:grid!important}`,
+      ),
+    )
+    .join('');
 ---
+
+<style is:inline set:html={swapCss}></style>
 
 <div class="op" data-op data-pick-scope>
   <p class="op-chosen" data-op-chosen aria-live="polite">{chosen}</p>
