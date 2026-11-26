@@ -30,6 +30,11 @@
  * Slots
  *   default   the drawing: SVG elements, placed inside the <svg>
  *   labels    HTML words over the drawing: <SceneLabel> elements
+ *   before    HTML in a row above the drawing, in normal flow (a number chip
+ *             that must be free to grow with 字大)
+ *
+ * The tag, when asked for, is printed on a line of its own under the drawing,
+ * as <Screen illustration> prints it: it never covers a word of the picture.
  *
  *   <SceneFrame locale={locale} box={VB} alt={alt} scenario="dozen">
  *     <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + people} />
@@ -60,19 +65,22 @@ const n = (v: number) => +v.toFixed(2);
 ---
 
 <figure class:list={['scene', cls]} id={id} data-arrive={arrive ? '' : undefined} {...rest}>
-  <svg
-    class:list={['scene__art', drift && 'air--drift']}
-    viewBox={`${n(box.x)} ${n(box.y)} ${n(box.w)} ${n(box.h)}`}
-    role="img"
-    aria-label={alt}
-    data-air-scn={scenario}
-    style={`--air-upp:${n(box.w / AIR.refWidth)}`}
-    focusable="false"
-  >
-    <slot />
-  </svg>
-  {Astro.slots.has('labels') && <div class="scene__labels"><slot name="labels" /></div>}
-  {tag && <IllustrationTag locale={locale} kind={tag} overlay />}
+  {Astro.slots.has('before') && <div class="scene__before"><slot name="before" /></div>}
+  <div class="scene__canvas">
+    <svg
+      class:list={['scene__art', drift && 'air--drift']}
+      viewBox={`${n(box.x)} ${n(box.y)} ${n(box.w)} ${n(box.h)}`}
+      role="img"
+      aria-label={alt}
+      data-air-scn={scenario}
+      style={`--air-upp:${n(box.w / AIR.refWidth)}`}
+      focusable="false"
+    >
+      <slot />
+    </svg>
+    {Astro.slots.has('labels') && <div class="scene__labels"><slot name="labels" /></div>}
+  </div>
+  {tag && <p class="scene__tag"><IllustrationTag locale={locale} kind={tag} /></p>}
 </figure>
 {/* Before first paint: hold the parts that will arrive at their starting look, but only when
     motion is welcome. If the script that plays the arrival never loads, show the resting state. */}

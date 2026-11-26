@@ -1,0 +1,114 @@
+---
+/**
+ * SpreadBars — /estimate/#range: the five inputs that move the estimate most (METHOD §7), each
+ * as a bar whose length is how many times the dozen scenario's answer moves when that input goes
+ * from its low end to its high end. Values are est.recipe.spread (lane A); nothing is typed.
+ * The bars are drawn with the estimate's mark (hatched, dashed edge: 算出來的), on a shared
+ * scale from 1 (no change) to the largest spread. HTML text, so labels wrap and grow with 字大.
+ *
+ * Props
+ *   locale   Locale
+ *   labels   { wind, meander, fuelFlow, scooters, nearest } — the reader's words for each input
+ *   times    '差 {x} 倍' — the value template
+ *   caption  one sentence under the bars
+ */
+import type { Locale } from '@/i18n';
+import { est } from '@/data/estimate';
+import { fill } from '@/i18n/pages/_copy';
+
+type Key = keyof typeof est.recipe.spread;
+interface Props {
+  locale: Locale;
+  labels: Record<Key, string>;
+  times: string;
+  caption?: string;
+}
+const { locale, labels, times, caption } = Astro.props;
+const order: Key[] = ['wind', 'meander', 'fuelFlow', 'scooters', 'nearest'];
+const max = Math.max(...order.map((k) => est.recipe.spread[k]));
+const nf = new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 1 });
+// bar length from 1× (nothing) to the largest spread, on a log scale so 2× is half of 4×
+const pct = (x: number) => Math.max(6, (Math.log(x) / Math.log(max)) * 100);
+const rows = order.map((k) => ({ k, label: labels[k], x: est.recipe.spread[k], text: fill(times, { x: nf.format(est.recipe.spread[k]) }) }));
+---
+
+<figure class="spread" data-chart="estimate-spread">
+  <ol class="spread__list">
+    {rows.map((r) => (
+      <li class="spread__row">
+        <span class="spread__label">{r.label}</span>
+        <span class="spread__track" aria-hidden="true"><span class="spread__bar" data-mark style={`inline-size:${pct(r.x).toFixed(1)}%`}></span></span>
+        <span class="spread__val">{r.text}</span>
+      </li>
+    ))}
+  </ol>
+  {caption && <figcaption class="spread__cap">{caption}</figcaption>}
+</figure>
+
+<style>
+  .spread {
+    margin: 0;
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .spread__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .spread__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'label val' 'track track';
+    gap: var(--sp-1) var(--sp-3);
+    align-items: baseline;
+  }
+  @media (min-width: 40em) {
+    .spread__row {
+      grid-template-columns: 13rem 1fr 6rem;
+      grid-template-areas: 'label track val';
+      align-items: center;
+    }
+  }
+  .spread__label {
+    grid-area: label;
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+  }
+  .spread__val {
+    grid-area: val;
+    font-size: var(--fs-base);
+    font-weight: var(--fw-black, 900);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    text-align: end;
+  }
+  .spread__track {
+    grid-area: track;
+    display: block;
+    block-size: 1.25rem;
+    border-radius: 0.25rem;
+    background: var(--bg-sunken);
+  }
+  .spread__bar {
+    display: block;
+    block-size: 100%;
+    border-radius: 0.25rem;
+    border: 2px dashed var(--estimate-ink, var(--estimate));
+    background: repeating-linear-gradient(135deg, var(--estimate-wash) 0 5px, color-mix(in srgb, var(--estimate) 55%, transparent) 5px 8px);
+    box-sizing: border-box;
+  }
+  .spread__cap {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: var(--lh-read, 1.6);
+  }
+  @media (forced-colors: active) {
+    .spread__bar {
+      background: CanvasText;
+      border-color: CanvasText;
+    }
+  }
+</style>

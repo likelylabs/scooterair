@@ -416,7 +416,7 @@ export const art = {
       { 'zh-TW': '離路口遠的對照點', en: 'A control point away from the junction' },
     ] as L10n[],
     heightTitle: { 'zh-TW': '量兩個高度', en: 'At two heights' } as L10n,
-    heightLow: { 'zh-TW': '約 0.6 公尺：嬰兒車的高度', en: 'About 0.6 m: stroller height' } as L10n,
+    heightLow: { 'zh-TW': '約 0.6 公尺：嬰兒車的高度', en: 'About 0.6 m: pushchair height' } as L10n,
     heightHigh: { 'zh-TW': '約 1.5 公尺：大人的高度', en: 'About 1.5 m: adult height' } as L10n,
     whatTitle: { 'zh-TW': '量什麼', en: 'What' } as L10n,
     what: [
@@ -427,7 +427,7 @@ export const art = {
     clockTitle: { 'zh-TW': '怎麼記錄', en: 'How' } as L10n,
     clock: {
       'zh-TW': '一秒記一筆，對上紅燈和綠燈；同時數每個紅燈停了幾輛機車；公開原始資料。',
-      en: 'Second by second, matched to red and green; count the scooters waiting in each phase; publish the raw data.',
+      en: 'Second by second, matched to red and green; count the scooters stopped at each red; publish the raw data.',
     } as L10n,
     control: { 'zh-TW': '對照點', en: 'Control' } as L10n,
   },

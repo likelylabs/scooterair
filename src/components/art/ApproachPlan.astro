@@ -72,11 +72,11 @@ const a = air({
   extra: AIR_EXTRA,
   kerb: { x0: plan.people.x, x1: plan.people.x + plan.people.w, ground: plan.people.y + plan.people.h, top: plan.people.h, sourceX: T.x0 + 18, sourceY: T.y1 - 20 },
   tailpipes: plan.tailpipes,
-  avoid: [...plan.avoid, ...(inset ? [{ x: VB.x, y: 0, w: 690, h: PLAN3.centre - 40 }] : [])],
+  avoid: [...plan.avoid, ...(inset ? [{ x: VB.x, y: 0, w: VB.w, h: PLAN3.centre - 40 }] : [])],
 });
 
 // the inset: the tail of a scooter from the side, 1.5 times the plan's scale, under a dashed one-metre line
-const IN = { x: VB.x + 14, y: 14, w: 650, h: PLAN3.centre - 66, k: 1.2 };
+const IN = { x: VB.x + 14, y: 14, w: VB.w - 28, h: PLAN3.centre - 66, k: 1.2 };
 const ground = IN.y + IN.h - 16;
 const scX = IN.x + IN.w - 184 * IN.k - 22;
 const pipe = { x: scX + TAILPIPE.x * IN.k, y: ground + TAILPIPE.y * IN.k };
@@ -95,11 +95,11 @@ const alt = sceneAlt(locale, fill(art.plan3.alt, locale, { gap: gapLabel, height
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive id={id} class={['scene--plan', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={scene} />
   <Fragment slot="labels">
-    <SceneLabel box={VB} x={(PLAN3.crossing[1] + T.x0) / 2 + 60} y={T.y0 - 88} anchor="center bottom" plate class="plan3-gap">{gapLabel}</SceneLabel>
+    <SceneLabel box={VB} x={VB.x + VB.w - 16} y={T.y0 - 46} anchor="end bottom" max={96} plate class="plan3-gap">{gapLabel}</SceneLabel>
     {labels && <SceneLabel box={VB} x={PLAN3.crossing[0] + 76} y={PLAN3.centre + 118} anchor="center middle" plate>{art.plan3.crossing[locale]}</SceneLabel>}
     {labels && <SceneLabel box={VB} x={(T.x0 + T.x1) / 2} y={PLAN3.kerb + 14} anchor="center top" plate>{art.plan3.turnBox[locale]}</SceneLabel>}
     {labels && <SceneLabel box={VB} x={plan.people.x - 10} y={plan.people.y + 62} anchor="end middle" plate max={30}>{art.plan3.waiting[locale]}</SceneLabel>}
     {inset && <SceneLabel box={VB} x={IN.x + 16} y={ground - 100 * IN.k - 6} anchor="start bottom">{art.words.oneMetre[locale]}</SceneLabel>}
-    {inset && <SceneLabel box={VB} x={pipe.x - 48} y={pipe.y - 3} anchor="end middle" max={38} class="hs-pipe-label">{heightLabel}</SceneLabel>}
+    {inset && <SceneLabel box={VB} x={pipe.x - 48} y={pipe.y + 12} anchor="end bottom" max={56} class="hs-pipe-label">{heightLabel}</SceneLabel>}
   </Fragment>
 </SceneFrame>

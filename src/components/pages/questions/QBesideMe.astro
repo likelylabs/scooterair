@@ -1,0 +1,87 @@
+---
+/**
+ * /questions/beside-me/ — 站遠一點有用嗎？ (brief 7.5, amendment 12.3)
+ *   1  G3, the junction from above. The answer is qualitative: further from the tailpipe is
+ *      usually thinner, and no metres are printed. The one measurement (the Institute of
+ *      Transportation's set-back waiting area) is the quiet line, with its caveat in the sheet.
+ *   2  G4, the kerb, with the scenario switch and the estimate of what the pack adds: the
+ *      number a reader who asks about "the scooters beside me" came for.
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import Screen from '@/components/ui/Screen.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import ScenarioSwitch from '@/components/ui/ScenarioSwitch.astro';
+import ApproachPlan from '@/components/art/ApproachPlan.astro';
+import KerbScene from '@/components/art/KerbScene.astro';
+import AirRange from '@/components/art/AirRange.astro';
+import WorkingSum from '@/components/charts/WorkingSum.astro';
+import { workingKerbFlow } from '@/components/charts/core/workingSum';
+import { est, estimateText, formatReference, kerbSentence, scenarioKeys } from '@/data/estimate';
+import { fact } from '@/data/facts';
+import questions from '@/i18n/pages/questions';
+import { filler } from './q';
+
+interface Props {
+  locale: Locale;
+  next: { label: string; href: string; primary?: boolean };
+}
+const { locale, next } = Astro.props;
+const f = filler(locale);
+const s1 = questions.besideMe.s1;
+const s2 = questions.besideMe.s2;
+const setback = fact('iot-setback-measured');
+const gap = locale === 'en' ? ' ' : '';
+---
+
+<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
+  <ApproachPlan slot="picture" locale={locale} />
+  <KindChip slot="chips" locale={locale} of={setback} />
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="measured" facts="iot-setback-measured" primary={{ href: href('/evidence/#link-3', locale) }}>
+    <p slot="block1">{f(s1.sheet.b1[locale])}</p>
+    <p slot="block2">{f(s1.sheet.b2[locale])}</p>
+    <p slot="block3">{f(s1.sheet.b3[locale])}</p>
+  </HowSheet>
+</Screen>
+
+<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} quiet={f(s2.quiet[locale])} illustration next={next}>
+  <KerbScene slot="picture" locale={locale} />
+  <ScenarioSwitch slot="controls" locale={locale} />
+  <p slot="body">{est.meta.gloss[locale]}{gap}{scenarioKeys.map((s) => <span data-when-scenario={s}>{kerbSentence(s, locale)}</span>)}</p>
+  <Fragment slot="chips">
+    {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-2" data-when-scenario={s} />)}
+  </Fragment>
+  <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" pollutant="co" anchor="recipe" facts="moenv-co-stations-2025">
+    <Fragment slot="block1">
+      <p>{f(s2.sheet.b1[locale])}</p>
+      <p class="q-ref">
+        <span>{estimateText.alreadyThere[locale]}</span>
+        <b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b>
+        <KindChip locale={locale} of={fact('moenv-co-stations-2025')} size="sm" />
+      </p>
+    </Fragment>
+    <WorkingSum slot="block2" locale={locale} {...workingKerbFlow(locale)} />
+    <Fragment slot="block3">
+      <p>{est.meta.appliesTo[locale]}</p>
+      <AirRange locale={locale} scenario="dozen" />
+    </Fragment>
+  </HowSheet>
+</Screen>
+
+<style>
+  /* what the street already holds: a name, its figure and its chip on one line of the sheet */
+  .q-ref {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.6rem;
+    margin-block-start: var(--sp-2);
+  }
+  .q-ref b {
+    font-weight: var(--fw-black);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>

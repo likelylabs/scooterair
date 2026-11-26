@@ -22,7 +22,7 @@
  * Props
  *   locale  Locale
  *   mask    the mask shown first: 'cloth' | 'surgical' (default) | 'carbon' | 'n95'
- *   says    print one line in the picture about the chosen mask (default true)
+ *   says    print one line above the drawing about the chosen mask (default true)
  *   tag     false (default; <Screen illustration> prints it) | 'street'
  *   id, class
  *
@@ -33,7 +33,6 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
-import SceneLabel from './SceneLabel.astro';
 import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
 import { MASK_CHOICES as MASKS, MASK_FACE, artId, maskHead, maskOn, type MaskChoice } from './parts';
 
@@ -132,12 +131,12 @@ const alt = [art.mask.alt[locale], art.alt2.plain[locale]].join(locale === 'en' 
 ---
 
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--mask', cls].filter(Boolean).join(' ')} data-mask={mask}>
+  {says && (
+    <div slot="before" class="mk-says" aria-live="polite">
+      {MASKS.map((m) => (
+        <p class:list={['mk-t', `mk-on-${m}`]} data-mask-says={m}><b>{art.mask.names[m][locale]}</b>{art.mask.says[m][locale]}</p>
+      ))}
+    </div>
+  )}
   <Fragment set:html={scene} />
-  <Fragment slot="labels">
-    {says && MASKS.map((m) => (
-      <SceneLabel box={VB} x={8} y={VB.y + 8} max={58} class={on(m)} data-mask-says={m}>
-        <b>{art.mask.names[m][locale]}</b><br />{art.mask.says[m][locale]}
-      </SceneLabel>
-    ))}
-  </Fragment>
 </SceneFrame>

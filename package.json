@@ -11,7 +11,7 @@
     "test:calc": "node --test 'src/lib/calc/__tests__/*.test.ts'",
     "check:copy": "node scripts/check-copy.mjs",
     "check:site": "node scripts/check-site.mjs",
-    "test:lib": "node --test 'src/lib/__tests__/*.test.ts' 'src/components/pages/electric/__tests__/*.test.ts'",
+    "test:lib": "node --test 'src/lib/__tests__/*.test.ts' 'src/components/pages/electric/__tests__/*.test.ts' 'src/components/art/__tests__/*.test.ts'",
     "share-cards": "node scripts/build-share-cards.mjs",
     "headline-font": "astro build && node scripts/build-display-font.mjs && astro build"
   },

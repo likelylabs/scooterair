@@ -982,3 +982,8 @@ None of these blocks the build; each has a stated fallback.
 **12.5 Notes left for lane owners by earlier fixers** (things in your files that must change because the registry, the calculator or shared components were corrected today) are in the `forOtherOwners` lists of `registry-evidence-results.json`, `calc-electric-results.json` and `shared-build-results.json` under the session scratchpad folder `fixes/`. The review's raw findings for the old pages are under `findings/` in the same scratchpad. Read the ones for your lane; most concern copy that this redesign replaces, but any factual correction in them still applies.
 
 **12.6 Working in a shared tree.** Several lanes edit at once. Edit only your lane's files, with targeted edits. Never commit, push, or run `npm run build` (it writes `dist/`). To check a build, build into your own scratch folder; if another lane's half-finished edit breaks the build, build from a scratch copy of the last commit plus your own files, and say so in your hand-over note.
+
+**12.7 Decisions on the scenes (2026-11-26).**
+- The opening street scene (G1, G14) draws sixteen scooters in three rows beside the kerb and does not paint the stop box and the turn box: that geometry does not fit a side view at a size where the people stay recognisable. The true layout is shown from above on G3. Accepted.
+- The diagram scenes G2, G6, G11 and G17 leave out the street's own sparse air (layer A), because every mark in them is placed to explain something. Layer A stays in every street scene. Accepted.
+- G7 (the road of time) lives in `src/components/art/` with the other scenes.

@@ -18,8 +18,9 @@
  *   tag     false (default; <Screen illustration> prints it) | 'street'
  *   id, class
  * Slot
- *   chip    the number chip (HTML from the host: an <EstimateValue>), laid over
- *           the top of the picture beside the can
+ *   chip    the number chip (HTML from the host: an <EstimateValue>). It sits in
+ *           a row above the drawing, beside the drinks can, in normal flow, so
+ *           it can grow with 字大 without covering the picture
  *
  *   <TailpipeMarks slot="picture" locale={locale}><EstimateValue slot="chip" … /></TailpipeMarks>
  *   <AirKey slot="controls" locale={locale} tap />
@@ -31,7 +32,7 @@ import SceneFrame from './SceneFrame.astro';
 import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
 import { CAN, MASK_FACE, TAILPIPE, artId, drinksCan, maskHead, rng, scooter } from './parts';
 import { put } from './kit';
-import { labelStyle, sceneAlt } from './scene';
+import { sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
@@ -44,7 +45,7 @@ const { locale, tag = false, id, class: cls } = Astro.props;
 const hasChip = Astro.slots.has('chip');
 const can = Astro.props.can ?? hasChip;
 
-const VB: Box = { x: -200, y: hasChip || can ? -290 : -230, w: 390, h: hasChip || can ? 375 : 315 };
+const VB: Box = { x: -200, y: -226, w: 390, h: 311 };
 const upp = unitsPerPx(VB.w);
 const at = { x: 4, y: 0 };
 const M = { x: at.x + TAILPIPE.x, y: TAILPIPE.y }; // the tailpipe mouth
@@ -77,7 +78,6 @@ const dots = Array.from({ length: 26 }, (_, i) => {
   return airDot(x, y, upp, { size: 0.5 + r() * 0.5, cls: 'sa-go', attrs: go(Math.round(i * 0.5), x, y) });
 }).join('');
 
-const canAt = { x: VB.x + 12, y: VB.y + 12, s: 0.6 };
 const scene = [
   `<rect class="a-plane" x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${-VB.y}"/>`,
   `<rect class="a-road" x="${VB.x}" y="0" width="${VB.w}" height="${VB.y + VB.h}"/>`,
@@ -87,13 +87,16 @@ const scene = [
   `<g class="tm-lane tm-lane--ring">${rings}</g>`,
   `<g class="tm-lane tm-lane--ribbon">${put(HEAD.x, HEAD.y, maskHead(), { s: HEAD.s, flip: true, cls: 'a-figure' })}${ribbons}</g>`,
   put(at.x, at.y, scooter({ kind: 'gas', rider: true }), { cls: 'a-figure' }),
-  can ? put(canAt.x, canAt.y + CAN.h * canAt.s, drinksCan(), { s: canAt.s }) : '',
 ].join('');
 const alt = sceneAlt(locale, art.tailpipe.alt[locale], { kind: 'plain' });
-const chipStyle = labelStyle(VB, canAt.x + (can ? CAN.w * canAt.s + 10 : 0), VB.y + 12);
 ---
 
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--tailpipe', cls].filter(Boolean).join(' ')}>
+  {(hasChip || can) && (
+    <div slot="before" class="tm-head">
+      {can && <svg class="tm-can" viewBox={`0 ${-CAN.h - 4} ${CAN.w} ${CAN.h + 6}`} aria-hidden="true" focusable="false" set:html={drinksCan()} />}
+      {hasChip && <div class="tm-chip"><slot name="chip" /></div>}
+    </div>
+  )}
   <Fragment set:html={scene} />
-  {hasChip && <div slot="labels" class="tm-chip" style={chipStyle}><slot name="chip" /></div>}
 </SceneFrame>

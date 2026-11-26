@@ -365,8 +365,16 @@ export function air(o: AirOptions): AirLayers {
   const allRings: Point[] = [];
   const allDots: Point[] = [];
 
-  const ringEl = (cls: string, d: string, attrs = '') => `<path class="air-ring ${cls}" stroke-width="${ringHalo}" d="${d}"${attrs}/>`;
-  const dotEl = (cls: string, d: string, attrs = '') => `<path class="air-dot ${cls}" stroke-width="${dotHalo}" d="${d}"${attrs}/>`;
+  // Every ring and dot carries a light halo so it reads over the darkest core. The halo is a
+  // second drawing of the same path underneath (<use>, class air-halo, stroked in the colour of
+  // the paper); the mark itself has a fill and no stroke, so its paint is its own colour.
+  let halos = 0;
+  const haloed = (kind: 'air-ring' | 'air-dot', width: number | string, cls: string, d: string, attrs: string) => {
+    const hid = `${id}-h${halos++}`;
+    return `<use class="air-halo ${cls}" href="#${hid}" stroke-width="${width}"${attrs}/><path id="${hid}" class="${kind} ${cls}" d="${d}"${attrs}/>`;
+  };
+  const ringEl = (cls: string, d: string, attrs = '') => haloed('air-ring', ringHalo, cls, d, attrs);
+  const dotEl = (cls: string, d: string, attrs = '') => haloed('air-dot', dotHalo, cls, d, attrs);
 
   /* ---- Layer A: the street's own air ------------------------------------ */
   let streetRings = 0;
@@ -586,11 +594,15 @@ export function air(o: AirOptions): AirLayers {
  */
 export function airRing(x: number, y: number, upp: number, o: { size?: number; cls?: string; attrs?: string } = {}): string {
   const r = (AIR.ring.rMin + (o.size ?? 0.5) * (AIR.ring.rMax - AIR.ring.rMin)) * upp;
-  return `<path class="air-ring${o.cls ? ' ' + o.cls : ''}" stroke-width="${f(AIR.ring.halo * 2 * upp)}" d="${ringPath(x, y, r, AIR.ring.stroke * upp)}"${o.attrs ?? ''}/>`;
+  const d = ringPath(x, y, r, AIR.ring.stroke * upp);
+  const cls = o.cls ? ' ' + o.cls : '';
+  return `<path class="air-halo${cls}" stroke-width="${f(AIR.ring.halo * 2 * upp)}" d="${d}"${o.attrs ?? ''}/><path class="air-ring${cls}" d="${d}"${o.attrs ?? ''}/>`;
 }
 export function airDot(x: number, y: number, upp: number, o: { size?: number; cls?: string; attrs?: string } = {}): string {
   const r = (AIR.dot.rMin + (o.size ?? 0.5) * (AIR.dot.rMax - AIR.dot.rMin)) * upp;
-  return `<path class="air-dot${o.cls ? ' ' + o.cls : ''}" stroke-width="${f(AIR.dot.halo * 2 * upp)}" d="${dotPath(x, y, r)}"${o.attrs ?? ''}/>`;
+  const d = dotPath(x, y, r);
+  const cls = o.cls ? ' ' + o.cls : '';
+  return `<path class="air-halo${cls}" stroke-width="${f(AIR.dot.halo * 2 * upp)}" d="${d}"${o.attrs ?? ''}/><path class="air-dot${cls}" d="${d}"${o.attrs ?? ''}/>`;
 }
 /** A ribbon along any path `d` (build it with airWave() or airWisp(), or pass your own). */
 export function airRibbon(d: string, upp: number, o: { weight?: number; cls?: string; attrs?: string } = {}): string {
@@ -651,8 +663,8 @@ export function airGlyph(kind: AirMark): string {
     case 'ribbon':
       return `<path class="air-rib" stroke-width="2.8" d="${wavePath(2, 12, 20, 1, 10, 3.6)}"/>`;
     case 'ring':
-      return `<path class="air-ring" stroke-width="0" d="${ringPath(12, 12, 6, 2.4)}"/>`;
+      return `<path class="air-ring" d="${ringPath(12, 12, 6, 2.4)}"/>`;
     case 'dot':
-      return `<path class="air-dot" stroke-width="0" d="${dotPath(7, 15, 2.2)}${dotPath(13, 8.5, 2.2)}${dotPath(17.5, 15.5, 2.2)}"/>`;
+      return `<path class="air-dot" d="${dotPath(7, 15, 2.2)}${dotPath(13, 8.5, 2.2)}${dotPath(17.5, 15.5, 2.2)}"/>`;
   }
 }

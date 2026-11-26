@@ -24,7 +24,7 @@ const { locale, class: cls } = Astro.props;
 const s = art.smell;
 ---
 
-<div class:list={['smell', cls]}>
+<figure class:list={['smell', cls]}>
   <div class="smell__cols">
     <div class="smell__col smell__col--can">
       <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" set:html={nose(true)} />
@@ -38,10 +38,11 @@ const s = art.smell;
     </div>
   </div>
   <p class="smell__foot">{s.footer[locale]}</p>
-</div>
+</figure>
 
 <style>
   .smell {
+    margin: 0;
     max-inline-size: 40rem;
   }
   .smell__cols {

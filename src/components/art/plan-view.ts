@@ -95,7 +95,7 @@ export function planView(): PlanParts {
   // the 50 cm: from the edge of the crossing to the rear edge of the turn box
   const [a, b] = [P.crossing[1], T.x0];
   const dy = T.y0 - 26;
-  const dimension = `<path class="plan3-dim" d="M${a},${dy}H${b}M${a},${dy - 20}V${T.y0 + 30}M${b},${dy - 20}V${T.y0 - 4}M${(a + b) / 2},${dy}V${dy - 58}H${b + 14}"/>`;
+  const dimension = `<path class="plan3-dim" d="M${a},${dy}H${b}M${a},${dy - 20}V${T.y0 + 30}M${b},${dy - 20}V${T.y0 - 4}M${(a + b) / 2},${dy}V${dy - 22}"/>`;
 
   const tailpipes: AirSource[] = [...rank, ...turn].map((s) => ({ x: s.x + 3, y: s.y + 21 }));
   const people: Box = { x: 244, y: P.kerb + 4, w: 300, h: 150 };

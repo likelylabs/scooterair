@@ -327,14 +327,17 @@
 .air-ring {
   fill: var(--air-ring);
   fill-rule: evenodd;
-  stroke: var(--air-halo, var(--here, var(--bg)));
-  stroke-linejoin: round;
-  paint-order: stroke;
 }
 .air-dot {
   fill: var(--air-dot);
+}
+/* The halo of a ring or dot: the same path drawn again underneath (air.ts), stroked in the
+   colour of the paper. The mark itself is only its fill, so its paint is its own colour. */
+.air-halo {
+  fill: none;
+  fill-rule: evenodd;
   stroke: var(--air-halo, var(--here, var(--bg)));
-  paint-order: stroke;
+  stroke-linejoin: round;
 }
 .air-rib {
   fill: none;
@@ -439,10 +442,21 @@ html[data-motion='on'] .air--drift .air-d3 { animation-name: air-drift-3; animat
   inline-size: 100%;
   block-size: auto;
 }
+.scene__canvas {
+  position: relative;
+}
 .scene__labels {
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+/* the tag on a line of its own under the drawing (a scene used outside a Screen) */
+.scene__tag {
+  margin: 0;
+  padding: 0.375rem 0.5rem;
+}
+.scene__before {
+  padding: 0.625rem 0.75rem 0.25rem;
 }
 .scene__label {
   position: absolute;
@@ -626,10 +640,19 @@ html:not(.js) .air-key--tap .air-key__item {
   cursor: default;
 }
 
+.tm-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.tm-can {
+  flex: none;
+  inline-size: 2.25rem;
+  block-size: auto;
+}
 .tm-chip {
-  position: absolute;
-  inset-inline-end: 0.5rem;
-  pointer-events: auto;
+  flex: 1 1 auto;
+  min-inline-size: 0;
 }
 
 /* ---- G6 BodyFigure: the numbered pins, and the sentences under the picture ---- */
@@ -949,8 +972,6 @@ html:not(.js) [data-js-only] { display: none; }
   background: var(--bg-sunken, var(--art-fill));
   --here: var(--bg-sunken, var(--art-fill));
 }
-/* inside a Screen that prints the tag, leave the tag its corner */
-.road:has(+ [data-illustration-tag]) { padding-block-end: 2.75rem; }
 .road__posts {
   position: relative;
   display: grid;
@@ -1083,5 +1104,29 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value=
 }
 
 /* ---- StationScene ---------------------------------------------------------------- */
-.st-cabinet { fill: var(--art-paint); stroke: var(--art-ink); stroke-width: 3; }
-.scene--station .st-name { color: #14191c; text-shadow: none; }
+.st-cabinet { fill: #fbfcfb; stroke: var(--art-ink); stroke-width: 3; }
+.scene--station .st-name { padding: 0 0.25rem; border-radius: 3px; background: #fbfcfb; color: #14191c; text-shadow: none; }
+
+/* the line of words about the chosen mask, above the drawing */
+.mk-says { min-block-size: 3em; }
+.mk-says p { margin: 0; font-size: var(--fs-sm, 0.9375rem); line-height: 1.45; color: var(--ink); }
+.mk-says b { display: block; font-weight: 900; }
+.mk-t { display: none; }
+[data-mask='cloth'] .mk-t.mk-on-cloth,
+[data-mask='surgical'] .mk-t.mk-on-surgical,
+[data-mask='carbon'] .mk-t.mk-on-carbon,
+[data-mask='n95'] .mk-t.mk-on-n95 { display: block; }
+[data-pick-mask] .mk-t { display: none; }
+[data-pick-mask='cloth'] .mk-t.mk-on-cloth,
+[data-pick-mask='surgical'] .mk-t.mk-on-surgical,
+[data-pick-mask='carbon'] .mk-t.mk-on-carbon,
+[data-pick-mask='n95'] .mk-t.mk-on-n95 { display: block; }
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask']:checked) .mk-t { display: none; }
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='cloth']:checked) .mk-t.mk-on-cloth,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='surgical']:checked) .mk-t.mk-on-surgical,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='carbon']:checked) .mk-t.mk-on-carbon,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checked) .mk-t.mk-on-n95 { display: block; }
+
+/* G8: the second row of names under the figures */
+.scene--heights .hs-row2 { margin-block-start: 1.45em; }
+.scene--plan .plan3-gap { white-space: nowrap; }

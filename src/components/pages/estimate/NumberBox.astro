@@ -1,0 +1,100 @@
+---
+/**
+ * NumberBox — the two-row number box of brief 3.2 screen 4, for the top of /estimate/:
+ *
+ *   一氧化碳：旁邊停了十來輛機車
+ *   街上原本就有        約 0.5 ppm         實測・台灣
+ *   這排機車多出來      [約 0.05 到 1 ppm  推估]   ← one EstimateValue (opens the sheet)
+ *   ppm＝一百萬份空氣裡有幾份
+ *
+ * What the street holds and what the pack adds are two labelled rows, never one figure
+ * (brief 4.2 rule 5). Every number is read from src/data/estimate.ts.
+ *
+ * Props
+ *   locale    Locale
+ *   title     the box's title
+ *   scenario  'few' | 'dozen' | 'full' (default 'dozen')
+ *   sheet     id of the HowSheet the estimate opens (else it links to /estimate/#numbers)
+ */
+import type { Locale } from '@/i18n';
+import { est, estimateText, formatReference, type ScenarioKey } from '@/data/estimate';
+import { fact } from '@/data';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  scenario?: ScenarioKey;
+  sheet?: string;
+}
+const { locale, title, scenario = 'dozen', sheet } = Astro.props;
+const bg = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
+---
+
+<div class="nbox" role="group" aria-labelledby="nbox-title">
+  <p class="nbox__title" id="nbox-title">{title}</p>
+  <div class="nbox__row">
+    <p class="nbox__label">{estimateText.alreadyThere[locale]}</p>
+    <p class="nbox__val"><span class="nbox__num">{bg}</span> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} /></p>
+  </div>
+  <div class="nbox__row nbox__row--est">
+    <p class="nbox__label">{estimateText.addedByPack[locale]}</p>
+    <div class="nbox__val"><EstimateValue locale={locale} slotId={`co.${scenario}.add`} sheet={sheet} size="lg" /></div>
+  </div>
+  <p class="nbox__gloss">{estimateText.ppmGloss[locale]}</p>
+</div>
+
+<style>
+  .nbox {
+    display: grid;
+    gap: 0;
+    padding: var(--sp-4);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    max-inline-size: 34rem;
+  }
+  .nbox p {
+    margin: 0;
+  }
+  .nbox__title {
+    font-weight: var(--fw-black, 900);
+    font-size: var(--fs-md);
+    padding-block-end: var(--sp-3);
+  }
+  .nbox__row {
+    display: grid;
+    gap: var(--sp-1) var(--sp-3);
+    padding-block: var(--sp-3);
+    border-block-start: 1px solid var(--line-strong);
+    align-items: center;
+  }
+  @media (min-width: 30em) {
+    .nbox__row {
+      grid-template-columns: minmax(8rem, 0.8fr) 1.2fr;
+    }
+  }
+  .nbox__label {
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-base);
+  }
+  .nbox__val {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+  .nbox__num {
+    font-size: var(--fs-xl, 1.5rem);
+    font-weight: var(--fw-black, 900);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .nbox__gloss {
+    padding-block-start: var(--sp-2);
+    border-block-start: 1px solid var(--line);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+</style>

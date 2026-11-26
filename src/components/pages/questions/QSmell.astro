@@ -1,0 +1,60 @@
+---
+/**
+ * /questions/smell/ — 那個味道是什麼？ (brief 7.5)
+ *   1  G2, the three kinds of mark, with the key under it. The answer is a ranking from odour
+ *      thresholds: the site's own working, so it carries 推估 and never says more than
+ *      "likeliest".
+ *   2  The 聞得到／聞不到 strip: no smell does not mean none is there; benzene.
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { chipWhere } from '@/i18n/ui';
+import Screen from '@/components/ui/Screen.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
+import AirKey from '@/components/art/AirKey.astro';
+import SmellStrip from '@/components/art/SmellStrip.astro';
+import WorkingSum from '@/components/charts/WorkingSum.astro';
+import questions from '@/i18n/pages/questions';
+import { filler } from './q';
+
+interface Props {
+  locale: Locale;
+  next: { label: string; href: string; primary?: boolean };
+}
+const { locale, next } = Astro.props;
+const f = filler(locale);
+const t = questions.smell;
+const s1 = t.s1;
+const s2 = t.s2;
+---
+
+<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
+  <TailpipeMarks slot="picture" locale={locale} can={false} />
+  <AirKey slot="controls" locale={locale} tap />
+  <KindChip slot="chips" locale={locale} kind="estimate" />
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="estimate" anchor="answers" title={s1.sheet.title[locale]} facts={['scooter-exhaust-carbonyls', 'odour-thresholds']}>
+    <p slot="block1">{f(s1.sheet.b1[locale])}</p>
+    <Fragment slot="block2">
+      <WorkingSum
+        locale={locale}
+        mode="flow"
+        steps={s1.sheet.flow.map((x) => ({ value: x.value[locale], label: x.label[locale], chip: 'measured' as const }))}
+        result={{ value: s1.sheet.result.value[locale], label: s1.sheet.result.label[locale], kind: 'estimate' }}
+      />
+      <p>{f(s1.sheet.b2[locale])}</p>
+    </Fragment>
+    <p slot="block3">{f(s1.sheet.b3[locale])}</p>
+  </HowSheet>
+</Screen>
+
+<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={f(s2.quiet[locale])} next={next}>
+  <SmellStrip slot="picture" locale={locale} class="q-plate" />
+  <KindChip slot="chips" locale={locale} kind="official" where={chipWhere.international[locale]} fact={['co-odourless', 'iarc-benzene-group1', 'who-benzene-no-safe-level']} />
+  <HowSheet slot="sheet" id="how-2" locale={locale} kind="official" where={chipWhere.international[locale]} facts={['co-odourless', 'iarc-benzene-group1', 'who-benzene-no-safe-level']} primary={{ href: href('/evidence/#link-4', locale) }}>
+    <p slot="block1">{f(s2.sheet.b1[locale])}</p>
+    <p slot="block2">{f(s2.sheet.b2[locale])}</p>
+    <p slot="block3">{f(s2.sheet.b3[locale])}</p>
+  </HowSheet>
+</Screen>

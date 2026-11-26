@@ -37,8 +37,8 @@ const VB = PLAN3.box;
 const plan = planView();
 const spots: [number, number][] = [
   [plan.people.x - 46, PLAN3.kerb + 66],
-  [PLAN3.turnBox.x1 + 44, PLAN3.kerb + 56],
-  [VB.x + 60, PLAN3.kerb + 56],
+  [PLAN3.turnBox.x1 + 4, PLAN3.kerb + 60],
+  [VB.x + 96, PLAN3.kerb + 60],
   [VB.x + VB.w - 110, VB.y + VB.h - 70],
 ];
 const a = air({ frame: VB, seed: 14, id: artId('air'), tailpipes: plan.tailpipes, avoid: [...plan.avoid, ...spots.map(([x, y]) => ({ x: x - 50, y: y - 50, w: 100, h: 100 }))] });
@@ -48,7 +48,7 @@ const alt = m.measure2Alt
   .replace('{list}', m.points.map((p, i) => `${i + 1} ${p[locale]}`).join(sep));
 ---
 
-<div class:list={['measure', cls]}>
+<figure class:list={['measure', cls]}>
   <p class="measure__stamp">{m.stamp[locale]}</p>
   <SceneFrame locale={locale} box={VB} alt={alt} tag="street" class="measure__plan">
     <Fragment set:html={a.defs + plan.ground + a.cores + a.marks + plan.figures + `<path class="plan3-dim" d="M${spots[3][0] + 34},${spots[3][1]}h40m0,0l-12,-9m12,9l-12,9"/>`} />
@@ -99,10 +99,11 @@ const alt = m.measure2Alt
     </section>
   </div>
   {Astro.slots.has('default') && <div class="measure__note"><slot /></div>}
-</div>
+</figure>
 
 <style>
   .measure {
+    margin: 0;
     position: relative;
     display: grid;
     gap: var(--sp-4);

@@ -44,7 +44,7 @@ interface Props {
 }
 const { locale, figures = ['pushchair', 'adult', 'schoolchild', 'rider'], band = true, tag = false, id, class: cls } = Astro.props;
 
-const VB: Box = { x: -60, y: -262, w: 544, h: 356 };
+const VB: Box = { x: -88, y: -262, w: 572, h: 374 };
 const TOP = 180; // the ruler's last tick
 const RULER = 0;
 const X: Record<Who, number> = { pushchair: 4, schoolchild: 206, adult: 138, rider: 296 };
@@ -100,7 +100,7 @@ const scene = [
   `<rect class="a-road" x="${VB.x}" y="0" width="${VB.w}" height="${VB.y + VB.h}"/>`,
   a.defs + a.wash + bandArt + metre + a.cores + a.marks + ruler,
   figures.map((w) => draw[w]).join(''),
-  has('rider') ? `<path class="a-leader" d="M${pipe.x},${pipe.y + 8}V6"/><circle class="hs-pipe" cx="${pipe.x + 2}" cy="${pipe.y - 2}" r="9"/>` : '',
+  has('rider') ? `<path class="a-leader" d="M${pipe.x},${pipe.y + 8}V40"/><circle class="hs-pipe" cx="${pipe.x + 2}" cy="${pipe.y - 2}" r="9"/>` : '',
   rings,
 ].join('');
 const names: Record<Who, string> = { pushchair: art.heights.names.pushchair[locale], schoolchild: art.heights.names.schoolchild[locale], adult: art.heights.names.adult[locale], rider: art.heights.names.rider[locale] };
@@ -113,7 +113,8 @@ const alt = sceneAlt(locale, fill(art.heights.alt, locale, { top: TOP, lo: STROL
     {nums.map((n) => <SceneLabel box={VB} x={RULER - 20} y={-n} anchor="end middle" quiet class="hs-num">{n}</SceneLabel>)}
     <SceneLabel box={VB} x={VB.x + 5} y={-TOP - 8} anchor="start bottom" quiet class="hs-num">{art.words.cm[locale]}</SceneLabel>
     <SceneLabel box={VB} x={RULER + 6} y={-104} anchor="start bottom" class="hs-metre-label">{art.words.oneMetre[locale]}</SceneLabel>
-    {figures.map((w) => <SceneLabel box={VB} x={centre[w]} y={8} anchor="center top">{names[w]}</SceneLabel>)}
-    {has('rider') && <SceneLabel box={VB} x={pipe.x} y={8} anchor="center top" class="hs-pipe-label">{art.words.tailpipe[locale]}</SceneLabel>}
+    {/* two rows, so five names fit side by side on a 320 px phone at the largest text size */}
+    {figures.map((w) => <SceneLabel box={VB} x={centre[w]} y={8} anchor="center top" class={w === 'adult' ? 'hs-row2' : undefined}>{names[w]}</SceneLabel>)}
+    {has('rider') && <SceneLabel box={VB} x={pipe.x} y={8} anchor="center top" class="hs-pipe-label hs-row2">{art.words.tailpipe[locale]}</SceneLabel>}
   </Fragment>
 </SceneFrame>
