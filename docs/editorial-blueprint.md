@@ -1,3 +1,5 @@
+> **Superseded on 2026-11-26 by `docs/redesign-brief.md`.** Kept for history; where the two differ, the redesign brief wins.
+
 # Editorial blueprint: 一個紅燈，90 秒 / One red light, ninety seconds
 
 Status: final blueprint for page builders. Written 2026-11-25. Supersedes the three proposals ("one-red-light", "follow-the-fumes", "your-street").
