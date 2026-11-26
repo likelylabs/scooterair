@@ -16,14 +16,20 @@
  *   money        true on pages with date-dependent subsidy copy (home, /electric/,
  *                /act/): prints the date-state snapshot and loads its runtime once.
  *                See src/lib/site-state.ts
+ *   alternates   false on a page that has no twin in the other language at the same path
+ *                (the 404 page): leaves out the canonical link and the hreflang alternates
  *
- * Every page gets a three-line pre-paint script that sets <html data-money-phase>
- * from today's date, so [data-money-when] variants are right before first paint.
+ * Before first paint, one inline script puts the reader's settings on <html>:
+ *   data-theme="light|dark"   the stored theme (absent = follow the system)
+ *   data-text="lg|xl"         字大: root font-size 115% / 130% (absent = 標準, 100%)
+ *   data-motion="on|off"      the 動畫 switch, or "off" when the system asks for reduced motion
+ * and a second one sets <html data-money-phase> from today's date, so [data-money-when]
+ * variants are right. Without JavaScript none of these attributes exist.
  *
  * Slots
  *   default  page content, rendered inside <main id="main">
- *   rail     the countdown rail: <CountdownRail slot="rail" … />. It sits between the
- *            header and <main>, and is the only pinned element on the site
+ *   rail     the screen rail: <ScreenRail slot="rail" … />. It sits between the header
+ *            and <main>, and is the only pinned element on the site besides the header
  *   head     extra <head> tags
  *   credits  passed through to the footer credits line
  *
@@ -61,9 +67,10 @@ interface Props {
   noindex?: boolean;
   home?: boolean;
   money?: boolean;
+  alternates?: boolean;
 }
 
-const { locale, title, description = site.description[locale], share = 'home', ogImage, noindex = false, home = false, money = false } = Astro.props;
+const { locale, title, description = site.description[locale], share = 'home', ogImage, noindex = false, home = false, money = false, alternates = true } = Astro.props;
 const hasRail = Astro.slots.has('rail');
 const card = shareCard(share, locale);
 
@@ -99,20 +106,30 @@ const ld = home
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f5f3" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101416" />
     <script is:inline>
-      // Runs before first paint: apply a stored theme choice and flag JS support.
+      // Runs before first paint: flag JS support and apply the reader's stored settings
+      // (theme, text size, animation). See src/components/shell/settings.client.ts.
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
-        try {
-          var t = localStorage.getItem('sa-theme');
-          if (t === 'light' || t === 'dark') {
-            d.dataset.theme = t;
-            var c = t === 'dark' ? '#101416' : '#f3f5f3';
-            document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
-              m.content = c;
-            });
+        var get = function (k) {
+          try {
+            return localStorage.getItem(k);
+          } catch (e) {
+            return null;
           }
-        } catch (e) {}
+        };
+        var t = get('sa-theme');
+        if (t === 'light' || t === 'dark') {
+          d.dataset.theme = t;
+          var c = t === 'dark' ? '#101416' : '#f3f5f3';
+          document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+            m.content = c;
+          });
+        }
+        var s = get('sa-text');
+        if (s === 'lg' || s === 'xl') d.dataset.text = s;
+        var m = get('sa-motion');
+        d.dataset.motion = m === 'on' || m === 'off' ? m : window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'on';
       })();
     </script>
     <script is:inline set:html={prePaintScript(snapshot)} />
@@ -120,9 +137,13 @@ const ld = home
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="canonical" href={canonical} />
-    {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(switchLocalePath(Astro.url.pathname, l))} />)}
-    <link rel="alternate" hreflang="x-default" href={abs(switchLocalePath(Astro.url.pathname, 'zh-TW'))} />
+    {alternates && (
+      <Fragment>
+        <link rel="canonical" href={canonical} />
+        {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(switchLocalePath(Astro.url.pathname, l))} />)}
+        <link rel="alternate" hreflang="x-default" href={abs(switchLocalePath(Astro.url.pathname, 'zh-TW'))} />
+      </Fragment>
+    )}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />

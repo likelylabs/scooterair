@@ -2,6 +2,10 @@
  * Illustration classes. Parts in src/components/art/parts.ts only ever use
  * these classes, so every drawing re-themes with the --art-* tokens.
  * `--here` is the surface behind the drawing (set by tones), used for cut-outs.
+ *
+ * The air (rings, dots, ribbons, the wash, the cores) is drawn by
+ * src/components/art/air.ts and styled in the section "The air rule" at the
+ * end of this file. Its colours are the --air-* properties defined there.
  */
 .a-ink { fill: var(--art-ink); }
 .a-deep { fill: var(--art-deep); }
@@ -24,6 +28,12 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.a-bg-s {
+  fill: none;
+  stroke: var(--here);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .a-ink-s { stroke: var(--art-ink); }
 .a-deep-s { stroke: var(--art-deep); }
 .a-metal-s { stroke: var(--art-metal); }
@@ -31,6 +41,27 @@
 .a-line { stroke: var(--art-line); stroke-width: 1.5; }
 .a-rule { stroke: var(--ink-3); stroke-width: 1.5; }
 .a-rule--dot { stroke-dasharray: 0.1 6; stroke-width: 2.2; }
+
+/* The drinks can: bare metal, one plain band, a blank roundel, no brand. */
+.a-can { fill: var(--art-can, #c3cbce); stroke: var(--art-ink); stroke-width: 2.2; stroke-linejoin: round; }
+.a-can-band { fill: var(--art-can-band, #7c8992); stroke: var(--art-ink); stroke-width: 2.2; }
+.a-can-mark { fill: var(--art-can, #c3cbce); }
+.a-can-shine { fill: none; stroke: var(--here); stroke-width: 3.5; stroke-linecap: round; opacity: 0.7; }
+.a-can-lid { fill: var(--art-can-lid, #e6eaea); stroke: var(--art-ink); stroke-width: 2.2; }
+.a-can-tab { fill: var(--art-can, #c3cbce); stroke: var(--art-ink); stroke-width: 1.4; }
+
+/* Masks (parts.maskFace). The mask is pale on the dark head; its outline keeps
+   it readable where it stands off the face, in both themes. */
+.a-mask { fill: var(--art-mask, #d7ebee); stroke: var(--art-ink); stroke-width: 1.6; stroke-linejoin: round; }
+.a-mask--cloth { fill: var(--art-mask-cloth, #f2c9a0); }
+.a-mask--carbon { fill: var(--art-mask-carbon, #9aa5aa); }
+.a-mask--n95 { fill: var(--art-mask-n95, #fbfcfb); }
+.a-mask-line { fill: none; stroke: var(--art-mask-line, #6f8f98); stroke-width: 1.3; stroke-linecap: round; }
+.a-mask-s { fill: none; stroke: var(--art-mask, #d7ebee); stroke-linecap: round; }
+
+/* The body figure (parts.bodyFigure): the heart is the one warm thing in it. */
+.a-heart { fill: var(--signal-red); stroke: var(--here); stroke-width: 3; stroke-linejoin: round; paint-order: stroke; }
+.a-heart-s { fill: none; stroke: var(--signal-red); stroke-linecap: round; }
 
 /* Depth: the second and third rows of a pack are the same drawings, lighter. */
 .a-row-2 {
@@ -162,6 +193,13 @@
   stroke: var(--art-haze);
   stroke-linecap: round;
 }
+/* A person or the nearest scooter standing in front of the wash or a core:
+   a one-pixel edge in the colour of the paper keeps the silhouette whole.
+   Put the class on the <g> that holds the figure. (Screen pixels, whatever
+   the drawing's scale. Not for anything that animates every frame.) */
+.a-figure {
+  filter: drop-shadow(1px 0 0 var(--here)) drop-shadow(-1px 0 0 var(--here)) drop-shadow(0 1px 0 var(--here)) drop-shadow(0 -1px 0 var(--here));
+}
 /* a figure that must stay separate from what is behind it */
 .a-halo {
   stroke: var(--here);
@@ -244,3 +282,232 @@
   font-weight: 900;
   fill: var(--ink);
 }
+
+/* ==== The air rule (src/components/art/air.ts; redesign brief 5.1) ==========
+ *
+ * Three kinds of mark, three layers:
+ *   .air-ring  hollow blue ring   carbon monoxide
+ *   .air-dot   small dark dot     particles
+ *   .air-rib   wavy ochre ribbon  what you can smell (fuel vapour)
+ *   .air-wash  layer B, the soft tint where people stand: three fixed steps
+ *   .air-core  layer C, the dark patch behind a tailpipe
+ *
+ * Contrast (measured on the test sheets, scratchpad build/C):
+ *   - a ring is at least 3:1 against the page, the road, the walls and the
+ *     wash at its strongest step;
+ *   - over a core it is not, so every ring carries a 1 px halo in the colour
+ *     of the paper (--air-halo): ring against halo, and halo against the
+ *     core, are both well over 3:1. On plain paper the halo cannot be seen.
+ * In the dark theme the paper is dark, so the cores glow amber instead of
+ * going dark, the rings turn pale blue and the halo is the dark paper.
+ */
+:root {
+  --air-ring: #1f5fa6;
+  --air-dot: #33230f;
+  --air-rib: #8f4a08;
+  --air-wash: #c4853c;
+  --air-core: #2a1a0b;
+  --air-core-mid: #6b3a0e;
+  --air-core-far: #b0651a;
+  --air-tyre: #5a666e;
+  /* --air-halo is the paper behind the drawing: var(--here), read where the mark is drawn */
+}
+@media screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --air-ring: #93c5f4;
+    --air-dot: #f6ead9;
+    --air-rib: #f3b663;
+    --air-wash: #d9933f;
+    --air-core: #f6b25c;
+    --air-core-mid: #dc8a30;
+    --air-core-far: #a85c16;
+    --air-tyre: #9aa5aa;
+    --art-mask: #27434c;
+    --art-mask-cloth: #6d4320;
+    --art-mask-carbon: #4b575d;
+    --art-mask-n95: #151b1e;
+    --art-mask-line: #8fb4bf;
+    --art-can: #5f6b72;
+    --art-can-band: #2a3237;
+    --art-can-lid: #8e999c;
+  }
+}
+@media screen {
+  :root[data-theme='dark'],
+  .tone-inverse {
+    --air-ring: #93c5f4;
+    --air-dot: #f6ead9;
+    --air-rib: #f3b663;
+    --air-wash: #d9933f;
+    --air-core: #f6b25c;
+    --air-core-mid: #dc8a30;
+    --air-core-far: #a85c16;
+    --air-tyre: #9aa5aa;
+    --art-mask: #27434c;
+    --art-mask-cloth: #6d4320;
+    --art-mask-carbon: #4b575d;
+    --art-mask-n95: #151b1e;
+    --art-mask-line: #8fb4bf;
+    --art-can: #5f6b72;
+    --art-can-band: #2a3237;
+    --art-can-lid: #8e999c;
+  }
+}
+
+.air-ring {
+  fill: var(--air-ring);
+  fill-rule: evenodd;
+  stroke: var(--air-halo, var(--here, var(--bg)));
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.air-dot {
+  fill: var(--air-dot);
+  stroke: var(--air-halo, var(--here, var(--bg)));
+  paint-order: stroke;
+}
+.air-rib {
+  fill: none;
+  stroke: var(--air-rib);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.air-tyre { fill: var(--air-tyre); }
+.air-wash-stop { stop-color: var(--air-wash); }
+.air-wash--flat { fill: var(--air-wash); }
+.air-core-stop { stop-color: var(--air-core); }
+.air-core-stop--mid { stop-color: var(--air-core-mid); }
+.air-core-stop--far { stop-color: var(--air-core-far); }
+
+/* Glyphs of the three marks in a key or legend: <svg class="air-glyph" viewBox="0 0 24 24"> */
+.air-glyph {
+  inline-size: 1.5em;
+  block-size: 1.5em;
+  flex: none;
+  vertical-align: -0.35em;
+  overflow: visible;
+}
+
+/* ---- Scenario steps -------------------------------------------------------
+ * air({ scenario: 'all' }) draws the fullest set once (.air-steps). Which part
+ * shows is decided here, in this order:
+ *   1. nothing said                      the dozen
+ *   2. data-air-scn on the <svg>         (SceneFrame's `scenario` prop: right without JavaScript)
+ *   3. data-pick-scenario on the Screen  (set by ScenarioSwitch: wins)
+ *   .air-b1  shown from 'few'      .air-b2  from 'dozen'      .air-b3  'full' only
+ * A scene's own parts can follow the same switch (rows of scooters behind).
+ */
+.air-b,
+.air-wash {
+  transition: opacity 0.6s ease;
+}
+.air-steps .air-b3 { opacity: 0; }
+[data-air-scn='few'] .air-steps :is(.air-b2, .air-b3) { opacity: 0; }
+[data-air-scn='full'] .air-steps .air-b3 { opacity: 1; }
+[data-air-scn='few'] .air-wash--steps { opacity: var(--air-w1); }
+[data-air-scn='dozen'] .air-wash--steps { opacity: var(--air-w2); }
+[data-air-scn='full'] .air-wash--steps { opacity: var(--air-w3); }
+
+[data-pick-scenario='few'] .air-steps :is(.air-b2, .air-b3),
+[data-pick-scenario='dozen'] .air-steps .air-b3 {
+  opacity: 0;
+}
+[data-pick-scenario='dozen'] .air-steps .air-b2,
+[data-pick-scenario='full'] .air-steps :is(.air-b2, .air-b3) {
+  opacity: 1;
+}
+[data-pick-scenario='few'] .air-wash--steps { opacity: var(--air-w1); }
+[data-pick-scenario='dozen'] .air-wash--steps { opacity: var(--air-w2); }
+[data-pick-scenario='full'] .air-wash--steps { opacity: var(--air-w3); }
+
+/* ---- Drift: a few pixels, all the time, and nothing else -------------------
+ * It never changes how much is drawn. The reader's 動畫 switch (html
+ * data-motion) and the system's reduced-motion setting both stop it; the
+ * shared stylesheet also stops every animation when data-motion is off.
+ */
+@keyframes air-drift-1 {
+  from { transform: translate(calc(-1.5px * var(--air-upp, 1)), calc(0.6px * var(--air-upp, 1))); }
+  to { transform: translate(calc(1.5px * var(--air-upp, 1)), calc(-0.9px * var(--air-upp, 1))); }
+}
+@keyframes air-drift-2 {
+  from { transform: translate(calc(1.2px * var(--air-upp, 1)), calc(-1px * var(--air-upp, 1))); }
+  to { transform: translate(calc(-1.6px * var(--air-upp, 1)), calc(0.8px * var(--air-upp, 1))); }
+}
+@keyframes air-drift-3 {
+  from { transform: translate(calc(-0.8px * var(--air-upp, 1)), calc(-1.3px * var(--air-upp, 1))); }
+  to { transform: translate(calc(1px * var(--air-upp, 1)), calc(1.2px * var(--air-upp, 1))); }
+}
+/* Inside an <svg> a CSS pixel is one unit of the drawing, so the distances are
+   multiplied by --air-upp (drawing units per screen pixel at 360 px, set by
+   SceneFrame): the drift is the same three pixels on screen in every scene. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion='off']) .air--drift :is(.air-d1, .air-d2, .air-d3) { animation: air-drift-1 7s ease-in-out infinite alternate; }
+  html:not([data-motion='off']) .air--drift .air-d2 { animation-name: air-drift-2; animation-duration: 9s; }
+  html:not([data-motion='off']) .air--drift .air-d3 { animation-name: air-drift-3; animation-duration: 11s; }
+}
+html[data-motion='on'] .air--drift :is(.air-d1, .air-d2, .air-d3) { animation: air-drift-1 7s ease-in-out infinite alternate; }
+html[data-motion='on'] .air--drift .air-d2 { animation-name: air-drift-2; animation-duration: 9s; }
+html[data-motion='on'] .air--drift .air-d3 { animation-name: air-drift-3; animation-duration: 11s; }
+
+/* ==== The frame every scene shares =========================================
+ * .scene         the picture: one <svg> and, over it, HTML words (SceneFrame.astro)
+ * .scene__labels the layer the words sit in
+ * .scene__label  a word placed at a point of the drawing (SceneLabel.astro);
+ *                never SVG <text>, never under 14 px
+ * The tag 示意圖｜廢氣其實大多看不見 is ui/IllustrationTag.astro (lane B): the home
+ * page's <Screen illustration> prints it, and SceneFrame prints it when asked
+ * (`tag`), for a scene used anywhere else.
+ */
+.scene {
+  position: relative;
+  margin: 0;
+  container-type: inline-size;
+  --here: var(--bg);
+}
+.scene__art {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+.scene__labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.scene__label {
+  position: absolute;
+  margin: 0;
+  /* as wide as its words, so a label near the right edge does not fold into a column */
+  inline-size: max-content;
+  max-inline-size: 60%;
+  font-size: var(--fs-sm, 0.9375rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+  /* a paper-coloured edge instead of a plate, so the word sits in the picture */
+  text-shadow:
+    0 0 2px var(--here),
+    0 0 2px var(--here),
+    0 0 4px var(--here),
+    0 0 6px var(--here);
+  pointer-events: none;
+}
+.scene__label--plate {
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-1, 4px);
+  background: color-mix(in srgb, var(--here, var(--bg)) 88%, transparent);
+  text-shadow: none;
+}
+.scene__label--quiet {
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.scene__label[data-anchor~='center'] { translate: -50% 0; text-align: center; }
+.scene__label[data-anchor~='end'] { translate: -100% 0; text-align: end; }
+.scene__label[data-anchor~='middle'] { translate: 0 -50%; }
+.scene__label[data-anchor~='bottom'] { translate: 0 -100%; }
+.scene__label[data-anchor~='center'][data-anchor~='middle'] { translate: -50% -50%; }
+.scene__label[data-anchor~='center'][data-anchor~='bottom'] { translate: -50% -100%; }
+.scene__label[data-anchor~='end'][data-anchor~='middle'] { translate: -100% -50%; }
+.scene__label[data-anchor~='end'][data-anchor~='bottom'] { translate: -100% -100%; }
+

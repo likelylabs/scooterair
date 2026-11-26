@@ -27,6 +27,19 @@
 //     cannot quietly outlive the copy it was reviewed against. Remove it.
 //   - Add entries only after reading the rule that fired (printed with each failure).
 //
+// THE REDESIGN BRIEF'S RULES (docs/redesign-brief.md; the rules themselves are in scripts/brief-rules.mjs)
+//   brief-banned-string   the strings of acceptance check 1 (沒人量過, 無資料, 待確認, "placeholder", …)
+//   brief-k-sentence-only 沒有人量過, 還沒有人, 沒有人證明過, 算不出來, "not measured", "nobody has
+//                         shown" … only inside one of the K sentences of brief 7.1 (check 2). The K
+//                         sentences are the brief's, plus any lane B publishes as `kSentences` in
+//                         src/i18n/ui.ts. Which page may carry which K sentence is check-site's job.
+//   brief-no-…, brief-vocab-…, brief-idling-legal, brief-masks-…
+//                         one rule per banned claim of brief 4.6 and check 3, and the masks
+//                         must-not-say list (12.2). Rules with scope 'headline' apply to strings
+//                         whose id names a headline or title.
+//   A claim rule in src/data/claims-policy.ts with the same id replaces the brief rule here; every
+//   other registry rule runs through flagCopy() as before, so lane A's new rules load by themselves.
+//
 // ALSO CHECKED (three mechanical voice rules from blueprint Part 2; same allow-list, rule ids below)
 //   reader-tai     reader-facing Chinese writes 台灣, not 臺灣
 //   voice-nin      你, never 您
@@ -34,20 +47,31 @@
 //   and: both languages present and non-empty.
 //
 // FLAGS
-//   --list   print every string id (to find the id for an allow-list entry)
-//   --json   machine-readable failures
+//   --list            print every string id (to find the id for an allow-list entry)
+//   --json            machine-readable failures
+//   --only home,act   report failures only for strings whose module is one of these (a lane checking
+//                     its own copy while others are mid-edit). Exit status follows what is reported.
+//   --vocab           also print advice from the vocabulary list of brief 6.6 (never fails)
 
-import { readdirSync, readFileSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync, writeSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 process.removeAllListeners('warning');
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const load = (p) => import(pathToFileURL(resolve(root, p)).href);
-const args = new Set(process.argv.slice(2));
+const argv = process.argv.slice(2);
+const args = new Set(argv);
+const onlyArg = argv.find((a, i) => a.startsWith('--only=') || argv[i - 1] === '--only');
+const only = onlyArg ? new Set((onlyArg.startsWith('--only=') ? onlyArg.slice(7) : onlyArg).split(',').filter(Boolean)) : null;
 const ALLOW = 'src/i18n/copy-allowlist.json';
 
-const { flagCopy } = await load('src/data/claims-policy.ts');
+const policy = await load('src/data/claims-policy.ts');
+const { flagCopy } = policy;
+const registryRuleIds = new Set(Object.keys(policy.claimRules ?? {}));
+const brief = await load('scripts/brief-rules.mjs');
+const briefRules = [...brief.bannedRules, ...brief.claimRules].filter((r) => !registryRuleIds.has(r.id));
+const HEADLINE_ID = /(^|\.)(headline|headlines|title|titles|heading|h1|h2|h3)(\.|$)|headline|title/i;
 
 // ---- collect strings ---------------------------------------------------------
 const isL10n = (v) => v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 2 && typeof v['zh-TW'] === 'string' && typeof v.en === 'string';
@@ -87,6 +111,22 @@ for (const m of modules) {
   } else for (const [k, v] of Object.entries(mod)) walk(v, `${m.name}.${k}`, m.file);
 }
 
+// K sentences: the brief's, plus lane B's shared strings when published (export `kSentences` in
+// src/i18n/ui.ts: { K1: { 'zh-TW', en }, … } or [{ id, text: { 'zh-TW', en } }, …])
+const kSentences = brief.kSentences.map((k) => ({ ...k, text: { 'zh-TW': [...k.text['zh-TW']], en: [...k.text.en] } }));
+try {
+  const ui = await load('src/i18n/ui.ts');
+  const pub = ui.kSentences;
+  const list = Array.isArray(pub) ? pub : pub && typeof pub === 'object' ? Object.entries(pub).map(([id, text]) => ({ id, text })) : [];
+  for (const p of list) {
+    const k = kSentences.find((x) => x.id === p.id);
+    if (!k || !isL10n(p.text)) continue;
+    for (const l of ['zh-TW', 'en']) if (!k.text[l].includes(p.text[l])) k.text[l].push(p.text[l]);
+  }
+} catch {
+  /* ui.ts failed to load: reported above as a problem */
+}
+
 if (args.has('--list')) {
   for (const s of strings) console.log(s.id);
   console.log(`\n${strings.length} strings in ${modules.length} modules`);
@@ -112,6 +152,28 @@ for (const s of strings) {
       continue;
     }
     for (const f of flagCopy(text, locale)) flags.push({ id: s.id, file: s.file, locale, rule: f.id, kind: f.kind, match: f.match, text, ruleText: f.rule, instead: f.instead });
+    const seenRule = new Set();
+    for (const r of briefRules) {
+      if (r.locale !== locale || seenRule.has(r.id)) continue;
+      if (r.scope === 'headline' && !HEADLINE_ID.test(s.id)) continue;
+      const m = r.re.exec(text);
+      if (!m) continue;
+      seenRule.add(r.id);
+      flags.push({ id: s.id, file: s.file, locale, rule: r.id, kind: `brief check ${r.check === 46 ? '4.6' : r.check}`, match: m[0], text, ruleText: r.rule, instead: r.instead });
+    }
+    const { stray } = brief.kScan(text, locale, kSentences);
+    if (stray.length)
+      flags.push({
+        id: s.id,
+        file: s.file,
+        locale,
+        rule: 'brief-k-sentence-only',
+        kind: 'brief check 2',
+        match: stray.map((x) => x.trigger).join(' / '),
+        text,
+        ruleText: '"Not yet measured / not yet known" wording appears only as one of the K sentences of brief 7.1 (K1–K6), word for word, on the pages listed there. Everywhere else, say the answer we have now.',
+        instead: 'Use the K sentence that fits (brief 7.1), or state the estimate or measurement that fills the place.',
+      });
     for (const v of voice) {
       if (v.locale !== locale) continue;
       const m = v.re.exec(text);
@@ -140,7 +202,10 @@ const failures = flags.filter((f) => {
   used.add(i);
   return false;
 });
-const stale = allow.entries.filter((_, i) => !used.has(i));
+const moduleOf = (id) => id.split('.')[0];
+const inScope = (id) => !only || only.has(moduleOf(id));
+const stale = allow.entries.filter((e, i) => !used.has(i) && inScope(e.id));
+const reported = failures.filter((f) => inScope(f.id));
 
 // ---- inline copy in pages -------------------------------------------------------
 const inline = [];
@@ -161,8 +226,8 @@ const CJK = /[㐀-鿿]/;
 
 // ---- report ----------------------------------------------------------------------
 if (args.has('--json')) {
-  console.log(JSON.stringify({ strings: strings.length, failures, stale, inline, problems }, null, 2));
-  process.exit(failures.length || stale.length || inline.length || problems.length ? 1 : 0);
+  writeSync(1, JSON.stringify({ strings: strings.length, failures: reported, stale, inline: only ? [] : inline, problems }, null, 2) + '\n');
+  process.exit(reported.length || stale.length || (!only && inline.length) || problems.length ? 1 : 0);
 }
 
 const cut = (s, n = 110) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
@@ -172,10 +237,10 @@ if (problems.length) {
   console.error(`\n✖ check-copy: ${problems.length} problem(s)\n`);
   for (const p of problems) console.error(`  ${p}`);
 }
-if (failures.length) {
-  bad += failures.length;
-  console.error(`\n✖ check-copy: ${failures.length} unreviewed match(es). Read the rule; fix the copy, or allow it with a reason in ${ALLOW}.\n`);
-  for (const f of failures) {
+if (reported.length) {
+  bad += reported.length;
+  console.error(`\n✖ check-copy: ${reported.length} unreviewed match(es)${only ? ` in ${[...only].join(', ')}` : ''}. Read the rule; fix the copy, or allow it with a reason in ${ALLOW}.\n`);
+  for (const f of reported) {
     console.error(`  ${f.id}  [${f.locale}]  rule: ${f.rule} (${f.kind})`);
     console.error(`    matched  「${f.match}」 in: ${cut(f.text)}`);
     console.error(`    rule     ${cut(f.ruleText, 200)}`);
@@ -188,12 +253,28 @@ if (stale.length) {
   console.error(`\n✖ check-copy: ${stale.length} stale allow-list entr${stale.length === 1 ? 'y' : 'ies'} (nothing matches any more; remove from ${ALLOW}):\n`);
   for (const e of stale) console.error(`  ${e.id} / ${e.rule}${e.locale ? ` [${e.locale}]` : ''}`);
 }
-if (inline.length) {
+if (inline.length && !only) {
   bad += inline.length;
   console.error(`\n✖ check-copy: copy written inline in a page. Move it to src/i18n/pages/<page>.ts so the guard can read it:\n`);
   for (const f of inline) console.error(`  ${f.file}: ${f.count} line(s) with Chinese text, first at line ${f.first[0]}: ${cut(f.first[1].trim(), 70)}`);
 }
+if (args.has('--vocab')) {
+  const advice = [];
+  for (const s of strings) {
+    if (!inScope(s.id)) continue;
+    for (const [re, use] of brief.vocabAdvice) {
+      const m = re.exec(s.text['zh-TW']);
+      if (m) advice.push(`  ${s.id}  「${m[0]}」 → ${use}`);
+    }
+  }
+  console.log(`\nℹ vocabulary (brief 6.6; advice, not a failure): ${advice.length} string(s)\n${advice.join('\n')}`);
+}
 if (bad) {
+  if (reported.length) {
+    const byRule = {};
+    for (const f of reported) byRule[f.rule] = (byRule[f.rule] ?? 0) + 1;
+    console.error(`  by rule: ${Object.entries(byRule).sort((a, b) => b[1] - a[1]).map(([r, n]) => `${r} ${n}`).join(' · ')}`);
+  }
   console.error('');
   process.exit(1);
 }

@@ -1,0 +1,510 @@
+---
+/**
+ * HowSheet — the sheet behind 怎麼知道的？ (brief 4.5). One pattern for the whole site: three
+ * short blocks and at most two buttons, with its own address (`#how-4`).
+ *
+ *   kind         block 1          block 2         block 3            buttons
+ *   estimate     量到的            我們算的          要小心的地方         完整算法 · 把推估換成實測
+ *   measured     誰量的            量到什麼          要小心的地方         看完整的證據
+ *   official     誰說的            說了什麼          要小心的地方         看完整的證據
+ *   study        誰研究的          發現什麼          要小心的地方         看完整的證據
+ *   derived      用了哪些數字       怎麼算            要小心的地方         看完整的證據 or 用我的條件算
+ *
+ * How it behaves
+ *   - Without JavaScript it is an open <details id="how-4"> in the page, right where it is
+ *     placed (under its screen). Every link to `#how-4` jumps to it.
+ *   - With JavaScript it is a modal bottom sheet (a native <dialog>): focus moves into it, is
+ *     kept inside it and returns to the control that opened it; Esc, the close button, a tap
+ *     outside and the phone's back button all close it. Visiting `…/#how-4` opens it.
+ *   - Open it from anywhere: <HowButton sheet="how-4" />, <EstimateValue sheet="how-4" />, or
+ *     any <a href="#how-4">.
+ *
+ * Props
+ *   locale      Locale
+ *   id          its address, e.g. 'how-4'. Unique on the page
+ *   kind        ChipKind (or a registry evidence id): picks the block headings and the chip
+ *   title       the sheet's title (default 怎麼知道的？). Say what number it is about:
+ *               「約 0.05 到 1 ppm」怎麼來的
+ *   heads       override the three block headings
+ *   where       the chip's qualifier in block 1 (研究・台灣)
+ *   -- kind="estimate" --
+ *   pollutant   'co' | 'benzene' | 'pm25': prints that pollutant's confidence word (可信程度：中,
+ *               from est.confidence in src/data/estimate.ts; brief 4.2 rule 9). Pass it whenever
+ *               the sheet stands behind an air number; leave it out for a count or a volume
+ *   anchor      section of /estimate/ for the 完整算法 button (default 'numbers')
+ *               The version stamp (推估 v1・2026-11-26, est.meta.stamp) is printed on every
+ *               estimate sheet by itself (rule 10), and so is 把推估換成實測 → /estimate/#measure
+ *   -- other kinds --
+ *   primary     { href, label? }  default label 看完整的證據; pass href('/evidence/#link-n', locale)
+ *   secondary   { href, label? }  an optional second, quieter button
+ * Slots
+ *   block1, block2, block3   the three blocks: short paragraphs, a <WorkingSum>, a small table.
+ *                            About 120 Chinese characters in all. A block left empty is not drawn.
+ *   default                  rare extra content after the blocks (a data-table view)
+ *
+ *   <HowSheet slot="sheet" id="how-4" locale={locale} kind="estimate" title={t.s4.sheetTitle}
+ *             pollutant="co" anchor="recipe">
+ *     <p slot="block1">{t.s4.measured}</p>
+ *     <WorkingSum slot="block2" … />
+ *     <p slot="block3">{t.s4.care}</p>
+ *   </HowSheet>
+ */
+import { href as link, type Locale } from '@/i18n';
+import { est, type Pollutant } from '@/data/estimate';
+import { chipKindOf, estText, how } from '@/i18n/ui';
+import Icon from './Icon.astro';
+import KindChip from './KindChip.astro';
+import { chipGlyphSvg } from './kinds';
+
+type Action = { href: string; label?: string };
+interface Props {
+  locale: Locale;
+  id: string;
+  kind: string;
+  title?: string;
+  heads?: [string, string, string];
+  where?: string;
+  pollutant?: Pollutant;
+  anchor?: string;
+  primary?: Action;
+  secondary?: Action;
+  class?: string;
+}
+const { locale, id, title = how.button[locale], where, pollutant, anchor = 'numbers', class: cls } = Astro.props;
+const kind = chipKindOf(Astro.props.kind);
+if (!/^[A-Za-z][\w-]*$/.test(id)) throw new Error(`HowSheet: id "${id}" must be a plain anchor name (letters, digits, - and _).`);
+const isEstimate = kind === 'estimate';
+if (pollutant && !isEstimate) throw new Error(`HowSheet ${id}: \`pollutant\` is for an estimate sheet (kind="estimate").`);
+const confidence = pollutant ? est.confidence[pollutant] : undefined;
+if (pollutant && !confidence) throw new Error(`HowSheet ${id}: the estimate has no confidence for "${pollutant}".`);
+
+const heads = Astro.props.heads ?? how.heads[kind].map((h) => h[locale]);
+const blocks = (
+  await Promise.all(
+    (['block1', 'block2', 'block3'] as const).map(async (name, i) => ({
+      i,
+      html: Astro.slots.has(name) ? (await Astro.slots.render(name)).trim() : '',
+    })),
+  )
+).filter((b) => b.html);
+if (blocks.length === 0) throw new Error(`HowSheet ${id}: no block has content. Fill block1, block2 and block3.`);
+
+const primary: Action | undefined = isEstimate ? { href: link(`/estimate/#${anchor}`, locale), label: how.fullMethod[locale] } : Astro.props.primary;
+const secondary: Action | undefined = isEstimate ? (Astro.props.secondary ?? { href: link('/estimate/#measure', locale), label: how.toMeasure[locale] }) : Astro.props.secondary;
+const colon = locale === 'en' ? ': ' : '：';
+const dot = locale === 'en' ? ' · ' : '　';
+---
+
+<details class:list={['how', cls]} id={id} open data-how-sheet data-chip={kind}>
+  <summary class="how__summary">
+    <span class="how__summary-text">{title === how.button[locale] ? title : `${how.button[locale]}${dot}${title}`}</span>
+    <Icon name="chevron-down" size="1.25rem" />
+  </summary>
+  <div class="how__panel" data-how-panel>
+    <div class="how__head">
+      <h3 class="how__title" id={`${id}-title`} tabindex="-1">{title}</h3>
+      <button class="tool how__close" type="button" data-how-close data-js-only aria-label={how.close[locale]}>
+        <Icon name="close" size="1.5rem" />
+      </button>
+    </div>
+    <div class="how__blocks">
+      {blocks.map((b) => (
+        <section class="how__block">
+          <h4 class="how__h">
+            {isEstimate && b.i === 0 && <span class="how__pill how__pill--measured"><Fragment set:html={chipGlyphSvg('measured')} />{heads[0]}</span>}
+            {isEstimate && b.i === 1 && <span class="how__pill how__pill--estimate"><Fragment set:html={chipGlyphSvg('estimate')} />{heads[1]}</span>}
+            {!(isEstimate && b.i < 2) && <span>{heads[b.i]}</span>}
+            {!isEstimate && b.i === 0 && <KindChip locale={locale} kind={kind} where={where} />}
+          </h4>
+          <div class="how__body" set:html={b.html} />
+        </section>
+      ))}
+    </div>
+    {Astro.slots.has('default') && <div class="how__extra"><slot /></div>}
+    {isEstimate && (
+      <p class="how__meta">
+        {confidence && <span>{estText.confidence[locale]}{colon}<b>{confidence.word[locale]}</b></span>}
+        <span>{est.meta.stamp[locale]}</span>
+      </p>
+    )}
+    {(primary || secondary) && (
+      <div class="how__actions">
+        {primary && <a class="how__btn how__btn--primary" href={primary.href}>{primary.label ?? how.fullEvidence[locale]}<Icon name="arrow-right" size="1.1em" /></a>}
+        {secondary && <a class="how__btn" href={secondary.href}>{secondary.label ?? how.fullEvidence[locale]}<Icon name="arrow-right" size="1.1em" /></a>}
+      </div>
+    )}
+  </div>
+</details>
+
+<style is:global>
+  /* Global on purpose: with JavaScript the panel is moved into a <dialog> at the end of <body>. */
+
+  /* ---- in the page (no JavaScript): an open block under its screen ---- */
+  .how {
+    margin-block: var(--sp-4) 0;
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-3);
+    background: var(--surface);
+    scroll-margin-block-start: 1rem;
+  }
+  html.js .how {
+    display: none;
+  }
+  .how__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    padding: 0.4rem var(--sp-4);
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+    line-height: 1.35;
+    list-style: none;
+    cursor: pointer;
+  }
+  .how__summary::-webkit-details-marker {
+    display: none;
+  }
+  .how[open] > .how__summary .icon {
+    transform: rotate(180deg);
+  }
+  /* the summary already carries the title; in the page the panel's own heading row would repeat it */
+  .how > .how__panel > .how__head {
+    display: none;
+  }
+  .how > .how__panel {
+    padding: 0 var(--sp-4) var(--sp-4);
+  }
+
+  /* ---- the panel (shared by both forms) ---- */
+  .how__panel {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+  .how__head {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-2) var(--sp-2) var(--gutter);
+    background: var(--surface);
+    border-block-end: 1px solid var(--line);
+  }
+  .how__title {
+    margin: 0;
+    padding-block: 0.45rem;
+    font-family: var(--font-heading);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    line-height: 1.3;
+    letter-spacing: var(--ls-heading);
+    text-wrap: balance;
+  }
+  .how__title:focus {
+    outline: none;
+  }
+  .how__close {
+    --tool: var(--tap);
+  }
+  .how__block {
+    padding-block: var(--sp-4);
+  }
+  .how__block + .how__block {
+    border-block-start: 1px solid var(--line);
+  }
+  .how__h {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4em 0.6em;
+    margin: 0 0 var(--sp-2);
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.45;
+    letter-spacing: 0;
+    color: var(--ink-2);
+  }
+  /* the two halves of an estimate, told apart the way the chips are: solid dot, hatched dot */
+  .how__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.14em 0.7em 0.14em 0.5em;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-pill);
+    color: var(--ink);
+  }
+  .how__pill .chip-glyph {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+  .how__pill--estimate {
+    border-style: dashed;
+    border-color: var(--estimate);
+    background: var(--estimate-wash);
+    color: var(--estimate-ink);
+  }
+  .how__body > * + * {
+    margin-block-start: 0.6em;
+  }
+  .how__body :is(ul, ol) {
+    padding-inline-start: 1.3em;
+  }
+  .how__extra {
+    padding-block-end: var(--sp-4);
+  }
+  .how__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2em 1.2em;
+    margin: 0;
+    padding-block: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .how__meta b {
+    color: var(--ink);
+  }
+  .how__actions {
+    display: grid;
+    gap: var(--tap-gap);
+    padding-block-start: var(--sp-2);
+  }
+  .how__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    min-block-size: var(--tap);
+    padding: 0.5em 1em;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-3);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
+    text-align: center;
+    text-decoration: none;
+  }
+  .how__btn:hover {
+    background: var(--bg-sunken);
+    color: var(--ink);
+  }
+  .how__btn--primary {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .how__btn--primary:hover {
+    border-color: var(--accent-hover);
+    background: var(--accent-hover);
+    color: var(--on-accent);
+  }
+
+  /* ---- the bottom sheet (JavaScript): one <dialog> that borrows the open sheet's panel ---- */
+  .how-dialog {
+    position: fixed;
+    inset: auto 0 0;
+    inline-size: 100%;
+    max-inline-size: 36rem;
+    max-block-size: 88vh;
+    max-block-size: 88dvh;
+    margin: 0 auto;
+    padding: 0;
+    border: 0;
+    border-radius: 1rem 1rem 0 0;
+    background: var(--surface);
+    color: var(--ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .how-dialog::backdrop {
+    background: rgb(10 13 15 / 0.62);
+  }
+  .how-dialog[open] {
+    animation: how-up var(--dur-2) var(--ease-out) backwards;
+  }
+  .how-dialog[open]::backdrop {
+    animation: how-fade var(--dur-2) var(--ease-out) backwards;
+  }
+  @keyframes how-up {
+    from {
+      transform: translateY(2.5rem);
+      opacity: 0;
+    }
+  }
+  @keyframes how-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  .how-dialog .how__panel {
+    padding-block-end: max(var(--sp-4), env(safe-area-inset-bottom));
+  }
+  .how-dialog .how__blocks,
+  .how-dialog .how__extra,
+  .how-dialog .how__meta,
+  .how-dialog .how__actions {
+    margin-inline: var(--gutter);
+  }
+  .how-dialog .how__actions {
+    padding-block-end: var(--sp-2);
+  }
+  @media (min-width: 48em) {
+    /* room to spare: a centred card instead of a sheet glued to the bottom edge */
+    .how-dialog {
+      inset: 0;
+      margin: auto;
+      block-size: fit-content;
+      max-block-size: 86vh;
+      border-radius: 0.75rem;
+    }
+  }
+  html.how-open {
+    overflow: hidden;
+  }
+  @media (forced-colors: active) {
+    .how-dialog {
+      border: 2px solid CanvasText;
+    }
+    .how__pill,
+    .how__btn {
+      border-color: CanvasText;
+    }
+  }
+  @media print {
+    /* paper has no buttons: every sheet prints open, in its place */
+    html.js .how {
+      display: block;
+    }
+    .how__close,
+    .how__actions {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // One <dialog> for the page. Opening a sheet moves that sheet's panel into it; closing moves
+  // the panel home again, so there is one copy of the content and the no-JavaScript markup stays valid.
+  const root = document.documentElement;
+  const sheetOf = (id: string) => (id ? document.querySelector<HTMLDetailsElement>(`details[data-how-sheet]#${CSS.escape(id)}`) : null);
+  const hashId = () => {
+    try {
+      return decodeURIComponent(location.hash.slice(1));
+    } catch {
+      return '';
+    }
+  };
+
+  let dialog: HTMLDialogElement | null = null;
+  let current: { id: string; home: HTMLDetailsElement; panel: HTMLElement; trigger: HTMLElement | null; pushed: boolean } | null = null;
+
+  function ensureDialog(): HTMLDialogElement {
+    if (dialog) return dialog;
+    const d = document.createElement('dialog');
+    d.className = 'how-dialog';
+    // Esc: close through our own path, so the address and the history entry are put right
+    d.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      requestClose();
+    });
+    // a tap on the dimmed page (the dialog element itself, outside the panel) closes the sheet
+    d.addEventListener('click', (e) => {
+      if (e.target === d) requestClose();
+    });
+    document.body.append(d);
+    dialog = d;
+    return d;
+  }
+
+  function open(id: string, trigger: HTMLElement | null, push: boolean): boolean {
+    const home = sheetOf(id);
+    const panel = home?.querySelector<HTMLElement>(':scope > [data-how-panel]');
+    if (!home || !panel) return false;
+    if (current) closeNow(false);
+    const d = ensureDialog();
+    d.setAttribute('aria-labelledby', `${id}-title`);
+    d.append(panel);
+    current = { id, home, panel, trigger, pushed: false };
+    // keep the page from scrolling under the sheet, without a sideways jump where scrollbars take room
+    const bar = window.innerWidth - root.clientWidth;
+    if (bar > 0) root.style.paddingInlineEnd = `${bar}px`;
+    root.classList.add('how-open');
+    d.showModal();
+    d.scrollTop = 0;
+    // start reading at the title; the close button is the next stop
+    panel.querySelector<HTMLElement>('.how__title')?.focus({ preventScroll: true });
+    if (push && hashId() !== id) {
+      // an entry of its own, so the phone's back button closes the sheet instead of leaving the page
+      history.pushState({ saHow: id }, '', `#${id}`);
+      current.pushed = true;
+    }
+    return true;
+  }
+
+  function closeNow(restoreFocus = true) {
+    if (!current || !dialog) return;
+    const { home, panel, trigger } = current;
+    current = null;
+    home.append(panel);
+    if (dialog.open) dialog.close();
+    root.classList.remove('how-open');
+    root.style.paddingInlineEnd = '';
+    if (restoreFocus && trigger?.isConnected) trigger.focus({ preventScroll: true });
+  }
+
+  function requestClose() {
+    if (!current) return;
+    if (current.pushed) {
+      history.back(); // popstate closes it
+      return;
+    }
+    // opened from a link that carried the address: leave the reader at the sheet's own screen
+    const screen = current.home.closest<HTMLElement>('[data-screen][id], section[id], article[id]');
+    closeNow();
+    if (hashId() && sheetOf(hashId())) history.replaceState(null, '', `${location.pathname}${location.search}${screen ? `#${screen.id}` : ''}`);
+  }
+
+  function sync(initial = false) {
+    const id = hashId();
+    if (sheetOf(id)) {
+      if (current?.id === id) return;
+      if (open(id, null, false) && initial) sheetOf(id)?.closest<HTMLElement>('[data-screen], section, article')?.scrollIntoView({ block: 'start' });
+    } else if (current) closeNow();
+  }
+
+  document.addEventListener('click', (e) => {
+    const el = (e.target as Element | null)?.closest?.<HTMLElement>('[data-how-close], [data-sheet-open], a[href^="#"]');
+    if (!el) return;
+    if (el.matches('[data-how-close]')) {
+      requestClose();
+      return;
+    }
+    const id = el.dataset.sheetOpen || (el.getAttribute('href') ?? '').slice(1);
+    if (!sheetOf(id)) return;
+    e.preventDefault();
+    // from inside an open sheet to another sheet: swap, keeping one history entry
+    const inside = !!current && !!dialog?.contains(el);
+    const opener = inside ? current!.trigger : el;
+    const pushed = inside ? current!.pushed : false;
+    if (inside) {
+      closeNow(false);
+      open(id, opener, false);
+      history.replaceState({ saHow: id }, '', `#${id}`);
+      if (current) (current as { pushed: boolean }).pushed = pushed;
+    } else open(id, opener, true);
+  });
+  window.addEventListener('popstate', () => sync());
+  window.addEventListener('hashchange', () => sync());
+  sync(true);
+</script>

@@ -1,0 +1,202 @@
+---
+/**
+ * Segmented — a switch made of whole-width segments, each at least 48 px tall (brief 6.3):
+ * the scenario switch, the red-lights-a-day stepper, the distance switch, the mask switch.
+ * Plain radio buttons underneath: arrow keys move, it works in a form, and it works without
+ * JavaScript.
+ *
+ * What it does when the reader chooses
+ *   1. Sets `data-pick-<name>="<value>"` on the nearest ancestor with `data-pick-scope`
+ *      (every <Screen> is one; add the attribute to any wrapper), so CSS can redraw a picture:
+ *        [data-pick-scenario='full'] .row-3 { opacity: 1 }
+ *   2. Shows only the matching variants inside that scope:
+ *        <span data-when-km="150">…</span> <span data-when-km="300 500">…</span>
+ *      Render every variant; the others are hidden. This part needs no JavaScript.
+ *   3. Dispatches `sa:pick` on itself (it bubbles), `detail: { name, value }`, for scripts:
+ *        screen.addEventListener('sa:pick', (e) => e.detail.name === 'km' && redraw(e.detail.value))
+ * To set it from a script: check the <input> and dispatch a bubbling `change` event on it.
+ *
+ * Props
+ *   name        the choice's name: lower-case letters, digits and hyphens ('scenario', 'km').
+ *               One name per scope
+ *   legend      the question (旁邊停了幾輛？). Always pass it; `hideLegend` keeps it for
+ *               screen readers only
+ *   options     { value, label, sub? }[] — `sub` is a second, smaller line (8–20 輛).
+ *               Values: letters, digits, hyphens
+ *   value       the option chosen at first: the page is never without a choice
+ *   columns     segments per row. Default: all in one row, or two per row when there are four
+ *               or more and one row would squeeze the words
+ *   hideLegend  boolean
+ *
+ *   <Segmented name="reds" legend={t.s7.stepper} value="4"
+ *              options={[2, 4, 6].map((n) => ({ value: String(n), label: String(n) }))} />
+ */
+import { uid } from '@/components/uid';
+
+interface Option {
+  value: string;
+  label: string;
+  sub?: string;
+}
+interface Props {
+  name: string;
+  legend: string;
+  options: Option[];
+  value: string;
+  columns?: number;
+  hideLegend?: boolean;
+  class?: string;
+}
+const { name, legend, options, value, hideLegend = false, class: cls } = Astro.props;
+if (!/^[a-z][a-z0-9-]*$/.test(name)) throw new Error(`Segmented: name "${name}" must be lower-case letters, digits and hyphens.`);
+if (options.length < 2) throw new Error(`Segmented ${name}: needs at least two options.`);
+for (const o of options) if (!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(o.value)) throw new Error(`Segmented ${name}: value "${o.value}" must be letters, digits and hyphens.`);
+if (!options.some((o) => o.value === value)) throw new Error(`Segmented ${name}: the first choice "${value}" is not one of its options. A switch is never empty.`);
+
+const longest = Math.max(...options.map((o) => [...o.label].reduce((n, ch) => n + (/[㐀-鿿]/.test(ch) ? 2 : 1), 0)));
+const columns = Astro.props.columns ?? (options.length >= 4 && longest > 6 ? 2 : options.length);
+const group = uid(`seg-${name}`);
+
+// Variant visibility, as CSS: the chosen value's variants stay, the rest are hidden.
+const when = `[data-when-${name}]`;
+const not = (v: string) => `${when}:not([data-when-${name}~="${v}"])`;
+const css = [
+  // scripting on, before the script has stamped the scope: the first choice
+  `html.js [data-pick-scope]:not([data-pick-${name}]) ${not(value)}`,
+  // scripting on: the scope carries the choice
+  ...options.map((o) => `html.js [data-pick-${name}="${o.value}"] ${not(o.value)}`),
+  // scripting off: read the checked radio
+  ...options.map((o) => `html:not(.js) [data-pick-scope]:has([data-pick-input="${name}"][value="${o.value}"]:checked) ${not(o.value)}`),
+].join(',') + '{display:none!important}' +
+  // scripting off in a browser without :has(): show the first choice and take the switch away, rather than show every variant at once
+  `@supports not selector(:has(*)){html:not(.js) ${not(value)},html:not(.js) [data-seg="${name}"]{display:none!important}}`;
+---
+
+<fieldset class:list={['seg', cls]} data-seg={name}>
+  <legend class:list={['seg__legend', hideLegend && 'vh']}>{legend}</legend>
+  <div class="seg__row" style={`--cols:${columns}`}>
+    {options.map((o) => (
+      <label class="seg__opt">
+        <input type="radio" name={group} value={o.value} checked={o.value === value} data-pick-input={name} />
+        <span class="seg__face">
+          <span class="seg__label">{o.label}</span>
+          {o.sub && <span class="seg__sub">{o.sub}</span>}
+        </span>
+      </label>
+    ))}
+  </div>
+</fieldset>
+<style is:inline set:html={css}></style>
+
+<style>
+  .seg {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .seg__legend {
+    padding: 0;
+    margin-block-end: var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .seg__row {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: 2px;
+    padding: 2px;
+    border: 2px solid var(--ink);
+    border-radius: calc(var(--radius-3) + 4px);
+    background: var(--surface);
+  }
+  .seg__opt {
+    position: relative;
+    display: grid; /* the face fills the cell, so the chosen fill reaches the bottom when a neighbour wraps */
+    cursor: pointer;
+  }
+  .seg__opt input {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .seg__face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.05em;
+    min-block-size: var(--tap);
+    padding: 0.3em 0.35em;
+    border-radius: var(--radius-3);
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.25;
+  }
+  .seg__label {
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+  }
+  .seg__sub {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    font-variant-numeric: tabular-nums;
+  }
+  .seg__opt:hover .seg__face {
+    background: var(--bg-sunken);
+  }
+  .seg__opt input:checked + .seg__face {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .seg__opt input:focus-visible + .seg__face {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+    z-index: 1;
+  }
+  @media (forced-colors: active) {
+    .seg__row {
+      border-color: CanvasText;
+    }
+    .seg__opt input:checked + .seg__face {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+  @media print {
+    .seg__opt input:checked + .seg__face {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  const stamp = (input: HTMLInputElement, announce: boolean) => {
+    const name = input.dataset.pickInput!;
+    const scope = input.closest<HTMLElement>('[data-pick-scope]') ?? document.documentElement;
+    scope.setAttribute(`data-pick-${name}`, input.value);
+    // two switches for the same choice inside one scope stay in step
+    scope.querySelectorAll<HTMLInputElement>(`input[data-pick-input="${name}"]`).forEach((other) => {
+      if (other !== input && other.value === input.value && other.closest('[data-pick-scope]') === input.closest('[data-pick-scope]')) other.checked = true;
+    });
+    if (announce) input.closest('[data-seg]')?.dispatchEvent(new CustomEvent('sa:pick', { bubbles: true, detail: { name, value: input.value } }));
+  };
+  // at load: whatever is checked (the first choice, or a choice the browser restored on reload)
+  document.querySelectorAll<HTMLInputElement>('input[data-pick-input]:checked').forEach((i) => stamp(i, false));
+  document.addEventListener('change', (e) => {
+    const input = e.target as HTMLInputElement | null;
+    if (input?.matches?.('input[data-pick-input]') && input.checked) stamp(input, true);
+  });
+  // a page restored from the back/forward cache may come back with different radios checked
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) document.querySelectorAll<HTMLInputElement>('input[data-pick-input]:checked').forEach((i) => stamp(i, false));
+  });
+</script>

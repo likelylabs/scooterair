@@ -1,0 +1,56 @@
+---
+/**
+ * HowButton — the button 怎麼知道的？ / How do we know? (brief 3.1, foot row 1). It opens a
+ * <HowSheet> on the same page. It is a link to the sheet's address, so without JavaScript it
+ * jumps to the sheet's content, which is then an open block under the screen.
+ *
+ * Props
+ *   locale  Locale
+ *   sheet   id of the HowSheet ('how-4')
+ *   label   override the words (default: how.button — keep it in words, never a bare "?")
+ *
+ *   <HowButton locale={locale} sheet="how-4" />
+ * <Screen> places one by itself when its `sheet` slot is filled.
+ */
+import type { Locale } from '@/i18n';
+import { how } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  sheet: string;
+  label?: string;
+  class?: string;
+}
+const { locale, sheet, label = how.button[locale], class: cls } = Astro.props;
+---
+
+<a class:list={['howbtn', cls]} href={`#${sheet}`} data-sheet-open={sheet}>{label}</a>
+
+<style>
+  .howbtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-block-size: var(--tap);
+    padding: 0.3em 1.1em;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
+    text-align: center;
+    text-decoration: none;
+  }
+  .howbtn:hover {
+    background: var(--bg-sunken);
+    color: var(--ink);
+  }
+  @media (forced-colors: active) {
+    .howbtn {
+      border-color: ButtonText;
+    }
+  }
+</style>

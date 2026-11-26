@@ -81,4 +81,25 @@ export default copy({
     past: { 'zh-TW': '已過', en: 'passed' },
     checked: { 'zh-TW': '{date}查', en: 'checked {date}' },
   },
+  /**
+   * Home screens 12 and 13, the film's money beat and /electric/ (brief 7.7): the deadline strip,
+   * one sentence per state, chosen by stripKind() in src/lib/home-money.ts. Dates are filled with
+   * formatDate(): {subsidy} the last day the counted subsidies accept purchases, {promo} the last
+   * day of the petrol scooter's dealer offers, {year} the reader's year.
+   * 'nothing-confirmed' says 還沒有確定, never 未公布: a draft has been pre-announced (fact
+   * econ-no-2027-programme).
+   */
+  home: {
+    strip: {
+      'subsidy-and-promo': { 'zh-TW': '補助到 {subsidy}。燃油機車的促銷到 {promo}。', en: 'Subsidies end {subsidy}. Petrol-scooter promotions end {promo}.' },
+      subsidy: { 'zh-TW': '補助到 {subsidy}。', en: 'Subsidies end {subsidy}.' },
+      'nothing-confirmed': { 'zh-TW': '{year} 年的補助還沒有確定。下面先用沒有補助的價格算。', en: 'Nothing is confirmed yet for {year} subsidies. The sums below use prices with no subsidy.' },
+      'next-programme': { 'zh-TW': '補助到 {subsidy}。', en: 'Subsidies end {subsidy}.' },
+      'no-subsidy': { 'zh-TW': '這個條件下，沒有可以算進去的補助。下面用沒有補助的價格算。', en: 'On these terms no subsidy can be counted. The sums below use prices with no subsidy.' },
+    },
+    plate: {
+      light: { 'zh-TW': '綠牌', en: 'green plate' },
+      heavy: { 'zh-TW': '白牌', en: 'white plate' },
+    },
+  },
 });

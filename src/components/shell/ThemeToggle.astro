@@ -1,9 +1,11 @@
 ---
 /**
- * ThemeToggle — light/dark switch. Hidden without JavaScript (the page then
- * simply follows prefers-color-scheme). The choice is stored in localStorage
- * under `sa-theme` and applied before first paint by the inline script in
- * Base.astro, so there is no flash.
+ * ThemeToggle — a stand-alone light/dark icon button. The header no longer places it: the
+ * theme switch lives in the menu with the other reader settings (Settings.astro). Kept for
+ * pages that want the button on its own (the print sheets' screen view).
+ * Hidden without JavaScript (the page then simply follows prefers-color-scheme). The choice is
+ * stored in localStorage under `sa-theme` and applied before first paint by the inline script
+ * in Base.astro, so there is no flash.
  *
  * Props
  *   locale  Locale
@@ -66,30 +68,6 @@ const { locale } = Astro.props;
 </style>
 
 <script>
-  const root = document.documentElement;
-  const mq = window.matchMedia('(prefers-color-scheme: dark)');
-  const current = () => root.dataset.theme ?? (mq.matches ? 'dark' : 'light');
-
-  function apply(theme: string) {
-    root.dataset.theme = theme;
-    const colour = theme === 'dark' ? '#101416' : '#f3f5f3';
-    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => (m.content = colour));
-    press();
-  }
-  const press = () => document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(current() === 'dark')));
-  press();
-  // following the system: keep the state right when the OS switches theme
-  mq.addEventListener('change', press);
-
-  document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const next = current() === 'dark' ? 'light' : 'dark';
-      apply(next);
-      try {
-        localStorage.setItem('sa-theme', next);
-      } catch {
-        /* private mode: the choice just lasts for this page */
-      }
-    });
-  });
+  // all three reader settings share one script (it also keeps this button's aria-pressed right)
+  import './settings.client';
 </script>

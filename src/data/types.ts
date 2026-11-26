@@ -41,8 +41,10 @@ export type Confidence = (typeof confidences)[number];
  *                   industry associations (scooter prices, battery plans, pump prices, company
  *                   results, association sales tallies), as opposed to government statistics
  */
-export const evidenceTypes = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived', 'market-tw'] as const;
+export const evidenceTypes = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived', 'market-tw', 'estimate'] as const;
 export type Evidence = (typeof evidenceTypes)[number];
+// - estimate:      the site's own signed kerbside estimate (research/estimate/, src/data/estimate.ts)
+//                  or an answer worked out from it. Always shown with a range and its working.
 
 export const confidenceLabels: Record<Confidence, { label: L10n; description: L10n }> = {
   verified: {
@@ -89,7 +91,119 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
       'Prices, offers, plan terms, sales and company figures published by Taiwanese manufacturers, dealers, energy operators or industry associations; not government statistics.',
     ),
   },
+  estimate: {
+    label: t('本站推估', 'Our estimate'),
+    description: t(
+      '我們用有出處的數字算出來的，不是量的，所以一定附範圍和算法。',
+      'Worked out by us from sourced figures, not measured, so it always comes with a range and the working.',
+    ),
+  },
 };
+
+// ---------------------------------------------------------------------------
+// The five reader chips (brief section 4.1)
+// ---------------------------------------------------------------------------
+
+/**
+ * What a reader sees beside every number: exactly one of five chips. They differ by word and
+ * shape (drawn by the KindChip component), not only by colour.
+ *  - measured  實測     solid dot       someone took an instrument and read it (Taiwan or abroad)
+ *  - estimate  推估     hatched dot     worked out by this site; always a range and the working
+ *  - official  官方     solid square    a rule, a standard, a government statistic, a WHO guideline value
+ *  - study     研究     open book       a published study: cohort, experiment, model
+ *  - derived   本站計算 plus sign       our own sums on sourced figures; all money
+ */
+export const readerKinds = ['measured', 'estimate', 'official', 'study', 'derived'] as const;
+export type ReaderKind = (typeof readerKinds)[number];
+
+export const readerKindLabels: Record<ReaderKind, { label: L10n; meaning: L10n; shape: 'dot' | 'hatched-dot' | 'square' | 'book' | 'plus' }> = {
+  measured: {
+    label: t('實測', 'Measured'),
+    meaning: t('有人拿儀器量到的。', 'Someone took an instrument and measured it.'),
+    shape: 'dot',
+  },
+  estimate: {
+    label: t('推估', 'Estimate'),
+    meaning: t('我們算出來的，一定附範圍和算法。', 'We worked it out; it always comes with a range and the working.'),
+    shape: 'hatched-dot',
+  },
+  official: {
+    label: t('官方', 'Official'),
+    meaning: t('法規、標準，或政府的統計。', 'A rule, a standard or a government statistic.'),
+    shape: 'square',
+  },
+  study: {
+    label: t('研究', 'Study'),
+    meaning: t('發表過的研究：長期追蹤、實驗、模式。', 'A published study: long-term follow-up, an experiment or a model.'),
+    shape: 'book',
+  },
+  derived: {
+    label: t('本站計算', 'Our arithmetic'),
+    meaning: t('我們拿有出處的數字做的加減乘除。', 'Our own sums on figures that have a source.'),
+    shape: 'plus',
+  },
+};
+
+/** Where a measured or study figure comes from, written after the chip: 實測・台灣, 研究・國外. */
+export const readerPlaceLabels = {
+  tw: t('台灣', 'Taiwan'),
+  abroad: t('國外', 'abroad'),
+  international: t('國際', 'international'),
+  twModel: t('台灣模式', 'Taiwan model'),
+} as const;
+export type ReaderPlace = keyof typeof readerPlaceLabels;
+
+/** Default chip for each registry evidence type. A fact may override it with `readerKind`. */
+export const evidenceReaderKind: Record<Evidence, ReaderKind> = {
+  'measured-tw': 'measured',
+  'official-tw': 'official',
+  'modelled-tw': 'study',
+  international: 'study',
+  derived: 'derived',
+  'market-tw': 'derived',
+  estimate: 'estimate',
+};
+
+/** Default place qualifier for each evidence type (undefined: the chip stands alone). */
+export const evidenceReaderPlace: Partial<Record<Evidence, ReaderPlace>> = {
+  'measured-tw': 'tw',
+  'modelled-tw': 'twModel',
+  international: 'abroad',
+};
+
+/**
+ * The chip for anything with an `evidence` type. Pass the fact (or any object with `evidence`
+ * and an optional `readerKind` override) so WHO guideline values read 官方 and instrument
+ * readings abroad read 實測, as the registry marks them.
+ *
+ *   readerKind(fact('who-no2-co-guideline'))   // 'official'
+ *   readerKind('international')                 // 'study'
+ */
+export function readerKind(x: Evidence | { evidence: Evidence; readerKind?: ReaderKind }): ReaderKind {
+  if (typeof x === 'string') return evidenceReaderKind[x];
+  return x.readerKind ?? evidenceReaderKind[x.evidence];
+}
+
+/** The place qualifier after the chip, or undefined. Facts may override with `readerPlace`. */
+export function readerPlace(x: Evidence | { evidence: Evidence; readerKind?: ReaderKind; readerPlace?: ReaderPlace | null }): ReaderPlace | undefined {
+  if (typeof x === 'string') return evidenceReaderPlace[x];
+  if (x.readerPlace === null) return undefined;
+  if (x.readerPlace) return x.readerPlace;
+  const kind = readerKind(x);
+  if (kind === 'official' || kind === 'derived' || kind === 'estimate') return undefined;
+  return evidenceReaderPlace[x.evidence];
+}
+
+/** Chip text with its qualifier: '實測・台灣', 'Study · abroad', '推估'. */
+export function readerChipText(
+  x: Evidence | { evidence: Evidence; readerKind?: ReaderKind; readerPlace?: ReaderPlace | null },
+  locale: Locale,
+): string {
+  const label = readerKindLabels[readerKind(x)].label[locale];
+  const place = readerPlace(x);
+  if (!place) return label;
+  return locale === 'zh-TW' ? `${label}・${readerPlaceLabels[place][locale]}` : `${label} · ${readerPlaceLabels[place][locale]}`;
+}
 
 // ---------------------------------------------------------------------------
 // The chain of evidence

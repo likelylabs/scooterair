@@ -54,10 +54,10 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
     letter-spacing: 0;
   }
   .wordmark__alt {
-    font-size: 0.8125rem;
+    font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
     line-height: 1;
-    color: var(--ink-3);
+    color: var(--ink-2);
     padding-inline-start: 0.55rem;
     border-inline-start: 1px solid var(--line-strong);
   }
@@ -65,7 +65,8 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
     font-stretch: 85%;
     letter-spacing: 0.02em;
   }
-  @media (max-width: 26em) {
+  /* beside the header's four controls there is room for the second name only on wide screens */
+  @media (max-width: 40em) {
     .wordmark__alt {
       display: none;
     }

@@ -24,6 +24,7 @@ const evidenceOrder: Record<Evidence, number> = {
   international: 3,
   derived: 4,
   'market-tw': 5,
+  estimate: 2,
 };
 
 const servesLink = (link: ChainLink, primaryOnly: boolean) => (x: { chainLink: ChainLink | null; alsoLinks?: ChainLink[] }) =>

@@ -1,0 +1,40 @@
+---
+/**
+ * ScenarioSwitch — 旁邊停了幾輛？ 幾輛 · 十來輛 · 停滿 (brief 3.2 screen 4, 5.1).
+ * Three whole-width segments, each with its count range underneath: a scenario's name never
+ * travels without its number of scooters. Names and counts are read from the signed estimate
+ * (`est.scn` in src/data/estimate.ts); nothing is typed here or passed in.
+ *
+ * It is a <Segmented> named `scenario`, so one choice redraws the picture and the 推估 row together:
+ *
+ *   CSS      [data-pick-scenario='full'] .kerb__row-3 { … }      (the scope is the <Screen>)
+ *   markup   <EstimateValue data-when-scenario="few" … />         (one per scenario; two are hidden)
+ *   script   el.addEventListener('sa:pick', (e) => e.detail.name === 'scenario' && draw(e.detail.value))
+ *
+ * Props
+ *   locale  Locale
+ *   value   'few' | 'dozen' | 'full' (default: the estimate's defaultScenario, 'dozen')
+ *   legend  override the question (default scenarioText.legend: 旁邊停了幾輛？)
+ *
+ *   <ScenarioSwitch slot="controls" locale={locale} />
+ */
+import type { Locale } from '@/i18n';
+import { defaultScenario, est, scenarioKeys, type ScenarioKey } from '@/data/estimate';
+import { range, scenarioText, t as fill } from '@/i18n/ui';
+import Segmented from './Segmented.astro';
+
+interface Props {
+  locale: Locale;
+  value?: ScenarioKey;
+  legend?: string;
+  class?: string;
+}
+const { locale, value = defaultScenario, legend = scenarioText.legend[locale], class: cls } = Astro.props;
+const options = scenarioKeys.map((s) => {
+  const c = est.scn[s]?.count;
+  if (!c || !Number.isFinite(c.lo) || !Number.isFinite(c.hi)) throw new Error(`ScenarioSwitch: the estimate has no count for "${s}" (est.scn.${s}.count).`);
+  return { value: s, label: est.scn[s].name[locale], sub: fill(scenarioText.count, locale, { range: range(c.lo, c.hi, locale) }) };
+});
+---
+
+<Segmented name="scenario" legend={legend} options={options} value={value} columns={3} class={cls} />

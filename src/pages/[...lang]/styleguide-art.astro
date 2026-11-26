@@ -20,7 +20,9 @@ import SignalCycle from '@/components/art/SignalCycle.astro';
 import SmellStrip from '@/components/art/SmellStrip.astro';
 import StreetScene from '@/components/art/StreetScene.astro';
 
-export const getStaticPaths = localeStaticPaths;
+// A builders' page: served by `astro dev` only. The production build makes no page for it
+// (redesign brief section 2), so it can never ship to readers.
+export const getStaticPaths = () => (import.meta.env.PROD ? [] : localeStaticPaths());
 const locale = localeFromParam(Astro.params.lang);
 const en = locale === 'en';
 const L = (zh: string, enText: string) => (en ? enText : zh);

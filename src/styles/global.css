@@ -16,13 +16,17 @@ html {
   scroll-padding-top: calc(var(--header-h) + 1rem);
   -webkit-tap-highlight-color: transparent;
 }
-/* Pages with the countdown rail (Base adds .has-rail when its `rail` slot is filled). */
+/* Pages with the screen rail (Base adds .has-rail when its `rail` slot is filled). */
 html.has-rail {
   scroll-padding-top: calc(var(--header-h) + var(--rail-h) + 1rem);
 }
 
+/* Smooth scrolling for the next-question buttons: only while animation is on (see "Motion" below). */
+html[data-motion='on'] {
+  scroll-behavior: smooth;
+}
 @media (prefers-reduced-motion: no-preference) {
-  html {
+  html:not([data-motion='off']) {
     scroll-behavior: smooth;
   }
 }
@@ -200,7 +204,48 @@ small,
 .meta {
   font-size: var(--fs-xs);
   line-height: var(--lh-snug);
-  color: var(--ink-3);
+  color: var(--ink-2); /* a sentence is never --ink-3 (brief 6.2) */
+}
+
+/* ---- Reading scale (brief 6.1) -------------------------------------------------
+ * The roles every page shares. <Screen> applies them itself; other pages use the classes.
+ */
+.headline {
+  font-family: var(--font-heading);
+  font-size: var(--fs-headline);
+  font-weight: var(--fw-black);
+  line-height: var(--lh-headline);
+  letter-spacing: var(--ls-heading);
+  text-wrap: balance;
+}
+.read {
+  font-size: var(--fs-base);
+  line-height: var(--lh-read);
+  color: var(--ink);
+}
+.quiet {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-read);
+  color: var(--ink-2);
+}
+/* The big figure: 40–56 px, tabular, clamped so it never leaves the screen; its unit sits
+   beside it at body size: <p class="figure-num">10,388<span class="figure-num__unit">元</span></p> */
+.figure-num {
+  font-family: var(--font-heading);
+  font-size: var(--fs-figure);
+  font-weight: var(--fw-black);
+  font-stretch: 84%;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums lining-nums;
+  overflow-wrap: anywhere;
+}
+.figure-num__unit {
+  margin-inline-start: 0.35em;
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  font-stretch: 100%;
+  white-space: nowrap;
 }
 
 /* Eyebrow / kicker: a lane-marking dash, then a short label. */
@@ -342,7 +387,7 @@ td {
   border-block-end: 1px solid var(--line);
 }
 thead th {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
   color: var(--ink-2);
   border-block-end: 1px solid var(--line-strong);
@@ -404,7 +449,7 @@ th.num {
   margin-block-start: 0.35em;
 }
 .prose li::marker {
-  color: var(--ink-3);
+  color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
 
@@ -573,10 +618,86 @@ html[data-money-phase]:not([data-money-phase='A'], [data-money-phase='B'], [data
 html:not(.js) [data-js-only] {
   display: none !important;
 }
+/* …and the reverse: what only a reader without scripting needs (a screen's own position line). */
+html.js [data-nojs-only] {
+  position: absolute !important;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Motion ---------------------------------------------------------------------
+ * One switch for the whole site (brief 5.3). <html data-motion="on|off"> is set before first
+ * paint by Base.astro: the reader's stored choice from the menu's 動畫 switch, or else "off"
+ * when the system asks for reduced motion. Without JavaScript the attribute is absent and the
+ * media query alone decides.
+ *
+ * When motion is off every CSS animation and transition finishes at once, so a picture shows
+ * its resting state. Author animations so that the resting state IS the final state (animate
+ * from something, with `backwards` or `both`); then nothing here can leave a picture half-drawn.
+ * Scripts ask motionOk() in src/components/ui/motion.client.ts instead of the media query.
+ */
+html[data-motion='off'] *,
+html[data-motion='off'] *::before,
+html[data-motion='off'] *::after,
+html[data-motion='off'] ::backdrop {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='on']) *,
+  html:not([data-motion='on']) *::before,
+  html:not([data-motion='on']) *::after,
+  html:not([data-motion='on']) ::backdrop {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Controls: shared look -----------------------------------------------------
+ * A square control in the header or a sheet (字大, the language switch, the menu, close).
+ */
+.tool {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-inline-size: var(--tool, 48px);
+  block-size: var(--tool, 48px);
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: var(--radius-2);
+  background: none;
+  color: var(--ink);
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tool:hover {
+  background: var(--bg-sunken);
+  color: var(--ink);
+}
+@media (forced-colors: active) {
+  .tool {
+    border: 1px solid ButtonText;
+  }
+}
 
 @media print {
   .site-header,
   .site-footer nav,
+  .screen-rail,
   [data-js-only] {
     display: none !important;
   }

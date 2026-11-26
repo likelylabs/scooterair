@@ -423,7 +423,6 @@ const baseSeries = {
     chart: 'grouped-bar',
     unit: 'million-vehicles',
     categories: [
-      { key: '2018', label: t('2018年', '2018') },
       { key: '2023', label: t('2023年', '2023') },
       { key: '2024', label: t('2024年', '2024') },
       { key: '2026-05', label: t('2026年5月', 'May 2026') },
@@ -433,7 +432,6 @@ const baseSeries = {
         key: 'total',
         label: t('全部機車', 'All motorcycles'),
         points: [
-          { x: '2018', y: null, note: t('2018年的總數，我們沒有查到。', 'We did not find a 2018 total.') },
           { x: '2023', y: 14.55 },
           { x: '2024', y: 14.66 },
           { x: '2026-05', y: 14.67, confidence: 'secondary', sources: ['pts-2026-07-scooter-fleet'] },
@@ -443,7 +441,6 @@ const baseSeries = {
         key: 'electric',
         label: t('電動機車', 'Electric'),
         points: [
-          { x: '2018', y: 0.19, flags: ['lower-bound'] },
           { x: '2023', y: 0.7 },
           { x: '2024', y: 0.77 },
           {
@@ -457,7 +454,7 @@ const baseSeries = {
         ],
       },
     ],
-    period: t('2018–2026年', '2018–2026'),
+    period: t('2023–2026年', '2023–2026'),
     place: TW,
     sources: ['moenv-air-review-2023', 'moenv-air-review-2024', 'pts-2026-07-scooter-fleet', 'datagov-14208-motorcycle-registrations'],
     confidence: 'verified',
@@ -523,7 +520,6 @@ const baseSeries = {
         kind: 'observed',
         points: [
           { x: 2019, y: 18.7, sources: ['cnyes-2019-registrations'] },
-          { x: 2020, y: null, note: t('無可查證的數字。', 'No verified figure.') },
           {
             x: 2021,
             y: 11.6,
@@ -570,13 +566,13 @@ const baseSeries = {
     confidence: 'secondary',
     evidence: 'official-tw',
     caveat: t(
-      '各年的數字都出自媒體轉述的交通部或業界統計，2021年是企業（Gogoro）公布的銷量推算。2020年我們找不到可以查證的數字，所以圖上留白；2019年以前的數字也沒有查證。目標出自公視對淨零路徑的報導；國家發展委員會的原始文件我們沒有讀到。',
-      'Each year\'s figure comes from media reports of transport-ministry or industry statistics; 2021 is calculated from company (Gogoro) sales figures. We found no verifiable figure for 2020, so that year is left blank; figures before 2019 were not verified either. Targets are from Public Television Service (PTS) News reporting on the net-zero pathway; we have not read the National Development Council\'s original document.',
+      '各年的數字都出自媒體轉述的交通部或業界統計，2021年是企業（Gogoro）公布的銷量推算。圖上只畫有出處的年份：2020年和2019年以前，沒有可以核對的數字，所以不畫。目標出自公視對淨零路徑的報導；國家發展委員會的原始文件我們沒有讀到。',
+      'Each year\'s figure comes from media reports of transport-ministry or industry statistics; 2021 is calculated from company (Gogoro) sales figures. The chart draws only years with a sourced figure: 2020 and the years before 2019 have none we could check, so they are not drawn. Targets are from Public Television Service (PTS) News reporting on the net-zero pathway; we have not read the National Development Council\'s original document.',
     ),
     requiresCaveat: true,
     relatedFacts: ['ev-share-2019', 'ev-share-2025', 'netzero-ev-sales-targets', 'netzero-2025-gap'],
     chainLink: 7,
-    editorNote: 'Leave unverified years as gaps; never interpolate.',
+    editorNote: 'Only sourced years are drawn (2020 omitted: no verifiable figure; the Highway Bureau registration CSV sat behind a bot wall on 2026-11-26). Never interpolate; a line chart joins 2019 to 2021, so say in the chart description that 2020 is not drawn.',
     research: '01 §7, §8, Charts A and G',
   },
   'new-registrations-electric-vs-gasoline': {

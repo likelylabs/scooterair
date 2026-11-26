@@ -6,9 +6,8 @@
 // (it reads import.meta.env).
 
 import type { L10n, Locale } from './index';
-import { confidenceLabels, evidenceLabels, evidenceTypes, type Evidence } from '../data/types.ts';
+import { confidenceLabels, evidenceLabels, evidenceTypes, readerKind, readerKindLabels, readerKinds, readerPlaceLabels, type Evidence, type ReaderKind } from '../data/types.ts';
 import { facts } from '../data/facts.ts';
-import { gapBadge } from '../data/gaps.ts';
 
 /**
  * Reader-facing Chinese writes 台灣 / 台北; the registry writes 臺. Pass any registry string
@@ -26,10 +25,18 @@ export const site = {
     'zh-TW': '等紅燈的時候，我們吸進了什麼',
     en: 'What we breathe at the red light',
   } as L10n,
+  /** Site description (brief 7.10): says 空氣污染 and 廢氣, so a search for either finds the site. */
   description: {
-    'zh-TW':
-      '機車的排氣管離地不到一公尺，就在斑馬線旁邊。路口等候區的 PM2.5 和一氧化碳有人量過，但緊鄰紅燈車陣的行人吸進什麼，台灣還沒有人量過。這裡整理已經知道的、還不知道的，以及換電動機車實際要花多少。',
-    en: 'A scooter’s tailpipe sits under a metre off the ground, beside the crosswalk. PM2.5 and carbon monoxide have been measured where pedestrians wait at some crossings, but what a pedestrian breathes right beside a red-light pack has not been measured in Taiwan. Here is what is known, what is not, and what going electric really costs.',
+    'zh-TW': '台灣路口的機車廢氣和空氣污染：等紅燈時，旁邊機車的廢氣有多少、對身體有什麼影響、換電動機車要多少錢。',
+    en: 'Scooter exhaust and air pollution at Taiwan’s junctions: how much exhaust the scooters beside you add at a red light, what it does to the body, and what an electric scooter costs.',
+  } as L10n,
+  /**
+   * The one sentence a reader should be able to repeat (brief section 1). The home page, the film,
+   * the poster and the share cards all end on it: print it from here, never retype it.
+   */
+  sentence: {
+    'zh-TW': '等紅燈的時候，旁邊機車的排氣管，離小孩只有一兩步、不到一公尺高；換一輛電動的，就少一根排氣管。',
+    en: 'At a red light, the tailpipes of the scooters beside you are a step or two from a child and less than a metre off the ground. Every electric scooter is one tailpipe fewer.',
   } as L10n,
 } as const;
 
@@ -39,17 +46,18 @@ export interface NavItem {
   label: L10n;
 }
 
-/** Primary navigation, in order (blueprint 4.1). Home is reached through the wordmark. */
+/** The main menu, five items, in order (brief section 2). Home is reached through the wordmark. */
 export const nav: NavItem[] = [
+  { path: '/90/', label: { 'zh-TW': '短片', en: 'Film' } },
   { path: '/questions/', label: { 'zh-TW': '問題', en: 'Questions' } },
-  { path: '/evidence/', label: { 'zh-TW': '證據', en: 'Evidence' } },
-  { path: '/unmeasured/', label: { 'zh-TW': '沒人量過', en: 'Not yet measured' } },
-  { path: '/electric/', label: { 'zh-TW': '換電動', en: 'Going electric' } },
-  { path: '/act/', label: { 'zh-TW': '行動', en: 'Take action' } },
+  { path: '/estimate/', label: { 'zh-TW': '怎麼算的', en: 'How we worked it out' } },
+  { path: '/electric/', label: { 'zh-TW': '換電動', en: 'Go electric' } },
+  { path: '/act/', label: { 'zh-TW': '行動', en: 'What I can do' } },
 ];
 
-/** Footer-only navigation. The corrections log is a section of /about/. */
+/** Footer navigation: the adults' pages. The corrections log is a section of /about/. */
 export const footerNav: NavItem[] = [
+  { path: '/evidence/', label: { 'zh-TW': '證據', en: 'Evidence' } },
   { path: '/sources/', label: { 'zh-TW': '資料來源', en: 'Sources' } },
   { path: '/about/', label: { 'zh-TW': '關於', en: 'About' } },
   { path: '/about/#corrections', label: { 'zh-TW': '修改紀錄', en: 'Corrections' } },
@@ -76,7 +84,7 @@ const filled = (l: L10n, vars: Record<string, L10n>): L10n => {
     });
   return { 'zh-TW': f('zh-TW'), en: f('en') };
 };
-/** Minimum gap between the turn box and the crosswalk, in centimetres (MOTC marking rules). */
+/** Minimum gap between the turn box and the crossing, in centimetres (MOTC marking rules). */
 const turnBoxGapCm = /* @__PURE__ */ registryNumber('marking-rules-turn-box', 'turnBoxGap', 100);
 
 export const ui = {
@@ -96,21 +104,23 @@ export const ui = {
   themeLight: { 'zh-TW': '淺色', en: 'Light' },
   themeDark: { 'zh-TW': '深色', en: 'Dark' },
   aboutData: {
-    'zh-TW': '本站每一個數字都附上來源。路口的插圖是示意圖，不是量測；沒有人量過的地方，我們會直接寫出來。',
-    en: 'Every figure on this site links to its source. The street drawings are illustrations, not measurements; where nobody has measured something, we say so.',
+    'zh-TW': '本站每一個數字都有出處，或者附上算法。標著「推估」的，是我們自己算的。路口的圖是示意圖。',
+    en: 'Every figure on this site has a source or shows its working. A figure marked “Estimate” is one we worked out ourselves. The street drawings are illustrations.',
   },
   aboutDataTitle: { 'zh-TW': '關於這些數字', en: 'About these figures' },
   credits: { 'zh-TW': '製作', en: 'Credits' },
   sources: { 'zh-TW': '資料來源', en: 'Sources' },
   source: { 'zh-TW': '來源', en: 'Source' },
   sourceN: { 'zh-TW': '來源 {n}', en: 'Source {n}' },
-  sampleData: { 'zh-TW': '示意資料', en: 'Sample data' },
+  /** @deprecated Style-guide demos only (the style guide is not in the production build). */
+  sampleData: { 'zh-TW': '示範用的數字', en: 'Demo figures' },
+  /** @deprecated Style-guide demos only. */
   sampleDataLong: {
-    'zh-TW': '示意資料，非真實量測',
-    en: 'Sample data, not real measurements',
+    'zh-TW': '示範用的數字，不是真的量測',
+    en: 'Demo figures, not real measurements',
   },
+  /** @deprecated Use `illustration.tag`. */
   illustrative: { 'zh-TW': '示意圖，未依實際比例或量測繪製', en: 'Illustrative: not to scale and not drawn from measurements' },
-  noData: { 'zh-TW': '無資料', en: 'No data' },
   figure: { 'zh-TW': '圖', en: 'Fig.' },
   dataTable: { 'zh-TW': '查看資料表', en: 'View data table' },
   externalLink: { 'zh-TW': '（另開新分頁）', en: '(opens in a new tab)' },
@@ -134,44 +144,6 @@ export const ui = {
     month: { 'zh-TW': '月', en: 'Month' },
     months: { 'zh-TW': '個月', en: 'months' },
     year: { 'zh-TW': '年', en: 'yr' },
-  },
-  // Street scene
-  scene: {
-    red: { 'zh-TW': '燃油機車', en: 'Gasoline' },
-    clean: { 'zh-TW': '電動機車', en: 'Electric' },
-    compareLegend: { 'zh-TW': '同一個路口，同一個紅燈', en: 'Same crossing, same red light' },
-    adult: { 'zh-TW': '大人口鼻', en: 'Adult' },
-    child: { 'zh-TW': '小孩口鼻', en: 'Child' },
-    stroller: { 'zh-TW': '嬰兒車', en: 'Stroller' },
-    tailpipe: { 'zh-TW': '排氣管', en: 'Tailpipe' },
-    heightUnit: { 'zh-TW': '公分', en: 'cm' },
-    altRed: {
-      'zh-TW':
-        '路口側面示意圖：一排燃油機車在停止線後和待轉區裡怠速等紅燈，行人從車陣前走過斑馬線，轉角有一個戴黃帽的小學生和一位長者在等同一個綠燈。地面附近用斜線標出一層：有廢氣，多濃沒人量過。',
-      en: 'Side view of a crossing: a row of gasoline scooters idles behind the stop line and in the turn box at a red light. People cross in front of them; on the corner a schoolchild in a yellow cap and an older woman wait for the same green. Hatching near the ground marks a layer where exhaust is present and its density has not been measured.',
-    },
-    altClean: {
-      'zh-TW': '同一個路口：等紅燈的換成電動機車，車陣沒有排氣管，地面附近不再畫那一層斜線。遠處的汽車還在。',
-      en: 'The same crossing: the scooters at the red light are electric, the pack has no tailpipes, and the hatched layer near the ground is no longer drawn. A car further off is still there.',
-    },
-  },
-  // Pollutant vocabulary (how each is drawn)
-  pollutant: {
-    odorTitle: { 'zh-TW': '聞得到的', en: 'What you smell' },
-    odorBody: {
-      'zh-TW': '廢氣裡聞得到的部分；是哪幾種成分，還沒有人鑑定過。畫成排氣管口的暖色波紋。',
-      en: 'The part of exhaust you can smell; which compounds, nobody has identified. Drawn as warm ribbons at the tailpipe.',
-    },
-    coTitle: { 'zh-TW': '聞不到的氣體', en: 'The gas you can’t smell' },
-    coBody: {
-      'zh-TW': '一氧化碳，無色無味。畫成空心圓圈。',
-      en: 'Carbon monoxide: no colour, no smell. Drawn as hollow rings.',
-    },
-    ufpTitle: { 'zh-TW': '看不到的微粒', en: 'The particles you can’t see' },
-    ufpBody: {
-      'zh-TW': '車流裡的超細微粒，不只來自機車。畫成針尖大小的細點。',
-      en: 'Ultrafine particles from traffic as a whole, not scooters alone. Drawn as pin-point stipple.',
-    },
   },
 } as const;
 
@@ -217,78 +189,89 @@ export const chain = {
   /**
    * The seven-line 懶人包 (blueprint 3.2). ONE source for ChainStrip, question
    * pages, share cards and the film: never retype these lines in a page.
-   * `badges` are EvidenceKind ids; line 7 is a fact of the machine and has none.
-   * `pip` is how the link is drawn on the rail and on any chain line:
-   * filled = Taiwan data, outline = modelled or international, open = the gap, go = the way out.
+   * `chips` are ChipKind ids (the five reader chips, brief 4.1); line 7 is a fact of the machine
+   * and has none. `pip` is how the link is drawn on any chain line:
+   * filled = Taiwan data, outline = an estimate, a model or international evidence, go = the way out.
+   * No link is drawn as a break any more: link 3 is whole (measured waiting areas + our estimate).
    */
   summary: [
     {
       text: { 'zh-TW': '論排放量，機車排的 PM2.5（細懸浮微粒）很少，油氣和一氧化碳很多。', en: 'By emissions, scooters put out little PM2.5 (fine particles) and a lot of fuel vapour and carbon monoxide.' },
       badges: ['official-tw'],
+      chips: ['official'],
       pip: 'filled',
     },
     {
       // {cm} is the registry's marking-rule minimum (facts['marking-rules-turn-box'].data.turnBoxGap), never typed here
       text: /* @__PURE__ */ filled(
-        { 'zh-TW': '排氣管離地不到一公尺；標線規則只要求待轉區離斑馬線 {cm} 公分。', en: 'The tailpipe is under a metre off the ground; the marking rules require only {cm} cm between the turn box and the crosswalk.' },
+        { 'zh-TW': '排氣管離地不到一公尺；待轉區和斑馬線之間，規定只要留 {cm} 公分以上。', en: 'The tailpipe is under a metre off the ground; the rules ask for at least {cm} cm between the turn box and the crossing.' },
         { cm: turnBoxGapCm },
       ),
       badges: ['international', 'official-tw'],
+      chips: ['official'],
       pip: 'filled',
     },
     {
-      // Not "nobody has measured anything": the transport research institute measured PM2.5 and CO in
-      // the waiting areas of 10 crossings (facts iot-waiting-area-pm25-2024, iot-waiting-area-co-2024).
-      // What is missing is the record right beside the idling pack, through the red light (gap-pedestrian-red-light-exposure).
+      // Link 3 is whole now (brief 7.3): the transport research institute measured the waiting areas
+      // (facts iot-waiting-area-pm25-2024, iot-waiting-area-co-2024), and what the pack adds beside
+      // the scooters is this site's signed estimate (src/data/estimate.ts).
       text: {
-        'zh-TW': '路口的行人等候區量過 PM2.5 和一氧化碳；緊鄰怠速車陣、等一個紅燈吸進多少，台灣還沒有公開的量測。',
-        en: 'PM2.5 and carbon monoxide have been measured where pedestrians wait at crossings; what someone right beside the idling pack breathes through one red light has not been measured in Taiwan.',
+        'zh-TW': '街上的人吸進什麼：運研所量過等候區（實測）；機車旁邊，本站推估。',
+        en: 'What people on the street breathe: the Institute of Transportation measured the waiting areas (measured); beside the scooters, this site gives an estimate.',
       },
-      badges: ['measured-tw', 'gap'],
-      pip: 'open',
+      badges: ['measured-tw', 'estimate'],
+      chips: ['measured', 'estimate'],
+      pip: 'outline',
     },
     {
       // What the evidence supports (facts 'co-odourless', 'odour-thresholds'): carbon monoxide has no smell;
       // benzene is smellable only at parts per million, so at roadside levels it is unlikely to be smelled.
-      // Never "cannot": nobody has measured benzene at a Taiwanese kerb.
       text: {
-        'zh-TW': '聞到味道，代表你站在廢氣裡；裡面的一氧化碳沒有味道，路邊那種濃度的苯也不太可能聞得出來。',
+        'zh-TW': '聞到味道，代表你站在廢氣裡；裡面的一氧化碳沒有味道，路邊那麼少的苯也不太聞得出來。',
         en: 'If you can smell it, you are standing in exhaust; the carbon monoxide in it has no smell, and at roadside levels you are unlikely to smell the benzene.',
       },
       badges: ['international'],
+      chips: ['study'],
       pip: 'outline',
     },
     {
-      // HEI's confidence covers deaths from heart disease and lung cancer and asthma onset (fact hei-sr23-trap-associations)
-      text: { 'zh-TW': '長年吸車流廢氣，和心臟病、肺癌的死亡以及氣喘發病有關；一個紅燈會怎樣，沒有研究。', en: 'Years of breathing traffic exhaust are associated with deaths from heart disease and lung cancer, and with new asthma; what one red light does, no study says.' },
-      badges: ['international', 'gap'],
+      // HEI's confidence covers asthma onset and deaths from heart disease and lung cancer (fact
+      // hei-sr23-trap-associations); the precise wording is in the sheet. The second sentence is K5.
+      text: {
+        'zh-TW': '長年吸車子的廢氣，和氣喘、心臟病、肺癌有關。等一個紅燈就會生病嗎？沒有人證明過。',
+        en: 'Years of breathing traffic exhaust are linked to asthma, heart disease and lung cancer. Does one red light make you ill? Nobody has shown that.',
+      },
+      badges: ['international'],
+      chips: ['study'],
       pip: 'outline',
     },
     {
       // Chuang 2020 (fact commute-scooter-vs-subway-chuang2020): scooter and walking were both significantly
-      // higher than subway and car, and did not differ significantly from each other or from the bus.
+      // higher than the metro, and did not differ significantly from each other.
       // Never "the most": the ranking is of means and is not significant. PM2.5 here is from all sources.
       text: {
-        'zh-TW': '台北一項研究裡，騎燃油機車和走路通勤的人，身上的 PM2.5 平均都明顯比搭捷運高，兩者之間沒有顯著差別；小孩呼吸比大人快。',
-        en: 'In a Taipei study, people commuting by gasoline scooter or on foot carried clearly more PM2.5 on average than subway riders, with no significant difference between the two; children breathe faster than adults.',
+        'zh-TW': '台北量過：騎機車和走路的人，吸到的 PM2.5 平均都比搭捷運的多；小孩呼吸又比大人快。',
+        en: 'Measured in Taipei: people on scooters and people on foot both breathed more PM2.5, on average, than people on the metro; and children breathe faster than adults.',
       },
       badges: ['measured-tw', 'international'],
+      chips: ['measured', 'study'],
       pip: 'filled',
     },
     {
       text: { 'zh-TW': '電動機車沒有排氣管。', en: 'An electric scooter has no tailpipe.' },
       badges: [],
+      chips: [],
       pip: 'go',
     },
-  ] as { text: L10n; badges: EvidenceKind[]; pip: ChainPip }[],
+  ] as { text: L10n; /** @deprecated registry-style ids for <EvidenceBadge>; use `chips` */ badges: EvidenceKind[]; chips: ChipKind[]; pip: ChainPip }[],
   summaryTitle: { 'zh-TW': '30 秒懶人包：|七件事', en: 'The 30-second version: |seven things' } as L10n,
   summaryShort: { 'zh-TW': '七件事', en: 'Seven things' } as L10n,
   summaryOf: { 'zh-TW': '七件事的第 {n} 件', en: 'Thing {n} of seven' } as L10n,
   summaryExpand: { 'zh-TW': '看全部七件', en: 'Show all seven' } as L10n,
   summaryUnder: {
-    // lines 1–6 carry sources; lines 3 and 5 also carry the gap badge; line 7 is a fact of the machine
-    'zh-TW': '六件有出處，其中兩件還有沒人量到的部分；一件是機器本身的事實。怎麼接起來，往下看。想直接問的，點這裡：',
-    en: 'Six have sources, and two of those still have a part nobody has measured; one is a fact of the machine. Scroll to see how they join. Or go straight to your question:',
+    // lines 1–6 carry their chips; line 7 is a fact of the machine
+    'zh-TW': '六件有出處或算法，一件是機器本身的事實。怎麼接起來，往下看。想直接問的，點這裡：',
+    en: 'Six have a source or a working; one is a fact of the machine. Scroll to see how they join. Or go straight to your question:',
   } as L10n,
   /** Footer of the collapsed strip on question pages. */
   summaryFooter: { 'zh-TW': '怎麼接起來，你自己判斷。', en: 'How they join is yours to judge.' } as L10n,
@@ -314,14 +297,15 @@ export const chain = {
   } as { prologue: [number, number]; links: [number, number][]; green: [number, number]; connect: [number, number] },
   /** Kicker text that prints the count in each chapter, so it reads without JavaScript. */
   kickerRed: { 'zh-TW': '紅燈 · 剩 {n} 秒', en: 'Red light · {n} seconds left' } as L10n,
-  kickerPaused: { 'zh-TW': '倒數暫停 · 鏡頭拉遠', en: 'Countdown paused · pulling back' } as L10n,
+  /** @deprecated The page has no countdown any more (ScreenRail shows no seconds). */
+  kickerPaused: { 'zh-TW': '紅燈 · 鏡頭拉遠', en: 'Red light · pulling back' } as L10n,
   kickerReset: { 'zh-TW': '紅燈 · 倒數回到 {n}', en: 'Red light · back to {n}' } as L10n,
   kickerGreen: { 'zh-TW': '綠燈', en: 'Green light' } as L10n,
 } as const;
 
 export type ChainPip = 'filled' | 'outline' | 'open' | 'go';
 
-/** The countdown rail under the header (V2). */
+/** @deprecated Strings of the old CountdownRail. ScreenRail uses `screenText`. Delete in phase 3. */
 export const rail = {
   label: { 'zh-TW': '紅燈倒數與章節選單', en: 'Countdown and chapter menu' } as L10n,
   jump: { 'zh-TW': '跳到', en: 'Jump to' } as L10n,
@@ -331,7 +315,7 @@ export const rail = {
   named: { 'zh-TW': '跳到章節，目前在：{name}', en: 'Jump to a chapter. Now reading: {name}' } as L10n,
   idle: { 'zh-TW': '一個紅燈，90 秒', en: 'One red light, ninety seconds' } as L10n,
   secondsLeft: { 'zh-TW': '紅燈剩 {n} 秒', en: '{n} seconds of red left' } as L10n,
-  paused: { 'zh-TW': '倒數暫停', en: 'Countdown paused' } as L10n,
+  paused: { 'zh-TW': '鏡頭拉遠', en: 'Pulling back' } as L10n,
   green: { 'zh-TW': '綠燈亮的那一秒', en: 'The second it turns green' } as L10n,
   connect: { 'zh-TW': '接起來', en: 'Joining it up' } as L10n,
   money: { 'zh-TW': '算錢', en: 'The money' } as L10n,
@@ -339,21 +323,22 @@ export const rail = {
   /** Pip legend, printed once at the foot of the jump menu. */
   pips: {
     filled: { 'zh-TW': '台灣的資料', en: 'Taiwan data' },
-    outline: { 'zh-TW': '推估或國際證據', en: 'Modelled or international' },
-    open: gapBadge,
+    outline: { 'zh-TW': '推估、模式或國際證據', en: 'Estimated, modelled or international' },
+    open: { 'zh-TW': '證據缺口', en: 'Evidence gap' },
     go: { 'zh-TW': '可以切斷', en: 'Can be broken' },
   } as Record<ChainPip, L10n>,
 } as const;
 
-/** Fixed labels inside a <Chapter> (blueprint 3.0, budget per chapter). */
+/** @deprecated Fixed labels inside the old <Chapter>. <Screen> needs none. Delete in phase 3. */
 export const chapterText = {
   caveat: { 'zh-TW': '這一段沒有說的事', en: 'What this does not say' } as L10n,
   action: { 'zh-TW': '你現在可以做的', en: 'What you can do now' } as L10n,
   more: { 'zh-TW': '看這一環的全部證據', en: 'See all the evidence for this link' } as L10n,
-  paused: { 'zh-TW': '倒數暫停', en: 'Countdown paused' } as L10n,
+  paused: { 'zh-TW': '鏡頭拉遠', en: 'Pulling back' } as L10n,
 } as const;
 
 /**
+ * @deprecated with QuestionChips.astro (the question index is a grid of picture cards now).
  * Question chips (V4), in the reader's words, in blueprint order. `path` is
  * locale-neutral: pass it through href(). The last chip is not a question page.
  */
@@ -370,8 +355,8 @@ export const questions = {
   all: { 'zh-TW': '看全部問題', en: 'All the questions' } as L10n,
   allPath: '/questions/',
   label: { 'zh-TW': '直接問', en: 'Go straight to a question' } as L10n,
-  askMeasure: { 'zh-TW': '誰來量？請環保局來量我家路口', en: 'Who will measure it? Ask the environmental protection bureau to measure my crossing' } as L10n,
-  askMeasurePath: '/unmeasured/#ask',
+  askMeasure: { 'zh-TW': '把推估換成實測', en: 'Turn the estimate into a measurement' } as L10n,
+  askMeasurePath: '/estimate/#measure',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -379,11 +364,13 @@ export const questions = {
 // ---------------------------------------------------------------------------
 
 /**
- * The eight reader-facing badges (blueprint Part 2): the registry's six
- * evidence types, in the registry's own words, plus two for the site's voice.
+ * The FINER registry types, for /evidence/ and /sources/ only, where they may sit beside a
+ * reader chip (brief 4.1). Everywhere else a number carries one of the five chips: see
+ * `chips` / <KindChip> below. `estimate` is the site's own kerbside estimate; `gap` is
+ * @deprecated (the old gap badge is gone) and stays only until the old pages are rebuilt.
  * Order = the order of the legend.
  */
-export const evidenceKinds = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'market-tw', 'derived', 'inference', 'gap'] as const;
+export const evidenceKinds = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'market-tw', 'derived', 'estimate', 'inference', 'gap'] as const;
 export type EvidenceKind = (typeof evidenceKinds)[number];
 
 /**
@@ -393,18 +380,25 @@ export type EvidenceKind = (typeof evidenceKinds)[number];
  */
 export type EvidenceLine = 'solid-filled' | 'solid-outline' | 'dashed' | 'open' | 'none';
 
-const registryLine: Record<Evidence, EvidenceLine> = {
+// Keyed by string, not by Evidence: the registry may hold a kind this list does not know yet
+// (it falls back to an outline), and this list may name one the registry adds later.
+const registryLine: Record<string, EvidenceLine> = {
   'measured-tw': 'solid-filled',
   'official-tw': 'solid-filled',
   'modelled-tw': 'solid-outline',
   international: 'solid-outline',
   'market-tw': 'none',
   derived: 'dashed',
+  estimate: 'dashed',
 };
 
+type KindText = { label: L10n; help: L10n; line: EvidenceLine };
 const registryKinds = Object.fromEntries(
-  evidenceTypes.map((k) => [k, { label: reader(evidenceLabels[k].label), help: reader(evidenceLabels[k].description), line: registryLine[k] }]),
-) as Record<Evidence, { label: L10n; help: L10n; line: EvidenceLine }>;
+  (evidenceTypes as readonly string[]).map((k) => [
+    k,
+    { label: reader(evidenceLabels[k as Evidence].label), help: reader(evidenceLabels[k as Evidence].description), line: registryLine[k] ?? 'solid-outline' },
+  ]),
+) as Record<string, KindText>;
 
 export const evidence = {
   heading: { 'zh-TW': '證據類型', en: 'Kind of evidence' } as L10n,
@@ -418,12 +412,18 @@ export const evidence = {
       } as L10n,
       line: 'dashed' as EvidenceLine,
     },
+    // the site's own estimate: the registry's wording when it has the kind, this wording until then
+    estimate: registryKinds.estimate ?? {
+      label: { 'zh-TW': '推估', en: 'Estimate' } as L10n,
+      help: { 'zh-TW': '我們算出來的。一定附範圍和算法。', en: 'Worked out by us. It always comes with a range and the working.' } as L10n,
+      line: 'dashed' as EvidenceLine,
+    },
+    /** @deprecated The gap badge is gone (brief 4.1). Kept so pages not yet rebuilt still build. */
     gap: {
-      // one name for the gap badge, read from the registry (src/data/gaps.ts)
-      label: gapBadge,
+      label: { 'zh-TW': '證據缺口', en: 'Evidence gap' } as L10n,
       help: {
-        'zh-TW': '我們找過了，找不到能回答這一點的量測；旁邊有什麼已經量過，會一起寫出來。不是量了沒事，是這一點還沒有人量。',
-        en: 'We looked and found no measurement that answers this point; what has been measured nearby is shown beside it. That does not mean someone measured it and found it fine. It means nobody has measured this point.',
+        'zh-TW': '這一點沒有實測可以直接回答；旁邊量過什麼、本站怎麼推估，會一起寫出來。',
+        en: 'No measurement answers this point directly; what has been measured nearby, and how this site estimates it, are shown beside it.',
       } as L10n,
       line: 'open' as EvidenceLine,
     },
@@ -436,8 +436,8 @@ export const evidence = {
   /** Legend key for the line styles. */
   lines: {
     'solid-filled': { 'zh-TW': '實線、實心：台灣的量測與官方資料', en: 'Solid, filled: measured or official Taiwan data' },
-    'solid-outline': { 'zh-TW': '實線、空心：推估與國際證據', en: 'Solid, outlined: modelled or international' },
-    dashed: { 'zh-TW': '虛線：本站的計算與推論', en: 'Dashed: our arithmetic and our inference' },
+    'solid-outline': { 'zh-TW': '實線、空心：模式與國際證據', en: 'Solid, outlined: modelled or international' },
+    dashed: { 'zh-TW': '虛線：本站的推估、計算與推論', en: 'Dashed: our estimate, our arithmetic and our inference' },
     open: { 'zh-TW': '斷開、兩端空心：證據缺口', en: 'Broken, hollow ends: an evidence gap' },
     none: { 'zh-TW': '不畫在鏈上', en: 'Not drawn on the chain' },
   } as Record<EvidenceLine, L10n>,
@@ -457,24 +457,216 @@ export const evidenceBadge = (kind: Evidence, confidence?: 'verified' | 'seconda
 });
 
 // ---------------------------------------------------------------------------
+// The five reader chips (brief 4.1)
+// ---------------------------------------------------------------------------
+
+/**
+ * Every number a reader sees carries exactly one of five chips. They differ by word and by
+ * shape (src/components/ui/kinds.ts), never by colour alone:
+ *   measured 實測 solid dot · estimate 推估 hatched dot, dashed edge · official 官方 solid square
+ *   study 研究 open book · derived 本站計算 plus sign
+ * The ids and the words are the registry's (`ReaderKind`, `readerKindLabels` in
+ * src/data/types.ts). `market` (業者公布) is a sixth chip for a seller's own price, on money
+ * pages only; pass it explicitly (the registry's market figures map to 本站計算 by default).
+ * One word for the site's own air numbers: 推估. Long-term studies of people are 研究, never 實測.
+ */
+export const chipKinds = [...readerKinds, 'market'] as const;
+export type ChipKind = ReaderKind | 'market';
+
+export const chips: Record<ChipKind, { label: L10n; help: L10n }> = {
+  ...(Object.fromEntries(readerKinds.map((k) => [k, { label: readerKindLabels[k].label, help: readerKindLabels[k].meaning }])) as Record<ReaderKind, { label: L10n; help: L10n }>),
+  market: {
+    label: { 'zh-TW': '業者公布', en: 'Seller’s figure' },
+    help: { 'zh-TW': '車廠和能源業者自己公布的價格和資費，不是政府的統計。', en: 'Prices and plan fees published by the makers and energy companies themselves; not government statistics.' },
+  },
+};
+
+/**
+ * The words that follow a chip after a middle dot: 研究・台灣, 實測・國外 (brief 4.1, 4.3).
+ * The four places are the registry's (`readerPlaceLabels`); for a fact, `readerPlace(fact)` picks one.
+ */
+export const chipWhere = {
+  taiwan: readerPlaceLabels.tw,
+  abroad: readerPlaceLabels.abroad,
+  international: readerPlaceLabels.international,
+  taiwanModel: readerPlaceLabels.twModel,
+  /** Home screen 6: 研究（長期・所有車輛） */
+  longTermAllTraffic: { 'zh-TW': '長期・所有車輛', en: 'long-term, all traffic' },
+} satisfies Record<string, L10n>;
+
+/**
+ * The chip for a chip id, or for any registry evidence id (`fact.evidence`, through the
+ * registry's own `readerKind`). Throws on anything else: the old gap and inference badges have
+ * no chip, so a page that still asks for one fails the build.
+ */
+export function chipKindOf(kind: string): ChipKind {
+  if ((chipKinds as readonly string[]).includes(kind)) return kind as ChipKind;
+  if ((evidenceTypes as readonly string[]).includes(kind)) return readerKind(kind as Evidence);
+  throw new Error(`[ui strings] "${kind}" has no reader chip (brief 4.1 has five: ${readerKinds.join(', ')}).`);
+}
+
+// ---------------------------------------------------------------------------
+// Words around the estimate that are not the estimate's own
+// ---------------------------------------------------------------------------
+//
+// The estimate's numbers, its scenario names, its fixed wording (多出來, 街上原本就有, the ppm
+// gloss, the two-item legend, the first-use gloss, the version stamp, the confidence words) and
+// its formatter all live in src/data/estimate.ts: `est`, `estimateText`, `formatEstimate`.
+// Only what a shared component adds around them is here.
+
+export const scenarioText = {
+  /** The question above the scenario switch. */
+  legend: { 'zh-TW': '旁邊停了幾輛？', en: 'How many beside you?' } as L10n,
+  /** Under each scenario's name: "8–20 輛". Fill with range(lo, hi). A name never travels without its count. */
+  count: { 'zh-TW': '{range} 輛', en: '{range} scooters' } as L10n,
+} as const;
+
+export const estText = {
+  /** For a total drawn on the same axis as measurements (brief 4.2 rule 5, 4.4). */
+  includingStreet: { 'zh-TW': '含街上原本就有的', en: 'including what the street already holds' } as L10n,
+  /** Label before the confidence word in an estimate's sheet (rule 9): 可信程度：中. */
+  confidence: { 'zh-TW': '可信程度', en: 'Confidence' } as L10n,
+} as const;
+
+/** The tag on every drawn scene, as HTML at 14 px or more (brief 5.1), and its relatives. */
+export const illustration = {
+  tag: { 'zh-TW': '示意圖｜廢氣其實大多看不見', en: 'Illustration: real exhaust is mostly invisible' } as L10n,
+  /** On the body picture. */
+  body: { 'zh-TW': '示意圖・不是醫學圖', en: 'Illustration, not a medical drawing' } as L10n,
+  /** The sentence every scene's alt text ends with. Name the scenario before it. */
+  altNote: {
+    'zh-TW': '這是示意圖：人站的地方畫了多少，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
+    en: 'This is an illustration: how much is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
+  } as L10n,
+} as const;
+
+/**
+ * The few sentences of the old framing that stay (brief 7.1). These are the ONLY places where
+ * "not yet measured / not yet known" wording may appear, and only on the pages listed there.
+ * Print them from here; the acceptance check uses this list as its allow-list.
+ */
+export const kSentences = {
+  /** /estimate/ (top and #measure), /about/, the measurement letter on /act/, the brief */
+  K1: {
+    'zh-TW': '紅燈時站在機車旁邊的人吸到多少，還沒有人直接量過；最接近的，是運研所在行人等候區的量測。',
+    en: 'Nobody has yet measured directly what a person beside the scooters breathes at a red light. The closest is the Institute of Transportation’s readings in pedestrian waiting areas.',
+  },
+  /** /estimate/, /evidence/#link-3 */
+  K2: { 'zh-TW': '苯和超細微粒，台灣還沒有人在紅燈路邊量過。', en: 'Benzene and ultrafine particles have not yet been measured at a Taiwanese red light.' },
+  /** /estimate/ */
+  K3: { 'zh-TW': '這排機車又加了多少超細微粒，現有的資料還算不出來。', en: 'How many ultrafine particles the pack adds cannot be worked out from the data that exist.' },
+  /** Home screen 8, /questions/my-child/, /estimate/ */
+  K4: { 'zh-TW': '矮的地方，廢氣一樣多或更多；多多少，還算不出來。', en: 'Lower down, the exhaust is the same or more. How much more cannot yet be worked out.' },
+  /** Home screen 6, /questions/one-red-light/, /evidence/#link-5, sheets */
+  K5: { 'zh-TW': '等一個紅燈就會生病嗎？沒有人證明過。', en: 'Does one red light make you ill? Nobody has shown that.' },
+  /** The film's health beat (a quiet line, so it is shorter) */
+  K5film: { 'zh-TW': '等一個紅燈就生病？沒有人證明過', en: 'One red light making you ill? Nobody has shown that' },
+  /** /estimate/#answers, the film transcript */
+  K6: { 'zh-TW': '綠燈起步那一陣有多大，還沒有人量過，所以本站不印倍數。', en: 'Nobody has measured how big the burst at green is, so this site prints no multiplier.' },
+} satisfies Record<string, L10n>;
+
+// ---------------------------------------------------------------------------
+// The screen frame, the sheet, the reader's settings
+// ---------------------------------------------------------------------------
+
+/** <Screen> and <ScreenRail> (brief 3.1). The rail marks the place in the story; it shows no seconds. */
+export const screenText = {
+  // English is one word each: the rail has room for about 26 Latin characters on a 320 px phone
+  red: { 'zh-TW': '紅燈', en: 'Red' } as L10n,
+  green: { 'zh-TW': '綠燈', en: 'Green' } as L10n,
+  /** "2 / 15" */
+  position: { 'zh-TW': '{n} / {total}', en: '{n} / {total}' } as L10n,
+  /** The same, said aloud. */
+  positionSr: { 'zh-TW': '第 {n} 張，共 {total} 張', en: 'Screen {n} of {total}' } as L10n,
+  railLabel: { 'zh-TW': '你看到哪裡了', en: 'Where you are' } as L10n,
+} as const;
+
+/** <HowSheet> and <HowButton>: the sheet behind 怎麼知道的？ (brief 4.5). */
+export const how = {
+  button: { 'zh-TW': '怎麼知道的？', en: 'How do we know?' } as L10n,
+  close: { 'zh-TW': '關閉', en: 'Close' } as L10n,
+  /** The three block headings, by the kind of number the sheet stands behind. */
+  heads: {
+    estimate: [
+      { 'zh-TW': '量到的', en: 'What was measured' },
+      { 'zh-TW': '我們算的', en: 'What we worked out' },
+      { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
+    ],
+    measured: [
+      { 'zh-TW': '誰量的', en: 'Who measured it' },
+      { 'zh-TW': '量到什麼', en: 'What they found' },
+      { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
+    ],
+    official: [
+      { 'zh-TW': '誰說的', en: 'Who says so' },
+      { 'zh-TW': '說了什麼', en: 'What it says' },
+      { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
+    ],
+    study: [
+      { 'zh-TW': '誰研究的', en: 'Who studied it' },
+      { 'zh-TW': '發現什麼', en: 'What they found' },
+      { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
+    ],
+    derived: [
+      { 'zh-TW': '用了哪些數字', en: 'The figures we used' },
+      { 'zh-TW': '怎麼算', en: 'The sum' },
+      { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
+    ],
+    market: [
+      { 'zh-TW': '誰公布的', en: 'Who published it' },
+      { 'zh-TW': '公布什麼', en: 'What it says' },
+      { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
+    ],
+  } as Record<ChipKind, [L10n, L10n, L10n]>,
+  /** Buttons: at most two per sheet. */
+  fullMethod: { 'zh-TW': '完整算法', en: 'The full working' } as L10n,
+  toMeasure: { 'zh-TW': '把推估換成實測', en: 'Turn the estimate into a measurement' } as L10n,
+  fullEvidence: { 'zh-TW': '看完整的證據', en: 'See the full evidence' } as L10n,
+  myTerms: { 'zh-TW': '用我的條件算', en: 'Work it out for me' } as L10n,
+} as const;
+
+/** The reader's settings: 字大 in the header; text size, animation and theme in the menu. */
+export const settings = {
+  heading: { 'zh-TW': '閱讀設定', en: 'Reading settings' } as L10n,
+  textSize: { 'zh-TW': '文字大小', en: 'Text size' } as L10n,
+  /** The header button's two glyphs: a small one and a large one. */
+  textSizeGlyphs: { 'zh-TW': '字大', en: 'AA' } as L10n,
+  textSizes: {
+    md: { 'zh-TW': '標準', en: 'Standard' },
+    lg: { 'zh-TW': '大', en: 'Large' },
+    xl: { 'zh-TW': '特大', en: 'Largest' },
+  } as Record<'md' | 'lg' | 'xl', L10n>,
+  /** The header button's name: what it is, and the size it is at now. */
+  textSizeNow: { 'zh-TW': '文字大小：{size}', en: 'Text size: {size}' } as L10n,
+  motion: { 'zh-TW': '動畫', en: 'Animation' } as L10n,
+  theme: { 'zh-TW': '深色', en: 'Dark theme' } as L10n,
+  on: { 'zh-TW': '開', en: 'On' } as L10n,
+  off: { 'zh-TW': '關', en: 'Off' } as L10n,
+} as const;
+
+// ---------------------------------------------------------------------------
 // Component strings
 // ---------------------------------------------------------------------------
 
-/** The empty chart (V8) and every empty-data Figure. */
+/**
+ * @deprecated There is no empty chart any more (brief 5.4): a chart always has a value, and a
+ * pollutant with no publishable estimate gets a sentence. These strings stay, in neutral
+ * wording, only so the old EmptyChart and Figure `empty` mode build until phase 3.
+ */
 export const emptyData = {
-  caption: { 'zh-TW': '這不是版面錯誤。這張圖要畫的資料不存在。', en: 'This is not a layout error. The data for this chart does not exist.' } as L10n,
+  caption: { 'zh-TW': '這張圖沒有實測可以畫；本站的推估在「怎麼算的」。', en: 'There is no measurement to draw here; this site’s estimate is under “How we worked it out”.' } as L10n,
   where: { 'zh-TW': '來源', en: 'Source' } as L10n,
-  none: { 'zh-TW': '沒有來源可以引用：我們找過了，沒有人量過。', en: 'There is no source to cite: we looked, and nobody has measured it.' } as L10n,
+  none: { 'zh-TW': '這一項沒有實測可以引用，本站用推估。', en: 'There is no measurement to cite for this; the site uses an estimate.' } as L10n,
   who: { 'zh-TW': '誰量得出來', en: 'Who could measure it' } as L10n,
   /** Appended to the graphic's accessible description. */
-  sr: { 'zh-TW': '這張圖是刻意留白的：座標軸和格線都在，但沒有任何資料點，因為沒有人量過。', en: 'This chart is empty on purpose: the axes and gridlines are drawn, and there are no data points, because nobody has measured this.' } as L10n,
-  panel: { 'zh-TW': '無資料', en: 'no data' } as L10n,
+  sr: { 'zh-TW': '這張圖沒有資料點：這一項沒有實測，本站用推估。', en: 'Nothing is plotted on this chart: there is no measurement for this, and the site uses an estimate.' } as L10n,
+  panel: { 'zh-TW': '見推估', en: 'see the estimate' } as L10n,
   xLabel: { 'zh-TW': '紅燈倒數（秒）', en: 'Red-light countdown (seconds)' } as L10n,
   red: { 'zh-TW': '紅燈', en: 'Red' } as L10n,
   green: { 'zh-TW': '綠燈', en: 'Green' } as L10n,
-  stroller: { 'zh-TW': '嬰兒車高度（約 0.6 公尺）', en: 'Stroller height (about 0.6 m)' } as L10n,
+  stroller: { 'zh-TW': '嬰兒車高度（約 0.6 公尺）', en: 'Pushchair height (about 0.6 m)' } as L10n,
   adult: { 'zh-TW': '大人的高度（約 1.5 公尺）', en: 'Adult height (about 1.5 m)' } as L10n,
-  heights: { 'zh-TW': '還沒有人量過的兩個高度', en: 'The two heights nobody has measured' } as L10n,
+  heights: { 'zh-TW': '兩個高度', en: 'Two heights' } as L10n,
   tableHeight: { 'zh-TW': '高度', en: 'Height' } as L10n,
   tablePanel: { 'zh-TW': '量什麼', en: 'What would be measured' } as L10n,
   tableValue: { 'zh-TW': '量測值', en: 'Measured value' } as L10n,
@@ -527,7 +719,7 @@ export const decision = {
   all: { 'zh-TW': '所有可能的結果', en: 'Every possible result' } as L10n,
 } as const;
 
-/** Time ladder (V11). */
+/** @deprecated with TimeLadder.astro (RoadOfTime replaces it; no rung is ever empty). */
 export const ladder = {
   label: { 'zh-TW': '時間的尺', en: 'The ruler of time' } as L10n,
   empty: { 'zh-TW': '沒有研究', en: 'No study' } as L10n,

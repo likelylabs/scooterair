@@ -20,19 +20,17 @@
  *   badge     EvidenceKind (or several) shown at the start of the source line
  *   secondary true = the figure rests on a secondary-confidence fact: adds the registry's
  *             secondary-confidence tag (evidence.secondary in ui.ts)
- *   empty     the empty-data state (V8): nobody has measured what this figure
- *             would show. The gap badge (gapBadge, src/data/gaps.ts) stands where the source line goes,
- *             the caption defaults to "this is not a layout error…", and `who`
- *             says who could measure it. Put an <EmptyChart> in the body.
- *   who       (with `empty`) who could fill the gap, as text
+ *   empty, who   @deprecated and ignored. There is no empty-data state any more (brief 5.4):
+ *             a figure always shows a value, and a pollutant with no publishable estimate
+ *             gets a sentence, not an empty chart. The props are still accepted so pages that
+ *             have not been rebuilt keep building; remove them from your page.
  * Slots
  *   default  the chart / table / art
  *   caption  rich caption
  *   source   rich source line, e.g. <Cite variant="chip" … />
- *   who      (with `empty`) rich "who could measure it" line, e.g. with the ask link
  */
 import type { Locale } from '@/i18n';
-import { emptyData, langHtml, typeset, ui, type EvidenceKind } from '@/i18n/ui';
+import { langHtml, typeset, ui, type EvidenceKind } from '@/i18n/ui';
 import EvidenceBadge from './EvidenceBadge.astro';
 import Phrased from './Phrased.astro';
 import Tag from './Tag.astro';
@@ -52,27 +50,27 @@ interface Props {
   tone?: 'ink' | 'exhaust' | 'clean' | 'signal';
   badge?: EvidenceKind | EvidenceKind[];
   secondary?: boolean;
+  /** @deprecated ignored */
   empty?: boolean;
+  /** @deprecated ignored */
   who?: string;
   class?: string;
 }
-const { locale, number, sample = false, id, level = 3, frame = 'rule', tone = 'ink', badge, secondary = false, empty = false, class: cls } = Astro.props;
+const { locale, number, sample = false, id, level = 3, frame = 'rule', tone = 'ink', badge, secondary = false, class: cls } = Astro.props;
 // plain-text props get the site's typography convention (Han–Latin spacing, ranges, minus: see ui.ts)
 const ts = (s: string | undefined) => (s === undefined ? s : typeset(s, locale));
 const title = ts(Astro.props.title) ?? '';
 const subtitle = ts(Astro.props.subtitle);
 const source = ts(Astro.props.source);
-const who = ts(Astro.props.who);
-const caption = ts(Astro.props.caption ?? (empty ? emptyData.caption[locale] : undefined));
+const caption = ts(Astro.props.caption);
 const badges = badge ? (Array.isArray(badge) ? badge : [badge]) : [];
-const hasWho = empty && (Boolean(who) || Astro.slots.has('who'));
 const H = `h${level}` as 'h2' | 'h3' | 'h4';
 const uid = id ?? makeId('fig');
 const hasCaption = caption || Astro.slots.has('caption');
 const hasSource = source || Astro.slots.has('source') || badges.length > 0;
 ---
 
-<figure id={id} class:list={['fig', `fig--${frame}`, `fig--${tone}`, empty && 'fig--empty', cls]} aria-labelledby={`${uid}-t`}>
+<figure id={id} class:list={['fig', `fig--${frame}`, `fig--${tone}`, cls]} aria-labelledby={`${uid}-t`}>
   <header class="fig__head">
     {(number !== undefined || sample) && (
       <p class="fig__meta">
@@ -84,32 +82,16 @@ const hasSource = source || Astro.slots.has('source') || badges.length > 0;
     {subtitle && <p class="fig__sub" set:html={langHtml(subtitle, locale)} />}
   </header>
   <div class="fig__body"><slot /></div>
-  {(hasCaption || hasSource || sample || empty) && (
+  {(hasCaption || hasSource || sample) && (
     <figcaption class="fig__foot">
       {hasCaption && <p class="fig__caption"><slot name="caption">{caption && <Fragment set:html={langHtml(caption, locale)} />}</slot></p>}
       {sample && <p class="fig__sample">{ui.sampleDataLong[locale]}</p>}
-      {empty ? (
-        <Fragment>
-          <p class="fig__source fig__source--empty">
-            <span class="fig__source-label">{ui.source[locale]}</span>
-            <EvidenceBadge kind="gap" locale={locale} />
-            <span>{emptyData.none[locale]}</span>
-          </p>
-          {hasWho && (
-            <p class="fig__who">
-              <span class="fig__source-label">{emptyData.who[locale]}</span>
-              <span><slot name="who">{who && <Fragment set:html={langHtml(who, locale)} />}</slot></span>
-            </p>
-          )}
-        </Fragment>
-      ) : (
-        hasSource && (
-          <p class="fig__source">
-            <span class="fig__source-label">{ui.source[locale]}</span>
-            {badges.map((b, i) => <EvidenceBadge kind={b} locale={locale} secondary={secondary && i === badges.length - 1} />)}
-            <slot name="source">{source && <Fragment set:html={langHtml(source, locale)} />}</slot>
-          </p>
-        )
+      {hasSource && (
+        <p class="fig__source">
+          <span class="fig__source-label">{ui.source[locale]}</span>
+          {badges.map((b, i) => <EvidenceBadge kind={b} locale={locale} secondary={secondary && i === badges.length - 1} />)}
+          <slot name="source">{source && <Fragment set:html={langHtml(source, locale)} />}</slot>
+        </p>
       )}
     </figcaption>
   )}
@@ -182,9 +164,9 @@ const hasSource = source || Astro.slots.has('source') || badges.length > 0;
     gap: var(--sp-2);
     padding-block-start: var(--sp-3);
     border-block-start: 1px solid var(--line);
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     line-height: var(--lh-snug);
-    color: var(--ink-3);
+    color: var(--ink-2);
   }
   .fig__caption {
     max-inline-size: 44rem;
@@ -206,27 +188,5 @@ const hasSource = source || Astro.slots.has('source') || badges.length > 0;
   }
   .fig__source-label:lang(en) {
     text-transform: uppercase;
-  }
-  /* empty-data state: the footer is where the absence is stated, so it reads at full strength */
-  .fig--empty .fig__caption {
-    color: var(--ink);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-  }
-  .fig__source--empty,
-  .fig__who {
-    color: var(--ink-2);
-  }
-  .fig__who {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--sp-1) var(--sp-2);
-    font-size: var(--fs-sm);
-    color: var(--ink);
-  }
-  .fig__who .fig__source-label {
-    font-size: var(--fs-xs);
-    color: var(--ink-2);
   }
 </style>

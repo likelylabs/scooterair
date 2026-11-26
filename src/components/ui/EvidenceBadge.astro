@@ -1,8 +1,12 @@
 ---
 /**
- * EvidenceBadge — what kind of evidence stands behind a claim. Eight kinds
- * (blueprint Part 2): the registry's six evidence types plus two for the
- * site's own voice. Each is told apart three ways, never by colour alone:
+ * EvidenceBadge — the FINER registry type behind a claim. Since the redesign this is for
+ * /evidence/ and /sources/ only, where it may sit beside a reader chip (brief 4.1). Every other
+ * page uses the five chips: <KindChip> (and <EstimateValue> for an estimated number).
+ * The `gap` kind is @deprecated: the old "nobody has measured" badge is gone, and the kind
+ * stays only until the pages that still pass it are rebuilt (phase 3).
+ *
+ * The kinds: the registry's evidence types plus two for the site's own voice. Each is told apart three ways, never by colour alone:
  * its words, its icon and its edge.
  *
  *   measured-tw    solid, filled     crosshair   台灣實測 / Measured in Taiwan
@@ -11,6 +15,7 @@
  *   international  solid, outline    globe       國際證據 / International evidence
  *   market-tw      thin, tinted      price tag   市場公開價格 / Published prices
  *   derived        dashed            sums        本站計算 / Our arithmetic
+ *   estimate       dashed, ochre     hatched dot 推估 / Estimate
  *   inference      dashed            arrow       我們的推論 / Our inference
  *   gap            open brackets     hollow ends 證據缺口 / Evidence gap
  *
@@ -106,6 +111,13 @@ const icon = variant === 'icon';
     border-color: var(--line-strong);
     background: var(--bg-sunken);
     padding-block: calc(0.2em + 0.5px);
+  }
+  /* the site's own estimate: the 推估 chip's dashed ochre edge */
+  .ev--estimate {
+    border-style: dashed;
+    border-color: var(--estimate);
+    background: var(--estimate-wash);
+    color: var(--estimate-ink);
   }
   /* dashed: our own sums and our own inference */
   .ev--derived,

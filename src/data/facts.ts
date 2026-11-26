@@ -29,12 +29,13 @@
 // unique across all groups. When a fact's meaning changes, give it a new id and delete the old
 // one so stale references fail the type check.
 
-import type { ChainLink, Confidence, Datum, Evidence, L10n, Locale, ResearchRef } from './types.ts';
-import { confidenceLabels, evidenceLabels, t, v } from './types.ts';
+import type { ChainLink, Confidence, Datum, Evidence, L10n, Locale, ReaderKind, ReaderPlace, ResearchRef } from './types.ts';
+import { confidenceLabels, evidenceLabels, readerChipText, readerKind, t, v } from './types.ts';
 import type { SourceId } from './sources.ts';
 import { formatCitation, shortCitation, sourceUrl } from './sources.ts';
 import { economics } from './facts-economics.ts';
 import { inspection, intersection, smell, acute, longterm, vulnerable, levers } from './facts-redlight.ts';
+import { kerb, masks } from './facts-air.ts';
 
 export interface FactInput {
   /** Raw values for charts and calculations. May be empty for qualitative facts (e.g. an IARC group). */
@@ -73,6 +74,14 @@ export interface FactInput {
   chainLink?: ChainLink | null;
   /** Other links this fact is also needed for. */
   alsoLinks?: ChainLink[];
+  /**
+   * The reader chip when it differs from the default for `evidence` (types.ts evidenceReaderKind):
+   * 'official' for WHO guideline values and other official statements abroad, 'measured' for
+   * instrument readings abroad. Read it with readerKind(fact).
+   */
+  readerKind?: ReaderKind;
+  /** The place after the chip when it differs from the default (null: no place). */
+  readerPlace?: ReaderPlace | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -2264,6 +2273,7 @@ const standards = {
     locator: 'Table 0.1, AQG level column',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       'WHO指引是建議值，不具法律效力；24小時值是第99百分位數（每年可超過3至4天）。',
       'WHO guidelines are recommendations, not legal limits; the 24-hour value is a 99th percentile (3–4 exceedance days a year).',
@@ -2293,6 +2303,7 @@ const standards = {
     locator: 'Table 0.1, interim targets 1–4',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       '過渡目標是給污染較重的地方逐步改善用的階段目標，不是安全值；WHO的指引值是5 µg/m³。',
       'Interim targets are steps for places with heavier pollution to work towards, not safe levels; the WHO guideline itself is 5 µg/m³.',
@@ -2316,16 +2327,19 @@ const standards = {
     ),
     period: t('2021年', '2021'),
     place: GLOBAL,
-    sources: ['who-2021-aqg'],
+    sources: ['who-2021-aqg', 'who-2010-indoor-air-guidelines'],
     locator: 'Table 0.1 (NO2 10/25 µg/m3, CO 4 mg/m3 24-h); Table 0.2 (CO 8-h 10, 1-h 35, 15-min 100 mg/m3, not re-evaluated)',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
+    readerPlace: 'international',
     caveat: t(
       '一氧化碳的8小時、1小時與15分鐘值（10、35、100 mg/m³）沿用舊版，2021年未重新評估。',
       'The 8-hour, 1-hour and 15-minute CO values (10, 35 and 100 mg/m³) carry over from earlier guidelines and were not re-evaluated in 2021.',
     ),
     chainLink: 3,
-    research: '03 §2',
+    editorNote: 'Lane A check of the 15-minute value (brief section 11), 2026-11-26: the value 100 mg/m3 rests on two WHO texts read at the primary source by earlier verifiers, the 2021 guidelines Table 0.2 (research/03-health.md §2, file 03 opened the IRIS PDF) and the 2010 indoor-air guidelines (research/redlight/smell-chemistry.json#who-co-benzene, PDF opened, CO values listed: 100 mg/m3 15 min, 35 mg/m3 1 h, 10 mg/m3 8 h). Re-opening both today was blocked (IRIS returns a JavaScript shell, NCBI Bookshelf a reCAPTCHA, the afro.who.int mirror HTTP 502), so the confidence rests on those recorded readings. Slot who.co15min_ppm = 100 / 1.146 = 87.3, printed 87.',
+    research: '03 §2; redlight/smell-chemistry#who-co-benzene',
   },
   'who-ufp-good-practice': {
     data: { lowPnc: v(1000, 'particles/cm3', { bound: 'lt' }), highPnc: v(10000, 'particles/cm3', { bound: 'gt' }) },
@@ -2340,6 +2354,7 @@ const standards = {
     locator: '"Low PNC can be considered < 1 000 particles/cm3 (24-hour mean). High PNC can be considered > 10 000 particles/cm3 (24-hour mean)"',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       '每立方公分10,000個的界線是WHO用來區分高低濃度的良好作法說明，不是健康指引值；WHO表示證據不足以訂定數值。',
       'The 10,000 particles/cm³ line is a WHO good-practice statement for telling high from low concentrations, not a health guideline; WHO says the evidence is too thin to set a value.',
@@ -2359,6 +2374,7 @@ const standards = {
     sources: ['who-europe-2018-noise'],
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       '這是以歐洲研究為主的區域指引，針對所有道路交通而非機車；台灣一項幼兒研究中，道路噪音與氣喘盛行率沒有顯著關聯。',
       'A European guideline built mostly on European studies, covering all road traffic rather than scooters; in one Taiwanese kindergarten study road noise was not significantly associated with asthma prevalence.',
@@ -2386,6 +2402,7 @@ const hazard = {
     locator: 'PR 213: "The Working Group concluded that gasoline exhaust was possibly carcinogenic to humans (Group 2B), a finding unchanged from the previous evaluation in 1989."',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       '第2B級比柴油廢氣的第1級弱；柴油廢氣的分級，不能套用在燃油機車（汽油引擎）的廢氣上。國際癌症研究機構分級的是危害，不是日常暴露量下的風險。',
       'Group 2B is weaker than diesel exhaust\'s Group 1; the diesel classification does not apply to gasoline scooter exhaust. IARC classifies hazard, not the risk at everyday doses.',
@@ -2407,6 +2424,7 @@ const hazard = {
     sources: ['iarc-pr213-2012', 'lancet-onc-2012-exhausts'],
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       '這一列只是對照：台灣的機車幾乎都是汽油引擎，柴油的分級不適用於機車廢氣。',
       'For contrast only: Taiwan\'s scooters are almost all gasoline-engined, so the diesel classification does not apply to scooter exhaust.',
@@ -2428,6 +2446,7 @@ const hazard = {
     locator: 'PR 221: "there is sufficient evidence that exposure to outdoor air pollution causes lung cancer (Group 1)"; PM "was also classified as carcinogenic to humans (Group 1)"',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       '這是IARC對一般室外空氣污染的結論；機車廢氣是其中一部分來源，但IARC沒有量化機車的比例。',
       'This is IARC\'s conclusion about outdoor air pollution in general; scooter exhaust is one contributing source, but IARC does not quantify its share.',
@@ -2448,6 +2467,7 @@ const hazard = {
     locator: 'Vol. 120 §6: "Benzene is carcinogenic to humans (Group 1)." "Benzene causes acute myeloid leukaemia in adults."',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'official',
     caveat: t(
       'IARC分類的是危害，不是日常暴露量下的風險；也沒有量化機車廢氣中苯造成的風險。',
       'IARC classifies hazard, not the risk at everyday doses, and does not quantify the risk from benzene in scooter exhaust.',
@@ -2958,6 +2978,7 @@ const children = {
     locator: 'Abstract: "The average in-pram concentration of fine particles was always higher by up to 44% compared with adult breathing height"',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'measured',
     caveat: t(
       '「最多44%」是各條件中的最大值，不是平均差異，且只針對細微粒；它不代表「兒童比成人多吸44%污染」。其他研究結果不一，有的發現嬰兒車高度反而較低或沒有差異（見文獻回顧）。台灣沒有兒童高度的實測研究。' + ABSTRACT_ONLY['zh-TW'],
       '"Up to 44%" is the maximum across conditions, not an average, and only for fine particles; it does not mean children breathe 44% more pollution. Other studies are mixed, some finding stroller height lower or no different (see the review). No child-height measurements exist for Taiwan. ' + ABSTRACT_ONLY.en,
@@ -3028,6 +3049,7 @@ const children = {
     locator: 'Abstract: children "exposed to > 20% higher concentrations on six days (p < 0.01)", one day > 80%',
     confidence: 'verified',
     evidence: 'international',
+    readerKind: 'measured',
     caveat: t(
       '單一國外研究，使用低價感測器，只有8天；摘要沒有說兩個高度是不是同時量的。台灣沒有兒童高度的實測研究。' + ABSTRACT_ONLY['zh-TW'],
       'A single study abroad using low-cost sensors over eight days; the abstract does not say whether the two heights were measured at the same time. No child-height measurements exist for Taiwan. ' + ABSTRACT_ONLY.en,
@@ -3060,6 +3082,8 @@ export const factGroups = {
   longterm,
   vulnerable,
   levers,
+  kerb,
+  masks,
 };
 export type Topic = keyof typeof factGroups;
 
@@ -3086,6 +3110,8 @@ export const topicLabels: Record<Topic, L10n> = {
   longterm: t('長期暴露與健康', 'Long-term exposure and health'),
   vulnerable: t('高暴露與易感族群', 'Most-exposed and susceptible groups'),
   levers: t('政策工具', 'Policy levers'),
+  kerb: t('路邊的空氣與參考值', 'Kerbside air and reference values'),
+  masks: t('口罩擋得住什麼', 'What masks do and do not stop'),
 };
 
 const merged = {
@@ -3106,6 +3132,8 @@ const merged = {
   ...longterm,
   ...vulnerable,
   ...levers,
+  ...kerb,
+  ...masks,
 };
 export type FactId = keyof typeof merged;
 export type Fact = Omit<FactInput, 'chainLink'> & { id: FactId; topic: Topic; chainLink: ChainLink | null };
@@ -3157,6 +3185,8 @@ export interface LocalizedFact {
   confidence: Confidence;
   evidence: Evidence;
   badges: { confidence: string; evidence: string; confidenceDescription: string; evidenceDescription: string };
+  /** The reader chip (brief 4.1): kind for KindChip, and its text with place ('實測・台灣'). */
+  chip: { kind: ReaderKind; text: string };
   citations: LocalizedCitation[];
   data: Record<string, Datum>;
 }
@@ -3183,6 +3213,7 @@ export function localizeFact(idOrFact: FactId | Fact, locale: Locale): Localized
       confidenceDescription: confidenceLabels[f.confidence].description[locale],
       evidenceDescription: evidenceLabels[f.evidence].description[locale],
     },
+    chip: { kind: readerKind(f), text: readerChipText(f, locale) },
     citations: f.sources.map((id) => ({
       id,
       short: shortCitation(id, locale),

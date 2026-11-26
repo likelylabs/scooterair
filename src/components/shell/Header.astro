@@ -1,10 +1,14 @@
 ---
 /**
- * Header — wordmark, primary nav, language switch, theme toggle.
+ * Header — 48 px: the wordmark (the home link), 字大, the language switch and the menu
+ * (brief 3.1). From 62em the five menu items also sit inline.
  *
- * Wide screens show the nav inline. Narrow screens get a <details> menu that
- * overlays the page (no layout shift, works without JavaScript); a small
- * script adds Escape / outside-click / link-click closing.
+ * The menu is a <details> that overlays the page (no layout shift, works without JavaScript):
+ * the five items of the main menu, then the reader's settings (text size, animation, dark
+ * theme). A small script adds Escape / outside-click / link-click closing.
+ *
+ * The header is sized in px on purpose: 字大 and a large browser font scale the page, not its
+ * four controls, so they always fit a 320 px screen. Every control is 48 × 48 px, 8 px apart.
  *
  * Props
  *   locale  Locale
@@ -13,7 +17,8 @@ import { href, htmlLang, switchLocalePath, type Locale } from '@/i18n';
 import { nav, ui } from '@/i18n/ui';
 import Icon from '@/components/ui/Icon.astro';
 import Wordmark from './Wordmark.astro';
-import ThemeToggle from './ThemeToggle.astro';
+import TextSize from './TextSize.astro';
+import Settings from './Settings.astro';
 
 interface Props {
   locale: Locale;
@@ -42,26 +47,29 @@ const items = nav.map((item) => {
     </nav>
 
     <div class="site-header__tools">
-      <a class="lang-switch" data-lang-switch href={switchLocalePath(path, other)} lang={htmlLang[other]} hreflang={htmlLang[other]} title={ui.switchLanguageHint[locale]}>
+      <TextSize locale={locale} />
+      <a class="tool lang-switch" data-lang-switch href={switchLocalePath(path, other)} lang={htmlLang[other]} hreflang={htmlLang[other]} title={ui.switchLanguageHint[locale]}>
         <span class="lang-switch__short" aria-hidden="true">{ui.switchLanguageShort[locale]}</span>
         <span class="lang-switch__long">{ui.switchLanguage[locale]}</span>
       </a>
-      <ThemeToggle locale={locale} />
       <details class="menu" data-menu>
-        <summary aria-label={ui.menu[locale]}>
-          <span class="menu__open"><Icon name="menu" size="1.5rem" /></span>
-          <span class="menu__close"><Icon name="close" size="1.5rem" /></span>
+        <summary class="tool menu__btn">
+          <span class="menu__icon menu__open"><Icon name="menu" size="24px" /></span>
+          <span class="menu__icon menu__close"><Icon name="close" size="24px" /></span>
+          <span class="menu__word">{ui.menu[locale]}</span>
         </summary>
-        <nav class="menu__panel" aria-label={ui.primaryNav[locale]}>
-          <ul>
-            <li><a href={href('/', locale)} aria-current={path === href('/', locale) ? 'page' : undefined}>{ui.home[locale]}</a></li>
-            {items.map((i) => (
-              <li>
-                <a href={i.url} aria-current={i.current ? 'page' : undefined}>{i.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <div class="menu__panel">
+          <nav class="menu__nav" aria-label={ui.primaryNav[locale]}>
+            <ul>
+              {items.map((i) => (
+                <li>
+                  <a href={i.url} aria-current={i.current ? 'page' : undefined}>{i.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <Settings locale={locale} />
+        </div>
       </details>
     </div>
   </div>
@@ -78,14 +86,57 @@ const items = nav.map((item) => {
   .site-header__bar {
     display: flex;
     align-items: center;
-    gap: var(--sp-4);
+    gap: 8px;
     block-size: var(--header-h);
+  }
+  /* px inside the header: see the note at the top of this file */
+  .site-header :global(.wordmark) {
+    min-block-size: 48px;
+    gap: 8px;
+  }
+  .site-header :global(.mark) {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+  .site-header :global(.wordmark__name) {
+    font-size: 19px;
+  }
+  .site-header :global(.wordmark__name:lang(en)) {
+    font-size: 21px;
+  }
+  .site-header :global(.wordmark__alt) {
+    font-size: 14px;
+    padding-inline-start: 8px;
   }
   .site-header__tools {
     display: flex;
     align-items: center;
-    gap: var(--sp-1);
+    gap: 8px;
     margin-inline-start: auto;
+  }
+  /* A header control is a 48 px square to the finger and a 38 px outlined button to the eye. */
+  .site-header :global(.tool) {
+    position: relative;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .site-header :global(.tool)::before {
+    content: '';
+    position: absolute;
+    inset: 5px 0;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+  .site-header :global(.tool:hover) {
+    background: none;
+  }
+  .site-header :global(.tool:hover)::before {
+    background: var(--bg-sunken);
+    z-index: -1;
+  }
+  .site-header :global(.tool:focus-visible) {
+    outline-offset: -3px;
   }
 
   /* Inline nav: wide screens only */
@@ -95,7 +146,7 @@ const items = nav.map((item) => {
   }
   .site-nav ul {
     display: flex;
-    gap: clamp(0.25rem, 1.2vw, 1.25rem);
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -104,43 +155,29 @@ const items = nav.map((item) => {
     display: inline-flex;
     align-items: center;
     block-size: var(--header-h);
-    padding-inline: 0.4rem;
-    color: var(--ink-2);
-    font-size: var(--fs-sm);
+    min-inline-size: 48px;
+    justify-content: center;
+    padding-inline: 8px;
+    color: var(--ink);
+    font-size: 16px;
     font-weight: var(--fw-medium);
     text-decoration: none;
     white-space: nowrap;
     /* painted underline, like a lane edge */
     box-shadow: inset 0 0 0 transparent;
-    transition: box-shadow var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+    transition: box-shadow var(--dur-1) var(--ease-out);
   }
   .site-nav a:hover {
     color: var(--ink);
     box-shadow: inset 0 -3px 0 var(--line-strong);
   }
   .site-nav a[aria-current='page'] {
-    color: var(--ink);
     font-weight: var(--fw-bold);
     box-shadow: inset 0 -3px 0 var(--ink);
   }
 
   .lang-switch {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-inline-size: var(--tap);
-    block-size: var(--tap);
-    padding-inline: 0.5rem;
-    border-radius: var(--radius-2);
-    color: var(--ink);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .lang-switch:hover {
-    background: var(--bg-sunken);
-    color: var(--ink);
+    font-stretch: 90%;
   }
   /* Narrow: short visible label, full label for assistive tech */
   .lang-switch__long {
@@ -152,32 +189,35 @@ const items = nav.map((item) => {
     white-space: nowrap;
   }
 
-  /* Overlay menu: narrow screens only */
+  /* The menu */
   .menu {
     position: static;
   }
-  .menu > summary {
-    display: grid;
-    place-items: center;
-    inline-size: var(--tap);
-    block-size: var(--tap);
-    border-radius: var(--radius-2);
+  .menu__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     list-style: none;
-    cursor: pointer;
   }
-  .menu > summary::-webkit-details-marker {
+  .menu__btn::-webkit-details-marker {
     display: none;
   }
-  .menu > summary:hover {
-    background: var(--bg-sunken);
-  }
-  .menu > summary span {
-    grid-area: 1 / 1;
+  .menu__icon {
     display: grid;
   }
   .menu:not([open]) .menu__close,
   .menu[open] .menu__open {
     display: none;
+  }
+  /* the word 選單 beside the icon wherever there is room for it; always there for a screen reader */
+  .menu__word {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   .menu__panel {
     position: absolute;
@@ -186,28 +226,32 @@ const items = nav.map((item) => {
     max-block-size: calc(100vh - var(--header-h));
     max-block-size: calc(100dvh - var(--header-h));
     overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 var(--gutter) var(--sp-4);
     background: var(--bg);
     border-block-end: var(--rule-stop) solid var(--ink);
   }
-  .menu__panel ul {
+  .menu__nav ul {
     margin: 0;
-    padding: var(--sp-2) var(--gutter) var(--sp-5);
+    padding: var(--sp-2) 0 0;
     list-style: none;
   }
-  .menu__panel li + li {
-    border-block-start: 1px solid var(--line);
+  .menu__nav li {
+    border-block-end: 1px solid var(--line);
   }
-  .menu__panel a {
+  .menu__nav a {
     display: flex;
     align-items: center;
-    min-block-size: 3.25rem;
+    min-block-size: 3.5rem;
     color: var(--ink);
     font-size: var(--fs-lg);
     font-weight: var(--fw-bold);
+    line-height: 1.3;
     text-decoration: none;
   }
-  .menu__panel a[aria-current='page']::before {
+  .menu__nav a[aria-current='page']::before {
     content: '';
+    flex: none;
     inline-size: 0.75rem;
     block-size: 0.75rem;
     margin-inline-end: 0.75rem;
@@ -215,15 +259,28 @@ const items = nav.map((item) => {
     border-radius: 50%;
   }
 
+  @media (min-width: 25em) {
+    .menu__btn {
+      padding-inline: 10px 12px;
+    }
+    .menu__word {
+      position: static;
+      inline-size: auto;
+      block-size: auto;
+      clip-path: none;
+      font-size: 16px;
+    }
+  }
   @media (min-width: 62em) {
+    .site-header__bar {
+      position: relative;
+      gap: 16px;
+    }
     .site-nav {
       display: block;
     }
-    .menu {
-      display: none;
-    }
     .site-header__tools {
-      margin-inline-start: var(--sp-2);
+      margin-inline-start: 0;
     }
     .lang-switch__short {
       display: none;
@@ -233,6 +290,29 @@ const items = nav.map((item) => {
       inline-size: auto;
       block-size: auto;
       clip-path: none;
+    }
+    /* the five items are inline, so the menu holds the settings only */
+    .menu__nav {
+      display: none;
+    }
+    .menu__panel {
+      inset-inline: auto 0;
+      inline-size: 22rem;
+      padding-block-start: var(--sp-2);
+      border: 2px solid var(--ink);
+      border-block-start: 0;
+      border-radius: 0 0 var(--radius-3) var(--radius-3);
+    }
+    :global(html:not(.js)) .menu {
+      display: none; /* nothing in it without scripting */
+    }
+  }
+  @media (forced-colors: active) {
+    .site-header :global(.tool) {
+      border: 0;
+    }
+    .site-header :global(.tool)::before {
+      border-color: ButtonText;
     }
   }
 </style>
@@ -258,7 +338,6 @@ const items = nav.map((item) => {
       const next = e.relatedTarget as Node | null;
       if (next && !menu.contains(next)) close();
     });
-    window.matchMedia('(min-width: 62em)').addEventListener('change', () => close());
   });
 
   // Language switches (header and footer) keep the reader's place: both languages use the same

@@ -1,22 +1,76 @@
 // Strings used inside illustrations (src/components/art/**), in both languages.
-// Owned by the art workstream. Same conventions as ui.ts: every value is an
-// L10n pair; Chinese uses full-width punctuation; English is written, not
-// translated.
+// Owned by the art lane. Same conventions as ui.ts: every value is an L10n
+// pair; Chinese is written first, with full-width punctuation, at
+// upper-primary reading level; English follows it sentence for sentence.
 //
-// Copy rules that bind these strings (editorial blueprint, Part 2):
-//  - the scene never states or implies a concentration (R11);
-//  - carbon monoxide, benzene and ultrafine particles are never ranked by
-//    harm (R3). What can be said about smell is only what a checked source
-//    supports: carbon monoxide has no smell (WHO); benzene is unlikely to be
-//    smelled at roadside levels (thresholds are parts per million). Nothing
-//    is said about the smell of ultrafine particles: there is no source;
-//  - the stipple is traffic's, not the scooters' (3.0);
-//  - "zero" is only ever a scooter's own exhaust (R8).
+// Copy rules that bind these strings (docs/redesign-brief.md):
+//  - the pictures DO show an amount now: sparse rings and dots are the
+//    street's own air; where people stand there are more, by the site's
+//    estimate (推估); the dark patches at the tailpipes are drawn for the eye
+//    (5.1). Every alt text says so (scene.ts → sceneAlt);
+//  - one word for the site's own air numbers: 推估. A scene never prints a
+//    number itself: numbers come from src/data/estimate.ts (3.3);
+//  - the three marks are named the same way everywhere: 油氣（沒燒完的汽油）
+//    / fuel vapour, 一氧化碳 / carbon monoxide, 微粒 / particles (6.6);
+//  - carbon monoxide, benzene and particles are never ranked by harm;
+//  - "zero" is only ever a scooter's own exhaust: tyre and brake dust and the
+//    other traffic stay in the electric pictures;
+//  - riders are never blamed: 引擎沒熄火, never 騎士不熄火.
+//
+// The tag on every scene (示意圖｜廢氣其實大多看不見) and the sentence every
+// alt text ends with live in ui.ts (`illustration`), shared with the film.
+//
+// The groups from `illustration` down to `cycle` serve the old scenes
+// (StreetScene, PollutantKey, SceneCompare, SignalCycle, SmellStrip). They go
+// when those components are deleted (brief 5.4, phase 3). New strings are in
+// `alt2`, `marks` and `range`, directly below.
 
 import type { L10n, Locale } from './index';
 
 export const art = {
-  /** Printed inside every frame: the scene is a drawing, not a measurement. */
+  /**
+   * Building blocks of a scene's alt text (scene.ts → sceneAlt): what the
+   * picture shows (written by the scene), then the scenario, then one of the
+   * closing sentences. The closing sentence for a scene with petrol scooters
+   * is ui.ts → illustration.altNote; `pack` here repeats it word for word so
+   * that this file can be loaded on its own by scripts and tests.
+   */
+  alt2: {
+    scenario: {
+      few: { 'zh-TW': '畫的是旁邊停了幾輛機車（{lo} 到 {hi} 輛）的情境。', en: 'It draws a few scooters beside you ({lo} to {hi}).' } as L10n,
+      dozen: { 'zh-TW': '畫的是旁邊停了十來輛機車（{lo} 到 {hi} 輛）的情境。', en: 'It draws a dozen or so scooters beside you ({lo} to {hi}).' } as L10n,
+      full: { 'zh-TW': '畫的是旁邊停滿機車（{lo} 到 {hi} 輛）的情境。', en: 'It draws a full box of scooters beside you ({lo} to {hi}).' } as L10n,
+    },
+    pack: {
+      'zh-TW': '這是示意圖：人站的地方畫了多少，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
+      en: 'This is an illustration: how much is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
+    } as L10n,
+    electric: {
+      'zh-TW': '這是示意圖：電動機車沒有排氣管，畫面上只有街上原本就有的稀疏圈圈和小點。',
+      en: 'This is an illustration: electric scooters have no tailpipe, so the picture shows only the sparse rings and dots of the air the street already holds.',
+    } as L10n,
+    plain: { 'zh-TW': '這是示意圖。', en: 'This is an illustration.' } as L10n,
+  },
+
+  /** The three kinds of mark, named once (screen 2's key, any legend). */
+  marks: {
+    ribbon: { 'zh-TW': '聞得到：油氣（沒燒完的汽油）', en: 'You can smell it: fuel vapour (unburnt petrol)' } as L10n,
+    ring: { 'zh-TW': '聞不到：一氧化碳', en: 'No smell: carbon monoxide' } as L10n,
+    dot: { 'zh-TW': '看不到：微粒', en: 'Too small to see: particles' } as L10n,
+  },
+
+  /** AirRange: the two patches that show the two ends of an estimate. */
+  range: {
+    lo: { 'zh-TW': '範圍低的一頭', en: 'Low end of the range' } as L10n,
+    hi: { 'zh-TW': '範圍高的一頭', en: 'High end of the range' } as L10n,
+    rings: { 'zh-TW': '一格 {n} 個圈', en: '{n} rings in a patch' } as L10n,
+    alt: {
+      'zh-TW': '示意圖：同一個推估的兩頭。{which}，一格畫 {n} 個圈；圈圈越密，一氧化碳越多。',
+      en: 'Illustration: the two ends of one estimate. {which}: {n} rings in a patch. More rings mean more carbon monoxide.',
+    } as L10n,
+  },
+
+  /** Printed inside every frame: the scene is a drawing, not a measurement. (Old scenes; the new tag is ui.ts → illustration.tag.) */
   illustration: { 'zh-TW': '示意圖・不是量測', en: 'Illustration, not a measurement' } as L10n,
   unitCm: { 'zh-TW': '公分', en: 'cm' } as L10n,
 

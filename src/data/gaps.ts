@@ -207,7 +207,7 @@ export const gaps = {
     chainLink: 6,
     title: t('上學途中與機車後座的兒童', 'Children on the school run and on the pillion'),
     statement: t(
-      '1992年冬天，台北一項研究量過學生上學途中的揮發性有機物，坐機車時比搭公車高；那是三十多年前的車隊與燃料。之後，我們沒有找到台灣兒童上學途中、在校門口或坐在機車後座時吸入什麼的量測。',
+      '1992年冬天，台北一項研究量過學生上學途中的揮發性有機物，坐機車時比搭公車高；那是三十多年前的車和燃料。之後，我們沒有找到台灣兒童上學途中、在校門口或坐在機車後座時吸入什麼的量測。',
       'In winter 1992 a Taipei study measured volatile organic compounds on students\' journeys to school and found more on motorcycles than in buses; that was a fleet and fuels of more than thirty years ago. Since then, we found no measurement of what Taiwanese children breathe on the way to school, at the school gate or riding pillion on a scooter.',
     ),
     whyItMatters: t('國外研究顯示每分鐘劑量以交通途中最高；在台灣，坐機車上下學的孩子有多少，我們也沒有找到官方統計。', 'Studies abroad find dose per minute highest in transport; we also found no official figure for how many Taiwanese children travel to school by scooter.'),
@@ -261,15 +261,15 @@ export const gaps = {
   },
   'gap-high-emitter-share': {
     chainLink: 1,
-    title: t('最髒的機車占多少排放', 'How much the dirtiest scooters emit'),
+    title: t('排最多的機車占多少排放', 'How much the dirtiest scooters emit'),
     statement: t(
-      '定檢告訴我們到檢機車中有多少不合格，而且車齡17年以上的不合格率較高。空氣污染防制法允許主管機關用遙測篩檢路上的車輛，但我們沒有找到公開的台灣機車遙測研究或篩檢結果，因此不知道最髒的一小部分機車占多少排放。',
+      '定檢告訴我們到檢機車中有多少不合格，而且車齡17年以上的不合格率較高。空氣污染防制法允許主管機關用遙測篩檢路上的車輛，但我們沒有找到公開的台灣機車遙測研究或篩檢結果，因此不知道排最多的一小部分機車占多少排放。',
       'Inspections tell us how many of the scooters that turn up fail, and failure rates are higher at 17 years and over. The Air Pollution Control Act lets officials screen vehicles on the road by remote sensing, but we found no published remote-sensing study or screening results for Taiwanese scooters, so the share of emissions from the dirtiest few is unknown.',
     ),
     whyItMatters: t('如果少數車占大部分排放，抓出高污染車會比全面汰換更有效。', 'If a few scooters emit most, finding high emitters could matter more than replacing everything.'),
     wouldClose: t('在路邊以遙測儀器量測大量行經的機車，並公布結果。', 'Roadside remote sensing of large numbers of passing scooters, with the results published.'),
     whoCouldMeasure: t(
-      '我們提議由環境部或各縣市環保局公開既有的遙測篩檢資料；如果還沒有，就在路邊用遙測設備量大量行經的機車，找出最髒的一小部分機車占多少排放。',
+      '我們提議由環境部或各縣市環保局公開既有的遙測篩檢資料；如果還沒有，就在路邊用遙測設備量大量行經的機車，找出排最多的一小部分機車占多少排放。',
       'We propose that the environment ministry or city environmental protection bureaus publish whatever remote-sensing screening data they hold, or, if there are none, use roadside remote sensing on large numbers of passing scooters to find what share of emissions comes from the dirtiest few.',
     ),
     editorNote: 'Found-not, not proven absent: the policy-idling check ran with the search budget exhausted and did not retrieve smoky-vehicle (烏賊車) or screening statistics (policy-idling gaps 0). APCA art. 46 allows remote-sensing screening (redlight/policy-idling#apca-inspection-and-reporting).',

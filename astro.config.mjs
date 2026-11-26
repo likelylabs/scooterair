@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
@@ -11,6 +12,8 @@ import { SKIP, coveredChars, scanDist } from './scripts/display-font.mjs';
 // an http:// origin for a custom domain, so the scheme is forced here, for any caller.
 const site = (process.env.SITE_URL || 'https://scooterair.tw').replace(/^http:\/\//i, 'https://').replace(/\/+$/, '');
 const base = process.env.BASE_PATH || '/';
+/** The base path as a URL path prefix with both slashes: '/' or '/scooterair/'. */
+const basePrefix = `/${base.replace(/^\/+|\/+$/g, '')}/`.replace(/^\/\/$/, '/');
 
 /**
  * The CJK display face (@fontsource/noto-sans-tc, weight 900) lists a .woff
@@ -81,6 +84,38 @@ const robots = {
   },
 };
 
+/**
+ * Which built pages stay out of the sitemap. A sitemap must list only pages that may be indexed,
+ * so anything that tells crawlers `noindex` is left out: every redirect page (src/layouts/Redirect.astro,
+ * e.g. /problem/, /unmeasured/, /questions/how-much/, /questions/electric/) and the print sheets.
+ * The decision is read from the built HTML itself, so a page that becomes a redirect leaves the
+ * sitemap without anyone editing this file. The builders' style guides are not built in production
+ * at all (their getStaticPaths returns nothing), and are named here as well so a dev-mode build
+ * cannot list them either.
+ */
+let outDir = null;
+const noindexPages = {
+  name: 'scooterair:noindex-pages',
+  hooks: {
+    'astro:config:done': ({ config }) => {
+      outDir = fileURLToPath(config.outDir);
+    },
+  },
+};
+const UTILITY = /^(en\/)?(styleguide(-[a-z]+)?|print\/[^/]+)\/$/;
+function indexable(pageUrl) {
+  const path = new URL(pageUrl).pathname;
+  const rel = decodeURIComponent(path.startsWith(basePrefix) ? path.slice(basePrefix.length) : path.replace(/^\//, ''));
+  if (UTILITY.test(rel)) return false;
+  if (!outDir) return true;
+  try {
+    const head = readFileSync(join(outDir, rel, 'index.html'), 'utf8').slice(0, 8000);
+    return !/<meta\b[^>]*name=["']?robots["']?[^>]*content=["'][^"']*noindex/i.test(head) && !/<meta\b[^>]*http-equiv=["']?refresh/i.test(head);
+  } catch {
+    return true;
+  }
+}
+
 /** The sitemap's language code for Chinese is the one the pages declare (src/i18n htmlLang). */
 const ZH = 'zh-Hant-TW';
 
@@ -100,10 +135,10 @@ export default defineConfig({
         if (zh && !item.links.some((l) => l.lang === 'x-default')) item.links.push({ lang: 'x-default', url: zh.url });
         return item;
       },
-      // out of the sitemap: utility pages, the /problem/ → /questions/ redirect, and the
-      // print sheets under /print/, which are noindex (a sitemap must not list those)
-      filter: (page) => !/\/(styleguide(-[a-z]+)?|problem|print\/[^/]+)\/$/.test(page),
+      // out of the sitemap: every noindex page (redirects, print sheets) and the style guides
+      filter: indexable,
     }),
+    noindexPages,
     headlineFont,
     robots,
   ],

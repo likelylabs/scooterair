@@ -20,17 +20,25 @@ export * from './facts.ts';
 export * from './series.ts';
 export * from './claims-policy.ts';
 export * from './gaps.ts';
+export * from './answers.ts';
+export * from './estimate.ts';
 export * from './chain.ts';
 
 import { getSource, type SourceId, type Source } from './sources.ts';
 import { facts, type FactId } from './facts.ts';
 import { series as seriesRecord, type SeriesId } from './series.ts';
 import { gaps as gapRecord, type GapId } from './gaps.ts';
+import { answers as answerRecord, type AnswerId } from './answers.ts';
 
-/** Every source cited by the given facts, series and gaps, de-duplicated, in first-cited order (for a page's reference list). */
-export function sourcesFor(ids: { facts?: FactId[]; series?: SeriesId[]; gaps?: GapId[] }): Source[] {
+/** Every source cited by the given facts, series, gaps and answers, de-duplicated, in first-cited order (for a page's reference list). */
+export function sourcesFor(ids: { facts?: FactId[]; series?: SeriesId[]; gaps?: GapId[]; answers?: AnswerId[] }): Source[] {
   const seen = new Set<SourceId>();
   const add = (list: readonly SourceId[]) => list.forEach((id) => seen.add(id));
+  for (const id of ids.answers ?? []) {
+    const a = answerRecord[id] as { facts: FactId[]; sources?: SourceId[] };
+    for (const f of a.facts) add(facts[f].sources);
+    add(a.sources ?? []);
+  }
   for (const id of ids.gaps ?? []) add((gapRecord[id] as { sources?: SourceId[] }).sources ?? []);
   for (const id of ids.facts ?? []) add(facts[id].sources);
   for (const id of ids.series ?? []) {

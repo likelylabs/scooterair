@@ -241,7 +241,7 @@ export const redlightSeries = {
     sources: ['tsai-2026-rineng'],
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('只有三台車，不是車隊平均；這是摘要寫的最高倍數，我們只讀了摘要。', 'Three vehicles only, not a fleet average; these are the highest ratios the abstract gives, and we read only the abstract.'),
+    caveat: t('只有三台車，不是所有機車的平均；這是摘要寫的最高倍數，我們只讀了摘要。', 'Three vehicles only, not a fleet average; these are the highest ratios the abstract gives, and we read only the abstract.'),
     requiresCaveat: true,
     relatedFacts: ['tsai2026-three-scooter-case'],
     chainLink: 1,

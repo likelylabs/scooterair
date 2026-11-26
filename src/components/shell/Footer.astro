@@ -1,8 +1,8 @@
 ---
 /**
- * Footer — zebra strip, wordmark + tagline, nav (the primary items plus the
- * footer-only ones: 資料來源, 關於, 修改紀錄), "about this data" line and a
- * credits slot.
+ * Footer — zebra strip, wordmark + tagline, two lists of links (the main menu's five, then
+ * the adults' pages: 證據 · 資料來源 · 關於 · 修改紀錄, brief section 2), one sentence about
+ * the figures and a credits slot. Every link is a 48 px target.
  *
  * Props
  *   locale  Locale
@@ -35,7 +35,12 @@ const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits'
       <nav class="site-footer__nav" aria-label={ui.footerNav[locale]}>
         <ul>
           <li><a href={href('/', locale)}>{ui.home[locale]}</a></li>
-          {[...nav, ...footerNav].map((item) => (
+          {nav.map((item) => (
+            <li><a href={href(item.path, locale)}>{item.label[locale]}</a></li>
+          ))}
+        </ul>
+        <ul>
+          {footerNav.map((item) => (
             <li><a href={href(item.path, locale)}>{item.label[locale]}</a></li>
           ))}
         </ul>
@@ -79,10 +84,15 @@ const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits'
     font-size: var(--fs-sm);
     line-height: var(--lh-snug);
   }
-  .site-footer__nav ul {
+  .site-footer__nav {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0 var(--sp-5);
+    align-items: start;
+  }
+  .site-footer__nav ul {
+    display: grid;
+    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -92,7 +102,9 @@ const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits'
     align-items: center;
     min-block-size: var(--tap);
     color: var(--ink);
+    font-size: var(--fs-btn);
     font-weight: var(--fw-medium);
+    line-height: 1.3;
     text-decoration: none;
   }
   .site-footer__nav a:hover {
@@ -115,7 +127,7 @@ const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits'
     margin-block: calc((var(--tap) - 1lh) / -2);
   }
   .site-footer__credits {
-    color: var(--ink-3);
+    color: var(--ink-2);
   }
   .site-footer__base {
     display: flex;
@@ -125,7 +137,7 @@ const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits'
     margin-block-start: var(--sp-7);
     padding-block-start: var(--sp-4);
     border-block-start: 1px solid var(--line);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-btn);
   }
   .site-footer__base a {
     display: inline-flex;

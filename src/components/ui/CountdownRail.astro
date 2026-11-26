@@ -1,5 +1,8 @@
 ---
 /**
+ * @deprecated Replaced by ScreenRail.astro (no seconds; brief 3.1). Kept until the pages that
+ * still import it are rebuilt; delete in phase 3.
+ *
  * CountdownRail — the 44px strip under the header (V2), and the only thing
  * that is ever pinned. LED count · seven pips · the current link's name; the
  * whole strip is a button that opens the jump menu (the seven links, 接起來,
@@ -132,6 +135,7 @@ const barName = (name: string) => (name === menuLabel ? menuLabel : t(rail.named
 
 <style>
   .rail {
+    --rail-h: 2.75rem; /* this old rail keeps its own height; the token is now ScreenRail's 2rem */
     position: sticky;
     inset-block-start: calc(var(--header-h) + 1px); /* the header's hairline */
     z-index: 40;

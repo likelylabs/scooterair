@@ -1,0 +1,39 @@
+---
+/**
+ * SceneLabel — a word placed at a point of a drawing, as HTML over the SVG.
+ * It keeps its own size (15 px, never under 14 px) however small the drawing
+ * gets, which SVG <text> cannot do. Use it in SceneFrame's `labels` slot.
+ *
+ * Props
+ *   box     the scene's viewBox { x, y, w, h }: the same object SceneFrame got
+ *   x, y    where the label goes, in the drawing's own units
+ *   anchor  which point of the label sits at (x, y):
+ *           'start' | 'center' | 'end', optionally with 'top' | 'middle' | 'bottom'
+ *           ('center bottom' puts the label centred above the point). Default 'start top'.
+ *   plate   a see-through plate behind the words (for a busy background)
+ *   quiet   lighter weight, secondary ink
+ *   max     maximum width, in % of the picture (default 60)
+ *   as      'p' (default) | 'span' | 'div'
+ *
+ *   <SceneLabel slot="labels" box={VB} x={296} y={-120} anchor="center bottom" plate>排氣管</SceneLabel>
+ */
+import '@/styles/art.css';
+import type { Box } from './air';
+import { labelStyle } from './scene';
+
+interface Props {
+  box: Box;
+  x: number;
+  y: number;
+  anchor?: string;
+  plate?: boolean;
+  quiet?: boolean;
+  max?: number;
+  as?: 'p' | 'span' | 'div';
+  class?: string;
+  [key: `data-${string}`]: string | number | boolean | undefined;
+}
+const { box, x, y, anchor = 'start top', plate = false, quiet = false, max, as: Tag = 'p', class: cls, ...rest } = Astro.props;
+---
+
+<Tag class:list={['scene__label', plate && 'scene__label--plate', quiet && 'scene__label--quiet', cls]} data-anchor={anchor} style={labelStyle(box, x, y, max)} {...rest}><slot /></Tag>

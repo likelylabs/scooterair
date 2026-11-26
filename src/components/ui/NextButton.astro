@@ -1,0 +1,77 @@
+---
+/**
+ * NextButton — the full-width button at the foot of a screen (brief 3.1, foot row 2). Its text
+ * is the question the next screen answers; pressing it scrolls there. This is how a reader is
+ * led along the chain, and how an older reader avoids fine scrolling.
+ *
+ * Props
+ *   href     where it goes: '#s-5' for the next screen, or a page (the calculator)
+ *   variant  'next' (default: outlined) | 'primary' (green: the hand-off to the calculator)
+ *   arrow    'down' | 'right' | 'none'. Default: 'down' for an in-page link, 'right' otherwise
+ * Slot
+ *   default  the question. Do not type an arrow into the copy; the button draws it.
+ * Any other attribute (id, data-*) is passed through.
+ *
+ *   <NextButton href="#s-5">{t.s4.next}</NextButton>
+ *   <NextButton href={href('/electric/', locale)} variant="primary">{t.s14.next}</NextButton>
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  variant?: 'next' | 'primary';
+  arrow?: 'down' | 'right' | 'none';
+  class?: string;
+  [key: string]: unknown;
+}
+const { href, variant = 'next', class: cls, ...rest } = Astro.props;
+const arrow = Astro.props.arrow ?? (href.startsWith('#') ? 'down' : 'right');
+delete (rest as Record<string, unknown>).arrow;
+---
+
+<a class:list={['next', `next--${variant}`, cls]} href={href} {...rest}>
+  <span class="next__text"><slot /></span>
+  {arrow !== 'none' && <Icon name={arrow === 'down' ? 'arrow-down' : 'arrow-right'} size="1.25em" />}
+</a>
+
+<style>
+  .next {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75em;
+    inline-size: 100%;
+    min-block-size: var(--tap);
+    padding: 0.55em 1em 0.55em 1.1em;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-3);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  .next:hover {
+    background: var(--bg-sunken);
+    color: var(--ink);
+  }
+  .next__text {
+    text-wrap: balance;
+  }
+  .next--primary {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .next--primary:hover {
+    border-color: var(--accent-hover);
+    background: var(--accent-hover);
+    color: var(--on-accent);
+  }
+  @media (forced-colors: active) {
+    .next {
+      border-color: ButtonText;
+    }
+  }
+</style>

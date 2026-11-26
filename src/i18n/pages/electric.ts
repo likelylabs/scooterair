@@ -181,7 +181,7 @@ export default copy({
     title: { 'zh-TW': '結果', en: 'Your result' },
     placeholder: { 'zh-TW': '先在上面第 1 題選縣市，結果就會出現在這裡。', en: 'Choose your city or county in question 1 above and your result appears here.' },
     working: { 'zh-TW': '計算中…', en: 'Working it out…' },
-    invalid: { 'zh-TW': '這組答案還算不出來：{issues}', en: 'We cannot work this out yet: {issues}' },
+    invalid: { 'zh-TW': '這組答案有地方要改一下，才能算：{issues}', en: 'Some answers need changing before we can work this out: {issues}' },
     announce: { 'zh-TW': '結果已更新：{title} {value}。', en: 'Result updated: {title} {value}.' },
     newTab: { 'zh-TW': '（另開新視窗）', en: ' (opens in a new tab)' },
     fellBack: { 'zh-TW': '照你的答案，找不到在家充電的車款，所以改用換電月租來算。', en: 'No home-charged model fits your answers, so this uses a swap subscription instead.' },

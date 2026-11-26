@@ -1,0 +1,72 @@
+---
+/**
+ * SceneFrame — the frame every drawn scene shares: one <svg>, HTML words laid
+ * over it, and (when asked) the tag.
+ *
+ * Why it exists (redesign brief 3.1 and 5.1):
+ *  - one SVG per scene, no hidden second copy for another width;
+ *  - words in a picture are HTML over the SVG, never SVG <text>, never under
+ *    14 px, so they do not shrink with the drawing on a small phone;
+ *  - every scene's alt text says it is an illustration (the build stops if it
+ *    does not).
+ *
+ * Props
+ *   locale    Locale
+ *   box       the drawing's viewBox as { x, y, w, h } (scene units)
+ *   alt       the description. Must contain 示意圖 / "illustration". Build it
+ *             with sceneAlt() from ./scene.ts so it names the scenario and
+ *             ends with the shared sentence about what is and is not estimated.
+ *   tag       false (default) | 'street' | 'body'. On the home page
+ *             <Screen illustration> prints the tag, so leave this off there;
+ *             anywhere else (a question page, the poster, /estimate/) set it.
+ *   scenario  'few' | 'dozen' | 'full': sets data-air-scn on the <svg>, for a
+ *             scene drawn with air({ scenario: 'all' }) (see art.css)
+ *   drift     let the air marks drift a few pixels (class air--drift)
+ *   id, class passed to the <figure>; other data-* attributes too
+ *
+ * Slots
+ *   default   the drawing: SVG elements, placed inside the <svg>
+ *   labels    HTML words over the drawing: <SceneLabel> elements
+ *
+ *   <SceneFrame locale={locale} box={VB} alt={alt} scenario="dozen">
+ *     <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + people} />
+ *     <SceneLabel slot="labels" box={VB} x={300} y={-190}>他也在等</SceneLabel>
+ *   </SceneFrame>
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import IllustrationTag from '@/components/ui/IllustrationTag.astro';
+import { AIR, type AirScenario, type Box } from './air';
+import { assertSceneAlt } from './scene';
+
+interface Props {
+  locale: Locale;
+  box: Box;
+  alt: string;
+  tag?: false | 'street' | 'body';
+  scenario?: AirScenario;
+  drift?: boolean;
+  id?: string;
+  class?: string;
+  [key: `data-${string}`]: string | number | boolean | undefined;
+}
+const { locale, box, alt, tag = false, scenario, drift = false, id, class: cls, ...rest } = Astro.props;
+assertSceneAlt(alt, locale);
+const n = (v: number) => +v.toFixed(2);
+---
+
+<figure class:list={['scene', cls]} id={id} {...rest}>
+  <svg
+    class:list={['scene__art', drift && 'air--drift']}
+    viewBox={`${n(box.x)} ${n(box.y)} ${n(box.w)} ${n(box.h)}`}
+    role="img"
+    aria-label={alt}
+    data-air-scn={scenario}
+    style={`--air-upp:${n(box.w / AIR.refWidth)}`}
+    focusable="false"
+  >
+    <slot />
+  </svg>
+  {Astro.slots.has('labels') && <div class="scene__labels"><slot name="labels" /></div>}
+  {tag && <IllustrationTag locale={locale} kind={tag} overlay />}
+</figure>

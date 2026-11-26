@@ -1,0 +1,331 @@
+---
+/**
+ * Screen — the frame every screen of the home page shares (brief 3.1), also used once per
+ * question page. One picture, one headline, at most two sentences, one optional quiet line,
+ * then two rows of controls. Replaces Chapter.astro.
+ *
+ *   ┌ picture (slot `picture`; full-bleed on a phone) ───────────────┐
+ *   │ slot `above`  — HTML over the picture: the number box           │
+ *   │ slot `controls` — under the picture: a switch                    │
+ *   ├ headline  27 px, weight 900, two lines, 22 Chinese characters ─┤
+ *   │ body      18 px, two sentences, 45 characters                   │
+ *   │ quiet     15 px, one line, 30 characters (caveats live here)     │
+ *   │ row 1     chips (slot `chips`) ………………… [怎麼知道的？]              │
+ *   │ row 2     slot `actions`, then the full-width next button        │
+ *   └ slot `sheet` — the <HowSheet> (an open block here without JS) ──┘
+ *
+ * From 900 px wide a screen is two columns (picture left, at most 560 px; text right) inside a
+ * 1,040 px column. Scrolling is ordinary scrolling: nothing is pinned or snapped.
+ *
+ * THE LIMITS ARE ENFORCED. A headline over 22 Chinese characters, a body over 45 or a quiet
+ * line over 30 throws, and the build fails. Han characters are counted; digits, units, Latin
+ * and punctuation are free (src/components/ui/screen-limits.ts). The finer advice of brief 6.5
+ * (two sentences, 30 characters and two commas a sentence) is printed as a build warning.
+ *
+ * Props
+ *   locale        Locale
+ *   n             position, 1-based
+ *   total         number of screens on the page (default 15; a question page passes 1)
+ *   id            anchor (default `s-${n}`)
+ *   chapter       the short name the rail shows: 排出什麼
+ *   phase         'red' (default) | 'green' — the rail's lamp while this screen is in view
+ *   headline      '|' marks the phrase boundaries where a line may break: '那個味道，|你也聞過'
+ *   as            'h2' (default) | 'h1' (a question page's one screen)
+ *   body          the body text; or slot `body` when it needs markup (it is counted the same)
+ *   quiet         the quiet line; or slot `quiet`
+ *   illustration  true = print the tag 示意圖｜廢氣其實大多看不見 on the picture (brief 5.1).
+ *                 'body' prints 示意圖・不是醫學圖. Scene components do not print it themselves
+ *   how           id of the sheet in the `sheet` slot (default `how-${n}`)
+ *   next          { label, href?, primary? } — the question the next screen answers.
+ *                 href defaults to `#s-${n + 1}`. Omit on the last screen
+ * Slots
+ *   picture (required) · above · controls · body · quiet · chips · actions · sheet
+ *   default: rare extra content after the quiet line
+ *
+ * The <article> carries data-screen, data-n, data-chapter, data-phase (read by ScreenRail) and
+ * data-pick-scope (the scope of any <Segmented> inside it).
+ *
+ *   <Screen locale={locale} n={2} chapter={t.s2.chapter} headline={t.s2.headline} body={t.s2.body}
+ *           quiet={t.s2.quiet} illustration next={{ label: t.s2.next }}>
+ *     <TailpipeMarks slot="picture" locale={locale} />
+ *     <EstimateValue slot="chips" … sheet="how-2" />
+ *     <HowSheet slot="sheet" id="how-2" … />
+ *   </Screen>
+ */
+import type { Locale } from '@/i18n';
+import { langHtml, screenText, t as fill, typeset } from '@/i18n/ui';
+import HowButton from './HowButton.astro';
+import IllustrationTag from './IllustrationTag.astro';
+import NextButton from './NextButton.astro';
+import Phrased from './Phrased.astro';
+import { screenCopyProblems } from './screen-limits';
+
+interface Props {
+  locale: Locale;
+  n: number;
+  total?: number;
+  id?: string;
+  chapter: string;
+  phase?: 'red' | 'green';
+  headline: string;
+  as?: 'h1' | 'h2';
+  body?: string;
+  quiet?: string;
+  illustration?: boolean | 'body';
+  how?: string;
+  next?: { label: string; href?: string; primary?: boolean };
+  class?: string;
+}
+const { locale, n, total = 15, chapter, phase = 'red', headline, as: Heading = 'h2', illustration = false, next, class: cls } = Astro.props;
+const id = Astro.props.id ?? `s-${n}`;
+if (!Astro.slots.has('picture')) throw new Error(`Screen ${id}: every screen has a picture (slot "picture").`);
+if (!headline?.trim()) throw new Error(`Screen ${id}: no headline.`);
+
+const render = async (name: string) => (Astro.slots.has(name) ? (await Astro.slots.render(name)).trim() : '');
+const bodyHtml = Astro.props.body ? langHtml(typeset(Astro.props.body, locale), locale) : await render('body');
+const quietHtml = Astro.props.quiet ? langHtml(typeset(Astro.props.quiet, locale), locale) : await render('quiet');
+
+const problems = screenCopyProblems({ headline, body: bodyHtml, quiet: quietHtml });
+const errors = problems.filter((p) => p.level === 'error');
+if (errors.length) throw new Error(`Screen ${id} breaks the words-per-screen limits (brief 3.1):\n  ${errors.map((p) => p.message).join('\n  ')}\nAnything longer belongs in the sheet.`);
+for (const p of problems) if (p.level === 'warn') console.warn(`[Screen ${id}] ${p.message}`);
+
+// a slot may hand over its own <p>: then the wrapper is a <div>, never a <p> inside a <p>
+const isBlock = (html: string) => /<(p|div|ul|ol|dl|table)\b/i.test(html);
+const BodyTag = isBlock(bodyHtml) ? 'div' : 'p';
+const QuietTag = isBlock(quietHtml) ? 'div' : 'p';
+
+const hasSheet = Astro.slots.has('sheet');
+const how = Astro.props.how ?? `how-${n}`;
+const hasChips = Astro.slots.has('chips');
+const hasAbove = Astro.slots.has('above');
+const hasControls = Astro.slots.has('controls');
+const phaseWord = phase === 'green' ? screenText.green[locale] : screenText.red[locale];
+const position = fill(screenText.position, locale, { n, total });
+---
+
+<article class:list={['screen', `screen--${phase}`, cls]} id={id} data-screen data-n={n} data-chapter={chapter} data-phase={phase} data-pick-scope aria-labelledby={`${id}-h`}>
+  <div class="screen__stage">
+    {hasAbove && <div class="screen__above"><slot name="above" /></div>}
+    <div class="screen__pic">
+      <slot name="picture" />
+      {illustration && <IllustrationTag locale={locale} kind={illustration === 'body' ? 'body' : 'street'} overlay />}
+    </div>
+    {hasControls && <div class="screen__controls"><slot name="controls" /></div>}
+  </div>
+
+  <div class="screen__text">
+    {/* Where this screen is in the story. The rail says it while scripting runs; this line says
+        it to a screen reader always, and to the eye when there is no script to move the rail. */}
+    {total > 1 && (
+      <p class="screen__place" data-nojs-only>
+        <span class="screen__lamp" aria-hidden="true"></span>
+        <span class="screen__phase">{phaseWord}</span><span aria-hidden="true">｜</span><span>{chapter}</span>
+        <span class="screen__pos" aria-hidden="true">{position}</span>
+        <span class="vh">{fill(screenText.positionSr, locale, { n, total })}</span>
+      </p>
+    )}
+    <Heading class="screen__headline" id={`${id}-h`}><Phrased text={typeset(headline, locale)} locale={locale} /></Heading>
+    {bodyHtml && <BodyTag class="screen__body" set:html={bodyHtml} />}
+    {quietHtml && <QuietTag class="screen__quiet" set:html={quietHtml} />}
+    <slot />
+
+    {(hasChips || hasSheet) && (
+      <div class="screen__foot">
+        <div class="screen__chips">{hasChips && <slot name="chips" />}</div>
+        {hasSheet && <HowButton locale={locale} sheet={how} />}
+      </div>
+    )}
+    {(Astro.slots.has('actions') || next) && (
+      <div class="screen__go">
+        <slot name="actions" />
+        {next && (
+          <NextButton href={next.href ?? `#s-${n + 1}`} variant={next.primary ? 'primary' : 'next'}>{next.label}</NextButton>
+        )}
+      </div>
+    )}
+  </div>
+
+  {hasSheet && <div class="screen__sheet"><slot name="sheet" /></div>}
+</article>
+
+<style>
+  .screen {
+    --pad: var(--gutter);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding-block-end: var(--sp-6);
+    /* the next button lands the screen flush under the rail: undo the page's 1rem scroll padding */
+    scroll-margin-block-start: -1rem;
+  }
+  .screen + :global(.screen) {
+    border-block-start: 1px solid var(--line);
+  }
+
+  /* ---- the picture ---- */
+  .screen__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-3);
+    min-inline-size: 0;
+  }
+  .screen__above,
+  .screen__controls {
+    padding-inline: var(--pad);
+  }
+  .screen__above {
+    padding-block-start: var(--sp-3);
+  }
+  .screen__pic {
+    position: relative;
+    min-inline-size: 0;
+    overflow: hidden; /* a scene never widens the page */
+  }
+  /* one SVG per scene, as wide as the screen; words in it are HTML laid over it */
+  .screen__pic > :global(svg),
+  .screen__pic > :global(img),
+  .screen__pic > :global(figure) {
+    display: block;
+    inline-size: 100%;
+    max-inline-size: none;
+    block-size: auto;
+    margin: 0;
+  }
+
+  /* ---- the words ---- */
+  .screen__text {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-content: start;
+    min-inline-size: 0;
+    padding: var(--sp-4) var(--pad) 0;
+  }
+  .screen__place {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .screen__lamp {
+    flex: none;
+    inline-size: 0.7em;
+    block-size: 0.7em;
+    border-radius: 50%;
+    background: var(--signal-red);
+  }
+  .screen__phase {
+    color: var(--signal-red-ink);
+  }
+  .screen--green .screen__lamp {
+    background: var(--clean);
+  }
+  .screen--green .screen__phase {
+    color: var(--clean-ink);
+  }
+  .screen__pos {
+    margin-inline-start: auto;
+    font-weight: var(--fw-medium);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+  /* 27 px on a 390 px phone and up. Narrower, it follows the width (24.8 px at 360, 22 px at
+     320), so a line always holds 13 full-width glyphs and a 22-character headline with its
+     punctuation still makes two lines. In rem at both ends, so 字大 enlarges it. */
+  .screen__headline {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.375rem, 6.9vw, var(--fs-headline));
+    font-weight: var(--fw-black);
+    font-stretch: 100%;
+    line-height: var(--lh-headline);
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+  .screen__headline:lang(en) {
+    font-stretch: 84%;
+    font-weight: 800;
+    line-height: 1.16;
+  }
+  .screen__body,
+  .screen__body :global(p) {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+  .screen__quiet,
+  .screen__quiet :global(p) {
+    margin: 0;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+  }
+
+  /* ---- the two rows of controls ---- */
+  .screen__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tap-gap) var(--sp-3);
+    margin-block-start: var(--sp-2);
+  }
+  .screen__chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap);
+    min-inline-size: 0;
+  }
+  .screen__foot > :global(.howbtn) {
+    margin-inline-start: auto;
+  }
+  .screen__go {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--tap-gap);
+  }
+  .screen__sheet {
+    padding-inline: var(--pad);
+  }
+  .screen__sheet:empty {
+    display: none;
+  }
+
+  /* ---- wide screens: picture left, words right ---- */
+  @media (min-width: 56.25em) {
+    .screen {
+      --pad: 0px;
+      grid-template-columns: minmax(0, 35rem) minmax(0, 1fr);
+      column-gap: var(--sp-7);
+      align-items: center;
+      inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
+      margin-inline: auto;
+      padding-block: var(--sp-7);
+      scroll-margin-block-start: 0;
+    }
+    .screen__pic {
+      border-radius: var(--radius-3);
+    }
+    .screen__text {
+      padding-block-start: 0;
+      gap: var(--sp-4);
+    }
+    .screen__sheet {
+      grid-column: 1 / -1;
+    }
+  }
+  @media print {
+    .screen {
+      break-inside: avoid;
+    }
+    .screen__go {
+      display: none;
+    }
+  }
+</style>
