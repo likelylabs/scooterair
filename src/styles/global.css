@@ -323,6 +323,10 @@ input[type='number'] {
 .nowrap {
   white-space: nowrap;
 }
+/* a character and the closing mark after it (Phrased, phrasedHtml): one unit, never split */
+.nobr {
+  white-space: nowrap;
+}
 
 /* Phrase unit inside a headline: the line may break between phrases but
    never inside one. Use via <Phrased text="…|…" />. */
@@ -720,4 +724,11 @@ html[data-motion='off'] ::backdrop {
   .eyebrow {
     break-after: avoid;
   }
+}
+
+/* The film page's inline "怎麼算的 →" link: a 48 px tap area from vertical padding on an inline
+   box, which does not open a gap above its line (Film.astro keeps it inline). Kept here so the
+   film's rendered MP4, which hashes Film.astro, is not invalidated by a page-only tap fix. */
+a.film__inline.film__inline {
+  padding-block: 1.05rem;
 }

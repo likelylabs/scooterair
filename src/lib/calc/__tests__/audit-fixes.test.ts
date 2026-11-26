@@ -122,8 +122,8 @@ test('[goods-tax-stack-follows-weaker-reading] the stacked goods-tax cuts are fl
   const m = msg(e, 'ambiguity', 'gas-goods-tax-new-2000')[0];
   assert.equal(m.amount, 2000);
   assert.equal(m.severity, 'warning');
-  assert.match(m.text.en, /^Gasoline:/);
-  assert.match(msg(e, 'secondary-input')[0].text.en, /both goods-tax cuts counted on the gasoline side/);
+  assert.match(m.text.en, /^Petrol:/);
+  assert.match(msg(e, 'secondary-input')[0].text.en, /both goods-tax cuts counted on the petrol side/);
 });
 
 test('[nanshan-counted-before-asof] the Nan Shan option is not counted on any date; TSMC is', () => {
@@ -172,7 +172,7 @@ test('[kinmen-*] Kinmen money is set against the MOENV payments together; MOENV 
   assert.ok(!lineIds(now).some((id) => id.startsWith('moenv-')));
   assert.equal(msg(now, 'ambiguity', 'kinmen-vs-moenv').find((m) => m.text.en.startsWith('Electric'))?.amount, 3400);
   // Gasoline side: the conservative reading drops the NT$300 and says so.
-  const gasUp = msg(now, 'ambiguity', 'kinmen-vs-moenv').find((m) => m.text.en.startsWith('Gasoline'));
+  const gasUp = msg(now, 'ambiguity', 'kinmen-vs-moenv').find((m) => m.text.en.startsWith('Petrol'));
   assert.equal(gasUp?.amount, 300);
   assert.ok(now.gasoline.purchase.messages.includes(gasUp!), 'attached to the gasoline ledger');
   // previousLocalSubsidy on 2026-12-15 (finding kinmen-group-blocks-moenv-stacking): MOENV stacks.
@@ -180,11 +180,12 @@ test('[kinmen-*] Kinmen money is set against the MOENV payments together; MOENV 
   assert.equal(government(prev), 7000 + 1000 + 2100 + 1000 + 300);
 });
 
-test('[nantou-scrap-only-missing] the Nantou NT$2,500 scrap-only payment is listed, not counted (its conditions are not published)', () => {
+test('[nantou-scrap-only] the Nantou NT$2,500 scrap-only payment counts for a petrol scooter built by 30 June 2007 (the bureau\'s own definition), not for a newer one', () => {
   const e = evaluate(situation({ jurisdiction: 'nantou', ...heavy, scrap: twoStroke2002 }));
-  assert.equal(excludedReason(e, 'nantou-scrap-only', 'gasoline'), 'not-published');
-  assert.equal(e.gasoline.purchase.excluded.find((x) => x.id === 'nantou-scrap-only')?.amount, 2500);
-  assert.equal(line(e, 'nantou-scrap-only', 'gasoline'), undefined);
+  assert.equal(line(e, 'nantou-scrap-only', 'gasoline'), 2500);
+  const newer = evaluate(situation({ jurisdiction: 'nantou', ...heavy, scrap: fourStroke2012 }));
+  assert.equal(line(newer, 'nantou-scrap-only', 'gasoline'), undefined);
+  assert.equal(excludedReason(newer, 'nantou-scrap-only', 'gasoline'), 'not-eligible');
 });
 
 test('[yunlin-scrap-only-2000-missing] Yunlin pays NT$2,000 for scrapping any gasoline scooter built by 2015, never stacked on the two-stroke 5,000', () => {
@@ -193,7 +194,7 @@ test('[yunlin-scrap-only-2000-missing] Yunlin pays NT$2,000 for scrapping any ga
   const two = evaluate(situation({ jurisdiction: 'yunlin', ...heavy, scrap: twoStroke2002 }));
   assert.equal(line(two, 'yunlin-scrap-only-two-stroke', 'gasoline'), 5000);
   assert.equal(line(two, 'yunlin-scrap-only-2015', 'gasoline'), undefined);
-  assert.match(msg(four, 'secondary-input')[0].text.en, /Yunlin scrap a gasoline scooter only/);
+  assert.match(msg(four, 'secondary-input')[0].text.en, /Yunlin scrap a petrol scooter only/);
 });
 
 test('[tiny-quota-*] a programme with a handful of places a year is counted with a warning and the price without it', () => {
@@ -367,8 +368,8 @@ test('[horizon-text-*] text follows the horizon; the EV road fee uses the band o
   assert.doesNotMatch(allText(e36), /five years/);
   const light = evaluate(situation({ energyPlan: 'gogoro-488' }));
   const fee = msg(light, 'ev-road-fee')[0];
-  assert.match(fee.text.en, /50cc-or-less gasoline rate of NT\$300/);
-  assert.match(msg(evaluate(situation(heavy)), 'ev-road-fee')[0].text.en, /125cc gasoline rate of NT\$450/);
+  assert.match(fee.text.en, /50cc-or-less petrol rate of NT\$300/);
+  assert.match(msg(evaluate(situation(heavy)), 'ev-road-fee')[0].text.en, /125cc petrol rate of NT\$450/);
 });
 
 // ---------------------------------------------------------------- dates and deadlines

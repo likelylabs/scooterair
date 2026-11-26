@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../../../lib/abs-url.ts';
 /**
  * Film — /90/ (redesign brief, section 8 and amendment 12.2): one red light as an animation.
  *
@@ -72,6 +73,8 @@ const stills = stillTimes.map(({ time, beat }, i) => {
   return {
     n: i + 1,
     time,
+    // the time printed with a still is the start of its caption, as in the transcript below
+    cueStart: cueAt(time).t,
     beat,
     r,
     hud: hudHTML(text, hud, { link: false }),
@@ -92,7 +95,7 @@ const mp4 = manifest.files?.[locale];
 const mp4Href = mp4 && existsSync(join(process.cwd(), 'public/film', mp4.file)) ? asset(`/film/${mp4.file}`) : null;
 const mp4Size = mp4 ? (mp4.bytes / 1e6).toFixed(1) : '';
 
-const pageUrl = new URL(href('/90/', locale), Astro.site).href;
+const pageUrl = absUrl(href('/90/', locale), Astro.site);
 const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(fill(t.player.lineText, { min: DURATION_MINUTES }))}`;
 
 // ---- transcript: every cue, what the picture adds to it, and what it rests on --------------
@@ -231,7 +234,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
               {s.tag === 'body' && <IllustrationTag locale={locale} kind="body" overlay class="film__tag" />}
             </div>
             <figcaption>
-              <p class="still__when">{fill(t.still.frameN, { n: s.n })} · {clock(s.time)} · {t.beats[s.beat.id]}</p>
+              <p class="still__when">{fill(t.still.frameN, { n: s.n })} · {clock(s.cueStart)} · {t.beats[s.beat.id]}</p>
               <p class="still__line">{s.cue.main}</p>
               {s.cue.note && <p class="still__note">{s.cue.note}{s.cue.chip && <Fragment> <KindChip locale={locale} kind={s.cue.chip.kind} size="sm" /></Fragment>}</p>}
               {s.panel && <p class="still__est"><EstimateValue locale={locale} slotId="co.dozen.add" label={text.panel.added} sheet="how-film-estimate" /></p>}
@@ -1180,6 +1183,12 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     color: var(--accent);
     font-weight: 700;
   }
+  /* the link inside the notes stays inline (an inline-flex box 48 px tall opened a gap above its
+     line); vertical padding on an inline box grows the tap area without moving the lines */
+  .film__inline {
+    display: inline;
+    padding-block: calc((var(--tap) - 1.6em) / 2);
+  }
   html:not(.film-live) .film__keys {
     display: none;
   }
@@ -1232,7 +1241,8 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .still__pic > .film__over,
   .still__pic > .hud,
   .still__pic > .film__tag {
-    --pr: clamp(9px, 4.4cqw, 16px);
+    /* never below the site's 14 px floor: at 0.875 × 16 px the smallest words are 14 px */
+    --pr: 16px;
     --fs-xs: calc(0.875 * var(--pr));
     --fs-sm: calc(0.9375 * var(--pr));
     --fs-btn: calc(1.0625 * var(--pr));

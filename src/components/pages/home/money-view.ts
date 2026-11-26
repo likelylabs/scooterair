@@ -69,7 +69,7 @@ export function phrasedHtml(text: string): string {
   return parts
     .map((p, i) => {
       const spaceAfter = /\s$/.test(p) || (i < parts.length - 1 && /^\s/.test(parts[i + 1]));
-      return `<span class="phrase">${esc(p.trim())}</span>${spaceAfter ? ' ' : ''}`;
+      return `<span class="phrase">${esc(p.trim()).replace(/([\u3400-\u9fff])([，。？！；：、）」』〉》…]+)/g, '<span class="nobr">$1$2</span>')}</span>${spaceAfter ? ' ' : ''}`;
     })
     .join('');
 }
@@ -189,6 +189,8 @@ export const monthUnder = (p: Pick<HomeMoneyPayload, 'D' | 'T'>, t: OpenTable, c
 /** G13's four bars, for lane D's renderMonthlyBars(). */
 export function monthlyBarsProps(p: Pick<HomeMoneyPayload, 'D'>, t: OpenTable, km: number): MonthlyBarsProps {
   const m = monthOf(t, km);
+  // the swap rows here are the cheapest plans of ANY make (chartText.month says so); /electric/'s
+  // opening shows the plans of the scooter on show, under its own label
   return { locale: p.D.locale, km, petrol: m.petrol, home: { lo: m.homeLo, hi: m.homeHi }, swapPlan: m.plan, swapPayg: m.payg, table: false };
 }
 

@@ -241,7 +241,10 @@ const tagText = illustration.tag[locale];
   }
   /* the square card (1080 × 1080): picture on top */
   @media (max-aspect-ratio: 3/2) {
+    /* the picture keeps at least 46% of the card: long words shrink to fit (build-share-cards.mjs),
+       never the drawing (en/app-sq had shrunk it to a sliver and clipped its tag) */
     .card__pic {
+      min-block-size: 46vh;
       max-block-size: 52vh;
     }
     /* leave room under the drawing for the scene's own 示意圖 tag, which sits below the svg */

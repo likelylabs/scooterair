@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../../../lib/abs-url.ts';
 /**
  * /print/brief/ — 一頁說明 / the one-page brief for a borough chief or a councillor (brief 7.9).
  *
@@ -26,7 +27,7 @@ export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(act, locale);
 const b = t.brief;
-const estimatePage = new URL(href('/estimate/', locale), Astro.site).href;
+const estimatePage = absUrl(href('/estimate/', locale), Astro.site);
 const shortUrl = estimatePage.replace(/^https?:\/\//, '');
 const child = formatEstimate('child.airPerKg', locale);
 const pollutants = [
@@ -418,5 +419,9 @@ const pollutants = [
       inline-size: min(100%, calc(var(--fit-h) * var(--ar, 1.3)));
       margin-inline: auto;
     }
+  }
+  /* the print button works only with JavaScript: until the script shows it, it stays hidden */
+  .toolbar__btn[hidden] {
+    display: none;
   }
 </style>

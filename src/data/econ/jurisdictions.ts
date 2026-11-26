@@ -205,7 +205,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     name: t('南投縣', 'Nantou County'),
     kind: 'county',
     status: 'partly-verified',
-    statusNote: t('換購16,000元、新購5,000元、單純報廢2,500元，取自環保局 2026 年 4 月 8 日的新聞和經濟部縣市補助表。環保局沒有公布申請期限和名額，申請前請打電話問：049-2237530。', 'NT$16,000 to scrap and replace, NT$5,000 for a new scooter and NT$2,500 to scrap only, from the bureau\'s news item of 8 April 2026 and the MOEA county table. The bureau has not published a deadline or number of places; phone (049) 223-7530 before you apply.'),
+    statusNote: t('換購16,000元、新購5,000元、單純報廢2,500元，取自環保局 2026 年 4 月 8 日的新聞和經濟部縣市補助表。單純報廢的機車須是 2007 年 6 月 30 日以前出廠的燃油機車。環保局沒有公布申請期限和名額，申請前請打補助專線問：049-2238573（總機 049-2237530）。', 'NT$16,000 to scrap and replace, NT$5,000 for a new scooter and NT$2,500 to scrap only, from the bureau\'s news item of 8 April 2026 and the MOEA county table. To scrap only, the scooter must be a petrol one built by 30 June 2007. The bureau has not published a deadline or number of places; phone its subsidy line, (049) 223-8573 (switchboard (049) 223-7530), before you apply.'),
     officialLinks: [
       { label: t('南投縣環保局：2026 年補助新聞', 'Nantou EPB: 2026 subsidy news'), url: 'https://www.ntepb.gov.tw/news/Details.aspx?Parser=9,3,19,,,,15939' },
       meidLink,
@@ -245,8 +245,8 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     kind: 'county',
     status: 'partly-verified',
     statusNote: t(
-      '換購14,000元、新購8,000元取自經濟部產業發展署的縣市補助表。中央社 2026 年 4 月 13 日報導縣府說明：受理到 2027 年 1 月 8 日，要報廢的機車須在 2026 年 12 月 31 日前完成報廢，經費有限。縣府網站我們打不開；中低收入戶沒有另外的金額，可以直接申請、不必線上預約。',
-      'Scrap-and-replace NT$14,000 and new purchase NT$8,000 come from the MOEA\'s county table. CNA reported the county\'s release on 13 April 2026: claims until 8 January 2027, the scooter you scrap must be scrapped by 31 December 2026, money limited. The county site would not open for us; low-income households get no separate amount but can apply without booking online.',
+      '換購14,000元、新購8,000元取自經濟部產業發展署的縣市補助表。中央社 2026 年 4 月 13 日報導縣府說明：受理到 2027 年 1 月 8 日，要報廢的機車須在 2026 年 12 月 31 日前完成報廢，經費有限。縣府網站我們打不開。縣府沒有公布中低收入戶另外的金額；中低收入戶不必線上預約。想知道有沒有多的錢，請打 05-3622234 問。',
+      'Scrap-and-replace NT$14,000 and new purchase NT$8,000 come from the MOEA\'s county table. CNA reported the county\'s release on 13 April 2026: claims until 8 January 2027, the scooter you scrap must be scrapped by 31 December 2026, money limited. The county site would not open for us. The county has not published a separate amount for low-income households; they need not book online. To ask whether there is more money, phone 05-3622234.',
     ),
     officialLinks: [meidLink],
     checkedOn: CHECKED,

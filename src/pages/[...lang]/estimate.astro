@@ -233,7 +233,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   </Section>
 
   <!-- ===================================================== 2 RECIPE -->
-  <Section id="recipe" eyebrow={t.recipe.eyebrow} title={t.recipe.title} lead={fill(t.recipe.lead, { runs: nf(est.meta.runs, 0) })} width="wide" rule>
+  <Section fold id="recipe" eyebrow={t.recipe.eyebrow} title={t.recipe.title} lead={fill(t.recipe.lead, { runs: nf(est.meta.runs, 0) })} width="wide" rule>
     <h3 class="es-h3"><Phrased text={t.recipe.flowTitle} /></h3>
     <WorkingSum {...workingKerbFlow(locale)} />
 
@@ -279,7 +279,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   </Section>
 
   <!-- ===================================================== 3 COUNT -->
-  <Section id="count" eyebrow={t.count.eyebrow} title={t.count.title} lead={t.count.lead} width="wide" tone="sunken" rule>
+  <Section fold id="count" eyebrow={t.count.eyebrow} title={t.count.title} lead={t.count.lead} width="wide" tone="sunken" rule>
     <ol class="es-scn">
       {scnCards.map((c) => (
         <li class:list={['es-scn__card', c.s === 'dozen' && 'es-scn__card--main']}>
@@ -330,7 +330,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   </Section>
 
   <!-- ===================================================== 5 RANGE -->
-  <Section id="range" eyebrow={t.range.eyebrow} title={t.range.title} lead={t.range.lead} width="wide" tone="sunken" rule>
+  <Section fold id="range" eyebrow={t.range.eyebrow} title={t.range.title} lead={t.range.lead} width="wide" tone="sunken" rule>
     <SpreadBars locale={locale} labels={t.range.spread} times={t.range.times} caption={t.range.spreadCaption} />
     <h3 class="es-h3"><Phrased text={t.range.confidenceTitle} /></h3>
     <dl class="es-conf">
@@ -344,7 +344,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   </Section>
 
   <!-- ===================================================== 6 DRAWING -->
-  <Section id="drawing" eyebrow={t.drawing.eyebrow} title={t.drawing.title} lead={t.drawing.lead} width="wide" rule>
+  <Section fold id="drawing" eyebrow={t.drawing.eyebrow} title={t.drawing.title} lead={t.drawing.lead} width="wide" rule>
     <ol class="es-rules">
       {drawingRules.map((r) => <li>{r}</li>)}
     </ol>
@@ -370,7 +370,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   </Section>
 
   <!-- ===================================================== 7 LIMITS -->
-  <Section id="limits" eyebrow={t.limits.eyebrow} title={t.limits.title} lead={t.limits.lead} width="wide" tone="sunken" rule>
+  <Section fold id="limits" eyebrow={t.limits.eyebrow} title={t.limits.title} lead={t.limits.lead} width="wide" tone="sunken" rule>
     <ul class="es-limits">
       {estimateText.limits.map((l) => <li>{l[locale]}</li>)}
       <li>{t.limits.more}</li>
@@ -382,7 +382,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   </Section>
 
   <!-- ===================================================== 8 ANSWERS -->
-  <Section id="answers" eyebrow={t.answers.eyebrow} title={fill(t.answers.title, { n: answerList.length })} lead={t.answers.lead} width="wide" rule>
+  <Section fold id="answers" eyebrow={t.answers.eyebrow} title={fill(t.answers.title, { n: answerList.length })} lead={t.answers.lead} width="wide" rule>
     <div class="es-answers">
       {answerList.map((a) => <AnswerCard locale={locale} id={a.id} on="estimate" k={[...answerK]} />)}
     </div>

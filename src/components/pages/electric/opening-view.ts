@@ -235,8 +235,8 @@ export function monthHtml(d: OpenData, T: OpenText, t: OpenTable, km: number): s
     const max = Math.max(m.petrol, m.homeHi, sw.plan?.[0] ?? 0, sw.payg?.[0] ?? 0);
     const homeExtra = m.homeHi > m.homeLo ? `<span class="op-mbar__more" style="inline-size:${((100 * (m.homeHi - m.homeLo)) / max).toFixed(2)}%"></span>` : '';
     const swaps = [
-      sw.plan && { label: T.mPlan, v: sw.plan[0], n: d.words[sw.plan[1]] },
-      sw.payg && { label: T.mPayg, v: sw.payg[0], n: d.words[sw.payg[1]] },
+      sw.plan && { label: g >= 0 ? T.mPlan : T.mPlanAny, v: sw.plan[0], n: d.words[sw.plan[1]] },
+      sw.payg && { label: g >= 0 ? T.mPayg : T.mPaygAny, v: sw.payg[0], n: d.words[sw.payg[1]] },
     ].filter((x): x is { label: string; v: number; n: string } => !!x);
     // the alt names every bar with its own label, and each swap row with its scooter and plan
     const alt =

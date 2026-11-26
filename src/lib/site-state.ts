@@ -298,7 +298,7 @@ export function moneyState(date: ISODate, city: JurisdictionId | null | undefine
 
 /** The four tile-map states (V41) plus 'unpublished', from a city's money status. */
 export type TileState = 'available' | 'restricted' | 'unpublished' | 'exhausted' | 'ended' | 'unknown';
-/** One legend for the whole site (brief 7.7): 還有名額 · 有條件 · 官網沒有公布名額 · 已用完 · 已截止 · 查不到官網. */
+/** One legend for the whole site (brief 7.7): 還有名額 · 有條件 · 剩多少名額沒公布 · 已用完 · 已截止 · 今年補助查不到，請打電話問. */
 export const tileState = (status: CityMoney): TileState => status;
 
 /** The pre-paint script Base inlines: sets <html data-money-phase>. Mirrors moneyPhase(). */

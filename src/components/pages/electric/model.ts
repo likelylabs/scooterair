@@ -103,7 +103,12 @@ export function answerIssues(a: Answers, data: EconDataset): InputIssue[] {
   return validateSituation({ ...baseOf(a), gasolineModel: gas.id } as Situation, data).filter((i) => !['electricModel', 'energyPlan'].includes(i.field));
 }
 
-/** Pick the two scooters: the reader's own choice, or bestOptions' lowest five-year total that fits the answers. */
+/**
+ * Pick the two scooters: the reader's own choice, or the cheapest to buy (price paid after every
+ * subsidy, ties by five-year total) that fits the answers. This is the rule of the opening above,
+ * of home screens 12 and 13 and of the break-even (src/lib/home-money.ts), so the same answers give
+ * the same scooter and the same figure everywhere on the site.
+ */
 export function choose(a: Answers, data: EconDataset): Choice {
   const gasAuto = !a.gas || !data.gasModels.some((m) => m.id === a.gas && m.calculator === true);
   const gasolineModel = gasAuto ? rankGas(a, data)[0].id : (a.gas as string);
@@ -112,11 +117,11 @@ export function choose(a: Answers, data: EconDataset): Choice {
   const own = data.evModels.find((m) => m.id === evM && m.calculator === true && m.plans.includes(evP));
   if (own) return { situation: { ...base, electricModel: evM, energyPlan: evP } as Situation, evAuto: false, gasAuto, best: null, fellBack: false };
   const best = bestOptions(base as Omit<Situation, 'electricModel' | 'energyPlan'>, data);
-  const fits = (power: Power) => best.byFiveYearTotal.find((o) => (a.plate === 'any' || o.plateClass === 'heavy') && planKind(data, o.energyPlan) === power);
+  const fits = (power: Power) => best.byNetPrice.find((o) => (a.plate === 'any' || o.plateClass === 'heavy') && planKind(data, o.energyPlan) === power);
   let pick = fits(a.power);
   let fellBack = false;
   if (!pick) {
-    pick = fits('subscription') ?? best.byFiveYearTotal[0];
+    pick = fits('subscription') ?? best.byNetPrice[0];
     fellBack = true;
   }
   return { situation: { ...base, electricModel: pick!.electricModel, energyPlan: pick!.energyPlan } as Situation, evAuto: true, gasAuto, best, fellBack };
@@ -660,7 +665,9 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
       break;
     case 'b': {
       const same = Math.abs(v.purchaseGap) < 1;
-      const head = fill(same ? T.verdict.bSame : T.verdict.bLess, { gap: money(locale, -v.purchaseGap), km, plan: planName, monthly: monthlyNow(true) });
+      // Chinese puts a space between a Han character and a Latin brand: 「用 Gogoro …」
+      const planInline = locale === 'en' ? planName : planName.replace(/^(?=[A-Za-z0-9])/, ' ').replace(/(?<=[A-Za-z0-9）)])$/, ' ');
+      const head = fill(same ? T.verdict.bSame : T.verdict.bLess, { gap: money(locale, -v.purchaseGap), km, plan: planInline, monthly: monthlyNow(true) });
       const tail = e.comparison.breakEven.kind === 'gas-catches-up' ? fill(T.verdict.bCatch, { n: v.month! }) : fill(T.verdict.bAhead, { h });
       const avg = ph.later !== null ? fill(T.verdict.bAverage, { h, monthly: money(locale, v.monthlyGap) }) : '';
       sentence = [head, avg, tail, maintEv < maintGas ? T.verdict.bBuysMaint : T.verdict.bBuys].filter(Boolean).join(sep);

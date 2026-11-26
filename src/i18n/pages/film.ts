@@ -81,7 +81,7 @@ export default copy({
       noScrap: { 'zh-TW': '沒有機車可報廢', en: 'nothing to scrap' },
       where: { 'zh-TW': '{county}・{scrap}', en: '{county} · {scrap}' },
       /** In front of the second tag: it is the least favourable case in the table, not the reader's county. */
-      worst: { 'zh-TW': '最不划算：', en: 'Worst case: ' },
+      worst: { 'zh-TW': '挑最便宜的車，最不划算：', en: 'Cheapest models, worst case: ' },
       less: { 'zh-TW': '少付 {amount}', en: '{amount} less' },
       more: { 'zh-TW': '多付 {amount}', en: '{amount} more' },
       same: { 'zh-TW': '差不多，只差 {amount}', en: 'about the same: {amount} apart' },
@@ -121,8 +121,9 @@ export default copy({
     child: { main: { 'zh-TW': '小孩個子矮，呼吸又快。', en: 'Children are shorter and breathe faster.' } },
     rider: { main: { 'zh-TW': '騎士也在這一層裡。', en: 'The rider is in it too.' } },
     daily: {
-      main: { 'zh-TW': '一個紅燈很短，可是天天等。', en: 'One red light is short. But it’s daily.' },
-      note: { 'zh-TW': '一年約 {lo} 到 {hi} 小時', en: 'About {lo} to {hi} hours a year' },
+      main: { 'zh-TW': '紅燈很短，天天都等。', en: 'One red light is short. But it’s daily.' },
+      // (U+2060 after each dash keeps a range on one line) the condition goes with the figure, so it never reads as a different yearly figure from home screen 7
+      note: { 'zh-TW': '一天 2–\u20606 個，一年 {lo}–\u2060{hi} 小時', en: 'Two to six lights a day: {lo}–\u2060{hi} hours a year' },
     },
     years: {
       main: { 'zh-TW': '長年吸車子的廢氣，', en: 'Years of breathing traffic exhaust' },
@@ -229,8 +230,8 @@ export default copy({
         en: 'The tailpipe height is the figure the Institute of Transportation used in its junction modelling. The pushchair height comes from a review of dozens of pushchair models abroad.',
       },
       what: {
-        'zh-TW': '排氣管離地約 {pipe} 公分。嬰兒車裡的寶寶，呼吸的高度約 {lo} 到 {hi} 公分。小孩照體重算，吸進的空氣是大人的 {airLo} 到 {airHi} 倍。',
-        en: 'A tailpipe is about {pipe} cm off the ground. A baby in a pushchair breathes at about {lo} to {hi} cm. For their body weight, children breathe {airLo} to {airHi} times as much air as adults.',
+        'zh-TW': '運研所算的時候，把排氣管設在離地 {pipe} 公分。嬰兒車裡的寶寶，呼吸的高度約 {lo} 到 {hi} 公分。小孩照體重算，吸進的空氣是大人的 {airLo} 到 {airHi} 倍。',
+        en: 'The Institute of Transportation’s model puts a tailpipe {pipe} cm off the ground. A baby in a pushchair breathes at about {lo} to {hi} cm. For their body weight, children breathe {airLo} to {airHi} times as much air as adults.',
       },
       care: {
         'zh-TW': '排氣管的高度是算路口空氣時設定的數字，不是一輛一輛量的。小孩吸得比較多，講的是呼吸量，不是哪個高度的廢氣比較多。',

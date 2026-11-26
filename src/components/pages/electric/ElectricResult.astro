@@ -93,8 +93,9 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
   }
   .el-src a,
   .el-msg__links a {
-    display: inline-block;
-    padding-block: 0.15em;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
   }
   .el-src__sep {
     margin-inline: 0.35em;
@@ -113,14 +114,14 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
   .el-jump a {
     display: inline-flex;
     align-items: center;
-    min-block-size: 2.25rem;
+    min-block-size: var(--tap);
     font-weight: var(--fw-bold);
   }
   .el-row__more > summary {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    min-block-size: 2.25rem;
+    min-block-size: var(--tap);
     font-size: var(--fs-sm);
     color: var(--ink-2);
   }

@@ -135,7 +135,8 @@ for (const p of data.programmes) {
   earlyByDate.set(p.validTo, list);
 }
 const early = [...earlyByDate.entries()].map(([date, places]) => fill(T.risks.early, { places: places.join(locale === 'en' ? ' and ' : '、'), date: d(date) })).join(' ');
-const rangeDesc = run.range.map((r) => fill(T.monthly.rangeDescItem, { label: r.label, mid: perKm(r.mid), min: perKm(r.min), max: perKm(r.max) })).join(locale === 'en' ? '; ' : '；');
+// a row whose low and high are the same figure is one value: say it once, not 「1.64 元到 1.64 元」
+const rangeDesc = run.range.map((r) => (perKm(r.min) === perKm(r.max) ? fill(T.monthly.rangeDescOne, { label: r.label, v: perKm(r.min) }) : fill(T.monthly.rangeDescItem, { label: r.label, mid: perKm(r.mid), min: perKm(r.min), max: perKm(r.max) }))).join(locale === 'en' ? '; ' : '；');
 
 // running-cost table: one row per distance, a column per way of powering it (CompareTable stacks on phones)
 const homeCols = run.homeModels.map((m) => ({ id: m.id, label: `${T.monthly.rows.home} · ${readerText(m.name[locale]).replace(/[（(].*$/, '')} · ${T.result.plate[m.plateClass]}` }));
@@ -289,14 +290,14 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     </Figure>
 
     <div class="el-two">
-      <Figure locale={locale} title={T.monthly.rangeTitle} subtitle={`${T.monthly.rangeSub}; ${fill(T.monthly.rangeAt, { km: nf(run.REF) })}`} badge="derived" secondary>
+      <Figure locale={locale} title={T.monthly.rangeTitle} subtitle={`${T.monthly.rangeSub}${locale === 'en' ? '; ' : '；'}${fill(T.monthly.rangeAt, { km: nf(run.REF) })}`} badge="derived" secondary>
         <RangePlot
           locale={locale}
           title={plain(T.monthly.rangeTitle)}
           data={run.range}
           labels={{ min: T.monthly.rangeLabels.min, mid: T.monthly.rangeLabels.mid, max: T.monthly.rangeLabels.max }}
           decimals={2}
-          unit="NT$/km"
+          unit={T.monthly.rangeUnit}
           categoryLabel={T.monthly.rangeCategory}
           desc={rangeDesc}
         />

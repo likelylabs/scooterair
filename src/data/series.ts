@@ -125,12 +125,12 @@ const IOT_CAVEAT = t(
   'A computer simulation, not readings before and after a change; the report\'s cover says its conclusions are not the transport ministry\'s view.',
 );
 const POLLUTANTS: Category[] = [
-  { key: 'pm25', label: t('細懸浮微粒 PM2.5', 'PM2.5') },
-  { key: 'pm10', label: t('懸浮微粒 PM10', 'PM10') },
-  { key: 'nox', label: t('氮氧化物 NOx', 'Nitrogen oxides (NOx)') },
-  { key: 'nmhc', label: t('非甲烷碳氫化合物 NMHC', 'Non-methane hydrocarbons (NMHC)') },
-  { key: 'thc', label: t('總碳氫化合物 THC', 'Total hydrocarbons (THC)') },
-  { key: 'co', label: t('一氧化碳 CO', 'Carbon monoxide (CO)') },
+  { key: 'pm25', label: t('細懸浮微粒（PM2.5）', 'Fine particles (PM2.5)') },
+  { key: 'pm10', label: t('比較粗的微粒（PM10）', 'Coarser particles (PM10)') },
+  { key: 'nox', label: t('氮氧化物（NOx）', 'Nitrogen oxides (NOx)') },
+  { key: 'nmhc', label: t('油氣，不算甲烷（NMHC）', 'Fuel vapour, not counting methane (NMHC)') },
+  { key: 'thc', label: t('油氣，全部（THC）', 'Fuel vapour, all of it (THC)') },
+  { key: 'co', label: t('一氧化碳（CO）', 'Carbon monoxide (CO)') },
 ];
 const SIM_DAYS: Category[] = [1, 2, 3, 4].map((d) => ({ key: `day${d}`, label: t(`第${d}模擬日`, `Simulated day ${d}`) }));
 const iot = (y: number, mark: '' | '*' | '#' = '', extra: PointFlag[] = []): SeriesPoint => ({
@@ -146,7 +146,7 @@ const baseSeries = {
   // -------------------------------------------------------------------------
   'teds13-motorcycle-share': {
     topic: 'emissions',
-    title: t('燃油機車占全國排放的比例', 'Gasoline scooters\' share of national emissions'),
+    title: t('燃油機車占全國排放的比例', 'Petrol scooters\' share of national emissions'),
     description: t(
       '機車的 PM2.5 占比很小，但一氧化碳與碳氫化合物占比很大：機車排得多的是氣體，不是微粒。',
       'Scooters\' share of PM2.5 is small, but their shares of carbon monoxide and hydrocarbons are large: scooters emit a large share of exhaust gases, not of particles.',
@@ -182,7 +182,7 @@ const baseSeries = {
       },
       {
         key: 'combined',
-        label: t('燃油機車合計', 'All gasoline scooters'),
+        label: t('燃油機車合計', 'All petrol scooters'),
         points: [
           { x: 'pm25', y: 1.31 },
           { x: 'pm10', y: 0.54 },
@@ -238,7 +238,7 @@ const baseSeries = {
       },
       {
         key: 'combined',
-        label: t('燃油機車合計', 'Gasoline combined'),
+        label: t('燃油機車合計', 'Petrol combined'),
         points: [
           { x: 'pm25', y: 441.7 },
           { x: 'pm10', y: 591.6 },
@@ -460,7 +460,7 @@ const baseSeries = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '2026 年數字出自媒體轉述（次級來源）。登記數在 2013 年因老舊機車切結報廢而出現斷層，所以 2013 年前後的數字不能直接比較。',
+      '2026 年數字出自媒體轉述。登記數在 2013 年因老舊機車切結報廢而出現斷層，所以 2013 年前後的數字不能直接比較。',
       'The 2026 figures come from a media report (secondary). The registration series has a break in 2013, when large numbers of old scooters were struck off the register on their owners\' signed declaration, so counts before and after 2013 are not directly comparable.',
     ),
     relatedFacts: ['fleet-registered-2024', 'fleet-electric-registered-2024', 'fleet-fuel-mix-may-2026'],
@@ -525,7 +525,7 @@ const baseSeries = {
             y: 11.6,
             flags: ['derived'],
             sources: ['chinatimes-2022-gogoro-briefing'],
-            note: t('由總銷量與燃油機車銷量推算。', 'Calculated from total and gasoline sales.'),
+            note: t('由總銷量與燃油機車銷量推算。', 'Calculated from total and petrol sales.'),
           },
           { x: 2022, y: 11.9, sources: ['pts-2026-04-ev-share'] },
           { x: 2023, y: 9.14, sources: ['ucar-ev-sales-2023', 'tvbs-cars-2024-market-total'] },
@@ -577,7 +577,7 @@ const baseSeries = {
   },
   'new-registrations-electric-vs-gasoline': {
     topic: 'electric',
-    title: t('新領牌機車：電動與燃油', 'New motorcycle registrations: electric vs gasoline'),
+    title: t('新領牌機車：電動與燃油', 'New motorcycle registrations: electric vs petrol'),
     description: t('電動機車新領牌數從 2019 年的 168,542 輛降到 2025 年的 49,128 輛。', 'New electric registrations fell from 168,542 in 2019 to 49,128 in 2025.'),
     chart: 'stacked-bar',
     unit: 'vehicles',
@@ -596,7 +596,7 @@ const baseSeries = {
       },
       {
         key: 'gasoline',
-        label: t('燃油機車', 'Gasoline'),
+        label: t('燃油機車', 'Petrol'),
         points: [
           { x: '2019', y: 733760 },
           { x: '2021', y: 715197 },
@@ -619,8 +619,8 @@ const baseSeries = {
     confidence: 'secondary',
     evidence: 'official-tw',
     caveat: t(
-      '出自媒體轉述的統計；2021 年為企業（Gogoro）公布的銷量；標示「本站計算」的數字為相減或回推所得，2025 年燃油機車數為約略值。',
-      'From media reports of statistics; 2021 figures are company (Gogoro) sales data; points marked as our calculation are subtractions or back-calculations, and the 2025 gasoline figure is approximate.',
+      '出自媒體轉述的統計；2021 年為企業（Gogoro）公布的銷量；標示「本站計算」的數字為相減或回推所得，2025 年燃油機車數為約略值。2020 年的數字沒查證到；2022 年只查到電動機車占的比例（約 11.9%），沒查到輛數，所以這張圖沒有這兩年。',
+      'From media reports of statistics; 2021 figures are company (Gogoro) sales data; points marked as our calculation are subtractions or back-calculations, and the 2025 petrol figure is approximate. The 2020 figures could not be verified; for 2022 we found only the electric share (about 11.9%), not the numbers of scooters, so this chart leaves those two years out.',
     ),
     chainLink: 7,
     research: '01 §7, Chart B',
@@ -779,7 +779,7 @@ const baseSeries = {
         label: t('戴口罩步行（在口罩外量）', 'Walking with a respirator (measured outside the mask)'),
         note: t('監測器在口罩外面，量的不是戴口罩的人吸進的空氣。', 'The monitor was outside the mask; this is not what the wearer breathed.'),
       },
-      { key: 'scooter', label: t('騎燃油機車', 'Gasoline scooter') },
+      { key: 'scooter', label: t('騎燃油機車', 'Petrol scooter') },
     ],
     datasets: [
       {
@@ -851,7 +851,7 @@ const baseSeries = {
     evidence: 'measured-tw',
     caveat: t(
       '兩組數字的單位不同，不能放在同一個刻度上比較。騎士騎的是電動機車，量到的是周圍車流的廢氣；這是研究助理在行進中的暴露，不是行人，也不是燃油與電動機車的比較。',
-      'The two datasets are in different units and cannot be read against one scale. The riders used electric scooters, so this is surrounding traffic\'s exhaust; it is research assistants riding, not pedestrians, and not a gasoline-versus-electric comparison.',
+      'The two datasets are in different units and cannot be read against one scale. The riders used electric scooters, so this is surrounding traffic\'s exhaust; it is research assistants riding, not pedestrians, and not a petrol-versus-electric comparison.',
     ),
     requiresCaveat: true,
     relatedFacts: ['scooter-lane-btex-wu2021', 'cyclist-vs-scooter-lane-benzene-wu2021'],
@@ -1155,23 +1155,23 @@ const baseSeries = {
   // -------------------------------------------------------------------------
   'hei-sr23-outcomes': {
     topic: 'health',
-    title: t('交通相關空氣污染與健康結果的關聯（HEI，2022）', 'Traffic-related air pollution and health outcomes (HEI, 2022)'),
+    title: t('長年吸車子的廢氣，哪些病比較多（HEI，2022）', 'Years of traffic exhaust: which illnesses are more common (HEI, 2022)'),
     description: t(
-      '大多數結果的相對風險略高於 1（約 1.02 至 1.11）；兒童氣喘發病的區間包含 1。類別說明為 HEI 的整體信心等級。',
-      'Most relative risks sit slightly above 1 (about 1.02 to 1.11); for children\'s asthma onset the interval includes 1. Category notes give HEI\'s overall confidence rating.',
+      '1 代表沒有差別，1.05 代表多 5%。大多數的病多了 2% 到 11%。小孩開始有氣喘那一項，線碰到 1，所以不能確定有差別。每一行旁邊寫的是 HEI 自己說有多確定。',
+      '1 means no difference; 1.05 means 5% more. Most of these illnesses are 2% to 11% more common. For children starting to have asthma the line touches 1, so a difference is not certain. Beside each row is how sure HEI itself says it is.',
     ),
     chart: 'dot-range',
     unit: 'relative-risk',
     categories: [
-      { key: 'asthmaChildren', label: t('兒童氣喘發病', 'Asthma onset, children'), note: t('中至高', 'Moderate to high') },
-      { key: 'asthmaAdults', label: t('成人氣喘發病', 'Asthma onset, adults'), note: t('中至高', 'Moderate to high') },
-      { key: 'alriChildren', label: t('兒童急性下呼吸道感染', 'Acute lower respiratory infection, children'), note: t('中至高', 'Moderate to high') },
-      { key: 'allCause', label: t('全死因死亡', 'All-cause mortality'), note: t('高', 'High') },
-      { key: 'circulatory', label: t('循環系統疾病死亡', 'Circulatory mortality'), note: t('高', 'High') },
-      { key: 'ihd', label: t('缺血性心臟病死亡', 'Ischaemic heart disease mortality'), note: t('高', 'High') },
-      { key: 'lungCancer', label: t('肺癌死亡', 'Lung cancer mortality'), note: t('中至高', 'Moderate to high') },
-      { key: 'termLbw', label: t('足月低出生體重', 'Term low birth weight'), note: t('中', 'Moderate') },
-      { key: 'sga', label: t('小於妊娠年齡', 'Small for gestational age'), note: t('中', 'Moderate') },
+      { key: 'asthmaChildren', label: t('小孩開始有氣喘', 'Children starting to have asthma'), note: t('中至高', 'Moderate to high') },
+      { key: 'asthmaAdults', label: t('大人開始有氣喘', 'Adults starting to have asthma'), note: t('中至高', 'Moderate to high') },
+      { key: 'alriChildren', label: t('小孩肺部、氣管急性發炎', 'Children’s chest infections'), note: t('中至高', 'Moderate to high') },
+      { key: 'allCause', label: t('各種原因的死亡', 'Deaths from any cause'), note: t('高', 'High') },
+      { key: 'circulatory', label: t('心臟和血管的病致死', 'Deaths from heart and blood-vessel disease'), note: t('高', 'High') },
+      { key: 'ihd', label: t('冠心病致死', 'Deaths from coronary heart disease'), note: t('高', 'High') },
+      { key: 'lungCancer', label: t('肺癌致死', 'Deaths from lung cancer'), note: t('中至高', 'Moderate to high') },
+      { key: 'termLbw', label: t('足月出生但體重太輕', 'Full-term babies born too small'), note: t('中', 'Moderate') },
+      { key: 'sga', label: t('寶寶比該有的週數小', 'Babies small for their age in the womb'), note: t('中', 'Moderate') },
     ],
     datasets: [
       {
@@ -1183,7 +1183,7 @@ const baseSeries = {
             y: 1.05,
             low: 0.99,
             high: 1.12,
-            note: t('95%信賴區間包含1，不能排除沒有差別。', '95% interval includes 1: no difference cannot be ruled out.'),
+            note: t('範圍碰到 1，不能確定有差別。', 'The range touches 1: a difference is not certain.'),
           },
           { x: 'asthmaAdults', y: 1.1, low: 1.01, high: 1.21 },
           { x: 'alriChildren', y: 1.09, low: 1.03, high: 1.16 },
@@ -1202,7 +1202,7 @@ const baseSeries = {
             y: 1.11,
             low: 0.94,
             high: 1.31,
-            note: t('95%信賴區間包含1，不能排除沒有差別。', '95% interval includes 1: no difference cannot be ruled out.'),
+            note: t('範圍碰到 1，不能確定有差別。', 'The range touches 1: a difference is not certain.'),
           },
           { x: 'allCause', y: 1.02, low: 1.0, high: 1.04 },
           { x: 'termLbw', y: 1.11, low: 1.03, high: 1.2 },
@@ -1381,13 +1381,13 @@ const baseSeries = {
   'econ-motc-spend-by-class': {
     topic: 'economics',
     title: t('每輛機車一年的油電、保養與停車支出', 'Yearly spend per scooter on energy, maintenance and parking'),
-    description: t('電動機車車主花在充電或租電池的錢，比普通重型燃油機車車主的油錢多；保養費只差一點。', 'Electric owners spend more on charging or battery rental than heavy-class gasoline owners spend on fuel; maintenance differs only slightly.'),
+    description: t('電動機車車主花在充電或租電池的錢，比普通重型燃油機車車主的油錢多；保養費只差一點。', 'Electric owners spend more on charging or battery rental than heavy-class petrol owners spend on fuel; maintenance differs only slightly.'),
     chart: 'stacked-bar',
     unit: 'ntd-per-year',
     categories: [
       { key: 'electric', label: t('電動機車', 'Electric') },
-      { key: 'gasolineHeavy', label: t('普通重型燃油機車', 'Heavy-class gasoline') },
-      { key: 'gasolineLight', label: t('輕型燃油機車', 'Light-class gasoline') },
+      { key: 'gasolineHeavy', label: t('普通重型燃油機車', 'Heavy-class petrol') },
+      { key: 'gasolineLight', label: t('輕型燃油機車', 'Light-class petrol') },
     ],
     yLabel: t('每年（元）', 'Per year (NT$)'),
     datasets: [

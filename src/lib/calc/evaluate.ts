@@ -126,7 +126,7 @@ function likeForLike(ev: EvModel, gas: GasModel): Comparison['likeForLike'] {
       verdict: 'different-class',
       note: t(
         `${ev.name['zh-TW']}：${ev.performance.text['zh-TW']}和${gas.displacementCc}cc燃油機車比價時，比的不是同級車；價差較小，部分原因是買的車比較小。`,
-        `${ev.name.en}: ${ev.performance.text.en} Against a ${gas.displacementCc}cc gasoline scooter this is not a like-for-like comparison; part of any price advantage comes from buying a smaller vehicle.`,
+        `${ev.name.en}: ${ev.performance.text.en} Against a ${gas.displacementCc}cc petrol scooter this is not a like-for-like comparison; part of any price advantage comes from buying a smaller vehicle.`,
       ),
     };
   }
@@ -135,7 +135,7 @@ function likeForLike(ev: EvModel, gas: GasModel): Comparison['likeForLike'] {
       verdict: 'same-class-performance-unverified',
       note: t(
         `${ev.name['zh-TW']}和${gas.displacementCc}cc燃油機車同屬普通重型（白牌），但我們沒有可查證的性能數據可以確認兩者相當。`,
-        `${ev.name.en} and the ${gas.displacementCc}cc gasoline scooter are both in the heavy (white-plate) class, but we have no verified performance figures to confirm they are equivalent.`,
+        `${ev.name.en} and the ${gas.displacementCc}cc petrol scooter are both in the heavy (white-plate) class, but we have no verified performance figures to confirm they are equivalent.`,
       ),
     };
   }
@@ -253,8 +253,8 @@ export function breakEvenPhrase(b: Comparison['breakEven'], horizonMonths: numbe
         : t(`第${b.month}個月打平`, `break-even at month ${b.month}`);
     case 'gas-catches-up':
       return back
-        ? t(`燃油機車第${b.month}個月追上（之前曾短暫交錯）`, `gasoline catches up at month ${b.month} (after the lines crossed back and forth)`)
-        : t(`燃油機車第${b.month}個月追上`, `gasoline catches up at month ${b.month}`);
+        ? t(`燃油機車第${b.month}個月追上（之前曾短暫交錯）`, `petrol catches up at month ${b.month} (after the lines crossed back and forth)`)
+        : t(`燃油機車第${b.month}個月追上`, `petrol catches up at month ${b.month}`);
     case 'ev-ahead':
       if (back) return t(`電動機車買時較便宜，${h['zh-TW']}後總花費仍較低（中間有幾個月較貴）`, `electric is cheaper to buy and still cheaper in total after ${h.en} (dearer for a few months in between)`);
       return b.runningCheaper === false
@@ -278,7 +278,7 @@ function buildMessages(c: Ctx): Message[] {
   const lines = [...evP.ledger.lines, ...gasP.ledger.lines];
   const excludedAll = [...evP.ledger.excluded, ...gasP.ledger.excluded];
   const names = (ls: { label: L10n }[]) => list(uniqueText(ls.map((l) => l.label)));
-  const SIDE = { electric: t('電動機車', 'Electric'), gasoline: t('燃油機車', 'Gasoline') } as const;
+  const SIDE = { electric: t('電動機車', 'Electric'), gasoline: t('燃油機車', 'Petrol') } as const;
   const sided = (side: 'electric' | 'gasoline', text: L10n) => t(`${SIDE[side]['zh-TW']}：${text['zh-TW']}`, `${SIDE[side].en}: ${lowerFirst(text.en)}`);
   const isGogoro = ev.brand.en === 'Gogoro';
 
@@ -359,7 +359,7 @@ function buildMessages(c: Ctx): Message[] {
         const head =
           side === 'electric'
             ? t(`電動機車：期限是 ${on['zh-TW']}。`, `Electric: the deadline is ${on.en}.`)
-            : t(`燃油機車：下面這些優惠或減稅只到 ${on['zh-TW']}，之後燃油機車的價格可能不一樣。`, `Gasoline: these offers or tax cuts end on ${on.en}; after that the gasoline scooter's price may be different.`);
+            : t(`燃油機車：下面這些優惠或減稅只到 ${on['zh-TW']}，之後燃油機車的價格可能不一樣。`, `Petrol: these offers or tax cuts end on ${on.en}; after that the petrol scooter's price may be different.`);
         push({
           code: 'deadline',
           severity: d.daysLeft <= 45 ? 'warning' : 'info',
@@ -700,7 +700,7 @@ function buildMessages(c: Ctx): Message[] {
   push({
     code: 'secondary-input',
     severity: 'warning',
-    text: t(`以下數字依據次級來源（媒體報導、部落格或本站推算），沒有更可靠的官方數字可用：${list(uniqueText(secondary))['zh-TW']}。`, `These inputs rest on secondary sources (media, blogs or our own arithmetic) because no verified figure was available: ${list(uniqueText(secondary)).en}.`),
+    text: t(`下面這些數字只在轉述中看到（媒體報導、部落格或本站推算），沒有更可靠的官方數字：${list(uniqueText(secondary))['zh-TW']}。`, `These inputs rest on secondary sources (media, blogs or our own arithmetic) because no verified figure was available: ${list(uniqueText(secondary)).en}.`),
   });
 
   // Like-for-like.
@@ -720,7 +720,7 @@ function buildMessages(c: Ctx): Message[] {
       smoothingOver ? (data.fuel.smoothing.mechanismAfterEnd ?? data.fuel.smoothing.mechanism) : data.fuel.smoothing.mechanism,
       t(
         `以每月${n(s.monthlyKm)}公里計，這台燃油機車每月油錢約${ntd(fuelNow)['zh-TW']}；如果這項壓低油價的措施結束（每公升多${data.fuel.smoothing.typical}元），每個月要多花約${ntd(fuelDelta)['zh-TW']}，結果會是：${be(comparison.withoutSmoothing.breakEven)['zh-TW']}（${smoothingOver ? '以查證時的油價計' : '現在'}：${be(comparison.breakEven)['zh-TW']}）。`,
-        `At ${n(s.monthlyKm)} km a month this gasoline scooter uses about ${ntd(fuelNow).en} of fuel. If this help with the pump price ended (NT$${data.fuel.smoothing.typical} more a litre), it would cost about ${ntd(fuelDelta).en} more a month, and the result would be: ${be(comparison.withoutSmoothing.breakEven).en} (${smoothingOver ? 'at the price we checked' : 'now'}: ${be(comparison.breakEven).en}).`,
+        `At ${n(s.monthlyKm)} km a month this petrol scooter uses about ${ntd(fuelNow).en} of fuel. If this help with the pump price ended (NT$${data.fuel.smoothing.typical} more a litre), it would cost about ${ntd(fuelDelta).en} more a month, and the result would be: ${be(comparison.withoutSmoothing.breakEven).en} (${smoothingOver ? 'at the price we checked' : 'now'}: ${be(comparison.breakEven).en}).`,
       ),
     ),
     amount: Math.round(fuelDelta),
@@ -744,7 +744,7 @@ function buildMessages(c: Ctx): Message[] {
         data.fees.roadFeeElectric.futureNote,
         t(
           `如果以後照${band['zh-TW']}燃油機車每年${n(rate)}元收，在這裡算的${horizonText(s.horizonMonths)['zh-TW']}裡，電動機車大約要多付${ntd(extra)['zh-TW']}（沒有算進去）。`,
-          `If it were charged at the ${band.en} gasoline rate of NT$${n(rate)} a year, electric would pay about ${ntd(extra).en} more within the ${horizonText(s.horizonMonths).en} counted here (not included).`,
+          `If it were charged at the ${band.en} petrol rate of NT$${n(rate)} a year, electric would pay about ${ntd(extra).en} more within the ${horizonText(s.horizonMonths).en} counted here (not included).`,
         ),
       ),
       amount: extra,
@@ -1049,9 +1049,9 @@ function rankResults(base: Omit<Situation, 'electricModel' | 'energyPlan'>, done
       text: closestSame
         ? t(
             `沒有任何選項經查證是125cc燃油機車的同級替代品。同屬白牌、最接近打平的是${closestSame.modelName['zh-TW']}，但它的性能是否相當未能查證。`,
-            `No option is verified as a like-for-like substitute for a 125cc gasoline scooter. The closest white-plate option is ${closestSame.modelName.en}, but whether its performance is equivalent is not verified.`,
+            `No option is verified as a like-for-like substitute for a 125cc petrol scooter. The closest white-plate option is ${closestSame.modelName.en}, but whether its performance is equivalent is not verified.`,
           )
-        : t('沒有任何選項經查證是125cc燃油機車的同級替代品，也沒有同屬白牌的選項。', 'No option is verified as a like-for-like substitute for a 125cc gasoline scooter, and none is in the same white-plate class.'),
+        : t('沒有任何選項經查證是125cc燃油機車的同級替代品，也沒有同屬白牌的選項。', 'No option is verified as a like-for-like substitute for a 125cc petrol scooter, and none is in the same white-plate class.'),
       ...(closestSame ? { about: [closestSame.electricModel] } : {}),
     });
   }

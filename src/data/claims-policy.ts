@@ -131,7 +131,7 @@ export const claimRules = {
     topic: 'exposure',
     rule: t(
       'Wu 等（2021）一律寫成「台北騎自行車與機車的通勤者」，不可寫成行人；機車組騎的是電動機車，吸入的是周圍車流的廢氣，研究沒有比較燃油與電動機車，也沒有把苯歸因於機車。機車對PM2.5「可能貢獻較多」是因為數量多，每輛公車貨車的影響約為機車的8至10倍。Chuang 等（2020）的騎機車組也是騎士自己的暴露。',
-      'Wu et al. 2021 is always "commuters on bicycles and scooters, Taipei", never pedestrians; its scooter group rode electric scooters and breathed surrounding traffic, the study did not compare gasoline with electric, and it does not attribute benzene to scooters. Scooters "could contribute more" to PM2.5 only because there are more of them; per vehicle a bus or truck added about 8-10 times as much. Chuang et al. 2020\'s scooter mode is likewise the rider\'s own exposure.',
+      'Wu et al. 2021 is always "commuters on bicycles and scooters, Taipei", never pedestrians; its scooter group rode electric scooters and breathed surrounding traffic, the study did not compare petrol with electric, and it does not attribute benzene to scooters. Scooters "could contribute more" to PM2.5 only because there are more of them; per vehicle a bus or truck added about 8-10 times as much. Chuang et al. 2020\'s scooter mode is likewise the rider\'s own exposure.',
     ),
     why: t(
       '全文顯示受測騎士是研究助理，騎租來的電動機車以免量到自己的廢氣；車種歸因只做了PM2.5。',
@@ -234,7 +234,7 @@ export const claimRules = {
     topic: 'emissions',
     rule: t(
       '不可把機車說成PM2.5的主要來源：燃油機車只占全國原生PM2.5排放的1.31%，每公里PM2.5排放也低於汽柴油車。機車的問題在碳氫化合物、苯、一氧化碳、數量龐大與離人很近。',
-      'Do not present scooters as a major PM2.5 source: gasoline scooters are 1.31% of primary PM2.5 emissions and emit less PM2.5 per km than cars or diesels. The case rests on hydrocarbons, benzene, CO, fleet size and proximity.',
+      'Do not present scooters as a major PM2.5 source: petrol scooters are 1.31% of primary PM2.5 emissions and emit less PM2.5 per km than cars or diesels. The case rests on hydrocarbons, benzene, CO, fleet size and proximity.',
     ),
     why: t('依TEDS 13.0與台灣排放係數研究。', 'Per TEDS 13.0 and Taiwanese emission-factor studies.'),
     patterns: { 'zh-TW': ['機車.{0,12}(PM2\\.5|細懸浮微粒).{0,10}(主要|最大)來源'], en: ['scooters?.{0,30}(main|major|biggest|largest) source of (PM2\\.5|fine particles)'] },
@@ -347,7 +347,7 @@ export const claimRules = {
     topic: 'policy',
     rule: t(
       '不可說政府已宣布禁售燃油機車；淨零路徑只有2040年電動機車市售比100%的目標。',
-      'Do not say the government has banned (or announced a ban on) new gasoline scooters; the net-zero path only sets a 100% electric sales-share target for 2040.',
+      'Do not say the government has banned (or announced a ban on) new petrol scooters; the net-zero path only sets a 100% electric sales-share target for 2040.',
     ),
     why: t('媒體說法互相矛盾，找不到國發會或交通部的正式文件。', 'Media statements conflict, and no NDC or MOTC primary document was found.'),
     patterns: { 'zh-TW': ['禁售', '禁止(販售|銷售)燃油'], en: ['\\bban(s|ned)?\\b.{0,30}(gas|petrol|gasoline)', 'phase[- ]out law'] },
@@ -394,7 +394,7 @@ export const claimRules = {
     topic: 'electric',
     rule: t(
       '電動機車銷量下滑的原因（補助減少、Gogoro方案調整、燃油機車貨物稅減徵）只能寫成「媒體報導認為」，不可寫成已證實的因果。',
-      'Reasons for falling electric sales (subsidy cuts, Gogoro plan changes, the gasoline excise-tax cut) may only be attributed to media reports, not stated as established causes.',
+      'Reasons for falling electric sales (subsidy cuts, Gogoro plan changes, the petrol excise-tax cut) may only be attributed to media reports, not stated as established causes.',
     ),
     why: t('這些原因只見於媒體分析。', 'These causes appear only in media analysis.'),
     facts: ['ev-registrations-decline-2019-2025', 'gas-scooter-excise-cut-2025'],
@@ -424,13 +424,13 @@ export const claimRules = {
     topic: 'hazard',
     rule: t(
       '不可說汽油（機車）廢氣是IARC第1級致癌物，或「和柴油一樣致癌」。汽油引擎廢氣是2B級；苯與室外空氣污染才是1級。',
-      'Do not say gasoline (scooter) exhaust is an IARC Group 1 carcinogen or "as carcinogenic as diesel". Gasoline engine exhaust is Group 2B; benzene and outdoor air pollution are Group 1.',
+      'Do not say petrol (scooter) exhaust is an IARC Group 1 carcinogen or "as carcinogenic as diesel". Petrol engine exhaust is Group 2B; benzene and outdoor air pollution are Group 1.',
     ),
     instead: t(
       'IARC把汽油引擎廢氣列為「可能致癌」（2B級）；汽油廢氣中含有的苯，以及整體室外空氣污染，則被列為「對人類致癌」（1級）。',
-      'IARC classifies gasoline engine exhaust as "possibly carcinogenic" (Group 2B); benzene, which gasoline exhaust contains, and outdoor air pollution as a whole are "carcinogenic to humans" (Group 1).',
+      'IARC classifies petrol engine exhaust as "possibly carcinogenic" (Group 2B); benzene, which petrol exhaust contains, and outdoor air pollution as a whole are "carcinogenic to humans" (Group 1).',
     ),
-    why: t('IARC 2012年重新評估後維持2B級；柴油廢氣是1級，不可混為一談。', 'IARC kept gasoline exhaust at 2B in 2012; diesel exhaust is Group 1 and must not be conflated.'),
+    why: t('IARC 2012年重新評估後維持2B級；柴油廢氣是1級，不可混為一談。', 'IARC kept petrol exhaust at 2B in 2012; diesel exhaust is Group 1 and must not be conflated.'),
     patterns: {
       'zh-TW': ['(汽油|機車).{0,10}(廢氣|排氣).{0,15}(第?一級|1\\s*級|一類|1\\s*類)', '(和|跟|與)柴油一樣'],
       en: ['(gasoline|petrol|scooter) (engine )?exhaust.{0,30}group 1\\b', 'as carcinogenic as diesel'],
@@ -824,9 +824,9 @@ export const claimRules = {
     ),
     instead: t(
       '機車的排放問題在一氧化碳、碳氫化合物與苯；2021年汽油車排放的苯約為機車的兩倍，機車的苯排放自2013年下降約73%。',
-      'Scooters\' emissions problem is carbon monoxide, hydrocarbons and benzene; in 2021 gasoline cars emitted about twice as much benzene as scooters, and scooter benzene had fallen about 73% since 2013.',
+      'Scooters\' emissions problem is carbon monoxide, hydrocarbons and benzene; in 2021 petrol cars emitted about twice as much benzene as scooters, and scooter benzene had fallen about 73% since 2013.',
     ),
-    why: t('TEDS 13.0與Tsai 等（2023）把機車的PM2.5與氮氧化物排在最低；苯的年總量從2016年起汽油車較多。', 'TEDS 13.0 and Tsai et al. 2023 put scooters lowest for PM2.5 and NOx; from 2016 gasoline vehicles emitted more benzene in total.'),
+    why: t('TEDS 13.0與Tsai 等（2023）把機車的PM2.5與氮氧化物排在最低；苯的年總量從2016年起汽油車較多。', 'TEDS 13.0 and Tsai et al. 2023 put scooters lowest for PM2.5 and NOx; from 2016 petrol vehicles emitted more benzene in total.'),
     patterns: {
       'zh-TW': ['機車.{0,10}(主要|最大)的?(苯|PM2\\.5|細懸浮微粒|氮氧化物|微粒)?(排放)?來源', '機車.{0,10}(苯|PM2\\.5).{0,10}(比汽車多|多於汽車)'],
       en: ['scooters?.{0,20}(main|largest|biggest|major) source of (traffic )?(benzene|PM2\\.5|fine particles|NOx)', 'scooters? emit more (PM2\\.5|NOx) than cars'],
@@ -1297,7 +1297,7 @@ export const claimRules = {
       '能在家插電、不付電池月租的車，電費遠低於油錢，但我們查到的這類車只有一家廠商的兩款；主流車款多半要付換電月租，騎得少的人會比油錢貴。換電方案划不划算，要看里程與換電時段。',
       'A scooter you can plug in at home with no battery plan costs far less in electricity than fuel, but we found only two such models, from one maker; most mainstream models need a swap plan, which costs more than fuel for low-mileage riders. Whether a swap plan pays off depends on mileage and when you swap.',
     ),
-    why: t('每月300公里時，新款125cc油錢約160至220元，而在這個里程最便宜的換電方案也要488元；交通部調查中，電動機車車主每年的油電支出也比燃油車主高。', 'At 300 km a month a modern 125cc uses about NT$160–220 of fuel, while the cheapest swap plan at that distance costs NT$488; in the MOTC survey electric owners also spent more a year on energy than gasoline owners.'),
+    why: t('每月300公里時，新款125cc油錢約160至220元，而在這個里程最便宜的換電方案也要488元；交通部調查中，電動機車車主每年的油電支出也比燃油車主高。', 'At 300 km a month a modern 125cc uses about NT$160–220 of fuel, while the cheapest swap plan at that distance costs NT$488; in the MOTC survey electric owners also spent more a year on energy than petrol owners.'),
     patterns: { 'zh-TW': ['(電動|電車).{0,10}(一定|絕對|都)(比較)?(省|便宜)'], en: ['electric.{0,30}(always|definitely) cheaper to run'] },
     facts: ['econ-swap-vs-petrol-low-mileage', 'econ-home-charging-cost-per-km', 'econ-motc-annual-spend'],
     research: 'econ/running-costs#swap-vs-petrol-lowmileage',

@@ -36,8 +36,8 @@ export default copy({
       en: '{city}’s subsidy closed on {date}. Central subsidies run to 31 December.',
     },
     'A-city-unknown': {
-      'zh-TW': '{city}：今年的補助我們查不到，請洽環保局。中央補助到 12 月 31 日。',
-      en: '{city}: we could not check this year’s subsidy; please ask the environmental bureau. Central subsidies run to 31 December.',
+      'zh-TW': '{city}：今年的補助我們查不到，請打電話問當地的環保局或縣市政府。中央補助到 12 月 31 日。',
+      en: '{city}: we could not check this year’s subsidy; please phone the local environmental bureau or county government. Central subsidies run to 31 December.',
     },
     B: {
       'zh-TW': '買車期限過了。12 月 31 日前買車的人，線上申請多半到 1 月 10 日。',
@@ -71,7 +71,7 @@ export default copy({
     label: { 'zh-TW': '補助時間軸', en: 'Subsidy timeline' },
     today: { 'zh-TW': '今天', en: 'Today' },
     purchaseDate: { 'zh-TW': '12/31', en: '31 Dec' },
-    purchase: { 'zh-TW': '買車、領牌的最後期限', en: 'Last day to buy and register' },
+    purchase: { 'zh-TW': '中央補助：買車、領牌的最後期限', en: 'Central subsidy: last day to buy and register' },
     filingDate: { 'zh-TW': '1/10', en: '10 Jan' },
     filing: { 'zh-TW': '線上申請截止（各縣市不同）', en: 'Online applications close (varies by city)' },
     nextDate: { 'zh-TW': '2027', en: '2027' },

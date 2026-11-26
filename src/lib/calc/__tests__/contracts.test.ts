@@ -224,7 +224,7 @@ test('[test-gaps 9] parity scans report every interval when the cost curve is no
 test('[test-gaps 10] group-scoped messages attach to the right ledger; the EV road fee is worked out from the electric class', () => {
   const k = evaluate(situation({ jurisdiction: 'kinmen', electricModel: 'gogoro-ezzy-500', energyPlan: 'gogoro-888', scrap: twoStroke2002 }));
   const ev = k.messages.find((m) => m.code === 'ambiguity' && m.about?.includes('kinmen-vs-moenv') && m.text.en.startsWith('Electric'));
-  const gas = k.messages.find((m) => m.code === 'ambiguity' && m.about?.includes('kinmen-vs-moenv') && m.text.en.startsWith('Gasoline'));
+  const gas = k.messages.find((m) => m.code === 'ambiguity' && m.about?.includes('kinmen-vs-moenv') && m.text.en.startsWith('Petrol'));
   assert.ok(ev && k.electric.purchase.messages.includes(ev));
   assert.ok(gas && k.gasoline.purchase.messages.includes(gas));
   // Road fee from 2031: (rate / 12) x months from 2031-01-01 to the horizon end (2031-11-01 for a 2026-11-25 start: 10 months).

@@ -614,6 +614,21 @@ export const verdict = {
 } as const;
 
 /** Tile map of the 22 cities and counties (V41). */
+/**
+ * Hard words, explained where a page first uses them (brief 6.6: a gloss at first use). A page
+ * names the words it uses; <WordHelp> prints them as one short line under its title.
+ */
+export const words = {
+  label: { 'zh-TW': '這頁的幾個字', en: 'A few words on this page' } as L10n,
+  pm25: { 'zh-TW': 'PM2.5：細懸浮微粒，很小的灰，小到可以吸進肺的深處', en: 'PM2.5: fine particles, dust small enough to reach deep into the lungs' } as L10n,
+  ufp: { 'zh-TW': '超細微粒：比 PM2.5 還小很多的微粒', en: 'Ultrafine particles: far smaller again than PM2.5' } as L10n,
+  ec: { 'zh-TW': '元素碳：黑色的碳粒，就是煙灰', en: 'Elemental carbon: black specks of carbon, that is, soot' } as L10n,
+  benzene: { 'zh-TW': '苯（ㄅㄣˇ）：汽油和廢氣裡的一種氣體', en: 'Benzene: a gas found in petrol and in exhaust' } as L10n,
+  ppm: { 'zh-TW': 'ppm：一百萬份空氣裡有幾份', en: 'ppm: parts in a million parts of air' } as L10n,
+  ug: { 'zh-TW': '微克：一百萬分之一公克', en: 'Microgram (µg): a millionth of a gram' } as L10n,
+} as const;
+export type WordId = Exclude<keyof typeof words, 'label'>;
+
 export const tiles = {
   label: { 'zh-TW': '各縣市電動機車補助狀態', en: 'Electric-scooter subsidy status by city and county' } as L10n,
   legend: { 'zh-TW': '圖例', en: 'Key' } as L10n,
@@ -621,13 +636,13 @@ export const tiles = {
   states: {
     available: { 'zh-TW': '還有名額', en: 'Places left' },
     restricted: { 'zh-TW': '有條件', en: 'With conditions' },
-    unpublished: { 'zh-TW': '官網沒有公布名額', en: 'No quota published' },
+    unpublished: { 'zh-TW': '剩多少名額沒公布', en: 'Places left not published' },
     exhausted: { 'zh-TW': '已用完', en: 'Used up' },
     ended: { 'zh-TW': '已截止', en: 'Closed' },
-    unknown: { 'zh-TW': '查不到官網', en: 'Official site not reachable' },
+    unknown: { 'zh-TW': '今年補助查不到，請打電話問', en: 'This year’s local money not found: please phone' },
   } as Record<'available' | 'restricted' | 'unpublished' | 'exhausted' | 'ended' | 'unknown', L10n>,
   /** A place whose official site could not be reached on the check date: the sums use central subsidies only. */
-  unknownDetail: { 'zh-TW': '{date} 查不到官網；下面的金額只算中央的補助。', en: 'Official site not reachable on {date}; the sums use central subsidies only.' } as L10n,
+  unknownDetail: { 'zh-TW': '{date} 查不到這個縣市今年自己的補助；下面的金額只算中央的補助。', en: 'On {date} we could not find this place’s own programme for this year; the sums use central subsidies only.' } as L10n,
   checked: { 'zh-TW': '{date}查', en: 'checked {date}' } as L10n,
   pick: { 'zh-TW': '點一個縣市，看金額和查證日期。', en: 'Choose a city or county for amounts and the date we checked.' } as L10n,
   official: { 'zh-TW': '官方頁面', en: 'Official page' } as L10n,

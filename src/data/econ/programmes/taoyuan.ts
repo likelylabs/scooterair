@@ -25,9 +25,9 @@ const general: Condition[] = [residency(undefined, '2024-12-31'), age(18)];
 const GENERAL = '年滿18歲、2024 年 12 月 31 日前設籍桃園市（或持居留證並符合配偶設籍條件）。';
 const GENERAL_EN = 'Aged 18+ and registered in Taoyuan by 31 December 2024 (or a residence-permit holder meeting the spouse rule).';
 const STACK_NOTE = t('桃園市公告沒有說明能否與中央補助併領；試算照其他縣市的做法同時計入中央補助，請向環保局確認。', 'The Taoyuan notice does not say whether its money stacks with central subsidies; like other cities we count both, so confirm with the bureau.');
-const generalQuota = quota('unknown', '2026-11-24', t('一般性補助共6,000名；我們打不開線上系統，還剩多少請上線上系統查，或打電話問環保局。', '6,000 general places; we could not open the online system, so check what is left there or phone the bureau.'), { total: 6000 });
+const generalQuota = quota('unknown', '2026-11-26', t('一般性補助共6,000名；我們打不開線上系統，還剩多少請上線上系統查，或打電話問環保局。', '6,000 general places; we could not open the online system, so check what is left there or phone the bureau.'), { total: 6000 });
 const projectQuota = (n: number, per = '') =>
-  quota('unknown', '2026-11-24', t(`名額${n.toLocaleString('en')}名${per}；還剩多少請打電話問環保局。`, `${n.toLocaleString('en')} places${per ? ' per team' : ''}; phone the bureau to ask what is left.`), { total: n });
+  quota('unknown', '2026-11-26', t(`名額${n.toLocaleString('en')}名${per}；還剩多少請打電話問環保局。`, `${n.toLocaleString('en')} places${per ? ' per team' : ''}; phone the bureau to ask what is left.`), { total: n });
 
 const p = (x: Partial<Programme> & Pick<Programme, 'id' | 'name' | 'amount' | 'conditions' | 'conditionText' | 'quota' | 'research'>): Programme => ({
   jurisdiction: 'taoyuan',
@@ -100,7 +100,7 @@ export const taoyuanProgrammes: Programme[] = [
     10000,
     [{ kind: 'any-of', conditions: [{ kind: 'income', levels: ['middle-low'], ambiguous: ['low'] }, flag('remoteDistrict')] }],
     ['中低收入戶或復興區居民。公告只寫「中低收入戶」，低收入戶是否適用請向環保局確認。', 'Middle-low income households or Fuxing District residents. The notice says only "lower-middle-income"; ask the bureau whether low-income households qualify.'],
-    quota('unknown', '2026-11-24', t('沒有公布名額；申請前請先打電話問環保局。', 'No number of places is published; phone the bureau before you apply.')),
+    quota('unknown', '2026-11-26', t('沒有公布名額；申請前請先打電話問環保局。', 'No number of places is published; phone the bureau before you apply.')),
     'ty-topup-lowincome-fuxing',
   ),
   topup('ty-child', ['桃園市婦幼E騎GO（育有0至12歲幼童）', 'Taoyuan family scheme (child aged 0–12)'], 6000, [flag('childUnder12')], ['育有0至12歲幼童的家庭。', 'A household raising a child aged 0–12.'], projectQuota(2500), 'ty-topup-women-children'),

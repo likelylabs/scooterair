@@ -52,8 +52,8 @@ jobs:
       # configure-pages reports an http:// origin for a custom domain; astro.config.mjs turns
       # it into https:// either way. Without Pages settings (pull requests) the build is for
       # the default address at the domain root.
-      SITE_URL: ${{ needs.pages.outputs.origin || 'https://scooterair.tw' }}
-      BASE_PATH: ${{ needs.pages.outputs.base_path || '/' }}
+      SITE_URL: ${{ needs.pages.outputs.origin || 'https://likelylabs.com' }}
+      BASE_PATH: ${{ needs.pages.outputs.base_path || '/scooterair' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

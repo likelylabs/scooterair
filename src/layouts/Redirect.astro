@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../lib/abs-url.ts';
 /**
  * Redirect — a static redirect page for a route that has moved. Static hosting has no server
  * redirects, so this page is the redirect: a meta refresh, a canonical link to the new home,
@@ -37,7 +38,7 @@ const { locale, to, label, hashMap = {}, share } = Astro.props;
 const card = share ? shareCard(share, locale) : null;
 const cardText = share ? shareCardContent(share, locale) : null;
 const target = href(to, locale);
-const abs = new URL(target, Astro.site).href;
+const abs = absUrl(target, Astro.site);
 // Three lines, inline, before anything else can navigate: append location.hash (through the map).
 const carry = `(function(){var h=location.hash.slice(1),m=${JSON.stringify(hashMap).replace(/</g, '\\u003c')};if(h)location.replace(${JSON.stringify(target.split('#')[0])}+'#'+(Object.prototype.hasOwnProperty.call(m,h)?m[h]:h))})()`;
 ---
@@ -58,7 +59,7 @@ const carry = `(function(){var h=location.hash.slice(1),m=${JSON.stringify(hashM
         <meta property="og:site_name" content={site.name[locale]} />
         <meta property="og:title" content={cardText.title.replaceAll('|', '')} />
         <meta property="og:url" content={abs} />
-        <meta property="og:image" content={new URL(asset(card.wide), Astro.site).href} />
+        <meta property="og:image" content={absUrl(asset(card.wide), Astro.site)} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={card.alt} />

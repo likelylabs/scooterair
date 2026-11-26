@@ -28,7 +28,7 @@ export const economics = {
     display: t('45,600 元起（須汰舊）', 'from NT$45,600 (with scrapping)'),
     statement: t(
       '2026年11月最便宜的125cc燃油機車官方優惠價是光陽GP 125的45,600元，但必須淘汰舊機車；沒有舊車可汰換時約50,500元，熱銷的迪爵125約59,000元。',
-      'In November 2026 the cheapest official offer on a 125cc gasoline scooter was NT$45,600 for the KYMCO GP 125, but only with an old scooter to scrap; without one it was about NT$50,500, and the best-selling SYM DUKE 125 about NT$59,000.',
+      'In November 2026 the cheapest official offer on a 125cc petrol scooter was NT$45,600 for the KYMCO GP 125, but only with an old scooter to scrap; without one it was about NT$50,500, and the best-selling SYM DUKE 125 about NT$59,000.',
     ),
     period: NOV_2026,
     place: TW,
@@ -81,7 +81,7 @@ export const economics = {
     display: t('最高 8,000 元，至 2026 年底', 'up to NT$8,000, until the end of 2026'),
     statement: t(
       '經濟部2026年新購電動機車補助7,000元（普通輕型第2級與小型輕型為5,100元），淘汰10年以上燃油機車再加1,000元，購車期限到2026年12月31日。補助表另列國產電池芯加碼3,000元，但沒有任何車款被證實符合，所以不算在內。',
-      'The 2026 MOEA subsidy for a new electric scooter is NT$7,000 (NT$5,100 for the light class level 2 (普通輕型第2級) and small-light class), plus NT$1,000 for scrapping a gasoline scooter at least 10 years old; purchases must be made by 31 December 2026. The MOEA table also lists a NT$3,000 bonus for Taiwan-made battery cells, but no model has been shown to qualify, so it is not counted.',
+      'The 2026 MOEA subsidy for a new electric scooter is NT$7,000 (NT$5,100 for the light class level 2 (普通輕型第2級) and small-light class), plus NT$1,000 for scrapping a petrol scooter at least 10 years old; purchases must be made by 31 December 2026. The MOEA table also lists a NT$3,000 bonus for Taiwan-made battery cells, but no model has been shown to qualify, so it is not counted.',
     ),
     period: t('2022年12月11日至2026年12月31日', '11 December 2022 to 31 December 2026'),
     place: TW,
@@ -106,7 +106,7 @@ export const economics = {
     display: t('約 3,400 元（兩項都領時）', 'about NT$3,400 (if both are paid)'),
     statement: t(
       '淘汰10年以上燃油機車並買電動機車，可向環境部申請減碳獎勵（全國最高2,100元）與空污補助（全國1,000元、部分地區最高2,200元），另有300元回收獎勵金；媒合平臺說明兩者分別審核撥款，但申請前仍應確認能否同時領取。',
-      'Scrapping a gasoline scooter at least 10 years old for an electric one qualifies for MOENV\'s carbon reward (up to NT$2,100 nationwide) and air subsidy (NT$1,000 nationwide, up to NT$2,200 in some areas), plus a NT$300 recycling payment; the matching platform says the two are reviewed and paid separately, but confirm that both can be claimed before relying on it.',
+      'Scrapping a petrol scooter at least 10 years old for an electric one qualifies for MOENV\'s carbon reward (up to NT$2,100 nationwide) and air subsidy (NT$1,000 nationwide, up to NT$2,200 in some areas), plus a NT$300 recycling payment; the matching platform says the two are reviewed and paid separately, but confirm that both can be claimed before relying on it.',
     ),
     period: t('2026年', '2026'),
     place: TW,
@@ -155,7 +155,7 @@ export const economics = {
     display: t('出廠滿 10 年；各縣市自訂期限', 'built 10 or more years ago; each city sets its own cut-off'),
     statement: t(
       '中央的汰舊補助（經濟部加碼1,000元與環境部的減碳、空污獎勵），都要求淘汰出廠滿10年以上的燃油機車。各縣市的汰舊補助另訂條件：台北市、高雄市是出廠滿10年；新北市與台南市是2015年12月31日以前出廠；桃園市是2016年12月31日以前出廠的1至5期機車；台中市則依舊車的出廠日期與期別分級補助。',
-      'The central scrap payments (the MOEA NT$1,000 bonus and MOENV\'s carbon and air rewards) all require scrapping a gasoline scooter built 10 or more years ago; city schemes set their own cut-offs: at least 10 years old in Taipei and Kaohsiung, built by 31 December 2015 in New Taipei and Tainan, a phase 1–5 scooter built by 31 December 2016 in Taoyuan, and in Taichung a sliding scale by build date and emission phase.',
+      'The central scrap payments (the MOEA NT$1,000 bonus and MOENV\'s carbon and air rewards) all require scrapping a petrol scooter built 10 or more years ago; city schemes set their own cut-offs: at least 10 years old in Taipei and Kaohsiung, built by 31 December 2015 in New Taipei and Tainan, a phase 1–5 scooter built by 31 December 2016 in Taoyuan, and in Taichung a sliding scale by build date and emission phase.',
     ),
     period: t('2026年', '2026'),
     place: SIX_CITIES,
@@ -174,7 +174,7 @@ export const economics = {
     evidence: 'official-tw',
     caveat: t(
       '這是2026年的規定；各縣市另有設籍、報廢期限與名額等條件，購車前請以縣市環保局的公告為準。環境部的300元回收獎勵金與燃油機車的貨物稅減徵，車齡門檻不同（分別為7年與4年）。',
-      'These are the 2026 rules; each city adds registration, scrapping-deadline and quota conditions, so check your city environmental bureau\'s notice before you buy. MOENV\'s NT$300 recycling payment and the goods-tax cut on a new gasoline scooter use different age thresholds (7 and 4 years).',
+      'These are the 2026 rules; each city adds registration, scrapping-deadline and quota conditions, so check your city environmental bureau\'s notice before you buy. MOENV\'s NT$300 recycling payment and the goods-tax cut on a new petrol scooter use different age thresholds (7 and 4 years).',
     ),
     requiresCaveat: true,
     editorNote: 'R12: never write 舊車 alone for scrappage; write 出廠滿10年的機車 and let the calculator apply each city\'s rule. Cite this fact rather than improvising cut-offs.',
@@ -203,7 +203,7 @@ export const economics = {
     evidence: 'market-tw',
     caveat: t(
       '都是廠商自己公布的最高時速，不是獨立測試；EZZY的68公里是實驗室條件下（平路、63公斤騎士、滿電）的儀表讀數，實際騎乘會因載重、坡度與電量而不同。i-One Fly Techno的數字出自媒體轉述的廠商說明。我們沒有查到125cc燃油機車的官方極速，所以這裡沒有並列比較。',
-      'These are the makers\' own top speeds, not independent tests; the EZZY\'s 68 km/h is a meter reading under lab conditions (flat road, 63 kg rider, full battery), and real riding varies with load, gradient and charge. The i-One Fly Techno figure is the maker\'s statement as reported by the media. We found no official top speed for 125cc gasoline scooters, so there is no side-by-side comparison.',
+      'These are the makers\' own top speeds, not independent tests; the EZZY\'s 68 km/h is a meter reading under lab conditions (flat road, 63 kg rider, full battery), and real riding varies with load, gradient and charge. The i-One Fly Techno figure is the maker\'s statement as reported by the media. We found no official top speed for 125cc petrol scooters, so there is no side-by-side comparison.',
     ),
     research: 'econ/other-ev-brands#ionex-air-battery; econ/other-ev-brands#ionex-coolone-spec; econ/other-ev-brands#ionex-flyt-perf; econ/home-charge-evs-r2#zau-es1000-spec; econ/home-charge-evs-r2#zau-es2000-spec; econ/gas-baseline-r2#r2-gogoro-ezzy-spec',
   },
@@ -293,7 +293,7 @@ export const economics = {
     confidence: 'secondary',
     evidence: 'derived',
     derivedFrom: ['econ-petrol-price-smoothing'],
-    caveat: t('每公升45公里是常見估計而非實測；交通部調查所有燃油機車車主自報平均每公升只有24.7公里（約每公里1.32元），但涵蓋舊車與大排氣量車。若平穩措施取消，油錢約增加近兩成。', '45 km/L is a common estimate, not a measurement; the MOTC owner survey averages only 24.7 km/L across all gasoline motorcycles (about NT$1.32 per km), including old and large bikes. If the smoothing ends, fuel costs rise by about a fifth.'),
+    caveat: t('每公升45公里是常見估計而非實測；交通部調查所有燃油機車車主自報平均每公升只有24.7公里（約每公里1.32元），但涵蓋舊車與大排氣量車。若平穩措施取消，油錢約增加近兩成。', '45 km/L is a common estimate, not a measurement; the MOTC owner survey averages only 24.7 km/L across all petrol motorcycles (about NT$1.32 per km), including old and large bikes. If the smoothing ends, fuel costs rise by about a fifth.'),
     research: 'econ/running-costs#fuel-cost-per-km-derived; econ/energy-prices-r2#lab-fueleco-2026-ranking',
   },
   'econ-home-charging-cost-per-km': {
@@ -345,10 +345,10 @@ export const economics = {
   },
   'econ-motc-annual-spend': {
     data: { electric: v(10506, 'ntd-per-year'), gasolineHeavy: v(8389, 'ntd-per-year'), electricEnergy: v(7717, 'ntd-per-year'), gasolineHeavyEnergy: v(5502, 'ntd-per-year') },
-    display: t('電動 10,506 元對燃油 8,389 元', 'electric NT$10,506 vs gasoline NT$8,389'),
+    display: t('電動 10,506 元對燃油 8,389 元', 'electric NT$10,506 vs petrol NT$8,389'),
     statement: t(
       '交通部2024年調查中，電動機車車主每年的油電、保養與停車支出平均10,506元，高於普通重型燃油機車車主的8,389元，差距主要來自充電或電池租用費。',
-      'In MOTC\'s 2024 survey, electric scooter owners spent on average NT$10,506 a year on energy, maintenance and parking, more than the NT$8,389 of heavy-class gasoline owners, mostly because of charging or battery-rental fees.',
+      'In MOTC\'s 2024 survey, electric scooter owners spent on average NT$10,506 a year on energy, maintenance and parking, more than the NT$8,389 of heavy-class petrol owners, mostly because of charging or battery-rental fees.',
     ),
     period: t('2024年（民國113年）', '2024'),
     place: TW,
@@ -365,7 +365,7 @@ export const economics = {
     display: t('每年省 450 元', 'NT$450 a year saved'),
     statement: t(
       '125cc燃油機車每年繳450元公路養管費，電動機車目前免繳；兩者的使用牌照稅都是0元，所以電動機車在固定規費上每年只省約450元；交通部表示電動車免徵到2030年底。',
-      'A 125cc gasoline scooter pays a NT$450 yearly road maintenance fee and an electric scooter currently pays nothing; both pay zero licence tax, so electric saves only about NT$450 a year in fixed fees; MOTC says electric vehicles are exempt to the end of 2030.',
+      'A 125cc petrol scooter pays a NT$450 yearly road maintenance fee and an electric scooter currently pays nothing; both pay zero licence tax, so electric saves only about NT$450 a year in fixed fees; MOTC says electric vehicles are exempt to the end of 2030.',
     ),
     period: t('2026年', '2026'),
     place: TW,

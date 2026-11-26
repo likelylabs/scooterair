@@ -80,7 +80,8 @@ const childKind = red ? 'schoolchild-cover' : 'schoolchild-step';
 const SIG = { x: 28, y: -656, scale: 2.9 };
 const sigBox: Box = { x: SIG.x - 8, y: SIG.y - 8, w: SIGNAL_HEAD.w * SIG.scale + 16, h: SIGNAL_HEAD.h * SIG.scale + 16 };
 const carAt = { x: 372, y: FAR + 4, s: 0.6 };
-const labelAt = { x: pack[faceIdx].x + 74, y: 30 };
+// under the rider with a face, pointing up at him (not under the empty road between scooters)
+const labelAt = { x: pack[faceIdx].x + 40, y: 30 };
 
 const a = air({
   frame: VB,
@@ -147,7 +148,7 @@ const alt = red
 
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive={red} id={id} class={['scene--hero', `scene--hero-${phase}`, cls].filter(Boolean).join(' ')} data-hero-count={red ? drawn : undefined}>
   <Fragment set:html={a.defs + street + signal + carArt + a.wash + pickSources(a.cores, () => false) + withoutSources(a.marks) + (red ? '' : a.cores) + rowArt(3) + rowArt(2) + rowArt(1) + folk} />
-  {red && <SceneLabel slot="labels" box={VB} x={labelAt.x} y={labelAt.y} anchor="center top" plate class="hero-waiting">{art.words.waiting[locale]}</SceneLabel>}
+  {red && <SceneLabel slot="labels" box={VB} x={labelAt.x} y={labelAt.y} anchor="center top" plate class="hero-waiting">{art.words.waitingUp[locale]}</SceneLabel>}
   {counter && (
     <SceneLabel slot="labels" box={VB} x={704} y={-672} anchor="end top" plate class="hero-count">
       <span data-hero-counter data-template={art.hero.counter[locale]}>{fill(art.hero.counter, locale, { n: drawn })}</span>

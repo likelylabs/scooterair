@@ -60,7 +60,7 @@ export const gasModels: GasModel[] = [
     ],
     fuelEconomy: null,
     calculator: {
-      excluded: t('全國最便宜的125cc燃油售價之一（汰舊45,600元），但我們沒有可引用的官方油耗數字，無法計算油錢，暫不列入試算。', 'One of the cheapest 125cc gasoline prices (NT$45,600 with scrapping), but we have no citable official fuel-economy figure, so fuel costs cannot be computed; left out of the calculator for now.'),
+      excluded: t('全國最便宜的125cc燃油售價之一（汰舊45,600元），但我們沒有可引用的官方油耗數字，無法計算油錢，暫不列入試算。', 'One of the cheapest 125cc petrol prices (NT$45,600 with scrapping), but we have no citable official fuel-economy figure, so fuel costs cannot be computed; left out of the calculator for now.'),
     },
   },
   {
@@ -211,7 +211,7 @@ export const evModels: EvModel[] = [
     maintenance: 'ev-gogoro-hub',
     comparableTo125: 'no',
     performance: {
-      text: t('綠牌普通輕型，極速68 km/h（官網實驗室儀表值），不是125cc燃油機車的同級替代品。', 'Green-plate light class with a 68 km/h top speed (Gogoro lab, instrument reading); not a like-for-like replacement for a 125cc gasoline scooter.'),
+      text: t('綠牌普通輕型，極速68 km/h（官網實驗室儀表值），不是125cc燃油機車的同級替代品。', 'Green-plate light class with a 68 km/h top speed (Gogoro lab, instrument reading); not a like-for-like replacement for a 125cc petrol scooter.'),
       sources: ['gogoro-ezzy-page'],
       confidence: 'verified',
       research: ['gas-baseline-r2#r2-gogoro-ezzy-spec'],
@@ -270,7 +270,7 @@ export const evModels: EvModel[] = [
     plans: ['ionex-318-single', 'ionex-518-single'],
     maintenance: 'ev-generic',
     comparableTo125: 'no',
-    performance: { text: t('輕型，2,000 W，儀表極速52 km/h；不是125cc燃油機車的同級替代品。', 'Light class, 2,000 W, 52 km/h meter top speed; not a like-for-like replacement for a 125cc gasoline scooter.'), sources: ['ionex-coolone-product'], confidence: 'verified', research: ['other-ev-brands#ionex-coolone-spec'] },
+    performance: { text: t('輕型，2,000 W，儀表極速52 km/h；不是125cc燃油機車的同級替代品。', 'Light class, 2,000 W, 52 km/h meter top speed; not a like-for-like replacement for a 125cc petrol scooter.'), sources: ['ionex-coolone-product'], confidence: 'verified', research: ['other-ev-brands#ionex-coolone-spec'] },
     calculator: true,
   },
   {
@@ -307,7 +307,7 @@ export const evModels: EvModel[] = [
     plans: ['ionex-318-single', 'ionex-518-single'],
     maintenance: 'ev-generic',
     comparableTo125: 'no',
-    performance: { text: t('綠牌，極速47 km/h；不是125cc燃油機車的同級替代品。', 'Green plate, 47 km/h top speed; not a like-for-like replacement for a 125cc gasoline scooter.'), sources: ['ionex-ione-air-product'], confidence: 'verified', research: ['other-ev-brands#ionex-air-battery'] },
+    performance: { text: t('綠牌，極速47 km/h；不是125cc燃油機車的同級替代品。', 'Green plate, 47 km/h top speed; not a like-for-like replacement for a 125cc petrol scooter.'), sources: ['ionex-ione-air-product'], confidence: 'verified', research: ['other-ev-brands#ionex-air-battery'] },
     calculator: true,
   },
   {
@@ -383,7 +383,7 @@ export const evModels: EvModel[] = [
     maintenance: 'ev-generic',
     comparableTo125: 'no',
     performance: {
-      text: t('極速53 km/h，定速30 km/h續航60公里（市區實際較短），電池9公斤可提上樓充電；不是125cc燃油機車的同級替代品。服務據點約42處。', 'Top speed 53 km/h, 60 km range at a constant 30 km/h (less in traffic); the 9 kg battery can be carried upstairs to charge. Not a like-for-like replacement for a 125cc gasoline scooter. About 42 service outlets.'),
+      text: t('極速53 km/h，定速30 km/h續航60公里（市區實際較短），電池9公斤可提上樓充電；不是125cc燃油機車的同級替代品。服務據點約42處。', 'Top speed 53 km/h, 60 km range at a constant 30 km/h (less in traffic); the 9 kg battery can be carried upstairs to charge. Not a like-for-like replacement for a 125cc petrol scooter. About 42 service outlets.'),
       sources: ['zau-es1000-spec'],
       confidence: 'verified',
       research: ['home-charge-evs-r2#zau-es1000-spec', 'home-charge-evs-r2#zau-dealers'],
@@ -426,7 +426,7 @@ export const evModels: EvModel[] = [
     maintenance: 'ev-generic',
     comparableTo125: 'unverified',
     performance: {
-      text: t('白牌，4.2 kW側掛馬達，極速74 km/h，0至50 km/h 5.9秒（廠商數字）；可插電也可換電，但試算以換電計費。沒有可查證的125cc比較數據，無法確認與125cc燃油機車相當。', 'White plate, 4.2 kW side-mounted motor, 74 km/h top speed, 0–50 km/h in 5.9 s (maker\'s figures); it can charge or swap, but costs here assume swapping. No verified comparison with a 125cc exists, so equivalence with a 125cc gasoline scooter cannot be confirmed.'),
+      text: t('白牌，4.2 kW側掛馬達，極速74 km/h，0至50 km/h 5.9秒（廠商數字）；可插電也可換電，但試算以換電計費。沒有可查證的125cc比較數據，無法確認與125cc燃油機車相當。', 'White plate, 4.2 kW side-mounted motor, 74 km/h top speed, 0–50 km/h in 5.9 s (maker\'s figures); it can charge or swap, but costs here assume swapping. No verified comparison with a 125cc exists, so equivalence with a 125cc petrol scooter cannot be confirmed.'),
       sources: ['wantrich-2025-09-ionex-fly-techno', 'ctee-2025-09-ionex-fly-techno'],
       confidence: 'verified',
       research: ['other-ev-brands#ionex-flyt-perf'],

@@ -126,8 +126,8 @@ export const answers = {
     chainLink: 2,
     question: t('一個紅燈，旁邊停幾輛機車？', 'How many scooters stop at one red light?'),
     answer: t(
-      '運研所量過最忙的路口，一個紅燈每個方向約停 34 輛；冷清的路口約 3 到 10 輛。本站用三種情況來算：幾輛（2 到 5）、十來輛（8 到 20）、停滿（25 到 45）。行人大約要等 85 到 115 秒。',
-      'At the busiest junction the Institute of Transportation counted, about 34 scooters stop per direction through one red; at a quiet one, 3 to 10. This site works with three cases: a few (2 to 5), a dozen or so (8 to 20) and a full box (25 to 45). Pedestrians wait about 85 to 115 seconds.',
+      '照運研所量到的車流算，最忙的路口一個紅燈每個方向約停 34 輛（本站計算）；冷清的路口約 3 到 10 輛。本站用三種情況來算：幾輛（2 到 5）、十來輛（8 到 20）、停滿（25 到 45）。行人大約要等 85 到 115 秒。',
+      'Working from the Institute of Transportation’s traffic counts, about 34 scooters stop per direction through one red at the busiest junction (our arithmetic); at a quiet one, 3 to 10. This site works with three cases: a few (2 to 5), a dozen or so (8 to 20) and a full box (25 to 45). Pedestrians wait about 85 to 115 seconds.',
     ),
     basis: t('運研所的錄影車流計數和號誌時制；一個方向每小時約 1,500 輛（路口每小時的機車 ÷ 4）× 83 秒的紅燈 ÷ 3,600 秒 ≈ 34 輛。', "The Institute's video counts and signal plans: about 1,500 scooters an hour in one direction (the junction's hourly count ÷ 4) × an 83-second red ÷ 3,600 seconds ≈ 34."),
     caveat: t(

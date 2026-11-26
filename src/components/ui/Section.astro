@@ -86,7 +86,9 @@ const container = width === 'page' ? 'container' : `container container--${width
     for (let d = el.closest('details[data-section-fold]'); d; d = d.parentElement?.closest('details[data-section-fold]') ?? null) (d as HTMLDetailsElement).open = true;
     const target = el;
     const go = () => target.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'start' });
-    if (!own && !el.closest('details[data-section-fold]')) return;
+    // a target outside any fold is left to the browser, except on arrival: the page above may
+    // still grow, so it is kept in view the same way (/electric/#cities below the calculator)
+    if (!own && !el.closest('details[data-section-fold]') && !settle) return;
     requestAnimationFrame(go);
     if (!settle) return;
     let stop = false;
@@ -98,6 +100,16 @@ const container = width === 'page' ? 'container' : `container container--${width
   };
   openFor(location.hash, true);
   addEventListener('hashchange', () => openFor(location.hash));
+  // printing from the browser prints what is folded too; the folds close again afterwards
+  let printed: HTMLDetailsElement[] = [];
+  addEventListener('beforeprint', () => {
+    printed = [...document.querySelectorAll<HTMLDetailsElement>('main details:not([open])')];
+    printed.forEach((d) => (d.open = true));
+  });
+  addEventListener('afterprint', () => {
+    printed.forEach((d) => (d.open = false));
+    printed = [];
+  });
   document.addEventListener('click', (e) => {
     const a = (e.target as Element | null)?.closest?.('a[href*="#"]') as HTMLAnchorElement | null;
     if (a && a.pathname === location.pathname && a.hash) openFor(a.hash);

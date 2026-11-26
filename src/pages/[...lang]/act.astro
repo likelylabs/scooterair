@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../../lib/abs-url.ts';
 /**
  * /act/ — 我能做什麼 / What I can do (redesign brief 7.6, amendment 12.2).
  *
@@ -16,6 +17,7 @@ import KindChip from '@/components/ui/KindChip.astro';
 import Cite from '@/components/ui/Cite.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Figure from '@/components/ui/Figure.astro';
+import WordHelp from '@/components/ui/WordHelp.astro';
 import EvShareChart from '@/components/pages/action/EvShareChart.astro';
 import Composer from '@/components/pages/action/Composer.astro';
 import { datum, lf, num, requiredCaveats, sourcesOf } from '@/components/pages/action/ev';
@@ -77,7 +79,7 @@ const chartCites = sourcesOf(['ev-share-2025', 'netzero-ev-sales-targets']);
 const chartCaveats = requiredCaveats(['ev-share-2025', 'netzero-ev-sales-targets'], locale);
 
 // ---- the forwarded message
-const siteUrl = new URL(href('/', locale), Astro.site).href;
+const siteUrl = absUrl(href('/', locale), Astro.site);
 const lineText = fill(t.walk.line, { sentence: site.sentence[locale], url: siteUrl });
 const composerLabels = { subject: t.composer.subject, copied: t.composer.copied, failed: t.composer.failed, mail: t.composer.mail, noStore: t.composer.noStore };
 
@@ -100,6 +102,7 @@ const idle = lf('idle-stop-mixed-evidence', locale);
       <p class="eyebrow">{t.hero.eyebrow}</p>
       <h1 class="display act-hero__t"><Phrased text={t.hero.title} /></h1>
       <p class="act-hero__deck">{t.hero.deck}</p>
+      <WordHelp locale={locale} words={['benzene', 'pm25', 'ufp']} />
       <nav class="jump" aria-labelledby="jump-label">
         <p class="jump__label" id="jump-label">{t.hero.jump}</p>
         <ul>

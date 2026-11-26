@@ -312,13 +312,13 @@ const foldItems = (l: (typeof links)[number]) => l.answers.length + l.own.length
           )}
 
           <div class="ev-visuals ev-visuals--lead">
-            {l.n === 1 && <SeriesFigure brief locale={locale} view={V('teds13-motorcycle-share')} title={T.v5.title} subtitle={T.v5.subtitle} caption={T.v5.caption} tone="exhaust" />}
-            {l.n === 2 && <SeriesFigure brief locale={locale} view={V('wu2021-quiet-route')} title={T.v32.title} subtitle={T.v32.subtitle} caption={T.v32.caption} />}
-            {l.n === 3 && <SeriesFigure brief locale={locale} view={V('taipei-traffic-vs-general-stations')} title={T.v9.title} subtitle={T.v9.subtitle} caption={T.v9.caption} />}
-            {l.n === 4 && <SeriesFigure brief locale={locale} view={V('odour-thresholds')} />}
-            {l.n === 5 && <SeriesFigure brief locale={locale} view={V('hei-sr23-outcomes')} />}
-            {l.n === 6 && <SeriesFigure brief locale={locale} view={strollerView(locale, T, strollerBand)} title={T.v29.title} subtitle={T.v29.subtitle} caption={T.v29.caption} />}
-            {l.n === 7 && <SeriesFigure brief locale={locale} view={V('ev-share-new-registrations')} title={T.v17.title} subtitle={T.v17.subtitle} caption={T.v17.caption} tone="clean" />}
+            {l.n === 1 && <SeriesFigure brief level={3} locale={locale} view={V('teds13-motorcycle-share')} title={T.v5.title} subtitle={T.v5.subtitle} caption={T.v5.caption} tone="exhaust" />}
+            {l.n === 2 && <SeriesFigure brief level={3} locale={locale} view={V('wu2021-quiet-route')} title={T.v32.title} subtitle={T.v32.subtitle} caption={T.v32.caption} />}
+            {l.n === 3 && <SeriesFigure brief level={3} locale={locale} view={V('taipei-traffic-vs-general-stations')} title={T.v9.title} subtitle={T.v9.subtitle} caption={T.v9.caption} />}
+            {l.n === 4 && <SeriesFigure brief level={3} locale={locale} view={V('odour-thresholds')} />}
+            {l.n === 5 && <SeriesFigure brief level={3} locale={locale} view={V('hei-sr23-outcomes')} />}
+            {l.n === 6 && <SeriesFigure brief level={3} locale={locale} view={strollerView(locale, T, strollerBand)} title={T.v29.title} subtitle={T.v29.subtitle} caption={T.v29.caption} />}
+            {l.n === 7 && <SeriesFigure brief level={3} locale={locale} view={V('ev-share-new-registrations')} title={T.v17.title} subtitle={T.v17.subtitle} caption={T.v17.caption} tone="clean" />}
           </div>
         </div>
 

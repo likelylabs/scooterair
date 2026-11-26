@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../lib/abs-url.ts';
 /**
  * Base — the site shell every page renders into.
  *
@@ -78,7 +79,7 @@ const card = shareCard(share, locale);
 
 const siteName = site.name[locale];
 const fullTitle = home ? `${siteName} — ${site.tagline[locale]}` : `${title} — ${siteName}`;
-const abs = (p: string) => new URL(p, Astro.site).href;
+const abs = (p: string) => absUrl(p, Astro.site);
 const canonical = abs(Astro.url.pathname);
 const image = abs(asset(ogImage ?? card.wide));
 const square = ogImage ? null : abs(asset(card.square));

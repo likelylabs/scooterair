@@ -92,11 +92,11 @@ export const ui = {
   listGas: t('建議售價（不含牌險）', 'List price (ex plate and insurance)'),
   net: t('實付價格', 'What you pay'),
   netElectric: t('電動機車實付價格', 'Electric scooter: what you pay'),
-  netGas: t('燃油機車實付價格', 'Gasoline scooter: what you pay'),
-  gap: t('和燃油機車的差距', 'Gap to the gasoline scooter'),
+  netGas: t('燃油機車實付價格', 'Petrol scooter: what you pay'),
+  gap: t('和燃油機車的差距', 'Gap to the petrol scooter'),
   upTo: t('（最高）', ' (up to)'),
   electric: t('電動機車', 'Electric scooter'),
-  gasoline: t('燃油機車', 'Gasoline scooter'),
+  gasoline: t('燃油機車', 'Petrol scooter'),
   item: t('項目', 'Item'),
   amount: t('金額', 'Amount'),
   month: t('時間', 'Time'),
@@ -113,5 +113,5 @@ export const ui = {
   /** Cheaper to buy and at the horizon, but dearer for a while in between. */
   aheadWithDip: t('買時較便宜，{h}後總花費仍較低（中間有幾個月較貴）', 'Cheaper to buy and still cheaper in total after {h} (dearer for a few months in between)'),
   ahead: t('買和騎都比較便宜', 'Cheaper to buy and to run'),
-  catchesUp: t('買時較便宜，但第 {n} 個月起總花費超過燃油機車', 'Cheaper to buy, but total cost passes the gasoline scooter at month {n}'),
+  catchesUp: t('買時較便宜，但第 {n} 個月起總花費超過燃油機車', 'Cheaper to buy, but total cost passes the petrol scooter at month {n}'),
 };

@@ -4,7 +4,7 @@
 // (docs/redesign-brief.md 3.3: "If a slot is missing the build fails").
 //
 // It also holds the guards for the two sentences whose words stand for a number
-// (「一天到一天半」 on screen 7, 「三分之一左右」 on screen 12): if the arithmetic behind them
+// (「一天到一天半」 on screen 7, 「三分之一到快一半」 on screen 12): if the arithmetic behind them
 // moves, the build stops and the sentence has to be rewritten, instead of going stale.
 
 import * as timeline from '../film/timeline.ts';
@@ -49,10 +49,10 @@ export function guardDayWords(): void {
       throw new Error(`home screen 7: time.hoursPerYear[${n}] is now ${h.lo}–${h.hi} hours, but the sentence home.s7.body.${n} was written for ${DAY_WORDS[n].lo}–${DAY_WORDS[n].hi}. Rewrite the sentence and this table together.`);
   }
 }
-/** Screen 12: 「三分之一左右」 holds only while the published range sits around a third. */
+/** Screen 12: 「三分之一到快一半」 holds only while the published range runs from about a third to just under half. */
 export function guardThird(): void {
   const s = est.inspect.top10share;
-  if (s.lo < 25 || s.hi > 45 || s.lo > 34 || s.hi < 33) throw new Error(`home screen 12: inspect.top10share is now ${s.lo}–${s.hi}%; 「三分之一左右」 / "about a third" in home.s12.body no longer describes it. Rewrite the sentence.`);
+  if (s.lo < 28 || s.lo > 36 || s.hi < 40 || s.hi > 49) throw new Error(`home screen 12: inspect.top10share is now ${s.lo}–${s.hi}%; 「三分之一到快一半」 / "a third to nearly half" in home.s12.body no longer describes it. Rewrite the sentence.`);
 }
 
 /** Every number the fifteen screens print that is not an EstimateValue or a money figure. */

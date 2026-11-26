@@ -287,6 +287,9 @@ function showErrors(issues: { field: string; message: Record<string, string> }[]
   const over = form.querySelector<HTMLElement>('[data-el-over]');
   const km = form.querySelector<HTMLInputElement>('#el-km');
   if (over && km) over.hidden = !(Number(km.value) > Number(over.dataset.elOver));
+  // below the slider's start the figure is still worked out, and the page says so (as above the end)
+  const under = form.querySelector<HTMLElement>('[data-el-under]');
+  if (under && km) under.hidden = !(km.value.trim() !== '' && Number(km.value) > 0 && Number(km.value) < Number(under.dataset.elUnder));
 }
 
 function clearLevers(text: string) {

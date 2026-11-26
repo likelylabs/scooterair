@@ -29,7 +29,7 @@ const MOEA_APPLY = t(
 
 const moenvScrap = t(
   '淘汰出廠滿10年以上的燃油機車並新購電動機車；須在購車前到環境部媒合平臺登記並選擇收購者。',
-  'Scrap a gasoline scooter at least 10 years old and buy an electric one; register on the MOENV matching platform and choose the buyer of the credit before you buy.',
+  'Scrap a petrol scooter at least 10 years old and buy an electric one; register on the MOENV matching platform and choose the buyer of the credit before you buy.',
 );
 const MOENV_DEADLINE = t('須先在環境部媒合平臺登記並選定收購者，再購車；購車須在這天以前完成。', 'Register on the MOENV matching platform and choose the buyer of the credit first, then buy, by this date.');
 const MOENV_2027_SHORT = t('方案至 2026 年 12 月 31 日。', 'Runs to 31 December 2026.');
@@ -160,7 +160,7 @@ export const centralProgrammes: Programme[] = [
     side: 'electric',
     amount: fixed(1000),
     conditions: [scrap, scrapAge(10), foreignApplyBy],
-    conditionText: t('淘汰出廠滿10年以上的燃油機車並新購電動機車。', 'Scrap a gasoline scooter at least 10 years old and buy an electric one.'),
+    conditionText: t('淘汰出廠滿10年以上的燃油機車並新購電動機車。', 'Scrap a petrol scooter at least 10 years old and buy an electric one.'),
     validFrom: '2025-06-16',
     validTo: '2026-12-31',
     applicationNote: MOEA_APPLY,
@@ -254,14 +254,14 @@ export const centralProgrammes: Programme[] = [
     jurisdiction: 'central',
     payer: 'moenv',
     payerName: t('環境部', 'Ministry of Environment (MOENV)'),
-    name: t('環境部廢機車回收獎勵金', 'MOENV recycling payment for a scrapped gasoline scooter'),
+    name: t('環境部廢機車回收獎勵金', 'MOENV recycling payment for a scrapped petrol scooter'),
     kind: 'recycling-bonus',
     side: 'both',
     amount: fixed(300),
     conditions: [scrap, scrapAge(7)],
     conditionText: t(
       '要報廢的燃油機車交給合格的回收業者回收，就能領 300 元；買電動或燃油新車都可以領（台北市環保局的說明叫它「燃油機車回收獎勵金」）。車齡規定我們只查到台中市環保局寫的「出廠滿 7 年以上」，所以每個縣市都照 7 年算。',
-      'Have the gasoline scooter you are replacing recycled by a licensed recycler and you get NT$300, whether the new scooter is electric or gasoline (Taipei\'s DEP calls it the gasoline scooter recycling payment). The only age rule we could confirm is Taichung EPB\'s "7 or more years old", so we apply that everywhere.',
+      'Have the petrol scooter you are replacing recycled by a licensed recycler and you get NT$300, whether the new scooter is electric or petrol (Taipei\'s DEP calls it the petrol scooter recycling payment). The only age rule we could confirm is Taichung EPB\'s "7 or more years old", so we apply that everywhere.',
     ),
     exclusiveGroups: ['kinmen-vs-moenv'],
     validFrom: '2026-01-01',
@@ -350,7 +350,7 @@ export const centralProgrammes: Programme[] = [
     research: ['central#goods-tax-scrap-replace-4000', 'gas-prices#kymco-gov-tax-table', 'gas-prices#sym-duke125-nov-promo'],
     note: t(
       '財政部網頁把新購2,000元與汰舊4,000元分開列，沒有寫可以相加；光陽與三陽的11月官方優惠與台中市環保局的金額表則兩者都算。試算依車廠做法相加，這會讓燃油機車看起來較便宜，對電動機車的比較是保守的；但相加只有次級依據，財政部未確認。',
-      'The MOF page lists the new-purchase NT$2,000 and scrap NT$4,000 separately and does not say they add up; KYMCO\'s and SYM\'s official November offers and Taichung\'s EPB amount table count both. We follow the manufacturers, which makes the gasoline scooter look cheaper and keeps the comparison conservative for electric; but the stacking rests on secondary evidence and the MOF has not confirmed it.',
+      'The MOF page lists the new-purchase NT$2,000 and scrap NT$4,000 separately and does not say they add up; KYMCO\'s and SYM\'s official November offers and Taichung\'s EPB amount table count both. We follow the manufacturers, which makes the petrol scooter look cheaper and keeps the comparison conservative for electric; but the stacking rests on secondary evidence and the MOF has not confirmed it.',
     ),
     calculator: true,
   },

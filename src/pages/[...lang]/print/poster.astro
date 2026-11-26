@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../../../lib/abs-url.ts';
 /**
  * /print/poster/ — 校門口海報 / the school-gate poster (brief 7.9), one A4 page per language.
  *
@@ -27,7 +28,7 @@ export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(act, locale);
 const p = t.poster;
-const target = new URL(href('/', locale), Astro.site).href;
+const target = absUrl(href('/', locale), Astro.site);
 const shortUrl = target.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const qr = qrSvg(target, fill(p.qrAlt, { url: shortUrl }));
 const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
@@ -302,5 +303,9 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
     .poster__code {
       inline-size: 30mm;
     }
+  }
+  /* the print button works only with JavaScript: until the script shows it, it stays hidden */
+  .toolbar__btn[hidden] {
+    display: none;
   }
 </style>

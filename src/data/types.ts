@@ -55,7 +55,7 @@ export const confidenceLabels: Record<Confidence, { label: L10n; description: L1
     ),
   },
   secondary: {
-    label: t('次級來源', 'Secondary'),
+    label: t('只在轉述中看到', 'Second-hand'),
     description: t(
       '這個數字只在可靠的轉述中看到，例如媒體報導的官方統計，沒有在原始來源中找到；附註會說明依據。',
       'The figure was seen only in a reputable report of the source, such as a news report of an official statistic, not in the source itself; the note says what it rests on.',
@@ -222,7 +222,7 @@ export const chainLinks = [1, 2, 3, 4, 5, 6, 7] as const;
 export type ChainLink = (typeof chainLinks)[number];
 
 export const chainLinkLabels: Record<ChainLink, { short: L10n; question: L10n }> = {
-  1: { short: t('排氣管排出什麼', 'What comes out of the tailpipe'), question: t('燃油機車的排氣管排出哪些污染物？', 'What does a gasoline scooter\'s tailpipe emit?') },
+  1: { short: t('排氣管排出什麼', 'What comes out of the tailpipe'), question: t('燃油機車的排氣管排出哪些污染物？', 'What does a petrol scooter\'s tailpipe emit?') },
   2: { short: t('在哪裡排出', 'Where it comes out'), question: t('廢氣在什麼高度、什麼位置排出，離行人多近？', 'At what height and where is it emitted, and how close to people on foot?') },
   3: { short: t('街上的人吸進什麼', 'What people on the street breathe'), question: t('走在街上、站在路口的人實際吸進了什麼？', 'What do people walking and waiting at the kerb actually breathe?') },
   4: { short: t('這些物質有什麼作用', 'What those compounds do'), question: t('廢氣中的物質對人體有什麼危害？聞得到又代表什麼？', 'What can these compounds do to the body, and what does the smell tell you?') },

@@ -50,7 +50,7 @@ export default copy({
     cheaper: { 'zh-TW': '換電動，|比燃油機車|少付 {amount}', en: 'Electric costs |{amount} less |than petrol' },
     same: { 'zh-TW': '換電動，|和燃油機車|差不多錢', en: 'Electric costs |about the same |as petrol' },
     dearer: { 'zh-TW': '換電動，|比燃油機車|多付 {amount}', en: 'Electric costs |{amount} more |than petrol' },
-    worst: { 'zh-TW': '最不划算的情況，多付 {amount}。', en: 'Worst case: {amount} more.' },
+    worst: { 'zh-TW': '挑最便宜的車，最不划算多付 {amount}。', en: 'Cheapest models, worst case: {amount} more.' },
     best: { 'zh-TW': '我們算的每個縣市，電動機車都不比較貴。', en: 'In every place we worked out, electric costs no more.' },
     caveat: { 'zh-TW': '價格和補助是 {date}查的。', en: 'Prices and subsidies checked {date}.' },
   },

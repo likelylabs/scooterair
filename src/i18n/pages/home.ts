@@ -101,8 +101,8 @@ export default copy({
     chapter: { 'zh-TW': '排在哪裡', en: 'Where it goes' },
     headline: { 'zh-TW': '待轉區的機車，|排氣管就對著斑馬線', en: 'In the turn box, the tailpipes sit |right in front of the crossing' },
     body: {
-      'zh-TW': '排氣管離地大約 {h} 公分，廢氣就排在腳邊。待轉區和斑馬線之間，規定只要留 {gap} 公分以上。',
-      en: 'A tailpipe is about {h} cm off the ground, so the exhaust comes out by your feet. The rules ask for at least {gap} cm between the turn box and the crossing.',
+      'zh-TW': '排氣管比膝蓋低（運研所算的時候設在離地 {h} 公分），廢氣就排在腳邊。待轉區和斑馬線之間，規定只要留 {gap} 公分以上。',
+      en: 'A tailpipe sits below knee height (the Institute of Transportation’s model puts it {h} cm up), so the exhaust comes out by your feet. The rules ask for at least {gap} cm between the turn box and the crossing.',
     },
     sheet: {
       title: { 'zh-TW': '這兩個 {gap} 公分，|是誰說的', en: 'Those two figures of {gap} cm: |who says so' },
@@ -455,10 +455,10 @@ export default copy({
     shareLabel: { 'zh-TW': '占一氧化碳{share}', en: '{share} of the carbon monoxide' },
     chapter: { 'zh-TW': '還沒要換車', en: 'Not switching yet' },
     headline: { 'zh-TW': '還沒要換車？|有一件事也很有用', en: 'Not switching yet? |One thing still helps a lot' },
-    /** 「三分之一左右」 is checked against inspect.top10share at build time. */
+    /** 「三分之一到快一半」 is checked against inspect.top10share at build time. */
     body: {
-      'zh-TW': '定檢讀數裡，排最多的一成，占了全部一氧化碳的三分之一左右。準時定檢、該修就修，路口就少一大團。',
-      en: 'In Taiwan’s inspection readings, the highest tenth account for about a third of all the carbon monoxide. Get inspected on time and fix what fails, and a big cloud leaves the junction.',
+      'zh-TW': '定檢讀數裡，排最多的一成，占了全部一氧化碳的三分之一到快一半。準時定檢、該修就修，路口就少一大團。',
+      en: 'In Taiwan’s inspection readings, the highest tenth account for a third to nearly half of all the carbon monoxide. Get inspected on time and fix what fails, and a big cloud leaves the junction.',
     },
     sheet: {
       used: {
@@ -499,11 +499,11 @@ export default copy({
     },
     /** Added by rule when that scooter can only swap batteries. */
     swapOnly: {
-      'zh-TW': '只能換電池、要付月費。',
+      'zh-TW': '只能換電池、付月費。',
       en: 'It only swaps batteries, so it needs a battery plan.',
     },
     /** The least favourable case in the table, named as such (the screen's word budget is 45 characters). */
-    worst: { 'zh-TW': '最不划算：{county}、{scrap}、買{plate}，多付 {n}。', en: 'Worst case: {county}, {scrap}, a {plate} model: {n} more.' },
+    worst: { 'zh-TW': '最不划算：{county}、{scrap}、最便宜的{plate}，多付 {n}。', en: 'Worst case: {county}, {scrap}, the cheapest {plate} model: {n} more.' },
     worstScrapYes: { 'zh-TW': '可報廢', en: 'one to scrap' },
     worstScrapNo: { 'zh-TW': '沒車報廢', en: 'nothing to scrap' },
     sheet: {

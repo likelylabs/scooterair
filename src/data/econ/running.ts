@@ -10,7 +10,7 @@ import type { FixedFees, MaintenanceProfile, SpendReference } from './types.ts';
 export const maintenance: MaintenanceProfile[] = [
   {
     id: 'gas-125',
-    label: t('125cc燃油機車定期保養', 'Scheduled maintenance, 125cc gasoline scooter'),
+    label: t('125cc燃油機車定期保養', 'Scheduled maintenance, 125cc petrol scooter'),
     kind: 'per-km',
     perKm: {
       low: 0.42,
@@ -30,7 +30,7 @@ export const maintenance: MaintenanceProfile[] = [
       sources: ['motc-2024-scooter-survey'],
       confidence: 'verified',
       research: ['running-costs#spend-electric-vs-gas', 'running-costs#maintenance-estimates'],
-      note: t('交通部調查普通重型燃油機車車主自報的平均每年保養維修費。', 'MOTC survey: heavy-class gasoline owners\' reported average yearly maintenance and repair spend.'),
+      note: t('交通部調查普通重型燃油機車車主自報的平均每年保養維修費。', 'MOTC survey: heavy-class petrol owners\' reported average yearly maintenance and repair spend.'),
     },
   },
   {
@@ -125,7 +125,7 @@ export const fees: FixedFees = {
     sources: ['mof-licence-tax-act'],
     confidence: 'verified',
     research: ['central#licence-tax-schedules-zero', 'maintenance-fees#tax-license-gas', 'maintenance-fees#tax-license-ev-table'],
-    note: t('150cc以下燃油機車與20.19馬力以下電動機車的使用牌照稅都是0元，電動車的免稅對125cc沒有省到錢。', 'Licence tax is zero for gasoline scooters of 150cc or less and for electric scooters up to 20.19 HP, so the electric exemption saves nothing against a 125cc.'),
+    note: t('150cc以下燃油機車與20.19馬力以下電動機車的使用牌照稅都是0元，電動車的免稅對125cc沒有省到錢。', 'Licence tax is zero for petrol scooters of 150cc or less and for electric scooters up to 20.19 HP, so the electric exemption saves nothing against a 125cc.'),
   },
   compulsoryInsurance: {
     value: 658,
@@ -137,7 +137,7 @@ export const fees: FixedFees = {
   inspection: {
     gasolineFromAgeYears: 5,
     fee: null,
-    note: t('出廠滿5年的燃油機車每年須做排氣檢驗（逾期罰500元）；檢驗費100元由環境部空污基金支付，車主不用付錢。新車在五年試算期內不會用到。', 'Gasoline scooters 5+ years old need a yearly emission test (NT$500 fine if missed); the NT$100 fee is paid by MOENV\'s air-pollution fund, so owners pay nothing. A new scooter does not reach this within the five-year horizon.'),
+    note: t('出廠滿5年的燃油機車每年須做排氣檢驗（逾期罰500元）；檢驗費100元由環境部空污基金支付，車主不用付錢。新車在五年試算期內不會用到。', 'Petrol scooters 5+ years old need a yearly emission test (NT$500 fine if missed); the NT$100 fee is paid by MOENV\'s air-pollution fund, so owners pay nothing. A new scooter does not reach this within the five-year horizon.'),
     sources: ['moenv-motor-inspection', 'udn-2026-emission-test'],
     confidence: 'verified',
     research: ['gas-baseline-r2#r2-emis-fee-official', 'gas-baseline-r2#r2-emis-rules-official'],

@@ -46,8 +46,8 @@ export default copy({
       en: 'At a red light, stand a little away from the scooters, and not right behind the pack.',
     },
     topWhy: {
-      'zh-TW': '排氣管離地大約 {cm} 公分，廢氣就排在腳邊。離排氣管遠一點，通常比較淡；差多少要看風，沒有準確的數字。',
-      en: 'A tailpipe is about {cm} cm off the ground, so the exhaust comes out by your feet. Further from the tailpipe it is usually thinner; how much depends on the wind, and there is no exact figure.',
+      'zh-TW': '排氣管比膝蓋還低（運研所算的時候設在離地 {cm} 公分），廢氣就排在腳邊。離排氣管遠一點，通常比較淡；差多少要看風，沒有準確的數字。',
+      en: 'A tailpipe sits below knee height (the Institute of Transportation’s model puts it {cm} cm up), so the exhaust comes out by your feet. Further from the tailpipe it is usually thinner; how much depends on the wind, and there is no exact figure.',
     },
     mask: {
       'zh-TW': '口罩擋不住廢氣裡的氣體；能做的是別站在車陣正後方。',

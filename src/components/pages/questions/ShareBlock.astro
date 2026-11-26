@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../../../lib/abs-url.ts';
 /**
  * ShareBlock — the share block that ends a question page (brief 7.5): the card the link will
  * carry, a LINE button, and (with JavaScript) a button that copies the page's link. The card
@@ -34,7 +35,7 @@ const manifestPath = join(process.cwd(), 'public', 'share', 'manifest.json');
 const manifest: { template?: number; cards?: Record<string, string> } = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
 const key = `${locale === 'en' ? 'en' : 'zh'}/${id}`;
 const rendered = (manifest.template ?? 0) >= REDESIGN_TEMPLATE && !!manifest.cards?.[key] && existsSync(join(process.cwd(), 'public', card.square));
-const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const pageUrl = absUrl(Astro.url.pathname, Astro.site);
 const line = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}`;
 ---
 

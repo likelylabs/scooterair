@@ -111,7 +111,7 @@ export default copy({
 
   // The headline of each link is the home page's (blueprint 3.3–3.11), verbatim.
   links: [
-    { title: { 'zh-TW': '粉塵很少，|油氣很多', en: 'Little dust. |A lot of fumes.' } },
+    { title: { 'zh-TW': '微粒很少，|油氣很多', en: 'Few particles. |A lot of fumes.' } },
     // On this page each headline stands alone (no deck), so it names what the 50 cm is between (claims policy: no typical stop-box distance)
     { title: { 'zh-TW': '排氣管離地不到一公尺。|待轉區只要求離斑馬線 {cm} 公分', en: 'The tailpipe is under a metre off the ground. |The turn box need only be {cm} cm from the crosswalk.' } },
     // Link 3 is whole (brief 7.3): the institute measured the waiting areas; beside the scooters, the site's estimate
@@ -183,13 +183,13 @@ export default copy({
 
   // Featured charts, blueprint Part 5. Titles say what the chart shows; numbers are filled in.
   v5: {
-    title: { 'zh-TW': '論排放量：|粉塵很少，油氣很多', en: 'By emissions: |little dust, a lot of fumes' },
-    subtitle: { 'zh-TW': '燃油機車占全台灣排放量的比例，每一條都是 0 到 100%', en: 'Gasoline scooters’ share of Taiwan’s emissions; each bar runs from 0 to 100%' },
+    title: { 'zh-TW': '論排放量：|微粒很少，油氣很多', en: 'By emissions: |few particles, a lot of fumes' },
+    subtitle: { 'zh-TW': '燃油機車占全台灣排放量的比例，每一條都是 0 到 100%', en: 'Petrol scooters’ share of Taiwan’s emissions; each bar runs from 0 to 100%' },
     caption: {
       'zh-TW': '這是「排放量」的占比，不是你吸進去的比例；排得多，不代表每個路口都濃。',
       en: 'These are shares of emissions, not of what you breathe; a large output does not mean thick air at every crossing.',
     },
-    chartTitle: { 'zh-TW': '燃油機車排放量占比的長條圖，每一條從 0 到 100%', en: 'Bar chart of gasoline scooters’ emission shares, each from 0 to 100%' },
+    chartTitle: { 'zh-TW': '燃油機車排放量占比的長條圖，每一條從 0 到 100%', en: 'Bar chart of petrol scooters’ emission shares, each from 0 to 100%' },
     desc: {
       'zh-TW': '每一種污染物一條，從 0 到 100%。PM2.5 和 PM10 的機車段很細，一氧化碳和碳氫化合物的機車段比較寬，沒有一條過半。',
       en: 'One bar per pollutant, from 0 to 100%. The scooter segment is a sliver for PM2.5 and PM10, wider for carbon monoxide and hydrocarbons, and nowhere a majority.',
@@ -220,7 +220,7 @@ export default copy({
     subtitle: { 'zh-TW': '推估的排放量（公噸／年），依車種，時間軸照實際年份畫', en: 'Estimated emissions (tonnes a year) by vehicle class, on a true time axis' },
     caption: {
       'zh-TW': '這是推估的排放量，不是量到的空氣。只有四個年度。交通排的苯，汽油車比機車多。',
-      en: 'These are estimated emissions, not readings of the air, for four years only. Gasoline cars emit more traffic benzene than scooters.',
+      en: 'These are estimated emissions, not readings of the air, for four years only. Petrol cars emit more traffic benzene than scooters.',
     },
   },
   v22: {
@@ -256,7 +256,7 @@ export default copy({
   },
   v25: {
     title: { 'zh-TW': '測站跟得上 PM2.5，|跟不上苯這一類', en: 'Stations track PM2.5, |not the benzene family' },
-    subtitle: { 'zh-TW': '通勤者身上的讀數和最近測站的相關係數範圍（−1 到 1）', en: 'Range of correlation between commuters’ readings and the nearest station (−1 to 1)' },
+    subtitle: { 'zh-TW': '通勤的人身上的讀數，跟最近的測站跟得多緊（0 是完全跟不上，1 是完全跟得上）', en: 'Range of correlation between commuters’ readings and the nearest station (−1 to 1)' },
     zero: { 'zh-TW': '0：完全跟不上', en: '0: no relation' },
     one: { 'zh-TW': '1：完全跟得上', en: '1: perfect' },
     caption: { 'zh-TW': '量的是台北騎腳踏車和電動機車的通勤者，不是行人。', en: 'Commuters on bicycles and rented electric scooters in Taipei, not pedestrians.' },
@@ -291,7 +291,7 @@ export default copy({
     benzene: { 'zh-TW': '苯', en: 'Benzene' },
     outdoor: { 'zh-TW': '室外空氣污染與其中的懸浮微粒', en: 'Outdoor air pollution and its particulate matter' },
     diesel: { 'zh-TW': '柴油引擎廢氣', en: 'Diesel engine exhaust' },
-    gasoline: { 'zh-TW': '汽油引擎廢氣', en: 'Gasoline engine exhaust' },
+    gasoline: { 'zh-TW': '汽油引擎廢氣', en: 'Petrol engine exhaust' },
     foot: { 'zh-TW': '分級講的是「會致癌」的證據有多強，不是吸多少才會。', en: 'A classification says how strong the evidence is that something is carcinogenic, not how much it takes.' },
   },
   v13: {
@@ -330,8 +330,8 @@ export default copy({
     value: { 'zh-TW': '數值', en: 'Value' },
     note: { 'zh-TW': '註記', en: 'Notes' },
     estimate: { 'zh-TW': '估計值', en: 'Estimate' },
-    ciLow: { 'zh-TW': '信賴區間下限', en: 'Lower confidence limit' },
-    ciHigh: { 'zh-TW': '信賴區間上限', en: 'Upper confidence limit' },
+    ciLow: { 'zh-TW': '範圍最低', en: 'Range, low end' },
+    ciHigh: { 'zh-TW': '範圍最高', en: 'Range, high end' },
     noChange: { 'zh-TW': '沒有差別', en: 'No difference' },
     ratioOne: { 'zh-TW': '1 = 沒有差別', en: '1 = no difference' },
     year: { 'zh-TW': '年', en: 'Year' },
@@ -340,10 +340,10 @@ export default copy({
     download: { 'zh-TW': '下載這張圖的資料（CSV）', en: 'Download this chart’s data (CSV)' },
     more: { 'zh-TW': '這張圖沒有說什麼、資料和出處', en: 'What this chart does not show; data and sources' },
     sources: { 'zh-TW': '出處：', en: 'Sources:' },
-    hollowNs: { 'zh-TW': '外框：統計上不顯著', en: 'Outline: not statistically significant' },
+    hollowNs: { 'zh-TW': '外框：差別不明顯，可能是碰巧', en: 'Outline: the difference may be down to chance' },
     hollowModel: { 'zh-TW': '外框：未通過模式效能檢核', en: 'Outline: failed the model-performance check' },
     filled: { 'zh-TW': '實心：研究報告的數值', en: 'Filled: the value as reported' },
-    significant: { 'zh-TW': '＊ 統計顯著', en: '* statistically significant' },
+    significant: { 'zh-TW': '＊ 研究算過：這個差別不是碰巧', en: '* the study checked: this difference is not down to chance' },
     sigFilled: { 'zh-TW': '實心：統計顯著', en: 'Filled: statistically significant' },
     sigHollow: { 'zh-TW': '空心：統計上不顯著', en: 'Hollow: not statistically significant' },
     // '|' breaks the band label into two lines (the ppm band is narrow on a phone)
@@ -423,7 +423,7 @@ export default copy({
         quote: { 'zh-TW': '「2035 年機車全面電動」', en: '“All new scooters electric by 2035”' },
         actually: {
           'zh-TW': '淨零路徑的目標，是 {y1} 年電動占新車的 {t1}，{y2} 年 {t2}。這是市售比的目標，不是禁售燃油機車。',
-          en: 'The net-zero pathway targets an electric share of new sales of {t1} in {y1} and {t2} in {y2}. These are sales targets, not a ban on gasoline scooters.',
+          en: 'The net-zero pathway targets an electric share of new sales of {t1} in {y1} and {t2} in {y2}. These are sales targets, not a ban on petrol scooters.',
         },
         weSay: { 'zh-TW': '我們照目標的原樣寫，並且說它是目標，不是預測。', en: 'We give the targets as they are, and call them targets, not forecasts.' },
       },
@@ -491,14 +491,14 @@ export default copy({
       },
       {
         no: { 'zh-TW': '騎車的人吸到的比誰都多。', en: 'That riders breathe more than anyone.' },
-        instead: { 'zh-TW': '台北量過：騎機車和走路的人，PM2.5 平均都比搭捷運的多；兩者之間差別不顯著。', en: 'Measured in Taipei: people on scooters and on foot both breathed more PM2.5 than metro riders, on average; the two did not differ significantly.' },
+        instead: { 'zh-TW': '台北量過：騎機車和走路的人，PM2.5 平均都比搭捷運的多；騎車和走路的差別不明顯。', en: 'Measured in Taipei: people on scooters and on foot both breathed more PM2.5 than metro riders, on average; the two did not differ significantly.' },
       },
       {
         no: { 'zh-TW': '台灣的路口沒有任何一氧化碳或 PM2.5 的量測。', en: 'That Taiwanese crossings have no carbon monoxide or PM2.5 readings at all.' },
         instead: { 'zh-TW': '運研所在 10 個路口的行人等候區量過；本站把它們放在推估旁邊。', en: 'The Institute of Transportation measured the waiting areas at 10 junctions; we show its readings beside our estimate.' },
       },
       {
-        no: { 'zh-TW': '說口罩沒有用，或說活性碳口罩擋得了廢氣。', en: 'That masks are useless, or that an activated-carbon mask stops exhaust.' },
+        no: { 'zh-TW': '口罩沒有用，或活性碳口罩擋得了廢氣。', en: 'That masks are useless, or that an activated-carbon mask stops exhaust.' },
         instead: { 'zh-TW': '一般口罩擋不住廢氣裡的氣體；口罩防感冒、流感還是有用。', en: 'Ordinary masks do not stop the gases in exhaust; a mask still helps against colds and flu.' },
       },
     ],

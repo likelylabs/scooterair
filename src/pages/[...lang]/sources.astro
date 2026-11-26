@@ -28,6 +28,7 @@ import sourcesCopy from '@/i18n/pages/sources';
 import { fill, localize } from '@/i18n/pages/_copy';
 import { answerList, chainLinks, facts, formatCitation, getSource, localizeAnswer, readLevelLabels, readLevels, sourceIds, sourceKindLabels, sourceKinds, sourceUrl, type AnswerId, type SourceId } from '@/data';
 import { estimateSourceIds } from '@/data/estimate';
+import { econData } from '@/data/econ';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -54,6 +55,9 @@ for (const a of answerList) {
   for (const id of srcs) answersBySource.set(id, [...(answersBySource.get(id) ?? []), a.id]);
 }
 const estimateSet = new Set<string>(estimateSourceIds);
+// sources the calculator's data cites (prices, plans, county programmes): "used in" names /electric/, never "background"
+const econText = JSON.stringify(econData);
+const econSet = new Set<string>(sourceIds.filter((id) => econText.includes(`"${id}"`)));
 /**
  * The citation is written in the reader's language; only the original title (and the journal or
  * series name) are in the source's. Split those out so each part carries the right lang (WCAG 3.1.2).
@@ -87,6 +91,7 @@ const entries = sourceIds.map((id) => {
     u,
     answers: answersBySource.get(id) ?? [],
     estimate: estimateSet.has(id),
+    econ: econSet.has(id),
     citation,
     parts: citeParts(citation, s),
     url: sourceUrl(id),
@@ -182,14 +187,16 @@ const css = [
               </p>
               <p class="sx-src__cite">{e.parts.map((p) => (p.lang ? <span lang={p.lang}>{p.text}</span> : p.text))}</p>
               {e.s.titleIsDescriptive && <p class="sx-src__hint">{T.entry.descriptiveHelp}</p>}
+              {e.s.readerNote && <p class="sx-src__hint">{readerText(e.s.readerNote[locale])}</p>}
               <div class="sx-src__actions">
                 <a href={e.url} rel="noopener noreferrer" target="_blank">{e.s.doi && !e.s.url ? `${T.entry.doi} ${e.s.doi}` : T.entry.open}<span class="vh">{locale === 'en' ? ': ' : '：'}{sourceShort(e.id, locale)} {ui.externalLink[locale]}</span> ↗</a>
                 <span class="sx-src__checked">{fill(T.entry.checked, { date: e.s.accessed })}</span>
               </div>
               <div class="sx-src__links">
                 <b>{T.entry.links}</b>
-                {e.u.links.length ? e.u.links.map((n) => <a href={href(`/evidence/#link-${n}`, locale)}>{topic(n)}</a>) : !e.estimate && <span>{T.entry.noLink}</span>}
+                {e.u.links.length ? e.u.links.map((n) => <a href={href(`/evidence/#link-${n}`, locale)}>{topic(n)}</a>) : !e.estimate && !e.econ && <span>{T.entry.noLink}</span>}
                 {e.estimate && <a href={href('/estimate/#recipe', locale)}>{T.entry.estimate}</a>}
+                {e.econ && <a href={href('/electric/#cities', locale)}>{T.entry.electric}</a>}
               </div>
               {e.count > 0 && (
                 <details class="sx-src__uses">

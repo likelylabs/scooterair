@@ -60,6 +60,7 @@ export default copy({
     series: { 'zh-TW': '圖表資料', en: 'Chart data' },
     answers: { 'zh-TW': '回答了哪些問題', en: 'Questions it helps answer' },
     estimate: { 'zh-TW': '本站的推估', en: 'Our estimate' },
+    electric: { 'zh-TW': '電動機車試算和各縣市補助', en: 'The electric-scooter calculator and local subsidies' },
     number: { 'zh-TW': '來源 {n}', en: 'Source {n}' },
   },
   top: { 'zh-TW': '回到篩選', en: 'Back to the filter' },

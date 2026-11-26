@@ -185,10 +185,10 @@ const fleet = {
   },
   'fleet-fuel-mix-may-2026': {
     data: { total: v(14.67, 'million-vehicles'), gasolineShare: v(94, 'percent'), electricShare: v(5.5, 'percent') },
-    display: t('94% 加汽油', '94% gasoline'),
+    display: t('94% 加汽油', '94% petrol'),
     statement: t(
       '截至 2026 年 5 月底，全國約有 1,467 萬輛機車，其中 94% 使用汽油，電動機車只占 5.5%。',
-      'At the end of May 2026 Taiwan had about 14.67 million motorcycles; 94% ran on gasoline and only 5.5% were electric.',
+      'At the end of May 2026 Taiwan had about 14.67 million motorcycles; 94% ran on petrol and only 5.5% were electric.',
     ),
     period: t('2026 年 5 月底', 'End of May 2026'),
     place: TW,
@@ -409,7 +409,7 @@ const electric = {
     display: t('約 11.6%', 'about 11.6%'),
     statement: t(
       '2021 年電動機車約占新賣機車的 11.6%，是用那一年機車總銷量和燃油機車銷量推算的。',
-      'In 2021 electric models were about 11.6% of new motorcycle sales, calculated from that year\'s total and gasoline sales.',
+      'In 2021 electric models were about 11.6% of new motorcycle sales, calculated from that year\'s total and petrol sales.',
     ),
     period: t('2021年', '2021'),
     place: TW,
@@ -419,7 +419,7 @@ const electric = {
     evidence: 'derived',
     caveat: t(
       '總銷量和燃油機車銷量，出自工商時報報導的 Gogoro 說明會（公司自己的資料）；電動機車的數量和比例是本站算的。',
-      'Total and gasoline sales are from a Commercial Times report of a Gogoro press briefing (company figures); the electric count and share are our calculation.',
+      'Total and petrol sales are from a Commercial Times report of a Gogoro press briefing (company figures); the electric count and share are our calculation.',
     ),
     chainLink: 7,
     research: '01 §7',
@@ -2427,7 +2427,7 @@ const hazard = {
     readerKind: 'official',
     caveat: t(
       '這一列只是拿來對照：台灣的機車幾乎都是汽油引擎，柴油的分級不適用機車廢氣。',
-      'For contrast only: Taiwan\'s scooters are almost all gasoline-engined, so the diesel classification does not apply to scooter exhaust.',
+      'For contrast only: Taiwan\'s scooters are almost all petrol-engined, so the diesel classification does not apply to scooter exhaust.',
     ),
     requiresCaveat: true,
     chainLink: 4,

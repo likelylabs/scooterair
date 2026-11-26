@@ -251,13 +251,13 @@ export const redlightSeries = {
   'tsai2023-benzene-by-class': {
     topic: 'emissions',
     title: t('各車種的苯排放量，2013–2021 年（模式推估）', 'Benzene emissions by vehicle class, 2013–2021 (modelled)'),
-    description: t('機車只在 2013 年最多；2021 年汽油小客車與輕型車約為機車的兩倍。', 'Scooters and motorcycles led only in 2013; by 2021 gasoline cars and light-duty vehicles emitted about twice as much.'),
+    description: t('機車只在 2013 年最多；2021 年汽油小客車與輕型車約為機車的兩倍。', 'Scooters and motorcycles led only in 2013; by 2021 petrol cars and light-duty vehicles emitted about twice as much.'),
     chart: 'line',
     unit: 'tonnes-per-year',
     xLabel: t('年份', 'Year'),
     datasets: [
       { key: 'motorcycles', label: t('機車', 'Scooters and motorcycles'), points: [{ x: 2013, y: 1048 }, { x: 2016, y: 571 }, { x: 2019, y: 344 }, { x: 2021, y: 286 }] },
-      { key: 'gasoline', label: t('汽油小客車與輕型車', 'Gasoline cars and light-duty vehicles'), points: [{ x: 2013, y: 721 }, { x: 2016, y: 721 }, { x: 2019, y: 683 }, { x: 2021, y: 545 }] },
+      { key: 'gasoline', label: t('汽油小客車與輕型車', 'Petrol cars and light-duty vehicles'), points: [{ x: 2013, y: 721 }, { x: 2016, y: 721 }, { x: 2019, y: 683 }, { x: 2021, y: 545 }] },
       { key: 'diesel', label: t('柴油車', 'Diesel vehicles'), points: [{ x: 2013, y: 95 }, { x: 2016, y: 119 }, { x: 2019, y: 115 }, { x: 2021, y: 113 }] },
     ],
     period: t('2013、2016、2019、2021年', '2013, 2016, 2019, 2021'),
@@ -274,13 +274,13 @@ export const redlightSeries = {
   'tsai2023-hc-by-class': {
     topic: 'emissions',
     title: t('各車種的碳氫化合物排放量，2013–2021 年（模式推估）', 'Hydrocarbon emissions by vehicle class, 2013–2021 (modelled)'),
-    description: t('機車在 2019 年後略少於汽油小客車與輕型車。', 'Scooters and motorcycles slightly below gasoline cars and light-duty vehicles from 2019.'),
+    description: t('機車在 2019 年後略少於汽油小客車與輕型車。', 'Scooters and motorcycles slightly below petrol cars and light-duty vehicles from 2019.'),
     chart: 'line',
     unit: 'tonnes-per-year',
     xLabel: t('年份', 'Year'),
     datasets: [
       { key: 'motorcycles', label: t('機車', 'Scooters and motorcycles'), points: [{ x: 2013, y: 68000 }, { x: 2016, y: 48000 }, { x: 2019, y: 38000 }, { x: 2021, y: 37000 }] },
-      { key: 'gasoline', label: t('汽油小客車與輕型車', 'Gasoline cars and light-duty vehicles'), points: [{ x: 2013, y: 23000 }, { x: 2016, y: 30000 }, { x: 2019, y: 40000 }, { x: 2021, y: 39000 }] },
+      { key: 'gasoline', label: t('汽油小客車與輕型車', 'Petrol cars and light-duty vehicles'), points: [{ x: 2013, y: 23000 }, { x: 2016, y: 30000 }, { x: 2019, y: 40000 }, { x: 2021, y: 39000 }] },
       { key: 'diesel', label: t('柴油車', 'Diesel vehicles'), points: [{ x: 2013, y: 8073 }, { x: 2016, y: 9881 }, { x: 2019, y: 9438 }, { x: 2021, y: 9211 }] },
     ],
     period: t('2013、2016、2019、2021年', '2013, 2016, 2019, 2021'),
@@ -334,7 +334,7 @@ export const redlightSeries = {
     evidence: 'measured-tw',
     caveat: t(
       '兩組的單位不同，不能放在同一個刻度上比。這是推算出來的值，論文沒說「±」是什麼；機車假設全部燒汽油。同一個隧道裡，機車排的微粒是三類車裡最少的。',
-      'Different units, which cannot be read against one scale. Regression estimates whose "±" the paper does not explain; all motorcycles assumed gasoline. In the same tunnel motorcycles had the lowest particle emissions of the three classes.',
+      'Different units, which cannot be read against one scale. Regression estimates whose "±" the paper does not explain; all motorcycles assumed petrol. In the same tunnel motorcycles had the lowest particle emissions of the three classes.',
     ),
     requiresCaveat: true,
     relatedFacts: ['tunnel-co-by-vehicle-class-ting2023', 'tunnel-particles-heavy-vehicles-ting2023'],
@@ -454,7 +454,7 @@ export const redlightSeries = {
   'odour-thresholds': {
     topic: 'smell',
     title: t('聞得到的濃度：嗅覺門檻', 'How little it takes to smell: odour thresholds'),
-    description: t('乙醛、丙烯醛在十億分之幾就聞得到，苯要到百萬分之幾，一氧化碳沒有味道。橫軸每一格差十倍，只看數量級。', 'Acetaldehyde and acrolein can be smelled at parts per billion, benzene only at parts per million, and carbon monoxide has no smell. Each step on the axis is ten times the one before; read orders of magnitude only.'),
+    description: t('乙醛、丙烯醛在十億分之幾就聞得到，苯要到百萬分之幾，一氧化碳沒有味道。橫軸每往右一格，就是多十倍。', 'Acetaldehyde and acrolein can be smelled at parts per billion, benzene only at parts per million, and carbon monoxide has no smell. Each step to the right on the axis is ten times more.'),
     chart: 'dot-range',
     unit: 'ppm',
     categories: [
@@ -462,9 +462,9 @@ export const redlightSeries = {
       { key: 'acrolein', label: t('丙烯醛', 'Acrolein') },
       { key: 'toluene', label: t('甲苯', 'Toluene') },
       { key: 'formaldehyde', label: t('甲醛', 'Formaldehyde') },
-      { key: 'isopentane', label: t('異戊烷', 'Isopentane') },
+      { key: 'isopentane', label: t('異戊烷（汽油裡的成分）', 'Isopentane (in petrol)') },
       { key: 'benzene', label: t('苯', 'Benzene') },
-      { key: 'methylpentane', label: t('2-甲基戊烷', '2-Methylpentane') },
+      { key: 'methylpentane', label: t('甲基戊烷（汽油裡的成分）', '2-Methylpentane (in petrol)') },
       { key: 'co', label: t('一氧化碳', 'Carbon monoxide'), note: t('無色、無味（WHO）。', 'Colourless and odourless (WHO).') },
     ],
     datasets: [
@@ -514,7 +514,7 @@ export const redlightSeries = {
   'chuang2020-effects-per-iqr': {
     topic: 'health',
     title: t('PM2.5 每高一個四分位距，同一小時的生理變化（Chuang 等，2020）', 'Same-hour changes per interquartile range of PM2.5 (Chuang et al., 2020)'),
-    description: t('百分比與 95% 信賴區間；各方式的增量不同，百分比不能直接互相比較。', 'Percent change with 95% CI; each mode has its own increment, so modes cannot be compared.'),
+    description: t('點是多了幾 %，線是可能的範圍；每一種算法加的量不一樣，所以不能直接互相比較。', 'Percent change with 95% CI; each mode has its own increment, so modes cannot be compared.'),
     chart: 'dot-range',
     unit: 'percent',
     categories: [

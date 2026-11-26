@@ -260,9 +260,8 @@ function htmlFiles(dir, out = []) {
   return out;
 }
 
-/** The base path the build was made for, from the home page's canonical link. */
-function detectBase() {
-  if (opt('base')) return `/${opt('base').replace(/^\/+|\/+$/g, '')}/`.replace(/^\/\/$/, '/');
+/** The public base path, from the home page's canonical link (what canonical links and the sitemap print). */
+function canonicalBase() {
   const html = readFileSync(join(DIST, 'index.html'), 'utf8');
   const m = /<link\b[^>]*rel=["']?canonical["']?[^>]*href=["']([^"']+)["']/i.exec(html) || /<link\b[^>]*href=["']([^"']+)["'][^>]*rel=["']?canonical/i.exec(html);
   if (!m) return '/';
@@ -272,7 +271,20 @@ function detectBase() {
     return '/';
   }
 }
+/**
+ * The base path the build was made for: where its own links and files point (the /_astro/
+ * folder). A build with no SITE_URL is served from / but prints the live address
+ * (likelylabs.com/scooterair/) in its canonical links, so the two can differ.
+ */
+function detectBase() {
+  if (opt('base')) return `/${opt('base').replace(/^\/+|\/+$/g, '')}/`.replace(/^\/\/$/, '/');
+  const html = readFileSync(join(DIST, 'index.html'), 'utf8');
+  const m = /(?:href|src)=["'](\/[^"']*?)_astro\//i.exec(html);
+  return m ? m[1].replace(/\/?$/, '/') : canonicalBase();
+}
 const BASE = detectBase();
+/** The base canonical links and the sitemap use (the live path; equal to BASE in a deploy build). */
+const CANON = opt('base') ? BASE : canonicalBase();
 
 const pages = htmlFiles(DIST)
   .sort()
@@ -604,7 +616,7 @@ await check(7, () => {
     for (const [from, to] of Object.entries(REDIRECTS)) {
       const route = `${prefix(l)}${from}`;
       const p = byRoute.get(route);
-      const want = `${BASE}${prefix(l).slice(1) ? 'en/' : ''}${to.slice(1)}`;
+      const want = `${CANON}${prefix(l).slice(1) ? 'en/' : ''}${to.slice(1)}`;
       if (!p) {
         fail(7, route, `redirect page is missing (should redirect to ${want})`);
         continue;
@@ -685,7 +697,7 @@ await check(7, () => {
         fail(7, m, `bad <loc> ${loc}`);
         continue;
       }
-      const route = path.startsWith(BASE) ? `/${path.slice(BASE.length)}` : path;
+      const route = path.startsWith(CANON) ? `/${path.slice(CANON.length)}` : path;
       const p = byRoute.get(route);
       if (!p) fail(7, m, `sitemap lists ${route}, which is not in the build`);
       else if (p.redirect) fail(7, m, `sitemap lists the redirect page ${route}`);

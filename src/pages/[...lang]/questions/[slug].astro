@@ -24,6 +24,8 @@ import QMyChild from '@/components/pages/questions/QMyChild.astro';
 import QRider from '@/components/pages/questions/QRider.astro';
 import QMask from '@/components/pages/questions/QMask.astro';
 import ShareBlock from '@/components/pages/questions/ShareBlock.astro';
+import WordHelp from '@/components/ui/WordHelp.astro';
+import type { WordId } from '@/i18n/ui';
 import { filler, nextQuestion, plain, slugs, type Slug } from '@/components/pages/questions/q';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { colon, typeset } from '@/i18n/ui';
@@ -41,6 +43,8 @@ const f = filler(locale);
 const next = nextQuestion(slug, locale);
 const pages = { smell: QSmell, 'beside-me': QBesideMe, app: QApp, 'one-red-light': QOneRedLight, 'my-child': QMyChild, rider: QRider, mask: QMask } satisfies Record<Slug, unknown>;
 const Page = pages[slug];
+// the hard words each page uses, explained under its title (brief 6.6: gloss at first use)
+const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppm'], 'beside-me': ['pm25', 'ug'], app: ['ppm', 'pm25'], 'one-red-light': ['pm25', 'ufp', 'ec'], 'my-child': ['pm25'], rider: ['pm25'], mask: ['benzene', 'ufp'] };
 ---
 
 <Base locale={locale} title={typeset(plain(item.q[locale]), locale)} description={f(item.card[locale])} share={slug}>
@@ -48,6 +52,7 @@ const Page = pages[slug];
     <header class="qp-head">
       <a class="qp-back" href={href('/questions/', locale)}><svg class="qp-back__arrow" viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" /></svg>{P.back[locale]}</a>
       <h1 class="qp-q"><span class="vh">{P.questionLabel[locale]}{colon(locale)}</span><Phrased text={typeset(item.q[locale], locale)} locale={locale} /></h1>
+      <WordHelp locale={locale} words={pageWords[slug]} />
     </header>
 
     <Page locale={locale} next={next} />

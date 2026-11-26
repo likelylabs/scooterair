@@ -7,7 +7,9 @@ to switch to an electric scooter. Traditional Chinese (zh-TW) is the main langua
 lives under `/en/`.
 
 Live at <https://likelylabs.com/scooterair/> (GitHub Pages, project path `/scooterair/`). The code
-is ready for its own domain as well (the default address in the build is `https://scooterair.tw`).
+is ready for its own domain as well (set `SITE_URL`, and `BASE_PATH` for a path). A build with neither
+set is served from `/` but prints the live address, `https://likelylabs.com/scooterair/`, in every
+canonical link, share link, sitemap entry and LINE text (`src/lib/abs-url.ts`, `astro.config.mjs`).
 
 Built with [Astro](https://astro.build/) and TypeScript. Every page is static HTML; the few scripts
 (the cost calculator, chart tooltips, date-dependent subsidy copy) only add to what is already on

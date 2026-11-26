@@ -279,6 +279,8 @@ export function surveyChart(locale: Locale) {
 const amountText = (p: Programme, locale: Locale) => {
   const C = localize(electric, locale).cities;
   const a = p.amount;
+  // a programme whose amount is not published is entered as 0: say so in words, never 「0 元」
+  if (a.kind === 'fixed' && a.value === 0) return C.amountUnknown;
   if (a.kind === 'fixed') return a.isMaximum ? fill(C.upTo, { amount: money(locale, a.value) }) : money(locale, a.value);
   if (a.kind === 'per-battery') return fill(C.perBattery, { single: money(locale, a.single), double: money(locale, a.double) });
   return fill(C.goodsTax, { amount: money(locale, a.max) });

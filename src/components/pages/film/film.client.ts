@@ -219,6 +219,12 @@ function start(root: HTMLElement): void {
     render();
   }
   const toggle = (): void => (playing ? pause() : play());
+  // a film the reader scrolls away from stops where it is, so it is not missed
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      for (const en of entries) if (!en.isIntersecting && playing && !new URLSearchParams(location.search).has('export')) pause();
+    }, { threshold: 0.15 }).observe(root);
+  }
   function go(to: number): void {
     const next = Math.max(0, Math.min(DURATION, to));
     // a jump redraws every part, so a second reached by seeking is exactly the second reached by playing
@@ -284,6 +290,8 @@ function start(root: HTMLElement): void {
     if (onSeek && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
       e.preventDefault();
       go(t + (e.key === 'ArrowRight' ? 5 : -5));
+      // render() leaves a focused, paused seek bar alone (so it never fights a drag): set it here
+      seek.value = String(Math.round(t * 10) / 10);
       return;
     }
     if ((e.key === ' ' || e.key === 'k') && !(onControl && e.key === ' ' && !onSeek)) {

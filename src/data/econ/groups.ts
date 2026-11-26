@@ -25,12 +25,12 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       sources: ['moenv-platform-faq', 'tcnews-2026-02-moenv-release'],
     }),
     g('gas-goods-tax-new', '貨物稅新購減徵', 'Goods-tax cut for a new purchase'),
-    g('gas-goods-tax-stacking', '燃油機車這邊的兩項貨物稅減徵都計入（新購與汰舊換新；財政部沒有確認可以相加）', 'both goods-tax cuts counted on the gasoline side (new purchase and scrap-and-replace; the MOF has not confirmed they add up)', {
+    g('gas-goods-tax-stacking', '燃油機車這邊的兩項貨物稅減徵都計入（新購與汰舊換新；財政部沒有確認可以相加）', 'both goods-tax cuts counted on the petrol side (new purchase and scrap-and-replace; the MOF has not confirmed they add up)', {
       advisory: true,
       secondaryStacking: true,
       ambiguity: t(
         '燃油機車這邊同時扣了新購2,000元與汰舊換新的貨物稅減徵：車廠官方優惠與台中市環保局的金額表都這樣算，但財政部網頁把兩者分開列，沒有寫可以相加。若不能相加，燃油機車會貴這筆金額，電動機車相對更划算。',
-        'The gasoline side deducts both the NT$2,000 new-purchase and the scrap-and-replace goods-tax cuts, as the manufacturers\' official offers and Taichung\'s EPB amount table do; but the MOF page lists them separately and does not say they add up. If they do not, the gasoline scooter costs that amount more and electric looks better.',
+        'The petrol side deducts both the NT$2,000 new-purchase and the scrap-and-replace goods-tax cuts, as the manufacturers\' official offers and Taichung\'s EPB amount table do; but the MOF page lists them separately and does not say they add up. If they do not, the petrol scooter costs that amount more and electric looks better.',
       ),
       sources: ['etax-goods-tax-scooter-cut', 'kymco-goods-tax-models', 'taichung-epb-2026-amount-table'],
     }),

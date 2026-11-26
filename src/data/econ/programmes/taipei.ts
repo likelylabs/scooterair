@@ -194,6 +194,6 @@ export const taipeiProgrammes: Programme[] = [
     }),
     side: 'gasoline',
     cap: undefined,
-    note: t('改買燃油機車的人可以領這筆錢；也可改選最多14,400元的TPASS月票補助（不是現金，未列入）。', 'Someone buying a gasoline scooter can claim this; the alternative TPASS commuter-pass support (up to NT$14,400, not cash) is not counted.'),
+    note: t('改買燃油機車的人可以領這筆錢；也可改選最多14,400元的TPASS月票補助（不是現金，未列入）。', 'Someone buying a petrol scooter can claim this; the alternative TPASS commuter-pass support (up to NT$14,400, not cash) is not counted.'),
   },
 ];

@@ -21,7 +21,11 @@ interface Props {
   text: string;
   locale?: Locale;
 }
-const esc = (s: string) => langHtml(s, Astro.props.locale ?? 'zh-TW');
+// A closing mark never starts a line on its own: the character before it and the mark stay
+// together (「警報器，」 never leaves 「，」 alone at 320 px 特大). Applied to text, never inside tags.
+const GLUE = /([\u3400-\u9fff])([，。？！；：、）」』〉》…]+)/g;
+const glue = (html: string) => html.split(/(<[^>]+>)/).map((x) => (x.startsWith('<') ? x : x.replace(GLUE, '<span class="nobr">$1$2</span>'))).join('');
+const esc = (s: string) => glue(langHtml(s, Astro.props.locale ?? 'zh-TW'));
 const parts = Astro.props.text.split('|');
 const html = parts
   .map((p, i) => {

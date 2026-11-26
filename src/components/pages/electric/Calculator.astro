@@ -115,6 +115,7 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
       <Range id="el-km" label={C.q4.label} min={50} max={kmMax} step={50} value={defaults.km} unit={C.q4.unit} hint={C.q4.hint} class="el-vh-label" />
       <p class="el-error" id="el-km-error" data-el-error="monthlyKm" data-error={C.q4.error} hidden></p>
       <p class="el-hint" id="el-km-over" data-el-over={kmMax} hidden>{fill(C.q4.overMax, { max: kmMax.toLocaleString(locale === 'en' ? 'en-GB' : 'zh-TW') })}</p>
+      <p class="el-hint" id="el-km-under" data-el-under={50} hidden>{fill(C.q4.underMin, { min: 50 })}</p>
     </div>
 
     <div class="el-q">

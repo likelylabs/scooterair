@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../../lib/abs-url.ts';
 /**
  * Home — one red light in fifteen screens (docs/redesign-brief.md section 3, with amendment
  * 12.2: the masks screen is the tenth; the rail is red to screen 12 and green from 13).
@@ -146,7 +147,7 @@ const countyName = D.counties.find((c) => c.id === choice.county)!.name;
 const price = V.priceBarsProps(P, table, choice);
 
 // ---- screen 15 -------------------------------------------------------------------------------
-const pageUrl = new URL(href('/', locale), Astro.site).href;
+const pageUrl = absUrl(href('/', locale), Astro.site);
 const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}`;
 ---
 

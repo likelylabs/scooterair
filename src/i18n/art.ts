@@ -80,6 +80,8 @@ export const art = {
   /** Words used in more than one scene. */
   words: {
     waiting: { 'zh-TW': '他也在等', en: 'He is waiting too' } as L10n,
+    /** The street scene's label, placed under the rider it names, pointing up at him. */
+    waitingUp: { 'zh-TW': '↑ 他也在等', en: '↑ He is waiting too' } as L10n,
     tailpipe: { 'zh-TW': '排氣管', en: 'Tailpipe' } as L10n,
     cm: { 'zh-TW': '公分', en: 'cm' } as L10n,
     oneMetre: { 'zh-TW': '1 公尺', en: '1 m' } as L10n,
@@ -292,7 +294,7 @@ export const art = {
   },
 
   scooter: {
-    gas: { 'zh-TW': '燃油機車', en: 'Gasoline scooter' } as L10n,
+    gas: { 'zh-TW': '燃油機車', en: 'Petrol scooter' } as L10n,
     electric: { 'zh-TW': '電動機車', en: 'Electric scooter' } as L10n,
   },
 } as const;
