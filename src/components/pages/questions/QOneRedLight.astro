@@ -1,0 +1,105 @@
+---
+/**
+ * /questions/one-red-light/ — 等一個紅燈有差嗎？ (brief 7.5; home screens 7 and 6)
+ *   1  G7, the road of time, with the stepper (always filled in). The hours a year are our
+ *      arithmetic. The five-minute study is a signpost, never a headline or a big number; the
+ *      dose arithmetic and the people who work at the kerb are in the sheet.
+ *   2  G6, the body: the long-term link, said plainly, with K5 on the same screen.
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { chipWhere, kSentences } from '@/i18n/ui';
+import Screen from '@/components/ui/Screen.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import Segmented from '@/components/ui/Segmented.astro';
+import RoadOfTime from '@/components/art/RoadOfTime.astro';
+import BodyFigure from '@/components/art/BodyFigure.astro';
+import BodyPins from '@/components/art/BodyPins.astro';
+import WorkingSum from '@/components/charts/WorkingSum.astro';
+import { workingHoursPerYear } from '@/components/charts/core/workingSum';
+import { defaultRedsPerDay, redsPerDayOptions } from '@/data/estimate';
+import questions from '@/i18n/pages/questions';
+import { filler, yearHours } from './q';
+
+interface Props {
+  locale: Locale;
+  next: { label: string; href: string; primary?: boolean };
+}
+const { locale, next } = Astro.props;
+const f = filler(locale);
+const s1 = questions.oneRedLight.s1;
+const s2 = questions.oneRedLight.s2;
+const where = [chipWhere.taiwan, chipWhere.abroad, chipWhere.international];
+const posts = s1.posts.map((p, i) => ({ when: f(p.when[locale]), text: f(p.text[locale]), kind: 'study', where: where[i][locale] })) as [Post, Post, Post];
+type Post = { when: string; text: string; kind: string; where?: string };
+const pins = ['nose', 'lungs', 'blood'] as const;
+const gap = locale === 'en' ? ' ' : '';
+const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung', 'route-co-blood'] as const;
+---
+
+<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} quiet={f(s1.quiet[locale])}>
+  <RoadOfTime slot="picture" locale={locale} posts={posts} reds={defaultRedsPerDay} class="q-plate" />
+  <Segmented slot="controls" name="reds" legend={s1.stepper[locale]} value={String(defaultRedsPerDay)} options={redsPerDayOptions.map((n) => ({ value: String(n), label: String(n), sub: s1.stepperUnit[locale] }))} />
+  <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={n}>{f(s1.body[`reds${n}`][locale], yearHours(n, locale))}</span>)}{gap}{f(s1.body.posts[locale])}</p>
+  <KindChip slot="chips" locale={locale} kind="derived" />
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: href('/evidence/#link-5', locale) }}>
+    <p slot="block1">{f(s1.sheet.b1[locale])}</p>
+    <div slot="block2">{redsPerDayOptions.map((n) => <div data-when-reds={n}><WorkingSum locale={locale} {...workingHoursPerYear(n, locale)} /></div>)}</div>
+    <p slot="block3">{f(s1.sheet.b3[locale])}</p>
+    <section class="q-studies">
+      <h3 class="q-studies__title">{s1.sheet.studiesTitle[locale]}</h3>
+      <ul class="q-studies__list">
+        {s1.sheet.studies.map((x, i) => (
+          <li>
+            <KindChip locale={locale} kind="study" where={where[i][locale]} size="sm" />
+            <span>{f(x[locale])}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </HowSheet>
+</Screen>
+
+<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={kSentences.K5[locale]} illustration="body" next={next}>
+  <BodyFigure slot="picture" locale={locale} pins={[...pins]} />
+  <BodyPins locale={locale} items={pins.map((pin) => ({ pin, text: s2.pins[pin][locale] }))} />
+  <KindChip slot="chips" locale={locale} kind="study" where={chipWhere.longTermAllTraffic[locale]} fact="hei-sr23-trap-associations" />
+  <HowSheet slot="sheet" id="how-2" locale={locale} kind="study" where={chipWhere.international[locale]} facts={['hei-sr23-trap-associations', ...routeFacts]} primary={{ href: href('/evidence/#link-5', locale) }}>
+    <p slot="block1">{f(s2.sheet.b1[locale])}</p>
+    <p slot="block2">{f(s2.sheet.b2[locale])}</p>
+    <Fragment slot="block3">
+      <p>{f(s2.sheet.b3[locale])}</p>
+      <p>{f(s2.sheet.routes[locale])}</p>
+    </Fragment>
+  </HowSheet>
+</Screen>
+
+<style>
+  .q-studies {
+    display: grid;
+    gap: var(--sp-2);
+    margin-block-start: var(--sp-4);
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+  }
+  .q-studies__title {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+  }
+  .q-studies__list {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .q-studies__list li {
+    display: grid;
+    gap: 0.3rem;
+    justify-items: start;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+</style>
