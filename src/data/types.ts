@@ -19,7 +19,9 @@ export const t = (zh: string, en: string): L10n => ({ 'zh-TW': zh, en });
  * How well the figure was checked against its source during research.
  * Nothing tagged UNVERIFIED in the research files is allowed into the registry.
  *  - verified:  during research the source itself was opened (the document, page, dataset or,
- *               for some papers, the abstract) and the figure was located in it.
+ *               for some papers, the abstract) and the figure was located in it. For evidence
+ *               'derived', it means every input in `derivedFrom` is itself verified; a derived
+ *               fact with any secondary input is 'secondary'.
  *  - secondary: the figure was seen only in a reputable report of the source (usually a news
  *               report of an official figure), or is our arithmetic on such figures. The caveat
  *               always says what it rests on.
@@ -45,8 +47,8 @@ export const confidenceLabels: Record<Confidence, { label: L10n; description: L1
   verified: {
     label: t('已查證', 'Verified'),
     description: t(
-      '查證時開啟了來源本身（文件、網頁、資料，部分論文為摘要），並在其中找到這個數字。',
-      'During our research the source itself was opened (the document, page, dataset or, for some papers, the abstract) and the figure was found in it.',
+      '查證時開啟了來源本身（文件、網頁、資料，部分論文為摘要），並在其中找到這個數字。標著「本站計算」的數字，指的是計算用到的每個數字都這樣查證過。',
+      'During our research the source itself was opened (the document, page, dataset or, for some papers, the abstract) and the figure was found in it. For a figure marked "Our arithmetic", it means every number the arithmetic uses was checked this way.',
     ),
   },
   secondary: {
