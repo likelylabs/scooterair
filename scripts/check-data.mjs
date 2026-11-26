@@ -246,6 +246,10 @@ for (const [topic, group] of Object.entries(factGroups)) {
     for (const dep of f.derivedFrom ?? []) {
       if (!factIds.has(dep)) err(w, `derivedFrom references unknown fact "${dep}"`);
       if (dep === id) err(w, 'derivedFrom references itself');
+      // types.ts: a derived figure is only as well checked as its weakest input.
+      if (f.confidence === 'verified' && facts[dep]?.confidence === 'secondary') {
+        err(w, `confidence 'verified' but input "${dep}" is 'secondary'; a derived fact with any secondary input is 'secondary'`);
+      }
     }
     if (!f.data || typeof f.data !== 'object') err(w, 'missing data object');
     for (const [k, d] of Object.entries(f.data ?? {})) {
