@@ -11,7 +11,8 @@
     "test:calc": "node --test 'src/lib/calc/__tests__/*.test.ts'",
     "check:copy": "node scripts/check-copy.mjs",
     "test:lib": "node --test 'src/lib/__tests__/*.test.ts'",
-    "share-cards": "node scripts/build-share-cards.mjs"
+    "share-cards": "node scripts/build-share-cards.mjs",
+    "headline-font": "astro build && node scripts/build-display-font.mjs && astro build"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

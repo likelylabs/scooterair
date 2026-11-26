@@ -49,11 +49,16 @@ const label = t(ui.sourceN, locale, { n });
 
 <style>
   .cite {
-    font-size: 0.7em;
+    /* 0.75em of the text it follows, never under 12px (it sat at 9–10.5px in small print) */
+    font-size: max(0.75em, 0.75rem);
     font-weight: var(--fw-bold);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     margin-inline-start: 0.1em;
+  }
+  /* neighbouring numbers ("13 15 16") are separate targets: keep their hit areas apart */
+  .cite + .cite {
+    margin-inline-start: 0.6em;
   }
   .cite a,
   .cite__n {
@@ -68,11 +73,15 @@ const label = t(ui.sourceN, locale, { n });
     text-decoration: none;
     line-height: 1.5;
   }
-  /* Enlarge the hit area without disturbing the line */
+  /* Enlarge the hit area to the full 44px height without disturbing the line. Sideways it
+     grows 0.25em (to at least 24px wide), so two neighbours (0.6em apart) never overlap. */
   .cite a::after {
     content: '';
     position: absolute;
-    inset: -0.7em -0.45em;
+    inset: calc((var(--tap) - 1.5em) / -2) -0.25em;
+  }
+  .cite a:focus-visible {
+    outline-offset: 1px;
   }
   .cite a:hover {
     background: var(--accent);
@@ -81,8 +90,9 @@ const label = t(ui.sourceN, locale, { n });
   .cite-chip {
     display: inline-flex;
     align-items: center;
-    min-block-size: 1.75rem;
-    padding: 0 0.6em;
+    /* a full tap target: chips sit in rows in figure footers, so they are not enlarged invisibly */
+    min-block-size: var(--tap);
+    padding: 0 0.85em;
     border: 1.5px solid currentColor;
     border-radius: var(--radius-pill);
     font-size: var(--fs-xs);

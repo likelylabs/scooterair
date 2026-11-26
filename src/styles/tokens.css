@@ -84,7 +84,7 @@
   --signal-red: #d93a2b; /* marks */
   --signal-red-ink: #b93225; /* text-safe */
   --signal-red-wash: #fbe4df;
-  --mark-bg: #f7dc7e; /* <mark> highlighter */
+  --mark-bg: #f9e39a; /* <mark> highlighter; on it --ink-2 6.3:1, --accent 5.0:1 (global.css lifts --ink-3 to --ink-2) */
 
   /* Charts. Order of the categorical slots is fixed: never cycle or reorder. */
   --chart-exhaust: #b0651a; /* slot 1: gasoline / exhaust */
@@ -93,7 +93,7 @@
   --chart-lime: #6e9b12; /* slot 4 */
   --chart-magenta: #b8327d; /* slot 5 */
   --chart-violet: #7256cc; /* slot 6 */
-  --chart-neutral: #9aa5a8; /* de-emphasis / "other" */
+  --chart-neutral: #7c888c; /* de-emphasis / "other": still carries data, so ≥3:1 on --bg (3.3), --bg-sunken (3.1), --surface (3.7) */
   --chart-ink: #14191c; /* totals, reference marks */
   --chart-signal: #d93a2b; /* reserved: red-phase / limit exceeded */
   --chart-track: #dce2df; /* empty waffle cells, range tracks */
@@ -203,7 +203,7 @@
  * `.tone-inverse` reuses the dark values to make an asphalt band inside a
  * light page (footer, night chapters).
  */
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
 
@@ -230,7 +230,7 @@
     --signal-red: #f0523f;
     --signal-red-ink: #f0806e;
     --signal-red-wash: #33191a;
-    --mark-bg: #6b5410;
+    --mark-bg: #4d3c06; /* --ink-2 5.5:1, --accent 5.7:1 on it */
 
     --chart-exhaust: #d08234;
     --chart-clean: #17ad96;
@@ -273,6 +273,9 @@
   }
 }
 
+/* Screen only, like the block above: paper always takes the light set (dark ink on white),
+   whatever theme the reader chose, so a printed page never comes out pale grey on white. */
+@media screen {
 :root[data-theme='dark'],
 .tone-inverse {
   color-scheme: dark;
@@ -300,7 +303,7 @@
   --signal-red: #f0523f;
   --signal-red-ink: #f0806e;
   --signal-red-wash: #33191a;
-  --mark-bg: #6b5410;
+  --mark-bg: #4d3c06;
 
   --chart-exhaust: #d08234;
   --chart-clean: #17ad96;
@@ -340,6 +343,7 @@
   --art-metal: #7c8992;
   --art-green: #1fd6b0;
   --art-lamp-off: #2a3237;
+}
 }
 
 /* ---- 5. Language-dependent tokens ----------------------------------------

@@ -8,6 +8,7 @@
 import type { L10n, Locale } from './index';
 import { confidenceLabels, evidenceLabels, evidenceTypes, type Evidence } from '../data/types.ts';
 import { facts } from '../data/facts.ts';
+import { gapBadge } from '../data/gaps.ts';
 
 /**
  * Reader-facing Chinese writes 台灣 / 台北; the registry writes 臺. Pass any registry string
@@ -27,8 +28,8 @@ export const site = {
   } as L10n,
   description: {
     'zh-TW':
-      '機車的排氣管離地不到一公尺，就在斑馬線旁邊。行人在路口到底吸進什麼，台灣還沒有人量過。這裡整理已經知道的、還不知道的，以及換電動機車實際要花多少。',
-    en: 'A scooter’s tailpipe sits under a metre off the ground, beside the crosswalk. What pedestrians actually breathe at the crossing has not been measured in Taiwan. Here is what is known, what is not, and what going electric really costs.',
+      '機車的排氣管離地不到一公尺，就在斑馬線旁邊。路口等候區的 PM2.5 和一氧化碳有人量過，但緊鄰紅燈車陣的行人吸進什麼，台灣還沒有人量過。這裡整理已經知道的、還不知道的，以及換電動機車實際要花多少。',
+    en: 'A scooter’s tailpipe sits under a metre off the ground, beside the crosswalk. PM2.5 and carbon monoxide have been measured where pedestrians wait at some crossings, but what a pedestrian breathes right beside a red-light pack has not been measured in Taiwan. Here is what is known, what is not, and what going electric really costs.',
   } as L10n,
 } as const;
 
@@ -89,28 +90,30 @@ export const ui = {
   switchLanguage: { 'zh-TW': 'English', en: '中文' },
   switchLanguageShort: { 'zh-TW': 'EN', en: '中文' },
   switchLanguageHint: { 'zh-TW': 'Read this page in English', en: '以中文閱讀本頁' },
-  themeToggle: { 'zh-TW': '切換深色/淺色', en: 'Switch light / dark theme' },
+  themeToggle: { 'zh-TW': '切換深色／淺色', en: 'Switch light / dark theme' },
+  /** The theme button's name: a toggle, pressed = dark (aria-pressed carries the state). */
+  themeDarkToggle: { 'zh-TW': '深色模式', en: 'Dark theme' },
   themeLight: { 'zh-TW': '淺色', en: 'Light' },
   themeDark: { 'zh-TW': '深色', en: 'Dark' },
   aboutData: {
-    'zh-TW': '本站每一個數字都附上來源。只用來示範版面的圖表，會清楚標示「示意數據」。',
-    en: 'Every figure on this site links to its source. Charts that only demonstrate a layout are clearly labelled “sample data”.',
+    'zh-TW': '本站每一個數字都附上來源。路口的插圖是示意圖，不是量測；沒有人量過的地方，我們會直接寫出來。',
+    en: 'Every figure on this site links to its source. The street drawings are illustrations, not measurements; where nobody has measured something, we say so.',
   },
-  aboutDataTitle: { 'zh-TW': '關於這些數據', en: 'About this data' },
+  aboutDataTitle: { 'zh-TW': '關於這些數字', en: 'About these figures' },
   credits: { 'zh-TW': '製作', en: 'Credits' },
   sources: { 'zh-TW': '資料來源', en: 'Sources' },
   source: { 'zh-TW': '來源', en: 'Source' },
   sourceN: { 'zh-TW': '來源 {n}', en: 'Source {n}' },
-  sampleData: { 'zh-TW': '示意數據', en: 'Sample data' },
+  sampleData: { 'zh-TW': '示意資料', en: 'Sample data' },
   sampleDataLong: {
-    'zh-TW': '示意數據，非真實量測',
+    'zh-TW': '示意資料，非真實量測',
     en: 'Sample data, not real measurements',
   },
-  illustrative: { 'zh-TW': '示意圖，未依實際比例或量測繪製', en: 'Illustrative, not drawn from measurements' },
+  illustrative: { 'zh-TW': '示意圖，未依實際比例或量測繪製', en: 'Illustrative: not to scale and not drawn from measurements' },
   noData: { 'zh-TW': '無資料', en: 'No data' },
   figure: { 'zh-TW': '圖', en: 'Fig.' },
   dataTable: { 'zh-TW': '查看資料表', en: 'View data table' },
-  externalLink: { 'zh-TW': '(另開新視窗)', en: '(opens in a new tab)' },
+  externalLink: { 'zh-TW': '（另開新分頁）', en: '(opens in a new tab)' },
   backToTop: { 'zh-TW': '回到頁首', en: 'Back to top' },
   note: { 'zh-TW': '說明', en: 'Note' },
   phaseRed: { 'zh-TW': '紅燈', en: 'Red phase' },
@@ -137,8 +140,8 @@ export const ui = {
     red: { 'zh-TW': '燃油機車', en: 'Gasoline' },
     clean: { 'zh-TW': '電動機車', en: 'Electric' },
     compareLegend: { 'zh-TW': '同一個路口，同一個紅燈', en: 'Same crossing, same red light' },
-    adult: { 'zh-TW': '成人口鼻', en: 'Adult' },
-    child: { 'zh-TW': '孩童口鼻', en: 'Child' },
+    adult: { 'zh-TW': '大人口鼻', en: 'Adult' },
+    child: { 'zh-TW': '小孩口鼻', en: 'Child' },
     stroller: { 'zh-TW': '嬰兒車', en: 'Stroller' },
     tailpipe: { 'zh-TW': '排氣管', en: 'Tailpipe' },
     heightUnit: { 'zh-TW': '公分', en: 'cm' },
@@ -185,11 +188,25 @@ export const chain = {
   links: [
     { 'zh-TW': '排氣管排出什麼', en: 'What leaves the tailpipe' },
     { 'zh-TW': '排在哪裡', en: 'Where it comes out' },
-    { 'zh-TW': '人因此吸進什麼', en: 'What people then breathe' },
-    { 'zh-TW': '這些物質會做什麼', en: 'What those compounds do' },
-    { 'zh-TW': '長期吸廢氣的人怎麼了', en: 'What happens to people who breathe it' },
+    { 'zh-TW': '旁邊的人吸進什麼', en: 'What people beside it breathe' },
+    { 'zh-TW': '這些成分對身體做什麼', en: 'What those compounds do' },
+    { 'zh-TW': '吸廢氣的人怎麼了', en: 'What happens to people who breathe it' },
     { 'zh-TW': '誰離得最近', en: 'Who is closest to it' },
-    { 'zh-TW': '哪一環可以切斷', en: 'Which link you can break' },
+    // the same words as `breakable`: link 7 has one name everywhere
+    { 'zh-TW': '這一環，你可以切斷', en: 'The link you can break' },
+  ] as L10n[],
+  /**
+   * The same seven names, short enough for the countdown strip on a phone (under 30em the
+   * strip has room for about 20 Latin characters). The jump menu always prints the full names.
+   */
+  linksShort: [
+    { 'zh-TW': '排氣管排出什麼', en: 'What comes out' },
+    { 'zh-TW': '排在哪裡', en: 'Where it comes out' },
+    { 'zh-TW': '旁邊的人吸進什麼', en: 'What people breathe' },
+    { 'zh-TW': '這些成分對身體做什麼', en: 'What it does' },
+    { 'zh-TW': '吸廢氣的人怎麼了', en: 'People who breathe it' },
+    { 'zh-TW': '誰離得最近', en: 'Who is closest' },
+    { 'zh-TW': '這一環，你可以切斷', en: 'The link to break' },
   ] as L10n[],
   /**
    * Chapter anchors, by convention. The home page and /evidence/ both use
@@ -206,22 +223,28 @@ export const chain = {
    */
   summary: [
     {
-      text: { 'zh-TW': '論排放量，機車的粉塵很少，油氣和一氧化碳很多。', en: 'By emissions, scooters put out little dust and a lot of fumes and carbon monoxide.' },
+      text: { 'zh-TW': '論排放量，機車排的 PM2.5（細懸浮微粒）很少，油氣和一氧化碳很多。', en: 'By emissions, scooters put out little PM2.5 (fine particles) and a lot of fuel vapour and carbon monoxide.' },
       badges: ['official-tw'],
       pip: 'filled',
     },
     {
       // {cm} is the registry's marking-rule minimum (facts['marking-rules-turn-box'].data.turnBoxGap), never typed here
       text: /* @__PURE__ */ filled(
-        { 'zh-TW': '排氣管離地不到一公尺；標線規則只要求待轉區離斑馬線 {cm} 公分。', en: 'The tailpipe is under a metre off the ground; the marking rules ask for {cm} cm between the turn box and the crosswalk.' },
+        { 'zh-TW': '排氣管離地不到一公尺；標線規則只要求待轉區離斑馬線 {cm} 公分。', en: 'The tailpipe is under a metre off the ground; the marking rules require only {cm} cm between the turn box and the crosswalk.' },
         { cm: turnBoxGapCm },
       ),
       badges: ['international', 'official-tw'],
       pip: 'filled',
     },
     {
-      text: { 'zh-TW': '站在旁邊的人吸進多少，台灣沒有人量過。', en: 'How much the person standing beside it breathes, nobody in Taiwan has measured.' },
-      badges: ['gap'],
+      // Not "nobody has measured anything": the transport research institute measured PM2.5 and CO in
+      // the waiting areas of 10 crossings (facts iot-waiting-area-pm25-2024, iot-waiting-area-co-2024).
+      // What is missing is the record right beside the idling pack, through the red light (gap-pedestrian-red-light-exposure).
+      text: {
+        'zh-TW': '路口的行人等候區量過 PM2.5 和一氧化碳；緊鄰怠速車陣、等一個紅燈吸進多少，台灣還沒有公開的量測。',
+        en: 'PM2.5 and carbon monoxide have been measured where pedestrians wait at crossings; what someone right beside the idling pack breathes through one red light has not been measured in Taiwan.',
+      },
+      badges: ['measured-tw', 'gap'],
       pip: 'open',
     },
     {
@@ -236,12 +259,19 @@ export const chain = {
       pip: 'outline',
     },
     {
-      text: { 'zh-TW': '長年吸車流廢氣，和心臟病、肺癌、氣喘有關；一個紅燈會怎樣，沒有研究。', en: 'Years of breathing traffic exhaust are associated with heart disease, lung cancer and asthma; what one red light does, no study says.' },
+      // HEI's confidence covers deaths from heart disease and lung cancer and asthma onset (fact hei-sr23-trap-associations)
+      text: { 'zh-TW': '長年吸車流廢氣，和心臟病、肺癌的死亡以及氣喘發病有關；一個紅燈會怎樣，沒有研究。', en: 'Years of breathing traffic exhaust are associated with deaths from heart disease and lung cancer, and with new asthma; what one red light does, no study says.' },
       badges: ['international', 'gap'],
       pip: 'outline',
     },
     {
-      text: { 'zh-TW': '台北的研究裡，騎機車通勤的人吸到的 PM2.5 最高；小孩呼吸比大人快。', en: 'In a Taipei study, scooter commuters breathed the most PM2.5; children breathe faster than adults.' },
+      // Chuang 2020 (fact commute-scooter-vs-subway-chuang2020): scooter and walking were both significantly
+      // higher than subway and car, and did not differ significantly from each other or from the bus.
+      // Never "the most": the ranking is of means and is not significant. PM2.5 here is from all sources.
+      text: {
+        'zh-TW': '台北一項研究裡，騎燃油機車和走路通勤的人，身上的 PM2.5 平均都明顯比搭捷運高，兩者之間沒有顯著差別；小孩呼吸比大人快。',
+        en: 'In a Taipei study, people commuting by gasoline scooter or on foot carried clearly more PM2.5 on average than subway riders, with no significant difference between the two; children breathe faster than adults.',
+      },
       badges: ['measured-tw', 'international'],
       pip: 'filled',
     },
@@ -256,8 +286,9 @@ export const chain = {
   summaryOf: { 'zh-TW': '七件事的第 {n} 件', en: 'Thing {n} of seven' } as L10n,
   summaryExpand: { 'zh-TW': '看全部七件', en: 'Show all seven' } as L10n,
   summaryUnder: {
-    'zh-TW': '六件有出處，一件沒人量過。怎麼接起來，往下看。想直接問的，點這裡：',
-    en: 'Six have sources; one has never been measured. Scroll to see how they join. Or go straight to your question:',
+    // lines 1–6 carry sources; lines 3 and 5 also carry the gap badge; line 7 is a fact of the machine
+    'zh-TW': '六件有出處，其中兩件還有沒人量到的部分；一件是機器本身的事實。怎麼接起來，往下看。想直接問的，點這裡：',
+    en: 'Six have sources, and two of those still have a part nobody has measured; one is a fact of the machine. Scroll to see how they join. Or go straight to your question:',
   } as L10n,
   /** Footer of the collapsed strip on question pages. */
   summaryFooter: { 'zh-TW': '怎麼接起來，你自己判斷。', en: 'How they join is yours to judge.' } as L10n,
@@ -296,6 +327,8 @@ export const rail = {
   jump: { 'zh-TW': '跳到', en: 'Jump to' } as L10n,
   /** The strip's label when no chapter is current: without JavaScript, and above the first chapter. */
   menu: { 'zh-TW': '跳到章節', en: 'Jump to a chapter' } as L10n,
+  /** Accessible name of the strip while a chapter is current: what it opens, then where the reader is. */
+  named: { 'zh-TW': '跳到章節，目前在：{name}', en: 'Jump to a chapter. Now reading: {name}' } as L10n,
   idle: { 'zh-TW': '一個紅燈，90 秒', en: 'One red light, ninety seconds' } as L10n,
   secondsLeft: { 'zh-TW': '紅燈剩 {n} 秒', en: '{n} seconds of red left' } as L10n,
   paused: { 'zh-TW': '倒數暫停', en: 'Countdown paused' } as L10n,
@@ -307,7 +340,7 @@ export const rail = {
   pips: {
     filled: { 'zh-TW': '台灣的資料', en: 'Taiwan data' },
     outline: { 'zh-TW': '推估或國際證據', en: 'Modelled or international' },
-    open: { 'zh-TW': '沒人量過', en: 'Not measured' },
+    open: gapBadge,
     go: { 'zh-TW': '可以切斷', en: 'Can be broken' },
   } as Record<ChainPip, L10n>,
 } as const;
@@ -333,10 +366,11 @@ export const questions = {
     { slug: 'rider', path: '/questions/rider/', label: { 'zh-TW': '騎車的人自己呢？', en: 'What about the riders themselves?' } },
     { slug: 'afford', path: '/electric/', label: { 'zh-TW': '我換得起嗎？', en: 'Can I afford to switch?' } },
   ] as { slug: string; path: string; label: L10n }[],
-  all: { 'zh-TW': '十題全部', en: 'All ten questions' } as L10n,
+  // count-free: /questions/ answers eight and points to two more on other pages
+  all: { 'zh-TW': '看全部問題', en: 'All the questions' } as L10n,
   allPath: '/questions/',
   label: { 'zh-TW': '直接問', en: 'Go straight to a question' } as L10n,
-  askMeasure: { 'zh-TW': '誰來量？請環保局來量我家路口', en: 'Who will measure it? Ask the city to measure my crossing' } as L10n,
+  askMeasure: { 'zh-TW': '誰來量？請環保局來量我家路口', en: 'Who will measure it? Ask the environmental protection bureau to measure my crossing' } as L10n,
   askMeasurePath: '/unmeasured/#ask',
 } as const;
 
@@ -385,10 +419,11 @@ export const evidence = {
       line: 'dashed' as EvidenceLine,
     },
     gap: {
-      label: { 'zh-TW': '沒人量過', en: 'Nobody has measured this' } as L10n,
+      // one name for the gap badge, read from the registry (src/data/gaps.ts)
+      label: gapBadge,
       help: {
-        'zh-TW': '我們找過了，找不到任何量測。不是量了沒事，是還沒有人去量。',
-        en: 'We looked and found no measurement. Not measured and found fine. Not measured.',
+        'zh-TW': '我們找過了，找不到能回答這一點的量測；旁邊有什麼已經量過，會一起寫出來。不是量了沒事，是這一點還沒有人量。',
+        en: 'We looked and found no measurement that answers this point; what has been measured nearby is shown beside it. That does not mean someone measured it and found it fine. It means nobody has measured this point.',
       } as L10n,
       line: 'open' as EvidenceLine,
     },
@@ -403,7 +438,7 @@ export const evidence = {
     'solid-filled': { 'zh-TW': '實線、實心：台灣的量測與官方資料', en: 'Solid, filled: measured or official Taiwan data' },
     'solid-outline': { 'zh-TW': '實線、空心：推估與國際證據', en: 'Solid, outlined: modelled or international' },
     dashed: { 'zh-TW': '虛線：本站的計算與推論', en: 'Dashed: our arithmetic and our inference' },
-    open: { 'zh-TW': '斷開、兩端空心：沒人量過', en: 'Broken, hollow ends: nobody has measured it' },
+    open: { 'zh-TW': '斷開、兩端空心：證據缺口', en: 'Broken, hollow ends: an evidence gap' },
     none: { 'zh-TW': '不畫在鏈上', en: 'Not drawn on the chain' },
   } as Record<EvidenceLine, L10n>,
   linesHeading: { 'zh-TW': '畫在證據鏈上的線', en: 'How each is drawn on the chain' } as L10n,
@@ -427,7 +462,7 @@ export const evidenceBadge = (kind: Evidence, confidence?: 'verified' | 'seconda
 
 /** The empty chart (V8) and every empty-data Figure. */
 export const emptyData = {
-  caption: { 'zh-TW': '這不是版面錯誤。這張圖的數據不存在。', en: 'This is not a layout error. The data for this chart does not exist.' } as L10n,
+  caption: { 'zh-TW': '這不是版面錯誤。這張圖要畫的資料不存在。', en: 'This is not a layout error. The data for this chart does not exist.' } as L10n,
   where: { 'zh-TW': '來源', en: 'Source' } as L10n,
   none: { 'zh-TW': '沒有來源可以引用：我們找過了，沒有人量過。', en: 'There is no source to cite: we looked, and nobody has measured it.' } as L10n,
   who: { 'zh-TW': '誰量得出來', en: 'Who could measure it' } as L10n,
@@ -438,7 +473,7 @@ export const emptyData = {
   red: { 'zh-TW': '紅燈', en: 'Red' } as L10n,
   green: { 'zh-TW': '綠燈', en: 'Green' } as L10n,
   stroller: { 'zh-TW': '嬰兒車高度（約 0.6 公尺）', en: 'Stroller height (about 0.6 m)' } as L10n,
-  adult: { 'zh-TW': '成人高度（約 1.5 公尺）', en: 'Adult height (about 1.5 m)' } as L10n,
+  adult: { 'zh-TW': '大人的高度（約 1.5 公尺）', en: 'Adult height (about 1.5 m)' } as L10n,
   heights: { 'zh-TW': '還沒有人量過的兩個高度', en: 'The two heights nobody has measured' } as L10n,
   tableHeight: { 'zh-TW': '高度', en: 'Height' } as L10n,
   tablePanel: { 'zh-TW': '量什麼', en: 'What would be measured' } as L10n,
@@ -474,7 +509,7 @@ export const tiles = {
   legend: { 'zh-TW': '圖例', en: 'Key' } as L10n,
   states: {
     available: { 'zh-TW': '有名額', en: 'Places left' },
-    restricted: { 'zh-TW': '只限汰舊或特定身分', en: 'Scrappage or certain groups only' },
+    restricted: { 'zh-TW': '只限汰舊或特定身分', en: 'Scrap-and-replace or certain groups only' },
     exhausted: { 'zh-TW': '已用完', en: 'Used up' },
     unknown: { 'zh-TW': '查不到', en: 'Could not be checked' },
   } as Record<'available' | 'restricted' | 'exhausted' | 'unknown', L10n>,
@@ -505,6 +540,84 @@ export function t(value: L10n, locale: Locale, vars?: Record<string, string | nu
   let s = value[locale];
   if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
   return s;
+}
+
+// ---------------------------------------------------------------------------
+// Typography: one convention, applied where shared components print text
+// ---------------------------------------------------------------------------
+//
+// THE CONVENTION (both languages unless stated)
+//   Spacing   zh: one ordinary space between a Han character and an adjacent Latin letter or
+//             digit — 「第 3 環」「PM2.5 很少」「2024 年」「12 小時」. Never a space next to
+//             full-width punctuation (「（PM2.5）」), and none inside a number or unit.
+//   Colons    after a label: zh 「：」 (full width, no space), en ': '. Use `colon(locale)`.
+//   Brackets  zh copy uses full-width （）「」 and ／ between Chinese words.
+//   Numbers   grouped with commas (20,980). Decimals as the source prints them.
+//   Money     NT$20,980 — no space after NT$, either language (`money()`).
+//   Ranges    two numbers joined by an en dash with no spaces: 4–14, 0.67–0.86 (`range()`).
+//             zh prose may write 「4 到 14」 instead; never a hyphen.
+//   Negatives a true minus sign (U+2212): −40%.
+//   Dates     for readers: zh 「2026 年 11 月 25 日」, en '25 November 2026' (`readerDate()`).
+//             ISO (2026-11-25) only in data and machine-readable attributes.
+//
+// HOW TO USE IT
+//   Components: wrap plain-text props in `typeset(text, locale)` before printing them (never on
+//   HTML: it is a text transform). Pages: print registry text through a shared component, or call
+//   `typeset` on it; build numbers with `money` / `range` / `readerDate` instead of template strings.
+
+const HAN = '\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uF900-\\uFAFF';
+const LATIN = 'A-Za-z0-9';
+const hanThenLatin = new RegExp(`([${HAN}])([${LATIN}])`, 'g');
+const latinThenHan = new RegExp(`([${LATIN}%³²‰°])([${HAN}])`, 'g');
+
+/** The label colon for a locale: 「：」 in Chinese, ': ' in English. */
+export const colon = (locale: Locale): string => (locale === 'en' ? ': ' : '：');
+
+/**
+ * Apply the site's typography convention to a plain-text string (see above). Idempotent.
+ * Chinese gets Han–Latin spacing; both languages get spaced en-dash ranges closed up
+ * ("0.67 – 0.86" → "0.67–0.86") and a true minus before a bare negative number.
+ */
+export function typeset(s: string, locale: Locale): string {
+  let out = s.replace(/(\d) ?[–] ?(?=\d)/g, '$1–').replace(/(^|[\s(（])-(?=\d)/g, '$1−');
+  if (locale === 'zh-TW') out = out.replace(hanThenLatin, '$1 $2').replace(latinThenHan, '$1 $2');
+  return out;
+}
+
+const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const hanRun = new RegExp(`[${HAN}][${HAN}\\u3000-\\u303F\\uFF01-\\uFF0F\\uFF1A-\\uFF20\\u00B7·]*`, 'g');
+
+/**
+ * Escaped HTML for a plain-text string, with any Chinese run inside English copy wrapped in
+ * <span lang="zh-Hant-TW"> (待轉區, 行人呼吸), so screen readers switch voice and the browser
+ * picks the CJK font. Chinese copy is returned escaped and unchanged: Latin terms in it
+ * (PM2.5, App, NT$) read correctly in a Chinese voice and need no markup.
+ * Use with set:html. Shared components use it for titles, captions and source lines.
+ */
+export function langHtml(s: string, locale: Locale): string {
+  const e = escHtml(s);
+  return locale === 'en' ? e.replace(hanRun, (m) => `<span lang="zh-Hant-TW">${m}</span>`) : e;
+}
+
+/** A number grouped by the convention (20,980). */
+export const num = (n: number, locale: Locale, maxDecimals = 2): string =>
+  new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: maxDecimals }).format(n).replace('-', '−');
+
+/** Money: NT$20,980, no space, either language. */
+export const money = (n: number, locale: Locale): string => `${n < 0 ? '−' : ''}${units.ntd}${num(Math.abs(n), locale, 0)}`;
+
+/** A numeric range: 4–14 (en dash, no spaces). */
+export const range = (a: number | string, b: number | string, locale: Locale): string =>
+  `${typeof a === 'number' ? num(a, locale) : a}–${typeof b === 'number' ? num(b, locale) : b}`;
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** An ISO date (2026-11-25) for readers: 「2026 年 11 月 25 日」 / '25 November 2026'. */
+export function readerDate(iso: string, locale: Locale): string {
+  const m = /^(\d{4})-(\d{2})(?:-(\d{2}))?/.exec(iso);
+  if (!m) return iso;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), m[3] ? Number(m[3]) : 0];
+  if (locale === 'en') return d ? `${d} ${MONTHS[mo - 1]} ${y}` : `${MONTHS[mo - 1]} ${y}`;
+  return d ? `${y} 年 ${mo} 月 ${d} 日` : `${y} 年 ${mo} 月`;
 }
 
 /**

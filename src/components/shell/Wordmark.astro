@@ -19,10 +19,12 @@ const { locale, compact = false } = Astro.props;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
 ---
 
-<a class="wordmark" href={href('/', locale)} aria-label={site.name[locale]}>
+{/* The link's name is its visible text, both names when both show (voice control: "click
+    ScooterAir" works); the other-language name carries its own lang. */}
+<a class="wordmark" href={href('/', locale)}>
   <Mark />
-  <span class="wordmark__name">{site.name[locale]}</span>
-  {!compact && <span class="wordmark__alt" lang={htmlLang[other]} aria-hidden="true">{site.altName[locale]}</span>}
+  <span class="wordmark__name">{site.name[locale]}</span>{' '}
+  {!compact && <span class="wordmark__alt" lang={htmlLang[other]}>{site.altName[locale]}</span>}
 </a>
 
 <style>

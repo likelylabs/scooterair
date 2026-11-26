@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit } from './shared';
 
 export interface BarDatum {
   label: string;
@@ -123,7 +123,7 @@ export function renderBar(p: BarChartProps): ChartRender {
     body: o.join(''),
     height,
     table: {
-      head: [p.categoryLabel, unit ? `${p.valueLabel} (${unit})` : p.valueLabel],
+      head: [p.categoryLabel, withUnit(locale, p.valueLabel, unit)],
       rows: [...data.map((d, i) => [d.label, values[i]]), ...(reference ? [[reference.label, fmtSigned(locale, reference.value, decimals)]] : [])],
     },
   };

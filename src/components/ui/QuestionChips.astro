@@ -109,6 +109,13 @@ const items = Astro.props.items ?? questions.chips.map((c) => ({ label: c.label[
   .chips__after {
     margin: 0;
   }
+  /* English words are long: below 344px a two-column chip is narrower than "themselves?",
+     which then breaks mid-word or leaves the "?" alone on a line. One column there. */
+  @media (max-width: 21.5em) {
+    .chips__list:lang(en) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
   @media (min-width: 40em) {
     .chips__list {
       grid-template-columns: repeat(3, minmax(0, 1fr));

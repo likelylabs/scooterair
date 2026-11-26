@@ -67,17 +67,22 @@ const text_name = (n: number) => (n === total ? chain.breakable[locale] : chain.
 const text = {
   link: chain.linkN[locale],
   links: chain.links.map((l, i) => (i === total - 1 ? chain.breakable[locale] : l[locale])),
+  /** Shorter names for a phone-width strip (the jump menu always prints the full names). */
+  short: chain.linksShort.map((l) => l[locale]),
   jump: rail.jump[locale],
+  /** The summary's accessible name: what it does, then where the reader is. */
+  named: rail.named[locale],
 };
 const idleKicker = current ? t(chain.linkN, locale, { n: current }) : '';
 /** The strip's label when it is not on a chapter: without JavaScript, and above the first chapter. */
 const menuLabel = rail.menu[locale];
 const idleName = current ? text_name(current) : menuLabel;
+const barName = (name: string) => (name === menuLabel ? menuLabel : t(rail.named, locale, { name }));
 ---
 
 <nav class:list={['rail', cls]} aria-label={rail.label[locale]} data-rail data-text={JSON.stringify({ ...text, idle: menuLabel })}>
   <details class="rail__menu">
-    <summary class="rail__bar">
+    <summary class="rail__bar" aria-label={barName(idleName)}>
       <span class="container rail__row">
         <span class="rail__led" aria-hidden="true" data-js-only={shown ? undefined : ''} data-phase={shown ? 'red' : 'off'}>
           <svg viewBox="0 0 26 18" width="39" height="27" focusable="false">
@@ -344,12 +349,20 @@ const idleName = current ? text_name(current) : menuLabel;
   const el = document.querySelector<HTMLElement>('[data-rail]');
   const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-rail-chapter]'));
   if (el && chapters.length) {
-    const text = JSON.parse(el.dataset.text ?? '{}') as { link: string; links: string[]; jump: string; idle?: string };
+    const text = JSON.parse(el.dataset.text ?? '{}') as { link: string; links: string[]; short?: string[]; jump: string; idle?: string; named?: string };
     const led = el.querySelector<HTMLElement>('.rail__led');
     const kicker = el.querySelector<HTMLElement>('[data-rail-kicker]');
     const name = el.querySelector<HTMLElement>('[data-rail-name]');
     const menu = el.querySelector<HTMLDetailsElement>('.rail__menu');
+    const bar = el.querySelector<HTMLElement>('.rail__bar');
+    // the strip is a phone-width line below 30em: the short link names fit it
+    const narrow = window.matchMedia('(max-width: 30em)');
     let shown = '';
+    /** Visible name on the strip; the summary's accessible name says what it opens, then that name. */
+    const setName = (visible: string, full: string) => {
+      if (name) name.textContent = visible;
+      if (bar) bar.setAttribute('aria-label', !text.named || full === text.idle ? full : text.named.replace('{name}', full));
+    };
 
     const setLed = (value: number | null, phase: string) => {
       if (!led) return;
@@ -378,7 +391,7 @@ const idleName = current ? text_name(current) : menuLabel;
         el.querySelectorAll<SVGGElement>('.rail__pips [data-pip]').forEach((g) => g.removeAttribute('data-now'));
         el.querySelectorAll<HTMLAnchorElement>('[data-rail-item]').forEach((a) => a.removeAttribute('aria-current'));
         if (kicker) kicker.textContent = '';
-        if (name) name.textContent = text.idle ?? '';
+        setName(text.idle ?? '', text.idle ?? '');
         return;
       }
       const box = cur.getBoundingClientRect();
@@ -389,7 +402,8 @@ const idleName = current ? text_name(current) : menuLabel;
       const to = Number(d.countTo ?? d.countFrom);
       const count = has ? Math.round(from + (to - from) * p) : null;
       const linkN = d.link ? Number(d.link) : 0;
-      const key = `${cur.id}|${count}`;
+      // keyed by position, not id: a chapter wrapper without an id must still redraw the name
+      const key = `${chapters.indexOf(cur)}|${count}|${narrow.matches}`;
       if (key === shown) return;
       shown = key;
       // at 00 the light has turned: the LED is green from there on
@@ -400,7 +414,8 @@ const idleName = current ? text_name(current) : menuLabel;
         else a.removeAttribute('aria-current');
       });
       if (kicker) kicker.textContent = linkN ? text.link.replace('{n}', String(linkN)) : '';
-      if (name) name.textContent = d.railLabel || (linkN ? text.links[linkN - 1] : '');
+      const full = d.railLabel || (linkN ? text.links[linkN - 1] : '');
+      setName(d.railLabel || !linkN ? full : (narrow.matches && text.short?.[linkN - 1]) || full, full);
     };
 
     let queued = false;
@@ -414,7 +429,9 @@ const idleName = current ? text_name(current) : menuLabel;
     };
     window.addEventListener('scroll', queue, { passive: true });
     window.addEventListener('resize', queue, { passive: true });
-    update();
+    // first draw in the next frame, not inside this task: reading every chapter's box while the
+    // page is still being styled forces a synchronous layout
+    queue();
 
     if (menu) {
       const summary = menu.querySelector('summary');
@@ -426,6 +443,12 @@ const idleName = current ? text_name(current) : menuLabel;
       document.addEventListener('keydown', (e) => e.key === 'Escape' && close(true));
       document.addEventListener('click', (e) => !menu.contains(e.target as Node) && close());
       menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => close()));
+      // the panel covers the page: close it when keyboard focus moves out, so focus never lands
+      // on a control hidden underneath (WCAG 2.4.11)
+      menu.addEventListener('focusout', (e) => {
+        const next = (e as FocusEvent).relatedTarget as Node | null;
+        if (next && !menu.contains(next)) close();
+      });
     }
   }
 </script>

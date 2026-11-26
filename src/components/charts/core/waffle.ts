@@ -31,11 +31,29 @@ export function renderWaffle(p: WaffleProps): ChartRender {
   });
   const counted = tones.length;
   while (tones.length < total) tones.push(null);
+  // which part each cell belongs to: the first part is a plain fill, the second carries a
+  // surface-coloured stroke, the third a dot, so the parts differ by more than hue (two tones
+  // of equal lightness merge in greyscale). The uncounted cells are drawn hollow.
+  const partOf: number[] = [];
+  parts.forEach((part, pi) => {
+    for (let i = 0; i < Math.round(part.value) && partOf.length < total; i++) partOf.push(pi);
+  });
+  const CUTS = ['rect', 'slash', 'dotted'] as const;
   let body = '';
   tones.forEach((t, i) => {
     const col = i % cols;
     const row = rowsN - 1 - Math.floor(i / cols);
-    body += `<rect class="${t ? `c-fill-${t}` : 'c-track'}" x="${col * (CELL + GAP)}" y="${row * (CELL + GAP)}" width="${CELL}" height="${CELL}" rx="1.2"/>`;
+    const x = col * (CELL + GAP);
+    const y = row * (CELL + GAP);
+    if (!t) {
+      // inset by half the outline, so the hollow cell is the same size as a filled one
+      body += `<rect class="c-hollow" x="${x + 0.5}" y="${y + 0.5}" width="${CELL - 1}" height="${CELL - 1}" rx="1" vector-effect="non-scaling-stroke"/>`;
+      return;
+    }
+    body += `<rect class="c-fill-${t}" x="${x}" y="${y}" width="${CELL}" height="${CELL}" rx="1.2"/>`;
+    const cut = CUTS[partOf[i]] ?? 'rect';
+    if (cut === 'slash') body += `<path class="c-cut" d="M${x + 2},${y + 2}L${x + CELL - 2},${y + CELL - 2}"/>`;
+    if (cut === 'dotted') body += `<circle class="c-cut--dot" cx="${x + CELL / 2}" cy="${y + CELL / 2}" r="1.8"/>`;
   });
   const f = (v: number) => fmt(locale, v, 0);
   return {
@@ -45,8 +63,8 @@ export function renderWaffle(p: WaffleProps): ChartRender {
     viewBox: `0 0 ${size(cols)} ${size(rowsN)}`,
     maxWidth: `${Math.min(20, cols * 1.9)}rem`,
     legend: [
-      ...parts.map((part) => ({ label: `${f(part.value)} · ${part.label}`, tone: part.tone, shape: 'rect' as const })),
-      { label: `${f(total - counted)} · ${p.restLabel}`, tone: 'neutral' as Tone, shape: 'light' as const },
+      ...parts.map((part, pi) => ({ label: `${f(part.value)} · ${part.label}`, tone: part.tone, shape: CUTS[pi] ?? ('rect' as const) })),
+      ...(total - counted > 0 ? [{ label: `${f(total - counted)} · ${p.restLabel}`, tone: 'neutral' as Tone, shape: 'hollow' as const }] : []),
     ],
     table: {
       head: [p.categoryLabel, p.valueLabel],

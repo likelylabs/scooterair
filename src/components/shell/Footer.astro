@@ -10,7 +10,7 @@
  *   credits  optional credits / partner line (plain inline content)
  */
 import { href, htmlLang, switchLocalePath, type Locale } from '@/i18n';
-import { footerNav, nav, site, ui } from '@/i18n/ui';
+import { colon, footerNav, nav, site, ui } from '@/i18n/ui';
 import Wordmark from './Wordmark.astro';
 
 interface Props {
@@ -18,7 +18,9 @@ interface Props {
 }
 const { locale } = Astro.props;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
-const hasCredits = Astro.slots.has('credits');
+// Render the credits line only when the slot has real content: Base forwards the slot even when
+// a page leaves it empty, and an empty line would announce a bare "製作：" to screen readers.
+const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits')).trim() : '';
 ---
 
 <footer class="site-footer">
@@ -45,16 +47,16 @@ const hasCredits = Astro.slots.has('credits');
           {ui.aboutData[locale]}{' '}
           <a href={href('/sources/', locale)}>{ui.sources[locale]}</a>
         </p>
-        {hasCredits && (
+        {credits && (
           <p class="site-footer__credits">
-            <span class="vh">{ui.credits[locale]}: </span>
-            <slot name="credits" />
+            <span class="vh">{ui.credits[locale]}{colon(locale)}</span>
+            <Fragment set:html={credits} />
           </p>
         )}
       </div>
     </div>
     <div class="container site-footer__base">
-      <a href={switchLocalePath(Astro.url.pathname, other)} lang={htmlLang[other]} hreflang={htmlLang[other]}>{ui.switchLanguage[locale]}</a>
+      <a data-lang-switch href={switchLocalePath(Astro.url.pathname, other)} lang={htmlLang[other]} hreflang={htmlLang[other]}>{ui.switchLanguage[locale]}</a>
       <a href="#top">{ui.backToTop[locale]}</a>
     </div>
   </div>
@@ -105,6 +107,13 @@ const hasCredits = Astro.slots.has('credits');
     margin-block-start: var(--sp-3);
     max-inline-size: 30em;
   }
+  /* the sources link ends the sentence but is the block's only action: give it a full tap target */
+  .site-footer__data p > a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    margin-block: calc((var(--tap) - 1lh) / -2);
+  }
   .site-footer__credits {
     color: var(--ink-3);
   }
@@ -121,7 +130,9 @@ const hasCredits = Astro.slots.has('credits');
   .site-footer__base a {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-block-size: var(--tap);
+    min-inline-size: var(--tap);
   }
   @media (min-width: 48em) {
     .site-footer__grid {

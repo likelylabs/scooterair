@@ -92,11 +92,21 @@ const cfg = {
     noCity: T.closer.noCity,
     statusNote: T.status.statusNote,
     officialLinks: T.status.officialLinks,
+    announce: T.result.announce,
+    barEmpty: T.calc.bar.empty,
+    barFix: T.calc.bar.fix,
   },
+  examples: [] as { key: string; answers: unknown; before: boolean; after: string; full: boolean }[],
+  built: today,
 };
 
 // ---- worked examples, running costs, cities, facts -------------------------------------------
 const ex = examples(locale);
+// The first worked example ships complete (it is the no-JavaScript answer too); the others ship
+// their verdict only, and the browser builds their working when one is opened, for the reader's day.
+const lazy = (i: number) => i > 0;
+cfg.examples = ex.map((x, i) => ({ key: x.key, answers: x.answers, before: !!x.before, after: afterDate, full: !lazy(i) }));
+const headOnly = (r: (typeof ex)[number]['after']['rendered'], i: number) => (lazy(i) ? { ...r, bodyHtml: '' } : r);
 const run = runningTables(locale);
 const { cities, central } = cityDetails(locale);
 const survey = surveyChart(locale);
@@ -107,6 +117,24 @@ const band = run.band;
 const share = factValue('econ-ev-brand-share-2026-07', 'gogoroShare');
 const stations = factValue('econ-gogoro-network', 'stations');
 const pageSources = sourcesFor({ facts: [...factIds], series: [...seriesIds] });
+// the checklist's dates, earliest first
+const foreignDates = data.programmes.flatMap((p) => p.conditions.flatMap((c) => (c.kind === 'applicant-deadline' ? [c.date] : []))).filter((x, i, a) => a.indexOf(x) === i);
+const dateItems = [
+  { date: yearEnd, text: fill(T.checklist.dates.purchase, { date: deadline }) },
+  { date: snapshot.filingEnd, text: fill(T.checklist.dates.filing, { date: filing }) },
+  ...foreignDates.map((date) => ({ date, text: fill(T.checklist.dates.foreign, { date: d(date) }) })),
+].sort((a, b) => a.date.localeCompare(b.date));
+// places whose own money closes before the central deadline (Keelung and Kinmen: 30 November)
+const earlyByDate = new Map<string, string[]>();
+for (const p of data.programmes) {
+  if (p.jurisdiction === 'central' || p.calculator !== true || p.validTo >= yearEnd) continue;
+  const name = readerText(data.jurisdictions[p.jurisdiction as JurisdictionId].name[locale]);
+  const list = earlyByDate.get(p.validTo) ?? [];
+  if (!list.includes(name)) list.push(name);
+  earlyByDate.set(p.validTo, list);
+}
+const early = [...earlyByDate.entries()].map(([date, places]) => fill(T.risks.early, { places: places.join(locale === 'en' ? ' and ' : '、'), date: d(date) })).join(' ');
+const rangeDesc = run.range.map((r) => fill(T.monthly.rangeDescItem, { label: r.label, mid: perKm(r.mid), min: perKm(r.min), max: perKm(r.max) })).join(locale === 'en' ? '; ' : '；');
 
 // running-cost table: one row per distance, a column per way of powering it (CompareTable stacks on phones)
 const homeCols = run.homeModels.map((m) => ({ id: m.id, label: `${T.monthly.rows.home} · ${readerText(m.name[locale]).replace(/[（(].*$/, '')} · ${T.result.plate[m.plateClass]}` }));
@@ -116,7 +144,7 @@ const useOf = (x: (typeof ex)[number]) => JSON.stringify({ ...x.answers, charge:
 const notYetBadge = (k: string) => k as EvidenceKind;
 ---
 
-<Base locale={locale} title={T.meta.title} description={T.meta.description} money>
+<Base locale={locale} title={T.meta.title} description={T.meta.description} share="electric" money>
   <header class="el-head">
     <div class="container container--wide el-head__inner">
       <p class="eyebrow">{T.head.eyebrow}</p>
@@ -126,9 +154,6 @@ const notYetBadge = (k: string) => k as EvidenceKind;
       <div class="el-answer-first" aria-labelledby="answer-title">
         <h2 id="answer-title" class="el-answer-first__title">{T.answer.title}</h2>
         <p>{T.answer.body}</p>
-        {band && <p data-money-when="A B C D static">{fill(T.answer.monthly, { low: nf(band.low), high: nf(band.high) })}</p>}
-        <p data-money-when="B C D" class="el-answer-first__after">{fill(T.answer.after, { deadline, checked })}</p>
-        <p data-money-when="static" class="el-answer-first__after">{fill(T.answer.staticNote, { deadline, checked })}</p>
         <div data-money-when="A static">
           <div class="el-actions">
             <Button href="#calc" size="lg" data-js-only>{T.answer.calcLink}</Button>
@@ -150,6 +175,9 @@ const notYetBadge = (k: string) => k as EvidenceKind;
             <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
           </div>
         </div>
+        {band && <p data-money-when="A B C D static">{fill(T.answer.monthly, { low: nf(band.low), high: nf(band.high) })}</p>}
+        <p data-money-when="B C D" class="el-answer-first__after">{fill(T.answer.after, { deadline, checked })}</p>
+        <p data-money-when="static" class="el-answer-first__after">{fill(T.answer.staticNote, { deadline, checked })}</p>
       </div>
     </div>
   </header>
@@ -172,40 +200,12 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   <Section id="calc" title={T.calc.title} width="wide">
     <p id="el-calc-lead" class="el-calc-lead" data-js-only>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[0]}<span data-money-fill="today">{d(today)}</span>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[1]}</p>
     <div class="el-calc-grid">
-      <Calculator locale={locale} cfg={cfg} today={today} />
+      <Calculator locale={locale} cfg={cfg} today={today} cityOptions={cityOptions} />
     </div>
   </Section>
 
-  <!-- Worked examples: complete results without JavaScript, on both sides of the deadline -->
-  <Section id="examples" title={T.examples.title} lead={T.examples.lead} width="wide" tone="sunken">
-    <Tabs label={T.examples.tabsLabel}>
-      {ex.map((x) => (
-        <TabPanel id={`example-${x.key}`} label={x.tab}>
-          <div class="el-example">
-            <p class="el-example__who">{x.who}</p>
-            {x.before && (
-              <div data-money-when="A static">
-                <div class="el-example__phase">
-                  <h4 class="el-example__when">{fill(T.examples.before, { deadline, checked })}</h4>
-                  <ElectricResult id={`ex-${x.key}-a`} locale={locale} rendered={x.before.rendered} city={x.answers.jurisdiction} />
-                </div>
-              </div>
-            )}
-            <div data-money-when={x.before ? 'B C D static' : 'A B C D static'}>
-              <div class="el-example__phase">
-                <h4 class="el-example__when">{fill(T.examples.after, { from: d(afterDate) })}</h4>
-                <ElectricResult id={`ex-${x.key}-c`} locale={locale} rendered={x.after.rendered} city={x.answers.jurisdiction} />
-              </div>
-            </div>
-            <p data-js-only><Button variant="secondary" data-el-use={useOf(x)}>{T.examples.useThis}</Button></p>
-          </div>
-        </TabPanel>
-      ))}
-    </Tabs>
-  </Section>
-
   <!-- How to get closer: the levers for the chosen place, from the engine -->
-  <Section id="closer" title={T.closer.title} lead={T.closer.lead} width="wide">
+  <Section id="closer" title={T.closer.title} lead={T.closer.lead} width="wide" tone="sunken">
     <div class="el-two">
       <div>
         <p class="el-small" data-js-only>{T.closer.leverNote}</p>
@@ -219,6 +219,41 @@ const notYetBadge = (k: string) => k as EvidenceKind;
         </ul>
       </Callout>
     </div>
+  </Section>
+
+  <!-- Worked examples: complete results without JavaScript, on both sides of the deadline -->
+  <Section id="examples" title={T.examples.title} lead={T.examples.lead} width="wide">
+    <Tabs label={T.examples.tabsLabel}>
+      {ex.map((x, i) => (
+        <TabPanel id={`example-${x.key}`} label={x.tab}>
+          <div class="el-example">
+            <p class="el-example__who">{x.who}</p>
+            <p class="el-small">{T.examples.voice}</p>
+            {lazy(i) && (
+              <p class="el-small" data-el-more>
+                <span data-js-only>{T.examples.more}</span>
+                <span class="el-nojs">{T.examples.moreNoJs}</span>
+              </p>
+            )}
+            {x.before && (
+              <div data-money-when="A static">
+                <div class="el-example__phase">
+                  <h4 class="el-example__when">{fill(T.examples.before, { deadline, checked })}</h4>
+                  <ElectricResult id={`ex-${x.key}-a`} locale={locale} rendered={headOnly(x.before.rendered, i)} city={x.answers.jurisdiction} />
+                </div>
+              </div>
+            )}
+            <div data-money-when={x.before ? 'B C D static' : 'A B C D static'}>
+              <div class="el-example__phase">
+                <h4 class="el-example__when">{fill(T.examples.after, { from: d(afterDate) })}</h4>
+                <ElectricResult id={`ex-${x.key}-c`} locale={locale} rendered={headOnly(x.after.rendered, i)} city={x.answers.jurisdiction} />
+              </div>
+            </div>
+            <p data-js-only><Button variant="secondary" data-el-use={useOf(x)}>{T.examples.useThis}</Button></p>
+          </div>
+        </TabPanel>
+      ))}
+    </Tabs>
   </Section>
 
   <!-- What to do next: the ordered, dated checklist -->
@@ -235,9 +270,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     </ol>
     <h3 class="el-h3">{T.checklist.datesTitle}</h3>
     <ul class="el-dates">
-      <li>{fill(T.checklist.dates.purchase, { date: deadline })}</li>
-      <li>{fill(T.checklist.dates.filing, { date: filing })}</li>
-      {data.programmes.flatMap((p) => p.conditions.flatMap((c) => (c.kind === 'applicant-deadline' ? [c.date] : []))).filter((x, i, a) => a.indexOf(x) === i).map((date) => <li>{fill(T.checklist.dates.foreign, { date: d(date) })}</li>)}
+      {dateItems.map((x) => <li>{x.text}</li>)}
       <li>{fill(T.checklist.dates.next, { date: checked })}</li>
     </ul>
     <p class="el-small">{T.checklist.yourDates}</p>
@@ -247,7 +280,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   <!-- Running costs, on their own -->
   <Section id="monthly" title={T.monthly.title} width="wide">
     <p class="el-opener">{T.monthly.opener}</p>
-    <p class="lead">{T.monthly.lead}</p>
+    <p class="lead">{run.suitsFrom !== null ? fill(T.monthly.leadFrom, { km: nf(run.suitsFrom) }) : T.monthly.lead}</p>
 
     <Figure locale={locale} title={T.monthly.tableTitle} subtitle={T.monthly.tableSub} caption={fill(T.monthly.tableCaption, { checked })} badge={['derived', 'market-tw']} secondary>
       <div class="el-kms">
@@ -280,7 +313,8 @@ const notYetBadge = (k: string) => k as EvidenceKind;
           labels={{ min: T.monthly.rangeLabels.min, mid: T.monthly.rangeLabels.mid, max: T.monthly.rangeLabels.max }}
           decimals={2}
           unit="NT$/km"
-          categoryLabel={T.monthly.perKm}
+          categoryLabel={T.monthly.rangeCategory}
+          desc={rangeDesc}
         />
       </Figure>
       <div class="stack" style="--stack: var(--sp-4)">
@@ -374,14 +408,21 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     <ul class="el-facts">
       <li>{T.risks.class}</li>
       <li>
-        {fill(T.risks.network, { month: fx['econ-ev-brand-share-2026-07'].period, share: `${nf(share ?? 0, 0)}%`, stations: nf(stations ?? 0) })}
-        {' '}{fill(T.risks.networkTail, { checked })}
+        {fill(T.risks.network, { month: fx['econ-ev-brand-share-2026-07'].period, share: `${nf(share ?? 0, 0)}%` })}
         <EvidenceBadge locale={locale} {...badgeOf('econ-ev-brand-share-2026-07')} variant="icon" />
-        <span class="el-small">{[...factSources('econ-ev-brand-share-2026-07'), ...factSources('econ-gogoro-network')].map((c) => c.short).join(' · ')}</span>
+        <span class="el-small">{factSources('econ-ev-brand-share-2026-07').map((c) => c.short).join(' · ')}</span>
+        {' '}{fill(T.risks.stations, { stations: nf(stations ?? 0) })}
+        <EvidenceBadge locale={locale} {...badgeOf('econ-gogoro-network')} variant="icon" />
+        <span class="el-small">{factSources('econ-gogoro-network').map((c) => c.short).join(' · ')}</span>
+        {' '}{fill(T.risks.networkTail, { checked })}
       </li>
-      <li>{T.risks.finance}</li>
+      <li>
+        <b>{T.risks.finance}</b>{fx['econ-gogoro-finances-2026'].statement} {fx['econ-gogoro-finances-2026'].caveat}
+        <EvidenceBadge locale={locale} {...badgeOf('econ-gogoro-finances-2026')} variant="icon" />
+        <span class="el-small">{factSources('econ-gogoro-finances-2026').map((c) => c.short).join(' · ')}</span>
+      </li>
       <li>{T.risks.resale}</li>
-      <li><b>{T.risks.next}</b>{readerText(data.meta.nextYear[locale])} {fx['econ-no-2027-programme'].caveat}</li>
+      <li><b>{T.risks.next}</b>{readerText(data.meta.nextYear[locale])} {T.risks.nextCaveat} {early}</li>
     </ul>
   </Section>
 
@@ -411,8 +452,9 @@ const notYetBadge = (k: string) => k as EvidenceKind;
             <ul class="el-citylines">
               {cities[id].lines.map((l) => (
                 <li>
-                  {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({l.side === 'gasoline' ? T.result.side.gasoline : T.result.side.electric}; {fill(T.cities.to, { date: l.to })}){!l.counted && ` ${T.cities.notCounted}`}</span>
+                  {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({l.side === 'gasoline' ? T.result.side.gasoline : T.result.side.electric}{l.when && `; ${l.when}`})</span>
                   <br /><span class="el-small">{T.cities.quota}{l.quota}</span>
+                  {l.excluded && <><br /><span class="el-small">{T.cities.notCountedWhy}{l.excluded}</span></>}
                 </li>
               ))}
             </ul>
@@ -427,8 +469,9 @@ const notYetBadge = (k: string) => k as EvidenceKind;
       <ul class="el-citylines">
         {central.map((l) => (
           <li>
-            {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({fill(T.cities.to, { date: l.to })}){!l.counted && ` ${T.cities.notCounted}`}</span>
+            {fill(T.cities.line, { name: l.name, amount: l.amount })} {l.when && <span class="el-small">({l.when})</span>}
             <br /><span class="el-small">{l.condition}</span>
+            {l.excluded && <><br /><span class="el-small">{T.cities.notCountedWhy}{l.excluded}</span></>}
           </li>
         ))}
       </ul>

@@ -7,6 +7,13 @@
   ],
   "entries": [
     {
+      "id": "ui.chain.summary.2.text",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Line 3 says exposure right beside the idling pack has NOT been measured in Taiwan, which is what the rule requires; 怠速 / idling describes the queue, and no idle emission figure or arcade comparison is cited. The measured part (PM2.5 and CO in waiting areas) is facts iot-waiting-area-pm25-2024 and iot-waiting-area-co-2024.",
+      "reviewedBy": "shared-ui fixer (review findings 2026-11-26)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
       "id": "ui.chain.summary.3.text",
       "rule": "benzene-not-the-smell",
       "locale": "en",

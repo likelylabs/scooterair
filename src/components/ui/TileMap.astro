@@ -23,13 +23,15 @@
  *   items   override or extend what a tile says, by JurisdictionId:
  *           Partial<Record<JurisdictionId, { state?: TileState; detail?: string; date?: string }>>
  *   label   accessible name of the map
+ *   level   heading level of each county's name in the detail rows (default 3: the map
+ *           sits under the section's h2)
  * Slots
  *   <jurisdiction id>  rich detail for one city (amounts, a <Ledger>), e.g.
  *                      <Fragment slot="taipei">…</Fragment>. Every amount needs its check date.
  *   after              a line under the map
  */
 import type { Locale } from '@/i18n';
-import { tiles, t } from '@/i18n/ui';
+import { colon, tiles, t, ui } from '@/i18n/ui';
 import { jurisdictionIds, type JurisdictionId } from '@/data/econ/types';
 import { cityMoney, formatDate, snapshot, tileState, todayInTaipei, type TileState } from '@/lib/site-state.data';
 import Icon from './Icon.astro';
@@ -39,9 +41,11 @@ interface Props {
   name?: string;
   items?: Partial<Record<JurisdictionId, { state?: TileState; detail?: string; date?: string }>>;
   label?: string;
+  level?: 3 | 4 | 5;
   class?: string;
 }
-const { locale, name = 'city', items = {}, label = tiles.label[locale], class: cls } = Astro.props;
+const { locale, name = 'city', items = {}, label = tiles.label[locale], level = 3, class: cls } = Astro.props;
+const H = `h${level}` as 'h3' | 'h4' | 'h5';
 
 /** Column (0 = outlying islands, 1 west coast, 2 inland, 3 east) and row, north to south. */
 const GRID: Record<JurisdictionId, [number, number]> = {
@@ -87,16 +91,16 @@ const labels = Object.fromEntries(states.map((s) => [s, stateLabel(s)]));
         <a class="tile" href={`#${name}-${c.id}`} data-tile={c.id} data-state={c.state}>
           <span class="tmap__swatch" aria-hidden="true"></span>
           <span class="tile__name">{c.short}</span>
-          <span class="vh">：<span data-part="state">{stateLabel(c.state)}</span></span>
+          <span class="vh">{colon(locale)}<span data-part="state">{stateLabel(c.state)}</span></span>
         </a>
       </li>
     ))}
   </ul>
   <p class="tmap__hint" data-js-only>{tiles.pick[locale]}</p>
-  <div class="tmap__rows" aria-live="polite">
+  <div class="tmap__rows">
     {cells.map((c) => (
-      <article class="tmap__row" id={`${name}-${c.id}`} data-row={c.id} data-state={c.state}>
-        <h4 class="tmap__name">{c.full}</h4>
+      <article class="tmap__row" id={`${name}-${c.id}`} data-row={c.id} data-state={c.state} aria-labelledby={`${name}-${c.id}-n`}>
+        <H class="tmap__name" id={`${name}-${c.id}-n`}>{c.full}</H>
         <p class="tmap__state">
           <span class="tmap__swatch" aria-hidden="true"></span>
           <b data-part="state">{stateLabel(c.state)}</b>
@@ -106,7 +110,7 @@ const labels = Object.fromEntries(states.map((s) => [s, stateLabel(s)]));
         {c.links.length > 0 && (
           <p class="tmap__links">
             {c.links.slice(0, 1).map((l) => (
-              <a href={l.url} rel="noopener external" target="_blank">{tiles.official[locale]}：{l.label[locale]}<Icon name="arrow-up-right" size="1em" /><span class="vh">{locale === 'en' ? ' (opens in a new tab)' : '（另開新視窗）'}</span></a>
+              <a href={l.url} rel="noopener external" target="_blank">{tiles.official[locale]}{colon(locale)}{l.label[locale]}<Icon name="arrow-up-right" size="1em" /><span class="vh">{locale === 'en' ? ' ' : ''}{ui.externalLink[locale]}</span></a>
             ))}
           </p>
         )}
@@ -354,7 +358,14 @@ const labels = Object.fromEntries(states.map((s) => [s, stateLabel(s)]));
       tilesEls.forEach((a) => (a.dataset.tile === id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
       rows.forEach((r) => r.toggleAttribute('data-on', r.dataset.row === id));
       root.toggleAttribute('data-picked', !!id);
-      if (focus) rows.find((r) => r.dataset.row === id)?.scrollIntoView({ block: 'nearest' });
+      if (!focus) return;
+      // move focus to the county's details, so a keyboard user does not have to Tab through the
+      // rest of the grid to reach them (the row is announced from its heading on arrival)
+      const row = rows.find((r) => r.dataset.row === id);
+      if (!row) return;
+      row.tabIndex = -1;
+      row.focus({ preventScroll: true });
+      row.scrollIntoView({ block: 'nearest' });
     };
     tilesEls.forEach((a) =>
       a.addEventListener('click', (e) => {

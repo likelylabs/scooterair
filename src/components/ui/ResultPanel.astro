@@ -37,7 +37,7 @@
  *   glyph, tone and the deadline / next slots follow from CSS.
  */
 import type { Locale } from '@/i18n';
-import { ui, verdict as verdictText } from '@/i18n/ui';
+import { colon, ui, verdict as verdictText } from '@/i18n/ui';
 import Signal from '@/components/art/Signal.astro';
 import Tag from './Tag.astro';
 
@@ -64,7 +64,7 @@ const states = ['A', 'B', 'C'] as const;
     {verdict && (
       <div class="result__verdict">
         <p class="result__state">
-          <span class="vh">{verdictText.heading[locale]}: </span>
+          <span class="vh">{verdictText.heading[locale]}{colon(locale)}</span>
           {states.map((v) => (
             <span class="result__label" data-for={v}>
               {v === 'A' && <Signal state="green" size="2rem" />}
@@ -175,6 +175,16 @@ const states = ['A', 'B', 'C'] as const;
   }
   .result__next :global(ul) {
     padding-inline-start: 1.2em;
+  }
+  /* each next step is a stand-alone link: give it a full tap target */
+  .result__next :global(li > a:only-child),
+  .result__next :global(li > a:first-child:last-child) {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+  }
+  .result__next :global(li + li) {
+    margin-block-start: var(--sp-1);
   }
   .result__title {
     display: flex;

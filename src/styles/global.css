@@ -243,6 +243,14 @@ b {
   quotes: '“' '”' '‘' '’';
 }
 
+/* On the highlighter (a citation's landing row, the lit chain row, <mark>) the faintest ink
+   drops under 4.5:1 in the dark theme: lift it to the secondary ink there. */
+:target,
+.is-lit,
+mark {
+  --ink-3: var(--ink-2);
+}
+
 mark {
   background: var(--mark-bg);
   color: var(--ink);
@@ -544,15 +552,16 @@ th.num {
  * paint, from today's date; without JavaScript only the "static" variant
  * (absolute dates, no day counts, no claim that money is still available) shows.
  */
-[data-money-when] {
+/* Hide the variants that do not match; never set `display` on the ones that do, so an element
+   keeps its own layout (a `.cluster` stays flex with its gap: `display: revert` here used to turn
+   it back into a plain block). */
+html:not([data-money-phase]) [data-money-when]:not([data-money-when~='static']),
+html[data-money-phase='A'] [data-money-when]:not([data-money-when~='A']),
+html[data-money-phase='B'] [data-money-when]:not([data-money-when~='B']),
+html[data-money-phase='C'] [data-money-when]:not([data-money-when~='C']),
+html[data-money-phase='D'] [data-money-when]:not([data-money-when~='D']),
+html[data-money-phase]:not([data-money-phase='A'], [data-money-phase='B'], [data-money-phase='C'], [data-money-phase='D']) [data-money-when] {
   display: none;
-}
-html:not([data-money-phase]) [data-money-when~='static'],
-html[data-money-phase='A'] [data-money-when~='A'],
-html[data-money-phase='B'] [data-money-when~='B'],
-html[data-money-phase='C'] [data-money-when~='C'],
-html[data-money-phase='D'] [data-money-when~='D'] {
-  display: revert;
 }
 /* variants that need the reader's city or a flag: switched on by site-state.client.ts */
 [data-money-state]:not(html):not([data-money-on]),
@@ -570,5 +579,19 @@ html:not(.js) [data-js-only] {
   .site-footer nav,
   [data-js-only] {
     display: none !important;
+  }
+  /* Colours: tokens.css applies the dark set on screen only, so paper always gets dark ink.
+     Keep a picture with its caption, and a heading with what follows it. */
+  figure,
+  .fig,
+  blockquote {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  .eyebrow {
+    break-after: avoid;
   }
 }

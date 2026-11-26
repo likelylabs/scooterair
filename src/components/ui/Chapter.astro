@@ -152,7 +152,7 @@ if (budget) {
         </p>
       )}
       {link && <ChainMarker locale={locale} n={link} href={chainHref} />}
-      <h2 id={`${id}-title`} class="chapter__title"><Phrased text={title} /></h2>
+      <h2 id={`${id}-title`} class="chapter__title"><Phrased text={title} locale={locale} /></h2>
       {lead && <p class="lead">{lead}</p>}
     </header>
     {Astro.slots.has('visual') && <div class="chapter__visual"><slot name="visual" /></div>}

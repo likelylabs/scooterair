@@ -2,8 +2,15 @@
 // Builds the Chinese headline font: Noto Sans TC Black cut down to the characters the site's
 // headlines use (see scripts/display-font.mjs for why, and for how a stale file stays correct).
 //
+//   npm run headline-font                                           build, rebuild the subset, build again
 //   npm run build && node scripts/build-display-font.mjs            rebuild the subset from dist/
 //   node scripts/build-display-font.mjs --check                     no tools needed: say whether dist/ is covered
+//   … --dist <folder>                                               read a build somewhere other than dist/
+//
+// CI (.github/workflows/deploy.yml) installs fontTools and, when --check finds a headline
+// character missing, rebuilds the subset and builds again before it deploys, so the live site
+// is always covered even if nobody ran this. Committing the rebuilt files keeps that second
+// build (and the build warning) away; see README.md, "When headlines change".
 //
 // Run it after changing Chinese headlines, then build again and commit the two files:
 //   src/styles/fonts/noto-sans-tc-900-headline.woff2   the font
@@ -18,13 +25,14 @@
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { CHARS_FILE, FONT_FILE, SKIP, SOURCE_FONT, coveredChars, root, scanDist } from './display-font.mjs';
 
 const CHECK = process.argv.includes('--check');
-const dist = join(root, 'dist');
+const at = process.argv.indexOf('--dist');
+const dist = at > 0 && process.argv[at + 1] ? resolve(process.argv[at + 1]) : join(root, 'dist');
 if (!existsSync(join(dist, 'index.html'))) {
-  console.error('\n✖ headline font: dist/ not found. Run `npm run build` first; the characters are read from the built pages.\n');
+  console.error(`\n✖ headline font: no built site in ${dist}. Run \`npm run build\` first; the characters are read from the built pages.\n`);
   process.exit(1);
 }
 
@@ -40,7 +48,7 @@ if (CHECK) {
   if (missing.length) {
     console.error(`\n✖ headline font: ${missing.length} headline character(s) are not in the subset: ${missing.join('')}`);
     console.error('  They are still drawn (from the sliced font), at the cost of extra downloads on those pages.');
-    console.error('  Run `node scripts/build-display-font.mjs`, build again and commit src/styles/fonts/.\n');
+    console.error('  Fix: `npm run headline-font` (needs `pip install fonttools brotli` once), then commit src/styles/fonts/.\n');
     process.exit(1);
   }
   console.log(`✔ headline font: covers all ${sorted.length} headline characters on ${pages.length} pages${unused.length ? ` (${unused.length} in the file are no longer used)` : ''}.`);
@@ -74,7 +82,9 @@ for path in slices:
     opts.hinting = False
     # halt / chws are what a browser uses to close up adjacent full-width punctuation (」，)
     opts.layout_features = ['halt', 'chws', 'kern', 'palt', 'locl', 'ccmp']
-    opts.name_IDs = [1, 2, 3, 4, 6]
+    # keep the copyright (0), version (5), licence (13) and licence URL (14) records: the SIL Open
+    # Font License asks that a modified copy carries its notice and licence (see src/styles/fonts/OFL.txt)
+    opts.name_IDs = [0, 1, 2, 3, 4, 5, 6, 13, 14]
     opts.notdef_outline = True
     opts.drop_tables += ['vhea', 'vmtx', 'VORG', 'DSIG', 'STAT', 'meta']
     s = subset.Subsetter(opts)
@@ -115,4 +125,4 @@ writeFileSync(
 );
 console.log(`✔ headline font: ${covered.length} characters from ${pages.length} pages → ${FONT_FILE} (${(statSync(out).size / 1024).toFixed(1)} kB).`);
 if (absent.length) console.log(`  ${absent.length} character(s) are not in Noto Sans TC Black and will come from the reader's system font: ${absent.join('')}`);
-console.log('  Build again (`npm run build`) and commit src/styles/fonts/.');
+console.log('  Build again (`npm run build`) and commit src/styles/fonts/ (`npm run headline-font` does both builds).');

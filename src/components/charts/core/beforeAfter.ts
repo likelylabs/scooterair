@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmt, niceMax, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmt, niceMax, pctN, px, text, LABEL_LINES, wrapLabel, withUnit } from './shared';
 
 export interface BeforeAfterProps {
   locale: Locale;
@@ -54,7 +54,7 @@ export function renderBeforeAfter(p: BeforeAfterProps): ChartRender {
       { label: p.afterLabel, tone: afterTone, shape: 'dot' },
     ],
     table: {
-      head: [p.categoryLabel, p.beforeLabel, p.afterLabel].map((h, i) => (i && unit ? `${h} (${unit})` : h)),
+      head: [p.categoryLabel, p.beforeLabel, p.afterLabel].map((h, i) => (i ? withUnit(locale, h, unit) : h)),
       rows: data.map((d) => [d.label, f(d.before), f(d.after)]),
     },
   };

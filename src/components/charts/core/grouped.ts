@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit } from './shared';
 
 export interface GroupedBarProps {
   locale: Locale;
@@ -51,9 +51,15 @@ export function renderGrouped(p: GroupedBarProps): ChartRender {
       const s = series[si];
       const end = pos(v);
       const val = f(v);
-      // direct-label the first group with the series names where they fit
+      // The first group names every series on its bars, so the order of the bars is learnt
+      // once without the colour key: after the value where it fits, otherwise on a line of
+      // its own just above the bar.
       const room = MIN_W * (1 - end / 100) - 12;
       const name = gi === 0 && v >= 0 && px(`${val}  ${s.label}`, 13) < room ? s.label : '';
+      if (gi === 0 && !name) {
+        body.push(text('c-note', 0, y + 10, s.label));
+        y += 15;
+      }
       const label =
         v < 0
           ? `<text class="c-value c-value--sm" x="${end.toFixed(2)}%" y="${y + 10.5}" dx="-7" text-anchor="end">${esc(val)}</text>`
@@ -83,7 +89,7 @@ export function renderGrouped(p: GroupedBarProps): ChartRender {
     height,
     legend: series.map((s) => ({ label: s.label, tone: s.tone, shape: 'rect' })),
     table: {
-      head: [p.categoryLabel, ...series.map((s) => (unit ? `${s.label} (${unit})` : s.label))],
+      head: [p.categoryLabel, ...series.map((s) => withUnit(locale, s.label, unit))],
       rows: groups.map((g) => [g.label, ...g.values.map(f)]),
     },
   };

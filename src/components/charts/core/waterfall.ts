@@ -77,7 +77,11 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
       false,
       (by) =>
         connector(edge, from, by) +
-        `<rect class="c-fill-${stepTone} c-light c-mark" x="${a}%" y="${by}" width="${w}%" height="${BAR}" rx="2"/>`,
+        // a tint with an outline in the full tone; a step too small to see at phone width
+        // (NT$300 off NT$100,000) is drawn 4px wide, centred where it falls
+        ((w / 100) * MIN_W >= 4
+          ? `<rect class="c-fill-${stepTone} c-stroke-${stepTone} c-step c-mark" x="${a}%" y="${by + 0.75}" width="${w}%" height="${BAR - 1.5}" rx="2"/>`
+          : `<svg x="${a + w / 2}%" y="${by}" width="1" height="${BAR}" overflow="visible"><rect class="c-fill-${stepTone} c-mark" x="-2" y="0" width="4" height="${BAR}" rx="1"/></svg>`),
       `${s.label}: ${amount}`,
     );
     table.push([s.label, amount]);

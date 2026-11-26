@@ -74,9 +74,15 @@ const { name, legend, options, value, variant = 'segmented', hint, class: cls } 
     border-radius: var(--radius-2);
     background: var(--surface);
   }
+  /* every option fills the row, so the checked fill and the separator reach the bottom
+     when a neighbour's label wraps onto more lines */
+  .radios--segmented .radios__opt {
+    display: grid;
+  }
   .radios--segmented .radios__face {
     position: relative;
     display: grid;
+    block-size: 100%;
     place-items: center;
     min-block-size: calc(3rem - 4px);
     padding: 0.25rem 0.5rem;
@@ -92,6 +98,11 @@ const { name, legend, options, value, variant = 'segmented', hint, class: cls } 
   .radios--segmented input:checked + .radios__face {
     background: var(--ink);
     color: var(--bg);
+  }
+  /* not by colour alone: the chosen option also carries a tick (decorative: the radio is
+     announced as checked) */
+  .radios--segmented input:checked + .radios__face .radios__label::before {
+    content: '✓\00a0' / '';
   }
   .radios--segmented .radios__opt:hover input:not(:checked) + .radios__face {
     color: var(--ink);
@@ -138,5 +149,28 @@ const { name, legend, options, value, variant = 'segmented', hint, class: cls } 
     font-size: var(--fs-xs);
     line-height: var(--lh-snug);
     color: var(--ink-3);
+  }
+  .radios--stack input:checked + .radios__face {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  /* High Contrast: author backgrounds and gradients are dropped, so draw the checked state in
+     system colours (the native radio underneath is invisible) */
+  @media (forced-colors: active) {
+    .radios--segmented input:checked + .radios__face {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+    .radios--stack input:checked + .radios__face {
+      border-color: Highlight;
+      outline: 2px solid Highlight;
+      outline-offset: -4px;
+    }
+    .radios--stack input:checked + .radios__face::before {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      box-shadow: inset 0 0 0 3px Canvas;
+    }
   }
 </style>

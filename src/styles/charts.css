@@ -91,7 +91,9 @@
     font-size: 11px;
   }
 }
-/* series names beside line ends, and in-between axis labels: only when the chart is wide enough */
+/* series names beside line ends, and in-between axis labels: only when the chart is wide enough.
+   Narrower, each series is still told apart without colour by its marker shape, which its
+   legend key repeats (core/line.ts, core/breakeven.ts). */
 .chart__svg .c-endname,
 .chart__svg .c-wideonly {
   display: none;
@@ -105,8 +107,10 @@
   .chart__svg .c-endname {
     display: inline;
   }
-  .chart--line .chart__plot {
-    padding-inline-end: 8.5rem !important;
+  /* room for "value + name": the renderer measures it (--pad-wide, core/line.ts) */
+  .chart--line .chart__plot,
+  .chart--breakeven .chart__plot {
+    padding-inline-end: var(--pad-wide, 8.5rem) !important;
   }
 }
 
@@ -132,6 +136,14 @@
 
 .c-track { fill: var(--chart-track); }
 .c-light { fill-opacity: 0.38; }
+/* something not counted, drawn hollow: an outline at ≥3:1 on the surface, not a pale fill */
+.c-hollow { fill: var(--here); stroke: var(--line-strong); stroke-width: 1.5; }
+/* a mark drawn in the surface colour on top of a fill (the waffle's second and third parts) */
+.c-cut { fill: none; stroke: var(--here); stroke-width: 1.4; stroke-linecap: round; }
+.c-cut--dot { fill: var(--here); stroke: none; }
+/* waterfall: what each subsidy takes off. A tint the reader can see (≥3:1 with its outline),
+   and an outline so a sliver of NT$300 still shows as a mark */
+.c-step { fill-opacity: 0.55; stroke-width: 1.5; }
 .c-hit { fill: transparent; }
 .c-axis { stroke: var(--chart-axis); stroke-width: 1; }
 .c-grid { stroke: var(--chart-grid); stroke-width: 1; }
@@ -154,7 +166,7 @@
 .c-dot { stroke: var(--here); stroke-width: 2; }
 /* stacked segments are separated by a surface-coloured gap, not an outline */
 .c-seg { stroke: var(--here); stroke-width: 2; }
-.c-span { stroke-width: 6; stroke-linecap: round; opacity: 0.35; }
+.c-span { stroke-width: 6; stroke-linecap: round; opacity: 0.6; }
 .c-cap { stroke-width: 2; stroke-linecap: round; }
 .c-link { stroke: var(--chart-neutral); stroke-width: 3; }
 .c-row:hover .c-mark { filter: brightness(1.12); }
@@ -167,8 +179,9 @@
 .chart--empty { max-inline-size: 56rem; }
 
 /* pictogram icons reuse the illustration parts, recoloured per state */
-.c-picto--off { --art-ink: var(--chart-track); --art-deep: var(--chart-track); --art-far: var(--chart-track); --art-metal: var(--chart-track); }
-.c-picto--off :is(.a-yellow, .a-exh, .a-clean, .a-clean-s) { fill: var(--chart-track); stroke: var(--chart-track); }
+/* the icons not counted: grey, but at ≥3:1 so they can still be counted */
+.c-picto--off { --art-ink: var(--line-strong); --art-deep: var(--line-strong); --art-far: var(--line-strong); --art-metal: var(--line-strong); }
+.c-picto--off :is(.a-yellow, .a-exh, .a-clean, .a-clean-s) { fill: var(--line-strong); stroke: var(--line-strong); }
 .c-picto--off .a-clean-s { fill: none; }
 .c-picto-exhaust { --art-ink: var(--chart-exhaust); --art-deep: var(--chart-exhaust); --art-far: var(--chart-exhaust); --art-metal: var(--chart-exhaust); }
 .c-picto-clean { --art-ink: var(--chart-clean); --art-deep: var(--chart-clean); --art-far: var(--chart-clean); --art-metal: var(--chart-clean); }
@@ -220,6 +233,50 @@
 }
 .chart__key--light {
   background: var(--chart-track);
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+}
+.chart__key--hollow {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+}
+/* the waffle's second and third parts: the same surface-coloured cut as their cells */
+.chart__key--slash {
+  background: linear-gradient(135deg, var(--k) 0 42%, var(--here, var(--bg)) 42% 58%, var(--k) 58%);
+}
+.chart__key--dotted {
+  background: radial-gradient(circle, var(--here, var(--bg)) 0 24%, var(--k) 26%);
+}
+/* a line key that carries its series' marker */
+.chart__key[data-marker] {
+  position: relative;
+  inline-size: 1.8em;
+}
+.chart__key[data-marker]::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 0.75em;
+  block-size: 0.75em;
+  translate: -50% -50%;
+  background: var(--k);
+}
+.chart__key[data-marker='circle']::after {
+  border-radius: 50%;
+}
+.chart__key[data-marker='square']::after {
+  inline-size: 0.65em;
+  block-size: 0.65em;
+}
+.chart__key[data-marker='triangle']::after {
+  inline-size: 0.85em;
+  block-size: 0.8em;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.chart__key[data-marker='diamond']::after {
+  inline-size: 0.85em;
+  block-size: 0.85em;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
 }
 .c-key-exhaust { --k: var(--chart-exhaust); }
 .c-key-clean { --k: var(--chart-clean); }
@@ -239,7 +296,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45em;
-  min-block-size: 2rem;
+  /* a full-size tap target (44px) */
+  min-block-size: 2.75rem;
   color: var(--ink-2);
   font-weight: var(--fw-bold);
   list-style: none;
@@ -259,6 +317,17 @@
 .chart__table {
   margin-block-start: var(--sp-2);
   overflow-x: auto;
+}
+/* the scroll box takes keyboard focus (core/shared.ts): show where it is */
+.chart__table:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.chart__caption {
+  caption-side: top;
+  text-align: start;
+  font-weight: var(--fw-bold);
+  padding-block-end: var(--sp-1);
 }
 .chart__table table {
   font-size: var(--fs-xs);
@@ -303,9 +372,60 @@
   opacity: 0.75;
 }
 
+/*
+ * Forced colours (Windows contrast themes). Browsers leave SVG fills alone, so the marks keep
+ * their colours; everything that was drawn in ink or in the surface colour follows the theme
+ * instead, or it would vanish on a black canvas. Legend keys are CSS backgrounds, which the
+ * browser would blank: they keep their colour and get an outline.
+ */
 @media (forced-colors: active) {
-  .c-seg,
-  .c-dot {
+  .chart__svg text,
+  .chart__svg .c-note,
+  .chart__svg .c-tick,
+  .chart__svg .c-tick--strong,
+  .chart__svg .c-ref,
+  .chart__svg .c-dim,
+  .chart__svg .c-empty-note {
+    fill: CanvasText;
     stroke: Canvas;
+  }
+  .c-seg,
+  .c-dot,
+  .c-break__gap,
+  .c-cut {
+    stroke: Canvas;
+  }
+  .c-cut--dot,
+  .c-ring,
+  .c-hollow {
+    fill: Canvas;
+  }
+  .c-hollow {
+    stroke: CanvasText;
+  }
+  .c-axis,
+  .c-grid {
+    stroke: GrayText;
+  }
+  .c-rule,
+  .c-ref-line,
+  .c-bracket,
+  .c-connector,
+  .c-cross,
+  .c-break__mark,
+  .c-stroke-ink {
+    stroke: CanvasText;
+  }
+  .c-fill-ink {
+    fill: CanvasText;
+  }
+  .chart__key {
+    forced-color-adjust: none;
+    outline: 1px solid CanvasText;
+  }
+  .chart__key--hollow,
+  .chart__key--ring {
+    background: Canvas;
+    box-shadow: inset 0 0 0 1.5px CanvasText;
   }
 }

@@ -18,7 +18,9 @@ interface Props {
 const { locale } = Astro.props;
 ---
 
-<button class="theme-toggle" type="button" data-theme-toggle data-js-only aria-label={ui.themeToggle[locale]} title={ui.themeToggle[locale]}>
+{/* A toggle button: its name says what it is ("深色模式" / "Dark theme") and aria-pressed says
+    whether it is on, so a screen reader hears the current theme and the result of pressing it. */}
+<button class="theme-toggle" type="button" data-theme-toggle data-js-only aria-label={ui.themeDarkToggle[locale]} aria-pressed="false" title={ui.themeToggle[locale]}>
   <span class="theme-toggle__sun"><Icon name="sun" size="1.25rem" /></span>
   <span class="theme-toggle__moon"><Icon name="moon" size="1.25rem" /></span>
 </button>
@@ -72,7 +74,12 @@ const { locale } = Astro.props;
     root.dataset.theme = theme;
     const colour = theme === 'dark' ? '#101416' : '#f3f5f3';
     document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => (m.content = colour));
+    press();
   }
+  const press = () => document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(current() === 'dark')));
+  press();
+  // following the system: keep the state right when the OS switches theme
+  mq.addEventListener('change', press);
 
   document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
     btn.addEventListener('click', () => {

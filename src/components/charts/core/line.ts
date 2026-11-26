@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type LegendItem, type Tone, axisBreak, esc, fmtCompact, fmtSigned, niceMax, niceScale, niceTicks, px, text } from './shared';
+import { MARKERS, MIN_W, type ChartRender, type LegendItem, type Marker, type Tone, axisBreak, esc, fmtCompact, fmtSigned, marker, niceMax, niceScale, niceTicks, px, text, withUnit } from './shared';
 
 export interface LineSeries {
   label: string;
@@ -102,7 +102,9 @@ export function renderLine(p: LineChartProps): ChartRender {
   const o: string[] = [];
 
   // grid + y ticks: labels hang in a gutter left of the plot, so a line can start at the edge
-  const tickText = ticks.map((t) => (decimals ? fmtSigned(locale, t, decimals) : t < 0 ? `−${fmtCompact(locale, -t)}` : fmtCompact(locale, t)));
+  // ticks that are whole numbers are printed as such (10, not 10.0), whatever the values' decimals
+  const tickDecimals = ticks.every((t) => Number.isInteger(t)) ? 0 : decimals;
+  const tickText = ticks.map((t) => (tickDecimals ? fmtSigned(locale, t, tickDecimals) : t < 0 ? `−${fmtCompact(locale, -t)}` : fmtCompact(locale, t)));
   const padLeft = Math.ceil(Math.max(...tickText.map((t) => px(t, 12)), unit ? px(unit, 12) - 4 : 0)) + 10;
   ticks.forEach((t, i) => {
     const y = yp(t);
@@ -193,17 +195,24 @@ export function renderLine(p: LineChartProps): ChartRender {
     return last;
   };
   const firstOf = (s: LineSeries) => s.values.findIndex((v) => v !== null);
+  // With more than one series each draws its own marker shape (circle, square, triangle,
+  // diamond, repeated in the legend key), so the lines differ by more than colour at every
+  // width: the names beside the line ends only appear on wide charts.
+  const shapes: Marker[] = series.map((_, si) => (series.length > 1 ? MARKERS[si % MARKERS.length] : 'circle'));
   series.forEach((s, si) => {
     const mode = s.markers ?? 'end';
     const last = lastOf(s);
+    const dot = (cx: string, cy: number, r: number) => o.push(marker(shapes[si], `c-dot c-fill-${s.tone}`, cx, cy, r));
     s.values.forEach((v, i) => {
       if (v === null) return;
       const cx = `${+xp(i).toFixed(2)}%`;
       const cy = +yp(v).toFixed(1);
       if (mode === 'hollow') o.push(`<circle class="c-ring c-stroke-${s.tone}" cx="${cx}" cy="${cy}" r="5.5"/>`);
-      else if (mode === 'all') o.push(`<circle class="c-dot c-fill-${s.tone}" cx="${cx}" cy="${cy}" r="${i === last ? 5 : 3.5}"/>`);
-      else if (mode === 'end' && i === last) o.push(`<circle class="c-dot c-fill-${s.tone}" cx="${cx}" cy="${cy}" r="5"/>`);
-      else if (lone.some((l) => l.si === si && l.i === i)) o.push(`<circle class="c-dot c-fill-${s.tone}" cx="${cx}" cy="${cy}" r="4"/>`);
+      else if (mode === 'all') dot(cx, cy, i === last ? 5 : 3.5);
+      else if (mode === 'end' && i === last) dot(cx, cy, 5);
+      else if (lone.some((l) => l.si === si && l.i === i)) dot(cx, cy, 4);
+      // a series without markers still shows its shape once, at its end, when others share the plot
+      else if (mode === 'none' && i === last && series.length > 1) dot(cx, cy, 4);
     });
   });
 
@@ -219,6 +228,7 @@ export function renderLine(p: LineChartProps): ChartRender {
   const ly = ends.map((e) => e.y);
   for (let k = 1; k < ly.length; k++) if (ly[k] - ly[k - 1] < 16) ly[k] = ly[k - 1] + 16;
   let padRight = 14;
+  let padRightWide = 0;
   ends.forEach((e, k) => {
     const s = series[e.si];
     if (e.i === n - 1 || (numeric && xp(e.i) > 99.9)) {
@@ -226,6 +236,7 @@ export function renderLine(p: LineChartProps): ChartRender {
       const named = series.length > 1;
       o.push(`<text class="c-value c-value--sm" x="100%" y="${ly[k] + 4.5}" dx="10">${esc(val)}${named ? `<tspan class="c-note c-endname" dx="6">${esc(s.label)}</tspan>` : ''}</text>`);
       padRight = Math.max(padRight, 14 + px(val, 13));
+      if (named) padRightWide = Math.max(padRightWide, 22 + px(val, 13) + px(s.label, 12));
     }
   });
   // labels on points: above the point, below it when the first choice would hit the top or another label
@@ -264,6 +275,7 @@ export function renderLine(p: LineChartProps): ChartRender {
   o.push(`<line class="c-cross" x1="0" x2="0" y1="${TOP}" y2="${plotBottom}" visibility="hidden"/>`);
 
   const shapeOf = (s: LineSeries): LegendItem['shape'] => (s.markers === 'hollow' ? 'ring' : s.dashed ? 'dash' : 'line');
+  const keyOf = (s: LineSeries, si: number): LegendItem => ({ label: s.label, tone: s.tone, shape: shapeOf(s), ...(s.markers === 'hollow' ? {} : { marker: shapes[si] }) });
   const u = unit ? ' ' + unit : '';
   const cell = (s: LineSeries, i: number) => (s.values[i] === null ? '–' : f(s.values[i] as number));
   return {
@@ -272,7 +284,8 @@ export function renderLine(p: LineChartProps): ChartRender {
     height: axisY + BOTTOM,
     padLeft,
     padRight: Math.ceil(padRight),
-    legend: series.length > 1 ? series.map((s) => ({ label: s.label, tone: s.tone, shape: shapeOf(s) })) : undefined,
+    padRightWide: Math.max(padRight, padRightWide),
+    legend: series.length > 1 ? series.map(keyOf) : undefined,
     hover: {
       xs: x.map((_, i) => +xp(i).toFixed(2)),
       rows: x.map(
@@ -286,7 +299,7 @@ export function renderLine(p: LineChartProps): ChartRender {
       ),
     },
     table: {
-      head: [p.xLabel, ...series.map((s) => (unit ? `${s.label} (${unit})` : s.label))],
+      head: [p.xLabel, ...series.map((s) => withUnit(locale, s.label, unit))],
       rows: x.map((xval, i) => [String(xval), ...series.map((s) => cell(s, i))]),
     },
   };

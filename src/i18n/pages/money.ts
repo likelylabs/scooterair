@@ -16,16 +16,16 @@ export default copy({
       en: '2026 subsidies end by 31 December at the latest. Choose your city or county to see whether places are left.',
     },
     'A-city-open': {
-      'zh-TW': '{city}：還有名額（{date}查）。最晚 12 月 31 日前買車、領牌。',
-      en: '{city}: places left (checked {date}). Buy and register by 31 December at the latest.',
+      'zh-TW': '{city}：還有名額（{date}查）。最晚 {cityDeadline}前買車、領牌。',
+      en: '{city}: places left (checked {date}). Buy and register by {cityDeadline} at the latest.',
     },
     'A-city-restricted': {
-      'zh-TW': '{city}：剩下的名額只限汰舊換新或特定身分（{date}查）。最晚 12 月 31 日前買車、領牌。',
-      en: '{city}: the places left are for scrap-and-replace or certain groups only (checked {date}). Buy and register by 31 December at the latest.',
+      'zh-TW': '{city}：剩下的名額只限汰舊換新或特定身分（{date}查）。最晚 {cityDeadline}前買車、領牌。',
+      en: '{city}: the places left are for scrap-and-replace or certain groups only (checked {date}). Buy and register by {cityDeadline} at the latest.',
     },
     'A-city-unpublished': {
-      'zh-TW': '{city}：方案還在進行，剩多少名額沒有公布（{date}查）。最晚 12 月 31 日前買車、領牌。',
-      en: '{city}: the programme is running; how many places remain has not been published (checked {date}). Buy and register by 31 December at the latest.',
+      'zh-TW': '{city}：方案還在進行，但剩多少名額沒有公布或沒有查證，可能已經沒了（{date}查）。最晚 {cityDeadline}前買車、領牌。',
+      en: '{city}: the programme is running, but how many places remain was not published or could not be checked, so they may be gone (checked {date}). Buy and register by {cityDeadline} at the latest.',
     },
     'A-city-exhausted': {
       'zh-TW': '{city}的補助已在 {date}用完。中央補助到 12 月 31 日。',

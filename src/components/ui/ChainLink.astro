@@ -16,14 +16,15 @@
  *   (default)  a sourced link
  *   final      the link you can break: detached from the rail, in green
  *   open       the open question at the end of the chain board (V15): the rail
- *              breaks before it, the node is a hollow "?", it wears 沒人量過
+ *              breaks before it, the node is a hollow "?", it wears the gap badge
  *
  * Props
  *   locale     Locale
  *   n          link number, 1-based
  *   title      the claim (default chain.links[n-1])
  *   strength   EvidenceKind or an array of them (omit for none; `open` defaults to 'gap')
- *   secondary  the fact behind it has secondary confidence: adds 次級來源
+ *   secondary  the fact behind it has secondary confidence: adds the secondary tag
+ *              (badge names are read from the registry via EvidenceBadge, never typed here)
  *   line       override the line style: 'solid-filled' | 'solid-outline' | 'dashed' | 'open'
  *   href       link the title to the chapter that argues this link
  *   final      this is the breakable link (default: n is the last link, unless `open`)
@@ -37,7 +38,7 @@
  *   action   (final link) a <Button>
  */
 import type { Locale } from '@/i18n';
-import { board, chain, evidence, toEvidenceKind, type EvidenceLevel, type EvidenceLine } from '@/i18n/ui';
+import { board, chain, evidence, langHtml, toEvidenceKind, typeset, type EvidenceLevel, type EvidenceLine } from '@/i18n/ui';
 import EvidenceBadge from './EvidenceBadge.astro';
 
 interface Props {
@@ -57,7 +58,7 @@ interface Props {
 }
 const { locale, n, secondary = false, href, open = false, current = false, level = 3, collapseSources = false, class: cls } = Astro.props;
 const final = !open && (Astro.props.final ?? n === chain.links.length);
-const title = Astro.props.title ?? chain.links[n - 1]?.[locale] ?? '';
+const title = typeset(Astro.props.title ?? chain.links[n - 1]?.[locale] ?? '', locale);
 const raw = Astro.props.strength ?? (open ? 'gap' : undefined);
 const kinds = (raw ? (Array.isArray(raw) ? raw : [raw]) : []).map(toEvidenceKind);
 const order: EvidenceLine[] = ['solid-filled', 'solid-outline', 'dashed', 'open'];
@@ -80,7 +81,7 @@ const H = `h${level}` as 'h3' | 'h4';
     {open && <p class="eyebrow link__flag">{board.open[locale]}</p>}
     <H class="link__title">
       {!open && <span class="vh">{n}. </span>}
-      {href ? <a href={href}>{title}</a> : title}
+      {href ? <a href={href} set:html={langHtml(title, locale)} /> : <Fragment set:html={langHtml(title, locale)} />}
     </H>
     {kinds.length > 0 && (
       <p class="link__strength">{kinds.map((k, i) => <EvidenceBadge kind={k} locale={locale} secondary={secondary && i === kinds.length - 1} />)}</p>

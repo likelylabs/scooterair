@@ -304,10 +304,19 @@ export interface Rendered {
 }
 
 const esc = (s: string): string => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const nf = (locale: Locale, v: number) => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'zh-TW', { maximumFractionDigits: 0 }).format(Math.round(v));
-export const money = (locale: Locale, v: number) => `NT$ ${nf(locale, Math.abs(v))}`;
+// formatters are built once per locale (building one per call was a large share of a result's time)
+const fmt = (locale: Locale, digits: 0 | 1 | 2) => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'zh-TW', { minimumFractionDigits: digits === 2 ? 2 : 0, maximumFractionDigits: digits });
+const FMT = { 'zh-TW': [fmt('zh-TW', 0), fmt('zh-TW', 1), fmt('zh-TW', 2)], en: [fmt('en', 0), fmt('en', 1), fmt('en', 2)] } as const;
+const nf = (locale: Locale, v: number) => FMT[locale][0].format(Math.round(v));
+/** A distance as the reader typed it: whole kilometres, or one decimal when they gave one. */
+const kmText = (locale: Locale, v: number) => (Number.isInteger(v) ? nf(locale, v) : FMT[locale][1].format(v));
+// a no-break space keeps NT$ with its number when a narrow column wraps
+export const money = (locale: Locale, v: number) => `NT$\u00a0${nf(locale, Math.abs(v))}`;
 const signed = (locale: Locale, v: number) => `${v < 0 ? '−' : v > 0 ? '+' : ''}${money(locale, v)}`;
-const perKm = (locale: Locale, v: number) => `NT$ ${new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v)}`;
+const perKm = (locale: Locale, v: number) => `NT$\u00a0${FMT[locale][2].format(v)}`;
+/** A link that opens in a new tab, saying so to screen readers. */
+const extLink = (url: string, text: string, locale: Locale) =>
+  `<a href="${esc(url)}" rel="noopener" target="_blank">${esc(text)}<span class="vh">${esc(localize(electric, locale).result.newTab)}</span></a>`;
 const day = (d: string, locale: Locale) => formatDate(d, locale, true);
 const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -329,7 +338,7 @@ function sourcesHtml(ids: readonly string[], ctx: RenderCtx): string {
   const items = [...new Set(ids)].map((id) => ctx.cite(id)).filter((c): c is Cite => !!c);
   if (!items.length) return '';
   const T = localize(electric, ctx.locale).result;
-  return `<p class="el-src"><span>${esc(T.sourcesLabel)}</span>${items.map((c) => `<a href="${esc(c.url)}" rel="noopener" target="_blank">${esc(c.short)}</a>`).join('<span aria-hidden="true"> · </span>')}</p>`;
+  return `<p class="el-src"><span>${esc(T.sourcesLabel)}</span>${items.map((c) => extLink(c.url, c.short, ctx.locale)).join('<span class="el-src__sep" aria-hidden="true">·</span>')}</p>`;
 }
 
 /** The model as the reader should see it: class, power, top speed, maker as a fact. */
@@ -354,9 +363,21 @@ export function describeGas(data: EconDataset, id: string, locale: Locale): stri
 function messageHtml(m: Message, ctx: RenderCtx): string {
   const T = localize(electric, ctx.locale).result;
   const links = m.links?.length
-    ? `<span class="el-msg__links">${esc(T.officialLinks)}${m.links.map((l) => `<a href="${esc(l.url)}" rel="noopener" target="_blank">${esc(readerText(l.label[ctx.locale]))}</a>`).join('<span aria-hidden="true"> · </span>')}</span>`
+    ? `<span class="el-msg__links">${esc(T.officialLinks)}${m.links.map((l) => extLink(l.url, readerText(l.label[ctx.locale]), ctx.locale)).join('<span class="el-src__sep" aria-hidden="true">·</span>')}</span>`
     : '';
-  return `<li class="el-msg el-msg--${m.severity}"><span class="el-msg__sev">${esc(T.severity[m.severity])}</span><span class="el-msg__text">${esc(readerText(m.text[ctx.locale]))}</span>${links}${sourcesHtml(m.sources ?? [], ctx)}</li>`;
+  // a message that is a list (one rule per deadline, for example) reads better as one
+  let body = `<span class="el-msg__text">${esc(readerText(m.text[ctx.locale]))}</span>`;
+  if (m.items?.length) {
+    const whole = readerText(m.text[ctx.locale]);
+    const items = m.items.map((x) => readerText(x[ctx.locale]));
+    // the lead is the text before the first item (the engine keeps `text` as lead + items)
+    const at = whole.indexOf(items[0]);
+    const lead = at > 0 ? whole.slice(0, at).trim() : '';
+    const rest = at >= 0 ? whole.slice(whole.indexOf(items[items.length - 1]) + items[items.length - 1].length).trim() : '';
+    body = `${lead ? `<span class="el-msg__text">${esc(lead)}</span>` : ''}<ul class="el-msg__items">${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>${rest ? `<span class="el-msg__text">${esc(rest)}</span>` : ''}`;
+    if (at < 0) body = `<span class="el-msg__text">${esc(whole)}</span>`;
+  }
+  return `<li class="el-msg el-msg--${m.severity}"><span class="el-msg__sev">${esc(T.severity[m.severity])}</span>${body}${links}${sourcesHtml(m.sources ?? [], ctx)}</li>`;
 }
 
 function ledgerHtml(e: Evaluation, side: 'electric' | 'gasoline', ctx: RenderCtx): string {
@@ -382,8 +403,9 @@ function ledgerHtml(e: Evaluation, side: 'electric' | 'gasoline', ctx: RenderCtx
     if (l.quota) meta.push(`<span><b>${esc(T.ledger.quota)}</b> ${esc(readerText(l.quota.text[locale]))}</span>`);
     meta.push(`<span><b>${esc(T.ledger.payer)}</b> ${esc(readerText(l.payer[locale]))}；${esc(l.paid === 'at-purchase' ? T.ledger.paidAt : T.ledger.paidLater)}</span>`.replace('；', locale === 'en' ? '; ' : '；'));
     const tags = [l.isMaximum ? `<span class="el-tag el-tag--upto">${esc(T.ledger.upTo)}</span>` : '', l.cappedFrom !== undefined ? `<span class="el-tag">${esc(T.ledger.capped)}</span>` : '', conf(l.confidence, locale)].join('');
+    // the line's conditions, deadline, quota and payer sit behind one tap: the amounts stay readable
     rows.push(
-      `<li class="el-row el-row--minus${l.isMaximum ? ' el-row--upto' : ''}"><div class="el-row__main"><span class="el-row__label">${esc(readerText(lineLabel(l, locale)))}</span><span class="el-row__amt"><span aria-hidden="true">− </span>${money(locale, l.amount)}</span></div>${tags ? `<p class="el-row__tags">${tags}</p>` : ''}<p class="el-row__meta">${meta.join('')}</p>${sourcesHtml(l.sources, ctx)}</li>`,
+      `<li class="el-row el-row--minus${l.isMaximum ? ' el-row--upto' : ''}"><div class="el-row__main"><span class="el-row__label">${esc(readerText(lineLabel(l, locale)))}</span><span class="el-row__amt"><span aria-hidden="true">− </span>${money(locale, l.amount)}</span></div>${tags ? `<p class="el-row__tags">${tags}</p>` : ''}<details class="el-row__more"><summary>${esc(T.ledger.more)}</summary><p class="el-row__meta">${meta.join('')}</p>${sourcesHtml(l.sources, ctx)}</details></li>`,
     );
   }
   const range = lg.net.high !== lg.net.value ? `<p class="el-row__meta">${esc(fill(T.ledger.netRange, { high: money(locale, lg.net.high) }))}</p>` : '';
@@ -391,7 +413,14 @@ function ledgerHtml(e: Evaluation, side: 'electric' | 'gasoline', ctx: RenderCtx
   if (side === 'electric') {
     rows.push(`<li class="el-row el-row--compare"><div class="el-row__main"><span class="el-row__label">${esc(T.ledger.gasNet)}</span><span class="el-row__amt">${money(locale, other.net.value)}</span></div></li>`);
     const gap = lg.net.value - other.net.value;
-    rows.push(`<li class="el-row el-row--gap${gap > 0 ? ' el-row--short' : ''}"><div class="el-row__main"><span class="el-row__label">${esc(T.ledger.gap)}</span><span class="el-row__amt">${signed(locale, gap)}</span></div></li>`);
+    const setup = e.electric.running.upfront;
+    rows.push(`<li class="el-row el-row--gap${gap > 0 && !setup ? ' el-row--short' : ''}"><div class="el-row__main"><span class="el-row__label">${esc(T.ledger.gap)}</span><span class="el-row__amt">${signed(locale, gap)}</span></div></li>`);
+    if (setup > 0) {
+      // a pay-per-use plan's setup fee is paid when the battery is switched on: part of what it costs to start
+      const atStart = e.comparison.cumulative.electric[0].typical - e.comparison.cumulative.gasoline[0].typical;
+      rows.push(`<li class="el-row el-row--compare"><div class="el-row__main"><span class="el-row__label">${esc(T.ledger.setupFee)}</span><span class="el-row__amt">+${money(locale, setup)}</span></div></li>`);
+      rows.push(`<li class="el-row el-row--gap${atStart > 0 ? ' el-row--short' : ''}"><div class="el-row__main"><span class="el-row__label">${esc(T.ledger.gapAtStart)}</span><span class="el-row__amt">${signed(locale, atStart)}</span></div></li>`);
+    }
   }
   return `<section class="el-ledger el-ledger--${side}"><h4 class="el-ledger__head">${esc(head)}</h4><ul class="el-rows">${rows.join('')}</ul></section>`;
 }
@@ -413,7 +442,7 @@ function excludedHtml(e: Evaluation, ctx: RenderCtx): string {
         `<li><span class="el-ex__label">${esc(readerText(x.label[locale]))}</span> <span class="el-ex__side">${esc(sideName(side))}</span>${
           x.amount ? ` <span class="el-ex__amt">${esc(fill(T.ledger.wouldPay, { amount: money(locale, x.amount) }))}</span>` : ''
         }<br /><span class="el-ex__why">${esc(readerText(x.reasonText[locale]))}</span>${conf(x.confidence, locale)}${
-          x.links?.length ? ` ${x.links.map((k) => `<a href="${esc(k.url)}" rel="noopener" target="_blank">${esc(readerText(k.label[locale]))}</a>`).join(' · ')}` : ''
+          x.links?.length ? ` ${x.links.map((k) => extLink(k.url, readerText(k.label[locale]), locale)).join('<span class="el-src__sep" aria-hidden="true">·</span>')}` : ''
         }</li>`,
     )
     .join('');
@@ -426,45 +455,74 @@ function monthlyHtml(e: Evaluation, ctx: RenderCtx): string {
   const ev = e.electric.running;
   const gas = e.gasoline.running;
   const order = ['energy', 'plan-fee', 'setup-fee', 'plan-credit', 'maintenance', 'road-fee', 'licence-tax', 'insurance', 'inspection'] as const;
+  // NT$ once per cell; the likely range sits under it as plain numbers, free to wrap
   const cell = (b?: { low: number; typical: number; high: number }) => {
     if (!b) return '—';
     const sign = b.typical < 0 ? '−' : '';
     const mid = `${sign}${money(locale, b.typical)}`;
-    return b.low !== b.high ? `${mid}<span class="el-range">${money(locale, b.low)}–${nf(locale, Math.abs(b.high))}</span>` : mid;
+    return b.low !== b.high ? `${mid}<span class="el-range">${esc(fill(T.monthlyTable.range, { low: nf(locale, Math.abs(b.low)), high: nf(locale, Math.abs(b.high)) }))}</span>` : mid;
   };
+  const MT = T.monthlyTable;
+  const SIDE = [T.side.electric, T.side.gasoline];
   const rows: string[] = [];
+  // the ongoing rows a reader can add up, for each side
+  const sum = { ev: 0, gas: 0 };
+  let k = 0;
   for (const id of order) {
     const a = ev.items.filter((i) => i.id === id);
     const g = gas.items.filter((i) => i.id === id);
     if (!a.length && !g.length) continue;
     const n = Math.max(a.length, g.length);
-    for (let k = 0; k < n; k++) {
-      const ai = a[k];
-      const gi = g[k];
-      const label = readerText((ai ?? gi).label[locale]);
+    for (let j = 0; j < n; j++) {
+      const ai = a[j];
+      const gi = g[j];
+      sum.ev += ai?.monthly.typical ?? 0;
+      sum.gas += gi?.monthly.typical ?? 0;
+      // energy and maintenance mean different things on each side: a neutral name, then each side's own
+      const shared = id === 'energy' || id === 'maintenance';
+      const label = shared ? MT.rowLabel[id] : readerText((ai ?? gi).label[locale]);
+      const what = shared
+        ? `<span class="el-mt__what">${[ai && `${SIDE[0]}${locale === 'en' ? ': ' : '：'}${readerText(ai.label[locale])}`, gi && `${SIDE[1]}${locale === 'en' ? ': ' : '：'}${readerText(gi.label[locale])}`].filter(Boolean).map((x) => `<span>${esc(x as string)}</span>`).join('')}</span>`
+        : '';
       const note = [ai?.note, gi?.note].filter(Boolean).map((x) => readerText(x![locale])).filter((x, i, all) => x && all.indexOf(x) === i);
       const months = ai?.months && !label.includes(String(ai.months)) ? ` <span class="el-small">(${esc(fill(T.monthsFor, { n: ai.months }))})</span>` : '';
       const tag = [ai, gi].some((x) => x?.confidence === 'secondary') ? conf('secondary', locale) : '';
-      rows.push(
-        `<tr><th scope="row">${esc(label)}${months}${tag}${note.length ? `<details class="el-note"><summary>?</summary><p>${note.map(esc).join('</p><p>')}</p></details>` : ''}</th><td class="num">${cell(ai?.monthly)}</td><td class="num">${cell(gi?.monthly)}</td></tr>`,
-      );
+      const noteId = `${ctx.id}-mt-${k++}`;
+      // the note opens as its own full-width row under the item, not inside the narrow first column
+      const toggle = note.length
+        ? ` <button type="button" class="el-note" aria-expanded="false" aria-controls="${noteId}" data-el-note><span aria-hidden="true">?</span><span class="vh">${esc(fill(MT.aboutRow, { label }))}</span></button>`
+        : '';
+      rows.push(`<tr><th scope="row">${esc(label)}${months}${tag}${toggle}${what}</th><td class="num">${cell(ai?.monthly)}</td><td class="num">${cell(gi?.monthly)}</td></tr>`);
+      // shown without JavaScript; the page script folds it behind the button
+      if (note.length) rows.push(`<tr class="el-mt__note" id="${noteId}" data-el-noterow><td colspan="3"><p>${note.map(esc).join('</p><p>')}</p></td></tr>`);
     }
   }
-  rows.push(`<tr class="el-total"><th scope="row">${esc(T.monthlyTable.total)}</th><td class="num">${money(locale, ev.averageMonthly.typical)}</td><td class="num">${money(locale, gas.averageMonthly.typical)}</td></tr>`);
-  if (ev.perKm && gas.perKm) rows.push(`<tr><th scope="row">${esc(T.monthlyTable.perKm)}</th><td class="num">${perKm(locale, ev.perKm.typical)}</td><td class="num">${perKm(locale, gas.perKm.typical)}</td></tr>`);
+  // Total = the rows above, so the column adds up. Credits and setup fees that stop or come back
+  // later are then given in plain words, with the five-year average the verdict uses.
+  rows.push(`<tr class="el-total"><th scope="row">${esc(MT.total)}</th><td class="num">${money(locale, sum.ev)}</td><td class="num">${money(locale, sum.gas)}</td></tr>`);
+  const evChanges = ev.items.some((i) => i.months) || Math.abs(sum.ev - ev.averageMonthly.typical) >= 1;
+  const gasChanges = Math.abs(sum.gas - gas.averageMonthly.typical) >= 5; // not rounding noise
+  if (evChanges || gasChanges) rows.push(`<tr class="el-avg"><th scope="row">${esc(fill(MT.average, { h: horizonText(e.comparison.cumulative.months.length - 1)[locale] }))}</th><td class="num">${money(locale, ev.averageMonthly.typical)}</td><td class="num">${money(locale, gas.averageMonthly.typical)}</td></tr>`);
+  if (ev.perKm && gas.perKm) rows.push(`<tr><th scope="row">${esc(MT.perKm)}</th><td class="num">${perKm(locale, ev.perKm.typical)}</td><td class="num">${perKm(locale, gas.perKm.typical)}</td></tr>`);
+  const credit = ev.items.find((i) => i.id === 'plan-credit' && i.months);
+  const setupItem = ev.items.find((i) => i.id === 'setup-fee');
+  const explain: string[] = [];
+  if (credit) explain.push(fill(MT.creditNote, { n: credit.months!, after: money(locale, sum.ev - credit.monthly.typical) }));
+  if (setupItem && e.electric.running.upfront > 0) explain.push(fill(MT.setupNote, { fee: money(locale, e.electric.running.upfront), n: setupItem.months ?? data.plans.find((p) => p.id === e.situation.energyPlan)?.lockInMonths ?? 0 }));
+  if (evChanges || gasChanges) explain.push(MT.averageNote);
   const plan = data.plans.find((p) => p.id === e.situation.energyPlan)!;
   const planLine = [
-    fill(T.monthlyTable.plan, { plan: readerText(plan.name[locale]) }),
-    plan.lockInMonths ? fill(T.monthlyTable.lockIn, { n: plan.lockInMonths }) : T.monthlyTable.noLockIn,
-    plan.setupFee ? fill(T.monthlyTable.setupFee, { fee: money(locale, plan.setupFee.value) }) : T.monthlyTable.noSetupFee,
+    fill(MT.plan, { plan: readerText(plan.name[locale]) }),
+    // the contract phrase is the research's own: a length, "not stated", or none (home charging)
+    readerText(plan.contract[locale]),
+    plan.setupFee ? fill(MT.setupFee, { fee: money(locale, plan.setupFee.value) }) : MT.noSetupFee,
   ].join(locale === 'en' ? '; ' : '；');
   const ref = data.spendReference;
-  const survey = fill(T.monthlyTable.survey, { ev: money(locale, ref.electric), gas: money(locale, ref.gasolineHeavy) });
-  const SIDE = [T.side.electric, T.side.gasoline];
-  return `<div class="el-monthly"><p class="el-small">${esc(fill(T.sections.monthlyLead, { km: nf(locale, e.situation.monthlyKm) }))}</p>
-<table class="el-mt"><thead><tr><th scope="col">${esc(T.monthlyTable.item)}</th><th scope="col" class="num">${esc(SIDE[0])}</th><th scope="col" class="num">${esc(SIDE[1])}</th></tr></thead><tbody>${rows.join('')}</tbody></table>
-<p class="el-small">${esc(fill(T.monthlyTable.totalNote, { ev: money(locale, ev.monthly.typical), gas: money(locale, gas.monthly.typical) }))}</p>
-<p class="el-plan">${esc(planLine)}</p><p class="el-small"><b>${esc(T.monthlyTable.terms)}</b>${esc(readerText(plan.terms[locale]))}</p>${sourcesHtml(plan.sources, ctx)}
+  const survey = fill(MT.survey, { ev: money(locale, ref.electric), gas: money(locale, ref.gasolineHeavy) });
+  return `<div class="el-monthly"><p class="el-small">${esc(fill(T.sections.monthlyLead, { km: kmText(locale, e.situation.monthlyKm) }))}</p>
+<div class="el-mt__wrap"><table class="el-mt"><caption class="vh">${esc(T.sections.monthly)}</caption><colgroup><col class="el-mt__c1" /><col /><col /></colgroup><thead><tr><th scope="col">${esc(MT.item)}</th><th scope="col" class="num">${esc(SIDE[0])}</th><th scope="col" class="num">${esc(SIDE[1])}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
+${explain.length ? `<p class="el-small">${esc(explain.join(locale === 'en' ? ' ' : ''))}</p>` : ''}
+<p class="el-plan">${esc(planLine)}</p><p class="el-small"><b>${esc(MT.terms)}</b>${esc(readerText(plan.terms[locale]))}</p>${sourcesHtml(plan.sources, ctx)}
 <p class="el-small">${esc(survey)}</p>${sourcesHtml(ref.sources, ctx)}</div>`;
 }
 
@@ -512,6 +570,18 @@ function waterfallHtml(e: Evaluation, ctx: RenderCtx): string {
   return figure(T.sections.waterfall, T.sections.waterfallSub, chart(render, `${ctx.id}-wf`, T.sections.waterfall.replaceAll('|', ''), desc, ctx.tableLabel));
 }
 
+/**
+ * The monthly difference (electric − gasoline) a reader can check against the table: the running
+ * items as they are now (a temporary plan credit included, the setup fee left out because it is
+ * paid at the start), and the difference once that credit ends.
+ */
+export function monthlyPhases(e: Evaluation): { now: number; later: number | null; until: number } {
+  const sumOf = (items: Evaluation['electric']['running']['items']) => items.filter((i) => i.id !== 'setup-fee').reduce((t, i) => t + i.monthly.typical, 0);
+  const now = sumOf(e.electric.running.items) - sumOf(e.gasoline.running.items);
+  const credit = e.electric.running.items.find((i) => i.id === 'plan-credit' && i.months && i.monthly.typical !== 0);
+  return credit ? { now, later: now - credit.monthly.typical, until: credit.months! } : { now, later: null, until: 0 };
+}
+
 /** Everything a result shows, as HTML strings for the ResultPanel parts and slots. */
 export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gasAuto' | 'fellBack'> & { plate?: Plate; power?: Power }, ctx: RenderCtx): Rendered {
   const { locale, data } = ctx;
@@ -520,7 +590,7 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
   const s = e.situation;
   const H = e.comparison.cumulative.months.length - 1;
   const h = horizonText(H)[locale];
-  const km = nf(locale, s.monthlyKm);
+  const km = kmText(locale, s.monthlyKm);
   const plan = data.plans.find((p) => p.id === s.energyPlan)!;
   const planName = readerText(plan.name[locale]);
   const gasName = describeGas(data, s.gasolineModel, locale);
@@ -534,6 +604,25 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
   let prefix = 'NT$';
   let value = '';
   let unit = '';
+  const sep = locale === 'en' ? ' ' : '';
+  // What it costs to start: with a pay-per-use plan the battery setup fee is paid on day one, so the
+  // gap at purchase is the price gap plus that fee, and the sentence says so (the ledger shows both).
+  const setup = e.electric.running.upfront;
+  const gapText = (gap: number) =>
+    setup > 0
+      ? fill(v.purchaseGap < 0 ? T.verdict.gapSetupLess : T.verdict.gapSetupMore, { gap: money(locale, gap), car: money(locale, v.purchaseGap), fee: money(locale, setup) })
+      : money(locale, gap);
+  // The monthly difference a reader can check: what it is now, and later if a credit ends.
+  const ph = monthlyPhases(e);
+  const monthlyNow = (more: boolean) => {
+    const now = more ? ph.now : -ph.now;
+    const later = ph.later === null ? null : more ? ph.later : -ph.later;
+    // the difference changes sign when a credit ends: quote the average rather than a wrong direction
+    if (now < 0 || (later !== null && later < 0)) return money(locale, v.monthlyGap);
+    return later === null ? money(locale, now) : fill(T.verdict.monthlyThen, { now: money(locale, now), n: ph.until, later: money(locale, later) });
+  };
+  const crossings = e.comparison.breakEven.crossings ?? [];
+  const crossTail = crossings.length > 1 ? fill(T.verdict.crossings, { months: crossings.join(locale === 'en' ? ', ' : '、') }) : '';
   switch (v.kind) {
     case 'parity':
       sentence = fill(T.verdict.parity, { gap: money(locale, -v.purchaseGap) });
@@ -541,11 +630,14 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
       value = nf(locale, -v.purchaseGap);
       break;
     case 'month':
-      sentence = fill(e.electric.running.upfront > 0 ? T.verdict.monthWithSetup : T.verdict.month, {
-        gap: money(locale, v.upfrontGap),
-        monthly: money(locale, -v.monthlyGap),
-        n: v.month!,
-      });
+      sentence = [
+        fill(T.verdict.month, {
+          gap: setup > 0 ? fill(T.verdict.gapWithSetupShort, { gap: money(locale, v.upfrontGap) }) : money(locale, v.upfrontGap),
+          monthly: monthlyNow(false),
+          n: v.month!,
+        }),
+        crossTail,
+      ].join(sep);
       title = T.panel.month;
       prefix = T.panel.monthPrefix;
       value = String(v.month);
@@ -553,22 +645,23 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
       break;
     case 'b': {
       const same = Math.abs(v.purchaseGap) < 1;
-      const head = fill(same ? T.verdict.bSame : T.verdict.bLess, { gap: money(locale, -v.purchaseGap), km, plan: planName, monthly: money(locale, v.monthlyGap) });
+      const head = fill(same ? T.verdict.bSame : T.verdict.bLess, { gap: money(locale, -v.purchaseGap), km, plan: planName, monthly: monthlyNow(true) });
       const tail = e.comparison.breakEven.kind === 'gas-catches-up' ? fill(T.verdict.bCatch, { n: v.month! }) : fill(T.verdict.bAhead, { h });
-      sentence = [head, tail, maintEv < maintGas ? T.verdict.bBuysMaint : T.verdict.bBuys].join(locale === 'en' ? ' ' : '');
-      title = T.panel.b;
+      const avg = ph.later !== null ? fill(T.verdict.bAverage, { h, monthly: money(locale, v.monthlyGap) }) : '';
+      sentence = [head, avg, tail, maintEv < maintGas ? T.verdict.bBuysMaint : T.verdict.bBuys].filter(Boolean).join(sep);
+      title = ph.later !== null ? fill(T.panel.bAverage, { h }) : T.panel.b;
       value = nf(locale, v.monthlyGap);
       break;
     }
     case 'c':
-      sentence = fill(T.verdict.c, { gap: money(locale, v.upfrontGap) });
+      sentence = fill(T.verdict.c, { gap: gapText(v.upfrontGap) });
       title = T.panel.c;
       value = nf(locale, v.upfrontGap);
       break;
     case 'c-slow': {
       const k = e.comparison.totalParityKm;
       const more = k && k.fromKm > s.monthlyKm ? fill(T.verdict.cSlowKm, { km: nf(locale, k.fromKm) }) : T.verdict.cSlowNever;
-      sentence = fill(T.verdict.cSlow, { gap: money(locale, v.upfrontGap), monthly: money(locale, -v.monthlyGap), h, more });
+      sentence = fill(T.verdict.cSlow, { gap: gapText(v.upfrontGap), monthly: monthlyNow(false), h, more });
       title = T.panel.c;
       value = nf(locale, v.upfrontGap);
       break;
@@ -582,7 +675,10 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
   const note = fill(T.panel.note, { km, plan: planName, gas: gasName });
 
   // deadline slot (verdict A only; the count is filled in the browser from today's date)
-  const deadline = data.meta.programmeYearEnd;
+  const yearEnd = data.meta.programmeYearEnd;
+  // the earliest last purchase day among the money counted (Keelung and Kinmen close on 30 November)
+  const lineDays = e.electric.purchase.lines.filter((l) => l.kind !== 'dealer' && l.deadline?.date).map((l) => l.deadline!.date).sort();
+  const deadline = lineDays.length && lineDays[0] < yearEnd ? lineDays[0] : yearEnd;
   // R10: a count only where this result rests on the city's own money; otherwise the date alone
   const cityMoneyCounted = e.electric.purchase.lines.some((l) => data.programmes.some((p) => p.id === l.id && p.jurisdiction === s.jurisdiction));
   const deadlineHtml =
@@ -604,17 +700,25 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
         engine: s.scrap.engine === 'two-stroke' ? localize(electric, locale).calc.q2.twoStroke : localize(electric, locale).calc.q2.fourStroke,
       }).replace(/(scrapping an?) ([A-Z])/, (_, a, b) => `${a} ${b.toLowerCase()}`)
     : T.scrapNo;
+  // a short map of the long working below, with the way to a smaller gap first
+  const jumps = [
+    [`#${ctx.id}-buy`, T.jump.buy],
+    [`#${ctx.id}-month`, T.jump.month],
+    [`#${ctx.id}-warn`, T.jump.warn],
+    [ctx.links.closer, T.closerLink],
+  ] as const;
+  parts.push(`<nav class="el-jump" aria-label="${esc(T.jump.label)}"><span>${esc(T.jump.label)}</span>${jumps.map(([h, t]) => `<a href="${esc(h)}">${esc(t)}</a>`).join('')}</nav>`);
   parts.push(`<p class="el-asof">${esc(fill(T.asOf, { date: day(s.date, locale), checked: day(e.dataCheckedOn, locale) }))}</p>`);
   parts.push(
     `<p class="el-summary">${esc(fill(T.summary, { city, scrap: scrapText, km, plan: planName, ev: readerText(evModel.name[locale]), gas: gasName }))}</p>`,
   );
   if (choice.evAuto || choice.gasAuto) {
     const why: string[] = [];
-    if (choice.evAuto) why.push(fill(T.whyModel, { rule: fill(T.whyModelRule, { plate: choice.plate === 'any' ? `${T.plate.heavy} / ${T.plate.light}` : T.plate.heavy, power: ((w: string) => (locale === 'en' ? w.charAt(0).toLowerCase() + w.slice(1) : w))(localize(electric, locale).calc.q5[choice.power === 'payg' ? 'payg' : choice.power === 'home' ? 'home' : 'sub']) }) }));
+    if (choice.evAuto) why.push(fill(T.whyModel, { rule: fill(T.whyModelRule, { plate: choice.plate === 'any' ? T.plateAny : T.plate.heavy, power: T.powerInline[choice.power === 'payg' ? 'payg' : choice.power === 'home' ? 'home' : 'subscription'] }) }));
     if (choice.gasAuto) why.push(T.whyGasRule);
     parts.push(`<p class="el-small">${esc(why.join(locale === 'en' ? ' ' : ''))}</p>`);
   }
-  if (choice.fellBack) parts.push(`<p class="el-small el-warn">${esc(localize(electric, locale).calc.q5.noSocket)} <a href="${esc(ctx.links.noSocket)}">→</a></p>`);
+  if (choice.fellBack) parts.push(`<p class="el-small el-warn">${esc(T.fellBack)} <a href="${esc(ctx.links.noSocket)}">${esc(localize(electric, locale).calc.q5.noSocketLink)}</a></p>`);
   if (e.jurisdiction.status === 'not-verified') {
     const m = e.messages.find((x) => x.code === 'jurisdiction-not-verified');
     if (m) parts.push(`<ul class="el-msgs el-msgs--lead">${messageHtml(m, ctx)}</ul>`);
@@ -625,15 +729,15 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
   const nm = nearMiss(e, data, locale);
   if (nm) {
     const lines: string[] = [];
-    if (nm.years) lines.push(fill(T.nearMiss, { years: nm.years, date: day(nm.on, locale), n: nm.months, deadline: day(deadline, locale) }));
+    if (nm.years) lines.push(fill(T.nearMiss, { years: nm.years, date: day(nm.on, locale), n: nm.months, deadline: day(yearEnd, locale) }));
     for (const c of nm.cutoffs) lines.push(fill(T.nearMissCutoff, { name: c.name, date: day(c.date, locale) }));
     parts.push(`<div class="el-box el-box--exhaust"><h4>${esc(T.sections.nearMiss)}</h4>${lines.map((x) => `<p>${esc(x)}</p>`).join('')}</div>`);
   }
 
-  parts.push(`<h4 class="el-h">${esc(T.sections.purchase)}</h4><div class="el-ledgers">${ledgerHtml(e, 'electric', ctx)}${ledgerHtml(e, 'gasoline', ctx)}</div>`);
+  parts.push(`<h4 class="el-h" id="${esc(ctx.id)}-buy">${esc(T.sections.purchase)}</h4><div class="el-ledgers">${ledgerHtml(e, 'electric', ctx)}${ledgerHtml(e, 'gasoline', ctx)}</div>`);
   parts.push(waterfallHtml(e, ctx));
   parts.push(excludedHtml(e, ctx));
-  parts.push(`<h4 class="el-h">${esc(T.sections.monthly)}</h4>${monthlyHtml(e, ctx)}`);
+  parts.push(`<h4 class="el-h" id="${esc(ctx.id)}-month">${esc(T.sections.monthly)}</h4>${monthlyHtml(e, ctx)}`);
   parts.push(breakEvenHtml(e, ctx));
 
   const sm = e.messages.find((m) => m.code === 'petrol-smoothing');
@@ -645,7 +749,7 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
   );
 
   const shown = e.messages.filter((m) => m.code !== 'petrol-smoothing' && !(m.code === 'jurisdiction-not-verified' && e.jurisdiction.status === 'not-verified'));
-  parts.push(`<h4 class="el-h">${esc(T.sections.warnings)}</h4><ul class="el-msgs">${shown.map((m) => messageHtml(m, ctx)).join('')}</ul>`);
+  parts.push(`<h4 class="el-h" id="${esc(ctx.id)}-warn">${esc(T.sections.warnings)}</h4><ul class="el-msgs">${shown.map((m) => messageHtml(m, ctx)).join('')}</ul>`);
 
   const nextText = v.verdict === 'A' ? T.nextA : v.verdict === 'B' ? T.nextB : '';
   const nextLinks =

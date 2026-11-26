@@ -129,6 +129,10 @@ const lit = current ? lines[current - 1] : undefined;
   .strip__line--go .strip__n {
     color: var(--clean-ink);
   }
+  /* on the highlight the faint number would drop under 3:1 (dark theme): full ink there */
+  .is-lit .strip__n {
+    color: var(--ink);
+  }
   .strip__body {
     display: grid;
     gap: var(--sp-2);

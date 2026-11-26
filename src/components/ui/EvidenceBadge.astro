@@ -12,17 +12,19 @@
  *   market-tw      thin, tinted      price tag   市場公開價格 / Published prices
  *   derived        dashed            sums        本站計算 / Our arithmetic
  *   inference      dashed            arrow       我們的推論 / Our inference
- *   gap            open brackets     hollow ends 沒人量過 / Nobody has measured this
+ *   gap            open brackets     hollow ends 證據缺口 / Evidence gap
  *
- * The six registry labels come from src/data/types.ts (`evidenceLabels`), so
- * the registry stays the single source of the wording.
+ * Every label comes from the registry, so it stays the single source of the wording:
+ * the six evidence types from src/data/types.ts (`evidenceLabels`), the gap badge from
+ * src/data/gaps.ts (`gapBadge`), the secondary tag from `confidenceLabels.secondary`.
+ * Never type a badge name in a component or page; read evidence.kinds / evidence.secondary.
  *
  * Props
  *   kind       EvidenceKind (see above). `level` is accepted as an alias, and
  *              the old names 'measured' / 'established' still resolve.
  *   locale     Locale
  *   secondary  true when the fact's registry confidence is 'secondary': adds
- *              the small 次級來源 / Secondary tag
+ *              the small secondary-confidence tag (evidence.secondary)
  *   variant    'full' (default: icon + words) | 'icon' (icon in its edge; the
  *              words stay for screen readers and as a tooltip)
  *   label      override the words
@@ -32,7 +34,7 @@
  * Explain the kinds once per page with <EvidenceLegend>.
  */
 import type { Locale } from '@/i18n';
-import { evidence, toEvidenceKind, type EvidenceLevel } from '@/i18n/ui';
+import { colon, evidence, toEvidenceKind, type EvidenceLevel } from '@/i18n/ui';
 import { evidenceIconSvg } from './evidence';
 
 interface Props {
@@ -54,7 +56,7 @@ const icon = variant === 'icon';
 
 <span class:list={['ev-wrap', cls]}>
   <span class:list={['ev', `ev--${kind}`, icon && 'ev--icon']} title={icon ? label : undefined}>
-    <span class="vh">{evidence.heading[locale]}: </span>
+    <span class="vh">{evidence.heading[locale]}{colon(locale)}</span>
     <Fragment set:html={evidenceIconSvg(kind)} />
     <span class:list={[icon && 'vh']}>{label}</span>
   </span>{secondary && <span class="ev-sec" title={evidence.secondary.help[locale]}>{evidence.secondary.label[locale]}</span>}

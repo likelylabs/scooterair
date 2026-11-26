@@ -42,7 +42,7 @@ const items = nav.map((item) => {
     </nav>
 
     <div class="site-header__tools">
-      <a class="lang-switch" href={switchLocalePath(path, other)} lang={htmlLang[other]} hreflang={htmlLang[other]} title={ui.switchLanguageHint[locale]}>
+      <a class="lang-switch" data-lang-switch href={switchLocalePath(path, other)} lang={htmlLang[other]} hreflang={htmlLang[other]} title={ui.switchLanguageHint[locale]}>
         <span class="lang-switch__short" aria-hidden="true">{ui.switchLanguageShort[locale]}</span>
         <span class="lang-switch__long">{ui.switchLanguage[locale]}</span>
       </a>
@@ -252,6 +252,24 @@ const items = nav.map((item) => {
       if (!menu.contains(e.target as Node)) close();
     });
     menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => close()));
+    // the panel covers the page: close it when keyboard focus leaves it, so focus never lands on
+    // a control hidden underneath (WCAG 2.4.11)
+    menu.addEventListener('focusout', (e) => {
+      const next = e.relatedTarget as Node | null;
+      if (next && !menu.contains(next)) close();
+    });
     window.matchMedia('(min-width: 62em)').addEventListener('change', () => close());
   });
+
+  // Language switches (header and footer) keep the reader's place: both languages use the same
+  // anchors, so carry the current #fragment over to the other language's URL.
+  const syncLangSwitch = () =>
+    document.querySelectorAll<HTMLAnchorElement>('a[data-lang-switch]').forEach((a) => {
+      const u = new URL(a.href, location.href);
+      u.hash = location.hash;
+      a.href = u.href;
+    });
+  syncLangSwitch();
+  window.addEventListener('hashchange', syncLangSwitch);
+  document.addEventListener('click', (e) => (e.target as Element | null)?.closest?.('a[data-lang-switch]') && syncLangSwitch(), true);
 </script>

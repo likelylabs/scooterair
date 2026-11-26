@@ -6,8 +6,11 @@ import { SKIP, coveredChars, scanDist } from './scripts/display-font.mjs';
 
 // SITE_URL / BASE_PATH let the same build serve a custom domain (default)
 // or a GitHub Pages project path (BASE_PATH=/scooterair).
-const site = process.env.SITE_URL ?? 'https://scooterair.tw';
-const base = process.env.BASE_PATH ?? '/';
+// Every absolute URL the site prints (canonical, og:url, og:image, hreflang, sitemap) is built
+// from `site`, and the site is only served over HTTPS. GitHub's configure-pages step reports
+// an http:// origin for a custom domain, so the scheme is forced here, for any caller.
+const site = (process.env.SITE_URL || 'https://scooterair.tw').replace(/^http:\/\//i, 'https://').replace(/\/+$/, '');
+const base = process.env.BASE_PATH || '/';
 
 /**
  * The CJK display face (@fontsource/noto-sans-tc, weight 900) lists a .woff
@@ -56,24 +59,53 @@ const headlineFont = {
       logger.info(`headline subset covers ${trimmed} Chinese page(s); the sliced font stays linked on the rest.`);
       if (missing.size)
         logger.warn(
-          `${missing.size} headline character(s) are not in the subset yet: ${[...missing].join('')}. They are drawn from the sliced font (extra downloads on those pages). Run \`node scripts/build-display-font.mjs\`, build again and commit src/styles/fonts/.`,
+          `${missing.size} headline character(s) are not in the subset yet: ${[...missing].join('')}. They are drawn from the sliced font (extra downloads on those pages). Fix: \`npm run headline-font\` (needs \`pip install fonttools brotli\` once), then commit src/styles/fonts/.`,
         );
     },
   },
 };
 
+/**
+ * robots.txt, pointing crawlers at the sitemap. Written after the build because the sitemap's
+ * address depends on SITE_URL and BASE_PATH. Crawlers only read robots.txt at the root of a
+ * host, so under a project path (likelylabs.com/scooterair/) this file is ignored and the
+ * sitemap has to be submitted in Search Console by hand; on its own domain it takes effect.
+ */
+const robots = {
+  name: 'scooterair:robots',
+  hooks: {
+    'astro:build:done': ({ dir }) => {
+      const sitemapUrl = new URL(`${base.replace(/\/?$/, '/')}sitemap-index.xml`, `${site}/`).href;
+      writeFileSync(new URL('robots.txt', dir), `User-agent: *\nAllow: /\n\nSitemap: ${sitemapUrl}\n`);
+    },
+  },
+};
+
+/** The sitemap's language code for Chinese is the one the pages declare (src/i18n htmlLang). */
+const ZH = 'zh-Hant-TW';
+
 export default defineConfig({
   site,
   base,
   trailingSlash: 'always',
+  // scoped styles mark elements with a short class instead of a data-astro-cid-* attribute:
+  // the same specificity, and tens of kilobytes less HTML on the longest pages
+  scopedStyleStrategy: 'class',
   integrations: [
     sitemap({
-      i18n: { defaultLocale: 'zh-TW', locales: { 'zh-TW': 'zh-TW', en: 'en' } },
+      i18n: { defaultLocale: 'zh-TW', locales: { 'zh-TW': ZH, en: 'en' } },
+      // the same x-default as each page's <link rel="alternate" hreflang="x-default">: the Chinese page
+      serialize: (item) => {
+        const zh = item.links?.find((l) => l.lang === ZH);
+        if (zh && !item.links.some((l) => l.lang === 'x-default')) item.links.push({ lang: 'x-default', url: zh.url });
+        return item;
+      },
       // out of the sitemap: utility pages, the /problem/ → /questions/ redirect, and the
       // print sheets under /print/, which are noindex (a sitemap must not list those)
       filter: (page) => !/\/(styleguide(-[a-z]+)?|problem|print\/[^/]+)\/$/.test(page),
     }),
     headlineFont,
+    robots,
   ],
   vite: {
     plugins: [woff2Only],

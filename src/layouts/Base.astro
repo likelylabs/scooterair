@@ -75,6 +75,19 @@ const image = abs(asset(ogImage ?? card.wide));
 const square = ogImage ? null : abs(asset(card.square));
 const ogLocale = { 'zh-TW': 'zh_TW', en: 'en_US' } as const;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
+// Structured data: a WebSite node on the two home pages, so search shows the site's name
+// (行人呼吸 / ScooterAir) rather than the domain. Nothing else is claimed here.
+const ld = home
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: site.name[locale],
+      alternateName: site.altName[locale],
+      description,
+      inLanguage: htmlLang[locale],
+      url: canonical,
+    }).replace(/</g, '\\u003c')
+  : null;
 ---
 
 <!doctype html>
@@ -153,6 +166,7 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
       </Fragment>
     )}
     <link rel="sitemap" href={asset('/sitemap-index.xml')} />
+    {ld && <script type="application/ld+json" set:html={ld} />}
     <slot name="head" />
   </head>
   <body>

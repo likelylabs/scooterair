@@ -5,49 +5,90 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # Rebuild every day just after midnight in Taiwan (16:07 UTC). Parts of the site are worked
+  # out at build time for "today" (the /electric/ worked examples, day counts, which subsidy
+  # phase applies), so the live site must be rebuilt daily even when nothing is pushed.
+  # GitHub pauses scheduled runs after 60 days without a commit; see README.md.
+  schedule:
+    - cron: '7 16 * * *'
 
 permissions:
   contents: read
 
+# One run per branch. A newer push cancels an older pull-request build, but never a run on
+# main: a deployment that has started is left to finish (GitHub's own Pages workflow does the
+# same), and the newer run waits for it.
 concurrency:
   group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build:
+  # Reads the Pages settings: the address the site is served at (origin) and its path
+  # (base_path, "/scooterair" for a project site). Reading them needs the Pages permission,
+  # so this runs in a job of its own that checks out nothing and runs none of the
+  # repository's code or packages. Pull requests skip it and build for the default address.
+  pages:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    # configure-pages reads the Pages site settings, which the default
-    # contents-only token cannot see.
+    timeout-minutes: 5
+    permissions:
+      pages: write
+    outputs:
+      origin: ${{ steps.pages.outputs.origin }}
+      base_path: ${{ steps.pages.outputs.base_path }}
+    steps:
+      - id: pages
+        uses: actions/configure-pages@v6
+
+  build:
+    needs: pages
+    # also when `pages` was skipped (pull requests)
+    if: ${{ !cancelled() && (needs.pages.result == 'success' || needs.pages.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
-      pages: write
+    env:
+      # configure-pages reports an http:// origin for a custom domain; astro.config.mjs turns
+      # it into https:// either way. Without Pages settings (pull requests) the build is for
+      # the default address at the domain root.
+      SITE_URL: ${{ needs.pages.outputs.origin || 'https://scooterair.tw' }}
+      BASE_PATH: ${{ needs.pages.outputs.base_path || '/' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
+      # fontTools, for the Chinese headline font (scripts/build-display-font.mjs)
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check fonttools==4.* brotli
       - run: npm ci
       - run: npm run check
-      - id: pages
-        if: github.event_name != 'pull_request'
-        uses: actions/configure-pages@v5
-      # With a custom domain, configure-pages reports an empty base path and
-      # the site builds for the domain root. Without one it builds for
-      # https://<owner>.github.io/<repo>/.
       - run: npm run build
-        env:
-          SITE_URL: ${{ steps.pages.outputs.origin || 'https://scooterair.tw' }}
-          BASE_PATH: ${{ steps.pages.outputs.base_path || '/' }}
+      # If a headline uses a character the committed font subset lacks (copy changed and
+      # `npm run headline-font` was not run), rebuild the subset and build again, so the
+      # live site never downloads the fallback font. Commit the rebuilt files to skip this.
+      - name: Headline font covers every headline
+        run: |
+          if ! node scripts/build-display-font.mjs --check; then
+            echo "::warning title=Headline font is out of date::Rebuilt it for this deploy. Run 'npm run headline-font' and commit src/styles/fonts/."
+            PYTHON=python node scripts/build-display-font.mjs
+            npm run build
+            node scripts/build-display-font.mjs --check
+          fi
       - if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: ${{ !cancelled() && needs.build.result == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       pages: write
       id-token: write
@@ -56,4 +97,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
