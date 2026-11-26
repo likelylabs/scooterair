@@ -1,0 +1,280 @@
+{
+ "generated": "2026-11-26",
+ "note": "Every source used by model.mjs / METHOD.md. verified = this project opened the source and found the figure; false = abstract, extraction or search excerpt only.",
+ "sources": [
+  {
+   "id": "iot-113-tb006",
+   "citation": "Hung P-Y et al. (2025). 路口交通環境特性對空氣品質影響及改善指引之研訂 (2/2) [Effect of intersection traffic environment on air quality and improvement guidelines]. MOTC Institute of Transportation, IOT-113-TB006 (Dec 2025).",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "doi": null,
+   "verified": true,
+   "supplied": "Validation anchor: 1-min waiting-zone CO (low-cost electrochemical, inlet 1.2-1.5 m), 48 h per site, Kaohsiung July 2024; Mingcheng 1st/Minzu 1st max ~1.3 ppm total; other sites 0.5-0.62 ppm at or below station (Zhongzheng 0.5 ppm is the median-island sensor, p.3-62). Motorcycle counts (12-h hourly means, e.g. 5,974/h), red 80-83 s, lane widths, tailpipe 0.5 m, on-site wind 0.4-3.6 m/s, kerb PM2.5 4-14 ug/m3."
+  },
+  {
+   "id": "moenv-co-2025",
+   "citation": "Ministry of Environment (MOENV). 各縣市機車排氣定檢CO檢測值統計表, 114年 (2025), national row.",
+   "url": "https://mobile.moenv.gov.tw/Motor/ReportNew/Unit_CO_Report.aspx?YearMonth=2025/12",
+   "doi": null,
+   "verified": true,
+   "supplied": "Per-scooter idle CO distribution: 9,067,160 tests in 1 % bins (0-1 %: 6,769,973 ... 9-10 %: 12,597)."
+  },
+  {
+   "id": "moenv-hc-2025",
+   "citation": "MOENV. 機車排氣定檢HC檢測值統計表, 114年 (2025).",
+   "url": "https://mobile.moenv.gov.tw/Motor/ReportNew/Unit_HC_Report.aspx?YearMonth=2025/12",
+   "doi": null,
+   "verified": true,
+   "supplied": "HC failures 12,280 of 8.29 M tests (0.15 %); failed-HC mean 5,823 ppm -> HC high-emitter share and rate."
+  },
+  {
+   "id": "moenv-annual-2025",
+   "citation": "MOENV (2026). 114年空氣品質監測年報 / Air Quality Annual Report of R.O.C. (Taiwan), 2025. Tables 2-2, 3-6, 3-20, 3-23.",
+   "url": "https://service.moenv.gov.tw/File/Get/moenv/zh-tw/VKuWKdIp1pJZHmU",
+   "doi": null,
+   "verified": true,
+   "supplied": "CO background (general stations 0.24, traffic stations 0.54 ppm annual), PM2.5 13.4 (traffic 15.4) ug/m3; Taiwan Air Quality Standard CO 1-h 31 ppm, 8-h 9 ppm; no benzene or particle-number standard."
+  },
+  {
+   "id": "cheng-2017-niu",
+   "citation": "Cheng et al. (2017). Yilan County motorcycle idle inspection statistics, 2014-2015. Bulletin of the College of Engineering, National Ilan University 12:33-76.",
+   "url": "https://lic.niu.edu.tw/var/file/10/1010/img/6/161991667.pdf",
+   "doi": null,
+   "verified": true,
+   "supplied": "CO+CO2 in diluted inspection readings 12.0-12.2 % (carbon-balance denominator)."
+  },
+  {
+   "id": "nguyen-2021",
+   "citation": "Nguyen et al. (2021). International Journal of Urban Sciences 25(4):522-541 (Hanoi motorcycle laboratory idle emissions).",
+   "url": "https://www.tandfonline.com/doi/full/10.1080/12265934.2020.1871059",
+   "doi": "10.1080/12265934.2020.1871059",
+   "verified": false,
+   "supplied": "Idle fuel flow ~180 g/h and CO 60.9, HC 10.3 g/h for five Vietnamese models (abstract only; its own carbon balance implies ~210 g/h). Upper end of fuel flow only."
+  },
+  {
+   "id": "nguyen-2025",
+   "citation": "Nguyen et al. (2025). Journal of the Chinese Institute of Engineers (motorcycle idle fuel consumption).",
+   "url": "https://www.tandfonline.com/doi/abs/10.1080/02533839.2025.2531199",
+   "doi": "10.1080/02533839.2025.2531199",
+   "verified": false,
+   "supplied": "Idle fuel flow 84-101 g/h (abstract only). Lower end of fuel flow."
+  },
+  {
+   "id": "yao-2008",
+   "citation": "Yao Y-C, Tsai J-H, Chang A-L, Jeng F-T (2008). Effects of sulfur and aromatic contents in gasoline on motorcycle emissions. Atmospheric Environment 42:6560-6564.",
+   "url": "https://doi.org/10.1016/j.atmosenv.2008.04.031",
+   "doi": "10.1016/j.atmosenv.2008.04.031",
+   "verified": true,
+   "supplied": "Taiwanese bench idle: benzene 764-918 mg/L vs THC 30-32 g/L (benzene 2.5-3 % of THC); THC 0.040-0.043 g/g fuel (FID); idle rpm 1,718."
+  },
+  {
+   "id": "tsai-2018",
+   "citation": "Tsai J-H et al. (2018). Aerosol and Air Quality Research (VOC emissions of in-use Taiwanese scooters by mileage).",
+   "url": "https://doi.org/10.4209/aaqr.2018.07.0264",
+   "doi": "10.4209/aaqr.2018.07.0264",
+   "verified": false,
+   "supplied": "Benzene ~2-3 % of VOC for catalysed Taiwanese scooters on a driving cycle (chart reading, repo extraction). Supports benzene-share central and low end."
+  },
+  {
+   "id": "tsai-2023",
+   "citation": "Tsai et al. (2023). Atmosphere 14(6):916 (Taiwan TEDS motorcycle VOC speciation).",
+   "url": "https://doi.org/10.3390/atmos14060916",
+   "doi": "10.3390/atmos14060916",
+   "verified": false,
+   "supplied": "Inventory benzene/HC 0.77 % (biased low as an exhaust share; low bound context)."
+  },
+  {
+   "id": "stockwell-2016",
+   "citation": "Stockwell CE et al. (2016). Nepal Ambient Monitoring and Source Testing Experiment (NAMaSTE): emissions of trace gases ... Atmos. Chem. Phys. 16:11043-11081.",
+   "url": "https://www.atmos-chem-phys.net/16/11043/2016/acp-16-11043-2016.pdf",
+   "doi": "10.5194/acp-16-11043-2016",
+   "verified": true,
+   "supplied": "BTEX from one pre-service carburetted motorcycle; upper end of benzene share (benzene/BTEX split assumed)."
+  },
+  {
+   "id": "jayarathne-2018",
+   "citation": "Jayarathne T et al. (2018). NAMaSTE: emissions of particulate matter ... Atmos. Chem. Phys. 18:2259-2286.",
+   "url": "https://www.atmos-chem-phys.net/18/2259/2018/acp-18-2259-2018.pdf",
+   "doi": "10.5194/acp-18-2259-2018",
+   "verified": true,
+   "supplied": "Motorcycle idle PM2.5 0.71 g/kg (serviced) and 8.81 +- 1.33 g/kg (pre-service): PM2.5 factor range and smoker rate."
+  },
+  {
+   "id": "kontses-2020",
+   "citation": "Kontses A, Ntziachristos L, Zardini AA, Papadopoulos G, Giechaskiel B (2020). Particulate emissions from L-category vehicles towards Euro 5. Environmental Research 182:109071.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7043005/",
+   "doi": "10.1016/j.envres.2019.109071",
+   "verified": true,
+   "supplied": "WMTC solid PN 2e11-3e12 /km; 10-23 nm adds 25-67 %; two-strokes ~10x; Euro 3 PM 0.03-0.10 g/kg derived. Particle number is NOT published."
+  },
+  {
+   "id": "chirico-2014",
+   "citation": "Chirico R et al. (2014). Emissions of organic aerosol mass, black carbon, particle number ... from scooters and light and heavy duty vehicles. Atmos. Chem. Phys. Discuss. 14:16591-16639.",
+   "url": "https://acp.copernicus.org/preprints/14/16591/2014/acpd-14-16591-2014.pdf",
+   "doi": "10.5194/acpd-14-16591-2014",
+   "verified": true,
+   "supplied": "Two-stroke PN ~1e13 /km (~10x four-stroke)."
+  },
+  {
+   "id": "chien-2010",
+   "citation": "Chien S-M, Huang Y-J et al. (2010). Sizes and PAH composition distributions of nano, ultrafine, fine and coarse particulates emitted from a four-stroke motorcycle. J Environ Sci Health A 45(13).",
+   "url": "https://doi.org/10.1080/10934529.2010.513289",
+   "doi": "10.1080/10934529.2010.513289",
+   "verified": false,
+   "supplied": "Idle PN concentration ~0.8x the 30 km/h value (abstract only; dilution basis unknown)."
+  },
+  {
+   "id": "epa-aermod-2026",
+   "citation": "US EPA (2026). AERMOD Model Formulation. EPA-454/B-26-003, July 2026, sec. 5.4, eqs 69-73.",
+   "url": "https://www.epa.gov/scram/air-quality-dispersion-modeling-preferred-and-recommended-models",
+   "doi": null,
+   "verified": true,
+   "supplied": "Low-wind coherent/random (meander) plume construction; effective (scalar) speed definition eq 72; minimum sigma_v 0.2 m/s. Saved full text was read by model-source-dispersion and critic-physics; exact PDF URL not recorded (landing page given)."
+  },
+  {
+   "id": "cal3qhc",
+   "citation": "US EPA (1995). User's Guide to CAL3QHC Version 2.0: A Modeling Methodology for Predicting Pollutant Concentrations Near Roadway Intersections. EPA-454/R-92-006 (Revised).",
+   "url": "https://www.weblakes.com/products/calroads/resources/docs/CAL3QHC.pdf",
+   "doi": null,
+   "verified": true,
+   "supplied": "No wake for idling queues; default sigma_theta 25 deg (sigma_v/U 0.44); validity limits."
+  },
+  {
+   "id": "ospm",
+   "citation": "Aarhus University. OSPM model description.",
+   "url": "https://envs.au.dk/en/gammelt-indhold/xxtil-gammelt-indhold/knowledge/air/models/ospm/ospm-description",
+   "doi": null,
+   "verified": true,
+   "supplied": "Traffic-produced turbulence in calm; not for crossings (why not used)."
+  },
+  {
+   "id": "cwa-climate",
+   "citation": "Central Weather Administration (CWA). Monthly mean statistics 1991-2020.",
+   "url": "https://www.cwa.gov.tw/V8/C/C/Statistics/monthlymean.html",
+   "doi": null,
+   "verified": true,
+   "supplied": "Station mean wind Taipei 2.6, Taichung 1.5, Kaohsiung 2.1 m/s; basis for kerb wind 0.2-0.6 x station."
+  },
+  {
+   "id": "law-174-2",
+   "citation": "道路交通標誌標線號誌設置規則 (Regulations for road traffic signs, markings and signals), art. 174-2 (version 2026-03-11).",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=K0040014",
+   "doi": null,
+   "verified": true,
+   "supplied": "Scooter stop-box depth 2.5-6 m."
+  },
+  {
+   "id": "chang-chang-2014",
+   "citation": "Chang & Chang (2014). 交通學報 14(1) (review of 許添本 & 王義川 2001 on scooter space use).",
+   "url": null,
+   "doi": null,
+   "verified": false,
+   "supplied": "2.2-3.2 m2 per stopped scooter; scooter width 0.8 m (secondary)."
+  },
+  {
+   "id": "lan-chang-2015",
+   "citation": "Lan C-L, Chang G-L (2015). A Traffic Signal Optimization Model for Intersections Experiencing Heavy Scooter-Vehicle Mixed Traffic Flows. IEEE Trans. Intelligent Transportation Systems.",
+   "url": "https://attap.umd.edu/wp-content/uploads/2022/05/A-Traffic-Signal-Optimization-Model-for-Intersections-Experiencing-Heavy-Scooter-Vehicle-Mixed-Traffic-Flows.pdf",
+   "doi": "10.1109/TITS.2014.2376292",
+   "verified": true,
+   "supplied": "Queues per red (16 in box; 27 per 80 s; up to 103 on a 4-lane approach): full-box scenario."
+  },
+  {
+   "id": "kenagy-2016",
+   "citation": "Kenagy HS, Lin C, Wu H, Heal MR (2016). Greater nitrogen dioxide concentrations at child versus adult breathing heights close to urban main road kerbside. Air Qual Atmos Health 9:589-595.",
+   "url": "https://link.springer.com/content/pdf/10.1007/s11869-015-0370-3.pdf",
+   "doi": "10.1007/s11869-015-0370-3",
+   "verified": true,
+   "supplied": "NO2 5-15 % higher at 0.8 m than 2.0 m within ~2.5 m of kerb (weekly means): borrowed height evidence."
+  },
+  {
+   "id": "buzzard-2009",
+   "citation": "Buzzard NA, Clark NN, Guffey SE (2009). Investigation into pedestrian exposure to near-vehicle exhaust emissions. Environmental Health 8:13.",
+   "url": "https://ehjournal.biomedcentral.com/track/pdf/10.1186/1476-069X-8-13",
+   "doi": "10.1186/1476-069X-8-13",
+   "verified": true,
+   "supplied": "Stroller-height exposure ~1.6x adult beside a diesel tailpipe: borrowed height evidence (upper side)."
+  },
+  {
+   "id": "wang-2015",
+   "citation": "Wang JM, Jeong C-H, Zimmerman N, Healy RM, Wang DK, Ke F, Evans GJ (2015). Plume-based analysis of vehicle fleet air pollutant emissions and the contribution from high emitters. Atmos Meas Tech 8:3263-3275.",
+   "url": "https://amt.copernicus.org/articles/8/3263/2015/amt-8-3263-2015.pdf",
+   "doi": "10.5194/amt-8-3263-2015",
+   "verified": true,
+   "supplied": "Dilution ~6,000 at 3 m for moving cars (context only; not a discriminating check)."
+  },
+  {
+   "id": "cheung-2013",
+   "citation": "Cheung HC, Chou CC-K, Huang W, Tsai C-Y (2013). Characterization of ultrafine particle number concentration and new particle formation in an urban environment of Taipei, Taiwan. Atmos Chem Phys 13:8935-8946.",
+   "url": "https://acp.copernicus.org/articles/13/8935/2013/acp-13-8935-2013.pdf",
+   "doi": "10.5194/acp-13-8935-2013",
+   "verified": true,
+   "supplied": "Taipei particle-number background 13,900 /cm3 (totals context only)."
+  },
+  {
+   "id": "abdillah-2024",
+   "citation": "Abdillah SFI, You S-J, Wang Y-F (2024). Characterizing Traffic-Related Ultrafine Particles in Roadside Microenvironments. Aerosol Air Qual Res 24(5):230295.",
+   "url": "https://doi.org/10.4209/aaqr.230295",
+   "doi": "10.4209/aaqr.230295",
+   "verified": false,
+   "supplied": "Taiwan roadside PN 25,000-38,000 /cm3 (abstract only; background upper end)."
+  },
+  {
+   "id": "wu-2021",
+   "citation": "Wu T-G, Chang J-C, Huang S-H, Lin W-Y, Chan C-C, Wu C-F (2021). Exposures and health impact for bicycle and electric scooter commuters in Taipei. Transportation Research Part D 91:102696.",
+   "url": "https://doi.org/10.1016/j.trd.2021.102696",
+   "doi": "10.1016/j.trd.2021.102696",
+   "verified": true,
+   "supplied": "Comparison only: on-road benzene ~2.6 ppb (cyclists) and ~4.2 ppb (electric-scooter riders), Fig. 2 chart reading, Taipei rush hour. Its 2.54 ppb is the study's own median x 0.9 (NOT ambient) and is no longer used as background."
+  },
+  {
+   "id": "ncku-thesis-hap",
+   "citation": "National Cheng Kung University master's thesis on ten years of Taiwanese hazardous-air-pollutant monitoring (title and author not yet confirmed).",
+   "url": "https://thesis.lib.ncku.edu.tw/thesis/detail/5e2db97f10546bf7fd23b16486abccfe",
+   "doi": null,
+   "verified": false,
+   "supplied": "National annual mean benzene ~0.55 ppbv (2012) -> 0.51 ppbv (2016), urban > non-urban (search-result excerpt only; page returned HTTP 503). Lower end of benzene background. needsManualFetch."
+  },
+  {
+   "id": "who-2021-aqg",
+   "citation": "WHO (2021). WHO global air quality guidelines: PM2.5, PM10, ozone, NO2, SO2 and carbon monoxide. Geneva. ISBN 9789240034228. Table 0.3.",
+   "url": "https://www.who.int/publications/i/item/9789240034228",
+   "doi": null,
+   "verified": true,
+   "supplied": "CO 15-min 100 mg/m3 (~87 ppm) and 1-h 35 mg/m3 (~30 ppm), not re-evaluated in 2021 but 'remain valid': fair comparators for a 90-s exposure."
+  },
+  {
+   "id": "saksena-2007",
+   "citation": "Saksena S et al. (2006, rev. 2007). Commuters' Exposure to Particulate Matter and Carbon Monoxide in Hanoi, Vietnam: A Pilot Study. East-West Center Working Papers No. 64.",
+   "url": "https://www.files.ethz.ch/isn/93173/2007_03_Commuters_Exposure.pdf",
+   "doi": null,
+   "verified": true,
+   "supplied": "Hanoi walkers mean 8.5 ppm CO (older fleet, in-stream): upper-bound context only, NOT a like-for-like comparison."
+  },
+  {
+   "id": "he-gao-2020",
+   "citation": "He & Gao (2020). Roadside particle measurements by signal phase, Shanghai. arXiv:2011.09286.",
+   "url": "https://arxiv.org/abs/2011.09286",
+   "doi": null,
+   "verified": true,
+   "supplied": "Particles highest at start of red then decaying (pull-away carry-over): why the modelled build-up curve is not published."
+  },
+  {
+   "id": "ting-2023",
+   "citation": "Ting Y-C, Chang P-K, Hung P-C, Chou CC-K, Chi K-H, Hsiao T-C (2023). Characterizing emission factors and oxidative potential of motorcycle emissions in a real-world tunnel environment. Environmental Research 234:116601.",
+   "url": "https://doi.org/10.1016/j.envres.2023.116601",
+   "doi": "10.1016/j.envres.2023.116601",
+   "verified": false,
+   "supplied": "Motorcycle PM2.5 0.013 +- 0.143 g/kg, CO 0.209 kg/kg (moving tunnel traffic; repo extraction). Considered and NOT used as an anchor."
+  }
+ ],
+ "needsManualFetch": [
+  "https://thesis.lib.ncku.edu.tw/thesis/detail/5e2db97f10546bf7fd23b16486abccfe (Taiwan HAP benzene annual means; HTTP 503 on 2026-11-26)",
+  "MOENV PAMS hourly benzene for urban stations (e.g. Wanhua), data.moenv.gov.tw (API key) - to replace the wide benzene background",
+  "IOT-113-TB006 Figs 3.3.2-1 to -11 (1-min CO series, images) or raw data from IOT - would show whether the kerb sensors resolve an increment at all",
+  "https://oehha.ca.gov/air/crnr/notice-adoption-revised-reference-exposure-levels-benzene (benzene acute REL and its averaging time; not used)",
+  "https://aaqr.org/articles/aaqr-18-07-oa-0264.pdf (Tsai 2018 benzene share; HTTP 403 earlier)",
+  "https://doi.org/10.1080/10934529.2010.513289 (Chien & Huang 2010 idle PN; HTTP 403 earlier)",
+  "Taichung idle fuel 1.55 g/min paper (researchgate 279289678) - the single most valuable input to replace",
+  "https://doi.org/10.1016/j.apr.2022.101632 (Ding et al. 2023 near-tailpipe dispersion; HTTP 403)"
+ ]
+}

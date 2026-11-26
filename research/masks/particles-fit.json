@@ -1,0 +1,179 @@
+{
+ "key": "particles-fit",
+ "date": "2026-11-26",
+ "summary": "See top-level 'synthesis' and 'findings'.",
+ "synthesis": {
+  "stated_ranges_as_worn": {
+   "note": "Ranges are from the opened sources; efficiency (material only) versus TIL / protection factor (material plus leaks) are kept apart. PF to leakage: leakage = 1/PF.",
+   "surgical_or_basic_disposable": {
+    "material_only": "Highly variable: hospital-type 4-37% penetration (Oberg 2008, NaCl 84 L/min); dental-type 53-90%; a single-fold disposable sold in Beijing 0.2-0.3% material penetration (Cherrie 2018).",
+    "as_worn_TIL": "Median protection factor about 4 (adults, 0.02-1 um candle-smoke particles; van der Sande 2008), i.e. about 25% inward leakage; mean fit factor 4.4 (Oberg 2008); a disposable mask in Cherrie 2018 had a TIL about 14x the best respirator's (median not given on the page I read). Surgical TIL 35% (Steinle 2018, volcanic ash, not opened in full, snippet only).",
+    "note": "Defensible plain-language range for the site: as worn, a surgical or basic disposable mask typically lets in roughly a quarter to well over half of particles in the 20 nm - 1 um range, varying with fit; it should not be called protection against traffic exhaust."
+   },
+   "cloth": {
+    "material_only": "74-90% penetration of 20-100 nm NaCl for cloth masks (Rengasamy 2010).",
+    "as_worn_TIL": "Protection factor about 2.5 in adults (about 40% leakage), 2.2 in children (van der Sande 2008); 'cloth with filter inserts' TIL median 67% (Cherrie 2018).",
+    "note": "Almost no reduction of ultrafines."
+   },
+   "fitted_respirator": {
+    "N95_FFP2": "As worn on unselected adults FFP2 median PF 66-113 at rest/activity (van der Sande 2008); N95 leakage in Grinshpun 2009 7-20x its filter penetration, so unfitted N95 is far from its 95% label; best mask in Cherrie 2018 TIL mean 2.3% (PF 43), median 1.8%, with only one of four masks under 10% TIL.",
+    "note": "Fit testing and seal are the main limit, not the filter medium."
+   }
+  },
+  "children": "Children are less well protected by every mask type: FFP2 PF median 18 (children, rest) vs 113 (adults); surgical 3.2 vs 4.1; home-made 2.2 vs 2.5 (van der Sande 2008, Table 1). Adult-size masks leak on small faces (Waterloo thesis, abstract only). A child-sized valved N95-class respirator passed fit in all 106 Singapore children aged 7-14 (Goh 2019) but the study is industry-funded and 5 min long.",
+  "what_would_work_and_limits": "Fitted N95/FFP2 reduces particle number and mass exposure (Langrish 2009, 2012; van der Sande 2008; Cherrie 2018 best mask) and an FFP1 produced small short-term improvements in blood pressure, HRV and ST-segment in Beijing trials. Limits: needs a seal (facial hair, small faces, loose straps), unselected wearers get far less than the label (Grinshpun 2009), breathing resistance and comfort, children, no effect on gases (CO, NOx, benzene and other VOCs); particle filters do not remove gases (not verified here: the gas part belongs to another key's research, no source opened for it in this file)."
+ },
+ "gaps": [
+  "Shakya et al. 2017 (J Expo Sci Environ Epidemiol 27:352): could not open; nature.com redirects to a cookie-authorisation page. Press and abstract text seen via search only: cloth masks 15-57% (number) and 13-40% (mass) against lab diesel particles at 30, 100, 500 nm; surgical mask better. Not marked verified.",
+  "Pacitto et al. 2019 (Sci Total Environ 650:1582): ScienceDirect returned 403 and PubMed is cookie-walled. Search snippet: median effectiveness PM2.5 48% (14-96%), BC 19%, particle number 19%, LDSA 22% for nine respirators in traffic-affected Barcelona. Not marked verified.",
+  "Huang & Morawska 2019 (Nature 574:29-30): nature.com redirect; PDF fetch returned binary I could not read. Not verified.",
+  "Vietnam motorcyclist-street study (Environ Sci Atmos 2022, doi 10.1039/D2EA00071G): RSC returned 403. Search snippet: N95, valved reusable and a local carbon mask 60-80% performance efficiency; surgical and cloth 25-60%; 6 masks on manikins at roadside in Ho Chi Minh City. Not verified.",
+  "Tehran study (J Expo Sci Environ Epidemiol 2020;30:606, doi 10.1038/s41370-020-0222-6): nature.com redirect and PubMed cookie wall; results not seen.",
+  "Steinle et al. 2018 (Int J Hyg Environ Health 221:977): Durham repository redirect; only search snippet seen (N95-equivalent mean TIL 9%, surgical and flat-fold 35%, volcanic ash task). Not verified.",
+  "No motorcyclist or traffic police fit study found for Thailand, Indonesia, India or Taiwan; none found for Taiwan masks at all in this pass.",
+  "Chinese-language search not done in this pass."
+ ],
+ "needsManualFetch": [
+  "https://www.nature.com/articles/jes201642",
+  "https://www.nature.com/articles/d41586-019-02938-1",
+  "https://www.nature.com/articles/s41370-020-0222-6",
+  "https://pubs.rsc.org/en/content/articlehtml/2022/ea/d2ea00071g",
+  "https://www.sciencedirect.com/science/article/pii/S0048969718336477",
+  "https://pubmed.ncbi.nlm.nih.gov/30308844/",
+  "https://pubmed.ncbi.nlm.nih.gov/27531371/",
+  "https://dro.dur.ac.uk/24736"
+ ],
+ "findings": [
+  {
+   "claim": "Retail 'anti-PM2.5' masks sold in Beijing: material filtration is usually good, but as worn on volunteers total inward leakage (TIL) ranges from about 2% to 68% of diesel black carbon, because of face-seal leakage.",
+   "figure": "Material penetration (not TIL): 8 of 9 masks median <9% at 40 L/min; best 0.2% BC / 0.3% PM2.5, worst 20.7% BC / 29.3% PM2.5 (40 L/min), 32.8% / 41.4% at 80 L/min. TIL on 10 volunteers (abstract): sedentary 3-68%, active 7-66%. Median TIL 3M9322 (3M model, type not described on the page I read) 1.8%; Yi Jie PM2.5 cloth with filters 67.3%. Adjusted TIL ratio vs 3M9322: 3M9502 x2.0, Yimeijian (disposable) x13.9, Yi Jie x26.7 (Table 1). Mean leakage best 2.3% (protection factor ~43), poorest 61% (PF 1.6).",
+   "tested": "Nine masks bought in Beijing (online, pharmacy, convenience store) claiming PM2.5 protection; filter test 30 min, diesel exhaust black carbon 50 ug/m3 and PM2.5, 40 and 80 L/min, material sample only. TIL on 10 volunteers (4 M, 6 F), 4 mask types, sedentary and active (breathing, deep breathing, head movements, talking, bending), in an exposure chamber in Edinburgh UK. Filter efficiency (material) and TIL (material+gaps) both reported.",
+   "citation": "Cherrie JW, Apsley A, Cowie H, Steinle S, Mueller W, Lin C, Horwell CJ, Sleeuwenhoek A, Loh M. Effectiveness of face masks used to protect Beijing residents against particulate air pollution. Occup Environ Med 2018;75(6):446-452.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5969371/",
+   "verified": true,
+   "quote": "\"Many commercially available face masks may not provide adequate protection, primarily due to poor facial fit.\" and \"Only one mask type tested showed an average TIL of less than 10%, under both test conditions.\"",
+   "applicability": "Best single source for the gap between filter efficiency and TIL on real faces, using diesel particles (BC is the nearest proxy to scooter exhaust particles). The masks tested are not Taiwan flat-fold surgical masks; the 'Yimeijian' single-fold disposable is the closest analogue (median penetration 0.2-0.3% at material level but TIL ~13.9x that of the best respirator). Tested at Edinburgh, not Taiwan, and not size-resolved (BC mass).",
+   "doi": "10.1136/oemed-2017-104765"
+  },
+  {
+   "claim": "Face-seal leakage, not filter material, dominates particle entry through both an N95 and a surgical mask during human breathing, and the dominance grows with particle size; the surgical mask let in about 5x more through leaks than through the filter.",
+   "figure": "N95: faceseal leakage about 7x filter penetration at 0.04 um, about 10x at 0.1 um, about 20x at 1 um. Surgical mask: faceseal-to-filter ratio 4.8-5.8 across the submicrometre range (Fig. 5, Fig. 4 for total/filter/faceseal penetration).",
+   "tested": "25 healthy adults (NIOSH fit-test panel; 15 M, 10 F; 11 Caucasian, 3 African American, 1 Hispanic, 10 Asian) wearing one N95 FFR and one surgical mask through 5 fit-test exercises; compared with a breathing manikin replaying each subject's breathing with the device glued on (perfect seal). NaCl aerosol 0.03-1 um, ELPI, 24.3 m3 chamber, 5,250 size- and exercise-specific values.",
+   "citation": "Grinshpun SA, Haruta H, Eninger RM, Reponen T, McKay RT, Lee SA. Performance of an N95 filtering facepiece particulate respirator and a surgical mask during human breathing: two pathways for particle penetration. J Occup Environ Hyg 2009;6(10):593-603.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7196699",
+   "verified": true,
+   "quote": "Leakage \"far exceeded the number of those penetrating through the filter medium\" (as quoted in the PMC page summary; N95 ratios ~7x at 0.04 um, 10x at 0.1 um, 20x at 1 um; surgical 4.8-5.8).",
+   "applicability": "Directly covers the ultrafine range (30-100 nm) which is where scooter exhaust particles sit. Note the N95 here was tested on a mixed-fit panel without a fit test selection, so it shows leakage for an unselected wearer; a fit-tested N95 does better. The tested ratio is not the same as an absolute TIL; Fig. 4 numbers were not reproduced in the page text I read.",
+   "doi": "10.1080/15459620903120086"
+  },
+  {
+   "claim": "Face-seal leakage remains the main route into an N95 and a surgical mask across breathing rates, for 20-500 nm particles.",
+   "figure": "Most faceseal-leakage-to-filter ratios >1; N95 TIL increased with breathing frequency; no clear trend for the surgical mask; higher inspiratory flow raised filter penetration but lowered TIL. Numeric TIL values by size not given on the page I read.",
+   "tested": "Breathing manikin, one N95 FFR and one surgical mask, mean inspiratory flows 15, 30, 55, 85 L/min, breathing frequencies 10-30 breaths/min, NaCl 20-500 nm.",
+   "citation": "He X, Reponen T, McKay RT, Grinshpun SA. How does breathing frequency affect the performance of an N95 filtering facepiece respirator and a surgical mask against surrogates of viral particles? J Occup Environ Hyg 2014;11(3):178-185.",
+   "url": "https://stacks.cdc.gov/view/cdc/87600",
+   "verified": true,
+   "quote": "\"Particles enter respirators through two principle penetration pathways: faceseal leakage and filter penetration.\"",
+   "applicability": "Supporting source only; manikin-based and numbers not extracted. Cite for the principle, not for figures.",
+   "doi": "10.1080/15459624.2013.848037"
+  },
+  {
+   "claim": "Surgical masks as worn have very low protection factors against ultrafine-to-submicron particles; an FFP2 gives roughly 25x more in adults; children get less protection from every mask type.",
+   "figure": "Protection factor (outside/inside particle concentration), median at rest, Table 1: FFP2 adults 113 (IQR 26-210), children 18 (6.1-165); surgical adults 4.1 (3.1-7.2), children 3.2 (2.2-4.1); home-made tea-cloth adults 2.5 (2.1-2.9), children 2.2 (1.5-2.2). Across activities FFP2 adult medians 66-99, child 13-35; surgical adult 4.2-5.3, child 3.4-4.9. Converted: PF 4 = about 25% inward leakage, PF 2.5 = 40%. Long-term (3 h, adults, Table 2): FFP2 141 at start, 53 at end; surgical 3.9 to 4.4; home-made 2.8 to 3.2.",
+   "tested": "Volunteers wearing masks as worn: 28 adults and 11 children aged 5-11, each wearing FFP2 (3M 1872V), surgical (3M 1818 tie-on) and home-made tea-cloth mask; 22 adults wore one type for 3 hours. Particles 0.02-1 um counted with a Portacount on each side of the mask in air with at least 10,000 particles/cm3 from lit candles. Total inward leakage as a protection factor.",
+   "citation": "van der Sande M, Teunis P, Sabel R. Professional and home-made face masks reduce exposure to respiratory infections among the general population. PLoS ONE 2008;3(7):e2618.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2440799",
+   "verified": true,
+   "quote": "\"Regardless of mask type, children were less well protected.\" Also \"which might be related to an inferior fit of the masks on their smaller faces.\" and \"Personal respirators were more efficient than surgical masks, which were more efficient than home-made masks.\"",
+   "applicability": "Best source for as-worn ultrafine-range numbers on people, including children. Candle smoke is a combustion aerosol with a small-particle mode, but its size distribution is not scooter exhaust. FFP2 results are on unselected volunteers without a fit test. The paper's own conclusion supports mask use for infection at population level; this should be said alongside. Not tested on traffic particles or in Taiwan.",
+   "doi": "10.1371/journal.pone.0002618"
+  },
+  {
+   "claim": "Disposable surgical masks (hospital grade and dental) do not meet respirator standards on filter or fit: wide filter penetration, and a surgical mask never reached a fit factor of 100.",
+   "figure": "NaCl penetration (84 L/min; text says 0.075 um, Table 2 label says 0.3 um): dental masks 53-90%, hospital masks 4-37% (Table 2: 90.2, 52.9, 77.2, 5.98, 37.4, 28.9, 10.44, 3.96, 31.6%). Quantitative fit factor (n=20): unassisted 2.5-6.9, mean 4.4 (SD 0.9); assisted 2.8-9.6, mean 5.7. Bitrex qualitative fit: 0 of 20 passed unassisted, 2 of 20 assisted.",
+   "tested": "9 brands of surgical mask; filter test with 0.895, 2.0, 3.1 um latex at 6 L/min and NaCl at 84 L/min; fit on 20 adult subjects (10 M, 10 F) for the 5 best-filtering masks.",
+   "citation": "Oberg T, Brosseau LM. Surgical mask filter and fit performance. Am J Infect Control 2008;36(4):276-282.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7115281",
+   "verified": true,
+   "quote": "\"None of these surgical masks exhibited adequate filter performance and facial fit characteristics\" (abstract conclusion; remainder of sentence not quoted).",
+   "applicability": "Good for the claim that a surgical mask is not a respirator. Particle size ambiguity (0.075 vs 0.3 um) must be disclosed if quoted; avoid citing a size. Fit factor of 4.4 means about 23% inward leakage on average.",
+   "doi": "10.1016/j.ajic.2007.07.008"
+  },
+  {
+   "claim": "Cloth masks and common fabrics let through most ultrafine particles, with penetration peaking around 100 nm.",
+   "figure": "Polydisperse NaCl (CMD about 75 nm) at 5.5 cm/s (33 L/min): cloth masks 74-90% penetration; T-shirts >86%; towels 60-66%; scarves 73-89%; sweatshirts 40-82%; N95 filter media 0.12%. Monodisperse: cloth masks 35-68% at 20 nm, 73-82% at about 100 nm, plateau to 400 nm; all materials 9-98% overall.",
+   "tested": "Material samples (100 cm2) of cloth masks and household fabrics, NaCl 20-1000 nm, face velocity 5.5 and 16.5 cm/s (33 and 99 L/min); filter material only, no face seal, no people.",
+   "citation": "Rengasamy S, Eimer B, Shaffer RE. Simple respiratory protection: evaluation of the filtration performance of cloth masks and common fabric materials against 20-1000 nm size particles. Ann Occup Hyg 2010;54(7):789-798.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7314261",
+   "verified": true,
+   "quote": "Authors cite fit factors of 13-67 for hand-made T-shirt masks and protection factors of 2-3 for tea-cloth masks (this is the page-summary paraphrase; the exact sentence was not read verbatim); fabrics offer \"only marginal protection\" against sub-micron particles (paraphrase).",
+   "applicability": "Material efficiency only, hence an upper bound of protection even before leakage. Covers the ultrafine range. Filtration of cloth varies a lot by fabric; do not generalise to all cloth. Note that the abstract range quoted elsewhere (9-98%) refers to monodisperse particles across all materials.",
+   "doi": "10.1093/annhyg/meq044"
+  },
+  {
+   "claim": "Kathmandu street-bought masks tested on a manikin against ambient PM2.5: N95-type 70%, surgical 39%, cloth 13%, and the test rig underestimates even N95.",
+   "figure": "Average filtration efficiency PM2.5 (PM10): N95 FFRs 70% (68-73%) [71%], surgical masks 39% (34-44%) [42%], cloth masks 13% (4-29%) [16%], prototype cloth masks with nose pin 60% (53-68%). Tables 2-9.",
+   "tested": "27 commercial masks (16 cloth, 7 surgical, 4 N95) from street vendors, plus 5 prototype cloth designs; mannequin head, two handheld light-scattering detectors, ambient outdoor aerosol, outdoors in Kathmandu Feb-Mar and Aug-Nov 2020; PM2.5/PM10 only, not size-resolved.",
+   "citation": "Neupane PR, Bajracharya I, Khatry SB. Effectiveness of inexpensive cloth facemasks and their amendments to reduce ambient particulate exposures: a case of Kathmandu, Nepal. J Environ Public Health 2023:5144345.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9904893",
+   "verified": true,
+   "quote": "\"Poor facial fit increases the particulate penetration level known as total inward leakage (TIL).\" and the authors state the rig was not fully sealed so values were underestimated \"even for standard N95\" (paraphrased by the page-reading tool).",
+   "applicability": "Low-quality instrument (handheld optical counters, unsealed mannequin) so use only as supporting direction, not for headline figures. Includes Asian street-market masks. Do not cite a figure for ultrafine.",
+   "doi": "10.1155/2023/5144345"
+  },
+  {
+   "claim": "In a trial of 98 coronary heart disease patients in Beijing, a tight-fitting FFP1 respirator worn for 2 h walks produced small but consistent cardiovascular benefits, which is evidence that cutting particle exposure matters for the heart in the short term and that a well-fitted filtering respirator is capable of doing it.",
+   "figure": "Particle number during walk: 4.39 +/- 1.45 x10^4 /cm3 without mask vs estimated about 0.12 x10^4 with mask (estimated from the filter's 97% number removal, not measured in the mask). PM2.5 89 ug/m3 (IQR 25-170) vs estimated about 2. ST-depression max -142 uV (IQR -179 to -110) vs -156 uV (-202 to -123), p=0.046. Mean arterial pressure during walk 93.3 vs 95.7 mmHg, p=0.025. HRV during walk: HF power 54 vs 40 ms2 p=0.005; RMSSD 16.7 vs 14.8 ms p=0.007. No difference in 24-h ischaemic burden, 24-h BP, arrhythmias, or angina frequency.",
+   "tested": "Open randomised crossover (PROBE), 98 non-smoking CHD patients (85% male, mean age 62), Fuwai Hospital Beijing, March-May 2009; 2 h city centre walk with and without a 3M 8812 FFP1 respirator (assigned protection factor 4), at least one week apart. No sham mask, so self-reported results may be biased.",
+   "citation": "Langrish JP, Li X, Wang S, et al. Reducing personal exposure to particulate air pollution improves cardiovascular health in patients with coronary heart disease. Environ Health Perspect 2012;120(3):367-372.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3295351/",
+   "verified": true,
+   "quote": "Authors describe \"small but consistent improvements\" in ischemia, exercise-related blood pressure rise, and heart rate variability (page-reading tool quote; I could not confirm the exact wording).",
+   "applicability": "Evidence that a filtering respirator lowers some short-term cardiovascular markers; the mask is FFP1 (lowest class, assigned PF 4, similar to what a surgical mask achieves in van der Sande), not an FFP2/N95, and exposure was from Beijing's urban mix, not scooter exhaust alone. Effect sizes are modest and 24-h benefits mostly absent; the study was not blinded. Do not claim it proves health protection against exhaust.",
+   "doi": "10.1289/ehp.1103898"
+  },
+  {
+   "claim": "In 15 healthy volunteers in Beijing, wearing a FFP1-type respirator for a 2 h walk lowered systolic BP and raised HRV; the authors say they could not measure the filter's efficacy as worn and that leaks mean true exposure is higher than predicted.",
+   "figure": "Systolic BP during walk 114 +/- 10 vs 121 +/- 11 mmHg (P<0.01); 24 h SDNN 65.6 +/- 11.5 vs 61.2 +/- 11.4 ms (P<0.05); mask penetrance 3.4% (lab); predicted 795 particles/cm3 (95% CI 726-864) inside the mask vs about 2.4 x10^4 /cm3 ambient (assumes perfect fit). No difference in 24-h BP or heart rate.",
+   "tested": "Open randomised crossover, 15 healthy non-smokers (13 F, 2 M, aged 20-45), 3M Dust Respirator 8812, Beijing city-centre walk 2 h, at least one week apart. No sham.",
+   "citation": "Langrish JP, Mills NL, Chan JKK, et al. Beneficial cardiovascular effects of reducing exposure to particulate air pollution with a simple facemask. Part Fibre Toxicol 2009;6:8.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2662779/",
+   "verified": true,
+   "quote": "\"it was not possible to assess accurately the efficacy of the mask filter when worn by the subjects\" (as reported by the page-reading tool). Conclusion: \"Wearing a facemask appears to abrogate the adverse effects of air pollution on blood pressure and heart rate variability.\"",
+   "applicability": "Supports the 'respirators help' side; small, healthy, no sham. Title says 'simple facemask' but the mask is a certified FFP1 respirator, not a surgical mask: important for the site not to imply surgical masks gave this benefit.",
+   "doi": "10.1186/1743-8977-6-8"
+  },
+  {
+   "claim": "Singapore paediatric N95 trial: a child-sized valved N95-class respirator could be fitted to all 106 children aged 7-14 (EN149 FFP2 fit-test criteria) with no CO2 safety issue in 5 minutes, which shows a child-sized respirator can fit; this is not evidence about standard retail children's masks.",
+   "figure": "106 of 106 passed the fit test (pass/fail only; no numeric fit factors). ETCO2 on brisk walking 28.2 (no mask) vs 32.0 mmHg (mask); max ETCO2 42 mmHg; 93% reported no breathing difficulty.",
+   "tested": "106 healthy children aged 7-14, Singapore, randomised crossover, each condition about 5 min, TSI Portacount 8038. Industry-funded (Innosparks, two authors employed by the company); minor numerical inconsistencies in the paper.",
+   "citation": "Goh DYT, Mun MW, Lee WLJ, Teoh OH, Rajgor DD. A randomised clinical trial to evaluate the safety, fit, comfort of a novel N95 mask in children. Sci Rep 2019;9:18952.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6908682",
+   "verified": true,
+   "quote": "\"All the children wearing the mask alone had ETCO2 values below 50 mmHg.\" (page-reading tool quote)",
+   "applicability": "Weak (manufacturer-funded, 5-min exposure, one product) but the only direct child respirator fit data found. Use to say that size-appropriate respirators can be fitted to older children, not that children should wear masks on streets; no data for under 7.",
+   "doi": "10.1038/s41598-019-55451-w"
+  },
+  {
+   "claim": "A small number of studies on children and adult masks confirms that adult-size masks leak on small faces.",
+   "figure": "Thesis abstract: child-sized masks gave better fitted efficiency on a child manikin than adult-sized versions; adult-sized surgical mask fit loosely and performed poorly; material efficiency near 100% but fitted efficiency much lower. Adult literature ranges quoted: N95 67.9-100%; regularly worn surgical 12.5-79.6%. No exact child percentages in the abstract.",
+   "tested": "Manikin tests, source control for 0.2-1 um particles, child vs adult masks; abstract only was read, not the full thesis.",
+   "citation": "El Khayri H. Evaluating face mask efficiency on children and adults. MASc thesis, University of Waterloo, 2025.",
+   "url": "https://uwspace.uwaterloo.ca/items/d664bd8f-7b2f-469c-a053-7e90c1582eec",
+   "verified": false,
+   "quote": "No quotable figure read; abstract summary only.",
+   "applicability": "Thesis, not peer-reviewed, and about source control for 0.2-1 um; do not cite as a headline. Need the PDF to extract numbers."
+  },
+  {
+   "claim": "Cloth masks as sold in Nepal (outdoors, ambient PM): filtration 63-84% for cloth masks vs 94% for one surgical mask in a passive, non-breathing test; washing four times cut efficiency by about 20%.",
+   "figure": "Cloth 63-84%; one surgical mask 94%; about 20% drop after 4 wash-and-dry cycles; 31% of 1,500 people at a Kathmandu junction wore masks (May 2016).",
+   "tested": "Passive coverslip sampling, 30 min outdoors, microscopy of settled particles (<5, 5-10, >10 um; resolution 0.6 um); no airflow, no fit. n=3.",
+   "citation": "Neupane BB, Mainali S, Sharma A, Giri B. Optical microscopic study of surface morphology and filtering efficiency of face masks. PeerJ 2019;7:e7142.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6599448",
+   "verified": true,
+   "quote": "\"The filtering efficiency of SM was found to be 94%\" (page-reading tool quote).",
+   "applicability": "Not usable for ultrafine; microscope cannot see them. Do NOT cite; it is here only because it was opened in error when looking for Shakya 2017. Listed for transparency.",
+   "doi": "10.7717/peerj.7142"
+  }
+ ]
+}

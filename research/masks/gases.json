@@ -1,0 +1,135 @@
+{
+ "file": "/home/user/scooterair/research/masks/gases.json",
+ "summary": "Verified: NIOSH says N95-type FFRs do not protect against gases (CO, methane) or vapours (gasoline, solvents). Activated-carbon dust masks do adsorb organic vapour for a limited time (Clinger 2019: minutes for cheap unapproved masks, hours for one NIOSH-approved model, ammonia in <10 min; Okrasa 2019 carbon nonwoven: ~6-8 min at 20-120 ppm cyclohexane; Taiwan MOL 2005: none of 10 disposable carbon masks met the CNS 14756 15-minute requirement). Nothing I found shows any mask removes CO; NIOSH lists only a full-facepiece gas mask with canister for CO. GAPS: no paper on NO2 through masks; no benzene test of a commercial mask opened (Rozzi et al. is cited inside Clinger but not opened); no COHb or urinary benzene biomarker study in mask wearers found; no Taiwan 職安署/環境部 text; CNS 14756, CNS 14774, CNS 14755 scope clauses not opened. One contradicting paper (Khayan 2019, claims 97% CO reduction by carbon mask material) is flagged as unreliable.",
+ "findings": [
+  {
+   "claim": "NIOSH: filtering facepiece respirators (N95 etc.) do not protect against gases or vapours.",
+   "figure": "Qualitative statement (no number).",
+   "tested": "Official guidance page, not an experiment.",
+   "citation": "CDC/NIOSH, Filtering Facepiece Respirators (page accessed 2026-11-26)",
+   "url": "https://www.cdc.gov/niosh/ppe/respirators/ffr.html",
+   "verified": true,
+   "quote": "FFRs do not provide protection against gases or vapors.",
+   "applicability": "Directly supports: N95/FFP2/KN95/KF94-type masks do not remove CO, benzene/VOCs or NO2. Applies to the filtering-facepiece class, which includes Taiwan N95 (CNS 14755)."
+  },
+  {
+   "claim": "NIOSH names carbon monoxide: filtering facepiece respirators do not protect against it.",
+   "figure": "Qualitative statement.",
+   "tested": "Official guidance page (wildfire smoke, outdoor workers).",
+   "citation": "CDC/NIOSH, Wildland Fire Smoke (page dated July 16, 2026 as displayed)",
+   "url": "https://www.cdc.gov/niosh/outdoor-workers/about/wildfire-smoke.html",
+   "verified": true,
+   "quote": "Filtering facepiece respirators (FFRs) do not protect against gases, such as carbon monoxide.",
+   "applicability": "Best single official sentence naming CO. Page is about wildfire smoke but the statement is general to FFRs."
+  },
+  {
+   "claim": "NIOSH names both gases (CO, methane) and vapours (gasoline, organic solvents) as not stopped by N95-type FFRs; gas protection needs elastomeric/PAPR with the right cartridge.",
+   "figure": "Qualitative statement.",
+   "tested": "NIOSH publication 2022-123, 'NIOSH Approved Respirators Used in Construction' (single page, modified 2022-09-08); text extracted from the PDF.",
+   "citation": "NIOSH Publication 2022-123 (2022)",
+   "url": "https://www.cdc.gov/niosh/docs/2022-123/pdfs/2022-123-508.pdf",
+   "verified": true,
+   "quote": "They do not protect against gases (e.g., carbon monoxide, methane) and vapors (e.g., gasoline, organic solvents) [NIOSH 2019].",
+   "applicability": "Gasoline vapour is the closest official analogue to petrol-scooter hydrocarbons. Cites NIOSH 2019 as its source."
+  },
+  {
+   "claim": "CAUTION on wording: a CO-capable air-purifying device does exist, but only as a full-facepiece gas mask with chin/back canister, not any mask or half-mask. So say 'no ordinary mask removes CO', not 'no filter can'.",
+   "figure": "NIOSH recommends, for CO up to 1200 ppm (IDLH), 'Any air-purifying, full-facepiece respirator (gas mask) with a chin-style, front- or back-mounted canister' (APF 50).",
+   "tested": "NIOSH Pocket Guide entry for carbon monoxide; guidance, not experiment.",
+   "citation": "NIOSH Pocket Guide to Chemical Hazards, Carbon monoxide",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0105.html",
+   "verified": true,
+   "quote": "(APF = 50) Any air-purifying, full-facepiece respirator (gas mask) with a chin-style, front- or back-mounted canister",
+   "applicability": "Do NOT claim that no cartridge removes CO. Safe claim: surgical, cloth, N95/KN95/KF94 and activated-carbon dust masks are not CO protection. I did not find a NIOSH sentence saying 'no APR cartridge removes CO'; I did not verify the 10 ppm/35 ppm CO-escape gas-mask letter beyond the 2010 NIOSH letter below."
+  },
+  {
+   "claim": "NIOSH certifies CO-protective gas masks only for escape purposes (42 CFR 84 subpart I / CBRN APER); breakthrough limit set at the NIOSH REL, 35 ppm.",
+   "figure": "35 ppm CO breakthrough limit (previously 10 ppm).",
+   "tested": "NIOSH NPPTL policy letter, 16 April 2010.",
+   "citation": "NIOSH NPPTL letter to manufacturers, 2010-04-16",
+   "url": "https://archive.cdc.gov/www_cdc_gov/niosh/npptl/resources/pressrel/letters/lttr-04162010.html",
+   "verified": true,
+   "quote": "The breakthrough concentration is now established at the current NIOSH REL of 35 ppm.",
+   "applicability": "Background only: shows CO needs a specially certified gas mask, never a dust mask. Not needed on the public site."
+  },
+  {
+   "claim": "Disposable masks with a thin activated-carbon layer: the one NIOSH-approved model lasted hours at nuisance-level vapour, the two non-approved ones failed in under 10 minutes, and all three failed on ammonia within 7-10 minutes.",
+   "figure": "Non-approved masks: <10 min to 50% breakthrough for all vapours. All masks: ammonia <7 min at 50 ppm, 10 min at 15 ppm. Approved 3M 8514: acetone 121 min (15 ppm) and 233 min (50 ppm); perchloroethylene >400 min at 50 ppm. High humidity (95% RH) cut breakthrough by up to 70%.",
+   "tested": "Three disposable dual-use dust masks (A: Nice Systems 'surgical mask' with carbon dusting; B: RZ Mask M1, non-NIOSH-approved; C: 3M 8514, NIOSH-approved). Mask sections on a pass-through column, flow scaled to ~30 L/min for a whole mask, acetone, perchloroethylene and ammonia at 15 and 50 ppm, 21 C, 50% RH (and 95% RH). Laboratory, University of Iowa, USA; published 2019.",
+   "citation": "Clinger JC, O'Shaughnessy PT. Breakthrough analysis for filtering facepiece respirators impregnated with activated carbon. J Occup Environ Hyg 2019;16(7):423-431.",
+   "url": "https://doi.org/10.1080/15459624.2019.1594838",
+   "verified": true,
+   "quote": "The non-approved dual-use dust masks were ineffective for all vapors and offered less than 10 min of protection before 50% breakthrough occurred. (also: 'Masks A and B contained a thin layer of fabric with a dusting of AC.')",
+   "applicability": "Strongest experimental paper on carbon masks. Read from the open PDF copy at stacks.cdc.gov (cdc_213384), publisher page returned 403. Tested acetone/PCE/ammonia, NOT benzene, CO or NO2; the paper cites Rozzi et al. (benzene/toluene/xylene, 91-150 min to 10% breakthrough for a mask like 3M 8514 at 20 ppm, 37 L/min), which I did not open. Phrase as: carbon masks vary from minutes to hours and get used up; most cheap ones last minutes."
+  },
+  {
+   "claim": "Carbon-loaded nonwoven of the type used in anti-odour respirators saturates in minutes at ppm-level vapour, and humidity shortens it further.",
+   "figure": "Cyclohexane 20-120 ppm: 100% breakthrough 8.5 +/- 1.3 min falling to 6.0 +/- 1.2 min; 50% breakthrough 1.9 to 1.1 min. At 70% RH 100% breakthrough 8.2 +/- 1.0 min (about 30 min at 2-10% RH). Sample 2.35 mm thick, 275.6 g/m2, 110 g/m2 carbon.",
+   "tested": "Commercial activated-carbon nonwoven (RK-270/C) as a flat sample, 100 cm2, 20-55 L/min, steady and pulsating flow, 2-70% RH. Material only, not a finished mask. Poland/Germany, 2019.",
+   "citation": "Okrasa M et al. Adsorption Performance of Activated-Carbon-Loaded Nonwoven Filters Used in Filtering Facepiece Respirators. Int J Environ Res Public Health 2019;16(11):1973.",
+   "url": "https://doi.org/10.3390/ijerph16111973",
+   "verified": true,
+   "quote": "(Paper's conclusion, paraphrased from page read: concentration, humidity, flow rate and flow pattern all affect breakthrough; performance assessment methods for odour-relief respirators are not yet clearly established.) Figures read on PMC6603930.",
+   "applicability": "Useful for 'carbon layer is thin and runs out'. Tested cyclohexane, not benzene. The abstract and conclusions of the paper disagree on the size of the humidity effect (73% vs 30%), so quote the minutes, not the percentage."
+  },
+  {
+   "claim": "Taiwan Ministry of Labor institute tested disposable activated-carbon masks against the national standard (CNS 14756): none met the 15-minute protection requirement.",
+   "figure": "10 products tested (2 flat activated-carbon disposable masks and 8 cup-type R95 masks with added carbon): none met the 15-minute breakthrough requirement; some passed vapour almost instantly. Cartridges, by contrast, protected over 300 minutes. No per-product times given.",
+   "tested": "Disposable activated-carbon masks tested for organic-solvent vapour (solvent not named) by the Institute of Labor Safety and Health, release dated 2005-07-26. Old (2005) and tested products may no longer be on sale.",
+   "citation": "Ministry of Labor (勞動部) press release 拋棄式活性碳口罩去除有機蒸氣效果有限，勞工應小心使用！, 2005-07-26.",
+   "url": "https://www.mol.gov.tw/1607/1632/1640/14091/post",
+   "verified": true,
+   "quote": "有的口罩幾乎立即就會透過，有的可防護一段時間 ... 沒有一款所測定之拋棄式口罩符合國家標準的要求",
+   "applicability": "Only Taiwanese official test of such masks I could open. Must be dated on the site as 2005. The 15-minute figure for CNS 14756 comes from the release (and a search snippet of the standard, not opened)."
+  },
+  {
+   "claim": "Taiwan FDA (食藥署): the carbon layer in an activated-carbon mask is for organic gases and odour molecules, not dust, and does not block bacteria.",
+   "figure": "Qualitative statement.",
+   "tested": "FDA rumour-debunking statement quoted in a TVBS Health article by 朱育嫻, published 2019-09-17, updated 2023-07-25. The article does not mention carbon monoxide.",
+   "citation": "TVBS Health, 活性碳口罩效果比外科口罩好?「這種口罩」無法阻隔細菌 (quoting 食藥署)",
+   "url": "https://health.tvbs.com.tw/medical/318754",
+   "verified": false,
+   "quote": "活性碳口罩的過濾層，主要功用在於吸附有機氣體、具惡臭的分子，並非用於過濾粉塵，也不具阻隔細菌穿透的功能。",
+   "applicability": "Secondary source; the FDA original was not opened. Quote read in TVBS page. Marked verified=false until the 食藥署 page is checked (see needsManualFetch). Note: this says carbon masks are for organic vapour/odour, so it does NOT support 'carbon masks do nothing' for VOCs; it supports 'not dust, not CO, not infection'."
+  },
+  {
+   "claim": "Taiwan FDA describes medical masks as a barrier against droplets and microbes, and TN95 as filtering 95%+ of dust; it says nothing about gases.",
+   "figure": "TN95: filters over 95% of dust in the environment (particles).",
+   "tested": "FDA weekly bulletin issue 975, 2024-05-24.",
+   "citation": "食藥署 藥物食品安全週報 第975期 (2024-05-24): 預防飛沫傳染，正確配戴醫用口罩最安心!",
+   "url": "https://www.fda.gov.tw/TC/PublishOtherEpaperContent.aspx?id=1510&tid=4753",
+   "verified": true,
+   "quote": "醫用口罩若宣稱符合TN95等級，則表示能過濾環境中95%以上的粉塵。",
+   "applicability": "Shows stated purpose is droplets/dust. It is an absence of any gas claim, not an explicit 'does not stop gases' statement. The page does not cite CNS 14774 or CNS 14755."
+  },
+  {
+   "claim": "CONTRADICTING / LOW-QUALITY: a single field study reports that surgical-type and carbon masks reduced CO measured downstream of the mask material.",
+   "figure": "CO: control 3.40 ppm, cotton 3.39 ppm, spunbond+meltblown 1.13 ppm, carbon+spunbond+meltblown 0.10 ppm (n=7 per group). The text and Table 3 disagree on the NOx values and units.",
+   "tested": "Mask material (cotton; spunbond+meltblown; carbon+spunbond+meltblown) with air drawn through at 85 L/min beside a busy highway, Pontianak, Indonesia, 7 sites; gases analysed by atomic absorption spectrophotometry. Material, not worn masks; 2019.",
+   "citation": "Khayan K, Anwar T, Wardoyo S, Puspita WL. Active Carbon Respiratory Masks as the Adsorbent of Toxic Gases in Ambient Air. J Toxicol 2019;2019:5283971.",
+   "url": "https://doi.org/10.1155/2019/5283971",
+   "verified": true,
+   "quote": "(Figures read in the article's tables on PMC6582802; no short quote verified.) Abstract: combining activated carbon, spunbond and meltblown 'is more effective'.",
+   "applicability": "DO NOT cite as support. It conflicts with NIOSH and the physics of CO (CO is barely adsorbed by activated carbon). Method (atomic absorption for CO gas), internal inconsistencies and unclear sampling make the CO numbers unreliable. Flagged so you know a reader may find it. Result is unverified against any independent replication."
+  },
+  {
+   "claim": "Context for 'carbon filters run out': real organic-vapour cartridges last far longer than a mask layer but still depend on concentration.",
+   "figure": "Activated-carbon-fibre cartridges, toluene, 32 L/min, 23 C, 50% RH, 2.54 cm bed: 10% breakthrough 809 and 873 min at 20 ppm vs 44 and 43 min at 500 ppm (best cartridges).",
+   "tested": "Respirator cartridges (not masks), toluene 20-500 ppm.",
+   "citation": "Balanay JAG, Oh J. Adsorption Characteristics of Activated Carbon Fibers in Respirator Cartridges for Toluene. Int J Environ Res Public Health 2021;18(16):8505.",
+   "url": "https://doi.org/10.3390/ijerph18168505",
+   "verified": true,
+   "quote": "(Read on PMC8393755: CS2 and CS6 cartridges 'have the longest breakthrough times'.) Tables 3 and text differ slightly on 5-ppm times.",
+   "applicability": "Optional. Contrasts a 2.5 cm cartridge bed with a ~2 mm mask layer. Not about masks sold to scooter riders."
+  }
+ ],
+ "needsManualFetch": [
+  "https://www.cnsonline.com.tw/ (CNS 14756, CNS 14774, CNS 14755, CNS 15980 scope clauses; paywalled/not opened)",
+  "https://www.tandfonline.com/doi/full/10.1080/15459624.2019.1594838 (publisher page 403; Clinger text read from CDC stacks PDF copy)",
+  "https://core.ac.uk/download/475613696.pdf (403)",
+  "https://www.cdc.gov/niosh/blogs/2017/n95-day.html (404; NIOSH blog 'FFRs do not protect you against gases, such as carbon monoxide' seen only in a search snippet)",
+  "Taiwan FDA original of the 活性碳口罩 statement (fda.gov.tw 闢謠專區), only seen via TVBS",
+  "Rozzi T, Snyder J, Novak D. Pilot study of ... dual-use dust masks, benzene/toluene/xylene (cited in Clinger 2019 ref 13), not opened",
+  "https://pmc.ncbi.nlm.nih.gov/ search for NO2 and mask or respirator; COHb or urinary t,t-muconic acid in mask wearers in traffic: no study found, needs PubMed search by a human"
+ ]
+}

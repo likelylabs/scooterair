@@ -2698,6 +2698,473 @@
    "highCase": 0.281556
   }
  ],
+ "interactiveBounds": {
+  "scooters": [
+   1,
+   60
+  ],
+  "nearest_m": [
+   0.3,
+   5
+  ],
+  "windSpeed_ms": [
+   0.3,
+   3
+  ],
+  "windFrom": [
+   "any",
+   "pack"
+  ],
+  "note": "outside these bounds the kernel or the scene layout is not supported; heights other than 1.5 m are computed but not published"
+ },
+ "testCases": [
+  {
+   "call": {
+    "scooters": 1,
+    "nearest": 2,
+    "windSpeed": 1,
+    "n": 2000,
+    "seed": 1
+   },
+   "co": {
+    "h0.6": {
+     "low": 0,
+     "central": 0.0457107,
+     "high": 0.428785,
+     "mean": 0.111529
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 0.0372194,
+     "high": 0.346908,
+     "mean": 0.0889092
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 0.0244751,
+     "high": 0.215409,
+     "mean": 0.0570449
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0,
+     "central": 0.120328,
+     "high": 0.965696,
+     "mean": 0.261551
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 0.0962194,
+     "high": 0.754501,
+     "mean": 0.208153
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 0.0634558,
+     "high": 0.512991,
+     "mean": 0.133727
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0,
+     "central": 0.181819,
+     "high": 2.08949,
+     "mean": 0.52667
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 0.144981,
+     "high": 1.66791,
+     "mean": 0.422472
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 0.0954202,
+     "high": 0.986848,
+     "mean": 0.275479
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 0,
+     "central": 42.1351,
+     "high": 1243.73,
+     "mean": 349.502
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 34.3781,
+     "high": 957.747,
+     "mean": 278.118
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 22.444,
+     "high": 607.625,
+     "mean": 178.787
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 10,
+    "nearest": 1,
+    "windSpeed": 0.5,
+    "n": 2000,
+    "seed": 2
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.204477,
+     "central": 0.704284,
+     "high": 2.52292,
+     "mean": 0.941985
+    },
+    "h1.0": {
+     "low": 0.182256,
+     "central": 0.598861,
+     "high": 2.04543,
+     "mean": 0.782924
+    },
+    "h1.5": {
+     "low": 0.136664,
+     "central": 0.423194,
+     "high": 1.3209,
+     "mean": 0.541828
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.307606,
+     "central": 1.54711,
+     "high": 6.56823,
+     "mean": 2.24965
+    },
+    "h1.0": {
+     "low": 0.272973,
+     "central": 1.31333,
+     "high": 5.44374,
+     "mean": 1.86615
+    },
+    "h1.5": {
+     "low": 0.204259,
+     "central": 0.920721,
+     "high": 3.49663,
+     "mean": 1.28142
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.312291,
+     "central": 2.5144,
+     "high": 15.8706,
+     "mean": 4.52167
+    },
+    "h1.0": {
+     "low": 0.277548,
+     "central": 2.14842,
+     "high": 12.7892,
+     "mean": 3.73895
+    },
+    "h1.5": {
+     "low": 0.203207,
+     "central": 1.4823,
+     "high": 8.7384,
+     "mean": 2.56675
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 34.9159,
+     "central": 668.892,
+     "high": 12957.4,
+     "mean": 3425.28
+    },
+    "h1.0": {
+     "low": 29.1988,
+     "central": 565.171,
+     "high": 10205.4,
+     "mean": 2837.89
+    },
+    "h1.5": {
+     "low": 20.8205,
+     "central": 411.348,
+     "high": 7145.68,
+     "mean": 1929.21
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 30,
+    "nearest": 1,
+    "windSpeed": 0.5,
+    "n": 2000,
+    "seed": 3
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.373349,
+     "central": 1.08235,
+     "high": 3.38878,
+     "mean": 1.3881
+    },
+    "h1.0": {
+     "low": 0.341185,
+     "central": 0.938441,
+     "high": 2.73926,
+     "mean": 1.1723
+    },
+    "h1.5": {
+     "low": 0.27796,
+     "central": 0.706523,
+     "high": 1.8842,
+     "mean": 0.852344
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.545579,
+     "central": 2.24157,
+     "high": 8.83505,
+     "mean": 3.09767
+    },
+    "h1.0": {
+     "low": 0.480178,
+     "central": 1.93038,
+     "high": 7.19874,
+     "mean": 2.62623
+    },
+    "h1.5": {
+     "low": 0.374129,
+     "central": 1.45071,
+     "high": 5.28039,
+     "mean": 1.91911
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.614883,
+     "central": 3.80122,
+     "high": 22.058,
+     "mean": 6.65366
+    },
+    "h1.0": {
+     "low": 0.539066,
+     "central": 3.3181,
+     "high": 18.452,
+     "mean": 5.62604
+    },
+    "h1.5": {
+     "low": 0.413232,
+     "central": 2.50437,
+     "high": 12.9314,
+     "mean": 4.06782
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 50.2567,
+     "central": 896.108,
+     "high": 19166.2,
+     "mean": 4339.76
+    },
+    "h1.0": {
+     "low": 44.302,
+     "central": 775.102,
+     "high": 16260.6,
+     "mean": 3676.3
+    },
+    "h1.5": {
+     "low": 32.9326,
+     "central": 581.929,
+     "high": 10429.5,
+     "mean": 2676.81
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 30,
+    "nearest": 1,
+    "windSpeed": 2.5,
+    "n": 2000,
+    "seed": 4
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.0688097,
+     "central": 0.314667,
+     "high": 1.38389,
+     "mean": 0.464671
+    },
+    "h1.0": {
+     "low": 0.0544784,
+     "central": 0.234524,
+     "high": 1.01952,
+     "mean": 0.343258
+    },
+    "h1.5": {
+     "low": 0.0367201,
+     "central": 0.149447,
+     "high": 0.651025,
+     "mean": 0.214786
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.114685,
+     "central": 0.689358,
+     "high": 3.32366,
+     "mean": 1.09837
+    },
+    "h1.0": {
+     "low": 0.0893531,
+     "central": 0.499585,
+     "high": 2.56106,
+     "mean": 0.809987
+    },
+    "h1.5": {
+     "low": 0.0570363,
+     "central": 0.3056,
+     "high": 1.57782,
+     "mean": 0.502899
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.137261,
+     "central": 1.0489,
+     "high": 8.54073,
+     "mean": 2.30446
+    },
+    "h1.0": {
+     "low": 0.0992951,
+     "central": 0.794933,
+     "high": 6.29872,
+     "mean": 1.69353
+    },
+    "h1.5": {
+     "low": 0.0616002,
+     "central": 0.506857,
+     "high": 3.72633,
+     "mean": 1.04259
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 13.0399,
+     "central": 285.899,
+     "high": 5875.22,
+     "mean": 1605.47
+    },
+    "h1.0": {
+     "low": 9.86719,
+     "central": 212.411,
+     "high": 4252.61,
+     "mean": 1181.17
+    },
+    "h1.5": {
+     "low": 6.17509,
+     "central": 135.653,
+     "high": 2697.6,
+     "mean": 727.364
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 60,
+    "nearest": 0.3,
+    "windSpeed": null,
+    "windFrom": "pack",
+    "n": 2000,
+    "seed": 5
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.456037,
+     "central": 1.51933,
+     "high": 5.26703,
+     "mean": 2.01229
+    },
+    "h1.0": {
+     "low": 0.366091,
+     "central": 1.20425,
+     "high": 3.7905,
+     "mean": 1.51123
+    },
+    "h1.5": {
+     "low": 0.243865,
+     "central": 0.790092,
+     "high": 2.32568,
+     "mean": 0.963064
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.697616,
+     "central": 3.13282,
+     "high": 14.6526,
+     "mean": 4.93946
+    },
+    "h1.0": {
+     "low": 0.569438,
+     "central": 2.4263,
+     "high": 10.1541,
+     "mean": 3.70131
+    },
+    "h1.5": {
+     "low": 0.374752,
+     "central": 1.59827,
+     "high": 6.44284,
+     "mean": 2.34298
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.742339,
+     "central": 4.96845,
+     "high": 33.2323,
+     "mean": 9.76766
+    },
+    "h1.0": {
+     "low": 0.603636,
+     "central": 3.77257,
+     "high": 24.5419,
+     "mean": 7.29752
+    },
+    "h1.5": {
+     "low": 0.372321,
+     "central": 2.44772,
+     "high": 15.6825,
+     "mean": 4.59966
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 72.95,
+     "central": 1234.6,
+     "high": 25672.5,
+     "mean": 6733.65
+    },
+    "h1.0": {
+     "low": 59.711,
+     "central": 977.915,
+     "high": 18220.2,
+     "mean": 4945.38
+    },
+    "h1.5": {
+     "low": 40.4472,
+     "central": 632.741,
+     "high": 10446.8,
+     "mean": 3034.68
+    }
+   }
+  }
+ ],
  "crossModel": {
   "note": "medians of CO increment, 90-s mean, ~1.5 m, ppm, as published by each model before/after critique corrections",
   "sourceDispersionOriginal": {

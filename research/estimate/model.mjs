@@ -404,6 +404,15 @@ if (isMain) {
       conventions: { low: 'P5', central: 'P50', high: 'P95', mean: 'arithmetic mean', heights_m: HEIGHTS, increment: 'above urban background', molarVolume_L: MOLAR_VOLUME_L,
         published: 'only CO, benzene and PM2.5 increments at 1.5 m, rounded to 1 significant figure, as ranges; particle number, height ratios and time series are recorded but NOT published' },
       inputs: INPUTS, fleet, scenarios: scen, validation: V, sensitivity: sens,
+      interactiveBounds: { scooters: [1, 60], nearest_m: [0.3, 5], windSpeed_ms: [0.3, 3], windFrom: ['any', 'pack'],
+        note: 'outside these bounds the kernel or the scene layout is not supported; heights other than 1.5 m are computed but not published' },
+      testCases: [
+        { scooters: 1, nearest: 2, windSpeed: 1, n: 2000, seed: 1 },
+        { scooters: 10, nearest: 1, windSpeed: 0.5, n: 2000, seed: 2 },
+        { scooters: 30, nearest: 1, windSpeed: 0.5, n: 2000, seed: 3 },
+        { scooters: 30, nearest: 1, windSpeed: 2.5, n: 2000, seed: 4 },
+        { scooters: 60, nearest: 0.3, windSpeed: null, windFrom: 'pack', n: 2000, seed: 5 },
+      ].map(call => { const r = estimate(call); return { call, co: r.co.increment, benzene: r.benzene.increment, pm25: r.pm25.increment, particleNumber: r.particleNumber.increment }; }),
       crossModel: {
         note: 'medians of CO increment, 90-s mean, ~1.5 m, ppm, as published by each model before/after critique corrections',
         sourceDispersionOriginal: { few: 0.033, dozen: 0.18, fullbox: 0.36 },
