@@ -1,0 +1,713 @@
+#!/usr/bin/env node
+// Validates the cited data layer in src/data. Run via `npm run check` (before `astro check`).
+//
+// Imports the TypeScript data files directly using Node's built-in type stripping
+// (Node >= 22.18), so it checks exactly what the site will import.
+//
+// Fails (exit 1) on:
+//  - a fact / series / claim rule citing a source id that does not exist
+//  - a source that nothing cites, or that has neither url nor doi
+//  - duplicate ids (facts across topic groups; series; rules)
+//  - any localized field (an object with exactly 'zh-TW' and 'en') with a missing or empty language
+//  - confidence other than 'verified' | 'secondary'; evidence outside the allowed set
+//  - 'derived' facts without derivedFrom (or derivedFrom pointing at unknown facts)
+//  - requiresCaveat without a caveat; secondary facts without a caveat
+//  - unknown units, flags, related-fact ids or series point keys outside the categories
+//  - malformed dates / DOIs / URLs, accessed date not ISO
+//  - Traditional Chinese copy with ASCII punctuation or simplified/mainland terms
+//  - reader-facing place names written 臺 instead of 台 (台灣, 台北 ... per the editorial
+//    blueprint); organisation names keep their own spelling, and the economics data (owned
+//    elsewhere) gets warnings, not errors, until it is converted
+//  - English copy with full-width punctuation
+//  - invalid regex patterns in the claims policy; a blueprint copy rule (R1-R16) with no claim rule
+//  - a fact or series without `chainLink` (unless its topic has a default), or a bad chain link
+//  - a `research` reference 'papers/<file>#<finding>' or 'redlight/<file>#<finding>' that does not
+//    exist or whose verdict is not CONFIRMED, CORRECTED or ADDED
+//  - evidence gaps: bad chain link, missing fields, unknown facts/series/sources, bad dates
+
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+process.removeAllListeners('warning'); // silence the type-stripping ExperimentalWarning on older 22.x
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const load = (p) => import(pathToFileURL(resolve(root, p)).href);
+
+let types, sourcesMod, factsMod, seriesMod, policyMod, gapsMod;
+try {
+  types = await load('src/data/types.ts');
+  sourcesMod = await load('src/data/sources.ts');
+  factsMod = await load('src/data/facts.ts');
+  seriesMod = await load('src/data/series.ts');
+  policyMod = await load('src/data/claims-policy.ts');
+  gapsMod = await load('src/data/gaps.ts');
+} catch (err) {
+  console.error('\n✖ check-data: could not load src/data (syntax error, duplicate id or bad import?)\n');
+  console.error(err);
+  process.exit(1);
+}
+
+const errors = [];
+const warnings = [];
+const err = (where, msg) => errors.push(`${where}: ${msg}`);
+const warn = (where, msg) => warnings.push(`${where}: ${msg}`);
+
+const { sources, sourceKinds, readLevels } = sourcesMod;
+const { factGroups, facts, topicLabels, topicDefaultChainLink } = factsMod;
+const { series, pointFlags, seriesTopicDefaultChainLink } = seriesMod;
+const { gaps } = gapsMod;
+const CHAIN_LINKS = new Set(types.chainLinks);
+const { claimRules } = policyMod;
+const CONFIDENCES = new Set(types.confidences);
+const EVIDENCE = new Set(types.evidenceTypes);
+const UNITS = new Set(Object.keys(types.units));
+const FLAGS = new Set(pointFlags);
+const TOPICS = new Set(Object.keys(factGroups));
+const sourceIds = new Set(Object.keys(sources));
+const factIds = new Set(Object.keys(facts));
+const ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const ISO_DATE_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+const cited = new Map([...sourceIds].map((id) => [id, 0]));
+
+// ---------------------------------------------------------------------------
+// Localized-field checks
+// ---------------------------------------------------------------------------
+
+const isL10n = (v) =>
+  v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 2 && 'zh-TW' in v && 'en' in v;
+
+// ASCII punctuation in Chinese copy (allowing digits like 1,466 / 0.5 / 07:00 / p<0.0001).
+const ZH_BAD_PUNCT = [
+  [/(?<!\d),|,(?!\d)/, 'ASCII comma (use ，or 、)'],
+  [/[()]/, 'ASCII parentheses (use （）)'],
+  [/;/, 'ASCII semicolon (use ；)'],
+  [/(?<!\d):|:(?!\d)/, 'ASCII colon (use ：)'],
+  [/[!?]/, 'ASCII ! or ? (use ！？)'],
+  [/\.(\s|$)/, 'ASCII full stop (use 。)'],
+  [/["']/, 'ASCII quotes (use 「」)'],
+];
+// Simplified characters / mainland usage that should not appear in Taiwanese copy.
+const ZH_TAI_TERMS = [['臺灣', '台灣'], ['臺北', '台北'], ['臺中', '台中'], ['臺南', '台南'], ['臺東', '台東']];
+const ZH_BAD_TERMS = [
+  ['摩托車', '機車'], ['顆粒物', '懸浮微粒'], ['尾氣', '廢氣'], ['質量', '品質'], ['信息', '資訊'],
+  ['數據庫', '資料庫'], ['人行橫道', '行人穿越道'], ['碳氫化合物類', '碳氫化合物'], ['网', '網'],
+  ['车', '車'], ['污染物质', '污染物質'], ['环', '環'], ['气', '氣'], ['颗', '顆'], ['细', '細'],
+  ['电', '電'], ['统计', '統計'], ['标准', '標準'], ['导致', '導致'], ['关', '關'],
+];
+const EN_BAD_PUNCT = /[，。（）「」；：！？、]/;
+
+const checkedL10n = new WeakSet();
+let TAI_WARN_SCOPE = false; // set while checking the economics dataset (src/data/econ), owned elsewhere
+function checkL10n(where, value, { optional = false, properNoun = false, taiWarnOnly = false } = {}) {
+  if (value && typeof value === 'object') checkedL10n.add(value);
+  if (value === undefined) {
+    if (!optional) err(where, 'missing localized field');
+    return;
+  }
+  if (!isL10n(value)) {
+    err(where, `expected { 'zh-TW', en } but got ${JSON.stringify(value)?.slice(0, 80)}`);
+    return;
+  }
+  const zh = value['zh-TW'];
+  const en = value.en;
+  if (typeof zh !== 'string' || zh.trim() === '') err(where, "empty or missing 'zh-TW'");
+  if (typeof en !== 'string' || en.trim() === '') err(where, "empty or missing 'en'");
+  if (typeof zh === 'string' && zh) {
+    if (!/[㐀-鿿]/.test(zh) && /[a-z]{3,}/.test(zh)) warn(where, `zh-TW text looks untranslated: "${zh}"`);
+    for (const [re, label] of ZH_BAD_PUNCT) if (re.test(zh)) err(where, `zh-TW: ${label} in "${zh.slice(0, 60)}…"`);
+    for (const [bad, good] of ZH_BAD_TERMS) if (zh.includes(bad)) err(where, `zh-TW: "${bad}" should be "${good}"`);
+    // Reader-facing copy writes 台; organisation names keep their own spelling (e.g. 臺北市政府).
+    if (!properNoun) {
+      for (const [bad, good] of ZH_TAI_TERMS) {
+        if (!zh.includes(bad)) continue;
+        (taiWarnOnly || TAI_WARN_SCOPE ? warn : err)(where, `zh-TW: "${bad}" should be "${good}" in reader-facing copy`);
+      }
+    }
+  }
+  if (typeof en === 'string' && en && EN_BAD_PUNCT.test(en)) err(where, `en: full-width punctuation in "${en.slice(0, 60)}…"`);
+}
+
+/** Walk any object and check every nested L10n value. */
+function walkL10n(where, obj, path = '', opts = {}) {
+  if (!obj || typeof obj !== 'object') return;
+  if (isL10n(obj)) return checkedL10n.has(obj) ? undefined : checkL10n(`${where}${path}`, obj, opts);
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === 'patterns') continue; // regex lists, not prose
+    if (v && typeof v === 'object') walkL10n(where, v, `${path}.${k}`, opts);
+  }
+}
+
+// Research references into the checked JSON files: 'papers/<file>#<id>' or 'redlight/<file>#<id>'.
+// Only CONFIRMED, CORRECTED or ADDED findings may back a registry entry.
+const FINDING_VERDICTS = new Set(['CONFIRMED', 'CORRECTED', 'ADDED']);
+const { readFileSync: readFs, existsSync: existsFs } = await import('node:fs');
+const jsonCache = new Map();
+function checkResearchRefs(where, research) {
+  if (typeof research !== 'string') return;
+  for (const m of research.matchAll(/\b(papers|redlight)\/([a-z0-9-]+)#([A-Za-z0-9._-]+)/g)) {
+    const [, dir, file, id] = m;
+    const key = `${dir}/${file}`;
+    if (!jsonCache.has(key)) {
+      const p = resolve(root, 'research', dir, `${file}.json`);
+      jsonCache.set(key, existsFs(p) ? JSON.parse(readFs(p, 'utf8')) : null);
+    }
+    const doc = jsonCache.get(key);
+    if (!doc) {
+      err(where, `research file research/${key}.json does not exist`);
+      continue;
+    }
+    const f = (doc.findings ?? []).find((x) => x.id === id);
+    if (!f) err(where, `research finding "${key}#${id}" not found`);
+    else if (!FINDING_VERDICTS.has(f.verdict)) err(where, `research finding "${key}#${id}" has verdict ${f.verdict}; only CONFIRMED, CORRECTED or ADDED may back a registry entry`);
+  }
+}
+
+function checkChainLink(where, obj, topicDefaults) {
+  const hasDefault = topicDefaults && Object.prototype.hasOwnProperty.call(topicDefaults, obj.topic);
+  if (obj.chainLink === undefined) {
+    if (!hasDefault) err(where, 'missing chainLink (1-7, or null for context outside the chain)');
+  } else if (obj.chainLink !== null && !CHAIN_LINKS.has(obj.chainLink)) err(where, `chainLink must be 1-7 or null, got ${obj.chainLink}`);
+  for (const l of obj.alsoLinks ?? []) {
+    if (!CHAIN_LINKS.has(l)) err(where, `alsoLinks contains invalid link ${l}`);
+    if (l === obj.chainLink) err(where, `alsoLinks repeats the primary chainLink ${l}`);
+  }
+}
+
+for (const [l, lab] of Object.entries(types.chainLinkLabels)) {
+  checkL10n(`chainLinkLabels.${l}.short`, lab.short);
+  checkL10n(`chainLinkLabels.${l}.question`, lab.question);
+}
+
+function citeSources(where, list, { required = true } = {}) {
+  if (!Array.isArray(list) || list.length === 0) {
+    if (required) err(where, 'no sources');
+    return;
+  }
+  const seen = new Set();
+  for (const id of list) {
+    if (seen.has(id)) err(where, `source "${id}" listed twice`);
+    seen.add(id);
+    if (!sourceIds.has(id)) err(where, `unknown source "${id}"`);
+    else cited.set(id, cited.get(id) + 1);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sources
+// ---------------------------------------------------------------------------
+
+for (const [id, s] of Object.entries(sources)) {
+  const w = `source ${id}`;
+  if (!ID_RE.test(id)) err(w, 'id must be kebab-case');
+  if (!sourceKinds.includes(s.kind)) err(w, `unknown kind "${s.kind}"`);
+  if (!readLevels.includes(s.readLevel)) err(w, `unknown readLevel "${s.readLevel}"`);
+  if (!s.url && !s.doi) err(w, 'needs a url or a doi');
+  if (s.url && !/^https:\/\/\S+$/.test(s.url)) err(w, `url must be https and contain no spaces: ${s.url}`);
+  if (s.doi && !/^10\.\d{4,9}\/\S+$/.test(s.doi)) err(w, `malformed doi "${s.doi}"`);
+  if (!s.title || !s.title.trim()) err(w, 'missing title');
+  if (!s.authors?.length && !s.org) err(w, 'needs authors or org');
+  if (s.org) checkL10n(`${w}.org`, s.org, { properNoun: true });
+  if (s.year !== undefined && !(Number.isInteger(s.year) && s.year > 1900 && s.year <= 2026)) err(w, `implausible year ${s.year}`);
+  if (s.date && !ISO_DATE_RE.test(s.date)) err(w, `date must be ISO (yyyy[-mm[-dd]]): ${s.date}`);
+  if (s.date && s.year && !s.date.startsWith(String(s.year))) err(w, `date ${s.date} does not match year ${s.year}`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s.accessed)) err(w, `accessed must be yyyy-mm-dd: ${s.accessed}`);
+  if (!['zh-TW', 'en'].includes(s.language)) err(w, `language must be zh-TW or en`);
+  if (s.language === 'zh-TW' && !s.titleTranslated) warn(w, 'Chinese title without an English translation');
+}
+
+// ---------------------------------------------------------------------------
+// Facts
+// ---------------------------------------------------------------------------
+
+const seenFact = new Map();
+for (const [topic, group] of Object.entries(factGroups)) {
+  if (!topicLabels[topic]) err(`topic ${topic}`, 'missing entry in topicLabels');
+  else checkL10n(`topicLabels.${topic}`, topicLabels[topic]);
+  for (const [id, f] of Object.entries(group)) {
+    const w = `fact ${id}`;
+    if (seenFact.has(id)) err(w, `duplicate id (also in topic "${seenFact.get(id)}")`);
+    seenFact.set(id, topic);
+    if (!ID_RE.test(id)) err(w, 'id must be kebab-case');
+    if (!CONFIDENCES.has(f.confidence)) err(w, `confidence must be 'verified' or 'secondary', got "${f.confidence}"`);
+    if (!EVIDENCE.has(f.evidence)) err(w, `unknown evidence "${f.evidence}"`);
+    const taiWarnOnly = topic === 'economics';
+    for (const key of ['display', 'statement', 'period', 'place']) checkL10n(`${w}.${key}`, f[key], { taiWarnOnly });
+    checkL10n(`${w}.caveat`, f.caveat, { optional: true, taiWarnOnly });
+    citeSources(w, f.sources);
+    if (!f.research) err(w, 'missing research reference');
+    checkResearchRefs(w, f.research);
+    checkChainLink(w, { ...f, topic }, topicDefaultChainLink);
+    if (f.requiresCaveat && !f.caveat) err(w, 'requiresCaveat is set but there is no caveat');
+    if (f.confidence === 'secondary' && !f.caveat) err(w, 'secondary facts must say in a caveat what they rest on');
+    if (f.evidence === 'derived') {
+      const hasDerivedDatum = Object.values(f.data ?? {}).some((d) => d.derived);
+      if (!f.derivedFrom?.length && !hasDerivedDatum) err(w, "evidence 'derived' needs derivedFrom or a datum marked derived");
+    }
+    for (const dep of f.derivedFrom ?? []) {
+      if (!factIds.has(dep)) err(w, `derivedFrom references unknown fact "${dep}"`);
+      if (dep === id) err(w, 'derivedFrom references itself');
+    }
+    if (!f.data || typeof f.data !== 'object') err(w, 'missing data object');
+    for (const [k, d] of Object.entries(f.data ?? {})) {
+      const dw = `${w}.data.${k}`;
+      if (typeof d.value !== 'number' || !Number.isFinite(d.value)) err(dw, 'value must be a finite number');
+      if (!UNITS.has(d.unit)) err(dw, `unknown unit "${d.unit}"`);
+      if (d.low !== undefined && d.high !== undefined && d.low > d.high) err(dw, `low ${d.low} > high ${d.high}`);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Series
+// ---------------------------------------------------------------------------
+
+for (const [id, s] of Object.entries(series)) {
+  const w = `series ${id}`;
+  if (!ID_RE.test(id)) err(w, 'id must be kebab-case');
+  if (!TOPICS.has(s.topic)) err(w, `unknown topic "${s.topic}"`);
+  if (!CONFIDENCES.has(s.confidence)) err(w, `confidence must be 'verified' or 'secondary', got "${s.confidence}"`);
+  if (!EVIDENCE.has(s.evidence)) err(w, `unknown evidence "${s.evidence}"`);
+  if (!UNITS.has(s.unit)) err(w, `unknown unit "${s.unit}"`);
+  const sTai = { taiWarnOnly: s.topic === 'economics' };
+  for (const key of ['title', 'description', 'period', 'place']) checkL10n(`${w}.${key}`, s[key], sTai);
+  for (const key of ['caveat', 'xLabel', 'yLabel']) checkL10n(`${w}.${key}`, s[key], { optional: true, ...sTai });
+  citeSources(w, s.sources);
+  if (!s.research) err(w, 'missing research reference');
+  checkResearchRefs(w, s.research);
+  checkChainLink(w, s, seriesTopicDefaultChainLink);
+  if (s.requiresCaveat && !s.caveat) err(w, 'requiresCaveat is set but there is no caveat');
+  if (s.confidence === 'secondary' && !s.caveat) err(w, 'secondary series must say in a caveat what they rest on');
+  for (const rf of s.relatedFacts ?? []) if (!factIds.has(rf)) err(w, `relatedFacts references unknown fact "${rf}"`);
+  const catKeys = s.categories ? new Set(s.categories.map((c) => c.key)) : null;
+  if (s.categories) {
+    if (catKeys.size !== s.categories.length) err(w, 'duplicate category keys');
+    s.categories.forEach((c, i) => {
+      checkL10n(`${w}.categories[${i}].label`, c.label);
+      checkL10n(`${w}.categories[${i}].note`, c.note, { optional: true });
+    });
+  }
+  if (!s.datasets?.length) err(w, 'no datasets');
+  const dsKeys = new Set();
+  let anySecondary = false;
+  for (const d of s.datasets ?? []) {
+    const dw = `${w}.datasets.${d.key}`;
+    if (dsKeys.has(d.key)) err(dw, 'duplicate dataset key');
+    dsKeys.add(d.key);
+    checkL10n(`${dw}.label`, d.label);
+    checkL10n(`${dw}.note`, d.note, { optional: true });
+    if (d.unit && !UNITS.has(d.unit)) err(dw, `unknown unit "${d.unit}"`);
+    if (d.confidence && !CONFIDENCES.has(d.confidence)) err(dw, `bad confidence "${d.confidence}"`);
+    if (d.evidence && !EVIDENCE.has(d.evidence)) err(dw, `bad evidence "${d.evidence}"`);
+    if (d.confidence === 'secondary') anySecondary = true;
+    const xs = new Set();
+    for (const p of d.points ?? []) {
+      const pw = `${dw}[x=${p.x}]`;
+      if (xs.has(p.x)) err(pw, 'duplicate x in dataset');
+      xs.add(p.x);
+      if (catKeys && !catKeys.has(String(p.x))) err(pw, `x "${p.x}" is not one of the series categories`);
+      if (p.y !== null && (typeof p.y !== 'number' || !Number.isFinite(p.y))) err(pw, 'y must be a finite number or null');
+      if (p.y === null && p.low === undefined && !p.note) err(pw, 'null y needs a note (why there is no value) or a low/high range');
+      if (p.low !== undefined && p.high !== undefined && p.low > p.high) err(pw, `low ${p.low} > high ${p.high}`);
+      for (const fl of p.flags ?? []) if (!FLAGS.has(fl)) err(pw, `unknown flag "${fl}"`);
+      if (p.confidence && !CONFIDENCES.has(p.confidence)) err(pw, `bad confidence "${p.confidence}"`);
+      if (p.confidence === 'secondary') anySecondary = true;
+      checkL10n(`${pw}.note`, p.note, { optional: true });
+      if (p.sources) citeSources(pw, p.sources);
+    }
+  }
+  if (anySecondary && s.confidence === 'verified' && !s.caveat) err(w, 'contains secondary points but has no caveat saying so');
+}
+
+// ---------------------------------------------------------------------------
+// Claims policy
+// ---------------------------------------------------------------------------
+
+for (const [id, r] of Object.entries(claimRules)) {
+  const w = `claim rule ${id}`;
+  if (!ID_RE.test(id)) err(w, 'id must be kebab-case');
+  if (!['do-not-claim', 'qualifier', 'correction'].includes(r.kind)) err(w, `unknown kind "${r.kind}"`);
+  if (!TOPICS.has(r.topic)) err(w, `unknown topic "${r.topic}"`);
+  checkL10n(`${w}.rule`, r.rule);
+  checkL10n(`${w}.why`, r.why);
+  checkL10n(`${w}.instead`, r.instead, { optional: true });
+  if (r.sources) citeSources(w, r.sources, { required: false });
+  for (const fid of r.facts ?? []) if (!factIds.has(fid)) err(w, `references unknown fact "${fid}"`);
+  for (const [loc, list] of Object.entries(r.patterns ?? {})) {
+    for (const src of list) {
+      try {
+        new RegExp(src, 'i');
+      } catch (e) {
+        err(w, `invalid ${loc} pattern /${src}/: ${e.message}`);
+      }
+    }
+  }
+  if (!r.research) err(w, 'missing research reference');
+  checkResearchRefs(w, r.research);
+  if (r.blueprintRule !== undefined && !/^R([1-9]|1[0-6])$/.test(r.blueprintRule)) err(w, `blueprintRule must be R1-R16, got ${r.blueprintRule}`);
+}
+for (let i = 1; i <= 16; i++) {
+  if (!Object.values(claimRules).some((r) => r.blueprintRule === `R${i}`)) err(`claims policy`, `blueprint copy rule R${i} has no claim rule (set blueprintRule on one)`);
+}
+
+// ---------------------------------------------------------------------------
+// Evidence gaps
+// ---------------------------------------------------------------------------
+
+const seriesIds = new Set(Object.keys(series));
+for (const [id, g] of Object.entries(gaps)) {
+  const w = `gap ${id}`;
+  if (!ID_RE.test(id) || !id.startsWith('gap-')) err(w, "id must be kebab-case and start with 'gap-'");
+  if (!CHAIN_LINKS.has(g.chainLink)) err(w, `chainLink must be 1-7, got ${g.chainLink}`);
+  for (const key of ['title', 'statement', 'whyItMatters', 'wouldClose']) checkL10n(`${w}.${key}`, g[key]);
+  checkL10n(`${w}.whoCouldMeasure`, g.whoCouldMeasure);
+  if (g.sources) citeSources(w, g.sources, { required: false });
+  for (const fid of g.closest?.facts ?? []) if (!factIds.has(fid)) err(w, `closest.facts references unknown fact "${fid}"`);
+  for (const sid of g.closest?.series ?? []) if (!seriesIds.has(sid)) err(w, `closest.series references unknown series "${sid}"`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(g.searchedOn ?? '')) err(w, 'searchedOn must be yyyy-mm-dd');
+  if (!g.research) err(w, 'missing research reference');
+  checkResearchRefs(w, g.research);
+}
+
+// ---------------------------------------------------------------------------
+// Economics dataset (src/data/econ): the calculator's inputs
+// ---------------------------------------------------------------------------
+
+let econ;
+try {
+  econ = (await load('src/data/econ/index.ts')).econData;
+} catch (e) {
+  err('econ', `could not load src/data/econ: ${e.message}`);
+}
+
+// Research findings that may feed a calculation: CONFIRMED, CORRECTED or ADDED. Round-two county
+// findings use the verdict REFUTED to mean "refutes a first-round 'no programme found'" while
+// reporting a VERIFIED official amount; those, and only those, are allow-listed here.
+const USABLE_VERDICTS = new Set(['CONFIRMED', 'CORRECTED', 'ADDED']);
+const REFUTATION_CORRECTIONS = new Set([
+  'counties-north-central-r2#changhua-new-purchase-v3',
+  'counties-north-central-r2#nantou-new-purchase-v3',
+  'counties-north-central-r2#hsinchucounty-new-heavy-v3',
+  'counties-north-central-r2#hsinchucounty-new-light-v3',
+  'counties-north-central-r2#hsinchucounty-swap-topup-v3',
+  'counties-north-central-r2#hsinchucounty-scrap-only-v3',
+  'counties-north-central-r2#keelung-swap-2stroke-heavy-v3',
+  'counties-north-central-r2#keelung-swap-2stroke-light-v3',
+  'counties-north-central-r2#keelung-swap-4stroke-heavy-v3',
+  'counties-north-central-r2#keelung-swap-4stroke-light-v3',
+  'counties-north-central-r2#keelung-new-heavy-v3',
+  'counties-north-central-r2#keelung-new-light-v3',
+]);
+const { readFileSync, existsSync } = await import('node:fs');
+const researchCache = new Map();
+function finding(ref) {
+  const [file, id] = ref.split('#');
+  if (!researchCache.has(file)) {
+    const p = resolve(root, 'research/econ', `${file}.json`);
+    researchCache.set(file, existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null);
+  }
+  const doc = researchCache.get(file);
+  if (!doc) return { missingFile: true };
+  if (!id) return { fileOnly: true };
+  return { f: doc.findings.find((x) => x.id === id) };
+}
+
+/** Validate one Provenance-like object. `feeds` = it can change a calculated number. */
+function checkProvenance(where, o, { feeds = true } = {}) {
+  citeSources(where, o.sources);
+  if (!CONFIDENCES.has(o.confidence)) err(where, `confidence must be 'verified' or 'secondary', got "${o.confidence}"`);
+  if (!Array.isArray(o.research) || o.research.length === 0) err(where, 'no research references');
+  for (const ref of o.research ?? []) {
+    const r = finding(ref);
+    if (r.missingFile) err(where, `research file for "${ref}" does not exist`);
+    else if (r.fileOnly) {
+      if (feeds) err(where, `research reference "${ref}" names a file, not a finding`);
+    } else if (!r.f) err(where, `research finding "${ref}" not found`);
+    else if (feeds && !USABLE_VERDICTS.has(r.f.verdict) && !REFUTATION_CORRECTIONS.has(ref)) {
+      err(where, `research finding "${ref}" has verdict ${r.f.verdict}; only CONFIRMED, CORRECTED or ADDED findings may feed a calculation`);
+    }
+  }
+  if (o.note !== undefined) checkL10n(`${where}.note`, o.note);
+}
+
+const isDate = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && !Number.isNaN(Date.parse(d));
+const nonNeg = (where, n) => {
+  if (typeof n !== 'number' || !Number.isFinite(n) || n < 0) err(where, `amount must be a non-negative number, got ${n}`);
+};
+
+if (econ) {
+  TAI_WARN_SCOPE = true;
+  const jIds = new Set(Object.keys(econ.jurisdictions));
+  const groupIds = new Set(Object.keys(econ.groups));
+  const planIds = new Set(econ.plans.map((p) => p.id));
+  const evIds = new Set(econ.evModels.map((m) => m.id));
+  const seenIds = new Set();
+  const uniqueId = (w, id) => {
+    if (!ID_RE.test(id)) err(w, 'id must be kebab-case');
+    if (seenIds.has(id)) err(w, 'duplicate id');
+    seenIds.add(id);
+  };
+  if (!isDate(econ.meta.checkedOn) || !isDate(econ.meta.programmeYearEnd)) err('econ meta', 'dates must be YYYY-MM-DD');
+  checkL10n('econ meta.nextYear', econ.meta.nextYear);
+
+  for (const [id, j] of Object.entries(econ.jurisdictions)) {
+    const w = `econ jurisdiction ${id}`;
+    if (j.id !== id) err(w, 'id mismatch');
+    if (!['verified', 'partly-verified', 'not-verified'].includes(j.status)) err(w, `bad status "${j.status}"`);
+    checkL10n(`${w}.name`, j.name);
+    checkL10n(`${w}.statusNote`, j.statusNote);
+    if (!j.officialLinks?.length) err(w, 'needs at least one official link a reader can check');
+    for (const l of j.officialLinks ?? []) {
+      checkL10n(`${w}.link`, l.label);
+      if (!/^https?:\/\/\S+$/.test(l.url)) err(w, `bad link ${l.url}`);
+    }
+    if (!isDate(j.checkedOn)) err(w, 'checkedOn must be YYYY-MM-DD');
+    const counted = econ.programmes.filter((p) => p.jurisdiction === id && p.calculator === true);
+    if (j.status === 'not-verified' && counted.length) err(w, `is not verified but has ${counted.length} programme(s) in the calculator`);
+  }
+  for (const [id, g] of Object.entries(econ.groups)) {
+    checkL10n(`econ group ${id}.label`, g.label);
+    if ((g.conservative || g.advisory) && !g.ambiguity) err(`econ group ${id}`, 'conservative or advisory groups must explain the ambiguity');
+    if (g.ambiguity) checkL10n(`econ group ${id}.ambiguity`, g.ambiguity);
+    if (g.sources) citeSources(`econ group ${id}`, g.sources);
+    for (const jj of g.jurisdictions ?? []) if (!jIds.has(jj)) err(`econ group ${id}`, `unknown jurisdiction "${jj}"`);
+  }
+
+  for (const p of econ.programmes) {
+    const w = `econ programme ${p.id}`;
+    uniqueId(w, p.id);
+    const feeds = p.calculator === true;
+    checkProvenance(w, p, { feeds: true });
+    if (p.jurisdiction !== 'central' && !jIds.has(p.jurisdiction)) err(w, `unknown jurisdiction "${p.jurisdiction}"`);
+    for (const key of ['name', 'conditionText', 'status2027']) checkL10n(`${w}.${key}`, p[key]);
+    // The payer is an agency's official name: it keeps the form its own documents use (臺北市政府…).
+    checkL10n(`${w}.payerName`, p.payerName, { properNoun: true });
+    if (p.applicationNote) checkL10n(`${w}.applicationNote`, p.applicationNote);
+    if (!isDate(p.validFrom)) err(w, `validFrom must be YYYY-MM-DD: ${p.validFrom}`);
+    if (!isDate(p.validTo)) err(w, `every programme needs a valid-to date (YYYY-MM-DD): ${p.validTo}`);
+    if (isDate(p.validFrom) && isDate(p.validTo) && p.validFrom > p.validTo) err(w, 'validFrom after validTo');
+    for (const k of ['applicationDeadline', 'confirmedThrough']) if (p[k] !== undefined && !isDate(p[k])) err(w, `${k} must be YYYY-MM-DD`);
+    if (!isDate(p.quota?.asOf)) err(w, 'quota.asOf must be YYYY-MM-DD');
+    checkL10n(`${w}.quota.text`, p.quota?.text);
+    if (p.quota?.sources) citeSources(`${w}.quota`, p.quota.sources);
+    const a = p.amount;
+    if (a.kind === 'fixed') nonNeg(`${w}.amount`, a.value);
+    else if (a.kind === 'per-battery') (nonNeg(`${w}.amount`, a.single), nonNeg(`${w}.amount`, a.double));
+    else if (a.kind === 'model-goods-tax-scrap') nonNeg(`${w}.amount`, a.max);
+    else err(w, `unknown amount kind ${a.kind}`);
+    if (feeds && a.kind === 'fixed' && a.value === 0) err(w, 'a counted programme pays 0; mark it calculator: { excluded }');
+    for (const g of p.exclusiveGroups ?? []) if (!groupIds.has(g)) err(w, `unknown group "${g}"`);
+    for (const r of p.requires?.anyOf ?? []) if (!econ.programmes.some((x) => x.id === r)) err(w, `requires unknown programme "${r}"`);
+    if (p.requires) checkL10n(`${w}.requires.text`, p.requires.text);
+    if (p.calculator !== true) checkL10n(`${w}.calculator.excluded`, p.calculator.excluded);
+    const walkCond = (c) => {
+      if (c.kind === 'region') for (const jj of c.jurisdictions) if (!jIds.has(jj)) err(w, `condition names unknown jurisdiction "${jj}"`);
+      if (c.kind === 'scrap-built') for (const d of [c.onOrBefore, c.onOrAfter]) if (d !== undefined && !isDate(d)) err(w, `bad date ${d}`);
+      if (c.kind === 'any-of') c.conditions.forEach(walkCond);
+    };
+    p.conditions.forEach(walkCond);
+  }
+
+  const checkPromo = (w, pr) => {
+    uniqueId(`${w} promo ${pr.id}`, pr.id);
+    checkProvenance(`${w} promo ${pr.id}`, pr);
+    nonNeg(`${w} promo ${pr.id}`, pr.amount);
+    if (!isDate(pr.validFrom) || !isDate(pr.validTo)) err(`${w} promo ${pr.id}`, 'dates must be YYYY-MM-DD');
+    checkL10n(`${w} promo ${pr.id}.name`, pr.name);
+    checkL10n(`${w} promo ${pr.id}.conditionText`, pr.conditionText);
+  };
+  for (const m of econ.gasModels) {
+    const w = `econ gas model ${m.id}`;
+    uniqueId(w, m.id);
+    const feeds = m.calculator === true;
+    checkL10n(`${w}.name`, m.name);
+    checkProvenance(`${w}.listPrice`, m.listPrice, { feeds });
+    nonNeg(`${w}.listPrice`, m.listPrice.value);
+    if (m.plateInsuranceIncluded) checkProvenance(`${w}.plateInsuranceIncluded`, m.plateInsuranceIncluded, { feeds });
+    checkProvenance(`${w}.goodsTaxScrapCut`, m.goodsTaxScrapCut, { feeds });
+    if (feeds && !m.fuelEconomy) err(w, 'a calculator model needs a fuel economy');
+    if (m.fuelEconomy) checkProvenance(`${w}.fuelEconomy`, m.fuelEconomy, { feeds });
+    m.promos.forEach((pr) => checkPromo(w, pr));
+  }
+  for (const m of econ.evModels) {
+    const w = `econ ev model ${m.id}`;
+    uniqueId(w, m.id);
+    const feeds = m.calculator === true;
+    checkL10n(`${w}.name`, m.name);
+    checkProvenance(`${w}.listPrice`, m.listPrice, { feeds });
+    nonNeg(`${w}.listPrice`, m.listPrice.value);
+    for (const k of ['plateClassBasis', 'moeaClassBasis']) checkProvenance(`${w}.${k}`, m[k], { feeds });
+    checkProvenance(`${w}.battery.basis`, m.battery.basis, { feeds });
+    checkProvenance(`${w}.efficiency`, m.efficiency, { feeds });
+    checkProvenance(`${w}.performance`, m.performance, { feeds: false });
+    if (!['yes', 'unknown'].includes(m.moeaListed)) err(w, 'moeaListed must be yes or unknown');
+    if (feeds && !m.battery.count) err(w, 'a calculator model needs a verified battery count');
+    for (const pid of m.plans) if (!planIds.has(pid)) err(w, `unknown plan "${pid}"`);
+    if (feeds && m.plans.length === 0) err(w, 'a calculator model needs at least one plan');
+    if (!econ.maintenance.some((x) => x.id === m.maintenance)) err(w, `unknown maintenance profile "${m.maintenance}"`);
+    m.promos.forEach((pr) => checkPromo(w, pr));
+  }
+  for (const p of econ.plans) {
+    const w = `econ plan ${p.id}`;
+    uniqueId(w, p.id);
+    checkProvenance(w, p, { feeds: p.calculator === true });
+    checkL10n(`${w}.name`, p.name);
+    checkL10n(`${w}.terms`, p.terms);
+    nonNeg(`${w}.monthlyFee`, p.monthlyFee);
+    if (p.setupFee) checkProvenance(`${w}.setupFee`, p.setupFee);
+    if (p.usage.kind === 'credit') checkProvenance(`${w}.allowance`, p.usage.allowance);
+    if (p.usage.kind === 'tariff') checkProvenance(`${w}.rate`, p.usage.rate);
+  }
+  for (const c of econ.planCredits) {
+    const w = `econ plan credit ${c.id}`;
+    uniqueId(w, c.id);
+    checkProvenance(w, c);
+    for (const pid of c.plans === 'any' ? [] : c.plans) if (!planIds.has(pid)) err(w, `unknown plan "${pid}"`);
+    for (const mid of c.models === 'any' ? [] : c.models) if (!evIds.has(mid)) err(w, `unknown model "${mid}"`);
+    if (!isDate(c.validFrom) || !isDate(c.validTo)) err(w, 'dates must be YYYY-MM-DD');
+  }
+  for (const k of ['petrol95', 'petrol92', 'smoothing', 'realWorldKmPerL']) checkProvenance(`econ fuel.${k}`, econ.fuel[k]);
+  checkProvenance('econ electricity', econ.electricity);
+  for (const m of econ.maintenance) {
+    const band = m.kind === 'per-km' ? m.perKm : m.perVisit;
+    checkProvenance(`econ maintenance ${m.id}`, band);
+    checkProvenance(`econ maintenance ${m.id}.ownerAverage`, m.ownerAverage);
+    if (band.low > band.typical || band.typical > band.high) err(`econ maintenance ${m.id}`, 'band must satisfy low <= typical <= high');
+    if (m.kind === 'visits') checkProvenance(`econ maintenance ${m.id}.intervalBasis`, m.intervalBasis);
+  }
+  for (const b of econ.fees.roadFeeGasoline) checkProvenance(`econ fees.roadFeeGasoline ${b.upToCc}`, b.perYear);
+  for (const k of ['roadFeeElectric', 'licenceTax', 'compulsoryInsurance', 'inspection']) checkProvenance(`econ fees.${k}`, econ.fees[k]);
+  checkProvenance('econ spendReference', econ.spendReference);
+
+  // Sweep every localized field in the dataset (brand and model names may be Latin in zh-TW).
+  walkL10n('econ', econ, '', { taiWarnOnly: true });
+  TAI_WARN_SCOPE = false;
+}
+
+// ---------------------------------------------------------------------------
+// Coverage
+// ---------------------------------------------------------------------------
+
+for (const [id, n] of cited) if (n === 0) err(`source ${id}`, 'is not cited by any fact, series or claim rule (remove it or cite it)');
+
+// Generic sweep for any localized field the targeted checks above did not reach.
+for (const [id, f] of Object.entries(facts)) walkL10n(`fact ${id}`, f);
+for (const [id, s] of Object.entries(series)) walkL10n(`series ${id}`, s);
+for (const [id, r] of Object.entries(claimRules)) walkL10n(`claim rule ${id}`, r);
+for (const [id, g] of Object.entries(gaps)) walkL10n(`gap ${id}`, g);
+
+// ---------------------------------------------------------------------------
+// Reader voice: no editor instructions in reader-facing text
+// ---------------------------------------------------------------------------
+// Pages print facts' captions, statements and caveats, series text and gap text to readers.
+// Instructions to editors ("never write…", "不可說成…", "只能用在證據頁…") belong in
+// `editorNote` (never rendered) or in claims-policy.ts. A reader-facing caveat states the limit
+// of the evidence in plain words a reader can use.
+
+const ZH_INSTRUCTION = [
+  /不可(?!能|思議|或缺|否認)/,
+  /不得/,
+  /只能用在/,
+  /請勿/,
+  /切勿/,
+  /絕不/,
+  /不應(?:該)?(?:寫|說|用|呈現|合併)/,
+  /不能說(?!明)/,
+  /不要(?:寫|說成|稱|合併|混用)/,
+];
+const EN_INSTRUCTION = [
+  /\bnever (?:write|say|present|show|use|call|merge|apply|rank|mix|print|quote|draw)\b/i,
+  /\bmust (?:not|never)\b/i,
+  /\bshould (?:be|not|never)\b/i,
+  /(?:^|[.;:!?]\s+|[,;]\s*(?:so|and|but)\s+)(?:do not|don't|never)\b(?!-)/i,
+  /\bdo not (?:merge|rank|mix|call|treat|count|compare|average|apply|use|write|say|share|translate|read|quote|show|present)\b/i,
+];
+/**
+ * Genuine uses: phrases that match a pattern above but are not instructions to editors.
+ * Keyed by the localized field's path prefix ('*' = anywhere); each phrase is removed before
+ * testing. Add an entry only after reading the sentence.
+ */
+const READER_VOICE_ALLOW = {
+  '*': [
+    '不可能', // "impossible"
+    '不得過戶', // a programme's own condition: the scooter may not be transferred
+    '不得遷出', // ... or moved out of the city
+    '不得疊加', // a programme's own rule: the schemes cannot be combined
+  ],
+  // Programme conditions quote the programme's own legal wording (不得再申請, 不得有…).
+  'econ.programmes': ['不得'],
+};
+function readerVoice(where, value, report = err) {
+  if (!isL10n(value)) return;
+  const allowed = Object.entries(READER_VOICE_ALLOW)
+    .filter(([k]) => k === '*' || where.startsWith(k))
+    .flatMap(([, list]) => list);
+  const clean = (s) => allowed.reduce((acc, p) => acc.split(p).join(''), s);
+  const zh = typeof value['zh-TW'] === 'string' ? clean(value['zh-TW']) : '';
+  const en = typeof value.en === 'string' ? clean(value.en) : '';
+  for (const re of ZH_INSTRUCTION) {
+    const m = zh.match(re);
+    if (m) report(where, `zh-TW: instruction to editors in reader-facing text ("${m[0]}"); state the limit for readers and move the instruction to editorNote or claims-policy.ts: "${zh.slice(0, 70)}…"`);
+  }
+  for (const re of EN_INSTRUCTION) {
+    const m = en.match(re);
+    if (m) report(where, `en: instruction to editors in reader-facing text ("${m[0].trim()}"); state the limit for readers and move the instruction to editorNote or claims-policy.ts: "${en.slice(0, 70)}…"`);
+  }
+}
+function walkReaderVoice(where, obj, report = err) {
+  if (!obj || typeof obj !== 'object') return;
+  if (isL10n(obj)) return readerVoice(where, obj, report);
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === 'editorNote' || k === 'patterns') continue;
+    if (v && typeof v === 'object') walkReaderVoice(`${where}.${k}`, v, report);
+  }
+}
+for (const [id, f] of Object.entries(facts)) walkReaderVoice(`fact ${id}`, f);
+for (const [id, s] of Object.entries(series)) walkReaderVoice(`series ${id}`, s);
+for (const [id, g] of Object.entries(gaps)) walkReaderVoice(`gap ${id}`, g);
+for (const [l, lab] of Object.entries(types.chainLinkLabels)) walkReaderVoice(`chainLinkLabels.${l}`, lab);
+walkReaderVoice('confidenceLabels', types.confidenceLabels);
+walkReaderVoice('evidenceLabels', types.evidenceLabels);
+if (econ) walkReaderVoice('econ', econ, warn); // owned elsewhere: warnings only
+for (const [id, f] of Object.entries(facts)) {
+  // Pages print a caveat beside every fact; without one they fall back to a generic line.
+  if (!f.caveat) err(`fact ${id}`, 'every fact needs a reader-facing caveat: one short, true statement of its scope or limit');
+  if (f.editorNote !== undefined && (typeof f.editorNote !== 'string' || !f.editorNote.trim())) err(`fact ${id}`, 'editorNote must be a non-empty string');
+}
+for (const [id, g] of Object.entries(gaps)) {
+  if (!g.whoCouldMeasure) err(`gap ${id}`, 'every gap needs whoCouldMeasure (the site\'s proposal: which body, with what instrument or study)');
+}
+
+// Dedupe messages produced by both the targeted checks and the sweep.
+const uniq = (a) => [...new Set(a)];
+const errs = uniq(errors);
+const warns = uniq(warnings);
+
+// ---------------------------------------------------------------------------
+// Report
+// ---------------------------------------------------------------------------
+
+const count = (list, key) => list.reduce((m, x) => ((m[x[key]] = (m[x[key]] ?? 0) + 1), m), {});
+const factArr = Object.values(facts);
+const seriesArr = Object.values(series);
+const seriesResolved = seriesMod.seriesList;
+const gapArr = Object.values(gaps);
+const summary = [
+  `sources ${sourceIds.size} ${JSON.stringify(count(Object.values(sources), 'readLevel'))}`,
+  `facts ${factArr.length} ${JSON.stringify(count(factArr, 'confidence'))} ${JSON.stringify(count(factArr, 'evidence'))}`,
+  `facts by chain link ${JSON.stringify(count(factArr, 'chainLink'))}`,
+  `series ${seriesArr.length} ${JSON.stringify(count(seriesArr, 'confidence'))} by chain link ${JSON.stringify(count(seriesResolved, 'chainLink'))}`,
+  `gaps ${gapArr.length} by chain link ${JSON.stringify(count(gapArr, 'chainLink'))}`,
+  `claim rules ${Object.keys(claimRules).length}`,
+].join('\n  ');
+
+if (warns.length) {
+  console.warn(`\n⚠ check-data: ${warns.length} warning(s)`);
+  for (const w of warns) console.warn(`  - ${w}`);
+}
+if (errs.length) {
+  console.error(`\n✖ check-data: ${errs.length} problem(s) in src/data — fix these before building:\n`);
+  for (const e of errs) console.error(`  ✖ ${e}`);
+  console.error(`\n  ${summary}\n`);
+  process.exit(1);
+}
+console.log(`✔ check-data: src/data is consistent\n  ${summary}`);

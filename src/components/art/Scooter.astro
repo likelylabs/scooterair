@@ -1,0 +1,59 @@
+---
+/**
+ * Scooter — a single scooter in side view, as a standalone drawing.
+ * The gasoline and electric versions share a wheelbase and stance so they can
+ * sit side by side in a comparison. Both are generic step-throughs: no real
+ * model's lines, no badge, no brand colour.
+ *
+ *   gas       a muffler, and one warm ribbon of fixed length at the tailpipe mouth
+ *   electric  a hub motor, a green light strip, and nothing behind the rear wheel
+ *
+ * Props
+ *   kind      'gas' | 'electric'
+ *   rider     seat a rider on it (default false)
+ *   face      give the rider a raised visor and a visible face (default false)
+ *   exhaust   gas only: draw the ribbon at the tailpipe mouth (default true)
+ *   flip      face left instead of right
+ *   label     accessible name; omit and the drawing is decorative
+ *   class     extra class
+ *
+ * The ribbon never varies: it marks where exhaust leaves, not how much.
+ */
+import '@/styles/art.css';
+import { TAILPIPE, ribbon, scooter } from './parts';
+
+interface Props {
+  kind: 'gas' | 'electric';
+  rider?: boolean;
+  face?: boolean;
+  exhaust?: boolean;
+  flip?: boolean;
+  label?: string;
+  animated?: boolean;
+  class?: string;
+}
+const { kind, rider = false, face = false, exhaust = true, flip = false, label, class: cls } = Astro.props;
+const body = (kind === 'gas' && exhaust ? `<g transform="translate(${TAILPIPE.x} ${TAILPIPE.y})">${ribbon()}</g>` : '') + scooter({ kind, rider, face });
+---
+
+<svg
+  class:list={['scooter-art', cls]}
+  viewBox="-90 -168 290 176"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  <g transform={flip ? 'translate(110 0) scale(-1 1)' : undefined}>
+    <path class="a-rule" d="M-90,0 H200"></path>
+    <Fragment set:html={body} />
+  </g>
+</svg>
+
+<style>
+  .scooter-art {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+</style>

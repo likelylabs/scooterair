@@ -1,0 +1,93 @@
+---
+/**
+ * Select — a labelled native <select>.
+ *
+ * Props
+ *   id       input id (required)
+ *   name     form field name (defaults to id)
+ *   label    visible label
+ *   options  { value: string; label: string }[]
+ *   value    initially selected value
+ *   hint     helper text under the label
+ * Any other attribute (data-*, required, autocomplete) is passed to the <select>.
+ * `data-money-city` marks it as the reader's city for the date-state utility
+ * (option values are JurisdictionIds; '' = not chosen).
+ */
+interface Props {
+  id: string;
+  name?: string;
+  label: string;
+  options: { value: string; label: string }[];
+  value?: string;
+  hint?: string;
+  class?: string;
+  [attr: string]: unknown;
+}
+const { id, name = id, label, options, value, hint, class: cls, ...rest } = Astro.props;
+---
+
+<div class:list={['field', cls]}>
+  <label class="field__label" for={id}>{label}</label>
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  <div class="select">
+    <select id={id} name={name} aria-describedby={hint ? `${id}-hint` : undefined} {...rest}>
+      {options.map((o) => <option value={o.value} selected={o.value === value}>{o.label}</option>)}
+    </select>
+  </div>
+</div>
+
+<style>
+  .select {
+    position: relative;
+  }
+  .select::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 1rem;
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+    border: solid var(--ink);
+    border-width: 0 2px 2px 0;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+  select {
+    appearance: none;
+    inline-size: 100%;
+    min-block-size: 3rem;
+    padding: 0 2.75rem 0 0.9rem;
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    font-weight: var(--fw-medium);
+    cursor: pointer;
+  }
+  select:hover {
+    border-color: var(--ink);
+  }
+</style>
+
+<style is:global>
+  /* Shared by every form control in src/components/ui */
+  .field {
+    display: grid;
+    gap: var(--sp-2);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .field__label {
+    padding: 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .field__hint {
+    margin-block-start: calc(var(--sp-1) * -1);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-3);
+  }
+</style>

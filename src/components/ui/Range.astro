@@ -1,0 +1,146 @@
+---
+/**
+ * Range — a number the reader sets: a number box (always there, works without
+ * JavaScript) plus a slider that appears and stays in sync when JavaScript is
+ * on. Listen for `input` on the number box (#id); the slider forwards to it.
+ *
+ * Props
+ *   id     id of the number input (required)
+ *   name   field name (defaults to id)
+ *   label  visible label
+ *   min, max, step   numbers
+ *   value  starting number. Leave it out to start empty: the box is blank (showing
+ *          `placeholder`), the slider's thumb is hollow and parked at `min` until the
+ *          reader sets a number, and the box submits no value. Clearing the box
+ *          returns to that state.
+ *   placeholder  shown in the empty number box (e.g. "300")
+ *   unit   unit shown after the number box ("公里/月")
+ *   hint   helper text under the label
+ */
+interface Props {
+  id: string;
+  name?: string;
+  label: string;
+  min: number;
+  max: number;
+  step?: number;
+  value?: number;
+  placeholder?: string;
+  unit?: string;
+  hint?: string;
+  class?: string;
+}
+const { id, name = id, label, min, max, step = 1, value, placeholder, unit, hint, class: cls } = Astro.props;
+const empty = value === undefined || value === null || Number.isNaN(value);
+---
+
+<div class:list={['field', 'range', empty && 'range--empty', cls]} data-range>
+  <label class="field__label" for={id}>{label}</label>
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  <div class="range__row">
+    <input class="range__slider" type="range" min={min} max={max} step={step} value={empty ? min : value} aria-label={label} tabindex="-1" data-js-only />
+    <span class="range__num">
+      <input id={id} name={name} type="number" inputmode="decimal" min={min} max={max} step={step} value={empty ? undefined : value} placeholder={placeholder} aria-describedby={hint ? `${id}-hint` : undefined} />
+      {unit && <span class="range__unit">{unit}</span>}
+    </span>
+  </div>
+</div>
+
+<style>
+  .range__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3) var(--sp-4);
+  }
+  .range__slider {
+    flex: 1 1 10rem;
+    min-inline-size: 0;
+    block-size: var(--tap);
+    margin: 0;
+    background: none;
+    accent-color: var(--ink);
+    cursor: pointer;
+    appearance: none;
+  }
+  .range__slider::-webkit-slider-runnable-track {
+    block-size: 6px;
+    background: var(--line-strong);
+    border-radius: 3px;
+  }
+  .range__slider::-moz-range-track {
+    block-size: 6px;
+    background: var(--line-strong);
+    border-radius: 3px;
+  }
+  .range__slider::-webkit-slider-thumb {
+    appearance: none;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    margin-block-start: calc(3px - 0.875rem);
+    border: 3px solid var(--bg);
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  .range__slider::-moz-range-thumb {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+    border: 3px solid var(--bg);
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  /* no value yet: a hollow thumb, so the slider does not claim a number nobody chose */
+  .range--empty .range__slider::-webkit-slider-thumb {
+    background: var(--bg);
+  }
+  .range--empty .range__slider::-moz-range-thumb {
+    background: var(--bg);
+  }
+  .range__num {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .range__num input {
+    inline-size: 6.5rem;
+    min-block-size: 3rem;
+    padding: 0 0.75rem;
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    font-weight: var(--fw-bold);
+    text-align: end;
+  }
+  .range__num input:hover {
+    border-color: var(--ink);
+  }
+  .range__unit {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-range]').forEach((root) => {
+    const slider = root.querySelector<HTMLInputElement>('input[type="range"]');
+    const number = root.querySelector<HTMLInputElement>('input[type="number"]');
+    if (!slider || !number) return;
+    slider.addEventListener('input', () => {
+      number.value = slider.value;
+      root.classList.remove('range--empty');
+      number.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    const sync = () => {
+      // an empty box is a state of its own: hollow thumb, parked at the minimum
+      const blank = number.value === '';
+      root.classList.toggle('range--empty', blank);
+      slider.value = blank ? slider.min : number.value;
+    };
+    number.addEventListener('input', sync);
+    // a value restored by the browser (back button, autofill) or set by a script before this ran
+    if (number.value !== '' || root.classList.contains('range--empty')) sync();
+  });
+</script>

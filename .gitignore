@@ -10,3 +10,15 @@ xcuserdata/
 local.properties
 .idea/
 .claude/settings.local.json
+dist/
+.astro/
+
+# Stray downloads from research runs; sources are cited by URL, not vendored
+/*.pdf
+/*.html
+/*.htm
+/*.txt
+/*.xml
+/*.xlsx
+/*.csv
+/*.zip

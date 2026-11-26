@@ -1,0 +1,246 @@
+/*
+ * Illustration classes. Parts in src/components/art/parts.ts only ever use
+ * these classes, so every drawing re-themes with the --art-* tokens.
+ * `--here` is the surface behind the drawing (set by tones), used for cut-outs.
+ */
+.a-ink { fill: var(--art-ink); }
+.a-deep { fill: var(--art-deep); }
+.a-far { fill: var(--art-far); }
+.a-bg { fill: var(--here); }
+.a-exh { fill: var(--art-haze); }
+.a-clean { fill: var(--clean); }
+.a-yellow { fill: var(--art-yellow); }
+.a-red { fill: var(--art-red); }
+.a-road { fill: var(--art-road); }
+.a-paint { fill: var(--art-paint); }
+.a-plane { fill: var(--art-fill); }
+.a-ink-s,
+.a-deep-s,
+.a-metal-s,
+.a-clean-s,
+.a-line,
+.a-rule {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.a-ink-s { stroke: var(--art-ink); }
+.a-deep-s { stroke: var(--art-deep); }
+.a-metal-s { stroke: var(--art-metal); }
+.a-clean-s { stroke: var(--clean); }
+.a-line { stroke: var(--art-line); stroke-width: 1.5; }
+.a-rule { stroke: var(--ink-3); stroke-width: 1.5; }
+.a-rule--dot { stroke-dasharray: 0.1 6; stroke-width: 2.2; }
+
+/* Depth: the second and third rows of a pack are the same drawings, lighter. */
+.a-row-2 {
+  --art-ink: var(--art-far);
+  --art-deep: var(--art-far);
+  --art-metal: var(--art-far);
+}
+.a-row-3 {
+  --art-ink: var(--art-far-2);
+  --art-deep: var(--art-far-2);
+  --art-metal: var(--art-far-2);
+  --art-far: var(--art-far-2);
+}
+.a-row-2 :is(.a-red, .a-exh),
+.a-row-3 :is(.a-red, .a-exh, .a-clean, .a-clean-s) {
+  opacity: 0.55;
+}
+
+/* ---- Air: three things, three treatments -------------------------------- */
+/* What you smell: fumes, as wavy ribbons */
+.a-fumes path {
+  fill: none;
+  stroke: var(--art-haze);
+  stroke-linecap: round;
+}
+/* The gas you can't smell (CO): hollow rings */
+.a-co circle {
+  fill: none;
+  stroke: var(--art-co);
+  stroke-width: 1.4;
+}
+/* The particles you can't see (ultrafines): pin-point stipple */
+.a-ufp path {
+  fill: var(--art-ufp);
+  opacity: 0.5;
+}
+.a-wash-stop { stop-color: var(--art-haze); }
+.a-glow-stop { stop-color: var(--art-red); }
+
+.a-curl {
+  fill: none;
+  stroke: var(--art-haze);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+.a-puff {
+  fill: var(--art-haze);
+  opacity: 0;
+}
+
+/* Breathing point: a ring around each mouth, pulsing at breathing pace */
+.a-breath {
+  fill: none;
+  stroke: var(--signal-red);
+  stroke-width: 2.6;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.is-clean .a-breath { stroke: var(--clean); }
+
+.a-label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: var(--here);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.a-led-red { fill: var(--art-red); }
+.a-led-green { fill: var(--art-green); }
+/* LED dots drawn as dashes (parts.ts ledDots): one near-zero dash per dot, capped round */
+.a-dots { fill: none; stroke-linecap: round; }
+.a-dots.a-led-red { fill: none; stroke: var(--art-red); }
+.a-dots.a-led-green { fill: none; stroke: var(--art-green); }
+.a-lamp-off { fill: var(--art-lamp-off); }
+.a-housing { fill: #0d1113; stroke: #3d474d; stroke-width: 1; }
+
+/* ---- Motion: slow, and only when welcome -------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .a-animated .a-puff {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: a-puff 3.6s linear infinite;
+  }
+  .a-animated .a-drift-1 { animation: a-drift 17s ease-in-out infinite alternate; }
+  .a-animated .a-drift-2 { animation: a-drift 23s ease-in-out infinite alternate-reverse; }
+  .a-animated .a-drift-3 { animation: a-drift 31s ease-in-out infinite alternate; }
+  .a-animated .a-breath { animation: a-breathe 4.2s ease-in-out infinite; }
+}
+@keyframes a-puff {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.35); }
+  14% { opacity: 0.42; }
+  100% { opacity: 0; transform: translate(-48px, -18px) scale(2.3); }
+}
+@keyframes a-drift {
+  from { transform: translate(-16px, 1px); }
+  to { transform: translate(16px, -3px); }
+}
+@keyframes a-breathe {
+  0%, 100% { transform: scale(0.85); opacity: 0.75; }
+  45% { transform: scale(1.18); opacity: 1; }
+}
+/* There is deliberately no animation that changes how much air pollution is drawn
+   (blueprint R11). The drift and puff keyframes above serve only the deprecated
+   Haze kinds and are not used by StreetScene, Scooter or any red-light frame. */
+
+/* ==== Second air vocabulary (see parts.ts) =================================
+ * Nothing here encodes an amount. The hatch has one pitch, the rings one
+ * count, the stipple one density, the ribbons one length.
+ */
+/* "exhaust present, amount not measured" */
+.a-hatch {
+  fill: none;
+  stroke: var(--art-haze);
+  stroke-width: 1.7;
+  opacity: 0.8;
+}
+.a-hatch-edge {
+  fill: none;
+  stroke: var(--art-haze-2);
+  stroke-width: 2;
+  stroke-dasharray: 9 7;
+}
+/* warm ribbon: tailpipe mouths only */
+.a-ribbon path {
+  fill: none;
+  stroke: var(--art-haze);
+  stroke-linecap: round;
+}
+/* a figure that must stay separate from what is behind it */
+.a-halo {
+  stroke: var(--here);
+  stroke-width: 2.5;
+  paint-order: stroke;
+}
+/* in-frame text: ink with a surface-coloured halo, never on a plate */
+.a-text {
+  font-family: var(--font-body);
+  font-weight: 700;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--here);
+  stroke-width: 0.32em;
+  stroke-linejoin: round;
+}
+.a-text--quiet {
+  font-weight: 500;
+  fill: var(--ink-2);
+}
+.a-text--exhaust {
+  fill: var(--exhaust-ink);
+}
+.a-text--clean {
+  fill: var(--clean-ink);
+}
+.a-leader {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.a-band-fill {
+  fill: var(--art-haze);
+  opacity: 0.1;
+}
+.a-kerb {
+  fill: var(--art-fill);
+  stroke: var(--art-line);
+  stroke-width: 1.5;
+}
+.a-dim {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.a-instrument {
+  fill: var(--here);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+/* ---- plan view (ApproachPlan, MeasurementDiagram) ------------------------- */
+.plan-box {
+  fill: none;
+  stroke: var(--art-paint);
+  stroke-width: 5;
+}
+.plan-yellow {
+  fill: none;
+  stroke: var(--art-yellow);
+  stroke-width: 3;
+}
+.plan-lane {
+  fill: none;
+  stroke: var(--art-paint);
+  stroke-width: 4;
+  stroke-dasharray: 22 18;
+}
+.a-ribbon-s {
+  fill: none;
+  stroke: var(--art-haze);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.plan-n {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 900;
+  fill: var(--ink);
+}

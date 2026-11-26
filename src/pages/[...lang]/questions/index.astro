@@ -1,0 +1,128 @@
+---
+/**
+ * /questions/ — 路口的八個問題 / Eight questions at the crossing (blueprint 4.2).
+ * The landing surface for search and LINE: eight questions in the reader's own words, each
+ * with its one-sentence answer and evidence badge, in the order of the chain so that reading
+ * down the list walks the argument. Then the two questions answered on other pages (the money,
+ * the evidence) and the whole chain in seven lines.
+ *
+ * Copy: src/i18n/pages/questions.ts. No calculator button here (R9): the money question is a
+ * card that goes to /electric/.
+ */
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import Card from '@/components/ui/Card.astro';
+import ChainStrip from '@/components/ui/ChainStrip.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import { chainOrder } from '@/components/pages/questions/q';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { chain, questions as qui } from '@/i18n/ui';
+import questions from '@/i18n/pages/questions';
+import { fill, localize } from '@/i18n/pages/_copy';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const t = localize(questions, locale);
+const I = t.index;
+const plain = (s: string) => s.replaceAll('|', '');
+const items = chainOrder.map((slug) => ({
+  slug,
+  q: plain(t.items[slug].q),
+  answer: t.items[slug].answer,
+  badges: questions.items[slug].badges,
+  link: questions.items[slug].link,
+  eyebrow: fill(t.page.linkWithName, { n: questions.items[slug].link, name: chain.links[questions.items[slug].link - 1][locale] }),
+}));
+---
+
+<Base locale={locale} title={plain(I.title)} description={I.description} share="brief">
+  <header class="qi-head">
+    <div class="container container--prose qi-head__inner">
+      <h1 class="display qi-title"><Phrased text={I.title} /></h1>
+      <p class="lead">{I.lead}</p>
+    </div>
+  </header>
+
+  <div class="container container--wide">
+    <ol class="qi-list" aria-label={plain(I.title)}>
+      {items.map((it) => (
+        <li>
+          <Card title={it.q} href={href(`/questions/${it.slug}/`, locale)} eyebrow={it.eyebrow} level={2}>
+            <p class="qi-answer"><span class="vh">{I.answerLabel}: </span>{it.answer}</p>
+            <Fragment slot="footer">{it.badges.map((k) => <EvidenceBadge locale={locale} kind={k} />)}</Fragment>
+          </Card>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <Section id="other" title={I.otherTitle} width="wide" pad="tight">
+    <div class="grid qi-other">
+      <Card title={I.afford.q} href={href('/electric/', locale)} eyebrow={I.afford.more} tone="sunken" level={3}>
+        <p>{I.afford.answer}</p>
+      </Card>
+      <Card title={I.evidence.q} href={href('/evidence/', locale)} eyebrow={I.evidence.more} tone="sunken" level={3}>
+        <p>{I.evidence.answer}</p>
+      </Card>
+    </div>
+  </Section>
+
+  <Section id="chain" title={I.chainTitle} lead={I.chainLead} width="prose" tone="sunken">
+    <ChainStrip locale={locale} />
+    <p class="qi-ask"><a href={href(qui.askMeasurePath, locale)}>{qui.askMeasure[locale]}<Icon name="arrow-right" size="1.05em" /></a></p>
+  </Section>
+</Base>
+
+<style>
+  .qi-head {
+    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-6);
+  }
+  .qi-head__inner {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .qi-title {
+    font-size: clamp(2.25rem, 9vw, 4rem);
+    line-height: 1.1;
+  }
+  .qi-list {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0 0 var(--sp-6);
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 48em) {
+    .qi-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--sp-5);
+    }
+  }
+  .qi-list > li {
+    display: grid;
+  }
+  .qi-answer {
+    line-height: 1.65;
+  }
+  .qi-other {
+    --min: 17rem;
+  }
+  .qi-ask {
+    margin-block-start: var(--sp-5);
+  }
+  .qi-ask a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-block-size: 2.75rem;
+    font-weight: var(--fw-bold);
+  }
+  /* Chinese titles wrap between phrases (after punctuation), never inside 「良好」 */
+  :is(.qi-list, .qi-other) :global(.card__title:lang(zh-Hant-TW)) {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+</style>

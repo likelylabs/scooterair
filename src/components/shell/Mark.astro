@@ -1,0 +1,43 @@
+---
+/**
+ * Mark — the logo glyph on its own, themed with CSS variables.
+ * A green signal dot (a head in clear air) above three exhaust strata that
+ * thicken toward the ground. public/favicon.svg is the same drawing on an
+ * asphalt tile with fixed colours.
+ *
+ * Props
+ *   size  CSS length, default '1.5rem'
+ */
+interface Props {
+  size?: string;
+}
+const { size = '1.5rem' } = Astro.props;
+---
+
+<svg class="mark" viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
+  <circle class="mark__dot" cx="12" cy="5" r="4.5"></circle>
+  <rect class="mark__s1" x="1" y="12" width="22" height="2"></rect>
+  <rect class="mark__s2" x="1" y="15.5" width="22" height="3"></rect>
+  <rect class="mark__s3" x="1" y="20" width="22" height="4"></rect>
+</svg>
+
+<style>
+  .mark {
+    flex: none;
+    display: block;
+  }
+  .mark__dot {
+    fill: var(--clean);
+  }
+  .mark__s1,
+  .mark__s2,
+  .mark__s3 {
+    fill: var(--exhaust);
+  }
+  .mark__s1 {
+    opacity: 0.45;
+  }
+  .mark__s2 {
+    opacity: 0.72;
+  }
+</style>

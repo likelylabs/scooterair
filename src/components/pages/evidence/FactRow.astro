@@ -1,0 +1,212 @@
+---
+/**
+ * FactRow — one fact as a row of the five-column evidence table (blueprint 4.5):
+ * 我們說什麼 · 數字 · 誰做的、怎麼做的 · 證據類型 · 這項研究沒有說什麼.
+ * The last column is never empty: the registry caveat, or, where the registry records none,
+ * the one line that is true of every fact of that evidence type. A caveat the registry marks
+ * as required is set beside the number and flagged. The row carries the anchor #<fact id>.
+ *
+ * On a phone each row is a block with its column names; from 60em it lines up as a table row
+ * under the header printed by the list (see FactList).
+ *
+ * Props
+ *   locale  Locale
+ *   id      FactId
+ *   as      'li' (default) | 'div'
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { evidenceBadge } from '@/i18n/ui';
+import { facts, getSource, type FactId } from '@/data';
+import Cite from '@/components/ui/Cite.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import evidenceCopy from '@/i18n/pages/evidence';
+import { localize } from '@/i18n/pages/_copy';
+import { cites, lf, readLabel, sourceShort } from './ev';
+import Mixed from './Mixed.astro';
+
+interface Props {
+  locale: Locale;
+  id: FactId;
+  as?: 'li' | 'div';
+}
+const { locale, id, as = 'li' } = Astro.props;
+const T = localize(evidenceCopy, locale);
+const C = T.columns;
+const f = lf(id, locale);
+const b = evidenceBadge(f.evidence, f.confidence);
+const srcs = cites(facts[id].sources);
+const notShow = f.caveat ?? T.row.noCaveat[f.evidence];
+const colon = locale === 'en' ? ': ' : '：';
+const Tag = as;
+---
+
+<Tag class:list={['frow', f.requiresCaveat && 'frow--must']} id={id}>
+  <article class="frow__inner" aria-labelledby={`${id}-say`}>
+    <dl class="frow__dl">
+      <div class="frow__cell frow__say">
+        <dt class="frow__dt">{C.say}</dt>
+        <dd id={`${id}-say`}>
+          <Mixed text={f.statement} locale={locale} />{srcs.map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}
+        </dd>
+      </div>
+      <div class="frow__cell frow__num">
+        <dt class="frow__dt">{C.number}</dt>
+        <dd><span class="frow__display"><Mixed text={f.display} locale={locale} /></span></dd>
+      </div>
+      <div class="frow__cell frow__who">
+        <dt class="frow__dt">{C.who}</dt>
+        <dd>
+          <ul class="frow__srcs">
+            {srcs.map((c) => (
+              <li>
+                <a href={href(`/sources/#${c.id}`, locale)}>[{c.n}] {sourceShort(c.id, locale)}</a>
+                <span class="frow__read"> · {readLabel(getSource(c.id), locale)}</span>
+              </li>
+            ))}
+          </ul>
+          <p class="frow__meta"><span>{T.row.when}</span>{f.period}</p>
+          <p class="frow__meta"><span>{T.row.where}</span><Mixed text={f.place} locale={locale} /></p>
+        </dd>
+      </div>
+      <div class="frow__cell frow__kind">
+        <dt class="frow__dt">{C.kind}</dt>
+        <dd><EvidenceBadge locale={locale} kind={b.kind} secondary={b.secondary} /></dd>
+      </div>
+      <div class="frow__cell frow__not">
+        <dt class="frow__dt">{C.notShow}</dt>
+        <dd>
+          {f.requiresCaveat && <strong class="frow__must">{T.row.mustRead}{colon}</strong>}
+          <Mixed text={notShow} locale={locale} />
+        </dd>
+      </div>
+    </dl>
+    <a class="frow__link" href={`#${id}`} aria-label={`${T.row.permalink}: ${f.display}`}>#</a>
+  </article>
+</Tag>
+
+<style>
+  .frow {
+    list-style: none;
+    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+  }
+  .frow__inner {
+    position: relative;
+    padding: var(--sp-4) 0 var(--sp-5);
+    border-block-start: 1px solid var(--line);
+  }
+  .frow:target .frow__inner {
+    background: var(--mark-bg);
+    box-shadow: 0 0 0 var(--sp-2) var(--mark-bg);
+  }
+  .frow__dl {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding-inline-end: var(--sp-6);
+  }
+  .frow__cell {
+    min-inline-size: 0;
+  }
+  .frow__dt {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+    margin-block-end: var(--sp-1);
+  }
+  .frow__dt:lang(en) {
+    text-transform: uppercase;
+  }
+  .frow dd {
+    margin: 0;
+  }
+  .frow__say dd {
+    font-size: var(--fs-base);
+    line-height: var(--lh-body);
+  }
+  .frow__display {
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-md);
+    line-height: var(--lh-snug);
+    font-variant-numeric: tabular-nums;
+  }
+  .frow__srcs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--sp-1);
+    display: grid;
+    gap: var(--sp-1);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .frow__srcs a {
+    color: var(--accent);
+    font-weight: var(--fw-bold);
+  }
+  .frow__read {
+    color: var(--ink-2);
+  }
+  .frow__meta {
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .frow__meta span {
+    font-weight: var(--fw-bold);
+    margin-inline-end: 0.25em;
+  }
+  .frow__not dd {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+    padding-inline-start: var(--sp-3);
+    border-inline-start: 2px solid var(--line-strong);
+  }
+  .frow--must .frow__not dd {
+    color: var(--ink);
+    border-inline-start: 3px solid var(--exhaust);
+  }
+  .frow__must {
+    color: var(--ink);
+    margin-inline-end: 0.25em;
+  }
+  .frow__link {
+    position: absolute;
+    inset-block-start: var(--sp-3);
+    inset-inline-end: 0;
+    display: grid;
+    place-items: center;
+    inline-size: var(--tap, 44px);
+    block-size: var(--tap, 44px);
+    margin: calc(var(--sp-2) * -1);
+    color: var(--ink-3);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+  }
+  .frow__link:hover,
+  .frow__link:focus-visible {
+    color: var(--accent);
+  }
+  @media (min-width: 60em) {
+    .frow__dl {
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 0.9fr) minmax(0, 2fr);
+      gap: var(--sp-5);
+      align-items: start;
+    }
+    .frow__dt {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .frow__say dd {
+      font-size: var(--fs-sm);
+    }
+    .frow__display {
+      font-size: var(--fs-base);
+    }
+  }
+</style>

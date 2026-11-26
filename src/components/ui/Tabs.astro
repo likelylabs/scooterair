@@ -1,0 +1,131 @@
+---
+/**
+ * Tabs — progressively enhanced tabs. Children are <TabPanel>s.
+ * Without JavaScript every panel is shown in order under its own heading.
+ * With it, the headings become a tab list (arrow keys, Home/End).
+ *
+ * Props
+ *   label  accessible name of the tab list
+ * Slot
+ *   default  <TabPanel> children
+ *
+ *   <Tabs label={t.tabsLabel}>
+ *     <TabPanel id="taipei" label="台北市"> … </TabPanel>
+ *     <TabPanel id="kaohsiung" label="高雄市"> … </TabPanel>
+ *   </Tabs>
+ */
+interface Props {
+  label: string;
+  class?: string;
+}
+const { label, class: cls } = Astro.props;
+---
+
+<sa-tabs class:list={['tabs', cls]} data-label={label}>
+  <slot />
+</sa-tabs>
+
+<style is:global>
+  .tabs {
+    display: block;
+  }
+  .tabs__list {
+    display: flex;
+    gap: var(--sp-1);
+    margin-block-end: var(--sp-5);
+    overflow-x: auto;
+    border-block-end: 1px solid var(--line-strong);
+    scrollbar-width: none;
+  }
+  .tabs__tab {
+    flex: none;
+    min-block-size: var(--tap);
+    padding: 0 var(--sp-4);
+    border: 0;
+    border-block-end: var(--rule-paint) solid transparent;
+    margin-block-end: -1px;
+    background: none;
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+  }
+  .tabs__tab:hover {
+    color: var(--ink);
+  }
+  .tabs__tab[aria-selected='true'] {
+    color: var(--ink);
+    border-block-end-color: var(--ink);
+  }
+  .tabs__tab:focus-visible {
+    outline-offset: -3px;
+  }
+  /* no-JS: stacked panels with visible headings */
+  .tabpanel + .tabpanel {
+    margin-block-start: var(--sp-7);
+  }
+  .tabpanel__title {
+    margin-block-end: var(--sp-3);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+  }
+  .tabs[data-enhanced] .tabpanel {
+    margin-block-start: 0;
+  }
+  .tabs[data-enhanced] .tabpanel__title {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+</style>
+
+<script>
+  class SaTabs extends HTMLElement {
+    connectedCallback() {
+      const panels = [...this.querySelectorAll<HTMLElement>(':scope > .tabpanel')];
+      if (panels.length < 2 || this.dataset.enhanced !== undefined) return;
+      const list = document.createElement('div');
+      list.className = 'tabs__list';
+      list.setAttribute('role', 'tablist');
+      list.setAttribute('aria-label', this.dataset.label ?? '');
+      const fromHash = panels.findIndex((p) => `#${p.id}` === location.hash);
+      const tabs = panels.map((panel, i) => {
+        const tab = document.createElement('button');
+        tab.type = 'button';
+        tab.className = 'tabs__tab';
+        tab.id = `${panel.id}-tab`;
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-controls', panel.id);
+        tab.textContent = panel.dataset.label ?? '';
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', tab.id);
+        panel.tabIndex = 0;
+        tab.addEventListener('click', () => select(i, true));
+        list.append(tab);
+        return tab;
+      });
+      const select = (index: number, focus = false) => {
+        tabs.forEach((tab, i) => {
+          const on = i === index;
+          tab.setAttribute('aria-selected', String(on));
+          tab.tabIndex = on ? 0 : -1;
+          panels[i].hidden = !on;
+        });
+        if (focus) tabs[index].focus();
+      };
+      list.addEventListener('keydown', (e) => {
+        const cur = tabs.findIndex((tab) => tab.getAttribute('aria-selected') === 'true');
+        const next = { ArrowRight: cur + 1, ArrowLeft: cur - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (next === undefined) return;
+        e.preventDefault();
+        select((next + tabs.length) % tabs.length, true);
+      });
+      this.prepend(list);
+      this.dataset.enhanced = '';
+      select(fromHash >= 0 ? fromHash : 0);
+    }
+  }
+  if (!customElements.get('sa-tabs')) customElements.define('sa-tabs', SaTabs);
+</script>

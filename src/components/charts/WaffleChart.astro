@@ -1,0 +1,31 @@
+---
+/**
+ * WaffleChart — a unit chart for "N in 100" statements: one cell per unit,
+ * filled from the bottom row up. Counts are named in the legend.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale         Locale
+ *   parts          { value: number; label: string; tone: Tone }[]  — usually one part
+ *   restLabel      what the unfilled cells are
+ *   total          number of cells (default 100)
+ *   cols           cells per row (default 10)
+ *   categoryLabel, valueLabel   data-table headers
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderWaffle, type WaffleProps } from './core/waffle';
+
+type Props = WaffleProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderWaffle(props as WaffleProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

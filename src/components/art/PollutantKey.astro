@@ -1,0 +1,106 @@
+---
+/**
+ * PollutantKey — the legend for how the site draws air. Four marks, none of
+ * which encodes an amount:
+ *
+ *   hatch   hatched band    exhaust present, amount not measured
+ *   fumes   warm ribbons    the tailpipe mouth: where the smell comes out
+ *   co      hollow rings    carbon monoxide: no smell; a marker of exhaust
+ *   ufp     fine stipple    ultrafine particles in traffic, not only from scooters
+ *
+ * Put it under any scene. Copy comes from art.key (src/i18n/art.ts) and
+ * follows the blueprint's rules: nothing is ranked by harm, the stipple is
+ * traffic's, and the note says the marks never change with the countdown.
+ *
+ * Props
+ *   locale  Locale
+ *   layers  which marks to show, in order (default all four)
+ *   note    show the "drawn the same in every frame" line (default true)
+ *   items   full override: { kind, title, body }[]
+ *   class   extra class
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+import { hatchBand, ribbon, ringsInBand, stipple } from './parts';
+
+type Kind = 'hatch' | 'fumes' | 'co' | 'ufp';
+interface Props {
+  locale: Locale;
+  layers?: Kind[];
+  note?: boolean;
+  items?: { kind: Kind; title: string; body: string }[];
+  class?: string;
+}
+const { locale, layers = ['hatch', 'fumes', 'co', 'ufp'], note = true, class: cls } = Astro.props;
+const items = Astro.props.items ?? layers.map((kind) => ({ kind, title: art.key[kind].title[locale], body: art.key[kind].body[locale] }));
+const swatch: Record<Kind, string> = {
+  hatch: hatchBand({ x0: 0, width: 96, top: 40, pitch: 9 }),
+  fumes: `<circle class="a-exh" cx="80" cy="-22" r="4.5"/><g transform="translate(78 -22) scale(1.25)">${ribbon()}</g>`,
+  co: `<g class="a-co">${ringsInBand({ width: 96, count: 7, top: 50, seed: 4 })}</g>`,
+  ufp: `<g class="a-ufp">${stipple({ width: 96, top: -56, bottom: 0, seed: 8, cell: 13 })}</g>`,
+};
+---
+
+<div class:list={['pkey', cls]}>
+  <ul class="pkey__list">
+    {items.map((item) => (
+      <li class="pkey__item">
+        <svg class="pkey__swatch" viewBox="0 -56 96 56" aria-hidden="true" focusable="false" set:html={swatch[item.kind]} />
+        <div>
+          <p class="pkey__title">{item.title}</p>
+          <p class="pkey__body">{item.body}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+  {note && <p class="pkey__note">{art.key.note[locale]}</p>}
+</div>
+
+<style>
+  .pkey {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .pkey__list {
+    display: grid;
+    gap: var(--sp-4) var(--sp-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pkey__item {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: var(--sp-3);
+    align-items: start;
+  }
+  .pkey__swatch {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    overflow: hidden;
+    border-block-end: 2px solid var(--ink);
+  }
+  .pkey__title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .pkey__body {
+    margin-block-start: 0.15em;
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .pkey__note {
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    color: var(--ink);
+    max-inline-size: 44rem;
+  }
+</style>

@@ -1,0 +1,152 @@
+---
+/**
+ * EvidenceBadge — what kind of evidence stands behind a claim. Eight kinds
+ * (blueprint Part 2): the registry's six evidence types plus two for the
+ * site's own voice. Each is told apart three ways, never by colour alone:
+ * its words, its icon and its edge.
+ *
+ *   measured-tw    solid, filled     crosshair   台灣實測 / Measured in Taiwan
+ *   official-tw    solid, filled     building    台灣官方資料 / Official Taiwan data
+ *   modelled-tw    solid, outline    curve       台灣模式推估 / Modelled for Taiwan
+ *   international  solid, outline    globe       國際證據 / International evidence
+ *   market-tw      thin, tinted      price tag   市場公開價格 / Published prices
+ *   derived        dashed            sums        本站計算 / Our arithmetic
+ *   inference      dashed            arrow       我們的推論 / Our inference
+ *   gap            open brackets     hollow ends 沒人量過 / Nobody has measured this
+ *
+ * The six registry labels come from src/data/types.ts (`evidenceLabels`), so
+ * the registry stays the single source of the wording.
+ *
+ * Props
+ *   kind       EvidenceKind (see above). `level` is accepted as an alias, and
+ *              the old names 'measured' / 'established' still resolve.
+ *   locale     Locale
+ *   secondary  true when the fact's registry confidence is 'secondary': adds
+ *              the small 次級來源 / Secondary tag
+ *   variant    'full' (default: icon + words) | 'icon' (icon in its edge; the
+ *              words stay for screen readers and as a tooltip)
+ *   label      override the words
+ *
+ * From a registry fact:
+ *   <EvidenceBadge locale={locale} {...evidenceBadge(fact.evidence, fact.confidence)} />
+ * Explain the kinds once per page with <EvidenceLegend>.
+ */
+import type { Locale } from '@/i18n';
+import { evidence, toEvidenceKind, type EvidenceLevel } from '@/i18n/ui';
+import { evidenceIconSvg } from './evidence';
+
+interface Props {
+  kind?: EvidenceLevel;
+  level?: EvidenceLevel;
+  locale: Locale;
+  secondary?: boolean;
+  variant?: 'full' | 'icon';
+  label?: string;
+  class?: string;
+}
+const { locale, secondary = false, variant = 'full', class: cls } = Astro.props;
+const raw = Astro.props.kind ?? Astro.props.level;
+if (!raw) throw new Error('EvidenceBadge: pass `kind`.');
+const kind = toEvidenceKind(raw);
+const label = Astro.props.label ?? evidence.kinds[kind].label[locale];
+const icon = variant === 'icon';
+---
+
+<span class:list={['ev-wrap', cls]}>
+  <span class:list={['ev', `ev--${kind}`, icon && 'ev--icon']} title={icon ? label : undefined}>
+    <span class="vh">{evidence.heading[locale]}: </span>
+    <Fragment set:html={evidenceIconSvg(kind)} />
+    <span class:list={[icon && 'vh']}>{label}</span>
+  </span>{secondary && <span class="ev-sec" title={evidence.secondary.help[locale]}>{evidence.secondary.label[locale]}</span>}
+</span>
+
+<style>
+  .ev-wrap {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3em 0.4em;
+    vertical-align: middle;
+    max-inline-size: 100%;
+  }
+  .ev {
+    --b: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.2em 0.6em 0.2em 0.45em;
+    border: var(--b) solid var(--ink);
+    border-radius: var(--radius-1);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.45;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .ev :global(svg) {
+    flex: none;
+    inline-size: 1.15em;
+    block-size: 1.15em;
+  }
+  .ev--icon {
+    padding: 0.25em;
+  }
+  /* solid, filled: Taiwan measurements and official data */
+  .ev--measured-tw,
+  .ev--official-tw {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  /* solid, outline: modelled and international — the base style */
+  /* published prices: never on the chain; a thin edge on a tinted ground */
+  .ev--market-tw {
+    --b: 1.5px;
+    border-color: var(--line-strong);
+    background: var(--bg-sunken);
+    padding-block: calc(0.2em + 0.5px);
+  }
+  /* dashed: our own sums and our own inference */
+  .ev--derived,
+  .ev--inference {
+    border-style: dashed;
+  }
+  /* open break: the edge is drawn only at the two ends, like [ ] */
+  .ev--gap {
+    border-color: transparent;
+    border-radius: 0;
+    background:
+      linear-gradient(var(--ink) 0 0) left top / var(--b) 100% no-repeat,
+      linear-gradient(var(--ink) 0 0) right top / var(--b) 100% no-repeat,
+      linear-gradient(var(--ink) 0 0) left top / 0.6em var(--b) no-repeat,
+      linear-gradient(var(--ink) 0 0) left bottom / 0.6em var(--b) no-repeat,
+      linear-gradient(var(--ink) 0 0) right top / 0.6em var(--b) no-repeat,
+      linear-gradient(var(--ink) 0 0) right bottom / 0.6em var(--b) no-repeat;
+    background-origin: border-box;
+  }
+  .ev--gap.ev--icon {
+    padding-inline: 0.45em;
+  }
+  .ev-sec {
+    padding: 0.1em 0.4em;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.45;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  @media (forced-colors: active) {
+    .ev--gap {
+      border-style: dotted;
+      border-color: CanvasText;
+    }
+  }
+  @media print {
+    .ev--measured-tw,
+    .ev--official-tw {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>

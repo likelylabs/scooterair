@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>行人呼吸 ScooterAir</title>
+  <!-- An asphalt tile with fixed colours. On a dark tab strip the tile lifts a step so its edge still shows. -->
+  <style>@media (prefers-color-scheme: dark) { .tile { fill: #2a3237 } }</style>
+  <rect class="tile" width="32" height="32" rx="6" fill="#101416"/>
+  <circle cx="16" cy="9" r="4.25" fill="#1fd6b0"/>
+  <rect x="6" y="16.5" width="20" height="2" fill="#d9933f" opacity=".5"/>
+  <rect x="6" y="20" width="20" height="3" fill="#d9933f" opacity=".78"/>
+  <rect x="6" y="24.5" width="20" height="4" fill="#d9933f"/>
+</svg>

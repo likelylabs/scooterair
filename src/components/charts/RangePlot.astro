@@ -1,0 +1,40 @@
+---
+/**
+ * RangePlot — a dot for the central value on a bar from minimum to maximum.
+ * For measurements that vary a lot (personal exposure, prices): it shows the
+ * spread honestly instead of one average.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale         Locale
+ *   data           { label: string; min: number; max: number; mid?: number; tone?: Tone }[]
+ *                  Leave `mid` out when the source gives only a span (a range of
+ *                  correlations, a low–high estimate): no dot is drawn and the row prints
+ *                  the span, so the chart never invents a centre. Values may be negative.
+ *   labels         { min, mid?, max } words for the numbers (say whether mid is a median or a mean)
+ *   unit, max, tone, decimals
+ *   min            axis start. A range plot shows position, not length, so it may start
+ *                  above zero: the chart then rules an axis with ticks and draws the
+ *                  axis-break mark where zero was cut off. With negative values the
+ *                  axis is ruled too, with a line at zero.
+ *   axis           true = rule the axis with ticks on a zero-based plot as well
+ *   reference      { value, label } vertical reference line (e.g. "no difference" at 0 or 1)
+ *   categoryLabel  data-table header for the label column
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderRange, type RangePlotProps } from './core/range';
+
+type Props = RangePlotProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderRange(props as RangePlotProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

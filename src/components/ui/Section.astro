@@ -1,0 +1,77 @@
+---
+/**
+ * Section — the standard page block: vertical rhythm, a container, and an
+ * optional head (eyebrow, title, lead).
+ *
+ * Props
+ *   id       anchor id (also labels the section via its title)
+ *   tone     'default' | 'sunken' | 'surface' | 'exhaust' | 'clean' | 'inverse'
+ *   width    'page' (default, 76rem) | 'wide' (60rem) | 'prose' (one text column)
+ *   eyebrow  short kicker above the title
+ *   title    section title; may contain '|' phrase marks (see Phrased)
+ *   lead     intro paragraph
+ *   level    heading level, 2 (default) or 3
+ *   pad      'normal' | 'tight' | 'none'
+ *   rule     draw a stop-line rule across the top of the section
+ * Slots
+ *   default  the content
+ *   head     replaces the generated head entirely
+ */
+import Phrased from './Phrased.astro';
+
+interface Props {
+  id?: string;
+  tone?: 'default' | 'sunken' | 'surface' | 'exhaust' | 'clean' | 'inverse';
+  width?: 'page' | 'wide' | 'prose';
+  eyebrow?: string;
+  title?: string;
+  lead?: string;
+  level?: 2 | 3;
+  pad?: 'normal' | 'tight' | 'none';
+  rule?: boolean;
+  class?: string;
+}
+const { id, tone = 'default', width = 'page', eyebrow, title, lead, level = 2, pad = 'normal', rule = false, class: cls } = Astro.props;
+const H = `h${level}` as 'h2' | 'h3';
+const titleId = id && title ? `${id}-title` : undefined;
+const container = width === 'page' ? 'container' : `container container--${width}`;
+---
+
+<section id={id} class:list={['section', `section--pad-${pad}`, tone !== 'default' && `tone-${tone}`, cls]} aria-labelledby={titleId}>
+  <div class={container}>
+    {rule && <hr class="stopline section__rule" />}
+    {Astro.slots.has('head') ? (
+      <slot name="head" />
+    ) : (
+      (eyebrow || title || lead) && (
+        <header class="section__head">
+          {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+          {title && <H id={titleId} class="section__title"><Phrased text={title} /></H>}
+          {lead && <p class="lead">{lead}</p>}
+        </header>
+      )
+    )}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section--pad-normal {
+    padding-block: var(--section-y);
+  }
+  .section--pad-tight {
+    padding-block: calc(var(--section-y) / 2);
+  }
+  .section__rule {
+    margin-block-end: var(--sp-5);
+  }
+  .section__head {
+    display: grid;
+    gap: var(--sp-3);
+    margin-block-end: var(--sp-6);
+    max-inline-size: 46rem;
+  }
+  .section__head .lead {
+    margin-block-start: var(--sp-1);
+  }
+</style>

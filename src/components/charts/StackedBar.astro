@@ -1,0 +1,37 @@
+---
+/**
+ * StackedBar — 100% stacked bar(s): how a whole splits into parts. One row
+ * for a single split, several rows to compare splits (e.g. share of PM2.5 vs
+ * share of CO vs share of hydrocarbons by vehicle type).
+ * Parts are separated by a gap in the surface colour. Every share is printed:
+ * under its own segment when all of them fit there; otherwise (a 1.3% sliver)
+ * each value gets a chip in its segment's colour and the values are spaced out
+ * in order under the bar, on a second line if needed. No share is ever hidden.
+ *
+ * Props (plus title, desc, id, class)
+ *   locale         Locale
+ *   series         { label: string; tone: Tone }[]  — ≤ 6 parts, fixed order; use tone 'neutral' for "other"
+ *   rows           { label: string; values: number[] }[]  — raw values or shares; normalised per row
+ *   decimals       decimals for the percentages (default 0)
+ *   categoryLabel  data-table header for the row column
+ *
+ * To compare close values across parts, use BarChart instead.
+ */
+import type { Locale } from '@/i18n';
+import ChartShell from './ChartShell.astro';
+import { renderStacked, type StackedBarProps } from './core/stacked';
+
+type Props = StackedBarProps & {
+  /** accessible name of the graphic */
+  title: string;
+  /** the takeaway in one sentence, for screen readers */
+  desc?: string;
+  /** id on the wrapper, needed if a script will redraw the chart */
+  id?: string;
+  class?: string;
+  locale: Locale;
+};
+const { title, desc, id, class: cls, ...props } = Astro.props;
+---
+
+<ChartShell render={renderStacked(props as StackedBarProps)} title={title} desc={desc} locale={props.locale} id={id} class={cls} />

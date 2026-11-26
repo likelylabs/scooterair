@@ -1,0 +1,105 @@
+---
+/**
+ * FactList — the five-column evidence table for one link: a header row (shown from 60em,
+ * where the rows line up as columns), the first `visible` rows, and the rest behind a native
+ * <details> so a phone reader is not handed forty rows at once. A link to any row inside the
+ * closed part opens it (native in current browsers; a small script covers the rest).
+ *
+ * Props
+ *   locale   Locale
+ *   ids      FactId[] in the order to show (strongest first)
+ *   link     chain link number, for the "show the rest" label
+ *   visible  rows shown before the fold (default 6)
+ */
+import type { Locale } from '@/i18n';
+import type { FactId } from '@/data';
+import evidenceCopy from '@/i18n/pages/evidence';
+import { fill, localize } from '@/i18n/pages/_copy';
+import Icon from '@/components/ui/Icon.astro';
+import FactRow from './FactRow.astro';
+
+interface Props {
+  locale: Locale;
+  ids: FactId[];
+  link?: number;
+  visible?: number;
+}
+const { locale, ids, link, visible = 6 } = Astro.props;
+const T = localize(evidenceCopy, locale);
+const C = T.columns;
+const head = ids.slice(0, visible);
+const rest = ids.slice(visible);
+---
+
+<div class="flist">
+  <div class="flist__head" aria-hidden="true">
+    <span>{C.say}</span><span>{C.number}</span><span>{C.who}</span><span>{C.kind}</span><span>{C.notShow}</span>
+  </div>
+  <ol class="flist__rows">
+    {head.map((id) => <FactRow locale={locale} id={id} />)}
+  </ol>
+  {rest.length > 0 && (
+    <details class="flist__more" data-ev-fold>
+      <summary>
+        <span>{fill(T.row.more, { n: link ?? '', count: rest.length })}</span>
+        <Icon name="chevron-down" size="1.25rem" />
+      </summary>
+      <ol class="flist__rows" start={visible + 1}>
+        {rest.map((id) => <FactRow locale={locale} id={id} />)}
+      </ol>
+    </details>
+  )}
+</div>
+
+<style>
+  .flist__rows {
+    padding: 0;
+    margin: 0;
+  }
+  .flist__head {
+    display: none;
+  }
+  @media (min-width: 60em) {
+    .flist__head {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 0.9fr) minmax(0, 2fr);
+      gap: var(--sp-5);
+      padding-block: var(--sp-2);
+      padding-inline-end: var(--sp-6);
+      border-block-end: 2px solid var(--ink);
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-caps);
+      color: var(--ink-2);
+    }
+    .flist__head span:lang(en) {
+      text-transform: uppercase;
+    }
+  }
+  .flist__more {
+    border-block-start: 1px solid var(--line);
+  }
+  .flist__more > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap, 44px);
+    padding-block: var(--sp-3);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    cursor: pointer;
+    list-style: none;
+  }
+  .flist__more > summary::-webkit-details-marker {
+    display: none;
+  }
+  .flist__more[open] > summary :global(svg) {
+    transform: rotate(180deg);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .flist__more > summary :global(svg) {
+      transition: transform var(--dur-1, 0.15s) ease;
+    }
+  }
+</style>

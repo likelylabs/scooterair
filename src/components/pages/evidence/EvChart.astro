@@ -1,0 +1,42 @@
+---
+/**
+ * EvChart — hands one of /evidence/'s ChartRenders (./charts.ts, or a shared core render)
+ * to the shared ChartShell, so it gets the same title, description, hover readout and data
+ * table as every chart on the site.
+ *
+ * Props
+ *   render  ChartRender
+ *   title   accessible name of the graphic
+ *   desc    the takeaway in one sentence, for screen readers
+ *   locale  Locale
+ */
+import type { Locale } from '@/i18n';
+import type { ChartRender } from '@/components/charts/core/shared';
+import ChartShell from '@/components/charts/ChartShell.astro';
+
+interface Props {
+  render: ChartRender;
+  title: string;
+  desc?: string;
+  locale: Locale;
+}
+const { render, title, desc, locale } = Astro.props;
+---
+
+<ChartShell render={render} title={title} desc={desc} locale={locale} />
+
+<style is:global>
+  /* marks the source itself qualifies (not significant / failed the model check): an outline */
+  .chart .evc-hollow {
+    fill: var(--bg);
+    stroke-width: 1.5;
+  }
+  .tone-sunken .chart .evc-hollow {
+    fill: var(--bg-sunken);
+  }
+  /* a block of the surface behind labels, so a reference line never runs through them */
+  .chart .evc-bg {
+    fill: var(--here, var(--bg));
+    stroke: none;
+  }
+</style>

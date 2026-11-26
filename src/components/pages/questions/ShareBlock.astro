@@ -1,0 +1,116 @@
+---
+/**
+ * ShareBlock — the share card of a question page (V44), shown on the page so the reader sees
+ * exactly what they will send: the question, the short answer, the caveat line and the badge,
+ * all inside the image. Links: send the page on LINE, open either card image, and (with
+ * JavaScript) copy the page's link. Everything but the copy button works without JavaScript.
+ *
+ * Props
+ *   locale  Locale
+ *   id      share-card id ('smell', 'my-child', … or 'brief')
+ */
+import type { Locale } from '@/i18n';
+import { asset, htmlLang } from '@/i18n';
+import { shareCard, type ShareCardId } from '@/lib/share-cards';
+import Icon from '@/components/ui/Icon.astro';
+import { ui } from '@/i18n/ui';
+import questions from '@/i18n/pages/questions';
+
+interface Props {
+  locale: Locale;
+  id: ShareCardId;
+}
+const { locale, id } = Astro.props;
+const P = questions.page;
+const card = shareCard(id, locale);
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const line = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}`;
+---
+
+<div class="share">
+  <img class="share__img" src={asset(card.square)} width="1080" height="1080" alt={card.alt} loading="lazy" decoding="async" lang={htmlLang[locale]} />
+  <div class="share__side">
+    <p class="share__lead">{P.shareLead[locale]}</p>
+    <ul class="share__links">
+      <li><a class="share__line" href={line} target="_blank" rel="noopener noreferrer">{P.shareLine[locale]}<Icon name="arrow-up-right" size="1.05em" /><span class="vh">{ui.externalLink[locale]}</span></a></li>
+      <li><a href={asset(card.square)}>{P.shareOpen[locale]}</a></li>
+      <li><a href={asset(card.wide)}>{P.shareWide[locale]}</a></li>
+      <li class="share__copy" hidden><button type="button" data-copy={pageUrl} data-done={P.shareCopied[locale]}>{P.shareCopy[locale]}</button><span class="share__status" role="status"></span></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.share__copy button[data-copy]').forEach((btn) => {
+    if (!navigator.clipboard) return;
+    const li = btn.closest('li');
+    if (li) li.hidden = false;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy ?? location.href);
+        const s = li?.querySelector('.share__status');
+        if (s) s.textContent = btn.dataset.done ?? '';
+      } catch {
+        /* clipboard refused: the links above still work */
+      }
+    });
+  });
+</script>
+
+<style>
+  .share {
+    display: grid;
+    gap: var(--sp-5);
+    align-items: start;
+  }
+  @media (min-width: 40em) {
+    .share {
+      grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+      gap: var(--sp-6);
+    }
+  }
+  .share__img {
+    inline-size: 100%;
+    max-inline-size: 20rem;
+    block-size: auto;
+    border: 1px solid var(--line);
+  }
+  .share__side {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .share__lead {
+    max-inline-size: 36rem;
+  }
+  .share__links {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .share__links a,
+  .share__links button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-block-size: 2.75rem;
+    font-weight: var(--fw-bold);
+  }
+  .share__links button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    font: inherit;
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+  }
+  .share__status {
+    margin-inline-start: var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+</style>

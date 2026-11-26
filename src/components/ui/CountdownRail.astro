@@ -1,0 +1,431 @@
+---
+/**
+ * CountdownRail — the 44px strip under the header (V2), and the only thing
+ * that is ever pinned. LED count · seven pips · the current link's name; the
+ * whole strip is a button that opens the jump menu (the seven links, 接起來,
+ * 算錢, 行動).
+ *
+ * Put ONE on a page, in Base's `rail` slot:
+ *
+ *   <Base locale={locale} …>
+ *     <CountdownRail slot="rail" locale={locale} />
+ *     <Chapter id="top" count={90} … />
+ *     <Chapter id="link-1" link={1} … />      ← count defaults to the blueprint's 90 → 78
+ *   </Base>
+ *
+ * How it works
+ *   - Every <Chapter> prints data-rail-* attributes. A small script reads them,
+ *     finds the chapter under the reading line and shows its count, pip and
+ *     name. The count interpolates with scroll progress inside the chapter
+ *     (chain.countdown in ui.ts holds the allocation). Above the first chapter
+ *     (a page that opens with a hero or an index) no link is current: the LED
+ *     shows dashes, no pip is ringed and the strip reads rail.menu ("跳到章節").
+ *   - Without JavaScript the LED is not rendered at all (a frozen "90" would be
+ *     wrong three chapters down). The strip is then a plain <details> jump menu,
+ *     and each chapter's kicker prints its own count as text.
+ *   - The LED is aria-hidden and nothing here is a live region: a screen reader
+ *     gets the count from each chapter's kicker, once, where it belongs.
+ *   - Fixed height, single line, name truncates: it cannot shift the layout.
+ *     No transitions, so nothing to switch off for reduced motion.
+ *
+ * Props
+ *   locale   Locale
+ *   page     locale-neutral path of the page whose chapters the menu jumps to
+ *            (default '/'; use '/evidence/' there). Anchors are #link-1 … #link-7.
+ *   current  pre-select link n in the static markup (for a page about one link)
+ *   count    show this count in the static LED (only with `current`; pages that
+ *            scroll through chapters leave it out)
+ *   items    replace the extra menu rows: { href: string; label: string }[]
+ *            (default 接起來 → {page}#connect, 算錢 → /#money, 行動 → /act/)
+ */
+import { href as link, type Locale } from '@/i18n';
+import { chain, rail, t } from '@/i18n/ui';
+import { ledDigitRuns } from '@/components/art/parts';
+import Icon from './Icon.astro';
+import { pipSvg, pipsBody, pipsWidth } from './pips';
+
+interface Props {
+  locale: Locale;
+  page?: string;
+  current?: number;
+  count?: number;
+  items?: { href: string; label: string }[];
+  class?: string;
+}
+const { locale, page = '/', current, count, class: cls } = Astro.props;
+const total = chain.links.length;
+const W = pipsWidth(total);
+const to = (hash: string) => link(`${page}#${hash}`, locale);
+const items = Astro.props.items ?? [
+  { href: to(chain.anchors.connect), label: rail.connect[locale] },
+  { href: link(`/#${chain.anchors.money}`, locale), label: rail.money[locale] },
+  { href: link('/act/', locale), label: rail.act[locale] },
+];
+const digits = '0123456789'.split('');
+const shown = count !== undefined ? String(Math.max(0, Math.min(99, Math.round(count)))).padStart(2, '0') : null;
+const text_name = (n: number) => (n === total ? chain.breakable[locale] : chain.links[n - 1][locale]);
+const text = {
+  link: chain.linkN[locale],
+  links: chain.links.map((l, i) => (i === total - 1 ? chain.breakable[locale] : l[locale])),
+  jump: rail.jump[locale],
+};
+const idleKicker = current ? t(chain.linkN, locale, { n: current }) : '';
+/** The strip's label when it is not on a chapter: without JavaScript, and above the first chapter. */
+const menuLabel = rail.menu[locale];
+const idleName = current ? text_name(current) : menuLabel;
+---
+
+<nav class:list={['rail', cls]} aria-label={rail.label[locale]} data-rail data-text={JSON.stringify({ ...text, idle: menuLabel })}>
+  <details class="rail__menu">
+    <summary class="rail__bar">
+      <span class="container rail__row">
+        <span class="rail__led" aria-hidden="true" data-js-only={shown ? undefined : ''} data-phase={shown ? 'red' : 'off'}>
+          <svg viewBox="0 0 26 18" width="39" height="27" focusable="false">
+            {[0, 1].map((pos) => (
+              <g data-led={pos}>
+                <path class="rail__dash" d={`M${3 + pos * 12},9h6`} data-on={shown ? undefined : ''} />
+                {digits.map((d) => <path class="rail__digit" d={ledDigitRuns(d, 2, 2 + pos * 12, 3)} data-d={d} data-on={shown && shown[pos] === d ? '' : undefined} />)}
+              </g>
+            ))}
+          </svg>
+        </span>
+        <svg class="pips rail__pips" viewBox={`0 0 ${W} 18`} width={W} height="18" aria-hidden="true" focusable="false" set:html={pipsBody(current)} />
+        <span class="rail__now">
+          <span class="rail__kicker" data-rail-kicker>{idleKicker}</span>
+          <span class="rail__name" data-rail-name>{idleName}</span>
+        </span>
+        <span class="rail__chev"><Icon name="chevron-down" size="1.25rem" /></span>
+      </span>
+    </summary>
+    <div class="rail__panel">
+      <div class="container rail__lists">
+        <ol class="rail__links">
+          {chain.links.map((l, i) => (
+            <li>
+              <a href={to(chain.anchor(i + 1))} data-rail-item={i + 1}>
+                <Fragment set:html={pipSvg(chain.summary[i].pip)} />
+                <span class="rail__n">{i + 1}</span>
+                <span>{i === total - 1 ? chain.breakable[locale] : l[locale]}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <ul class="rail__more">
+          {items.map((it) => (
+            <li><a href={it.href}>{it.label}<Icon name="arrow-right" size="1.1rem" /></a></li>
+          ))}
+        </ul>
+        <ul class="rail__key" aria-hidden="true">
+          {(['filled', 'outline', 'open', 'go'] as const).map((k) => (
+            <li><Fragment set:html={pipSvg(k)} />{rail.pips[k][locale]}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </details>
+</nav>
+
+<style>
+  .rail {
+    position: sticky;
+    inset-block-start: calc(var(--header-h) + 1px); /* the header's hairline */
+    z-index: 40;
+    block-size: var(--rail-h);
+    background: var(--bg);
+    border-block-end: 1px solid var(--line-strong);
+    font-size: var(--fs-sm);
+    line-height: 1.2;
+  }
+  .rail__bar {
+    display: block;
+    block-size: calc(var(--rail-h) - 1px);
+    list-style: none;
+    cursor: pointer;
+  }
+  .rail__bar::-webkit-details-marker {
+    display: none;
+  }
+  .rail__bar:focus-visible {
+    outline-offset: -3px;
+  }
+  .rail__row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    block-size: 100%;
+    min-inline-size: 0;
+  }
+  /* LED: the same dot-matrix as the pedestrian signal, on its dark housing in both themes */
+  .rail__led {
+    flex: none;
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2rem;
+    border-radius: var(--radius-1);
+    background: var(--asphalt-950);
+  }
+  .rail__digit,
+  .rail__dash {
+    visibility: hidden;
+  }
+  /* each run of lit dots is one short line; the dash pattern turns it into dots (see parts.ts ledRuns) */
+  .rail__digit {
+    fill: none;
+    stroke: var(--signal-red-led);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 0.01 1.99;
+  }
+  .rail__dash {
+    fill: none;
+    stroke: var(--asphalt-600);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+  .rail__led [data-on] {
+    visibility: visible;
+  }
+  .rail__led[data-phase='green'] .rail__digit {
+    stroke: var(--signal-green-led);
+  }
+  .rail__led[data-phase='paused'] .rail__digit {
+    stroke: var(--asphalt-300);
+  }
+  .rail__now {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+    flex: 1;
+    min-inline-size: 0;
+    white-space: nowrap;
+  }
+  .rail__kicker {
+    flex: none;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+  }
+  .rail__kicker:lang(en) {
+    text-transform: uppercase;
+  }
+  .rail__kicker:empty {
+    display: none;
+  }
+  .rail__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: var(--fw-bold);
+  }
+  .rail__chev {
+    flex: none;
+    display: grid;
+    color: var(--ink-2);
+  }
+  .rail__menu[open] .rail__chev {
+    transform: rotate(180deg);
+  }
+  .rail__panel {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 100%;
+    max-block-size: calc(100vh - var(--header-h) - var(--rail-h));
+    max-block-size: calc(100dvh - var(--header-h) - var(--rail-h));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--bg);
+    border-block-end: var(--rule-stop) solid var(--ink);
+  }
+  .rail__lists {
+    padding-block: var(--sp-2) var(--sp-4);
+  }
+  .rail__links,
+  .rail__more,
+  .rail__key {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rail__links li + li,
+  .rail__more li {
+    border-block-start: 1px solid var(--line);
+  }
+  .rail__panel a {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    padding-block: var(--sp-2);
+    color: var(--ink);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    text-decoration: none;
+  }
+  .rail__panel a:hover {
+    color: var(--accent);
+  }
+  .rail__panel a[aria-current] {
+    box-shadow: inset 3px 0 0 var(--signal-red);
+    padding-inline-start: var(--sp-3);
+  }
+  .rail__n {
+    flex: none;
+    inline-size: 1ch;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .rail__more {
+    border-block-start: 2px solid var(--ink);
+  }
+  .rail__more li:first-child {
+    border-block-start: 0;
+  }
+  .rail__more a {
+    justify-content: space-between;
+  }
+  .rail__key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    margin-block-start: var(--sp-3);
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+  .rail__key li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+  @media (max-width: 30em) {
+    /* phones: the name gets the room. The ring on the pips already says which link. */
+    .rail__row {
+      gap: var(--sp-2);
+    }
+    .rail__kicker {
+      display: none;
+    }
+    .rail__pips {
+      inline-size: 6.25rem;
+      block-size: auto;
+    }
+  }
+  @media (max-width: 21.5em) {
+    /* under 344px the row of pips goes too; the jump menu still shows all seven */
+    .rail__pips {
+      display: none;
+    }
+  }
+  @media (min-width: 48em) {
+    .rail__lists {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 0 var(--sp-7);
+      align-items: start;
+    }
+    .rail__more {
+      border-block-start: 0;
+    }
+    .rail__key {
+      grid-column: 1 / -1;
+    }
+  }
+  @media print {
+    .rail {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Countdown rail: read the chapters, show where the reader is. Enhancement only.
+  const el = document.querySelector<HTMLElement>('[data-rail]');
+  const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-rail-chapter]'));
+  if (el && chapters.length) {
+    const text = JSON.parse(el.dataset.text ?? '{}') as { link: string; links: string[]; jump: string; idle?: string };
+    const led = el.querySelector<HTMLElement>('.rail__led');
+    const kicker = el.querySelector<HTMLElement>('[data-rail-kicker]');
+    const name = el.querySelector<HTMLElement>('[data-rail-name]');
+    const menu = el.querySelector<HTMLDetailsElement>('.rail__menu');
+    let shown = '';
+
+    const setLed = (value: number | null, phase: string) => {
+      if (!led) return;
+      const str = value === null ? '' : String(Math.max(0, Math.min(99, Math.round(value)))).padStart(2, '0');
+      led.dataset.phase = value === null ? 'off' : phase;
+      led.querySelectorAll<SVGGElement>('[data-led]').forEach((g, pos) => {
+        g.querySelectorAll<SVGPathElement>('path').forEach((p) => {
+          const on = str ? p.dataset.d === str[pos] : p.classList.contains('rail__dash');
+          p.toggleAttribute('data-on', on);
+        });
+      });
+    };
+
+    const update = () => {
+      // the reading line: a third of the way down the space under the rail
+      const top = el.getBoundingClientRect().bottom;
+      const line = top + (window.innerHeight - top) * 0.33;
+      let cur: HTMLElement | null = null;
+      for (const c of chapters) if (c.getBoundingClientRect().top <= line) cur = c;
+      if (!cur) {
+        // above the first chapter (a page that opens with a hero or an index): the strip is a
+        // jump menu and nothing else. No link is "current" until the reader reaches one.
+        if (shown === 'idle') return;
+        shown = 'idle';
+        setLed(null, 'off');
+        el.querySelectorAll<SVGGElement>('.rail__pips [data-pip]').forEach((g) => g.removeAttribute('data-now'));
+        el.querySelectorAll<HTMLAnchorElement>('[data-rail-item]').forEach((a) => a.removeAttribute('aria-current'));
+        if (kicker) kicker.textContent = '';
+        if (name) name.textContent = text.idle ?? '';
+        return;
+      }
+      const box = cur.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, (line - box.top) / Math.max(1, box.height)));
+      const d = cur.dataset;
+      const has = d.countFrom !== undefined;
+      const from = Number(d.countFrom);
+      const to = Number(d.countTo ?? d.countFrom);
+      const count = has ? Math.round(from + (to - from) * p) : null;
+      const linkN = d.link ? Number(d.link) : 0;
+      const key = `${cur.id}|${count}`;
+      if (key === shown) return;
+      shown = key;
+      // at 00 the light has turned: the LED is green from there on
+      setLed(count, count === 0 ? 'green' : (d.phase ?? 'red'));
+      el.querySelectorAll<SVGGElement>('.rail__pips [data-pip]').forEach((g) => g.toggleAttribute('data-now', Number(g.dataset.pip) === linkN));
+      el.querySelectorAll<HTMLAnchorElement>('[data-rail-item]').forEach((a) => {
+        if (Number(a.dataset.railItem) === linkN) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+      if (kicker) kicker.textContent = linkN ? text.link.replace('{n}', String(linkN)) : '';
+      if (name) name.textContent = d.railLabel || (linkN ? text.links[linkN - 1] : '');
+    };
+
+    let queued = false;
+    const queue = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        update();
+      });
+    };
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue, { passive: true });
+    update();
+
+    if (menu) {
+      const summary = menu.querySelector('summary');
+      const close = (focus = false) => {
+        if (!menu.open) return;
+        menu.open = false;
+        if (focus) summary?.focus({ preventScroll: true });
+      };
+      document.addEventListener('keydown', (e) => e.key === 'Escape' && close(true));
+      document.addEventListener('click', (e) => !menu.contains(e.target as Node) && close());
+      menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => close()));
+    }
+  }
+</script>

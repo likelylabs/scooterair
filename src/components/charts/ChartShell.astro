@@ -1,0 +1,55 @@
+---
+/**
+ * ChartShell — internal wrapper used by every chart component. Page builders
+ * should not need it directly: use BarChart, LineChart, … instead, and put
+ * them inside a <Figure>.
+ *
+ * It takes a ChartRender (from core/*.ts) and outputs the legend, the SVG
+ * with <title>/<desc>, the hover data and the "view data table" toggle.
+ *
+ * Props
+ *   render   ChartRender
+ *   title    accessible name of the graphic (required on every chart)
+ *   desc     the takeaway in a sentence, for screen readers
+ *   locale   Locale
+ *   id       optional id on the wrapper (needed to update it from a script)
+ *   empty    the empty-data state: the chart has a frame and no marks because
+ *            nobody has measured this. Adds .chart--empty, appends "this chart
+ *            is empty on purpose…" to the description, and keeps the data
+ *            table (whose cells read 無資料). Use <EmptyChart> for the frame.
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { emptyData, ui } from '@/i18n/ui';
+import { chartHtml, type ChartRender } from './core/shared';
+import { uid as makeId } from '@/components/uid';
+
+interface Props {
+  render: ChartRender;
+  title: string;
+  desc?: string;
+  locale: Locale;
+  id?: string;
+  empty?: boolean;
+  class?: string;
+}
+const { render, title, locale, id, empty = false, class: cls } = Astro.props;
+const desc = empty ? [Astro.props.desc, emptyData.sr[locale]].filter(Boolean).join(' ') : Astro.props.desc;
+const uid = id ?? makeId('chart');
+const tableLabel = ui.dataTable[locale];
+---
+
+<div
+  id={id}
+  class:list={['chart', `chart--${render.kind}`, empty && 'chart--empty', cls]}
+  data-empty={empty ? '' : undefined}
+  data-id={uid}
+  data-title={title}
+  data-desc={desc}
+  data-table-label={tableLabel}
+  set:html={chartHtml(render, { id: uid, title, desc, tableLabel })}
+/>
+
+<script>
+  import './core/enhance';
+</script>

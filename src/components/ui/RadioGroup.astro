@@ -1,0 +1,142 @@
+---
+/**
+ * RadioGroup — a set of radio buttons in a <fieldset>.
+ * `segmented` draws them as one joined control (2–4 short options, e.g.
+ * "有舊車可汰換 / 沒有"); `stack` is a list with room for a hint per option.
+ * Plain radios underneath, so they submit and work without JavaScript.
+ *
+ * Props
+ *   name     field name (required, unique per form)
+ *   legend   the question
+ *   options  { value: string; label: string; hint?: string }[]
+ *   value    initially checked value
+ *   variant  'segmented' (default) | 'stack'
+ *   hint     helper text under the legend
+ */
+interface Props {
+  name: string;
+  legend: string;
+  options: { value: string; label: string; hint?: string }[];
+  value?: string;
+  variant?: 'segmented' | 'stack';
+  hint?: string;
+  class?: string;
+}
+const { name, legend, options, value, variant = 'segmented', hint, class: cls } = Astro.props;
+---
+
+<fieldset class:list={['field', 'radios', `radios--${variant}`, cls]}>
+  <legend class="field__label">{legend}</legend>
+  {hint && <p class="field__hint">{hint}</p>}
+  <div class="radios__list">
+    {options.map((o) => (
+      <label class="radios__opt">
+        <input type="radio" name={name} value={o.value} checked={o.value === value} />
+        <span class="radios__face">
+          <span class="radios__label">{o.label}</span>
+          {o.hint && variant === 'stack' && <span class="radios__hint">{o.hint}</span>}
+        </span>
+      </label>
+    ))}
+  </div>
+</fieldset>
+
+<style>
+  .radios legend {
+    margin-block-end: var(--sp-2);
+  }
+  .radios__opt {
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+  .radios__opt input {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .radios__opt input:focus-visible + .radios__face {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    z-index: 1;
+  }
+
+  /* segmented */
+  .radios--segmented .radios__list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .radios--segmented .radios__face {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-block-size: calc(3rem - 4px);
+    padding: 0.25rem 0.5rem;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.25;
+    text-align: center;
+    color: var(--ink-2);
+  }
+  .radios--segmented .radios__opt + .radios__opt .radios__face {
+    border-inline-start: 1px solid var(--line-strong);
+  }
+  .radios--segmented input:checked + .radios__face {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .radios--segmented .radios__opt:hover input:not(:checked) + .radios__face {
+    color: var(--ink);
+    background: var(--bg-sunken);
+  }
+
+  /* stack */
+  .radios--stack .radios__list {
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .radios--stack .radios__face {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--sp-3);
+    align-items: center;
+    min-block-size: 3rem;
+    padding: var(--sp-2) var(--sp-3);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .radios--stack .radios__face::before {
+    content: '';
+    grid-row: span 2;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border: 2px solid var(--line-strong);
+    border-radius: 50%;
+  }
+  .radios--stack input:checked + .radios__face {
+    border-color: var(--ink);
+  }
+  .radios--stack input:checked + .radios__face::before {
+    border-color: var(--ink);
+    background: radial-gradient(var(--ink) 0 45%, transparent 50%);
+  }
+  .radios--stack .radios__label {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .radios--stack .radios__hint {
+    grid-column: 2;
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    color: var(--ink-3);
+  }
+</style>

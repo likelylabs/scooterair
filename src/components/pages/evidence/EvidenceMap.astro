@@ -1,0 +1,251 @@
+---
+/**
+ * EvidenceMap — V30. Rows: the seven links. Columns: the kinds of evidence, then 沒人量過.
+ * Each cell lists the sources that link uses for that kind, as numbered chips that go to the
+ * source's entry on /sources/; an empty cell stays empty. The gap cell of link 3 (pedestrians
+ * at the crossing, the central gap) is outlined in the gap style.
+ *
+ * A real <table> on wide screens; below 60em each row becomes a block, with the column name
+ * printed beside each cell. Explicit roles keep the table semantics when the display changes.
+ *
+ * Props
+ *   locale  Locale
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { chain, evidence } from '@/i18n/ui';
+import { chainLinks, factsForLink, gapsForLink, seriesForLink, type Evidence, type SourceId } from '@/data';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import evidenceCopy from '@/i18n/pages/evidence';
+import { fill, localize } from '@/i18n/pages/_copy';
+import { citeN, kindOf, lg, seriesSources, sourceShort } from './ev';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const T = localize(evidenceCopy, locale);
+const M = T.map;
+const cols: Evidence[] = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived', 'market-tw'];
+const rows = chainLinks.map((n) => {
+  const fs = factsForLink(n, { primaryOnly: true });
+  const ss = seriesForLink(n, { primaryOnly: true });
+  const cells = cols.map((e) => {
+    const ids = new Set<SourceId>();
+    fs.filter((f) => f.evidence === e).forEach((f) => f.sources.forEach((s) => ids.add(s)));
+    ss.filter((s) => s.evidence === e).forEach((s) => seriesSources(s.id).forEach((x) => ids.add(x)));
+    return [...ids].sort((a, b) => citeN(a) - citeN(b));
+  });
+  return { n, name: chain.links[n - 1][locale], cells, gaps: gapsForLink(n).map((g) => lg(g.id, locale)) };
+});
+const usedCols = cols.filter((_, i) => rows.some((r) => r.cells[i].length > 0));
+const colIdx = usedCols.map((c) => cols.indexOf(c));
+---
+
+<div class="emap">
+  <table class="emap__table" role="table" aria-describedby="emap-caption">
+    <thead role="rowgroup">
+      <tr role="row">
+        <th scope="col" role="columnheader">{M.linkColumn}</th>
+        {usedCols.map((c) => <th scope="col" role="columnheader"><EvidenceBadge locale={locale} kind={kindOf(c)} /></th>)}
+        <th scope="col" role="columnheader"><EvidenceBadge locale={locale} kind="gap" /></th>
+      </tr>
+    </thead>
+    <tbody role="rowgroup">
+      {rows.map((r) => (
+        <tr role="row">
+          <th scope="row" role="rowheader" class="emap__link">
+            <a href={`#${chain.anchor(r.n)}`}>
+              <span class="emap__n">{fill(T.toc.linkN, { n: r.n })}</span>
+              <span class="emap__name">{r.name}</span>
+            </a>
+          </th>
+          {colIdx.map((ci) => (
+            <td role="cell" class:list={['emap__cell', r.cells[ci].length === 0 && 'emap__cell--empty']}>
+              <span class="emap__label" aria-hidden="true">{evidence.kinds[kindOf(cols[ci])].label[locale]}</span>
+              {r.cells[ci].length === 0 ? (
+                <span class="emap__none"><span class="vh">{M.none}</span></span>
+              ) : (
+                <span class="emap__chips">
+                  {r.cells[ci].map((id) => (
+                    <a class="emap__chip" href={href(`/sources/#${id}`, locale)} title={sourceShort(id, locale)}>
+                      <span aria-hidden="true">{citeN(id)}</span>
+                      <span class="vh">{sourceShort(id, locale)}</span>
+                    </a>
+                  ))}
+                </span>
+              )}
+            </td>
+          ))}
+          <td role="cell" class:list={['emap__cell', 'emap__gapcell', r.n === 3 && 'emap__gapcell--central', r.gaps.length === 0 && 'emap__cell--empty']}>
+            <span class="emap__label" aria-hidden="true">{M.gapColumn}</span>
+            {r.n === 3 && <span class="emap__ped">{M.pedestrians}</span>}
+            {r.gaps.length === 0 ? (
+              <span class="emap__none"><span class="vh">{M.none}</span></span>
+            ) : (
+              <ul class="emap__gaps">
+                {r.gaps.map((g) => <li><a href={`#${g.id}`}>{g.title}</a></li>)}
+              </ul>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="emap__caption" id="emap-caption">{M.caption}</p>
+</div>
+
+<style>
+  .emap__table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+  }
+  .emap__table th,
+  .emap__table td {
+    text-align: start;
+    vertical-align: top;
+  }
+  .emap__link a {
+    display: grid;
+    gap: 2px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .emap__n {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+  }
+  .emap__name {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  .emap__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .emap__chip {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 2rem;
+    min-block-size: 1.75rem;
+    padding: 0 0.35em;
+    border-radius: var(--radius-1);
+    background: var(--bg-sunken);
+    color: var(--accent);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+  }
+  .emap__chip:hover,
+  .emap__chip:focus-visible {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .emap__gaps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-1);
+    line-height: var(--lh-snug);
+  }
+  .emap__gaps a {
+    color: var(--ink);
+  }
+  .emap__ped {
+    display: block;
+    font-weight: var(--fw-bold);
+    margin-block-end: var(--sp-1);
+  }
+  .emap__gapcell--central {
+    outline: 2px dashed var(--ink);
+    outline-offset: -4px;
+  }
+  .emap__caption {
+    margin-block-start: var(--sp-3);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    max-inline-size: 44rem;
+  }
+
+  /* phones and tablets: one block per link */
+  @media (max-width: 59.99em) {
+    .emap__table,
+    .emap__table tbody,
+    .emap__table tr,
+    .emap__table th,
+    .emap__table td {
+      display: block;
+    }
+    .emap__table thead {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .emap__table tr {
+      padding-block: var(--sp-3) var(--sp-4);
+      border-block-start: 2px solid var(--ink);
+    }
+    .emap__link {
+      margin-block-end: var(--sp-2);
+    }
+    .emap__cell {
+      display: grid !important;
+      grid-template-columns: 7.5rem minmax(0, 1fr);
+      gap: var(--sp-2);
+      align-items: start;
+      padding-block: var(--sp-2);
+      border-block-start: 1px solid var(--line);
+    }
+    .emap__cell--empty {
+      display: none !important;
+    }
+    .emap__label {
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-bold);
+      color: var(--ink-2);
+      line-height: 1.75rem;
+    }
+    .emap__gapcell {
+      grid-template-columns: 7.5rem minmax(0, 1fr);
+    }
+    .emap__gapcell .emap__ped,
+    .emap__gapcell .emap__gaps {
+      grid-column: 2;
+    }
+    .emap__gapcell--central {
+      padding-inline: var(--sp-2);
+    }
+  }
+  @media (min-width: 60em) {
+    .emap__label {
+      display: none;
+    }
+    .emap__table thead th {
+      padding: var(--sp-2);
+      border-block-end: 2px solid var(--ink);
+      vertical-align: bottom;
+    }
+    .emap__table tbody th,
+    .emap__table tbody td {
+      padding: var(--sp-3) var(--sp-2);
+      border-block-end: 1px solid var(--line);
+    }
+    .emap__table tbody th {
+      inline-size: 11rem;
+    }
+    .emap__gapcell {
+      inline-size: 14rem;
+    }
+  }
+</style>

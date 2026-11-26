@@ -1,0 +1,58 @@
+---
+/**
+ * PullQuote — a quotation or a pulled sentence, set large beside a thick rule.
+ * Type the quotation marks yourself in the right style for the language
+ * (「」 in Chinese, “ ” in English); the component adds none.
+ *
+ * Props
+ *   tone  'ink' | 'exhaust' | 'clean' (rule colour)
+ * Slots
+ *   default      the quotation
+ *   attribution  who said it / where it is from; put the <Cite> here
+ */
+interface Props {
+  tone?: 'ink' | 'exhaust' | 'clean';
+  class?: string;
+}
+const { tone = 'ink', class: cls } = Astro.props;
+---
+
+<figure class:list={['pq', `pq--${tone}`, cls]}>
+  <blockquote class="pq__quote"><slot /></blockquote>
+  {Astro.slots.has('attribution') && <figcaption class="pq__by"><slot name="attribution" /></figcaption>}
+</figure>
+
+<style>
+  .pq {
+    --c: var(--ink);
+    max-inline-size: 44rem;
+    padding-inline-start: var(--sp-4);
+    border-inline-start: var(--rule-stop) solid var(--c);
+  }
+  .pq--exhaust {
+    --c: var(--exhaust);
+  }
+  .pq--clean {
+    --c: var(--clean);
+  }
+  .pq__quote {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-heading);
+    text-wrap: balance;
+  }
+  .pq__quote:lang(zh) {
+    line-height: 1.5;
+  }
+  .pq__by {
+    margin-block-start: var(--sp-3);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  @media (min-width: 48em) {
+    .pq {
+      padding-inline-start: var(--sp-5);
+    }
+  }
+</style>

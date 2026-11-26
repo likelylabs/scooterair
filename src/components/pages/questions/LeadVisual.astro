@@ -1,0 +1,157 @@
+---
+/**
+ * LeadVisual — the one lead visual of each question page (blueprint 4.2, part 3), in a Figure
+ * with its source line and badge. Scene art (V6, V7, V16) is always marked as illustration and
+ * never shares a frame with a health number; charts take every value from the registry.
+ *
+ * Props
+ *   locale  Locale
+ *   slug    question slug
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { questions as qui } from '@/i18n/ui';
+import Figure from '@/components/ui/Figure.astro';
+import Cite from '@/components/ui/Cite.astro';
+import Callout from '@/components/ui/Callout.astro';
+import TimeLadder from '@/components/ui/TimeLadder.astro';
+import Icon from '@/components/ui/Icon.astro';
+import BarChart from '@/components/charts/BarChart.astro';
+import EmptyChart from '@/components/charts/EmptyChart.astro';
+import SmellStrip from '@/components/art/SmellStrip.astro';
+import ApproachPlan from '@/components/art/ApproachPlan.astro';
+import StreetScene from '@/components/art/StreetScene.astro';
+import SceneCompare from '@/components/art/SceneCompare.astro';
+import QChart from './QChart.astro';
+import { renderCorrelation } from './charts';
+import { catLabel, lg, ls, points, requiredCaveats, seriesCites, sourcesOf, type Slug } from './q';
+import questions from '@/i18n/pages/questions';
+import { localize } from '@/i18n/pages/_copy';
+import { units } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  slug: Slug;
+}
+const { locale, slug } = Astro.props;
+const all = localize(questions, locale);
+const C = (ids: Parameters<typeof sourcesOf>[0], gaps: Parameters<typeof sourcesOf>[1] = []) => sourcesOf(ids, gaps);
+const ask = { href: href(qui.askMeasurePath, locale), text: qui.askMeasure[locale] };
+
+// per-page data, prepared only for the page being rendered
+let corr: ReturnType<typeof renderCorrelation> | undefined;
+let corrSeries: ReturnType<typeof ls> | undefined;
+if (slug === 'app') {
+  corrSeries = ls('wu2021-station-correlation', locale);
+  const r = points(corrSeries, 'r').points;
+  const F = all.pages.app.figure;
+  corr = renderCorrelation({
+    locale,
+    rows: [
+      { label: F.pm25, low: r.find((p) => p.x === 'pm25')!.low!, high: r.find((p) => p.x === 'pm25')!.high!, tone: 'neutral' },
+      { label: F.btex, low: r.find((p) => p.x === 'btex')!.low!, high: r.find((p) => p.x === 'btex')!.high!, tone: 'exhaust' },
+    ],
+    min: -0.2,
+    max: 1,
+    zeroLabel: F.none,
+    oneLabel: F.full,
+    categoryLabel: F.pollutant,
+    lowLabel: F.low,
+    highLabel: F.high,
+  });
+}
+let modes: { label: string; value: number; highlight?: boolean }[] = [];
+let modesSeries: ReturnType<typeof ls> | undefined;
+if (slug === 'rider') {
+  modesSeries = ls('commute-pm25-chuang2020', locale);
+  modes = points(modesSeries, 'mean').points.map((p) => ({ label: catLabel(modesSeries!, String(p.x)), value: p.y as number, highlight: p.x === 'walking' || p.x === 'scooter' }));
+}
+const pedGap = slug === 'how-much' ? lg('gap-pedestrian-red-light-exposure', locale) : undefined;
+---
+
+{slug === 'smell' && (
+  <Figure locale={locale} title={all.pages.smell.figure.title} subtitle={all.pages.smell.figure.subtitle} badge={['international', 'gap']} frame="none">
+    <SmellStrip locale={locale}>
+      <Fragment slot="can">{all.pages.smell.figure.can}{C(['scooter-exhaust-carbonyls'], ['gap-odorants']).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</Fragment>
+      <Fragment slot="cannot">{all.pages.smell.figure.cannot}{C(['co-odourless', 'odour-thresholds']).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</Fragment>
+    </SmellStrip>
+    <Fragment slot="source">{C(['co-odourless', 'odour-thresholds', 'scooter-exhaust-carbonyls']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{slug === 'beside-me' && (
+  <Figure locale={locale} title={all.pages['beside-me'].figure.title} subtitle={all.pages['beside-me'].figure.subtitle} badge="official-tw" frame="none">
+    <ApproachPlan locale={locale} />
+    <Fragment slot="source">{C(['marking-rules-turn-box']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{slug === 'app' && corr && corrSeries && (
+  <Figure locale={locale} title={all.pages.app.figure.title} subtitle={all.pages.app.figure.subtitle} badge="measured-tw" caption={corrSeries.caveat}>
+    <QChart locale={locale} render={corr} title={all.pages.app.figure.chart} desc={all.pages.app.figure.desc} />
+    <Fragment slot="source">{seriesCites('wu2021-station-correlation').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{slug === 'how-much' && pedGap && (
+  <Figure locale={locale} empty title={all.pages['how-much'].figure.title} subtitle={all.pages['how-much'].figure.subtitle}>
+    <EmptyChart locale={locale} title={all.pages['how-much'].figure.chart} desc={all.pages['how-much'].figure.desc} />
+    <Fragment slot="who">{pedGap.whoCouldMeasure} <a href={ask.href}>{ask.text}<Icon name="arrow-right" size="1.05em" /></a></Fragment>
+  </Figure>
+)}
+
+{slug === 'one-red-light' && (
+  <Figure locale={locale} title={all.pages['one-red-light'].figure.title} subtitle={all.pages['one-red-light'].figure.subtitle} frame="none">
+    <TimeLadder
+      locale={locale}
+      stops={[
+        { time: all.pages['one-red-light'].figure.stops.red, empty: true, body: all.pages['one-red-light'].figure.stops.redBody },
+        { time: all.pages['one-red-light'].figure.stops.hour, body: all.pages['one-red-light'].figure.stops.hourBody, badge: 'measured-tw', scope: 'all-sources' },
+        { time: all.pages['one-red-light'].figure.stops.walk, body: all.pages['one-red-light'].figure.stops.walkBody, badge: 'international', scope: 'traffic' },
+        { time: all.pages['one-red-light'].figure.stops.years, body: all.pages['one-red-light'].figure.stops.yearsBody, badge: 'measured-tw', scope: 'all-sources' },
+      ]}
+    />
+    <Callout label={all.pages['one-red-light'].figure.rulerLabel} class="q-ruler">
+      <p>{all.pages['one-red-light'].figure.ruler}</p>
+    </Callout>
+    <Fragment slot="caption">
+      {requiredCaveats(['chuang2020-cardiovascular-association', 'mccreanor2007-london-walk', 'mj-cohort-mortality-guo2021'], locale).map((n) => <p>{n.text}</p>)}
+    </Fragment>
+    <Fragment slot="source">{C(['chuang2020-cardiovascular-association', 'mccreanor2007-london-walk', 'mj-cohort-mortality-guo2021'], ['gap-brief-exposure-harm']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{slug === 'my-child' && (
+  <Figure locale={locale} title={all.pages['my-child'].figure.title} subtitle={all.pages['my-child'].figure.subtitle} badge="international" frame="none">
+    <StreetScene locale={locale} frame="kerb" emphasis="heights" />
+    <Fragment slot="source">{C(['first-metre-sharma-kumar-2018']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{slug === 'rider' && modesSeries && (
+  <Figure locale={locale} title={all.pages.rider.figure.title} subtitle={all.pages.rider.figure.subtitle} badge="measured-tw" caption={all.pages.rider.figure.caption}>
+    <BarChart locale={locale} title={all.pages.rider.figure.chart} data={modes} unit={units.ugm3} decimals={1} emphasis categoryLabel={all.pages.rider.figure.mode} valueLabel={all.pages.rider.figure.value} />
+    <Fragment slot="source">{seriesCites('commute-pm25-chuang2020').map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+{slug === 'electric' && (
+  <Figure locale={locale} title={all.pages.electric.figure.title} subtitle={all.pages.electric.figure.subtitle} frame="none">
+    <div class="q-bleed"><SceneCompare locale={locale} name="q-scene" /></div>
+    <Fragment slot="source">{C(['teds13-electric-mc-pm25']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  </Figure>
+)}
+
+<style>
+  :global(.q-ruler) {
+    margin-block-start: var(--sp-6);
+  }
+  .q-bleed {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+  @media (min-width: 60em) {
+    .q-bleed {
+      margin-inline: 0;
+    }
+  }
+</style>

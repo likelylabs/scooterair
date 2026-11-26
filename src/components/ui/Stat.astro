@@ -1,0 +1,111 @@
+---
+/**
+ * Stat — the big-number block. One number, what it measures, and one line of
+ * meaning. The numeral is set tall and condensed, like figures painted on a
+ * road. Use sparingly: one to three per screen.
+ *
+ * Props
+ *   value   the number, already formatted for the locale ("94", "1,460")
+ *   unit    unit or suffix set small after the number ("%", "µg/m³", "萬輛")
+ *   prefix  set small before the number ("NT$", "約")
+ *   label   what is being measured (short, above the number)
+ *   tone    'neutral' | 'exhaust' | 'clean' | 'signal' — colours the rule, not the text
+ *   size    'lg' (default) | 'md'
+ *   sample  true = demo number: shows the sample-data tag. Never omit for placeholders.
+ *   locale  Locale (needed for the sample tag)
+ * Slot
+ *   default  one sentence of context; put the <Cite> here
+ */
+import type { Locale } from '@/i18n';
+import { ui } from '@/i18n/ui';
+import Tag from './Tag.astro';
+
+interface Props {
+  value: string;
+  unit?: string;
+  prefix?: string;
+  label: string;
+  tone?: 'neutral' | 'exhaust' | 'clean' | 'signal';
+  size?: 'lg' | 'md';
+  sample?: boolean;
+  locale: Locale;
+  class?: string;
+}
+const { value, unit, prefix, label, tone = 'neutral', size = 'lg', sample = false, locale, class: cls } = Astro.props;
+---
+
+<div class:list={['stat', `stat--${tone}`, `stat--${size}`, cls]}>
+  <p class="stat__label">
+    <span>{label}</span>
+    {sample && <Tag tone="sample">{ui.sampleData[locale]}</Tag>}
+  </p>
+  <p class="stat__value">
+    {prefix && <span class="stat__affix">{prefix}</span>}<span class="stat__num">{value}</span>{unit && <span class="stat__affix">{unit}</span>}
+  </p>
+  {Astro.slots.has('default') && <p class="stat__text"><slot /></p>}
+</div>
+
+<style>
+  .stat {
+    --stat-rule: var(--ink);
+    display: grid;
+    gap: var(--sp-2);
+    padding-block-start: var(--sp-3);
+    border-block-start: var(--rule-stop) solid var(--stat-rule);
+    min-inline-size: 0;
+  }
+  .stat--exhaust {
+    --stat-rule: var(--exhaust);
+  }
+  .stat--clean {
+    --stat-rule: var(--clean);
+  }
+  .stat--signal {
+    --stat-rule: var(--signal-red);
+  }
+  .stat__label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .stat__value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.12em;
+    font-family: var(--font-body);
+    line-height: 0.92;
+    color: var(--ink);
+  }
+  .stat__num {
+    font-size: var(--fs-stat);
+    font-weight: 800;
+    font-stretch: 68%;
+    letter-spacing: -0.01em;
+    /* proportional figures: tabular ones look loose at this size */
+    font-variant-numeric: lining-nums;
+  }
+  .stat--md .stat__num {
+    font-size: clamp(2.75rem, 2rem + 4vw, 4.5rem);
+  }
+  .stat__affix {
+    font-size: clamp(1.25rem, 1rem + 1.4vw, 2rem);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .stat__affix:lang(en) {
+    font-stretch: 80%;
+  }
+  .stat__text {
+    max-inline-size: 26em;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+</style>

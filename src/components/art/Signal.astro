@@ -1,0 +1,58 @@
+---
+/**
+ * Signal — the pedestrian signal as a reusable motif: an LED dot-matrix
+ * figure (red standing / green walking) with an optional countdown above it.
+ * Red marks "the red-light moment" (the problem); green marks the way out.
+ *
+ * Props
+ *   state  'red' | 'green'
+ *   count  0–99: show a static countdown above the figure (omit for none)
+ *   size   CSS height of the whole signal (default '3.5rem')
+ *   label  accessible name; omit and the signal is decorative
+ *   class  extra class
+ */
+import '@/styles/art.css';
+import { LED_FIGURES, ledDigitRuns, ledDots, ledRuns } from './parts';
+
+interface Props {
+  state: 'red' | 'green';
+  count?: number;
+  size?: string;
+  label?: string;
+  class?: string;
+}
+const { state, count, size = '3.5rem', label, class: cls } = Astro.props;
+const hasCount = count !== undefined;
+const led = state === 'red' ? 'a-led-red' : 'a-led-green';
+// dots as dashed runs (parts.ts ledDots): the same picture in a twentieth of the markup,
+// which matters because a page can carry twenty of these
+const dots = (d: string) => ledDots(d, { pitch: 2, r: 0.8, cls: led });
+const figure = dots(ledRuns(state === 'red' ? LED_FIGURES.stand : LED_FIGURES.walk, 2, 3, 2));
+const text = hasCount ? String(Math.max(0, Math.min(99, Math.round(count!)))).padStart(2, '0') : '';
+const digits = hasCount ? dots(ledDigitRuns(text[0], 2, 4, 3) + ledDigitRuns(text[1], 2, 16, 3)) : '';
+const H = hasCount ? 58 : 36;
+---
+
+<svg
+  class:list={['signal', cls]}
+  viewBox={`0 0 30 ${H}`}
+  style={`block-size:${size}`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  <rect class="a-housing" width="30" height={H} rx="2.5"></rect>
+  {hasCount && <Fragment set:html={digits} />}
+  {hasCount && <rect x="2" y="20.5" width="26" height="1" fill="#2a3237" />}
+  <g transform={`translate(0 ${hasCount ? 22 : 0})`} set:html={figure} />
+</svg>
+
+<style>
+  .signal {
+    display: inline-block;
+    flex: none;
+    inline-size: auto;
+    vertical-align: middle;
+  }
+</style>

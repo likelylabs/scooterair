@@ -1,0 +1,259 @@
+---
+/**
+ * ChainStrip — the seven-line 懶人包 (V3): the whole chain in seven sentences,
+ * each true when read alone, each with its evidence badge and a link to its
+ * chapter. The text comes from chain.summary in ui.ts — the one source shared
+ * with question pages, share cards and the film. Never retype a line.
+ *
+ * Two forms
+ *   full       the numbered list (home page, directly under the hero)
+ *   collapsed  one line lit — the one this page is about — inside a native
+ *              <details>; opening it shows all seven. Its footer hands on to
+ *              the chain board: 「怎麼接起來，你自己判斷。看我們怎麼接 →」
+ *
+ * Props
+ *   locale   Locale
+ *   variant  'full' (default) | 'collapsed'
+ *   current  1–7: the lit line (required for `collapsed`; optional highlight for `full`)
+ *   page     locale-neutral path of the page that holds the chapters (default '/';
+ *            lines link to {page}#link-n)
+ *   badges   'full' (default: icon + words) | 'icon' (icons only; the words stay for
+ *            screen readers) — use 'icon' only where the legend is on the same screen
+ *   label    accessible name of the list (default "七件事 / Seven things")
+ */
+import { href, type Locale } from '@/i18n';
+import { chain, t } from '@/i18n/ui';
+import EvidenceBadge from './EvidenceBadge.astro';
+import Icon from './Icon.astro';
+import { pipSvg } from './pips';
+
+interface Props {
+  locale: Locale;
+  variant?: 'full' | 'collapsed';
+  current?: number;
+  page?: string;
+  badges?: 'full' | 'icon';
+  label?: string;
+  class?: string;
+}
+const { locale, variant = 'full', current, page = '/', badges = 'full', label = chain.summaryShort[locale], class: cls } = Astro.props;
+if (variant === 'collapsed' && !current) throw new Error('ChainStrip: `current` is required with variant="collapsed".');
+const lines = chain.summary.map((l, i) => ({ n: i + 1, text: l.text[locale], badges: l.badges, pip: l.pip, url: href(`${page}#${chain.anchor(i + 1)}`, locale) }));
+const lit = current ? lines[current - 1] : undefined;
+---
+
+{variant === 'full' ? (
+  <ol class:list={['strip', cls]} aria-label={label}>
+    {lines.map((l) => (
+      <li class:list={['strip__line', `strip__line--${l.pip}`, current === l.n && 'is-lit']} aria-current={current === l.n ? 'step' : undefined}>
+        <span class="strip__n" aria-hidden="true">{l.n}</span>
+        <div class="strip__body">
+          <a class="strip__text" href={l.url}>{l.text}</a>
+          {l.badges.length > 0 && (
+            <span class="strip__badges">{l.badges.map((b) => <EvidenceBadge kind={b} locale={locale} variant={badges} />)}</span>
+          )}
+        </div>
+      </li>
+    ))}
+  </ol>
+) : (
+  <details class:list={['strip-c', cls]}>
+    <summary>
+      <span class="strip-c__meta">
+        <span class="strip-c__label">{label}</span>
+        <span class="vh">{t(chain.summaryOf, locale, { n: lit!.n })}</span>
+        <span class="strip-c__frac" aria-hidden="true"><b>{lit!.n}</b>/7</span>
+        <span class="strip-c__pips" aria-hidden="true">{lines.map((l) => <span class:list={[l.n === lit!.n && 'is-now']} set:html={pipSvg(l.pip)} />)}</span>
+      </span>
+      <span class="strip-c__now">
+        <span class="strip-c__text">{lit!.text}</span>
+        {lit!.badges.length > 0 && <span class="strip__badges">{lit!.badges.map((b) => <EvidenceBadge kind={b} locale={locale} />)}</span>}
+      </span>
+      <span class="strip-c__toggle">{chain.summaryExpand[locale]}<Icon name="chevron-down" size="1.1rem" /></span>
+    </summary>
+    <ol class="strip strip--inside" aria-label={label}>
+      {lines.map((l) => (
+        <li class:list={['strip__line', `strip__line--${l.pip}`, l.n === lit!.n && 'is-lit']} aria-current={l.n === lit!.n ? 'step' : undefined}>
+          <span class="strip__n" aria-hidden="true">{l.n}</span>
+          <div class="strip__body">
+            <a class="strip__text" href={l.url}>{l.text}</a>
+            {l.badges.length > 0 && <span class="strip__badges">{l.badges.map((b) => <EvidenceBadge kind={b} locale={locale} variant={badges} />)}</span>}
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="strip-c__foot">
+      {chain.summaryFooter[locale]}
+      <a href={href(`${page}#${chain.anchors.connect}`, locale)}>{chain.summaryFooterLink[locale]}<Icon name="arrow-right" size="1.05em" /></a>
+    </p>
+  </details>
+)}
+
+<style>
+  .strip {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-inline-size: 46rem;
+    border-block-end: var(--rule-paint) solid var(--ink);
+  }
+  .strip__line {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0 var(--sp-3);
+    padding-block: var(--sp-3);
+    border-block-start: var(--rule-paint) solid var(--ink);
+  }
+  /* the edge of each line is its evidence line style */
+  .strip__line--outline {
+    border-block-start: 1px solid var(--ink);
+    box-shadow: inset 0 3px 0 var(--here), inset 0 4px 0 var(--ink);
+  }
+  .strip__line--open {
+    border-block-start-color: transparent;
+    background: linear-gradient(to right, var(--ink) 0 1.5rem, transparent 1.5rem calc(100% - 1.5rem), var(--ink) calc(100% - 1.5rem)) top / 100% var(--rule-paint) no-repeat;
+    background-origin: border-box;
+  }
+  .strip__line--go {
+    border-block-start-color: var(--clean);
+  }
+  .strip__n {
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    font-stretch: 68%;
+    font-variant-numeric: lining-nums;
+    line-height: 1.15;
+    color: var(--ink-3);
+  }
+  .strip__line--go .strip__n {
+    color: var(--clean-ink);
+  }
+  .strip__body {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+  }
+  .strip__text {
+    color: var(--ink);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    text-decoration-color: var(--line-strong);
+  }
+  .strip__text:hover {
+    color: var(--accent);
+  }
+  .strip__badges {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-2);
+  }
+  .is-lit {
+    background-color: var(--mark-bg);
+    box-shadow: 0 0 0 0.5rem var(--mark-bg);
+    clip-path: inset(0 -0.5rem);
+  }
+  .strip__line--outline.is-lit,
+  .strip__line--open.is-lit {
+    box-shadow: 0 0 0 0.5rem var(--mark-bg);
+  }
+
+  /* collapsed form */
+  .strip-c {
+    max-inline-size: 46rem;
+    border: var(--rule-paint) solid var(--ink);
+  }
+  .strip-c > summary {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    list-style: none;
+    cursor: pointer;
+  }
+  .strip-c > summary::-webkit-details-marker {
+    display: none;
+  }
+  .strip-c__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+  }
+  .strip-c__label:lang(en) {
+    text-transform: uppercase;
+  }
+  .strip-c__frac {
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+  }
+  .strip-c__frac b {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    color: var(--ink);
+  }
+  .strip-c__pips {
+    display: inline-flex;
+    align-items: center;
+  }
+  .strip-c__pips span {
+    display: grid;
+    border-block-end: 3px solid transparent;
+  }
+  .strip-c__pips .is-now {
+    border-block-end-color: var(--signal-red);
+  }
+  .strip-c__now {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+  }
+  .strip-c__text {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .strip-c__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-block-size: 1.75rem;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+  }
+  .strip-c[open] .strip-c__toggle :global(svg) {
+    transform: rotate(180deg);
+  }
+  .strip-c[open] .strip-c__now {
+    display: none;
+  }
+  .strip--inside {
+    margin-inline: var(--sp-4);
+    border-block-end: 0;
+  }
+  .strip-c__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-3);
+    margin: 0;
+    padding: var(--sp-3) var(--sp-4);
+    border-block-start: var(--rule-paint) solid var(--ink);
+    background: var(--bg-sunken);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+  }
+  .strip-c__foot a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+  }
+</style>

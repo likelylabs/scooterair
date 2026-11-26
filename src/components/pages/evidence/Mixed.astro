@@ -1,0 +1,24 @@
+---
+/**
+ * Mixed — prints registry text with a lang attribute on each run that is not in the page's
+ * language: Chinese runs inside English text (「機慢車停等區」 in an English statement) get
+ * lang="zh-Hant-TW", so screen readers and fonts switch correctly. Chinese pages leave Latin runs
+ * alone (they are short names and units that read correctly as they are).
+ *
+ * Props
+ *   text    the string
+ *   locale  the page's Locale
+ */
+import type { Locale } from '@/i18n';
+import { htmlLang } from '@/i18n';
+
+interface Props {
+  text: string;
+  locale: Locale;
+}
+const { text, locale } = Astro.props;
+// a run of CJK characters and the CJK punctuation that travels with them
+const parts = locale === 'en' ? text.split(/([　-〿㐀-鿿＀-￯]+(?:[\s\d.,–-]*[　-〿㐀-鿿＀-￯]+)*)/) : [text];
+---
+
+{parts.map((p, i) => (i % 2 === 1 ? <span lang={htmlLang['zh-TW']}>{p}</span> : p))}

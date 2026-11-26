@@ -1,0 +1,190 @@
+---
+/**
+ * SubsidyTimeline — the date-aware timeline strip (V19): today · 12/31, the
+ * last day to buy and register · 1/10, online applications close (varies by
+ * city) · then a dotted stretch for 2027, where nothing is confirmed. The
+ * 2027 stop is drawn in the gap style (dotted line, hollow dot) and carries the
+ * date we checked, not the 沒人量過 badge: that badge is for measurements.
+ *
+ * - Before the deadline it never counts down: dates only (blueprint, decision 0).
+ * - After the filing deadline, with nothing confirmed, the dotted stretch
+ *   carries a count aimed at government: 「已經 N 天沒有定案」.
+ * - Without JavaScript it prints the dates and no "today" marker.
+ * The state comes from src/lib/site-state.ts, the same one MoneyBanner uses.
+ * The page must be rendered with <Base money> (it prints the snapshot the
+ * browser re-evaluates from); without it the strip still follows the date,
+ * but cannot print "today" or the day count.
+ *
+ * Props
+ *   locale  Locale
+ */
+import type { Locale } from '@/i18n';
+import money from '@/i18n/pages/money';
+import { fill } from '@/i18n/pages/_copy';
+import { formatDate, snapshot } from '@/lib/site-state.data';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+const { locale, class: cls } = Astro.props;
+const t = money.timeline;
+const confirmed = snapshot.next.confirmed;
+const checked = fill(t.checked[locale], { date: formatDate(snapshot.checkedOn, locale, true) });
+---
+
+<div class:list={['tl', cls]}>
+  <ol class="tl__list" aria-label={t.label[locale]}>
+    <li class="tl__today" data-money-when="A"><span class="tl__dot" aria-hidden="true"></span><b>{t.today[locale]}</b><span data-money-fill="today"></span></li>
+    <li class="tl__stop">
+      <span class="tl__dot" aria-hidden="true"></span>
+      <b class="tl__date">{t.purchaseDate[locale]}</b>
+      <span>{t.purchase[locale]}<span class="tl__past" data-money-when="B C D">{t.past[locale]}</span></span>
+    </li>
+    <li class="tl__today" data-money-when="B"><span class="tl__dot" aria-hidden="true"></span><b>{t.today[locale]}</b><span data-money-fill="today"></span></li>
+    <li class="tl__stop">
+      <span class="tl__dot" aria-hidden="true"></span>
+      <b class="tl__date">{t.filingDate[locale]}</b>
+      <span>{t.filing[locale]}<span class="tl__past" data-money-when="C D">{t.past[locale]}</span></span>
+    </li>
+    <li class="tl__today" data-money-when="C D"><span class="tl__dot" aria-hidden="true"></span><b>{t.today[locale]}</b><span data-money-fill="today"></span></li>
+    <li class:list={['tl__stop tl__stop--next', confirmed && 'is-confirmed']}>
+      <span class="tl__dot" aria-hidden="true"></span>
+      <b class="tl__date">{t.nextDate[locale]}</b>
+      <span class="tl__next">
+        {confirmed ? (
+          <span>{t.nextConfirmed[locale]}</span>
+        ) : (
+          <Fragment>
+            <span>{t.next[locale]}</span>
+            <span class="tl__checked">{locale === 'en' ? `(${checked})` : `（${checked}）`}</span>
+            <span class="tl__count" data-money-when="C">
+              <span class="tl__led" aria-hidden="true" data-money-fill="daysSince"></span>
+              <span data-money-template={t.daysWithout[locale]}></span>
+            </span>
+          </Fragment>
+        )}
+      </span>
+    </li>
+  </ol>
+</div>
+
+<style>
+  .tl__list {
+    --dot: 0.875rem;
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-inline-size: 44rem;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .tl__list li {
+    position: relative;
+    grid-template-columns: var(--dot) 3.25rem minmax(0, 1fr);
+    gap: 0 var(--sp-3);
+    align-items: baseline;
+    padding-block-end: var(--sp-4);
+  }
+  /* display lives on the variants so data-money-when can still hide them */
+  .tl__stop,
+  :global(html[data-money-phase='A']) .tl__today[data-money-when~='A'],
+  :global(html[data-money-phase='B']) .tl__today[data-money-when~='B'],
+  :global(html[data-money-phase='C']) .tl__today[data-money-when~='C'],
+  :global(html[data-money-phase='D']) .tl__today[data-money-when~='D'] {
+    display: grid;
+  }
+  /* the line: solid between known dates, dotted into 2027 */
+  .tl__list li::before {
+    content: '';
+    position: absolute;
+    inset-block: 0.5em -0.5em;
+    inset-inline-start: calc(var(--dot) / 2 - 1.5px);
+    border-inline-start: 3px solid var(--ink);
+  }
+  .tl__list li:last-child::before {
+    inset-block-end: 0;
+    border-inline-start-style: dotted;
+  }
+  .tl__list li:nth-last-child(2)::before,
+  .tl__list li:nth-last-child(3)::before {
+    border-inline-start-style: dotted;
+  }
+  .tl__dot {
+    position: relative;
+    align-self: start;
+    margin-block-start: 0.3em;
+    inline-size: var(--dot);
+    block-size: var(--dot);
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .tl__stop--next .tl__dot {
+    border-style: dotted;
+    background: var(--here);
+  }
+  .tl__stop--next.is-confirmed .tl__dot {
+    border-style: solid;
+    border-color: var(--clean);
+    background: var(--clean);
+  }
+  .tl__today {
+    color: var(--signal-red-ink);
+    font-weight: var(--fw-bold);
+  }
+  .tl__today .tl__dot {
+    border-color: var(--signal-red);
+    background: var(--signal-red);
+    border-radius: 0;
+    transform: rotate(45deg) scale(0.85);
+  }
+  .tl__date {
+    font-size: var(--fs-md);
+    font-weight: 800;
+    font-stretch: 72%;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .tl__past {
+    margin-inline-start: 0.6em;
+    padding: 0 0.4em;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .tl__next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    font-weight: var(--fw-bold);
+  }
+  .tl__checked {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    color: var(--ink-2);
+  }
+  .tl__count {
+    align-items: center;
+    gap: var(--sp-2);
+    flex-basis: 100%;
+  }
+  :global(html[data-money-phase='C']) .tl__count {
+    display: flex;
+  }
+  .tl__led {
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-1);
+    background: var(--asphalt-950);
+    color: var(--signal-red-led);
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    font-stretch: 68%;
+    font-variant-numeric: tabular-nums lining-nums;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+  }
+</style>

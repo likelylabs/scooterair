@@ -1,0 +1,22 @@
+---
+/**
+ * TabPanel — one panel inside <Tabs>. See Tabs.astro.
+ *
+ * Props
+ *   id     unique id (also the URL hash that opens this tab)
+ *   label  tab label; shown as the panel heading when JavaScript is off
+ *   level  heading level for that fallback heading (default 3)
+ */
+interface Props {
+  id: string;
+  label: string;
+  level?: 3 | 4;
+}
+const { id, label, level = 3 } = Astro.props;
+const H = `h${level}` as 'h3' | 'h4';
+---
+
+<section class="tabpanel" id={id} data-label={label}>
+  <H class="tabpanel__title">{label}</H>
+  <slot />
+</section>

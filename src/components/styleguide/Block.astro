@@ -1,0 +1,90 @@
+---
+/**
+ * Block — styleguide-only: one documented specimen (name, note, live demo,
+ * usage snippet). Not for production pages.
+ *
+ * Props
+ *   name  component / token name
+ *   file  source path shown beside the name
+ *   code  usage snippet
+ *   wide  let the demo use the full width
+ * Slots
+ *   default  the live demo
+ *   note     explanatory text (prose)
+ */
+interface Props {
+  name: string;
+  file?: string;
+  code?: string;
+  wide?: boolean;
+}
+const { name, file, code, wide = false } = Astro.props;
+const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+---
+
+<article class:list={['sgb', wide && 'sgb--wide']} id={`c-${id}`}>
+  <header class="sgb__head">
+    <h3 class="sgb__name">{name}</h3>
+    {file && <code class="sgb__file">{file}</code>}
+  </header>
+  {Astro.slots.has('note') && <div class="sgb__note prose"><slot name="note" /></div>}
+  <div class="sgb__demo"><slot /></div>
+  {code && <pre class="sgb__code" tabindex="0"><code>{code}</code></pre>}
+</article>
+
+<style>
+  .sgb {
+    display: grid;
+    gap: var(--sp-4);
+    padding-block: var(--sp-6);
+    border-block-start: 1px solid var(--line-strong);
+    min-inline-size: 0;
+  }
+  .sgb__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-1) var(--sp-3);
+  }
+  .sgb__name {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    font-stretch: 100%;
+  }
+  .sgb__file {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+    background: none;
+    padding: 0;
+    overflow-wrap: anywhere;
+  }
+  .sgb__note {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .sgb__note:lang(zh) {
+    line-height: 1.7;
+  }
+  .sgb__demo {
+    min-inline-size: 0;
+  }
+  .sgb:not(.sgb--wide) .sgb__demo {
+    max-inline-size: 46rem;
+  }
+  .sgb__code {
+    margin: 0;
+    padding: var(--sp-3) var(--sp-4);
+    overflow-x: auto;
+    background: var(--bg-sunken);
+    border-inline-start: 3px solid var(--line-strong);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    white-space: pre;
+  }
+  .sgb__code code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+</style>

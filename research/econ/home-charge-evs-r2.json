@@ -1,0 +1,204 @@
+{
+ "scope": "home-charge-evs-r2",
+ "round": 2,
+ "checkedOn": "2026-11-25",
+ "summary": "Only one no-fee, removable-battery, home-charged scooter was verified: ZAU ES-1000, listed at NT$58,000 on PChome (struck-through 62,000). It is a 1.29 kWh, 9 kg battery you can carry upstairs, charges from a normal socket in 4.5-5.5 h, tops out at 53 km/h and is rated 60 km at a steady 30 km/h, so real range in traffic will be lower. Battery warranty is 3 years (vehicle 2); service is limited to about 42 outlets, 8 in Keelung. Home electricity is roughly NT$0.05-0.12/km by estimate against about NT$0.55-0.93 for petrol. Subsidy class and an official km/kWh figure were not found. Ionex plug-in models still need a plan from NT$318 a month, so they are not no-fee. Fixed charging in shared areas of an apartment needs committee consent; Kaohsiung's community subsidy closed 2026-08-31. Honest bottom line: no no-fee model matches a 125cc on speed and range.",
+ "findings": [
+  {
+   "id": "zau-es1000-price",
+   "subject": "ZAU ES-1000 普通輕型 (green plate) PChome price",
+   "verdict": "CORRECTED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Price confirmed in PChome page data: price 58000, struck-through 62000, tagline 免月租費綁約. Correction: the page markets it as a retailer listing only; the listing says 普通輕型 but the underlying product name is 輕型, so confirm plate class with a dealer. No manufacturer MSRP seen; zau.com.tw shows no price.",
+   "value": 58000,
+   "valueText": "NT$58,000 PChome (struck-through 62,000); retailer price, before subsidy",
+   "sourceUrl": "https://24h.pchome.com.tw/store/DXBK2V",
+   "quote": "【ZAU】ES-1000普通輕型電動機車(珍珠白) ... \"price\":58000,\"salePrice\":62000",
+   "status2027": "unknown",
+   "vehicleClass": "普通輕型 (per listing title)"
+  },
+  {
+   "id": "zau-es2000-price",
+   "subject": "ZAU ES-2000 普通重型 PChome price",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Page data shows price 79000, struck-through 82000.",
+   "value": 79000,
+   "valueText": "NT$79,000 (struck-through 82,000)",
+   "sourceUrl": "https://24h.pchome.com.tw/store/DXBK2V",
+   "quote": "【ZAU】ES-2000普通重型電動機車(珍珠白) ... \"price\":79000,\"salePrice\":82000"
+  },
+  {
+   "id": "zau-es1000-spec",
+   "subject": "ZAU ES-1000 official spec",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Every figure matches the official spec table; confirmed 2,250 W max, 60.5 kg empty/70 kg with battery, charger AC 100-240 V. Note the spec page and the whole ZAU site's newest news item is dated 2025-03, so the site looks lightly maintained.",
+   "value": 1290,
+   "valueText": "60V/21.5Ah/1290Wh single removable battery; 53 km/h; 60 km at constant 30 km/h; 4.5-5.5 h charge",
+   "sourceUrl": "https://www.zau.com.tw/es-1000.html",
+   "quote": "電池類型 鋰電池，抽取式1顆 / 電池容量 60V/21.5Ah/1290Wh / 最高時速 53km/Hr / 續航里程 60km @定速30km/h / 充電時間 4.5~ 5.5小時"
+  },
+  {
+   "id": "zau-es2000-spec",
+   "subject": "ZAU ES-2000 official spec",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "All figures match (72 V motor, 4,500 W, 36V*2*30Ah=2200Wh, 80 km/h, 80 km at 30 km/h, 7.5-8.5 h).",
+   "value": 2200,
+   "valueText": "2,200 Wh in two removable batteries; 80 km/h; 80 km at 30 km/h",
+   "sourceUrl": "https://www.zau.com.tw/es-2000.html",
+   "quote": "電池類型 鋰電池，抽取式2顆串聯使用 / 電池容量 36V*2*30Ah=2200Wh / 最高時速 80km/Hr / 續航里程 80km @定速30km/h / 充電時間 7.5~ 8.5小時"
+  },
+  {
+   "id": "zau-battery-hc6020",
+   "subject": "ZAU HC6020 battery pack",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Matches. Page does not name the ES-1000, but 60V/21.5Ah matches. No price.",
+   "value": 9,
+   "valueText": "60 V 21.5 Ah, 17S7P, 9 kg, 178x210x200 mm",
+   "sourceUrl": "https://www.zau.com.tw/60v.html",
+   "quote": "型號 HC6020 / 額定容量(Ah) 21.5 / 額定電壓(V) 60 / 重量(Kg) 9"
+  },
+  {
+   "id": "zau-warranty",
+   "subject": "ZAU warranty",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Terms match. Additional detail: motor/controller 1-year extension after replacement; accessories 1 year; service only at ZAU-designated stations with ZAU-specified parts; warranty coverage is lost if scheduled services are skipped. The battery clause wording is ambiguous (the 30,000 km / above-60% condition is unclear).",
+   "value": 3,
+   "valueText": "Vehicle 2 years from registration; lithium battery 3 years or 30,000 km with remaining capacity above 60%, whichever first",
+   "sourceUrl": "https://www.zau.com.tw/warranty.html",
+   "quote": "鋰電池：1)鋰電池保固3年，或2)行駛里程數3萬公里後電池剩餘容量>60%，保固期限以ZAU電動機車掛牌日開始起算，以先到者為準。"
+  },
+  {
+   "id": "zau-dealers",
+   "subject": "ZAU dealer network",
+   "verdict": "CORRECTED",
+   "confidence": "VERIFIED",
+   "verifierNote": "42 address lines confirmed. Corrected my parse of counts: Keelung 8, New Taipei 5 (not 4), Taichung 3, Kaohsiung 3, Penghu 3, Kinmen about 2 (not 4, regex-based), Lienchiang 1, Chiayi City 2 + Chiayi County 1, Tainan 2, Pingtung 2, Nantou 2, and 1 each Taipei, Taoyuan, Hsinchu City, Changhua, Yunlin, Yilan, Hualien, Taitung. None listed for Miaoli or Hsinchu County. Counts are approximate (automated parse).",
+   "value": 42,
+   "valueText": "About 42 listed outlets, 8 in Keelung",
+   "sourceUrl": "https://www.zau.com.tw/store.html",
+   "quote": "基隆德新機車-總店 地址：基隆市仁愛區南榮路65號 ... 實車展示：有"
+  },
+  {
+   "id": "zau-registrations",
+   "subject": "ZAU registrations",
+   "verdict": "UNREACHABLE",
+   "confidence": "SECONDARY",
+   "verifierNote": "The July 2026 (29) and June 2026 (11) figures come from the first-sweep other-ev-brands.json and were not re-verified here; I did not open the TVBS page.",
+   "value": 29,
+   "valueText": "July 2026: 29; June 2026: 11 (first-sweep file)",
+   "sourceUrl": "https://cars.tvbs.com.tw/car-news/235912"
+  },
+  {
+   "id": "zau-es1000-cost-per-km",
+   "subject": "ZAU ES-1000 home electricity cost per km (derived)",
+   "verdict": "CONFIRMED",
+   "confidence": "SECONDARY",
+   "verifierNote": "Arithmetic checks out from the verified spec (1.29 kWh/60 km = 0.0215 kWh/km best case). Charger loss and real-traffic penalty are assumptions; no official km/kWh label figure found. Tariff 1.68-3.03 NTD/kWh not re-verified here. Note ZAU's own range is a 30 km/h constant-speed test, so at 40-50 km/h expect a lot less range.",
+   "value": 0.08,
+   "valueText": "about NT$0.05-0.12/km (derived, assumptions stated)",
+   "sourceUrl": "https://www.zau.com.tw/es-1000.html"
+  },
+  {
+   "id": "ionex-home-charge-plan",
+   "subject": "Ionex plug-in under rental plan",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "All figures confirmed on the live page: 318 plan (NT$250 credit, pure charging about 6.8 kWh / 212 km), 518 plan (17.6 kWh / 552 km), overage NT$52/kWh effective 2026-09-01, NT$15/kWh charging credit, plans effective 2026-08-17. The derived example is arithmetic-consistent: 250/(52-15) = 6.76 kWh, and 12 kWh gives 318+(12-6.8)*37 = about NT$510/month. Addition: the single-battery plan list explicitly includes COZY, so even the micro Cozy appears to be on a plan; the first sweep's claim that the Mint/Cozy micro models are no-fee is not supported by this page (only a legacy 終身免基本費 plan exists for existing owners).",
+   "value": 318,
+   "valueText": "NT$318/month minimum on single-battery models",
+   "sourceUrl": "https://www.ionex.com.tw/plans",
+   "quote": "純充電 - 約6.8度 可騎乘約 212 公里* … 超量使用費 依每度(kWh) $52 元計價 … 使用充電模式可回饋每度15元電池使用費折抵金"
+  },
+  {
+   "id": "ionex-which-models-charge",
+   "subject": "Ionex models with 充換合一",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Home page menu marks i-One Fly Techno, S7 Techno, S7R Techno and MiG 9 as 充換合一; Mint and Cozy are labelled 微型電動(充電). Dual-battery plan list covers i-One Fly, i-One Fly Techno, S6, S6 Rex, S7 Techno, S7R Techno, MiG 9. Whether i-One Air has a socket is still not stated. Price class claim not rechecked.",
+   "value": 4,
+   "valueText": "4 plug-and-swap lines",
+   "sourceUrl": "https://www.ionex.com.tw/",
+   "quote": "i-One Fly Techno 充換合一新上市 / S7 Techno 充換合一 / S7R Techno 充換合一 / MiG 9 New! 充換合一旗艦登場 / Mint 微型電動(充電) / Cozy 微型電動(充電)"
+  },
+  {
+   "id": "yamaha-cuxie-gogoro",
+   "subject": "Yamaha CUXiE on Gogoro Network",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Yamaha page text opened via curl contains the Gogoro Network reference.",
+   "valueText": "Battery plans refer to Gogoro Network",
+   "sourceUrl": "https://www.yamaha-motor.com.tw/motor/motor_CUXiE",
+   "quote": "電池資費方案請參考 Gogoro Network 網站"
+  },
+  {
+   "id": "other-brands-gogoro-network",
+   "subject": "eMOVING/Aeon/PGO/eReady are swap-network models",
+   "verdict": "UNREACHABLE",
+   "confidence": "SECONDARY",
+   "verifierNote": "Brand sites still unreachable (emoving.com.tw: proxy 502). Not re-verified; keep as secondary and flag that eMOVING historically sold plug-in models, so a plug-in variant may exist."
+  },
+  {
+   "id": "apt-ntpc-guide",
+   "subject": "New Taipei apartment EV charging guide",
+   "verdict": "CONFIRMED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Opened the PDF with pdftotext: dated 中華民國111年1月 (1.0版) and cites 第6條第1項第4款 for using common parts. Still dated 2022; amendments not checked.",
+   "valueText": "Guide v1.0, Jan 2022",
+   "sourceUrl": "https://www.publicwork.ntpc.gov.tw/userfiles/1060600/files/新北市既有公寓大廈增設電動車充電設備指引.pdf",
+   "quote": "中華民國111年1月 (1.0版)"
+  },
+  {
+   "id": "apt-fire-guidance",
+   "subject": "Fire-service charging advice (UDN)",
+   "verdict": "CORRECTED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Quote confirmed. Correction: the article is dated 2026-02-23 (the first researcher said undated), so it is recent. It is local fire-bureau advice, not national rule.",
+   "valueText": "Dedicated circuit, no extension cords; dated 2026-02-23",
+   "sourceUrl": "https://udn.com/news/story/7320/9339591",
+   "quote": "電動車充電過程中引發火災的原因，包括未使用專用回路，且任意使用延長線，導至電流負荷過大。"
+  },
+  {
+   "id": "apt-community-subsidy-kaohsiung",
+   "subject": "Kaohsiung community low-carbon subsidy",
+   "verdict": "CORRECTED",
+   "confidence": "VERIFIED",
+   "verifierNote": "Cap and 49% confirmed, but the article is dated 2026-02-10, so 'this year' is 2026 and the application deadline 2026-08-31 has passed: the round is CLOSED. The programme is 114-115年度 with total NT$10 million budget and NT$500,000 max per unit. Charging posts are listed under 永續 items. 2027 round unknown.",
+   "value": 300000,
+   "valueText": "Charging posts under 低碳 items, up to 49%, NT$300,000 cap; closed 2026-08-31",
+   "sourceUrl": "https://news.tvbs.com.tw/esg/3124659",
+   "quote": "補助經費為建置總經費的49%，總補助上限30萬元"
+  },
+  {
+   "id": "substitute-verdict",
+   "subject": "Cheapest home-charged substitute",
+   "verdict": "CORRECTED",
+   "confidence": "SECONDARY",
+   "verifierNote": "Verdict stands with caveats: ES-1000 (NT$58,000, 53 km/h, 60 km at a constant 30 km/h) is the only no-fee removable-battery model verified, and is a light-use substitute, not a fair 125cc substitute. Confirmed ZAU's PChome copy says charging at TES public posts is possible and no monthly fee. Plate class and subsidy amount remain unverified, and speed rules for the class must be checked before publishing.",
+   "value": 58000
+  }
+ ],
+ "gaps": [
+  "MOEA subsidy class and 2026 central subsidy for ZAU ES-1000/ES-2000 not found (meid.nat.gov.tw unreachable via curl, status 000).",
+  "Official CNS energy-efficiency (km/kWh) figures for ZAU models not found.",
+  "ZAU replacement battery prices not published; real dealer price and delivered price after subsidy unknown.",
+  "eMOVING, Aeon, PGO, eReady, SYM, Suzuki, 摩特動力, 亞帝發, 捷穎 official pages unreachable; 2026 prices, plug-in options and warranties unverified.",
+  "Gogoro home-charging availability and cost not researched.",
+  "Ionex printed MSRPs, Mint/Cozy price and whether Mint/Cozy escape the monthly plan not found.",
+  "Whether the Condominium Act was amended since the Jan 2022 New Taipei guide not checked; no national rule on 騎樓/basement scooter charging found.",
+  "2027 status of subsidies and tariffs unknown.",
+  "Per-model 2026 ZAU registrations not found; ZAU site news is stale (latest 2025-03)."
+ ],
+ "needsManualFetch": [
+  "https://meid.nat.gov.tw/ (approved model list with subsidy class; unreachable)",
+  "https://www.moeaea.gov.tw (energy-efficiency label search)",
+  "https://www.emoving.com.tw/ (proxy 502)",
+  "https://www.aeonmotor.com.tw, https://www.pgo.com.tw, https://www.ereadyev.com, https://www.suzuki.com.tw, https://www.sym-global.com",
+  "https://www.taipower.com.tw residential tariff table",
+  "A ZAU dealer from https://www.zau.com.tw/store.html for real price, subsidy class and battery price"
+ ]
+}

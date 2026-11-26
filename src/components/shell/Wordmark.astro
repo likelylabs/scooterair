@@ -1,0 +1,71 @@
+---
+/**
+ * Wordmark — the mark (a green dot above three thickening exhaust strata)
+ * plus the site name from src/i18n/ui.ts. Links home.
+ *
+ * Props
+ *   locale   Locale
+ *   compact  hide the secondary-language name (default false)
+ */
+import { href, htmlLang, type Locale } from '@/i18n';
+import { site } from '@/i18n/ui';
+import Mark from './Mark.astro';
+
+interface Props {
+  locale: Locale;
+  compact?: boolean;
+}
+const { locale, compact = false } = Astro.props;
+const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
+---
+
+<a class="wordmark" href={href('/', locale)} aria-label={site.name[locale]}>
+  <Mark />
+  <span class="wordmark__name">{site.name[locale]}</span>
+  {!compact && <span class="wordmark__alt" lang={htmlLang[other]} aria-hidden="true">{site.altName[locale]}</span>}
+</a>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-block-size: var(--tap);
+    color: var(--ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .wordmark:hover {
+    color: var(--ink);
+  }
+  .wordmark__name {
+    font-family: var(--font-heading);
+    font-size: 1.1875rem;
+    font-weight: var(--fw-black);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .wordmark__name:lang(en) {
+    font-size: 1.3125rem;
+    font-weight: 800;
+    font-stretch: 78%;
+    letter-spacing: 0;
+  }
+  .wordmark__alt {
+    font-size: 0.8125rem;
+    font-weight: var(--fw-medium);
+    line-height: 1;
+    color: var(--ink-3);
+    padding-inline-start: 0.55rem;
+    border-inline-start: 1px solid var(--line-strong);
+  }
+  .wordmark__alt:lang(en) {
+    font-stretch: 85%;
+    letter-spacing: 0.02em;
+  }
+  @media (max-width: 26em) {
+    .wordmark__alt {
+      display: none;
+    }
+  }
+</style>

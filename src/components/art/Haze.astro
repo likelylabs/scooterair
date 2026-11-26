@@ -1,0 +1,134 @@
+---
+/**
+ * Haze — the band of street-level air along the bottom of a chapter.
+ * Decorative (aria-hidden); position it yourself or let <Chapter haze> do it.
+ *
+ * kind="unmeasured" is the one to use (blueprint 3.0): a strip of uniform
+ * diagonal hatching with a dashed upper edge and the label
+ * 「有廢氣｜多濃沒人量過」 / "exhaust present | amount not measured".
+ * Hatching is the map-maker's texture for "no data": it says where, and
+ * refuses to say how much. For this kind `density` only switches the band on
+ * (> 0) or off (0): it is always drawn at the same pitch, weight and height.
+ *
+ * Props
+ *   kind      'unmeasured' | 'all' | 'fumes' | 'co' | 'ufp'   (default 'all', for older callers)
+ *   density   0 = render nothing. For 'unmeasured', any value above 0 draws the same band.
+ *   height    box height in px reserved by the caller (default 220). The hatched strip itself is fixed.
+ *   locale    language of the label; defaults to the page's locale
+ *   label     set false to drop the in-band label (default true)
+ *   seed, animated   only used by the deprecated kinds
+ *   class     extra class on the wrapper
+ *
+ * DEPRECATED kinds 'all' | 'fumes' | 'co' | 'ufp': the density-graded washes
+ * from before the scientist's review. They draw an amount nobody has measured;
+ * do not use them next to the red-light scene.
+ */
+import '@/styles/art.css';
+import { localeFromParam, type Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+import { coRings, fumes, ufpDots } from './parts';
+
+interface Props {
+  density?: number;
+  kind?: 'unmeasured' | 'all' | 'fumes' | 'co' | 'ufp';
+  height?: number;
+  seed?: number;
+  animated?: boolean;
+  locale?: Locale;
+  label?: boolean;
+  class?: string;
+}
+const { density = 0.6, kind = 'all', height = 220, seed = 7, animated = true, label = true, class: cls } = Astro.props;
+const locale = Astro.props.locale ?? localeFromParam(Astro.params.lang);
+const d = Math.max(0, Math.min(1, density));
+const W = 2400; // drawn once at this width; the wrapper clips it
+const show = (k: string) => kind === 'all' || kind === k;
+const sc = height / 230;
+---
+
+{d > 0 && kind === 'unmeasured' && (
+  <div class:list={['haze', 'haze--unmeasured', cls]} style={`--haze-h:${height}px`} aria-hidden="true">
+    <div class="haze__hatch">
+      {label && (
+        <p class="haze__label">
+          <span>{art.band.present[locale]}</span>
+          <span>{art.band.unknown[locale]}</span>
+        </p>
+      )}
+    </div>
+  </div>
+)}
+
+{d > 0 && kind !== 'unmeasured' && (
+  <div class:list={['haze', animated && 'a-animated', cls]} style={`--haze-h:${height}px;--haze-d:${d}`} aria-hidden="true">
+    {show('fumes') && <div class="haze__wash" />}
+    <svg width={W} height={height} viewBox={`0 ${-height} ${W} ${height}`} focusable="false">
+      {show('ufp') && <g class="a-ufp a-drift-3" set:html={ufpDots({ width: W, count: Math.round(640 * d), seed: seed + 2, scale: 105 * sc, top: height - 6 })} />}
+      {show('co') && <g class="a-co a-drift-2" set:html={coRings({ width: W, count: Math.round(150 * d), seed: seed + 1, scale: 70 * sc, top: height - 10 })} />}
+      {show('fumes') && <g class="a-fumes a-drift-1" set:html={fumes({ width: W, count: Math.round(64 * d), seed, scale: 34 * sc, top: height * 0.8 })} />}
+    </svg>
+  </div>
+)}
+
+<style>
+  .haze {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: var(--haze-h);
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .haze svg {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 50%;
+    max-inline-size: none;
+    margin-inline-start: -1200px;
+    overflow: visible;
+  }
+  .haze__wash {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--art-haze) calc(var(--haze-d) * 46%), transparent),
+      color-mix(in srgb, var(--art-haze) calc(var(--haze-d) * 18%), transparent) 38%,
+      transparent 82%
+    );
+  }
+
+  /* "exhaust present, amount not measured": one pitch, one weight, one height */
+  .haze__hatch {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 5.25rem;
+    border-block-start: 2px dashed var(--art-haze-2);
+    background-color: color-mix(in srgb, var(--art-haze) 9%, transparent);
+    background-image: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--art-haze) 82%, transparent) 0 1.5px,
+      transparent 1.5px 9px
+    );
+  }
+  .haze__label {
+    position: absolute;
+    inset-block-end: calc(100% + 0.5rem);
+    inset-inline-start: var(--gutter);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.6em;
+    margin: 0;
+    padding: 0.1em 0.5em;
+    background: var(--here);
+    color: var(--exhaust-ink);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.5;
+  }
+  .haze__label span + span {
+    padding-inline-start: 0.6em;
+    border-inline-start: 1.5px solid currentColor;
+  }
+</style>

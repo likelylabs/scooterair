@@ -1,0 +1,89 @@
+---
+/**
+ * Claim — one sentence about the world, with everything that stands behind it: a citation
+ * marker for every source of the registry facts (and gaps) it rests on, its evidence badge(s),
+ * and the caveat the registry marks as required, set directly under the sentence.
+ *
+ * Props
+ *   locale    Locale
+ *   text      the sentence; default: the registry statement of the first fact
+ *   facts     registry fact ids the sentence rests on
+ *   gaps      registry gap ids the sentence states
+ *   badge     override the badges (e.g. 'inference')
+ *   caveats   false to leave the required caveats out (only where the same caveat already sits
+ *             next to the same number on screen); default true
+ *   as        'p' (default) | 'li' | 'div'
+ *   size      'md' (default) | 'sm'
+ */
+import type { Locale } from '@/i18n';
+import type { EvidenceKind } from '@/i18n/ui';
+import type { FactId, GapId } from '@/data';
+import Cite from '@/components/ui/Cite.astro';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import { badgesFor, lf, requiredCaveats, sourcesOf } from './ev';
+
+interface Props {
+  locale: Locale;
+  text?: string;
+  facts?: readonly FactId[];
+  gaps?: readonly GapId[];
+  badge?: EvidenceKind | EvidenceKind[];
+  caveats?: boolean;
+  as?: 'p' | 'li' | 'div';
+  size?: 'md' | 'sm';
+  class?: string;
+}
+const { locale, facts = [], gaps = [], caveats = true, as = 'p', size = 'md', class: cls } = Astro.props;
+const text = Astro.props.text ?? (facts[0] ? lf(facts[0], locale).statement : '');
+const cites = sourcesOf(facts, gaps);
+const kinds = Astro.props.badge
+  ? (Array.isArray(Astro.props.badge) ? Astro.props.badge : [Astro.props.badge]).map((k) => ({ kind: k, secondary: false }))
+  : facts.length
+    ? badgesFor(facts)
+    : gaps.length
+      ? [{ kind: 'gap' as EvidenceKind, secondary: false }]
+      : [];
+const notes = caveats ? requiredCaveats(facts, locale) : [];
+const noteLabel = locale === 'en' ? 'Read with this:' : '要一起看：';
+const Tag = as;
+---
+
+<Tag class:list={['claim', `claim--${size}`, cls]}>
+  <span class="claim__text">{text}{cites.map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}</span>
+  {kinds.length > 0 && <span class="claim__badges">{kinds.map((k) => <EvidenceBadge locale={locale} kind={k.kind} secondary={k.secondary} />)}</span>}
+  {notes.map((n) => (
+    <span class="claim__note"><b>{noteLabel}</b> {n.text}</span>
+  ))}
+</Tag>
+
+<style>
+  .claim {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+  }
+  .claim--sm .claim__text {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .claim__text {
+    display: block;
+  }
+  .claim__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-2);
+  }
+  .claim__note {
+    display: block;
+    padding-inline-start: var(--sp-3);
+    border-inline-start: 2px solid var(--line-strong);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .claim__note b {
+    color: var(--ink);
+    margin-inline-end: 0.25em;
+  }
+</style>

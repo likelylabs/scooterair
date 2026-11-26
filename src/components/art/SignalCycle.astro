@@ -1,0 +1,148 @@
+---
+/**
+ * SignalCycle — one signal cycle as a time bar (blueprint V14): red, then
+ * green, with two annotated stretches. There is deliberately no curve and no
+ * value axis: the strip says WHEN two things happen, never HOW MUCH.
+ *
+ *   over the red            怠速：你站在旁邊的時間 / Idling: the time you stand beside it
+ *   first seconds of green  起步：國外量到微粒高峰（汽車和柴油車）, with its evidence badge
+ *   tag                     機車、台灣：沒人量過 / Scooters, Taiwan: nobody has measured this
+ *
+ * Props
+ *   locale  Locale
+ *   class   extra class
+ * Slots
+ *   badge   the evidence badge for the pull-away note (default: the words
+ *           "國際證據 / International evidence" in a plain outlined tag —
+ *           pass <EvidenceBadge> here)
+ *   gap     replaces the gap tag (pass the 沒人量過 badge)
+ */
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+const { locale, class: cls } = Astro.props;
+const c = art.cycle;
+---
+
+<div class:list={['cycle', cls]}>
+  <p class="cycle__note cycle__note--idle">{c.idle[locale]}</p>
+  <div class="cycle__marks cycle__marks--over" aria-hidden="true"><span class="cycle__bracket cycle__bracket--over"></span></div>
+  <div class="cycle__bar" role="img" aria-label={c.alt[locale]}>
+    <span class="cycle__red"><b>{c.red[locale]}</b></span>
+    <span class="cycle__green"><b>{c.green[locale]}</b></span>
+  </div>
+  <div class="cycle__marks" aria-hidden="true"><span></span><span class="cycle__bracket"></span><span></span></div>
+  <div class="cycle__note cycle__note--pull">
+    <p>{c.pullAway[locale]}</p>
+    <p class="cycle__tags">
+      <slot name="badge"><span class="cycle__badge">{c.badge[locale]}</span></slot>
+      <slot name="gap"><span class="cycle__gap">{c.gap[locale]}</span></slot>
+    </p>
+  </div>
+  <p class="cycle__axis" aria-hidden="true">{c.time[locale]} →</p>
+</div>
+
+<style>
+  .cycle {
+    --split: 76%; /* where the bar turns green */
+    display: grid;
+    max-inline-size: 44rem;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  /* the idling note sits over the red stretch, tied to it by a bracket that opens onto the bar
+     (the mirror of the one under the first seconds of green). No box: nothing to hang off an edge. */
+  .cycle__note--idle {
+    max-inline-size: var(--split);
+    padding-block-end: var(--sp-1);
+    font-weight: var(--fw-bold);
+  }
+  .cycle .cycle__marks--over {
+    grid-template-columns: var(--split) 1fr;
+    margin-block: 0 var(--sp-1);
+  }
+  .cycle .cycle__bracket--over {
+    border: 2px solid var(--ink);
+    border-block-end: 0;
+  }
+  .cycle__bar {
+    display: grid;
+    grid-template-columns: var(--split) 1fr;
+    block-size: 2.25rem;
+  }
+  .cycle__bar span {
+    display: flex;
+    align-items: center;
+    padding-inline: var(--sp-2);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.06em;
+    min-inline-size: 0;
+  }
+  .cycle__red {
+    background: var(--signal-red);
+    color: #fff;
+  }
+  .cycle__green {
+    background: var(--clean);
+    color: #fff;
+  }
+  :global(:root[data-theme='dark']) .cycle__red,
+  :global(:root[data-theme='dark']) .cycle__green {
+    color: #0b0e10;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .cycle__red,
+    :global(:root:not([data-theme='light'])) .cycle__green {
+      color: #0b0e10;
+    }
+  }
+  /* the bracket under the first seconds of green */
+  .cycle__marks {
+    display: grid;
+    grid-template-columns: var(--split) 9% 1fr;
+    block-size: 0.6rem;
+    margin-block-start: var(--sp-1);
+  }
+  .cycle__bracket {
+    border: 2px solid var(--ink);
+    border-block-start: 0;
+  }
+  .cycle__note--pull {
+    display: grid;
+    gap: var(--sp-2);
+    justify-self: end;
+    inline-size: min(100%, 24rem);
+    margin-block-start: var(--sp-1);
+    padding: var(--sp-2) 0 0 var(--sp-3);
+    border-inline-end: 2px solid var(--ink);
+    padding-inline-end: var(--sp-3);
+    text-align: end;
+    font-weight: var(--fw-bold);
+  }
+  .cycle__tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+  }
+  .cycle__badge {
+    padding: 0.15em 0.6em;
+    border: 2px solid var(--ink);
+  }
+  .cycle__gap {
+    padding: 0.15em 0.6em;
+    border: 2px dotted var(--line-strong);
+    font-weight: var(--fw-medium);
+    color: var(--ink-2);
+  }
+  .cycle__axis {
+    margin-block-start: var(--sp-3);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+</style>

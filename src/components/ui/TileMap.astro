@@ -1,0 +1,369 @@
+---
+/**
+ * TileMap — Taiwan's 22 cities and counties as a tile grid (V41), each tile in
+ * one of the subsidy states. States are told apart by a swatch pattern and a
+ * word, never by colour alone:
+ *
+ *   available    有名額                 solid swatch
+ *   restricted   只限汰舊或特定身分      hatched swatch
+ *   unpublished  方案進行中，名額沒公布  ring swatch
+ *   exhausted    已用完（或已截止）       struck, empty swatch
+ *   unknown      查不到                 dashed tile with a "?" — never drawn as zero
+ *
+ * By default the states come from the registry through src/lib/site-state.ts
+ * for the day of the build, and are re-evaluated in the browser on pages
+ * rendered with <Base money> (a city whose window closes on 30 November shows
+ * as closed on 1 December without a rebuild). Each tile links to its detail
+ * row under the map; with JavaScript the rows become one panel that follows
+ * the selected tile. Without it the rows are a complete list.
+ *
+ * Props
+ *   locale  Locale
+ *   name    id prefix for the detail rows (default 'city'; rows are #city-taipei …)
+ *   items   override or extend what a tile says, by JurisdictionId:
+ *           Partial<Record<JurisdictionId, { state?: TileState; detail?: string; date?: string }>>
+ *   label   accessible name of the map
+ * Slots
+ *   <jurisdiction id>  rich detail for one city (amounts, a <Ledger>), e.g.
+ *                      <Fragment slot="taipei">…</Fragment>. Every amount needs its check date.
+ *   after              a line under the map
+ */
+import type { Locale } from '@/i18n';
+import { tiles, t } from '@/i18n/ui';
+import { jurisdictionIds, type JurisdictionId } from '@/data/econ/types';
+import { cityMoney, formatDate, snapshot, tileState, todayInTaipei, type TileState } from '@/lib/site-state.data';
+import Icon from './Icon.astro';
+
+interface Props {
+  locale: Locale;
+  name?: string;
+  items?: Partial<Record<JurisdictionId, { state?: TileState; detail?: string; date?: string }>>;
+  label?: string;
+  class?: string;
+}
+const { locale, name = 'city', items = {}, label = tiles.label[locale], class: cls } = Astro.props;
+
+/** Column (0 = outlying islands, 1 west coast, 2 inland, 3 east) and row, north to south. */
+const GRID: Record<JurisdictionId, [number, number]> = {
+  lienchiang: [0, 0], taipei: [2, 0], keelung: [3, 0],
+  taoyuan: [1, 1], 'new-taipei': [2, 1], yilan: [3, 1],
+  'hsinchu-city': [1, 2], 'hsinchu-county': [2, 2],
+  kinmen: [0, 3], miaoli: [1, 3], taichung: [2, 3],
+  changhua: [1, 4], nantou: [2, 4], hualien: [3, 4],
+  penghu: [0, 5], yunlin: [1, 5],
+  'chiayi-city': [1, 6], 'chiayi-county': [2, 6],
+  tainan: [1, 7], kaohsiung: [2, 7], taitung: [3, 7],
+  pingtung: [2, 8],
+};
+const today = todayInTaipei();
+const short = (id: JurisdictionId, full: string) => {
+  if (locale !== 'en') return full;
+  const name = full.replace(/\s*\(.*\)$/, '');
+  return /^(hsinchu|chiayi)-/.test(id) ? name.replace('County', 'Co.') : name.replace(/ (City|County)$/, '');
+};
+const order = [...jurisdictionIds].sort((a, b) => GRID[a][1] - GRID[b][1] || GRID[a][0] - GRID[b][0]);
+const cells = order.map((id) => {
+  const c = cityMoney(id, today, snapshot);
+  const over = items[id] ?? {};
+  const state = over.state ?? tileState(c.status);
+  const full = c.name[locale];
+  const date = over.date ?? c.asOf;
+  const detail = over.detail ?? (state === 'unknown' ? tiles.unknownDetail[locale] : c.quotaText?.[locale]);
+  return { id, state, full, short: short(id, full), date, detail, links: snapshot.cities[id].links, col: GRID[id][0] + 1, row: GRID[id][1] + 1 };
+});
+const states: TileState[] = ['available', 'restricted', 'unpublished', 'exhausted', 'unknown'];
+const stateLabel = (s: TileState) => (s === 'unpublished' ? { 'zh-TW': '名額沒公布', en: 'Places not published' }[locale] : tiles.states[s][locale]);
+const used = states.filter((s) => s !== 'unpublished' || cells.some((c) => c.state === 'unpublished'));
+const labels = Object.fromEntries(states.map((s) => [s, stateLabel(s)]));
+---
+
+<div class:list={['tmap', cls]} data-tilemap data-name={name} data-labels={JSON.stringify(labels)}>
+  <ul class="tmap__key" aria-label={tiles.legend[locale]}>
+    {used.map((s) => <li><span class={`tmap__swatch tmap__swatch--${s}`} aria-hidden="true"></span>{stateLabel(s)}</li>)}
+  </ul>
+  <ul class="tmap__grid" aria-label={label}>
+    {cells.map((c) => (
+      <li style={`grid-column:${c.col};grid-row:${c.row}`}>
+        <a class="tile" href={`#${name}-${c.id}`} data-tile={c.id} data-state={c.state}>
+          <span class="tmap__swatch" aria-hidden="true"></span>
+          <span class="tile__name">{c.short}</span>
+          <span class="vh">：<span data-part="state">{stateLabel(c.state)}</span></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <p class="tmap__hint" data-js-only>{tiles.pick[locale]}</p>
+  <div class="tmap__rows" aria-live="polite">
+    {cells.map((c) => (
+      <article class="tmap__row" id={`${name}-${c.id}`} data-row={c.id} data-state={c.state}>
+        <h4 class="tmap__name">{c.full}</h4>
+        <p class="tmap__state">
+          <span class="tmap__swatch" aria-hidden="true"></span>
+          <b data-part="state">{stateLabel(c.state)}</b>
+          <span class="tmap__date">{t(tiles.checked, locale, { date: formatDate(c.date, locale, true) })}</span>
+        </p>
+        {Astro.slots.has(c.id) ? <div class="tmap__detail"><slot name={c.id} /></div> : c.detail && <p class="tmap__detail">{c.detail}</p>}
+        {c.links.length > 0 && (
+          <p class="tmap__links">
+            {c.links.slice(0, 1).map((l) => (
+              <a href={l.url} rel="noopener external" target="_blank">{tiles.official[locale]}：{l.label[locale]}<Icon name="arrow-up-right" size="1em" /><span class="vh">{locale === 'en' ? ' (opens in a new tab)' : '（另開新視窗）'}</span></a>
+            ))}
+          </p>
+        )}
+      </article>
+    ))}
+  </div>
+  {Astro.slots.has('after') && <p class="tmap__after"><slot name="after" /></p>}
+</div>
+
+<style>
+  .tmap {
+    display: grid;
+    gap: var(--sp-4);
+    min-inline-size: 0;
+    --sw: var(--clean);
+  }
+  .tmap__key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    color: var(--ink-2);
+  }
+  .tmap__key li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+  }
+  /* the swatch carries the state as a pattern */
+  .tmap__swatch {
+    flex: none;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    border: 2px solid var(--ink);
+    background: var(--ink);
+  }
+  .tmap__swatch--restricted,
+  [data-state='restricted'] > .tmap__swatch,
+  [data-state='restricted'] .tmap__state .tmap__swatch {
+    background: repeating-linear-gradient(-45deg, var(--ink) 0 2px, transparent 2px 4.5px);
+  }
+  .tmap__swatch--unpublished,
+  [data-state='unpublished'] > .tmap__swatch,
+  [data-state='unpublished'] .tmap__state .tmap__swatch {
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--ink) 0 22%, transparent 26%);
+  }
+  .tmap__swatch--exhausted,
+  [data-state='exhausted'] > .tmap__swatch,
+  [data-state='exhausted'] .tmap__state .tmap__swatch {
+    background: linear-gradient(to top right, transparent calc(50% - 1.2px), var(--ink) calc(50% - 1.2px) calc(50% + 1.2px), transparent calc(50% + 1.2px));
+  }
+  .tmap__swatch--unknown,
+  [data-state='unknown'] > .tmap__swatch,
+  [data-state='unknown'] .tmap__state .tmap__swatch {
+    border-style: dashed;
+    border-width: 1.5px;
+    background: none;
+  }
+  .tmap__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 3.5rem;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-inline-size: 26rem;
+  }
+  .tmap__grid li {
+    display: grid;
+    min-inline-size: 0;
+  }
+  .tile {
+    position: relative;
+    display: grid;
+    align-content: space-between;
+    justify-items: start;
+    gap: 2px;
+    padding: 5px 6px;
+    border: 2px solid var(--ink);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    text-decoration: none;
+    min-inline-size: 0;
+  }
+  .tile__name {
+    overflow-wrap: anywhere;
+  }
+  .tile__name:lang(en) {
+    font-stretch: 80%;
+  }
+  .tile[data-state='available'] {
+    background: var(--clean-wash);
+  }
+  .tile[data-state='restricted'] {
+    background: repeating-linear-gradient(-45deg, var(--clean-wash) 0 6px, var(--surface) 6px 12px);
+  }
+  .tile[data-state='exhausted'] {
+    background: var(--bg-sunken);
+    color: var(--ink-2);
+    border-color: var(--line-strong);
+  }
+  .tile[data-state='unknown'] {
+    border-style: dashed;
+    background: transparent;
+  }
+  .tile[data-state='unknown']::after {
+    content: '?';
+    position: absolute;
+    inset-block-start: 3px;
+    inset-inline-end: 6px;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    color: var(--ink-2);
+  }
+  .tile:hover {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+  .tile[aria-current='true'] {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+    z-index: 1;
+  }
+  .tmap__hint {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .tmap__rows {
+    display: grid;
+    max-inline-size: 44rem;
+  }
+  .tmap__row {
+    display: grid;
+    gap: var(--sp-1);
+    padding-block: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    scroll-margin-top: calc(var(--header-h) + var(--rail-h) + 1rem);
+  }
+  .tmap__row:target {
+    box-shadow: inset 4px 0 0 var(--ink);
+    padding-inline-start: var(--sp-3);
+  }
+  /* with JavaScript: one panel that follows the selected tile */
+  :global(html.js) .tmap__row:not([data-on]) {
+    display: none;
+  }
+  :global(html.js) .tmap__row[data-on] {
+    padding: var(--sp-4);
+    border: var(--rule-paint) solid var(--ink);
+    box-shadow: none;
+  }
+  :global(html.js) [data-tilemap][data-picked] .tmap__hint {
+    display: none;
+  }
+  .tmap__name {
+    font-size: var(--fs-md);
+  }
+  .tmap__state {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-2);
+    font-size: var(--fs-sm);
+  }
+  .tmap__date {
+    color: var(--ink-2);
+    font-size: var(--fs-xs);
+  }
+  .tmap__detail,
+  .tmap__links {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-2);
+  }
+  .tmap__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-block-size: 2rem;
+    overflow-wrap: anywhere;
+  }
+  .tmap__after {
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+  @media (min-width: 30em) {
+    .tmap__grid {
+      grid-auto-rows: 3.75rem;
+      gap: 6px;
+    }
+    .tile {
+      font-size: var(--fs-sm);
+      padding: 6px 8px;
+    }
+  }
+  @media (forced-colors: active) {
+    .tmap__swatch {
+      forced-color-adjust: none;
+    }
+  }
+</style>
+
+<script>
+  import { cityMoney, tileState, todayInTaipei, type MoneySnapshot } from '@/lib/site-state';
+  import type { JurisdictionId } from '@/data/econ/types';
+
+  document.querySelectorAll<HTMLElement>('[data-tilemap]').forEach((root) => {
+    const tilesEls = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-tile]'));
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-row]'));
+
+    // re-evaluate states for today's date when the page carries the snapshot (<Base money>)
+    const raw = document.querySelector('script[data-money-snapshot]')?.textContent;
+    if (raw) {
+      try {
+        const snap = JSON.parse(raw) as MoneySnapshot;
+        const labels = JSON.parse(root.dataset.labels ?? '{}') as Record<string, string>;
+        const today = todayInTaipei();
+        for (const tile of tilesEls) {
+          const id = tile.dataset.tile as JurisdictionId;
+          const state = tileState(cityMoney(id, today, snap).status);
+          if (state === tile.dataset.state) continue;
+          const row = rows.find((r) => r.dataset.row === id);
+          for (const el of [tile, row]) {
+            if (!el) continue;
+            el.dataset.state = state;
+            el.querySelectorAll('[data-part="state"]').forEach((s) => (s.textContent = labels[state] ?? state));
+          }
+        }
+      } catch {
+        /* keep the build-time states */
+      }
+    }
+
+    const pick = (id: string | null, focus = false) => {
+      tilesEls.forEach((a) => (a.dataset.tile === id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      rows.forEach((r) => r.toggleAttribute('data-on', r.dataset.row === id));
+      root.toggleAttribute('data-picked', !!id);
+      if (focus) rows.find((r) => r.dataset.row === id)?.scrollIntoView({ block: 'nearest' });
+    };
+    tilesEls.forEach((a) =>
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        pick(a.dataset.tile ?? null, true);
+        history.replaceState(null, '', a.getAttribute('href'));
+      }),
+    );
+    const fromHash = rows.find((r) => `#${r.id}` === location.hash);
+    if (fromHash) pick(fromHash.dataset.row ?? null);
+  });
+</script>

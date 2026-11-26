@@ -1,0 +1,52 @@
+---
+/**
+ * Swatch — styleguide-only: one colour token.
+ *
+ * Props
+ *   token  CSS custom property name, e.g. '--exhaust'
+ *   note   what it is for
+ *   text   render sample text in this colour on the page background instead of a block
+ */
+interface Props {
+  token: string;
+  note?: string;
+  text?: boolean;
+}
+const { token, note, text = false } = Astro.props;
+---
+
+<div class="sw">
+  {text ? <div class="sw__chip sw__chip--text" style={`color:var(${token})`}>Aa 字</div> : <div class="sw__chip" style={`background:var(${token})`} />}
+  <code class="sw__token">{token}</code>
+  {note && <span class="sw__note">{note}</span>}
+</div>
+
+<style>
+  .sw {
+    display: grid;
+    gap: 0.15rem;
+    min-inline-size: 0;
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+  }
+  .sw__chip {
+    block-size: 3rem;
+    border: 1px solid var(--line);
+  }
+  .sw__chip--text {
+    display: grid;
+    place-items: center start;
+    padding-inline: 0.6rem;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+  }
+  .sw__token {
+    background: none;
+    padding: 0;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+  .sw__note {
+    color: var(--ink-3);
+  }
+</style>

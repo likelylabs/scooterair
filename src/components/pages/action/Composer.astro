@@ -1,0 +1,218 @@
+---
+/**
+ * Composer — a ready-to-send text (a request, a letter, a note) with a few blanks the reader
+ * fills in. Nothing is sent anywhere and nothing is stored: the text is composed in the
+ * browser, then copied or opened in the reader's own mail app.
+ *
+ * Without JavaScript the template is simply shown with its blanks (○○), and the mail link
+ * still opens with that text. With it, the fields fill the blanks as you type, and a copy
+ * button appears.
+ *
+ * Props
+ *   locale    Locale
+ *   id        unique id (fields and status are ids under it)
+ *   title     accessible name of the composed text ("the request" / "the letter")
+ *   fields    { key, label, hint? }[] — each `key` fills `{key}` in subject and body
+ *   subject   optional subject line template ("主旨" is added by the label below)
+ *   body      body template; blank lines separate paragraphs
+ *   blank     what an empty field shows (default ○○)
+ *   labels    { subject, copy, copied, failed, mail, fields, noStore }
+ *   share     optional { href, label } for an extra link (e.g. LINE)
+ */
+import type { Locale } from '@/i18n';
+import Button from '@/components/ui/Button.astro';
+
+interface Field {
+  key: string;
+  label: string;
+  hint?: string;
+}
+interface Props {
+  locale: Locale;
+  id: string;
+  title: string;
+  fields?: Field[];
+  subject?: string;
+  body: string;
+  blank?: string;
+  labels: { subject?: string; copy: string; copied: string; failed: string; mail?: string; fields?: string; noStore?: string };
+  share?: { href: string; label: string };
+  class?: string;
+}
+const { locale, id, title, fields = [], subject, body, blank = '○○', labels, share, class: cls } = Astro.props;
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** Template → HTML with one <span data-slot> per blank. */
+const slots = (tpl: string) => esc(tpl).replace(/\{(\w+)\}/g, (_m, k: string) => `<span class="composer__slot" data-slot="${k}">${blank}</span>`);
+const fillStatic = (tpl: string) => tpl.replace(/\{(\w+)\}/g, blank);
+const mailHref = (s: string, b: string) => `mailto:?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`;
+const paras = body.split(/\n\s*\n/);
+const tpl = JSON.stringify({ subject: subject ?? '', body, blank, subjectLabel: labels.subject ?? '' });
+---
+
+<div class:list={['composer', cls]} data-composer={tpl} id={id}>
+  {
+    fields.length > 0 && (
+      <fieldset class="composer__fields" data-js-only>
+        {labels.fields && <legend class="composer__legend">{labels.fields}</legend>}
+        {fields.map((f) => (
+          <label class="composer__field">
+            <span class="composer__label">{f.label}</span>
+            {f.hint && <span class="composer__hint">{f.hint}</span>}
+            <input type="text" name={f.key} data-field={f.key} autocomplete="off" lang={locale === 'en' ? 'en' : 'zh-Hant-TW'} />
+          </label>
+        ))}
+      </fieldset>
+    )
+  }
+  <div class="composer__text" role="group" aria-label={title}>
+    {subject && (
+      <p class="composer__subject">
+        {labels.subject && <b>{labels.subject}</b>}
+        <Fragment set:html={slots(subject)} />
+      </p>
+    )}
+    {paras.map((p) => <p class="composer__para" set:html={slots(p)} />)}
+  </div>
+  <div class="composer__actions">
+    <Button data-copy data-js-only>{labels.copy}</Button>
+    {labels.mail && <Button variant="secondary" data-mail href={mailHref(fillStatic(subject ?? ''), fillStatic(body))}>{labels.mail}</Button>}
+    {share && <Button variant="secondary" href={share.href} external locale={locale}>{share.label}</Button>}
+    <span class="composer__status" role="status" aria-live="polite" data-status data-copied={labels.copied} data-failed={labels.failed}></span>
+  </div>
+  {labels.noStore && <p class="composer__note">{labels.noStore}</p>}
+</div>
+
+<script>
+  type Tpl = { subject: string; body: string; blank: string; subjectLabel: string };
+  const fillTpl = (s: string, vals: Record<string, string>, blank: string) => s.replace(/\{(\w+)\}/g, (_m, k: string) => vals[k]?.trim() || blank);
+  for (const root of document.querySelectorAll<HTMLElement>('[data-composer]')) {
+    const tpl = JSON.parse(root.dataset.composer!) as Tpl;
+    const inputs = [...root.querySelectorAll<HTMLInputElement>('[data-field]')];
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const mail = root.querySelector<HTMLAnchorElement>('[data-mail]');
+    const values = () => Object.fromEntries(inputs.map((i) => [i.dataset.field!, i.value])) as Record<string, string>;
+    const update = () => {
+      const vals = values();
+      for (const s of root.querySelectorAll<HTMLElement>('[data-slot]')) {
+        const v = vals[s.dataset.slot!]?.trim();
+        s.textContent = v || tpl.blank;
+        s.classList.toggle('is-filled', !!v);
+      }
+      if (mail) mail.href = `mailto:?subject=${encodeURIComponent(fillTpl(tpl.subject, vals, tpl.blank))}&body=${encodeURIComponent(fillTpl(tpl.body, vals, tpl.blank))}`;
+    };
+    inputs.forEach((i) => i.addEventListener('input', update));
+    update();
+    root.querySelector<HTMLButtonElement>('[data-copy]')?.addEventListener('click', async () => {
+      const vals = values();
+      const subject = tpl.subject ? `${tpl.subjectLabel}${fillTpl(tpl.subject, vals, tpl.blank)}\n\n` : '';
+      const text = subject + fillTpl(tpl.body, vals, tpl.blank);
+      let ok = false;
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.append(ta);
+        ta.select();
+        try {
+          ok = document.execCommand('copy');
+        } catch {
+          ok = false;
+        }
+        ta.remove();
+      }
+      status.textContent = ok ? status.dataset.copied! : status.dataset.failed!;
+    });
+  }
+</script>
+
+<style>
+  .composer {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .composer__fields {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .composer__legend {
+    font-weight: var(--fw-bold);
+    margin-block-end: var(--sp-2);
+  }
+  .composer__field {
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .composer__label {
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+  }
+  .composer__hint {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+  .composer__field input {
+    min-block-size: var(--tap, 44px);
+    padding: var(--sp-2) var(--sp-3);
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    inline-size: 100%;
+  }
+  .composer__field input:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .composer__text {
+    background: var(--surface);
+    border: 2px dashed var(--line-strong);
+    border-radius: var(--radius-2);
+    padding: var(--sp-4);
+    display: grid;
+    gap: 0.8em;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-body);
+    overflow-wrap: anywhere;
+  }
+  .composer__text p {
+    margin: 0;
+    white-space: pre-line;
+  }
+  .composer__subject b {
+    margin-inline-end: 0.2em;
+  }
+  .composer__slot {
+    padding-inline: 0.15em;
+    background: var(--mark-bg);
+    border-radius: 2px;
+  }
+  .composer__slot.is-filled {
+    background: transparent;
+    font-weight: var(--fw-bold);
+  }
+  .composer__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+  .composer__status {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .composer__note {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,114 @@
+---
+/**
+ * ChainMarker — "link 3 of 7", the signpost inside a chapter: the count in
+ * words, the seven pips and the link's name. <Chapter link={3}> renders one.
+ *
+ * The pips encode the evidence behind each link (filled = Taiwan data,
+ * outline = modelled or international, a break with hollow ends = nobody has
+ * measured it, green and set apart = the link you can break). A red ring
+ * marks the current link.
+ *
+ * The pinned 44px strip under the header is <CountdownRail>; `sticky` here is
+ * kept as an alias that renders that rail (one per page, in Base's `rail` slot).
+ *
+ * Props
+ *   locale  Locale
+ *   n       this link, 1-based
+ *   total   number of links (default: length of chain.links)
+ *   title   link name (default chain.links[n-1])
+ *   href    link the marker to the chain overview (e.g. href('/#connect', locale))
+ *   count   seconds left on the red light: printed as text after the name
+ *           ("紅燈剩 64 秒"), so the count reads without JavaScript
+ *   sticky  render the countdown rail instead (see CountdownRail for its props)
+ */
+import type { Locale } from '@/i18n';
+import { chain, rail, t } from '@/i18n/ui';
+import CountdownRail from './CountdownRail.astro';
+import { pipsBody, pipsWidth } from './pips';
+
+interface Props {
+  locale: Locale;
+  n: number;
+  total?: number;
+  title?: string;
+  href?: string;
+  count?: number;
+  sticky?: boolean;
+  class?: string;
+}
+const { locale, n, total = chain.links.length, title = chain.links[n - 1]?.[locale] ?? '', href, count, sticky = false, class: cls } = Astro.props;
+const last = n === total;
+const W = pipsWidth(total);
+const Tag = href ? 'a' : 'span';
+---
+
+{sticky ? (
+  <CountdownRail locale={locale} current={n} count={count} class={cls} />
+) : (
+  <p class:list={['cm', last && 'cm--last', cls]}>
+    <Tag class="cm__inner" href={href}>
+      <span class="cm__count">
+        <span class="cm__name">{chain.name[locale]}</span>
+        <span class="vh">{t(chain.linkOf, locale, { n, total })}</span>
+        <span class="cm__frac" aria-hidden="true"><b>{n}</b><i>/</i>{total}</span>
+      </span>
+      <svg class="pips" viewBox={`0 0 ${W} 18`} width={W} height="18" aria-hidden="true" focusable="false" set:html={pipsBody(n)} />
+      <span class="cm__title">{last ? chain.breakable[locale] : title}</span>
+      {count !== undefined && <span class="cm__left">{t(rail.secondsLeft, locale, { n: count })}</span>}
+    </Tag>
+  </p>
+)}
+
+<style>
+  .cm {
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+  }
+  .cm__inner {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
+    min-block-size: 1.75rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  a.cm__inner:hover .cm__title {
+    text-decoration: underline;
+  }
+  .cm__count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6em;
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-caps);
+    color: var(--ink-2);
+  }
+  .cm__name:lang(en) {
+    text-transform: uppercase;
+  }
+  .cm__frac {
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+  .cm__frac b {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    color: var(--ink);
+  }
+  .cm__frac i {
+    margin-inline: 0.15em;
+    font-style: normal;
+  }
+  .cm__title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+  .cm__left {
+    color: var(--signal-red-ink);
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

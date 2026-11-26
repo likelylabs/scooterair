@@ -1,0 +1,28 @@
+---
+/**
+ * Phrased — a headline that only wraps between phrases, never inside one.
+ * Chinese has no spaces, so the browser may break a headline mid-word;
+ * mark the phrase boundaries with `|` and each unit stays whole.
+ *
+ * Props
+ *   text  the headline, phrases separated by '|'.
+ *         zh: "等紅燈的時候，|我們吸進了什麼"   en: "What we breathe |at the red light"
+ *         (in English keep the normal space next to the bar)
+ *
+ * Renders inline spans only: put it inside your own heading element.
+ *   <h1 class="display"><Phrased text={t.headline} /></h1>
+ */
+interface Props {
+  text: string;
+}
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const parts = Astro.props.text.split('|');
+const html = parts
+  .map((p, i) => {
+    const spaceAfter = /\s$/.test(p) || (i < parts.length - 1 && /^\s/.test(parts[i + 1]));
+    return `<span class="phrase">${esc(p.trim())}</span>${spaceAfter ? ' ' : ''}`;
+  })
+  .join('');
+---
+
+<Fragment set:html={html} />

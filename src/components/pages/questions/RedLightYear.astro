@@ -1,0 +1,123 @@
+---
+/**
+ * RedLightYear — 「你的紅燈，一年加起來」 (blueprint V12). Two empty number boxes, no presets:
+ * nothing is shown until the reader has entered both. The output is time, never a dose, and
+ * says so in a fixed line. Collapsed by default inside a native <details>. Without JavaScript
+ * the box explains the sum so the reader can do it by hand.
+ *
+ * Props
+ *   locale  Locale
+ */
+import type { Locale } from '@/i18n';
+import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import Details from '@/components/ui/Details.astro';
+import questions from '@/i18n/pages/questions';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const T = questions.pages['one-red-light'].more.tool;
+const L = (x: { 'zh-TW': string; en: string }) => x[locale];
+---
+
+<Details summary={L(T.summary)} id="your-red-lights">
+  <div class="rly" data-rly data-locale={locale}>
+    <p>{L(T.lead)}</p>
+    <div class="rly__inputs">
+      <label class="rly__field">
+        <span class="rly__label">{L(T.perDay)}</span>
+        <span class="rly__box"><input type="number" inputmode="numeric" min="0" max="500" step="1" name="per-day" data-rly-n /><span>{L(T.perDayUnit)}</span></span>
+      </label>
+      <label class="rly__field">
+        <span class="rly__label">{L(T.seconds)}</span>
+        <span class="rly__box"><input type="number" inputmode="numeric" min="0" max="600" step="1" name="seconds" data-rly-s /><span>{L(T.secondsUnit)}</span></span>
+      </label>
+    </div>
+    <div class="rly__out" aria-live="polite">
+      <p class="rly__wait" data-rly-wait>{L(T.waiting)}</p>
+      <p class="rly__result" data-rly-result hidden>{L(T.result)} <strong data-rly-hours></strong> {L(T.hours)}</p>
+    </div>
+    <p class="rly__fixed">{L(T.fixed)} <EvidenceBadge locale={locale} kind="derived" label={L(T.tag)} /></p>
+    <noscript><p class="meta">{L(T.noScript)}</p></noscript>
+  </div>
+</Details>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-rly]').forEach((root) => {
+    const n = root.querySelector<HTMLInputElement>('[data-rly-n]');
+    const s = root.querySelector<HTMLInputElement>('[data-rly-s]');
+    const wait = root.querySelector<HTMLElement>('[data-rly-wait]');
+    const result = root.querySelector<HTMLElement>('[data-rly-result]');
+    const out = root.querySelector<HTMLElement>('[data-rly-hours]');
+    if (!n || !s || !wait || !result || !out) return;
+    const nf = new Intl.NumberFormat(root.dataset.locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 1 });
+    const update = () => {
+      const a = n.valueAsNumber;
+      const b = s.valueAsNumber;
+      const ok = n.value !== '' && s.value !== '' && Number.isFinite(a) && Number.isFinite(b) && a > 0 && b > 0;
+      wait.hidden = ok;
+      result.hidden = !ok;
+      if (ok) out.textContent = nf.format((a * b * 365) / 3600);
+    };
+    root.addEventListener('input', update);
+  });
+</script>
+
+<style>
+  .rly {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .rly__inputs {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  @media (min-width: 30em) {
+    .rly__inputs {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .rly__field {
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .rly__label {
+    font-weight: var(--fw-bold);
+  }
+  .rly__box {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .rly__box input {
+    inline-size: 7rem;
+    min-block-size: 2.75rem;
+    padding-inline: var(--sp-3);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-1);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+  .rly__out {
+    padding: var(--sp-3) var(--sp-4);
+    border: 1.5px dashed var(--line-strong);
+  }
+  .rly__result strong {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-variant-numeric: tabular-nums;
+  }
+  .rly__wait {
+    color: var(--ink-2);
+  }
+  .rly__fixed {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    font-weight: var(--fw-bold);
+  }
+</style>

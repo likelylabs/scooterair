@@ -1,0 +1,232 @@
+---
+/**
+ * DecisionStrip — a short run of questions that ends in one recommendation
+ * (V42: 換電還是充電 — can you charge where you park, how far do you ride, must
+ * it be a white plate → an energy option for the calculator).
+ *
+ * Numbered questions in a row (stacked on phones), each a plain radio group,
+ * then a result box. With JavaScript the first outcome whose `when` matches
+ * the answers is shown; without it every outcome is listed with its
+ * conditions, so the strip is still a readable decision table.
+ *
+ * Props
+ *   locale    Locale
+ *   name      unique prefix for the radio groups (required)
+ *   steps     { id: string; legend: string; hint?: string;
+ *               options: { value: string; label: string }[] }[]        — two to four
+ *   outcomes  { when: Record<stepId, string | string[]>;   // omit a step = any answer
+ *               title: string; body?: string;
+ *               value?: string }[]                         // e.g. the calculator's energyPlan id
+ *             Order matters: the first match wins, so put the specific cases first
+ *             and end with a catch-all ({ when: {} }).
+ *   resultLabel  heading of the result box (default 「比較適合你的」)
+ *
+ * Script hook: the root dispatches `decision:change` (bubbles) with
+ *   detail = { answers: Record<stepId, string>, outcome: number | null, value: string | null }
+ * and mirrors the chosen outcome's `value` on [data-value], so the calculator can
+ * pick it up:  root.addEventListener('decision:change', (e) => setPlan(e.detail.value)).
+ */
+import type { Locale } from '@/i18n';
+import { decision } from '@/i18n/ui';
+import RadioGroup from './RadioGroup.astro';
+
+interface Step {
+  id: string;
+  legend: string;
+  hint?: string;
+  options: { value: string; label: string }[];
+}
+interface Outcome {
+  when: Partial<Record<string, string | string[]>>;
+  title: string;
+  body?: string;
+  value?: string;
+}
+interface Props {
+  locale: Locale;
+  name: string;
+  steps: Step[];
+  outcomes: Outcome[];
+  resultLabel?: string;
+  class?: string;
+}
+const { locale, name, steps, outcomes, resultLabel = decision.result[locale], class: cls } = Astro.props;
+const describe = (o: Outcome) =>
+  steps
+    .filter((s) => o.when[s.id] !== undefined)
+    .map((s) => {
+      const want = ([] as string[]).concat(o.when[s.id] ?? []);
+      return s.options
+        .filter((op) => want.includes(op.value))
+        .map((op) => op.label)
+        .join(locale === 'en' ? ' or ' : '或');
+    })
+    .join(' · ');
+---
+
+<div class:list={['dstrip', cls]} data-decision data-outcomes={JSON.stringify(outcomes.map((o) => ({ when: o.when, value: o.value ?? null })))}>
+  <ol class="dstrip__steps" style={`--n:${steps.length}`}>
+    {steps.map((s, i) => (
+      <li class="dstrip__step" data-step={s.id}>
+        <span class="dstrip__n" aria-hidden="true">{i + 1}</span>
+        <RadioGroup name={`${name}-${s.id}`} legend={s.legend} hint={s.hint} options={s.options} />
+      </li>
+    ))}
+  </ol>
+  <div class="dstrip__result" aria-live="polite" data-js-only>
+    <p class="eyebrow">{resultLabel}</p>
+    <p class="dstrip__pending" data-part="pending">{decision.pending[locale]}</p>
+    {outcomes.map((o, i) => (
+      <div class="dstrip__outcome" data-outcome={i} hidden>
+        <p class="dstrip__title">{o.title}</p>
+        {o.body && <p>{o.body}</p>}
+      </div>
+    ))}
+  </div>
+  <details class="dstrip__all" open>
+    <summary>{decision.all[locale]}</summary>
+    <dl>
+      {outcomes.map((o) => (
+        <div>
+          <dt>{describe(o) || '—'}</dt>
+          <dd><b>{o.title}</b>{o.body && <span> {o.body}</span>}</dd>
+        </div>
+      ))}
+    </dl>
+  </details>
+</div>
+
+<style>
+  .dstrip {
+    display: grid;
+    gap: var(--sp-5);
+    min-inline-size: 0;
+  }
+  .dstrip__steps {
+    display: grid;
+    gap: var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .dstrip__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0 var(--sp-3);
+    align-items: start;
+  }
+  .dstrip__n {
+    display: grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    line-height: 1;
+  }
+  /* the line that joins the questions and leads to the result */
+  .dstrip__step::before {
+    content: '';
+    position: absolute;
+    inset-block: 2rem calc(var(--sp-5) * -1);
+    inset-inline-start: calc(1rem - 1.5px);
+    border-inline-start: 3px solid var(--ink);
+  }
+  .dstrip__result {
+    padding: var(--sp-4);
+    border: var(--rule-paint) solid var(--clean);
+    background: var(--clean-wash);
+    --here: var(--clean-wash);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .dstrip__pending {
+    margin-block-start: var(--sp-2);
+    color: var(--ink-2);
+  }
+  .dstrip__outcome {
+    margin-block-start: var(--sp-2);
+  }
+  .dstrip__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-snug);
+  }
+  .dstrip__all {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+  .dstrip__all > summary {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2rem;
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+    cursor: pointer;
+  }
+  .dstrip__all dl {
+    display: grid;
+    margin-block-start: var(--sp-2);
+  }
+  .dstrip__all dl > div {
+    display: grid;
+    gap: var(--sp-1);
+    padding-block: var(--sp-2);
+    border-block-start: 1px solid var(--line);
+  }
+  .dstrip__all dt {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  @media (min-width: 56em) {
+    .dstrip__steps {
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    }
+    .dstrip__step {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-3);
+    }
+    .dstrip__step::before {
+      inset-block: calc(1rem - 1.5px) auto;
+      inset-inline: 2rem calc(var(--sp-5) * -1);
+      border-inline-start: 0;
+      border-block-start: 3px solid var(--ink);
+    }
+    .dstrip__step:last-child::before {
+      inset-inline-end: 0;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-decision]').forEach((root) => {
+    const outcomes = JSON.parse(root.dataset.outcomes ?? '[]') as { when: Record<string, string | string[]>; value: string | null }[];
+    const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
+    const all = root.querySelector<HTMLDetailsElement>('.dstrip__all');
+    if (all) all.open = false;
+    const update = () => {
+      const answers: Record<string, string> = {};
+      for (const s of steps) {
+        const v = s.querySelector<HTMLInputElement>('input:checked')?.value;
+        if (v !== undefined) answers[s.dataset.step ?? ''] = v;
+      }
+      const complete = Object.keys(answers).length === steps.length;
+      const idx = complete ? outcomes.findIndex((o) => Object.entries(o.when).every(([k, want]) => ([] as string[]).concat(want).includes(answers[k]))) : -1;
+      root.querySelectorAll<HTMLElement>('[data-outcome]').forEach((el) => (el.hidden = Number(el.dataset.outcome) !== idx));
+      const pending = root.querySelector<HTMLElement>('[data-part="pending"]');
+      if (pending) pending.hidden = idx >= 0;
+      const value = idx >= 0 ? outcomes[idx].value : null;
+      if (value) root.dataset.value = value;
+      else delete root.dataset.value;
+      root.dispatchEvent(new CustomEvent('decision:change', { bubbles: true, detail: { answers, outcome: idx >= 0 ? idx : null, value } }));
+    };
+    root.addEventListener('change', update);
+    update();
+  });
+</script>
