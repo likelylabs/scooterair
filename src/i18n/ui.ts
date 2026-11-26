@@ -366,8 +366,8 @@ export const questions = {
 /**
  * The FINER registry types, for /evidence/ and /sources/ only, where they may sit beside a
  * reader chip (brief 4.1). Everywhere else a number carries one of the five chips: see
- * `chips` / <KindChip> below. `estimate` is the site's own kerbside estimate; `gap` is
- * @deprecated (the old gap badge is gone) and stays only until the old pages are rebuilt.
+ * `chips` / <KindChip> below. `estimate` is the site's own kerbside estimate. `gap` is on
+ * its way out (the old gap badge is gone): it stays only until the old pages are rebuilt.
  * Order = the order of the legend.
  */
 export const evidenceKinds = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'market-tw', 'derived', 'estimate', 'inference', 'gap'] as const;

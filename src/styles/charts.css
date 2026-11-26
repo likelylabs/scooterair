@@ -43,20 +43,21 @@
   font-variant-numeric: tabular-nums lining-nums;
 }
 .chart__svg .c-value--sm {
-  font-size: 13px;
+  font-size: 14px;
 }
 .chart__svg .c-strong {
   font-weight: 900;
 }
 .chart__svg .c-note {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   fill: var(--ink-2);
 }
+/* ticks and units are labels a reader reads: --ink-2 (7.3:1), not the marker grey */
 .chart__svg .c-tick {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
-  fill: var(--ink-3);
+  fill: var(--ink-2);
   font-variant-numeric: tabular-nums lining-nums;
 }
 .chart__svg .c-tick--strong {
@@ -64,31 +65,20 @@
   font-weight: 700;
 }
 .chart__svg .c-ref {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   fill: var(--ink);
 }
 .chart__svg .c-dim {
-  fill: var(--ink-3);
+  fill: var(--ink-2);
   font-weight: 500;
 }
-/* A chart squeezed below the width it is laid out for (core/shared.ts MIN_W), e.g. inside a
-   padded panel on a 320px phone: the type goes a step smaller so labels and values keep clear
-   of each other. Positions are percentages, so nothing else needs to move. */
+/* 14px is the floor for chart text at every width (docs/redesign-brief.md 6.1): a chart squeezed
+   below the width it is laid out for (core/shared.ts MIN_W) keeps its type size. Only the bold
+   value steps down, from 15px to the floor, so it keeps clear of its label. */
 @container (max-width: 17rem) {
-  .chart__svg text {
-    font-size: 12.5px;
-  }
   .chart__svg .c-value {
-    font-size: 13.5px;
-  }
-  .chart__svg .c-value--sm {
-    font-size: 12px;
-  }
-  .chart__svg .c-note,
-  .chart__svg .c-tick,
-  .chart__svg .c-ref {
-    font-size: 11px;
+    font-size: 14px;
   }
 }
 /* series names beside line ends, and in-between axis labels: only when the chart is wide enough.
@@ -296,8 +286,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45em;
-  /* a full-size tap target (44px) */
-  min-block-size: 2.75rem;
+  /* a full-size tap target: 48px (--tap), like every control on the site */
+  min-block-size: var(--tap, 3rem);
+  padding-inline-end: var(--sp-2);
   color: var(--ink-2);
   font-weight: var(--fw-bold);
   list-style: none;
@@ -317,6 +308,11 @@
 .chart__table {
   margin-block-start: var(--sp-2);
   overflow-x: auto;
+}
+/* a data table printed open (<ChartTable>): in a sheet or on a print page */
+.chart__table--open {
+  margin-block-start: 0;
+  font-size: var(--fs-xs);
 }
 /* the scroll box takes keyboard focus (core/shared.ts): show where it is */
 .chart__table:focus-visible {
@@ -340,9 +336,17 @@
   /* wide enough that a label wraps between words, not inside one; the table scrolls instead */
   min-inline-size: 7.5em;
 }
-/* a figure is never broken across lines */
-.chart__table td.num {
+/* a figure is never broken across lines; nor is a column of short words (實測, 推估) */
+.chart__table td.num,
+.chart__table .nw {
   white-space: nowrap;
+}
+/* a figure column ends flush right: the words after it need their gap back */
+.chart__table :is(td, th).num + :is(td, th):not(.num) {
+  padding-inline-start: var(--sp-4);
+}
+.chart__table :is(td, th):last-child {
+  padding-inline-end: 0;
 }
 
 /* ---- tooltip ----------------------------------------------------------------- */
@@ -427,5 +431,821 @@
   .chart__key--ring {
     background: Canvas;
     box-shadow: inset 0 0 0 1.5px CanvasText;
+  }
+}
+
+/* ==============================================================================================
+ * HTML charts (the redesign: G5, G12, G13, G15, the estimate's range bands and table).
+ * Built by src/components/charts/core/html.ts and friends. Words and numbers are HTML text in
+ * rem (they wrap, and grow with 字大); only the marks are SVG. Nothing is set under --fs-xs.
+ * ============================================================================================ */
+.hc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+  min-inline-size: 0;
+  container-type: inline-size;
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+  /* room beside a plot so a dot on the first or last tick is not cut */
+  --hc-in-start: 0.75rem;
+  --hc-in-end: 0.75rem;
+}
+.hc p,
+.hc ol,
+.hc ul {
+  margin: 0;
+}
+.hc-rows {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  list-style: none;
+}
+.hc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+/* name on the left, figure on the right; the figure drops to its own line before either is cut */
+.hc-row__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 var(--sp-3);
+}
+.hc-row__label {
+  font-weight: var(--fw-bold);
+}
+.hc-row__value {
+  margin-inline-start: auto;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-black);
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+}
+.hc-row__unit {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+.hc-row__sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.5rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+.hc-row__text {
+  display: grid;
+  gap: 0.2rem;
+}
+/* a longer figure (約 0.05 到 1 ppm): the same weight, one step smaller, and free to wrap */
+.hc-row__value--sm {
+  font-size: var(--fs-sm);
+  white-space: normal;
+  text-align: end;
+}
+/* the estimate row of G5: name, figure and chip are one control that opens the working */
+a.hc-row__link {
+  display: grid;
+  gap: 0.2rem;
+  min-block-size: var(--tap, 3rem);
+  align-content: center;
+  margin-inline: -0.4rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-2);
+  color: inherit;
+  text-decoration: none;
+}
+a.hc-row__link:hover {
+  background: var(--estimate-wash);
+  color: var(--ink);
+}
+a.hc-row__link .hc-row__n {
+  text-decoration: underline dashed var(--estimate);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.28em;
+}
+.hc-row__go {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.5em;
+  block-size: 1.5em;
+  margin-inline-start: auto;
+  border-radius: 50%;
+  background: var(--estimate-wash);
+  color: var(--estimate-ink);
+}
+.hc-row__go svg {
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+/* ---- plots ------------------------------------------------------------------------------------ */
+.hc-plot {
+  display: block;
+  overflow: visible;
+  inline-size: calc(100% - var(--hc-in-start) - var(--hc-in-end));
+  margin-inline: var(--hc-in-start) var(--hc-in-end);
+}
+/* bars start at the edge: no inset */
+.hc-plot--flush {
+  inline-size: 100%;
+  margin-inline: 0;
+}
+.hc-grid {
+  stroke: var(--chart-axis);
+  stroke-width: 1;
+  stroke-opacity: 0.55;
+}
+.hc-base {
+  stroke: var(--chart-axis);
+  stroke-width: 1.5;
+}
+.hc-track {
+  fill: var(--chart-track);
+  fill-opacity: 0.55;
+}
+/* measured: solid ink, with a ring of the surface so two close readings stay two dots */
+.hc-dot,
+.hc-square {
+  fill: var(--chart-ink);
+  stroke: var(--here, var(--bg));
+  stroke-width: 2;
+}
+.hc-solid {
+  fill: var(--chart-ink);
+}
+/* estimate: a hatched band with a dashed edge. Never a dot, never a line */
+.hc-band {
+  stroke: var(--estimate);
+  stroke-width: 2;
+  stroke-dasharray: 5 3.5;
+}
+.hc-hatch-bg {
+  fill: var(--estimate-wash);
+}
+.hc-hatch-line {
+  stroke: var(--estimate);
+  stroke-width: 2.2;
+}
+/* where the street's own level falls, repeated in every row below it */
+.hc-guide {
+  stroke: var(--chart-ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 1.5 3.5;
+  stroke-linecap: round;
+}
+.hc-guide-zone {
+  fill: var(--chart-ink);
+  fill-opacity: 0.12;
+}
+/* the part of a list price that comes off: an outline only, dashed, in the bar's own tone */
+.hc-off {
+  fill: var(--here, var(--bg));
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+.hc-off--exhaust {
+  stroke: var(--chart-exhaust);
+}
+.hc-off--clean {
+  stroke: var(--chart-clean);
+}
+/* a thin outlined bar: the second-choice options of G13 */
+.hc-outline {
+  fill: var(--here, var(--bg));
+  stroke-width: 2;
+}
+.hc-outline--clean {
+  stroke: var(--chart-clean);
+}
+.hc-outline--exhaust {
+  stroke: var(--chart-exhaust);
+}
+
+/* ---- axis (HTML tick labels under the last row) ------------------------------------------------ */
+.hc-axis {
+  position: relative;
+  block-size: 1.5em;
+  margin-inline: var(--hc-in-start) var(--hc-in-end);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1.5;
+}
+.hc-axis > span {
+  position: absolute;
+  inset-block-start: 0;
+  translate: -50% 0;
+  white-space: nowrap;
+}
+/* the unit follows the last tick without moving it off its line */
+.hc-axis__unit {
+  position: absolute;
+  inset-inline-start: calc(100% + 0.7em);
+  font-weight: var(--fw-bold);
+}
+.hc--unit-end {
+  --hc-in-end: 3rem;
+}
+
+/* ---- the two-item legend: ● 量到的 ▨ 算出來的 ---------------------------------------------------- */
+.hc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.25rem;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.hc-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+.hc-legend svg {
+  flex: none;
+  overflow: visible;
+}
+
+/* ---- the zoom-out strip ----------------------------------------------------------------------- */
+.hc-zoom {
+  display: grid;
+  gap: 0.3rem;
+  /* the funnel starts right under the axis: this strip is that axis, seen from far away */
+  margin-block-start: calc(var(--sp-3) * -1 + 0.15rem);
+}
+.hc-zoom__track {
+  fill: var(--chart-track);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+}
+.hc-zoom__block {
+  fill: var(--chart-ink);
+}
+.hc-zoom__funnel {
+  stroke: var(--ink-3);
+  stroke-width: 1.25;
+  stroke-dasharray: 3 3;
+}
+.hc-zoom__who {
+  stroke: var(--chart-ink);
+  stroke-width: 3;
+}
+.hc-zoom__labels {
+  display: grid;
+  gap: 0.3rem;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.hc-zoom__here {
+  padding-inline-start: calc(var(--hc-in-start) - 0.35rem);
+}
+.hc-zoom__limit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.2rem 0.5rem;
+  padding-inline-end: calc(var(--hc-in-end) - 0.35rem);
+  text-align: end;
+}
+.hc-zoom__limit b {
+  white-space: nowrap;
+  font-weight: var(--fw-black);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+@container (min-width: 34rem) {
+  .hc-zoom__labels {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: var(--sp-4);
+  }
+}
+
+/* ---- chips inside a chart drawn by a function (the same five shapes as <KindChip>) -------------- */
+.c-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.05em 0.5em 0.05em 0.38em;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-2);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  line-height: 1.45;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.c-chip .chip-glyph {
+  flex: none;
+  inline-size: 1em;
+  block-size: 1em;
+}
+.c-chip__w {
+  font-weight: var(--fw-medium);
+}
+.c-chip--measured {
+  background: var(--ink);
+  color: var(--bg);
+}
+.c-chip--estimate {
+  border-style: dashed;
+  border-color: var(--estimate);
+  background: var(--estimate-wash);
+  color: var(--estimate-ink);
+}
+
+/* ---- panels of the range bands (/estimate/) --------------------------------------------------- */
+/* a log axis ends in wide labels (0.01, 100): more room beside the plot */
+.hc-bands {
+  --hc-in-start: 1.1rem;
+  --hc-in-end: 1.1rem;
+}
+.hc-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1rem 0.75rem;
+  padding-block-end: var(--sp-2);
+  border-block-end: var(--rule-paint, 3px) solid var(--ink);
+}
+.hc-panel__name {
+  font-family: var(--font-heading);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-black);
+  line-height: 1.3;
+}
+.hc-panel__unit {
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+.hc-group {
+  display: grid;
+  gap: var(--sp-3);
+}
+.hc-group__name {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-caps, 0.06em);
+}
+.hc-group__name::after {
+  content: '';
+  flex: 1;
+  block-size: 1px;
+  background: var(--line);
+}
+.hc-note {
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  line-height: 1.55;
+}
+.hc-note strong {
+  color: var(--ink);
+  font-weight: var(--fw-bold);
+}
+.hc-bands-set {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-6);
+}
+@media (min-width: 56em) {
+  .hc-bands-set {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--sp-7);
+  }
+  .hc-bands-set > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- the numbers table (/estimate/#numbers) ---------------------------------------------------- */
+.hc-etable {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+.hc-etable caption {
+  caption-side: top;
+  padding-block-end: var(--sp-2);
+  text-align: start;
+  font-weight: var(--fw-bold);
+}
+.hc-etable th,
+.hc-etable td {
+  padding: 0.55rem 0;
+  border-block-end: 1px solid var(--line);
+  text-align: start;
+  vertical-align: top;
+}
+.hc-etable thead th {
+  padding-block: 0.3rem;
+  border-block-end: 2px solid var(--ink);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.hc-etable th[scope='row'] {
+  inline-size: 38%;
+  padding-inline-end: var(--sp-3);
+  font-weight: var(--fw-bold);
+}
+.hc-etable__scn,
+.hc-etable__count {
+  display: block;
+}
+.hc-etable__count {
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+.hc-etable__group th {
+  padding-block: 1.1rem 0.45rem;
+  border-block-end: 2px solid var(--ink);
+}
+.hc-etable tbody:first-of-type .hc-etable__scn,
+.hc-etable__count {
+  display: block;
+}
+.hc-etable__count {
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+.hc-etable__group th {
+  padding-block-start: 0.8rem;
+}
+.hc-etable__name {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-black);
+}
+.hc-etable__name small {
+  margin-inline-start: 0.4em;
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+.hc-etable__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.5rem;
+  margin-block-start: 0.25rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+.hc-etable__v {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.5rem;
+  font-weight: var(--fw-black);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.hc-etable__total {
+  display: block;
+  margin-block-start: 0.2rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+.hc-etable__note td {
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  line-height: 1.55;
+}
+
+/* ---- G12 · price bars -------------------------------------------------------------------------- */
+.hc-price,
+.hc-month {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.hc-price .hc-row__label,
+.hc-month .hc-row__label {
+  font-size: var(--fs-sm);
+}
+.hc-price .hc-row[data-series='petrol'] {
+  padding-block-end: 0;
+}
+.hc-price .hc-row[data-series='electric'] .hc-plot {
+  margin-block-end: 0.15rem;
+}
+.hc-price .hc-row[data-series='petrol'] .hc-plot {
+  margin-block-start: 0.15rem;
+}
+.hc-key {
+  flex: none;
+  display: inline-block;
+  inline-size: 1.3em;
+  block-size: 0.75em;
+  margin-inline-end: 0.45em;
+  border-radius: 2px;
+  vertical-align: -0.02em;
+}
+/* the sentence under a price runs on after its key, and wraps under it */
+.hc-price .hc-row__sub {
+  display: block;
+}
+.hc-key--off {
+  border: 2px dashed var(--ink-2);
+}
+.hc-key--off.hc-key--exhaust {
+  border-color: var(--chart-exhaust);
+}
+.hc-key--off.hc-key--clean {
+  border-color: var(--chart-clean);
+}
+.hc-keyline {
+  margin-block-start: var(--sp-3) !important;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+/* the bracket between the two bars */
+.hc-gap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-block-size: 2.5rem;
+  --gap-tone: var(--chart-ink);
+  --gap-wash: var(--bg-sunken);
+}
+.hc-gap--cheaper {
+  --gap-tone: var(--chart-clean);
+  --gap-wash: var(--clean-wash);
+}
+.hc-gap--dearer {
+  --gap-tone: var(--chart-exhaust);
+  --gap-wash: var(--exhaust-wash);
+}
+.hc-gap__svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.hc-bracket {
+  stroke: var(--gap-tone);
+  stroke-width: 3;
+  stroke-linecap: square;
+}
+.hc-gap__label {
+  position: relative;
+  flex: 1;
+  min-inline-size: 0;
+  padding-block: 0.3rem;
+  font-weight: var(--fw-black);
+  line-height: 1.3;
+}
+.hc-gap__label span {
+  display: inline-block;
+  padding: 0.12em 0.5em;
+  border-radius: var(--radius-2);
+  background: var(--gap-wash);
+  box-shadow: inset 0 0 0 1.5px var(--gap-tone);
+}
+
+/* ---- G13 · monthly bars ------------------------------------------------------------------------ */
+/* room for an outline's stroke at the far end */
+.hc-month .hc-plot {
+  inline-size: calc(100% - 3px);
+}
+.hc-month .hc-row {
+  padding-block: 0.3rem 0.55rem;
+}
+.hc-month .hc-row--thin .hc-row__value {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+.hc-month .hc-row--thin .hc-row__label {
+  font-weight: var(--fw-medium);
+}
+.hc-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-block: 0.5rem 0.2rem !important;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.hc-divider::before,
+.hc-divider::after {
+  content: '';
+  flex: 1;
+  block-size: 0;
+  border-block-start: 2px dotted var(--line-strong);
+}
+.hc-divider::before {
+  flex: 0 0 0.75rem;
+}
+
+/* ---- G15 · the working, drawn ------------------------------------------------------------------- */
+.hc-sum {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.45rem;
+  padding: 0;
+  list-style: none;
+}
+.hc-sum__step {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.4rem;
+}
+.hc-sum__op {
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-black);
+  line-height: 1;
+}
+.hc-sum__arrow {
+  color: var(--ink-2);
+}
+.hc-sum__box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1rem 0.6rem;
+  min-inline-size: 0;
+  padding: 0.5rem 0.7rem;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-2);
+  background: var(--surface);
+}
+.hc-sum__v {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-black);
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1.3;
+}
+.hc-sum__l {
+  flex: 1 1 12em;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  line-height: 1.45;
+}
+.hc-sum__box .c-chip {
+  align-self: center;
+}
+.hc-sum__box--result {
+  border-color: var(--ink);
+  border-width: 3px;
+}
+.hc-sum__box--estimate {
+  border: 3px dashed var(--estimate);
+  background: var(--estimate-wash);
+}
+.hc-sum__box--estimate .hc-sum__l {
+  color: var(--estimate-ink);
+}
+/* a flow's boxes hold a phrase, not a figure: the words are the content */
+.hc-sum--flow .hc-sum__v {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  line-height: 1.4;
+}
+@container (min-width: 44rem) {
+  .hc-sum {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-columns: none;
+    align-items: stretch;
+  }
+  .hc-sum__step {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .hc-sum__op--none {
+    display: none;
+  }
+  .hc-sum__step:first-child {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hc-sum__box {
+    block-size: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hc-sum__l {
+    flex: none;
+  }
+  .hc-sum__arrow {
+    rotate: -90deg;
+  }
+}
+
+/* ---- arriving: bars and bands grow once, dots pop in (core/grow.ts sets data-grow) -------------
+ * The resting state is the final state: without JavaScript, with reduced motion, or with the
+ * 動畫 switch off (global.css ends every animation at once), the chart is simply there. */
+@keyframes hc-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes hc-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+.hc-g,
+.hc-p {
+  transform-box: fill-box;
+}
+.hc-g {
+  transform-origin: left center;
+}
+.hc-p {
+  transform-origin: center;
+}
+[data-grow='wait'] :is(.hc-g, .hc-p) {
+  visibility: hidden;
+}
+[data-grow='go'] .hc-g {
+  animation: hc-grow 0.75s var(--ease-out) backwards;
+}
+[data-grow='go'] .hc-p {
+  animation: hc-pop 0.35s var(--ease-out) 0.3s backwards;
+}
+@media print {
+  [data-grow] :is(.hc-g, .hc-p) {
+    visibility: visible !important;
+    animation: none !important;
+  }
+  .hc-band,
+  .hc-hatch-bg,
+  .hc-hatch-line,
+  .c-chip {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+@media (forced-colors: active) {
+  .hc-dot,
+  .hc-square {
+    fill: CanvasText;
+    stroke: Canvas;
+  }
+  .hc-solid,
+  .hc-zoom__block {
+    fill: CanvasText;
+  }
+  .hc-band,
+  .hc-hatch-line,
+  .hc-guide,
+  .hc-zoom__who,
+  .hc-bracket {
+    stroke: CanvasText;
+  }
+  .hc-hatch-bg,
+  .hc-off,
+  .hc-outline {
+    fill: Canvas;
+  }
+  .hc-off,
+  .hc-outline,
+  .hc-zoom__track {
+    stroke: CanvasText;
+  }
+  .hc-grid,
+  .hc-base {
+    stroke: GrayText;
+  }
+  .c-chip,
+  .hc-sum__box {
+    border-color: CanvasText;
+  }
+  .hc-gap__label span {
+    box-shadow: none;
+    outline: 1px solid CanvasText;
   }
 }

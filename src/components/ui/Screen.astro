@@ -118,7 +118,7 @@ const position = fill(screenText.position, locale, { n, total });
     {/* Where this screen is in the story. The rail says it while scripting runs; this line says
         it to a screen reader always, and to the eye when there is no script to move the rail. */}
     {total > 1 && (
-      <p class="screen__place" data-nojs-only>
+      <p class="screen__kicker" data-nojs-only>
         <span class="screen__lamp" aria-hidden="true"></span>
         <span class="screen__phase">{phaseWord}</span><span aria-hidden="true">｜</span><span>{chapter}</span>
         <span class="screen__pos" aria-hidden="true">{position}</span>
@@ -201,7 +201,7 @@ const position = fill(screenText.position, locale, { n, total });
     min-inline-size: 0;
     padding: var(--sp-4) var(--pad) 0;
   }
-  .screen__place {
+  .screen__kicker {
     display: flex;
     align-items: center;
     gap: 0.35em;

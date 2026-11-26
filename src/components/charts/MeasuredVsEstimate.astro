@@ -1,0 +1,171 @@
+---
+/**
+ * MeasuredVsEstimate — G5 (docs/redesign-brief.md 3.2 screen 5, 4.4): what was measured beside
+ * what this site worked out, for carbon monoxide, on ONE linear ppm axis from 0 to 2.
+ *
+ *   ● 平常的路邊              交通測站，2025 年平均            0.5 ppm            實測
+ *   ● 路口等過馬路的地方       運研所，3 個路口，最高的一分鐘     0.5 · 0.6 · 1.3 ppm 實測
+ *   ▨ 紅燈時，十來輛機車旁邊   90 秒平均，含街上原本就有的       約 0.3 到 1.6 ppm   推估
+ *
+ * then the two-item legend (● 量到的 ▨ 算出來的) and the zoom-out strip: the whole chart as a
+ * small block at the left end of a bar that runs to the WHO 15-minute guideline (about 87 ppm).
+ *
+ * The rules it keeps: measured rows above, the estimate below; solid dots for readings, a
+ * hatched band with a dashed edge for the estimate (never a dot or a line); nothing joins them;
+ * the estimate is plotted as a total (added plus what the street holds) and says so; no row is
+ * ever empty. Every figure comes from src/data/estimate.ts.
+ *
+ * The chart is fixed to one scenario (the dozen): no pollutant tabs, no scenario switch.
+ *
+ * Props
+ *   locale    Locale
+ *   sheet     id of a <HowSheet> on the page ('how-5'): the estimate row opens it.
+ *             Without one the row links to /estimate/#numbers
+ *   table     false leaves out the "view data table" toggle (when the page prints the table in
+ *             its sheet with <ChartTable table={mveModel(locale).table} />). Default true
+ *   zoom      false leaves out the zoom-out strip. Default true
+ *   scenario  'dozen' (default) | 'few' | 'full'
+ *   id, class
+ *
+ *   <MeasuredVsEstimate locale={locale} sheet="how-5" />
+ *
+ * The estimate row is `<a data-kind="estimate" data-slot="co.dozen.total">`: 約, a range, the
+ * 推估 chip and a way to the working, as acceptance check 4 asks. The measured rows carry
+ * `data-fact`; their facts are marked requiresCaveat, so the page's sheet must print the caveat.
+ */
+import '@/styles/charts.css';
+import { href as link, type Locale } from '@/i18n';
+import type { ScenarioKey } from '@/data/estimate';
+import { uid as makeId } from '@/components/uid';
+import { mveModel } from './core/estimateCharts';
+import { chipHtml, guides, hatchDef, pc } from './core/html';
+import { tableHtml } from './core/shared';
+import { chartText } from './strings';
+
+interface Props {
+  locale: Locale;
+  sheet?: string;
+  table?: boolean;
+  zoom?: boolean;
+  scenario?: ScenarioKey;
+  id?: string;
+  class?: string;
+}
+const { locale, sheet, table = true, zoom = true, scenario = 'dozen', id, class: cls } = Astro.props;
+const m = mveModel(locale, scenario);
+const u = makeId('mve');
+const H = 26;
+const x = (v: number) => (v / m.axis.max) * 100;
+const tickXs = m.axis.ticks.map(x);
+const full = link('/estimate/#numbers', locale);
+const target = sheet ? `#${sheet}` : full;
+// the zoom-out strip: the block is the chart's whole axis on the 0–87 ppm bar, never thinner than 5px
+const block = Math.max(m.who.share, 0.1);
+---
+
+<div id={id} class:list={['chart', 'hc', 'hc-mve', 'hc--unit-end', cls]} data-chart="measured-vs-estimate" data-grow="" role="group" aria-label={m.title}>
+  <p class="vh" data-chart-summary>{m.summary}</p>
+  <ol class="hc-rows" role="list">
+    {
+      m.rows.map((r) => {
+        const plot = (
+          <svg class="hc-plot" width="100%" height={H} aria-hidden="true" focusable="false">
+            {r.band && <Fragment set:html={hatchDef(`${u}-h`)} />}
+            <rect class="hc-track" x="0" y={H / 2 - 9} width="100%" height="18" rx="2" />
+            <Fragment set:html={guides(tickXs, H)} />
+            {r.dots?.map((v) => <circle class="hc-dot hc-p" data-mark="measured" cx={pc(x(v))} cy={H / 2} r="7.5" />)}
+            {r.band && <rect class="hc-band hc-g" data-mark="estimate" x={pc(x(r.band.lo))} y={H / 2 - 10} width={pc(x(r.band.hi) - x(r.band.lo))} height="20" rx="2" fill={`url(#${u}-h)`} />}
+          </svg>
+        );
+        const head = (
+          <Fragment>
+            <span class="hc-row__head">
+              <span class="hc-row__label">{r.label}</span>
+              <span class="hc-row__value">
+                <span class="hc-row__n">{r.value}</span> <span class="hc-row__unit">{r.unit}</span>
+              </span>
+            </span>
+            <span class="hc-row__sub">
+              <Fragment set:html={chipHtml(r.kind, locale)} />
+              <span>{r.sub}</span>
+              {r.id === 'estimate' && (
+                <span class="hc-row__go" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12h15M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+              )}
+            </span>
+          </Fragment>
+        );
+        return r.id === 'estimate' ? (
+          <li class="hc-row hc-row--estimate">
+            <a class="hc-row__link" href={target} data-kind="estimate" data-slot={r.slot} data-how={full} data-sheet-open={sheet}>
+              {head}
+              <span class="vh">{chartText.mve.how[locale]}</span>
+            </a>
+            {plot}
+          </li>
+        ) : (
+          <li class="hc-row hc-row--measured" data-fact={r.factId}>
+            <div class="hc-row__text">{head}</div>
+            {plot}
+          </li>
+        );
+      })
+    }
+  </ol>
+  <div class="hc-axis" data-chart-axis aria-hidden="true">
+    {m.axis.ticks.map((t, i) => <span style={`inset-inline-start:${pc(tickXs[i])}`}>{t}</span>)}
+    <b class="hc-axis__unit">{m.axis.unit}</b>
+  </div>
+  {
+    zoom && (
+      <div class="hc-zoom">
+        <svg class="hc-plot" width="100%" height="38" aria-hidden="true" focusable="false">
+          <line class="hc-zoom__funnel" x1="0" y1="0" x2="0" y2="16" />
+          <line class="hc-zoom__funnel" x1="100%" y1="0" x2={pc(block)} y2="16" />
+          <rect class="hc-zoom__track" x="0" y="16" width="100%" height="16" rx="2" />
+          <svg x="0" y="16" width={pc(block)} height="16" overflow="visible">
+            <rect class="hc-zoom__block" data-mark="chart-extent" x="0" y="0" width="100%" height="16" />
+            <rect class="hc-zoom__block" x="0" y="0" width="5" height="16" />
+          </svg>
+          <line class="hc-zoom__who" data-mark="who-guideline" x1="100%" x2="100%" y1="10" y2="38" />
+        </svg>
+        <div class="hc-zoom__labels">
+          <p class="hc-zoom__here">
+            <span aria-hidden="true">↑ </span>
+            {m.who.here}
+          </p>
+          <p class="hc-zoom__limit">
+            <span>
+              {m.who.label}
+              {locale === 'en' ? ': ' : '：'}
+              <b>{m.who.text}</b>
+            </span>
+            <Fragment set:html={chipHtml('official', locale)} />
+            <span aria-hidden="true">↑</span>
+          </p>
+        </div>
+      </div>
+    )
+  }
+  <ul class="hc-legend" role="list">
+    <li>
+      <svg width="16" height="16" aria-hidden="true" focusable="false"><circle class="hc-dot" cx="8" cy="8" r="6.5" /></svg>
+      {m.legend.measured}
+    </li>
+    <li>
+      <svg width="26" height="16" aria-hidden="true" focusable="false">
+        <Fragment set:html={hatchDef(`${u}-k`)} />
+        <rect class="hc-band" x="1" y="1" width="24" height="14" rx="2" fill={`url(#${u}-k)`} />
+      </svg>
+      {m.legend.estimated}
+    </li>
+  </ul>
+  {table && <Fragment set:html={tableHtml(m.table, { title: m.title, tableLabel: chartText.dataTable[locale] })} />}
+</div>
+
+<script>
+  import './core/grow';
+</script>

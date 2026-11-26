@@ -230,7 +230,10 @@ function renderLevers(levers: Lever[], cityName: string) {
       b.textContent = cfg.text.levers[l.key];
       const v = document.createElement('span');
       v.className = 'el-lever__amt';
-      const money = (n: number) => `NT$ ${new Intl.NumberFormat(cfg.locale === 'en' ? 'en-GB' : 'zh-TW').format(Math.round(n))}`;
+      const money = (n: number) => {
+        const v = new Intl.NumberFormat(cfg.locale === 'en' ? 'en-GB' : 'zh-TW').format(Math.round(n));
+        return cfg.locale === 'en' ? `NT$${v}` : `${v}\u00a0元`;
+      };
       v.textContent = l.key === 'plan' ? fill(cfg.text.leverPlanNote, { amount: money(l.monthly ?? 0) }) : fill(cfg.text.worth, { amount: money(l.amount) });
       li.append(b, v);
       return li;
@@ -306,7 +309,7 @@ const KEYS = ['el-scrap', 'el-engine', 'el-charge', 'el-power', 'el-plate', 'el-
 function saveUrl() {
   if (!form || !city) return;
   const q = new URLSearchParams();
-  if (city.value) q.set('city', city.value);
+  if (city.value) q.set('county', city.value);
   KEYS.forEach((k) => {
     const v = radio(k);
     const def = form.querySelector<HTMLInputElement>(`input[name="${k}"][checked]`)?.value;
@@ -314,7 +317,7 @@ function saveUrl() {
   });
   if (radio('el-scrap') === 'yes') q.set('built', `${form.querySelector<HTMLSelectElement>('#el-year')?.value}-${form.querySelector<HTMLSelectElement>('#el-month')?.value}`);
   const km = form.querySelector<HTMLInputElement>('#el-km')?.value;
-  if (km && km !== '400') q.set('km', km);
+  if (km && km !== form.querySelector<HTMLInputElement>('#el-km')?.defaultValue) q.set('km', km);
   const age = form.querySelector<HTMLInputElement>('#el-age')?.value;
   if (age) q.set('age', age);
   const flags = [...form.querySelectorAll<HTMLInputElement>('input[data-el-flag]:checked')].map((c) => c.dataset.elFlag);
@@ -331,11 +334,15 @@ function saveUrl() {
 function restoreUrl() {
   if (!form || !city) return;
   const q = new URLSearchParams(location.search);
-  const id = q.get('city');
-  if (!id || !cfg?.cityNames[id]) return;
-  city.value = id;
-  city.dispatchEvent(new Event('change', { bubbles: true }));
+  // ?county= from the home page and from this page; ?city= from links made before the redesign
+  const id = q.get('county') ?? q.get('city');
+  if (id && cfg?.cityNames[id]) {
+    city.value = id;
+    city.dispatchEvent(new Event('change', { bubbles: true }));
+  }
   KEYS.forEach((k) => q.get(k.slice(3)) && setRadio(k, q.get(k.slice(3))!));
+  // a reader who can charge where they park, with no plan chosen yet, is costed on home charging
+  if (q.get('charge') === 'yes' && !q.get('power')) setRadio('el-power', 'home');
   const built = q.get('built')?.split('-');
   if (built?.length === 2) {
     const ys = form.querySelector<HTMLSelectElement>('#el-year');
@@ -413,7 +420,7 @@ async function run(): Promise<void> {
     dayCounts(live);
     section.removeAttribute('aria-busy');
     // one line that a screen reader always hears, and the same answer in the bar
-    const head = `${r.title} ${r.prefix && r.prefix !== 'NT$' ? r.prefix : r.prefix === 'NT$' ? 'NT$\u00a0' : ''}${r.value}${r.unit ? ` ${r.unit}` : ''}`.replace(/[ \t\n]+/g, ' ').trim();
+    const head = `${r.title} ${r.prefix && r.prefix !== 'NT$' ? r.prefix : r.prefix === 'NT$' ? 'NT$' : ''}${r.value}${r.unit ? ` ${r.unit}` : ''}`.replace(/[ \t\n]+/g, ' ').trim();
     if (status) status.textContent = fill(cfg.text.announce, { title: r.title, value: head.slice(r.title.length).trim() });
     setBar(head, true);
     // the levers (#closer) take a few more engine runs: when the browser is free
@@ -472,6 +479,27 @@ if (form && cfg) {
   window.addEventListener('load', () => idle(() => void load()));
   restoreUrl();
   if (city?.value) schedule(0);
+  // the opening above (ElectricOpening): a change there is the same answer here. The first state
+  // came from the address, which restoreUrl() has already read, so only the reader's changes count.
+  document.addEventListener('el:open', (ev) => {
+    const o = (ev as CustomEvent<{ county: string; scrap: 'yes' | 'no'; km: number; charge: 'yes' | 'no'; initial?: boolean }>).detail;
+    if (!o || o.initial || !city) return;
+    if (city.value !== o.county && cfg.cityNames[o.county]) {
+      city.value = o.county;
+      syncForm();
+    }
+    setRadio('el-scrap', o.scrap);
+    setRadio('el-charge', o.charge);
+    if (o.charge === 'yes') setRadio('el-power', 'home');
+    else if (radio('el-power') === 'home') setRadio('el-power', 'subscription');
+    const km = form.querySelector<HTMLInputElement>('#el-km');
+    if (km && Number(km.value) !== o.km) {
+      km.value = String(o.km);
+      km.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    syncForm();
+    schedule(150);
+  });
   // a tab left open across midnight on 31 December must not keep yesterday's answer
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && lastDate && lastDate !== todayInTaipei()) schedule(0);

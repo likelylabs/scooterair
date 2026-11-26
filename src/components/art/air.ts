@@ -165,6 +165,8 @@ export interface AirSource {
   /** override the cluster of marks for this source (G11 only) */
   rings?: number;
   dots?: number;
+  /** ribbons at this mouth; the default follows the core's size on screen (a crowded wide shot passes 1 for its far rows) */
+  ribbons?: number;
 }
 
 /** The kerb zone (layer B). Leave it out for electric and green-light scenes. */
@@ -493,7 +495,7 @@ export function air(o: AirOptions): AirLayers {
       const room = Math.min(1, w / upp / C.fullAtPx); // 1 in a close shot, less when the core is only a few dozen pixels long
       const nRings = s.rings ?? (s.car ? AIR.car.rings : Math.max(1, Math.round(C.rings * room)));
       const nDots = s.dots ?? (s.car ? AIR.car.dots : Math.max(2, Math.round(C.dots * room)));
-      const nRibs = s.car ? AIR.car.ribbons : Math.max(1, Math.round(C.ribbons * room));
+      const nRibs = s.ribbons ?? (s.car ? AIR.car.ribbons : Math.max(1, Math.round(C.ribbons * room)));
       let g = `<g class="air-src${s.car ? ' air-src--car' : ''}" data-src="${key}" transform="${t}">`;
       // ribbons leave the mouth in a narrow fan
       const fan = [0, -1, 1];
@@ -565,6 +567,50 @@ export function air(o: AirOptions): AirLayers {
     all: out.defs + out.wash + out.cores + out.marks,
     counts: { street: { rings: streetRings, dots: streetDots }, kerb: kerbCounts, cores: sources.length },
   };
+}
+
+/* ------------------------------------------------------------------------ */
+/* Single marks, for diagrams                                                 */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * One mark at a time, drawn exactly as air() draws them (same sizes, same
+ * stroke, same halo), for the diagrams that place every mark on purpose: the
+ * three lanes leaving one tailpipe (G2), the routes into the body (G6), what a
+ * mask stops (G17), the cloud of the one scooter that needs repair (G11).
+ * A street scene never uses these: it calls air().
+ *
+ *   upp   drawing units per screen pixel at 360 px (unitsPerPx(frame.w))
+ *   size  0 to 1 within the rule's size range (default 0.5)
+ *   cls   extra classes; attrs  extra attributes (' data-k="3"')
+ */
+export function airRing(x: number, y: number, upp: number, o: { size?: number; cls?: string; attrs?: string } = {}): string {
+  const r = (AIR.ring.rMin + (o.size ?? 0.5) * (AIR.ring.rMax - AIR.ring.rMin)) * upp;
+  return `<path class="air-ring${o.cls ? ' ' + o.cls : ''}" stroke-width="${f(AIR.ring.halo * 2 * upp)}" d="${ringPath(x, y, r, AIR.ring.stroke * upp)}"${o.attrs ?? ''}/>`;
+}
+export function airDot(x: number, y: number, upp: number, o: { size?: number; cls?: string; attrs?: string } = {}): string {
+  const r = (AIR.dot.rMin + (o.size ?? 0.5) * (AIR.dot.rMax - AIR.dot.rMin)) * upp;
+  return `<path class="air-dot${o.cls ? ' ' + o.cls : ''}" stroke-width="${f(AIR.dot.halo * 2 * upp)}" d="${dotPath(x, y, r)}"${o.attrs ?? ''}/>`;
+}
+/** A ribbon along any path `d` (build it with airWave() or airWisp(), or pass your own). */
+export function airRibbon(d: string, upp: number, o: { weight?: number; cls?: string; attrs?: string } = {}): string {
+  return `<path class="air-rib${o.cls ? ' ' + o.cls : ''}" stroke-width="${f(AIR.ribbon.stroke * (o.weight ?? 1) * upp)}" d="${d}"${o.attrs ?? ''}/>`;
+}
+/** Path of a wavy line from (x, y), `len` long, toward `dir` (1 = larger x). Wave and height follow the rule. */
+export const airWave = (x: number, y: number, len: number, dir: -1 | 1, upp: number, flip: 1 | -1 = 1): string =>
+  wavePath(x, y, len, dir, AIR.ribbon.wave * upp * 0.7, AIR.ribbon.amp * upp * 0.8, flip);
+/** Path of a ribbon that eases from (x0, y0) to (x1, y1), waving as it goes. */
+export const airWisp = (x0: number, y0: number, x1: number, y1: number, upp: number, flip: 1 | -1 = 1): string =>
+  wispPath(x0, y0, x1, y1, AIR.ribbon.wave * upp, AIR.ribbon.amp * upp, flip);
+
+/** The three grey dots behind one electric rear tyre, as air({ tyres }) draws them, for a scooter that is swapped by itself (G10). */
+export function airTyreDust(t: Point & { scale?: number; dir?: -1 | 1 }, upp: number, seed = 1, cls = ''): string {
+  const rt = rng(seed * 7919 + 53);
+  const dir = t.dir ?? -1;
+  const back = dir * 25 * (t.scale ?? 1);
+  let d = '';
+  for (let j = 0; j < AIR.tyreDots; j++) d += dotPath(t.x + back + dir * upp * (2.5 + j * 5.5 + rt() * 2), t.y - upp * (2 + rt() * 5), upp * (1.5 + rt() * 0.5));
+  return `<path class="air-tyre${cls ? ' ' + cls : ''}" d="${d}"/>`;
 }
 
 /* ------------------------------------------------------------------------ */

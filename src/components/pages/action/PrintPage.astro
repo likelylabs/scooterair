@@ -1,0 +1,102 @@
+---
+/**
+ * PrintPage — the shell of lane J's paper pages (/print/poster/, /print/brief/) and of the
+ * share-card pages the card generator photographs (/print/card/<id>/). Brief 7.9: light tokens
+ * on paper, no site chrome (no header, no menu, no footer). It loads the site's own fonts,
+ * tokens and base styles, so a sheet looks like the site.
+ *
+ * Props
+ *   locale       Locale
+ *   title        the <title> (the site name is appended)
+ *   description  meta description
+ *   canonical    true: print a canonical link and the language alternates (default true)
+ *   bare         true: no on-screen toolbar spacing (the card pages) (default false)
+ *
+ * Slots
+ *   default  the page
+ *   head     extra <head> tags
+ *
+ *   <PrintPage locale={locale} title={p.metaTitle} description={p.metaDescription}> … </PrintPage>
+ */
+import '@/styles/fonts.css';
+import '@/styles/tokens.css';
+import '@/styles/global.css';
+import '@/styles/art.css';
+import archivoUrl from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+import cjkDisplayCss from '@fontsource/noto-sans-tc/900.css?url';
+import cjkHeadlineUrl from '@/styles/fonts/noto-sans-tc-900-headline.woff2?url';
+import { asset, htmlLang, locales, switchLocalePath, type Locale } from '@/i18n';
+import { site } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description?: string;
+  canonical?: boolean;
+  bare?: boolean;
+}
+const { locale, title, description = site.description[locale], canonical = true, bare = false } = Astro.props;
+const abs = (p: string) => new URL(p, Astro.site).href;
+// Keep the range in step with UNICODE_RANGE in scripts/display-font.mjs (as Base.astro does).
+const cjkHeadlineFace = `@font-face{font-family:'Noto Sans TC Headline';font-style:normal;font-weight:900;font-display:swap;src:url(${cjkHeadlineUrl}) format('woff2');unicode-range:U+00B7,U+2000-2BFF,U+2E80-FFEF}`;
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]} data-theme="light" data-motion="off" class:list={['print-page', bare && 'print-page--bare']}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{`${title} — ${site.name[locale]}`}</title>
+    <meta name="description" content={description} />
+    {
+      canonical && (
+        <Fragment>
+          <link rel="canonical" href={abs(Astro.url.pathname)} />
+          {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(switchLocalePath(Astro.url.pathname, l))} />)}
+        </Fragment>
+      )
+    }
+    <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
+    <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
+    {
+      locale === 'zh-TW' && (
+        <Fragment>
+          <link rel="preload" href={cjkHeadlineUrl} as="font" type="font/woff2" crossorigin />
+          <style is:inline set:html={cjkHeadlineFace} />
+          <link rel="stylesheet" href={cjkDisplayCss} media="print" onload={"this.media='all'"} data-cjk-slices />
+          <noscript data-cjk-slices><link rel="stylesheet" href={cjkDisplayCss} /></noscript>
+        </Fragment>
+      )
+    }
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <slot name="head" />
+  </head>
+  <body>
+    <main id="main">
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  html.print-page,
+  html.print-page body {
+    background: var(--bg-sunken);
+  }
+  html.print-page--bare,
+  html.print-page--bare body {
+    background: var(--bg);
+  }
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  @media print {
+    html.print-page,
+    html.print-page body {
+      background: #fff !important;
+    }
+  }
+</style>

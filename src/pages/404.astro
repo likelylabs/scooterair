@@ -17,15 +17,15 @@ import { href, locales, type Locale } from '@/i18n';
 import notFound from '@/i18n/pages/not-found';
 import { localize } from '@/i18n/pages/_copy';
 
-const order = ['home', 'questions', 'evidence', 'unmeasured', 'electric', 'act', 'sources', 'about'] as const;
+const order = ['home', 'film', 'electric', 'questions', 'estimate', 'act', 'evidence', 'about'] as const;
 const paths: Record<(typeof order)[number], string> = {
   home: '/',
-  questions: '/questions/',
-  evidence: '/evidence/',
-  unmeasured: '/unmeasured/',
+  film: '/90/',
   electric: '/electric/',
+  questions: '/questions/',
+  estimate: '/estimate/',
   act: '/act/',
-  sources: '/sources/',
+  evidence: '/evidence/',
   about: '/about/#report',
 };
 const blocks = locales.map((locale: Locale) => ({ locale, t: localize(notFound, locale), lang: locale === 'en' ? 'en' : 'zh-Hant-TW' }));
@@ -33,7 +33,7 @@ const zh = blocks.find((b) => b.locale === 'zh-TW')!.t;
 const enPrefix = href('/', 'en');
 ---
 
-<Base locale="zh-TW" title={`${zh.meta.title} · ${localize(notFound, 'en').meta.title}`} description={zh.meta.description} noindex>
+<Base locale="zh-TW" title={`${zh.meta.title} · ${localize(notFound, 'en').meta.title}`} description={zh.meta.description} noindex alternates={false}>
   <div class="nf container container--wide" data-en-prefix={enPrefix}>
     {
       blocks.map(({ locale, t, lang }, i) => (
@@ -129,7 +129,7 @@ const enPrefix = href('/', 'en');
   }
   .nf__routes {
     display: grid;
-    gap: var(--sp-1);
+    gap: var(--tap-gap, 0.5rem);
     margin: var(--sp-4) 0 0;
     padding: 0;
     list-style: none;
@@ -138,7 +138,7 @@ const enPrefix = href('/', 'en');
   .nf__other a {
     display: inline-flex;
     align-items: center;
-    min-block-size: 2.75rem;
+    min-block-size: var(--tap, 3rem);
     font-weight: var(--fw-bold);
   }
   .nf__other {

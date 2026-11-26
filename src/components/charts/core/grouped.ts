@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit, tip, tipDot } from './shared';
 
 export interface GroupedBarProps {
   locale: Locale;
@@ -32,7 +32,7 @@ export function renderGrouped(p: GroupedBarProps): ChartRender {
     max = p.max ?? Math.max(sc.max, 0);
   } else max = p.max ?? niceMax(Math.max(...all));
   const f = (v: number) => fmtSigned(locale, v, decimals);
-  const valueW = Math.max(...all.map((v) => px(f(v), 13))) + 12;
+  const valueW = Math.max(...all.map((v) => px(f(v), 14))) + 12;
   // leave room after the longest bar for its value, and before the lowest negative bar for its
   const scale = Math.max(55, 100 - (valueW / MIN_W) * 100);
   const inset = signedAxis ? Math.min(22, (valueW / MIN_W) * 100) : 0;
@@ -55,7 +55,7 @@ export function renderGrouped(p: GroupedBarProps): ChartRender {
       // once without the colour key: after the value where it fits, otherwise on a line of
       // its own just above the bar.
       const room = MIN_W * (1 - end / 100) - 12;
-      const name = gi === 0 && v >= 0 && px(`${val}  ${s.label}`, 13) < room ? s.label : '';
+      const name = gi === 0 && v >= 0 && px(`${val}  ${s.label}`, 14) < room ? s.label : '';
       if (gi === 0 && !name) {
         body.push(text('c-note', 0, y + 10, s.label));
         y += 15;
@@ -65,7 +65,7 @@ export function renderGrouped(p: GroupedBarProps): ChartRender {
           ? `<text class="c-value c-value--sm" x="${end.toFixed(2)}%" y="${y + 10.5}" dx="-7" text-anchor="end">${esc(val)}</text>`
           : `<text class="c-value c-value--sm" x="${end.toFixed(2)}%" y="${y + 10.5}" dx="7">${esc(val)}${name ? `<tspan class="c-note" dx="8">${esc(name)}</tspan>` : ''}</text>`;
       body.push(
-        `<g class="c-row" data-tip="${esc(`${g.label} · ${s.label}: ${val}${unit ? ' ' + unit : ''}`)}">` +
+        `<g class="c-row" data-tip="${esc(tip(locale, `${g.label}${tipDot(locale)}${s.label}`, val, unit))}">` +
           `<rect class="c-hit" x="0" y="${y - 2}" width="100%" height="${BAR + GAP}"/>` +
           (signedAxis ? hbarFrom(s.tone, zero, end, y, BAR, 'c-mark') : hbar(s.tone, end, y, BAR, 'c-mark')) +
           label +

@@ -310,10 +310,10 @@ const FMT = { 'zh-TW': [fmt('zh-TW', 0), fmt('zh-TW', 1), fmt('zh-TW', 2)], en: 
 const nf = (locale: Locale, v: number) => FMT[locale][0].format(Math.round(v));
 /** A distance as the reader typed it: whole kilometres, or one decimal when they gave one. */
 const kmText = (locale: Locale, v: number) => (Number.isInteger(v) ? nf(locale, v) : FMT[locale][1].format(v));
-// a no-break space keeps NT$ with its number when a narrow column wraps
-export const money = (locale: Locale, v: number) => `NT$\u00a0${nf(locale, Math.abs(v))}`;
+// Chinese amounts in 元 (a no-break space keeps the number with its unit), English NT$20,980 (brief 6.6, 7.7)
+export const money = (locale: Locale, v: number) => (locale === 'en' ? `NT$${nf(locale, Math.abs(v))}` : `${nf(locale, Math.abs(v))}\u00a0元`);
 const signed = (locale: Locale, v: number) => `${v < 0 ? '−' : v > 0 ? '+' : ''}${money(locale, v)}`;
-const perKm = (locale: Locale, v: number) => `NT$\u00a0${FMT[locale][2].format(v)}`;
+const perKm = (locale: Locale, v: number) => (locale === 'en' ? `NT$${FMT[locale][2].format(v)}` : `${FMT[locale][2].format(v)}\u00a0元`);
 /** A link that opens in a new tab, saying so to screen readers. */
 const extLink = (url: string, text: string, locale: Locale) =>
   `<a href="${esc(url)}" rel="noopener" target="_blank">${esc(text)}<span class="vh">${esc(localize(electric, locale).result.newTab)}</span></a>`;
@@ -723,6 +723,9 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
     const m = e.messages.find((x) => x.code === 'jurisdiction-not-verified');
     if (m) parts.push(`<ul class="el-msgs el-msgs--lead">${messageHtml(m, ctx)}</ul>`);
   }
+  // a day longer than the scooter goes on one charge: said before any figure, not only in the list below
+  const rangeMsg = e.messages.find((x) => x.code === 'range');
+  if (rangeMsg) parts.push(`<ul class="el-msgs el-msgs--lead">${messageHtml(rangeMsg, ctx)}</ul>`);
   if (e.electric.purchase.net.high !== e.electric.purchase.net.value) parts.push(`<p class="el-small el-warn">${esc(fill(T.upToRange, { low: money(locale, e.electric.purchase.net.value), high: money(locale, e.electric.purchase.net.high) }))}</p>`);
   parts.push(`<p class="el-small"><b>${esc(T.likeForLike)}</b>${esc(readerText(e.comparison.likeForLike.note[locale]))}</p>`);
 
@@ -748,7 +751,7 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
     }</div>`,
   );
 
-  const shown = e.messages.filter((m) => m.code !== 'petrol-smoothing' && !(m.code === 'jurisdiction-not-verified' && e.jurisdiction.status === 'not-verified'));
+  const shown = e.messages.filter((m) => m.code !== 'petrol-smoothing' && m.code !== 'range' && !(m.code === 'jurisdiction-not-verified' && e.jurisdiction.status === 'not-verified'));
   parts.push(`<h4 class="el-h" id="${esc(ctx.id)}-warn">${esc(T.sections.warnings)}</h4><ul class="el-msgs">${shown.map((m) => messageHtml(m, ctx)).join('')}</ul>`);
 
   const nextText = v.verdict === 'A' ? T.nextA : v.verdict === 'B' ? T.nextB : '';
@@ -758,6 +761,11 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
       : `<a href="${esc(ctx.links.checklist)}">${esc(T.checklistLink)}</a> · <a href="${esc(ctx.links.closer)}">${esc(T.closerLink)}</a> · <a href="${esc(ctx.links.notYet)}">${esc(T.notYetLink)}</a>`;
   parts.push(`<div class="el-next"><h4 class="el-h">${esc(T.sections.next)}</h4>${nextText ? `<p>${esc(nextText)}</p>` : ''}<p class="el-next__links">${nextLinks}</p></div>`);
 
+  // Chinese: the amount reads 「227 元」, not 「NT$ 227」
+  if (prefix === 'NT$' && locale === 'zh-TW') {
+    prefix = '';
+    unit = '元';
+  }
   return { verdict: v.verdict, sentence, title, prefix, value, unit, note, deadlineHtml, nextHtml, bodyHtml: parts.filter(Boolean).join('\n') };
 }
 

@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmt, niceMax, pctN, px, text, LABEL_LINES, wrapLabel, withUnit } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmt, niceMax, pctN, px, text, LABEL_LINES, wrapLabel, withUnit, tip } from './shared';
 
 export interface BeforeAfterProps {
   locale: Locale;
@@ -32,7 +32,7 @@ export function renderBeforeAfter(p: BeforeAfterProps): ChartRender {
     const cy = y + labelH + 13;
     const a = pctN(d.before, max);
     const b = pctN(d.after, max);
-    let g = `<g class="c-row" data-tip="${esc(`${d.label}: ${p.beforeLabel} ${f(d.before)} → ${p.afterLabel} ${f(d.after)}${unit ? ' ' + unit : ''}`)}">`;
+    let g = `<g class="c-row" data-tip="${esc(tip(locale, d.label, `${p.beforeLabel} ${f(d.before)} → ${p.afterLabel} ${f(d.after)}`, unit))}">`;
     g += `<rect class="c-hit" x="0" y="${y}" width="100%" height="${labelH + 28}"/>`;
     lines.forEach((ln, k) => (g += text('c-label', 0, y + 14 + k * LINE, ln)));
     g += text('c-value', '100%', y + 14, pair, 'text-anchor="end"');

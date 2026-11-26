@@ -32,7 +32,8 @@ const run = (a: Record<string, unknown>, locale: 'zh-TW' | 'en' = 'zh-TW') => {
   const e = evaluate(c.situation, econData);
   return { e, r: M.renderResult(e, { ...c, plate: answers.plate, power: answers.power }, ctx(locale)) };
 };
-const nt = (v: number) => `NT$ ${new Intl.NumberFormat('zh-TW').format(Math.round(Math.abs(v)))}`;
+// Chinese amounts read 「4,480 元」 with a no-break space, as money() in model.ts prints them
+const nt = (v: number) => `${new Intl.NumberFormat('zh-TW').format(Math.round(Math.abs(v)))}\u00a0元`;
 
 test('verdict C with a pay-per-use setup fee says the fee, and the ledger adds up to the headline', () => {
   const { e, r } = run({ jurisdiction: 'keelung', monthlyKm: 1000, plate: 'any', power: 'payg' });

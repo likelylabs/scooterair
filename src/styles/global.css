@@ -307,7 +307,7 @@ mark {
 sup,
 sub {
   line-height: 0;
-  font-size: 0.72em;
+  font-size: max(0.78em, var(--fs-xs)); /* never under the 14 px floor */
 }
 
 /* Numbers. Running text keeps proportional figures; anything that lines up
@@ -365,7 +365,7 @@ code,
 kbd,
 samp {
   font-family: var(--font-mono);
-  font-size: 0.88em;
+  font-size: max(0.88em, var(--fs-xs));
 }
 code {
   background: var(--bg-sunken);

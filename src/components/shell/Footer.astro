@@ -92,7 +92,7 @@ const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits'
   }
   .site-footer__nav ul {
     display: grid;
-    gap: 0;
+    gap: var(--tap-gap);
     margin: 0;
     padding: 0;
     list-style: none;

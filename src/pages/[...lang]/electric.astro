@@ -2,7 +2,7 @@
 /**
  * /electric/ — 換電動，把帳攤開 / Going electric: the full bill (blueprint 4.3).
  *
- * The answer first, then the reader's own sums (#status, #calc, #result), worked examples that
+ * A worked result first (ElectricOpening: the price on the day and each month, brief 7.7), then the reader's own sums (#status, #calc, #result), worked examples that
  * are complete results without JavaScript (#examples), how to get closer (#closer), the dated
  * checklist (#checklist), running costs on their own (#monthly), the honest limits (#no-socket,
  * #who, #risks), what to do if not this year (#not-yet), the 22 places (#cities), our asks
@@ -34,8 +34,10 @@ import RangePlot from '@/components/charts/RangePlot.astro';
 import GroupedBarChart from '@/components/charts/GroupedBarChart.astro';
 import Calculator from '@/components/pages/electric/Calculator.astro';
 import ElectricResult from '@/components/pages/electric/ElectricResult.astro';
+import ElectricOpening from '@/components/pages/electric/ElectricOpening.astro';
 import { afterDate, cityDetails, citeMap, data, examples, F, factIds, factValue, flagsByCity, pageLinks, runningTables, seriesIds, surveyChart, today, yearEnd } from '@/components/pages/electric/electric-data';
 import { money } from '@/components/pages/electric/model';
+import { DEFAULTS, defaultScrap } from '@/lib/home-money';
 import { formatCitation, sourcesFor, sourceUrl } from '@/data';
 import { cityMoney, formatDate, snapshot } from '@/lib/site-state.data';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
@@ -53,7 +55,7 @@ const deadline = d(yearEnd);
 const checked = d(data.meta.checkedOn);
 const filing = d(snapshot.filingEnd);
 const nf = (v: number, digits = 0) => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'zh-TW', { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(v);
-const perKm = (v: number) => `NT$ ${nf(v, 2)}`;
+const perKm = (v: number) => (locale === 'en' ? `NT$${nf(v, 2)}` : `${nf(v, 2)} 元`);
 const links = pageLinks(locale);
 
 // ---- city select (#status): every place with how far we could check it ----------------------
@@ -65,7 +67,7 @@ const statusWord = (id: JurisdictionId) => {
   if (j.status !== 'not-verified' && m.status === 'ended') return T.status.cityStatus.ended;
   return T.status.cityStatus[j.status];
 };
-const cityOptions = [{ value: '', label: T.status.cityNone }, ...ids.map((id) => ({ value: id, label: `${readerText(data.jurisdictions[id].name[locale])}${locale === 'en' ? ' (' : '（'}${statusWord(id)}${locale === 'en' ? ')' : '）'}` }))];
+const cityOptions = [...ids.map((id) => ({ value: id, label: `${readerText(data.jurisdictions[id].name[locale])}${locale === 'en' ? ' (' : '（'}${statusWord(id)}${locale === 'en' ? ')' : '）'}` }))];
 
 // ---- the calculator's settings ---------------------------------------------------------------
 const cfg = {
@@ -113,7 +115,6 @@ const survey = surveyChart(locale);
 const fx = Object.fromEntries(factIds.map((id) => [id, F(id, locale)])) as Record<(typeof factIds)[number], ReturnType<typeof F>>;
 const badgeOf = (id: (typeof factIds)[number]) => evidenceBadge(fx[id].evidence, fx[id].confidence);
 const factSources = (id: (typeof factIds)[number]) => fx[id].citations;
-const band = run.band;
 const share = factValue('econ-ev-brand-share-2026-07', 'gogoroShare');
 const stations = factValue('econ-gogoro-network', 'stations');
 const pageSources = sourcesFor({ facts: [...factIds], series: [...seriesIds] });
@@ -151,33 +152,16 @@ const notYetBadge = (k: string) => k as EvidenceKind;
       <h1 class="display el-title"><Phrased text={T.head.title} /></h1>
       <p class="lead">{T.head.lead}</p>
 
-      <div class="el-answer-first" aria-labelledby="answer-title">
-        <h2 id="answer-title" class="el-answer-first__title">{T.answer.title}</h2>
-        <p>{T.answer.body}</p>
-        <div data-money-when="A static">
-          <div class="el-actions">
-            <Button href="#calc" size="lg" data-js-only>{T.answer.calcLink}</Button>
-            <Button href="#examples" variant="secondary" size="lg">{T.answer.examplesLink}</Button>
-            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
-          </div>
+      <ElectricOpening locale={locale} />
+      <div data-money-when="B">
+        <div class="el-actions">
+          <Button href="#checklist" variant="secondary" size="lg">{T.answer.boughtLink}</Button>
         </div>
-        <div data-money-when="B">
-          <div class="el-actions">
-            <Button href="#checklist" size="lg">{T.answer.boughtLink}</Button>
-            <Button href="#calc" variant="secondary" size="lg">{T.answer.noSubsidyLink}</Button>
-            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
-          </div>
+      </div>
+      <div data-money-when="C D">
+        <div class="el-actions">
+          <Button href={href('/act/#policy', locale)} variant="secondary" size="lg">{T.answer.askLink}</Button>
         </div>
-        <div data-money-when="C D">
-          <div class="el-actions">
-            <Button href={href('/act/#policy', locale)} size="lg">{T.answer.askLink}</Button>
-            <Button href="#calc" variant="secondary" size="lg">{T.answer.noSubsidyLink}</Button>
-            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
-          </div>
-        </div>
-        {band && <p data-money-when="A B C D static">{fill(T.answer.monthly, { low: nf(band.low), high: nf(band.high) })}</p>}
-        <p data-money-when="B C D" class="el-answer-first__after">{fill(T.answer.after, { deadline, checked })}</p>
-        <p data-money-when="static" class="el-answer-first__after">{fill(T.answer.staticNote, { deadline, checked })}</p>
       </div>
     </div>
   </header>
@@ -187,7 +171,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     <div class="el-status">
       <div class="stack" style="--stack: var(--sp-4)">
         <div data-js-only>
-          <Select id="el-city" label={T.status.cityLabel} options={cityOptions} value="" hint={T.status.cityHint} data-money-city />
+          <Select id="el-city" label={T.status.cityLabel} options={cityOptions} value={DEFAULTS.county} hint={T.status.cityHint} data-money-city />
         </div>
         <MoneyBanner locale={locale} tone="box" />
         <div class="el-citynote" data-el-citynote hidden></div>
@@ -200,7 +184,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   <Section id="calc" title={T.calc.title} width="wide">
     <p id="el-calc-lead" class="el-calc-lead" data-js-only>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[0]}<span data-money-fill="today">{d(today)}</span>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[1]}</p>
     <div class="el-calc-grid">
-      <Calculator locale={locale} cfg={cfg} today={today} cityOptions={cityOptions} />
+      <Calculator locale={locale} cfg={cfg} today={today} cityOptions={cityOptions} defaults={{ county: DEFAULTS.county, km: DEFAULTS.km, scrap: defaultScrap(today) }} />
     </div>
   </Section>
 
@@ -421,7 +405,6 @@ const notYetBadge = (k: string) => k as EvidenceKind;
         <EvidenceBadge locale={locale} {...badgeOf('econ-gogoro-finances-2026')} variant="icon" />
         <span class="el-small">{factSources('econ-gogoro-finances-2026').map((c) => c.short).join(' · ')}</span>
       </li>
-      <li>{T.risks.resale}</li>
       <li><b>{T.risks.next}</b>{readerText(data.meta.nextYear[locale])} {T.risks.nextCaveat} {early}</li>
     </ul>
   </Section>
@@ -524,23 +507,6 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   }
   .el-title {
     max-inline-size: 18ch;
-  }
-  .el-answer-first {
-    display: grid;
-    gap: var(--sp-3);
-    margin-block-start: var(--sp-4);
-    padding: var(--sp-5);
-    border: var(--rule-paint) solid var(--ink);
-    max-inline-size: 46rem;
-  }
-  .el-answer-first__title {
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-black);
-    line-height: var(--lh-heading);
-  }
-  .el-answer-first__after {
-    border-inline-start: var(--rule-paint) solid var(--exhaust);
-    padding-inline-start: var(--sp-3);
   }
   .el-actions {
     display: flex;

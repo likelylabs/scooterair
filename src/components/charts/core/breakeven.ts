@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { type ChartRender, type Marker, type Tone, esc, fmt, fmtCompact, marker, niceMax, niceTicks, px, text, withUnit, wrapLabel } from './shared';
+import { type ChartRender, type Marker, type Tone, esc, fmt, fmtCompact, marker, niceMax, niceTicks, px, text, withUnit, wrapLabel, tip } from './shared';
 
 export interface CostLine {
   label: string;
@@ -83,7 +83,7 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
 
   const ticks = niceTicks(yMax, 4);
   const tickText = ticks.map((t) => fmtCompact(locale, t));
-  const padLeft = Math.ceil(Math.max(...tickText.map((t) => px(t, 12)), px(prefix, 12) - 4)) + 10;
+  const padLeft = Math.ceil(Math.max(...tickText.map((t) => px(t, 14)), px(prefix, 14) - 4)) + 10;
 
   // The answer label above the plot: at the crossing when there is one, else top right. It is
   // set for the narrowest plot, wrapped into lines that fit the room on the side it hangs to, so
@@ -114,10 +114,10 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
     o.push(text('c-tick', 0, y + 4, tickText[i], 'text-anchor="end" dx="-8"'));
   });
   o.push(text('c-tick', 0, 9, prefix, `dx="${-padLeft}"`));
-  const firstW = px(p.tickLabel(0), 12);
+  const firstW = px(p.tickLabel(0), 14);
   for (let m = 0; m <= months; m += 12) {
     // on narrow charts only every other year is labelled, and nothing crowds the first or the last label
-    const clearOfFirst = m === 0 || (xp(m) / 100) * NARROW - px(p.tickLabel(m), 12) / 2 > firstW + 8;
+    const clearOfFirst = m === 0 || (xp(m) / 100) * NARROW - px(p.tickLabel(m), 14) / 2 > firstW + 8;
     const always = m === 0 || m === months || (m % 24 === 0 && months - m >= 24 && clearOfFirst);
     o.push(text(always ? 'c-tick' : 'c-tick c-wideonly', `${xp(m)}%`, TOP + H + 18, p.tickLabel(m), `text-anchor="${m === 0 ? 'start' : m === months ? 'end' : 'middle'}"`));
     if (m > 0 && m < months) o.push(`<line class="c-axis" x1="${xp(m)}%" x2="${xp(m)}%" y1="${TOP + H}" y2="${TOP + H + 4}"/>`);
@@ -158,8 +158,8 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   ends.forEach((e) => {
     const val = f(at(e.c, months));
     o.push(`<text class="c-value c-value--sm" x="100%" y="${e.y + 4.5}" dx="10">${esc(val)}<tspan class="c-note c-endname" dx="6">${esc(e.c.label)}</tspan></text>`);
-    padRight = Math.max(padRight, 14 + px(val, 13));
-    padRightWide = Math.max(padRightWide, 22 + px(val, 13) + px(e.c.label, 12));
+    padRight = Math.max(padRight, 14 + px(val, 14));
+    padRightWide = Math.max(padRightWide, 22 + px(val, 14) + px(e.c.label, 14));
   });
 
   if (inside) {
@@ -180,7 +180,7 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   const table: string[][] = [];
   for (let m = 0; m <= months; m += 6) {
     xs.push(+xp(m).toFixed(2));
-    rows.push(`${p.tickLabel(m)}\n${a.label}: ${prefix} ${f(at(a, m))}\n${b.label}: ${prefix} ${f(at(b, m))}`);
+    rows.push(`${p.tickLabel(m)}\n${tip(locale, a.label, `${prefix} ${f(at(a, m))}`)}\n${tip(locale, b.label, `${prefix} ${f(at(b, m))}`)}`);
     if (m % 12 === 0) table.push([p.tickLabel(m), f(at(a, m)), f(at(b, m))]);
   }
 

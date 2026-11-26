@@ -104,7 +104,7 @@ export function renderEmpty(p: EmptyChartProps): ChartRender {
     body: o.join(''),
     height: y,
     padLeft: PAD,
-    padRight: Math.max(2, Math.ceil(px(p.x.phase?.second ?? '', 12) / 2) - 8),
+    padRight: Math.max(2, Math.ceil(px(p.x.phase?.second ?? '', 14) / 2) - 8),
     table: {
       head: [p.seriesHeader, ...p.panels.map(head)],
       rows: p.series.map((s) => [s.label, ...p.panels.map(() => p.noData)]),

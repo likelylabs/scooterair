@@ -49,8 +49,8 @@ const label = t(ui.sourceN, locale, { n });
 
 <style>
   .cite {
-    /* 0.75em of the text it follows, never under 12px (it sat at 9–10.5px in small print) */
-    font-size: max(0.75em, 0.75rem);
+    /* 0.78em of the text it follows, never under the 14 px floor */
+    font-size: max(0.78em, var(--fs-xs));
     font-weight: var(--fw-bold);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;

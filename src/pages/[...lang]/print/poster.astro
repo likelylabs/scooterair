@@ -1,141 +1,232 @@
 ---
 /**
- * /print/poster/ — 校門口海報 / the school-gate poster (blueprint V46), A4, one per language.
- * The empty chart, small; the headline; one request; a QR code to /unmeasured/#ask (drawn at
- * build time by components/pages/action/qr.ts, with the address printed beside it); and the
- * smaller second line, which says it is a request and not a measured effect.
+ * /print/poster/ — 校門口海報 / the school-gate poster (brief 7.9), one A4 page per language.
  *
- * Copy: src/i18n/pages/act.ts (`poster`).
+ * G4 at the dozen scenario; the headline of home screen 4; the two-row number box (what the
+ * street already holds, measured; what the pack adds, estimated, with its range and chip); the
+ * mask line; the sentence a reader should repeat; a QR code to the home page (drawn at build
+ * time by components/pages/action/qr.ts, with the address printed beside it); one request.
+ * Light tokens on paper and no site chrome (PrintPage). On screen a small toolbar sits above
+ * the sheet; in print only the sheet prints.
+ *
+ * Copy: src/i18n/pages/act.ts (`poster`). Numbers: src/data/estimate.ts.
  */
-import Base from '@/layouts/Base.astro';
+import PrintPage from '@/components/pages/action/PrintPage.astro';
+import Picture from '@/components/pages/action/Picture.astro';
 import Phrased from '@/components/ui/Phrased.astro';
-import Button from '@/components/ui/Button.astro';
-import EmptyChart from '@/components/charts/EmptyChart.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
 import { qrSvg } from '@/components/pages/action/qr';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { site } from '@/i18n/ui';
+import { est, estimateText, formatReference } from '@/data/estimate';
 import act from '@/i18n/pages/act';
-import unmeasured from '@/i18n/pages/unmeasured';
 import { fill, localize } from '@/i18n/pages/_copy';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
-const p = localize(act, locale).poster;
-const u = localize(unmeasured, locale);
-const target = new URL(href('/unmeasured/', locale), Astro.site).href + '#ask';
-const shortUrl = target.replace(/^https?:\/\//, '');
+const t = localize(act, locale);
+const p = t.poster;
+const target = new URL(href('/', locale), Astro.site).href;
+const shortUrl = target.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const qr = qrSvg(target, fill(p.qrAlt, { url: shortUrl }));
+const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
 ---
 
-<Base locale={locale} title={p.metaTitle} description={p.metaDescription} noindex>
-  <!-- A print page is paper: show it in the light theme (not stored, so the reader's choice stands elsewhere). -->
-  <script is:inline>document.documentElement.dataset.theme = 'light';</script>
-  <div class="container print-ui">
+<PrintPage locale={locale} title={p.metaTitle} description={p.metaDescription}>
+  <div class="toolbar">
     <p>{p.screenNote}</p>
-    <p class="print-ui__row">
-      <Button data-print data-js-only>{p.printButton}</Button>
-      <a href={href('/act/#neighbourhood', locale)}>{p.back}</a>
+    <p class="toolbar__row">
+      <button type="button" class="toolbar__btn" data-print hidden>{p.printButton}</button>
+      <a class="toolbar__link" href={href('/act/#community', locale)}>{p.back}</a>
     </p>
   </div>
 
   <article class="poster" aria-labelledby="poster-t">
-    <p class="poster__kicker">{p.kicker}</p>
-    <h1 id="poster-t" class="poster__title"><Phrased text={p.title} /></h1>
-    <div class="poster__chart">
-      <EmptyChart locale={locale} title={u.hero.figure.chart} desc={u.hero.figure.desc} panelHeight={44} />
-      <p class="poster__caption">{p.chartCaption}</p>
+    <header class="poster__head">
+      <p class="poster__kicker">{p.kicker}</p>
+      <h1 id="poster-t" class="poster__title"><Phrased text={p.title} /></h1>
+    </header>
+
+    <div class="poster__numbers">
+      <p class="poster__co">{p.co}</p>
+      <div class="poster__row">
+        <span class="poster__label">{estimateText.alreadyThere[locale]}</span>
+        <span class="poster__value">{street}</span>
+        <KindChip locale={locale} kind="measured" />
+      </div>
+      <div class="poster__row poster__row--est">
+        <span class="poster__label">{estimateText.addedByPack[locale]}</span>
+        <EstimateValue locale={locale} slotId="co.dozen.add" class="poster__est" />
+      </div>
+      <p class="poster__gloss"><span>{estimateText.ppmGloss[locale]}</span> <span>{est.meta.gloss[locale]}</span></p>
     </div>
-    <div class="poster__ask">
-      <p class="poster__request">{p.ask}</p>
+
+    <div class="poster__pic">
+      <Picture locale={locale} kind="kerb" scenario="dozen" />
+    </div>
+
+    <p class="poster__mask">{t.walk.mask}</p>
+    <p class="poster__sentence">{site.sentence[locale]}</p>
+
+    <footer class="poster__foot">
       <div class="poster__qr">
         <div class="poster__code" set:html={qr} />
-        <div>
+        <div class="poster__qrtext">
           <p class="poster__qrlabel">{p.qr}</p>
           <p class="poster__url">{shortUrl}</p>
+          <p class="poster__site"><b>{site.name[locale]}</b> · {site.tagline[locale]}</p>
         </div>
       </div>
-    </div>
-    <p class="poster__engine">{p.engine}</p>
-    <p class="poster__site"><b>{site.name[locale]}</b> · {site.tagline[locale]}</p>
+      <p class="poster__engine">{p.engine}</p>
+    </footer>
   </article>
-</Base>
+</PrintPage>
 
 <script>
-  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+  const b = document.querySelector<HTMLButtonElement>('[data-print]');
+  if (b) {
+    b.hidden = false;
+    b.addEventListener('click', () => window.print());
+  }
 </script>
 
 <style>
-  .print-ui {
+  .toolbar {
+    box-sizing: border-box;
+    inline-size: min(210mm, calc(100% - 2 * var(--gutter, 16px)));
+    margin: 0 auto;
     padding-block: var(--sp-5) var(--sp-4);
     display: grid;
     gap: var(--sp-3);
+    font-size: var(--fs-base);
   }
-  .print-ui p {
+  .toolbar p {
     margin: 0;
   }
-  .print-ui__row {
+  .toolbar__row {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--sp-4);
+    gap: var(--sp-3);
     align-items: center;
   }
+  .toolbar__btn,
+  .toolbar__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 3rem);
+    padding: 0 var(--sp-4);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    font: inherit;
+    font-size: var(--fs-btn, 1.0625rem);
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+    background: var(--surface);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .toolbar__btn {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  /* The sheet: an A4 page on screen, and the only thing that prints. */
   .poster {
+    --here: #fff;
     box-sizing: border-box;
     inline-size: min(210mm, calc(100% - 2 * var(--gutter, 16px)));
     margin: 0 auto var(--sp-8);
-    padding: 14mm;
+    padding: clamp(16px, 5vw, 13mm);
     background: #fff;
-    color: #111;
-    border: 1px solid #c9cfcc;
-    box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+    color: var(--ink);
+    box-shadow: 0 2px 18px rgb(0 0 0 / 0.14);
     display: grid;
-    gap: 7mm;
+    gap: clamp(12px, 3vw, 5mm);
     align-content: start;
-    border-block-start: 10mm solid #111;
+    border-block-start: 9mm solid var(--signal-red, #c62828);
   }
   .poster p {
     margin: 0;
   }
   .poster__kicker {
-    font-size: 12pt;
-    font-weight: 700;
-    color: #333;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
   }
   .poster__title {
+    margin: 4px 0 0;
     font-family: var(--font-heading);
     font-weight: var(--fw-black);
-    font-size: clamp(22pt, 7vw, 40pt);
-    line-height: 1.15;
+    font-size: clamp(1.6875rem, 6.4vw, 2.75rem);
+    line-height: 1.22;
+    text-wrap: balance;
+  }
+  .poster__numbers {
+    display: grid;
+    gap: 6px;
+    padding: 12px 14px;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+  }
+  .poster__co {
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+  }
+  .poster__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    font-size: var(--fs-base);
+  }
+  .poster__label {
+    flex: 1 1 9em;
+    font-weight: var(--fw-bold);
+  }
+  .poster__value {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--fw-bold);
+    font-size: 1.25rem;
+  }
+  .poster__row--est :global(.poster__est) {
+    font-size: 1.25rem;
+  }
+  .poster__gloss {
+    display: grid;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .poster__pic :global(.scene) {
     margin: 0;
   }
-  .poster__chart {
-    display: grid;
-    gap: 2mm;
+  .poster__mask {
+    padding: 10px 14px;
+    border-inline-start: 6px solid var(--ink);
+    background: var(--bg-sunken);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    line-height: 1.55;
   }
-  .poster__caption {
-    font-weight: 700;
-    font-size: 12pt;
-  }
-  .poster__ask {
-    display: grid;
-    gap: 5mm;
-    padding: 6mm;
-    border: 3px solid #111;
-  }
-  .poster__request {
+  .poster__sentence {
     font-family: var(--font-heading);
     font-weight: var(--fw-black);
-    font-size: clamp(16pt, 5vw, 24pt);
-    line-height: 1.3;
+    font-size: clamp(1.125rem, 3.6vw, 1.5rem);
+    line-height: 1.5;
+  }
+  .poster__foot {
+    display: grid;
+    gap: 10px;
+    padding-block-start: 12px;
+    border-block-start: 2px solid var(--line-strong);
   }
   .poster__qr {
     display: flex;
-    flex-wrap: wrap;
-    gap: 5mm;
+    gap: 14px;
     align-items: center;
   }
   .poster__code {
-    inline-size: 38mm;
+    inline-size: clamp(88px, 22vw, 32mm);
     flex: none;
   }
   .poster__code :global(svg) {
@@ -143,66 +234,57 @@ const qr = qrSvg(target, fill(p.qrAlt, { url: shortUrl }));
     inline-size: 100%;
     block-size: auto;
   }
+  .poster__qrtext {
+    display: grid;
+    gap: 4px;
+    min-inline-size: 0;
+  }
   .poster__qrlabel {
-    font-weight: 700;
-    font-size: 13pt;
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-base);
   }
   .poster__url {
-    font-size: 10pt;
+    font-size: var(--fs-sm);
     overflow-wrap: anywhere;
-    color: #333;
+    color: var(--ink-2);
   }
+  .poster__site,
   .poster__engine {
-    font-size: 11pt;
-    color: #333;
-    padding-block-start: 3mm;
-    border-block-start: 1.5px solid #8a938f;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
   }
-  .poster__site {
-    font-size: 10pt;
-    color: #333;
-  }
-  @page {
-    size: A4;
-    margin: 0;
-  }
+
   @media print {
-    :global(.site-header),
-    :global(.site-footer),
-    :global(.skip-link),
-    .print-ui {
+    .toolbar {
       display: none !important;
-    }
-    :global(html),
-    :global(body) {
-      background: #fff !important;
     }
     .poster {
       inline-size: 210mm;
       block-size: 297mm;
       margin: 0;
-      border-inline: 0;
-      border-block-end: 0;
+      padding: 12mm 14mm 10mm;
+      gap: 4.5mm;
       box-shadow: none;
+      overflow: hidden;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
     .poster__title {
-      font-size: 34pt;
-    }
-    .poster__title:lang(en) {
       font-size: 30pt;
     }
-    .poster__request {
-      font-size: 22pt;
+    .poster__title:lang(en) {
+      font-size: 26pt;
     }
-    .poster {
-      padding: 12mm 14mm;
-      gap: 6mm;
-      overflow: hidden;
+    .poster__pic :global(.scene__art) {
+      max-block-size: 98mm;
+      inline-size: auto;
+      margin-inline: auto;
     }
-  }
-  .poster :global(details) {
-    display: none;
+    .poster__sentence {
+      font-size: 15pt;
+    }
+    .poster__code {
+      inline-size: 30mm;
+    }
   }
 </style>

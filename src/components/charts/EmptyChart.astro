@@ -1,6 +1,11 @@
 ---
 /**
- * EmptyChart — the empty chart (V8), the site's signature graphic. A complete,
+ * @deprecated RETIRED (docs/redesign-brief.md 5.4): the site draws no empty chart any more.
+ * Use <MeasuredVsEstimate> (measured beside estimated) or <EstimateBands>. This file and
+ * core/empty.ts stay only until every page has moved off them; they are deleted in phase 3
+ * (acceptance check 8 fails while any `EmptyChart` remains in src/).
+ *
+ * EmptyChart — the empty chart (V8), formerly the site's signature graphic. A complete,
  * carefully drawn chart frame (stacked panels, axes, ticks, gridlines, the
  * red-then-green phase bar) with no marks at all, because nobody has measured
  * what it would show. It has to look deliberate, never broken: the frame is
@@ -68,4 +73,4 @@ const render = renderEmpty({
 });
 ---
 
-<ChartShell render={render} title={title} desc={desc} locale={locale} id={id} class={cls} empty />
+<ChartShell render={render} title={title} desc={[desc, emptyData.sr[locale]].filter(Boolean).join(' ')} locale={locale} id={id} class={['chart--empty', cls].filter(Boolean).join(' ')} />

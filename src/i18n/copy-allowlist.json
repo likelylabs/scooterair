@@ -7,25 +7,10 @@
   ],
   "entries": [
     {
-      "id": "ui.chain.summary.2.text",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Line 3 says exposure right beside the idling pack has NOT been measured in Taiwan, which is what the rule requires; 怠速 / idling describes the queue, and no idle emission figure or arcade comparison is cited. The measured part (PM2.5 and CO in waiting areas) is facts iot-waiting-area-pm25-2024 and iot-waiting-area-co-2024.",
-      "reviewedBy": "shared-ui fixer (review findings 2026-11-26)",
-      "reviewedOn": "2026-11-26"
-    },
-    {
       "id": "ui.chain.summary.3.text",
       "rule": "benzene-not-the-smell",
       "locale": "en",
       "reason": "Line 4 of the seven lines says the reader CANNOT smell the benzene, which is what the rule requires; it does not name benzene as the smell.",
-      "reviewedBy": "system (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "ui.ui.scene.altRed",
-      "rule": "no-arcade-or-idling-measurements",
-      "locale": "zh-TW",
-      "reason": "Alt text from blueprint 4.10: 怠速 describes what the drawn scooters are doing. No idle emission figure is cited, and the same sentence says the layer's density has not been measured.",
       "reviewedBy": "system (blueprint text)",
       "reviewedOn": "2026-11-25"
     },

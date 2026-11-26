@@ -821,6 +821,23 @@ function buildMessages(c: Ctx): Message[] {
     });
   }
 
+  // Range: a home-charging scooter must cover an average day on one charge (no swap on the way).
+  if (plan.system === 'home' && ev.range) {
+    const perDay = s.monthlyKm / 30;
+    if (perDay > ev.range.km) {
+      push({
+        code: 'range',
+        severity: 'warning',
+        text: t(
+          `每月${n(s.monthlyKm)}公里，平均一天約${n(perDay)}公里，比這輛車充飽一次能騎的${n(ev.range.km)}公里還多：一天要充不只一次，或是要換一輛跑得更遠的車。${ev.range.text['zh-TW']}`,
+          `${n(s.monthlyKm)} km a month is about ${n(perDay)} km a day on average, more than the ${n(ev.range.km)} km this scooter goes on one charge: you would need to charge more than once a day, or choose a scooter that goes further. ${ev.range.text.en}`,
+        ),
+        about: ['monthlyKm', ev.id],
+        sources: ev.range.sources,
+      });
+    }
+  }
+
   if (plan.system === 'home') push({ code: 'electricity-review', severity: 'info', text: data.electricity.reviewNote, sources: data.electricity.sources });
 
   // Most severe first, stable otherwise.

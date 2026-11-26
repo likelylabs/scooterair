@@ -24,9 +24,13 @@
  *   id          its address, e.g. 'how-4'. Unique on the page
  *   kind        ChipKind (or a registry evidence id): picks the block headings and the chip
  *   title       the sheet's title (default 怎麼知道的？). Say what number it is about:
- *               「約 0.05 到 1 ppm」怎麼來的
+ *               「約 0.05 到 1 ppm」|怎麼來的 — '|' marks where the line may break, as in <Phrased>
  *   heads       override the three block headings
  *   where       the chip's qualifier in block 1 (研究・台灣)
+ *   facts       id (or ids) of the registry facts the sheet stands behind. Printed as `data-fact`,
+ *               and for every one marked `requiresCaveat` the registry's caveat is printed in
+ *               block 3 by itself unless your block already holds it word for word: a number
+ *               that needs its caveat can never ship without it (brief 4.3 rule 2, check 6)
  *   -- kind="estimate" --
  *   pollutant   'co' | 'benzene' | 'pm25': prints that pollutant's confidence word (可信程度：中,
  *               from est.confidence in src/data/estimate.ts; brief 4.2 rule 9). Pass it whenever
@@ -51,9 +55,11 @@
  */
 import { href as link, type Locale } from '@/i18n';
 import { est, type Pollutant } from '@/data/estimate';
-import { chipKindOf, estText, how } from '@/i18n/ui';
+import { facts as registry, type FactId } from '@/data/facts';
+import { chipKindOf, estText, how, langHtml, readerText } from '@/i18n/ui';
 import Icon from './Icon.astro';
 import KindChip from './KindChip.astro';
+import Phrased from './Phrased.astro';
 import { chipGlyphSvg } from './kinds';
 
 type Action = { href: string; label?: string };
@@ -64,6 +70,7 @@ interface Props {
   title?: string;
   heads?: [string, string, string];
   where?: string;
+  facts?: FactId | FactId[];
   pollutant?: Pollutant;
   anchor?: string;
   primary?: Action;
@@ -86,8 +93,22 @@ const blocks = (
       html: Astro.slots.has(name) ? (await Astro.slots.render(name)).trim() : '',
     })),
   )
-).filter((b) => b.html);
-if (blocks.length === 0) throw new Error(`HowSheet ${id}: no block has content. Fill block1, block2 and block3.`);
+);
+
+// Caveats the registry requires beside these facts: added to block 3 unless it already says them.
+const factIds = [...new Set([Astro.props.facts ?? []].flat())];
+const squash = (s: string) => s.replace(/<[^>]*>/g, '').toLowerCase().replace(/[\s\p{P}\p{S}]+/gu, '');
+const said = squash(blocks.map((b) => b.html).join(' '));
+const owed: string[] = [];
+for (const fid of factIds) {
+  const f = registry[fid];
+  if (!f) throw new Error(`HowSheet ${id}: no fact "${fid}" in the registry.`);
+  const text = f.requiresCaveat && f.caveat ? readerText(f.caveat[locale]) : '';
+  if (text && !said.includes(squash(text)) && !owed.includes(text)) owed.push(text);
+}
+if (owed.length) blocks[2].html += owed.map((c) => `<p class="how__caveat">${langHtml(c, locale)}</p>`).join('');
+const shown = blocks.filter((b) => b.html);
+if (shown.length === 0) throw new Error(`HowSheet ${id}: no block has content. Fill block1, block2 and block3.`);
 
 const primary: Action | undefined = isEstimate ? { href: link(`/estimate/#${anchor}`, locale), label: how.fullMethod[locale] } : Astro.props.primary;
 const secondary: Action | undefined = isEstimate ? (Astro.props.secondary ?? { href: link('/estimate/#measure', locale), label: how.toMeasure[locale] }) : Astro.props.secondary;
@@ -95,20 +116,20 @@ const colon = locale === 'en' ? ': ' : '：';
 const dot = locale === 'en' ? ' · ' : '　';
 ---
 
-<details class:list={['how', cls]} id={id} open data-how-sheet data-chip={kind}>
+<details class:list={['how', cls]} id={id} open data-how-sheet data-chip={kind} data-fact={factIds.join(' ') || undefined}>
   <summary class="how__summary">
-    <span class="how__summary-text">{title === how.button[locale] ? title : `${how.button[locale]}${dot}${title}`}</span>
+    <span class="how__summary-text">{title === how.button[locale] ? title : `${how.button[locale]}${dot}${title.replace(/\s*\|\s*/g, locale === 'en' ? ' ' : '')}`}</span>
     <Icon name="chevron-down" size="1.25rem" />
   </summary>
   <div class="how__panel" data-how-panel>
     <div class="how__head">
-      <h3 class="how__title" id={`${id}-title`} tabindex="-1">{title}</h3>
+      <h3 class="how__title" id={`${id}-title`} tabindex="-1"><Phrased text={title} locale={locale} /></h3>
       <button class="tool how__close" type="button" data-how-close data-js-only aria-label={how.close[locale]}>
         <Icon name="close" size="1.5rem" />
       </button>
     </div>
     <div class="how__blocks">
-      {blocks.map((b) => (
+      {shown.map((b) => (
         <section class="how__block">
           <h4 class="how__h">
             {isEstimate && b.i === 0 && <span class="how__pill how__pill--measured"><Fragment set:html={chipGlyphSvg('measured')} />{heads[0]}</span>}

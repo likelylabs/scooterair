@@ -1,0 +1,206 @@
+---
+/**
+ * /print/card/<id>/ — one share card laid out as a page, for scripts/build-share-cards.mjs to
+ * photograph at 1200 × 630 (og:image) and 1080 × 1080 (LINE). Never in the production build:
+ * getStaticPaths returns nothing unless SA_SHARE_CARDS=1 (the generator sets it for its own
+ * scratch build).
+ *
+ * One picture and one line per card (brief 7.9). The picture is drawn with the site's own
+ * scenes, so cards, pages, poster and film share one picture grammar: lane J's Picture for the
+ * kerb, the electric kerb and the heights; lane C's TailpipeMarks, MaskScene, RiderScene and
+ * BodyFigure when they exist (the kerb until then); the film card uses the heights picture,
+ * which is the film's ruler shot (beat 10), until lane F publishes a frame of it.
+ *
+ * Words: src/lib/share-cards.ts (shareCardContent) and src/i18n/pages/share.ts.
+ */
+import PrintPage from '@/components/pages/action/PrintPage.astro';
+import Picture from '@/components/pages/action/Picture.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import { localeFromParam, localeStaticPaths } from '@/i18n';
+import { illustration, site } from '@/i18n/ui';
+import { shareCardContent, shareCardIds, type CardPicture, type ShareCardId } from '@/lib/share-cards';
+
+export function getStaticPaths() {
+  if (process.env.SA_SHARE_CARDS !== '1') return [];
+  return localeStaticPaths().flatMap((l) => shareCardIds.map((id) => ({ params: { lang: l.params.lang, id } })));
+}
+const locale = localeFromParam(Astro.params.lang);
+const id = Astro.params.id as ShareCardId;
+const c = shareCardContent(id, locale);
+
+const scenes = import.meta.glob<{ default: any }>(
+  ['/src/components/art/TailpipeMarks.astro', '/src/components/art/MaskScene.astro', '/src/components/art/RiderScene.astro', '/src/components/art/BodyFigure.astro'],
+  { eager: true },
+);
+const scene = (name: string) => scenes[`/src/components/art/${name}.astro`]?.default;
+const fromC: Partial<Record<CardPicture, any>> = { smell: scene('TailpipeMarks'), mask: scene('MaskScene'), rider: scene('RiderScene'), body: scene('BodyFigure') };
+const C = fromC[c.picture];
+const own: 'kerb' | 'kerb-electric' | 'heights' = c.picture === 'kerb-electric' ? 'kerb-electric' : c.picture === 'heights' || c.picture === 'film' ? 'heights' : 'kerb';
+const host = new URL(Astro.site ?? 'https://scooterair.tw').host;
+const tagText = illustration.tag[locale];
+---
+
+<PrintPage locale={locale} title={c.title.replaceAll('|', '')} canonical={false} bare>
+  <div class="card" data-card={id} style="--k:1">
+    <div class="card__pic">
+      {C ? <C locale={locale} tag="street" /> : <Picture locale={locale} kind={own} scenario="dozen" labels={own === 'heights'} />}
+    </div>
+    <div class="card__text">
+      <p class="card__head"><span class="card__name">{site.name[locale]}</span><span class="card__host">{host}</span></p>
+      <div class="card__fit">
+        <p class="card__kicker">{c.kicker}</p>
+        <h1 class="card__title"><Phrased text={c.title} /></h1>
+        <p class="card__line">
+          {c.line}
+          {c.chip && <KindChip locale={locale} kind={c.chip} />}
+        </p>
+        {c.estimate && <p class="card__est"><EstimateValue locale={locale} slotId={c.estimate.slot} /></p>}
+        {c.caveat !== tagText && <p class="card__caveat">{c.caveat}</p>}
+      </div>
+    </div>
+  </div>
+</PrintPage>
+
+<style is:global>
+  html.print-page--bare,
+  html.print-page--bare body {
+    margin: 0;
+    overflow: hidden;
+  }
+  .card {
+    --here: var(--bg);
+    box-sizing: border-box;
+    inline-size: 100vw;
+    block-size: 100vh;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    background: var(--bg);
+    color: var(--ink);
+    border-block-start: 14px solid var(--signal-red, #c62828);
+  }
+  .card p,
+  .card h1 {
+    margin: 0;
+  }
+  .card__pic {
+    min-block-size: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: var(--bg-sunken);
+  }
+  .card__pic .scene {
+    margin: 0;
+    block-size: 100%;
+    inline-size: 100%;
+    display: grid;
+    place-items: center;
+  }
+  .card__pic .scene__art {
+    display: block;
+    max-block-size: 100%;
+    max-inline-size: 100%;
+    block-size: 100%;
+    inline-size: auto;
+  }
+  .card__pic .scene__label {
+    font-size: calc(15px * var(--pic-k, 1.6));
+  }
+  .card__pic .ill-tag,
+  .card__pic [class*='tag'] {
+    font-size: 22px;
+  }
+  .card__text {
+    display: grid;
+    align-content: start;
+    gap: 18px;
+    padding: 28px 48px 36px;
+    min-inline-size: 0;
+  }
+  .card__head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    font-weight: 900;
+    font-size: 26px;
+  }
+  .card__host {
+    margin-inline-start: auto;
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--ink-2);
+  }
+  .card__fit {
+    display: grid;
+    gap: calc(14px * var(--k));
+  }
+  .card__kicker {
+    font-size: calc(26px * var(--k));
+    font-weight: 700;
+    color: var(--signal-red-ink, var(--ink-2));
+  }
+  .card__title {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: calc(72px * var(--k));
+    line-height: 1.16;
+    text-wrap: balance;
+  }
+  .card__title:lang(en) {
+    font-size: calc(64px * var(--k));
+    line-height: 1.08;
+  }
+  .card__line {
+    font-size: calc(32px * var(--k));
+    line-height: 1.45;
+    font-weight: 700;
+    text-wrap: pretty;
+  }
+  .card__line .chip {
+    font-size: calc(22px * var(--k));
+    margin-inline-start: 0.4em;
+    vertical-align: 0.15em;
+  }
+  .card__est .est {
+    font-size: calc(40px * var(--k));
+    min-block-size: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .card__est .est .chip {
+    font-size: calc(24px * var(--k));
+  }
+  .card__est .est__go {
+    display: none;
+  }
+  .card__caveat {
+    font-size: calc(22px * var(--k));
+    line-height: 1.45;
+    color: var(--ink-2);
+    padding-inline-start: 14px;
+    border-inline-start: 5px solid var(--estimate, #c98a1e);
+  }
+
+  /* the wide card (og:image, 1200 × 630): picture left, words right */
+  @media (min-aspect-ratio: 3/2) {
+    .card {
+      grid-template-rows: none;
+      grid-template-columns: 46% minmax(0, 1fr);
+    }
+    .card__text {
+      padding: 30px 48px 30px 44px;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+    .card__fit {
+      align-content: center;
+    }
+  }
+  /* the square card (1080 × 1080): picture on top */
+  @media (max-aspect-ratio: 3/2) {
+    .card__pic {
+      max-block-size: 52vh;
+    }
+  }
+</style>

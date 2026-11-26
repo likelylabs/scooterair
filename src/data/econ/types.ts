@@ -398,6 +398,12 @@ export interface EvModel {
    */
   comparableTo125: 'yes' | 'no' | 'unverified';
   performance: Provenance & { text: L10n };
+  /**
+   * How far it goes on one full charge, as the maker states it (km), with the conditions of that
+   * figure in `text`. Only where the research has a sourced figure. The engine warns when a
+   * home-charging scooter's average day (monthlyKm ÷ 30) is longer than this.
+   */
+  range?: Provenance & { km: number; text: L10n };
   calculator: true | { excluded: L10n };
   note?: L10n;
 }

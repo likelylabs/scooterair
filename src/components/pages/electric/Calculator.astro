@@ -32,8 +32,11 @@ interface Props {
   today: string;
   /** the same places as the #status select (question 1 mirrors it) */
   cityOptions: { value: string; label: string }[];
+  /** the worked result the calculator opens on (brief 7.7): the place, the distance, and the old scooter assumed when there is one to scrap */
+  defaults: { county: string; km: number; scrap: { engine: 'four-stroke' | 'two-stroke'; builtOn: string } };
 }
-const { locale, cfg, today, cityOptions } = Astro.props;
+const { locale, cfg, today, cityOptions, defaults } = Astro.props;
+const [defYear, defMonth] = defaults.scrap.builtOn.split('-');
 const T = localize(electric, locale);
 const C = T.calc;
 const year = Number(today.slice(0, 4));
@@ -68,19 +71,19 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
          (aria-hidden), so a screen reader hears the question once, from the control itself. -->
     <div class="el-q">
       <p class="el-q__n" aria-hidden="true"><span class="el-num">1</span>{C.q1}</p>
-      <Select id="el-city-q" label={C.q1} options={cityOptions} value="" hint={C.q1Hint} class="el-vh-label" data-el-cityq />
+      <Select id="el-city-q" label={C.q1} options={cityOptions} value={defaults.county} hint={C.q1Hint} class="el-vh-label" data-el-cityq />
     </div>
 
     <div class="el-q">
       <p class="el-q__n" aria-hidden="true"><span class="el-num">2</span>{C.q2.legend}</p>
-      <RadioGroup name="el-scrap" legend={C.q2.legend} hint={C.q2.hint} options={[{ value: 'no', label: C.q2.no }, { value: 'yes', label: C.q2.yes }]} value="no" class="el-vh-legend" />
-      <div class="el-sub" data-el-if="scrap" hidden>
+      <RadioGroup name="el-scrap" legend={C.q2.legend} hint={C.q2.hint} options={[{ value: 'no', label: C.q2.no }, { value: 'yes', label: C.q2.yes }]} value="yes" class="el-vh-legend" />
+      <div class="el-sub" data-el-if="scrap">
         <div class="el-pair">
-          <Select id="el-year" label={C.q2.year} options={years.map((y) => ({ value: y, label: y }))} value={String(year - 12)} />
-          <Select id="el-month" label={C.q2.month} options={months} value="06" data-el-thismonth={thisMonth} />
+          <Select id="el-year" label={C.q2.year} options={years.map((y) => ({ value: y, label: y }))} value={defYear} />
+          <Select id="el-month" label={C.q2.month} options={months} value={defMonth} data-el-thismonth={thisMonth} />
         </div>
         <p class="el-hint">{C.q2.builtHint}</p>
-        <RadioGroup name="el-engine" legend={C.q2.engine} options={[{ value: 'four-stroke', label: C.q2.fourStroke }, { value: 'two-stroke', label: C.q2.twoStroke }]} value="four-stroke" hint={C.q2.engineHint} />
+        <RadioGroup name="el-engine" legend={C.q2.engine} options={[{ value: 'four-stroke', label: C.q2.fourStroke }, { value: 'two-stroke', label: C.q2.twoStroke }]} value={defaults.scrap.engine} hint={C.q2.engineHint} />
       </div>
     </div>
 
@@ -109,7 +112,7 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
 
     <div class="el-q">
       <p class="el-q__n" aria-hidden="true"><span class="el-num">4</span>{C.q4.label}</p>
-      <Range id="el-km" label={C.q4.label} min={50} max={kmMax} step={50} value={400} unit={C.q4.unit} hint={C.q4.hint} class="el-vh-label" />
+      <Range id="el-km" label={C.q4.label} min={50} max={kmMax} step={50} value={defaults.km} unit={C.q4.unit} hint={C.q4.hint} class="el-vh-label" />
       <p class="el-error" id="el-km-error" data-el-error="monthlyKm" data-error={C.q4.error} hidden></p>
       <p class="el-hint" id="el-km-over" data-el-over={kmMax} hidden>{fill(C.q4.overMax, { max: kmMax.toLocaleString(locale === 'en' ? 'en-GB' : 'zh-TW') })}</p>
     </div>
@@ -137,7 +140,7 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
           { value: 'heavy', label: C.q5.heavy, hint: C.q5.heavyHint },
           { value: 'any', label: C.q5.light, hint: C.q5.lightHint },
         ]}
-        value="heavy"
+        value="any"
       />
     </div>
 
@@ -163,7 +166,7 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
 
 <section id="result" class="el-live" aria-labelledby="result-title" data-js-only>
   <h2 id="result-title" class="el-live__title">{T.result.title}</h2>
-  <p class="el-live__placeholder" data-el-placeholder>{T.result.placeholder}</p>
+  <p class="el-live__placeholder" data-el-placeholder hidden>{T.result.placeholder}</p>
   <p class="el-live__status" data-el-status role="status" aria-live="polite" aria-atomic="true"></p>
   <ElectricResult id="el-live" locale={locale} hidden />
 </section>

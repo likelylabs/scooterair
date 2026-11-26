@@ -236,13 +236,15 @@ const items = nav.map((item) => {
     padding: var(--sp-2) 0 0;
     list-style: none;
   }
+  /* each link is a 48 px target; the 4 px above and below keep two links 8 px apart */
   .menu__nav li {
+    padding-block: 4px;
     border-block-end: 1px solid var(--line);
   }
   .menu__nav a {
     display: flex;
     align-items: center;
-    min-block-size: 3.5rem;
+    min-block-size: var(--tap);
     color: var(--ink);
     font-size: var(--fs-lg);
     font-weight: var(--fw-bold);

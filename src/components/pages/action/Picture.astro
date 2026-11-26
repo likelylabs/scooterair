@@ -1,0 +1,92 @@
+---
+/**
+ * Picture — the two drawn pictures lane J's pages print (the poster, the one-page brief and the
+ * share-card pages): the kerb close-up (G4) and the heights picture (G8).
+ *
+ * One picture grammar: when lane C's own scene exists (src/components/art/KerbScene.astro,
+ * HeightsScene.astro) it is used, with the props of contract C §7. Until then the same
+ * composition is drawn here from air() and parts.ts (./art.ts), so the page is finished either way.
+ *
+ * Props
+ *   locale     Locale
+ *   kind       'kerb' | 'kerb-electric' | 'heights'
+ *   scenario   for 'kerb': 'few' | 'dozen' | 'full' (default 'dozen')
+ *   tag        print the illustration tag over the picture (default true)
+ *   labels     print the words in the picture (default true)
+ *   class, id  passed to the figure
+ *
+ *   <Picture locale={locale} kind="kerb" scenario="dozen" />
+ */
+import type { Locale } from '@/i18n';
+import SceneFrame from '@/components/art/SceneFrame.astro';
+import SceneLabel from '@/components/art/SceneLabel.astro';
+import { sceneAlt } from '@/components/art/scene';
+import type { AirScenario } from '@/components/art/air';
+import { STROLLER_BAND } from '@/components/art/parts';
+import { est } from '@/data/estimate';
+import act from '@/i18n/pages/act';
+import { fill, localize } from '@/i18n/pages/_copy';
+import { heightsDrawing, kerbDrawing } from './art';
+
+interface Props {
+  locale: Locale;
+  kind: 'kerb' | 'kerb-electric' | 'heights';
+  scenario?: AirScenario;
+  tag?: boolean;
+  labels?: boolean;
+  class?: string;
+  id?: string;
+}
+const { locale, kind, scenario = 'dozen', tag = true, labels = true, class: cls, id } = Astro.props;
+const t = localize(act, locale).pictures;
+
+// lane C's scenes, if they are there yet (an empty match is not an error)
+const scenes = import.meta.glob<{ default: any }>(['/src/components/art/KerbScene.astro', '/src/components/art/HeightsScene.astro'], { eager: true });
+const KerbScene = scenes['/src/components/art/KerbScene.astro']?.default;
+const HeightsScene = scenes['/src/components/art/HeightsScene.astro']?.default;
+const useC = kind === 'heights' ? Boolean(HeightsScene) : kind === 'kerb' && Boolean(KerbScene);
+
+const d = kind === 'heights' ? heightsDrawing() : kerbDrawing({ scenario, electric: kind === 'kerb-electric' });
+const alt =
+  kind === 'heights'
+    ? sceneAlt(locale, t.heightsAlt, { scenario: 'dozen', count: est.scn.dozen.count })
+    : kind === 'kerb-electric'
+      ? sceneAlt(locale, t.kerbElectricAlt, { kind: 'electric' })
+      : sceneAlt(locale, t.kerbAlt, { scenario, count: est.scn[scenario].count });
+const p = d.points;
+---
+
+{
+  useC && kind === 'kerb' ? (
+    <KerbScene locale={locale} scenario={scenario} initial={scenario} tag={tag ? 'street' : false} class={cls} id={id} />
+  ) : useC && kind === 'heights' ? (
+    <HeightsScene locale={locale} tag={tag ? 'street' : false} class={cls} id={id} />
+  ) : (
+    <SceneFrame locale={locale} box={d.box} alt={alt} tag={tag ? 'street' : false} scenario={kind === 'kerb' ? scenario : undefined} class:list={['jpic', `jpic--${kind}`, cls]} id={id}>
+      <Fragment set:html={d.svg} />
+      {labels && kind === 'kerb' && (
+        <SceneLabel slot="labels" box={d.box} x={p.rider.x} y={p.rider.y} anchor="center bottom" plate>
+          {t.waitingToo}
+        </SceneLabel>
+      )}
+      {labels && kind === 'heights' && (
+        <Fragment slot="labels">
+          <SceneLabel box={d.box} x={p.cm50.x} y={p.cm50.y} anchor="end middle" quiet>50</SceneLabel>
+          <SceneLabel box={d.box} x={p.cm100.x} y={p.cm100.y} anchor="end middle" quiet>100</SceneLabel>
+          <SceneLabel box={d.box} x={p.cm150.x} y={p.cm150.y} anchor="end middle" quiet>150</SceneLabel>
+          <SceneLabel box={d.box} x={p.oneMetre.x} y={p.oneMetre.y - 2} anchor="end bottom" plate>{t.oneMetre}</SceneLabel>
+          <SceneLabel box={d.box} x={p.band.x} y={p.band.y} anchor="end middle" plate>{fill(t.band, { lo: STROLLER_BAND.low, hi: STROLLER_BAND.high })}</SceneLabel>
+          <SceneLabel box={d.box} x={p.tailpipe.x} y={p.tailpipe.y} anchor="center bottom" plate>{t.tailpipe}</SceneLabel>
+        </Fragment>
+      )}
+    </SceneFrame>
+  )
+}
+
+<style>
+  .jpic :global(.scene__art) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+</style>

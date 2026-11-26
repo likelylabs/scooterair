@@ -12,6 +12,9 @@
 //   --static        skip the browser checks (9, 10 heights, 11–16, 23)
 //   --max N         offending lines printed per check (default 12; --json always has all)
 //   --json          machine-readable report on stdout
+//   --report f.json also write the full report to a file (with the normal output on screen)
+//   --pages REGEX   browser checks only on routes matching REGEX (e.g. '^/(en/)?electric/$')
+//   --progress      print each browser page as it is checked, with its time (stderr)
 //   --base /x/      the base path the build was made for (default: read from the home page's
 //                   canonical link, so a BASE_PATH=/scooterair build is checked as deployed)
 //   --no-phone-font do not alias the phone's system CJK font (see below)
@@ -28,18 +31,23 @@
 //   browser    11 text ≥ 14 px, body ≥ 18 px (320, 360, 390) · 12 targets ≥ 48 × 48 px, 8 px
 //              apart · 13 no sideways scroll or clipped text at 320 (標準, 大, 特大), no headline
 //              break inside a phrase · 14 contrast (body and headlines 7:1, labels 4.5:1,
-//              [data-mark] marks 3:1; light and dark) · 15 JavaScript off: screens show picture,
+//              air marks 3:1; light and dark) · 15 JavaScript off: screens show picture,
 //              text and sheet; the film shows stills and transcript · 16 prefers-reduced-motion:
 //              nothing moves · 17 scenes: alt text says 示意圖 / illustration, the tag is shown ·
 //              23 /electric/ opens on a worked result, and on the one the URL asks for
 //   Not here: 18–22 (the film's own guard, lane F), 24 (dated builds), 25 (npm run test:calc).
 //
-// THE MARKUP IT READS (contract for page and component builders; see
-// scratchpad/redesign/contracts/K.md): article[data-screen] (home screens) with its h2,
-// [data-screen-body], [data-screen-picture]; [data-scene] (every illustrated scene) with its
-// accessible name and the HTML tag inside it; [data-kind="estimate"]; [data-sheet] (HowSheet);
-// [data-fact="id id2"] (registry facts a block prints); [data-mark] (meaningful SVG marks);
-// [data-result] (the calculator's worked result); [data-transcript] (the film's transcript).
+// THE MARKUP IT READS (the hooks the shared components print; full list in the integrator's
+// contract, scratchpad/redesign/contracts/K.md):
+//   home screens   article[data-screen] (ui/Screen) › h2, .screen__body, .screen__pic
+//   sheets         details[data-how-sheet] › [data-how-panel] (ui/HowSheet)
+//   estimates      [data-kind="estimate"] (ui/EstimateValue), its href="#how-n" or data-how
+//   scenes         figure.scene (art/SceneFrame) or [data-scene]; the tag [data-illustration-tag]
+//   marks          .air-ring, .air-dot, .air-rib (art/air.ts)
+//   facts          [data-fact="id id2"] on whatever prints a registry fact (requested of lane B)
+//   calculator     [data-result] (falls back to #result) (requested of lane I)
+//   film           [data-transcript] (falls back to #transcript) (requested of lane F)
+//   K sentences    the brief's, plus src/i18n/ui.ts → kSentences (lane B)
 // Where a hook is missing the check fails and says which hook it looked for.
 //
 // Every check runs and reports; a check that throws is reported as failed with its error.
@@ -49,7 +57,7 @@
 // aliased to "Noto Sans CJK TC", the family Android phones have and the site's body stack names.
 // The site itself never loads it.
 
-import { existsSync, readdirSync, readFileSync, statSync, writeSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, writeSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
@@ -66,7 +74,7 @@ const opt = (name) => {
   if (i < 0) return undefined;
   return argv[i].includes('=') ? argv[i].split('=').slice(1).join('=') : argv[i + 1];
 };
-const optValues = new Set(['only', 'max', 'base', 'pages'].map((n) => opt(n)).filter(Boolean));
+const optValues = new Set(['only', 'max', 'base', 'pages', 'report'].map((n) => opt(n)).filter(Boolean));
 const positional = argv.filter((a, i) => !a.startsWith('--') && !(argv[i - 1]?.startsWith('--') && optValues.has(a)));
 const DIST = resolve(positional[0] ?? join(root, 'dist'));
 const ONLY = opt('only') ? new Set(opt('only').split(',').map((s) => Number(s.trim()))) : null;
@@ -180,7 +188,8 @@ const closest = (el, pred) => {
   for (let n = el; n && n.type === ELEMENT_NODE; n = n.parent) if (pred(n)) return n;
   return null;
 };
-const isSheet = (el) => has(el, 'data-sheet') || classes(el).some((c) => /(^|-)how-?sheet|^sheet$/i.test(c));
+// HowSheet (lane B) renders <details data-how-sheet id="how-n"> › [data-how-panel]
+const isSheet = (el) => has(el, 'data-how-sheet') || has(el, 'data-how-panel') || has(el, 'data-sheet');
 const isHidden = (el) => has(el, 'hidden') || attr(el, 'aria-hidden') === 'true';
 
 /** Split a page's text into block-level segments, each with the flags of its context. */
@@ -208,7 +217,8 @@ function segmentsOf(doc) {
         lastParent = n;
       } else if (c.type === ELEMENT_NODE && !SKIP.has(c.name)) {
         if (c.name === 'title' && closest(c, (x) => x.name === 'svg')) continue; // accessible name, read as alt
-        const block = BLOCK.has(c.name) || c.name === 'br' || c.name === 'svg';
+        // an estimate (EstimateValue) is its own segment, so the words around it are judged apart from it
+        const block = BLOCK.has(c.name) || c.name === 'br' || c.name === 'svg' || attr(c, 'data-kind') === 'estimate';
         const f = {
           el: block ? c : flags.el,
           heading: /^h[1-3]$/.test(c.name) ? Number(c.name[1]) : flags.heading,
@@ -340,7 +350,7 @@ try {
   const pub = ui.kSentences;
   const list = Array.isArray(pub) ? pub : pub && typeof pub === 'object' ? Object.entries(pub).map(([id, text]) => ({ id, text })) : [];
   for (const p of list) {
-    const k = kSentences.find((x) => x.id === p.id);
+    const k = kSentences.find((x) => x.id === String(p.id).match(/^K\d/)?.[0]);
     if (!k || !p.text) continue;
     for (const l of LOC) if (typeof p.text[l] === 'string' && !k.text[l].includes(p.text[l])) k.text[l].push(p.text[l]);
   }
@@ -442,6 +452,7 @@ await check(4, () => {
       const linksThere = (n) => [n, ...elements(n)].some((x) => x.name === 'a' && /estimate\/#/.test(attr(x, 'href') ?? ''));
       let reach = inner.some((x) => x.name === 'a' && /estimate\/#/.test(attr(x, 'href') ?? ''));
       if (!reach) {
+        if (inner.some((x) => /estimate\/#/.test(attr(x, 'data-how') ?? ''))) reach = true;
         const targets = inner.flatMap((x) => [attr(x, 'aria-controls'), attr(x, 'data-sheet-target'), attr(x, 'data-opens'), x.name === 'a' ? (attr(x, 'href') ?? '').match(/^#(.+)/)?.[1] : undefined, has(x, 'data-sheet') && attr(x, 'data-sheet') ? attr(x, 'data-sheet') : undefined].filter(Boolean));
         reach = targets.some((id) => {
           const t = p.els.find((x) => attr(x, 'id') === id);
@@ -721,8 +732,8 @@ await check(9, () => {
       const ht = h ? textOf(h) : '';
       if (!h) fail(9, label(p), `screen ${i + 1} has no <h2>`);
       else if (countChars(ht) > 22) fail(9, label(p), `screen ${i + 1} headline has ${countChars(ht)} characters (max 22): ${ht}`);
-      const b = [...elements(a)].find((e) => has(e, 'data-screen-body'));
-      if (!b) fail(9, label(p), `screen ${i + 1} has no [data-screen-body]`);
+      const b = [...elements(a)].find((e) => has(e, 'data-screen-body') || classes(e).includes('screen__body'));
+      if (!b) fail(9, label(p), `screen ${i + 1} has no body (.screen__body)`);
       else if (countChars(textOf(b)) > 45) fail(9, label(p), `screen ${i + 1} body has ${countChars(textOf(b))} characters (max 45): ${cut(textOf(b))}`);
     });
   }
@@ -733,9 +744,10 @@ await check(17, () => {
   for (const p of pages) {
     if (p.redirect) continue;
     const zh = p.locale === 'zh-TW';
-    for (const el of p.els.filter((e) => has(e, 'data-scene'))) {
+    // a scene is lane C's <figure class="scene"> (SceneFrame), or anything marked data-scene
+    for (const el of p.els.filter((e) => has(e, 'data-scene') || (e.name === 'figure' && classes(e).includes('scene')))) {
       scenes++;
-      const name = `${attr(el, 'data-scene') || el.name}`;
+      const name = `${attr(el, 'data-scene') || attr(el, 'id') || classes(el).filter((c) => c !== 'scene')[0] || el.name}`;
       const inner = [el, ...elements(el)];
       const labelled = (attr(el, 'aria-labelledby') ?? '').split(/\s+/).filter(Boolean).map((id) => p.els.find((x) => attr(x, 'id') === id)).filter(Boolean).map((x) => textOf(x));
       const names = [
@@ -746,14 +758,16 @@ await check(17, () => {
       ].filter(Boolean);
       const okName = names.some((n) => (zh ? /示意圖/.test(n) : /illustration/i.test(n)));
       if (!okName) fail(17, label(p), `scene ${name}: alt text does not say ${zh ? '示意圖' : '"illustration"'}${names.length ? ` (it says 「${cut(names[0], 50)}」)` : ' (no alt text)'}`);
-      const box = closest(el, (x) => has(x, 'data-screen-picture') || x.name === 'figure') ?? el;
-      const html = textOf(box, { svgText: false });
-      const okTag = zh ? /示意圖/.test(html) && /看不見/.test(html) : /illustration/i.test(html) && /invisible/i.test(html);
-      if (!okTag) fail(17, label(p), `scene ${name}: the tag ${zh ? '示意圖｜廢氣其實大多看不見' : '"Illustration: real exhaust is mostly invisible"'} is not shown as HTML beside it`);
+      // the tag: lane B's IllustrationTag ([data-illustration-tag]) on the picture, printed by the scene
+      // (tag="street" | "body") or by <Screen illustration>
+      const box = closest(el.parent, (x) => has(x, 'data-screen-picture') || classes(x).includes('screen__pic')) ?? el;
+      const tags = [box, ...elements(box)].filter((x) => has(x, 'data-illustration-tag')).map((x) => textOf(x));
+      const okTag = tags.some((t) => (zh ? /示意圖/.test(t) : /illustration/i.test(t)));
+      if (!okTag) fail(17, label(p), `scene ${name}: no tag ([data-illustration-tag] 示意圖｜廢氣其實大多看不見 / 示意圖・不是醫學圖) on the picture`);
     }
   }
-  note(17, `${scenes} [data-scene] element(s) on the site`);
-  if (!scenes) fail(17, '(all pages)', 'no element carries data-scene; every illustrated scene (lane C) must, so its alt text and tag can be checked');
+  note(17, `${scenes} scene(s) on the site (figure.scene or [data-scene])`);
+  if (!scenes) fail(17, '(all pages)', 'no scene (figure.scene from SceneFrame, or [data-scene]) on any page');
 });
 
 // ============================================================================================
@@ -806,6 +820,7 @@ async function browserChecks(chromium) {
   const fontCssFile = join(NM, '@fontsource-variable/noto-sans-tc/wght.css');
   const phoneFont = !flag('no-phone-font') && existsSync(fontCssFile) ? readFileSync(fontCssFile, 'utf8').replaceAll("'Noto Sans TC Variable'", "'Noto Sans CJK TC'").replaceAll('url(./files/', `url(${origin}/__nm/@fontsource-variable/noto-sans-tc/files/`) : null;
 
+  for (const n of BROWSER) if (run(n)) result(n);
   const browser = await chromium.launch();
   const viewPages = pages.filter((p) => !p.redirect && p.route.endsWith('/') && (!PAGES || PAGES.test(p.route)));
   const SIZES = { 標準: null, 大: '115%', 特大: '130%' };
@@ -819,9 +834,10 @@ async function browserChecks(chromium) {
       await ctx.close();
     }
   }
-  async function open(page, route, { size = null, settle = 250 } = {}) {
+  async function open(page, route, { size = null, settle = 250, js = true } = {}) {
     await page.goto(url(route), { waitUntil: 'load', timeout: 45000 });
-    if (phoneFont) await page.addStyleTag({ content: phoneFont }).catch(() => {});
+    // addStyleTag waits for a load event that never comes with JavaScript off
+    if (phoneFont && js !== false) await page.addStyleTag({ content: phoneFont }).catch(() => {});
     if (size) await page.evaluate((s) => (document.documentElement.style.fontSize = s), size);
     await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
     if (settle) await page.waitForTimeout(settle);
@@ -845,10 +861,11 @@ async function browserChecks(chromium) {
   // helpers injected into every page
   const HELPERS = `
     window.__cs = {
+      inClosedDetails(el) { for (let d = el.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) { if (!d.open && !(el.closest('summary') && el.closest('summary').parentElement === d)) return true; } return false; },
       sel(el) { if (!el || el.nodeType !== 1) return '?'; let s = el.tagName.toLowerCase(); if (el.id) s += '#' + el.id; else if (el.classList.length) s += '.' + [...el.classList].slice(0, 2).join('.'); const anc = el.parentElement && el.parentElement.closest('[id]'); return anc ? '#' + anc.id + ' ' + s : s; },
-      visible(el) { if (!el || !el.getBoundingClientRect) return false; const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return false; if (r.right <= 0 || r.left >= innerWidth) return false; const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) return false; return true; },
-      textNodes() { const out = []; const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.nodeValue.trim()) continue; const el = n.parentElement; if (!el || el.closest('script,style,noscript,template,svg title,svg desc')) continue; const range = document.createRange(); range.selectNodeContents(n); const rects = [...range.getClientRects()].filter(r => r.width >= 1 && r.height >= 1); if (!rects.length) continue; const cs = getComputedStyle(el); if (cs.visibility === 'hidden') continue; let hiddenByClip = false; for (let a = el; a && a !== document.body; a = a.parentElement) { const s = getComputedStyle(a); if (Number(s.opacity) === 0) { hiddenByClip = true; break; } const r = a.getBoundingClientRect(); if ((s.overflow === 'hidden' || s.clip !== 'auto' || s.clipPath !== 'none') && (r.width <= 2 || r.height <= 2)) { hiddenByClip = true; break; } } if (hiddenByClip) continue; out.push({ node: n, el, rects }); } return out; },
-      isBody(el) { const p = el.closest('p'); if (!p || !p.closest('main')) return false; if (p.closest('figure,figcaption,footer,header,nav,aside,table,small,label,legend,button,summary,dl,[data-sheet],[data-screen-quiet],[data-quiet],[role=note],svg')) return false; const cls = (x) => (x.className && typeof x.className === 'string' ? x.className : ''); for (let a = p; a && a.tagName !== 'MAIN'; a = a.parentElement) if (/quiet|caption|note|meta|label|legend|chip|badge|fine|source|cite|eyebrow|kicker|small|footnote|tag|hint|disclaim|caveat/i.test(cls(a))) return false; return true; },
+      visible(el) { if (!el || !el.getBoundingClientRect) return false; const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return false; if (r.right <= 0 || r.left >= innerWidth) return false; if (this.inClosedDetails(el)) return false; const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) return false; return true; },
+      textNodes() { const out = []; const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.nodeValue.trim()) continue; const el = n.parentElement; if (!el || el.closest('script,style,noscript,template,svg title,svg desc') || this.inClosedDetails(el)) continue; const range = document.createRange(); range.selectNodeContents(n); const rects = [...range.getClientRects()].filter(r => r.width >= 1 && r.height >= 1); if (!rects.length) continue; const cs = getComputedStyle(el); if (cs.visibility === 'hidden') continue; let hiddenByClip = false; for (let a = el; a && a !== document.body; a = a.parentElement) { const s = getComputedStyle(a); if (Number(s.opacity) === 0) { hiddenByClip = true; break; } const r = a.getBoundingClientRect(); if ((s.overflow === 'hidden' || s.clip !== 'auto' || s.clipPath !== 'none') && (r.width <= 2 || r.height <= 2)) { hiddenByClip = true; break; } } if (hiddenByClip) continue; out.push({ node: n, el, rects }); } return out; },
+      isBody(el) { const p = el.closest('p'); if (!p || !p.closest('main')) return false; if (p.closest('figure,figcaption,footer,header,nav,aside,table,small,label,legend,button,summary,dl,[data-how-sheet],[data-sheet],[data-illustration-tag],[role=note],svg')) return false; const cls = (x) => (x.className && typeof x.className === 'string' ? x.className : ''); for (let a = p; a && a.tagName !== 'MAIN'; a = a.parentElement) if (/quiet|caption|note|meta|label|legend|chip|badge|fine|source|cite|eyebrow|kicker|small|footnote|tag|hint|disclaim|caveat/i.test(cls(a))) return false; return true; },
       rgba(s) { const m = s.match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(/[ ,\\/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; },
       lum(c) { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); },
       over(top, under) { const a = top.a + under.a * (1 - top.a); if (a === 0) return { r: 0, g: 0, b: 0, a: 0 }; return { r: (top.r * top.a + under.r * under.a * (1 - top.a)) / a, g: (top.g * top.a + under.g * under.a * (1 - top.a)) / a, b: (top.b * top.a + under.b * under.a * (1 - top.a)) / a, a }; },
@@ -866,7 +883,7 @@ async function browserChecks(chromium) {
         const m = await page.evaluate(() => {
           const arts = [...document.querySelectorAll('article[data-screen]')];
           const H = document.documentElement.scrollHeight;
-          let pics = [...document.querySelectorAll('[data-screen-picture]')];
+          let pics = [...document.querySelectorAll('article[data-screen] .screen__pic, [data-screen-picture]')];
           const hooked = pics.length > 0;
           if (!hooked) {
             const all = [...document.querySelectorAll('main svg, main img, main canvas, main video, main picture')].filter((e) => { const r = e.getBoundingClientRect(); return r.width * r.height > 20000; });
@@ -884,9 +901,9 @@ async function browserChecks(chromium) {
         }
         if (run(10)) {
           const share = m.cover / m.H;
-          note(10, `${p.route}: pictures cover ${(share * 100).toFixed(0)}% of ${m.H} px${m.hooked ? '' : ' (no [data-screen-picture] hooks; counted every large svg/img in main)'}`);
+          note(10, `${p.route}: pictures cover ${(share * 100).toFixed(0)}% of ${m.H} px${m.hooked ? '' : ' (no Screen pictures; counted every large svg/img in main)'}`);
           if (share < 0.45) fail(10, p.route, `pictures and charts cover ${(share * 100).toFixed(1)}% of the page height (min 45%)`);
-          if (!m.hooked) fail(10, p.route, 'no [data-screen-picture] element: the home screens must mark their picture');
+          if (!m.hooked) fail(10, p.route, 'no screen picture (article[data-screen] .screen__pic) on the page');
         }
       });
 
@@ -897,7 +914,9 @@ async function browserChecks(chromium) {
       const bad = await page.evaluate(() => {
         const small = [], body = [];
         for (const { el, node } of __cs.textNodes()) {
-          const fs = parseFloat(getComputedStyle(el).fontSize);
+          // SVG text is sized in the drawing's units: what the reader sees is that times the drawing's scale
+          let fs = parseFloat(getComputedStyle(el).fontSize);
+          if (el.closest('svg') && el.getScreenCTM) { const m = el.getScreenCTM(); if (m) fs = Math.round(fs * Math.hypot(m.a, m.b) * 10) / 10; }
           if (fs < 13.95) small.push(`${fs}px 「${node.nodeValue.trim().slice(0, 24)}」 ${__cs.sel(el)}`);
           else if (fs < 17.95 && __cs.isBody(el)) body.push(`${fs}px 「${node.nodeValue.trim().slice(0, 24)}」 ${__cs.sel(el)}`);
         }
@@ -1008,7 +1027,7 @@ async function browserChecks(chromium) {
           const need = el.closest('h1,h2,h3') || __cs.isBody(el) ? 7 : 4.5;
           if (ratio < need - 0.005) out.low.push(`${ratio.toFixed(2)}:1 (needs ${need}) ${__cs.sel(el)} 「${node.nodeValue.trim().slice(0, 16)}」`);
         }
-        for (const m of document.querySelectorAll('[data-mark]')) {
+        for (const m of document.querySelectorAll('.air-ring, .air-dot, .air-rib')) {
           if (!__cs.visible(m)) continue;
           out.marks++;
           const cs = getComputedStyle(m);
@@ -1018,7 +1037,7 @@ async function browserChecks(chromium) {
           const bg = __cs.bg(host);
           if (!fg || bg.unknown) continue;
           const ratio = __cs.ratio(__cs.over({ ...fg, a: fg.a * (Number(cs.strokeOpacity || cs.fillOpacity || 1)) }, bg), bg);
-          if (ratio < 2.995) out.lowMarks.push(`${ratio.toFixed(2)}:1 ${__cs.sel(m)} (${m.getAttribute('data-mark')})`);
+          if (ratio < 2.995) out.lowMarks.push(`${ratio.toFixed(2)}:1 ${__cs.sel(m)}`);
         }
         return out;
       });
@@ -1028,8 +1047,8 @@ async function browserChecks(chromium) {
       if (r.lowMarks.length) fail(14, where, `${r.lowMarks.length} mark(s) under 3:1, e.g. ${r.lowMarks.slice(0, 2).join(' · ')}`);
     });
   if (run(14)) {
-    note(14, `${marks} visible [data-mark] mark(s) checked across both themes`);
-    if (!marks) fail(14, '(all pages)', 'no [data-mark] element, so no meaningful mark could be checked for 3:1; scenes and charts (lanes C, D) must tag their meaningful marks');
+    note(14, `${marks} visible air mark(s) (.air-ring, .air-dot, .air-rib) checked across both themes`);
+    if (!marks) fail(14, '(all pages)', 'no air mark (.air-ring, .air-dot, .air-rib from air.ts) on any page, so no meaningful mark was checked for 3:1');
   }
 
   // ---- 15 JavaScript off ------------------------------------------------------------------------
@@ -1045,14 +1064,14 @@ async function browserChecks(chromium) {
             const arts = [...document.querySelectorAll('article[data-screen]')];
             if (!arts.length) out.problems.push('no article[data-screen] to check');
             arts.forEach((a, i) => {
-              const pic = a.querySelector('[data-screen-picture]') || a.querySelector('svg, img, picture');
+              const pic = a.querySelector('.screen__pic, [data-screen-picture]') || a.querySelector('svg, img, picture');
               if (!vis(pic)) out.problems.push(`screen ${i + 1}: no visible picture`);
               if (!vis(a.querySelector('h2'))) out.problems.push(`screen ${i + 1}: no visible headline`);
-              if (!vis(a.querySelector('[data-screen-body]'))) out.problems.push(`screen ${i + 1}: no visible [data-screen-body]`);
-              const sheet = a.querySelector('[data-sheet]') || (a.querySelector('[aria-controls]') && document.getElementById(a.querySelector('[aria-controls]').getAttribute('aria-controls')));
+              if (!vis(a.querySelector('.screen__body, [data-screen-body]'))) out.problems.push(`screen ${i + 1}: no visible body (.screen__body)`);
+              const sheet = a.querySelector('[data-how-sheet], [data-sheet]');
               const content = sheet && (sheet.matches('details') ? sheet : sheet.querySelector('details') || sheet);
               const open = content && (!content.matches('details') || content.open);
-              if (!content || !vis(content) || !open || content.textContent.trim().length < 20) out.problems.push(`screen ${i + 1}: sheet content not shown (needs an open <details> / [data-sheet] without JavaScript)`);
+              if (!content || !vis(content) || !open || content.textContent.trim().length < 20) out.problems.push(`screen ${i + 1}: sheet content not shown (HowSheet: an open <details data-how-sheet> without JavaScript)`);
             });
           } else if (neutral === '/90/') {
             const stills = [...document.querySelectorAll('main img, main svg, main picture')].filter((e) => { const b = e.getBoundingClientRect(); return vis(e) && b.width * b.height > 20000; });
@@ -1061,7 +1080,7 @@ async function browserChecks(chromium) {
             if (!tr) out.problems.push('no [data-transcript] element');
             else if (!vis(tr) || tr.textContent.trim().length < 200) out.problems.push('the transcript is not shown without JavaScript');
           }
-          for (const s of document.querySelectorAll('[data-sheet]')) {
+          for (const s of document.querySelectorAll('[data-how-sheet], [data-sheet]')) {
             const d = s.matches('details') ? s : s.querySelector('details');
             if (d && !d.open && !s.closest('article[data-screen]')) out.problems.push(`sheet ${s.id ? '#' + s.id : ''} is a closed <details> without JavaScript`);
           }
@@ -1147,6 +1166,7 @@ async function browserChecks(chromium) {
 // Report
 // ============================================================================================
 const order = [...results.values()].sort((a, b) => a.id - b.id);
+if (opt('report')) writeFileSync(resolve(opt('report')), `${JSON.stringify({ dist: DIST, base: BASE, pages: pages.length, checks: order }, null, 2)}\n`);
 if (JSON_OUT) {
   writeSync(1, `${JSON.stringify({ dist: DIST, base: BASE, pages: pages.length, checks: order }, null, 2)}\n`);
 } else {

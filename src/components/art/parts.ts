@@ -732,6 +732,9 @@ export function drinksCan(): string {
 /* ------------------------------------------------------------------------ */
 
 export type MaskKind = 'none' | 'cloth' | 'surgical' | 'carbon' | 'n95';
+/** The four masks of the switch on the mask screen (brief 12.2), in its order. Values of lane B's <Segmented name="mask">. */
+export const MASK_CHOICES = ['cloth', 'surgical', 'carbon', 'n95'] as const;
+export type MaskChoice = (typeof MASK_CHOICES)[number];
 
 /**
  * Where things are on maskFace(), in its own units (the drawing is 130 wide
@@ -761,13 +764,26 @@ export const MASK_FACE = {
  *   n95       a fitted cup with a nose clip and two head straps: sealed at the edges
  */
 export function maskFace(kind: MaskKind = 'surgical'): string {
-  const p: string[] = [
+  return maskHead() + maskOn(kind);
+}
+
+/** The head and shoulders of maskFace() alone, with no mask. */
+export function maskHead(): string {
+  return [
     // shoulders, neck and head in one silhouette, then an eye and an ear
     '<path class="a-ink" d="M33,-117 C37,-135 51,-146 70,-146 C94,-146 112,-128 112,-103 C112,-85 105,-71 95,-63 L93,-43 C106,-31 122,-25 128,0 L6,0 C8,-15 24,-27 54,-39 L56,-56 C50,-54 40,-54 34,-58 C29,-62 27,-67 27,-72 L25,-78 L27,-84 L19,-88 L29,-102 C30,-107 31,-112 33,-117 Z"/>',
     '<circle class="a-bg" cx="42" cy="-106" r="2.6"/>',
     '<path class="a-bg-s" stroke-width="2.4" d="M80,-103 C74,-103 72,-96 75,-91 C76,-88 79,-86 81,-87"/>',
-  ];
-  if (kind === 'none') return p.join('');
+  ].join('');
+}
+
+/**
+ * One mask alone, to lay over maskHead(): a scene that switches between masks
+ * draws the head once and the four masks on top of it (G17).
+ */
+export function maskOn(kind: MaskKind): string {
+  const p: string[] = [];
+  if (kind === 'none') return '';
   if (kind === 'n95') {
     // two straps right round the head, then the cup, sealed to the face, with a metal nose clip
     p.push('<path class="a-mask-s" stroke-width="2.6" d="M58,-96 L111,-113 M58,-70 L103,-66"/>');
@@ -805,6 +821,8 @@ export function maskFace(kind: MaskKind = 'surgical'): string {
  *             rings   carbon monoxide: through a lung into the blood    (pin 3)
  * It is a diagram, not anatomy: say so with the tag 示意圖・不是醫學圖.
  */
+/** The three numbered pins of the body figure. */
+export type BodyPin = 'nose' | 'lungs' | 'blood';
 export const BODY = {
   box: { x: -120, y: -300, w: 240, h: 300 },
   nose: { x: 60, y: -236 },

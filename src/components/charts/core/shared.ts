@@ -270,6 +270,25 @@ export function niceScale(lo: number, hi: number, count = 4): { min: number; max
   return { min, max, ticks };
 }
 
+/**
+ * The type sizes the SVG charts are laid out for, in px. 14 is the site's floor for anything a
+ * reader can see (docs/redesign-brief.md 6.1): no chart text is set below it, at any width.
+ * charts.css sets the same sizes; a renderer that measures text passes these to px().
+ */
+export const FS = { label: 14, value: 15, small: 14 } as const;
+
+/**
+ * A hover readout: 「不合格率 2025：3.78%」 / "Failure rate 2025: 3.78%". Chinese takes the
+ * full-width colon; a percent sign sits against its number in both languages, any other unit
+ * after a space.
+ */
+export function tip(locale: Locale, label: string, value: string, unit?: string): string {
+  const u = unit ? (unit.trim() === '%' ? (value.trim().endsWith('%') ? '' : '%') : ` ${unit.trim()}`) : '';
+  return `${label}${locale === 'zh-TW' ? '：' : ': '}${value}${u}`.replace(/\s+/g, ' ').trim();
+}
+/** The separator between two parts of a readout's label: 「新北市・燃油」 / "New Taipei · petrol". */
+export const tipDot = (locale: Locale) => (locale === 'zh-TW' ? '・' : ' · ');
+
 /** A number with a typographic minus, for values that can be negative. */
 export const fmtSigned = (locale: Locale, v: number, decimals = 0) => (v < 0 ? MINUS : '') + fmt(locale, Math.abs(v), decimals);
 
@@ -345,6 +364,41 @@ export function isFigure(cell: string): boolean {
   return cjk <= 2 && rest.length - cjk <= 6;
 }
 
+/** Word columns (not figures, not the first) whose every cell is short: they are set unbroken. */
+export function shortColumns(t: ChartTable, figureCol: boolean[]): boolean[] {
+  return t.head.map((h, i) => i > 0 && !figureCol[i] && em(h) <= 7 && t.rows.every((row) => em(row[i] ?? '') <= 7));
+}
+
+/**
+ * The "view data table" toggle and its table: the accessible twin of every chart. Shared by the
+ * SVG charts (chartHtml) and the HTML charts (core/html.ts), so every table on the site behaves
+ * the same: a 48px toggle named after its chart, a caption, figures right-aligned, a scroll box
+ * that takes keyboard focus.
+ */
+export function tableHtml(t: ChartTable, o: Pick<ChartHtmlOptions, 'title' | 'tableLabel'>, open = false): string {
+  // a column of figures is right-aligned and never wraps; a column of words (notes) wraps
+  const figureCol = t.head.map((_, i) => i > 0 && t.rows.filter((row) => isFigure(row[i] ?? '')).length * 2 >= t.rows.length);
+  // a column of short words (實測, 推估) keeps each on one line instead of breaking it a character at a time
+  const shortCol = shortColumns(t, figureCol);
+  const colClass = (i: number, c?: string) => (figureCol[i] && (c === undefined || isFigure(c)) ? ' class="num"' : shortCol[i] ? ' class="nw"' : '');
+  // Every toggle, table and scroll box is named after its chart: a screen-reader user moving by
+  // table or by control hears which chart it belongs to, not 43 identical "view data table"s.
+  // The box scrolls sideways on a phone, so it takes keyboard focus (Safari does not give it);
+  // it is a named group, not a region, so a page of 40 charts does not get 40 landmarks.
+  const name = o.title ? `${o.tableLabel}${/[⺀-￿]/.test(o.tableLabel) ? '：' : ': '}${o.title}` : o.tableLabel;
+  const table = `<details class="chart__data"${open ? ' open' : ''}><summary>${TABLE_ICON}<span>${esc(o.tableLabel)}</span>${
+    o.title ? `<span class="vh">${esc(name.slice(o.tableLabel.length))}</span>` : ''
+  }</summary><div class="chart__table" tabindex="0" role="group" aria-label="${esc(name)}"><table>${
+    t.caption || o.title ? `<caption class="${t.caption ? 'chart__caption' : 'vh'}">${esc(t.caption ?? o.title)}</caption>` : ''
+  }<thead><tr>${t.head
+    .map((h, i) => `<th scope="col"${colClass(i)}>${esc(h)}</th>`)
+    .join('')}</tr></thead><tbody>${t.rows
+    .map((row) => `<tr>${row.map((c, i) => (i ? `<td${colClass(i, c)}>${esc(c)}</td>` : `<th scope="row">${esc(c)}</th>`)).join('')}</tr>`)
+    .join('')}</tbody></table></div></details>`;
+  return table;
+}
+
+
 /** The complete inner HTML of a chart: legend, plot, data table. */
 export function chartHtml(r: ChartRender, o: ChartHtmlOptions): string {
   const legend = r.legend?.length
@@ -361,22 +415,6 @@ export function chartHtml(r: ChartRender, o: ChartHtmlOptions): string {
   const svg = `<svg class="chart__svg${r.viewBox ? ' chart__svg--picture' : ''}" ${size} role="img" aria-labelledby="${labelled}" focusable="false"><title id="${o.id}-t">${esc(o.title)}</title>${
     o.desc ? `<desc id="${o.id}-d">${esc(o.desc)}</desc>` : ''
   }${r.body}</svg>`;
-  const t = r.table;
-  // a column of figures is right-aligned and never wraps; a column of words (notes) wraps
-  const figureCol = t.head.map((_, i) => i > 0 && t.rows.filter((row) => isFigure(row[i] ?? '')).length * 2 >= t.rows.length);
-  // Every toggle, table and scroll box is named after its chart: a screen-reader user moving by
-  // table or by control hears which chart it belongs to, not 43 identical "view data table"s.
-  // The box scrolls sideways on a phone, so it takes keyboard focus (Safari does not give it);
-  // it is a named group, not a region, so a page of 40 charts does not get 40 landmarks.
-  const name = o.title ? `${o.tableLabel}${/[⺀-￿]/.test(o.tableLabel) ? '：' : ': '}${o.title}` : o.tableLabel;
-  const table = `<details class="chart__data"><summary>${TABLE_ICON}<span>${esc(o.tableLabel)}</span>${
-    o.title ? `<span class="vh">${esc(name.slice(o.tableLabel.length))}</span>` : ''
-  }</summary><div class="chart__table" tabindex="0" role="group" aria-label="${esc(name)}"><table>${
-    t.caption || o.title ? `<caption class="${t.caption ? 'chart__caption' : 'vh'}">${esc(t.caption ?? o.title)}</caption>` : ''
-  }<thead><tr>${t.head
-    .map((h, i) => `<th scope="col"${figureCol[i] ? ' class="num"' : ''}>${esc(h)}</th>`)
-    .join('')}</tr></thead><tbody>${t.rows
-    .map((row) => `<tr>${row.map((c, i) => (i ? `<td${figureCol[i] && isFigure(c) ? ' class="num"' : ''}>${esc(c)}</td>` : `<th scope="row">${esc(c)}</th>`)).join('')}</tr>`)
-    .join('')}</tbody></table></div></details>`;
+  const table = tableHtml(r.table, o);
   return `${legend}<div class="chart__plot" style="${pad}"${hover}>${svg}</div>${table}`;
 }

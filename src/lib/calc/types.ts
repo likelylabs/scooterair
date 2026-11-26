@@ -115,6 +115,7 @@ export const messageCodes = [
   'electricity-review',
   'unconfirmed',
   'stale-data',
+  'range',
 ] as const;
 export type MessageCode = (typeof messageCodes)[number];
 

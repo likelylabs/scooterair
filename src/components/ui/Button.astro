@@ -6,7 +6,7 @@
  * Props
  *   href      render an <a> (pass internal paths through href())
  *   variant   'primary' (green, one per view) | 'secondary' (outlined) | 'ghost' (text + arrow)
- *   size      'md' (default, 44px) | 'lg' (52px)
+ *   size      'md' (default, 48px) | 'lg' (52px)
  *   arrow     trailing arrow (default: true for ghost, false otherwise)
  *   external  link leaves the site: adds rel, target and an "opens in new tab" hint
  *   locale    Locale (only needed with `external`)
@@ -55,7 +55,7 @@ const classes = ['btn', `btn--${variant}`, `btn--${size}`, cls];
     padding: 0.5em 1.15em;
     border: 2px solid transparent;
     border-radius: var(--radius-2);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-btn); /* 17 px, weight 700 (brief 6.1) */
     font-weight: var(--fw-bold);
     line-height: 1.3;
     text-align: center;

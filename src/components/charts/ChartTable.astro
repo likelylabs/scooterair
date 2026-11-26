@@ -1,0 +1,43 @@
+---
+/**
+ * ChartTable — a chart's data table printed open, as an ordinary table (for a sheet, a print
+ * page, or under a chart whose own toggle is switched off with table={false}).
+ *
+ *   import { mveModel } from '@/components/charts/core/estimateCharts';
+ *   <ChartTable table={mveModel(locale).table} caption={mveModel(locale).title} />
+ *
+ * Props
+ *   table    ChartTable: { head: string[]; rows: string[][]; caption?: string }
+ *   caption  shown above the table (default: the table's own caption, if any)
+ *   id, class
+ */
+import '@/styles/charts.css';
+import { isFigure, shortColumns, type ChartTable } from './core/shared';
+
+interface Props {
+  table: ChartTable;
+  caption?: string;
+  id?: string;
+  class?: string;
+}
+const { table: t, id, class: cls } = Astro.props;
+const caption = Astro.props.caption ?? t.caption;
+const figureCol = t.head.map((_, i) => i > 0 && t.rows.filter((row) => isFigure(row[i] ?? '')).length * 2 >= t.rows.length);
+const shortCol = shortColumns(t, figureCol);
+---
+
+<div id={id} class:list={['chart__table', 'chart__table--open', cls]} tabindex="0" role="group" aria-label={caption}>
+  <table>
+    {caption && <caption class="chart__caption">{caption}</caption>}
+    <thead>
+      <tr>{t.head.map((h, i) => <th scope="col" class:list={[figureCol[i] ? 'num' : shortCol[i] && 'nw']}>{h}</th>)}</tr>
+    </thead>
+    <tbody>
+      {
+        t.rows.map((row) => (
+          <tr>{row.map((c, i) => (i ? <td class:list={[figureCol[i] && isFigure(c) ? 'num' : shortCol[i] && 'nw']}>{c}</td> : <th scope="row">{c}</th>))}</tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

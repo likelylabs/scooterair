@@ -23,6 +23,9 @@
  *           taken abroad reads 實測・國外, as the registry marks them
  *   where   words after a middle dot — 研究・台灣, 實測・國外 (see `chipWhere` in ui.ts).
  *           With `of`, the registry's place is used unless you pass this
+ *   fact    id (or ids) of the registry fact(s) this chip stands for: printed as `data-fact`,
+ *           which the site check reads to make sure a fact marked `requiresCaveat` has its caveat
+ *           in a sheet on the page. With `of`, the fact's own id is printed by itself
  *   size    'md' (default, 15 px) | 'sm' (14 px, the floor)
  *
  *   <KindChip locale={locale} of={fact('commute-scooter-vs-subway-chuang2020')} />     實測・台灣
@@ -36,7 +39,8 @@ import { chipGlyphSvg } from './kinds';
 interface Props {
   locale: Locale;
   kind?: string;
-  of?: { evidence: Evidence; readerKind?: ReaderKind; readerPlace?: ReaderPlace | null };
+  of?: { evidence: Evidence; readerKind?: ReaderKind; readerPlace?: ReaderPlace | null; id?: string };
+  fact?: string | string[];
   where?: string;
   size?: 'md' | 'sm';
   class?: string;
@@ -47,9 +51,10 @@ const kind = of ? readerKind(of) : chipKindOf(Astro.props.kind!);
 const place = of ? readerPlace(of) : undefined;
 const where = Astro.props.where ?? (place ? readerPlaceLabels[place][locale] : undefined);
 const dot = locale === 'en' ? ' · ' : '・';
+const factIds = [...new Set([of?.id, ...[Astro.props.fact ?? []].flat()].filter(Boolean))].join(' ') || undefined;
 ---
 
-<span class:list={['chip', `chip--${kind}`, size === 'sm' && 'chip--sm', cls]} data-chip={kind}>
+<span class:list={['chip', `chip--${kind}`, size === 'sm' && 'chip--sm', cls]} data-chip={kind} data-fact={factIds}>
   <Fragment set:html={chipGlyphSvg(kind)} />
   <span class="chip__text"><span class="chip__label">{chips[kind].label[locale]}</span>{where && <span class="chip__where">{dot}{where}</span>}</span>
 </span>

@@ -105,7 +105,7 @@ export function renderLine(p: LineChartProps): ChartRender {
   // ticks that are whole numbers are printed as such (10, not 10.0), whatever the values' decimals
   const tickDecimals = ticks.every((t) => Number.isInteger(t)) ? 0 : decimals;
   const tickText = ticks.map((t) => (tickDecimals ? fmtSigned(locale, t, tickDecimals) : t < 0 ? `−${fmtCompact(locale, -t)}` : fmtCompact(locale, t)));
-  const padLeft = Math.ceil(Math.max(...tickText.map((t) => px(t, 12)), unit ? px(unit, 12) - 4 : 0)) + 10;
+  const padLeft = Math.ceil(Math.max(...tickText.map((t) => px(t, 14)), unit ? px(unit, 14) - 4 : 0)) + 10;
   ticks.forEach((t, i) => {
     const y = yp(t);
     // the axis line is at zero: the bottom of a zero-based plot, or wherever zero falls when values go negative
@@ -134,7 +134,7 @@ export function renderLine(p: LineChartProps): ChartRender {
     const room = (pos: number, w: number) => kept.every((k) => Math.abs(k.pos - pos) * (MIN_W / 100) > (k.w + w) / 2 + 10);
     const place = (i: number) => {
       const label = String(x[i]);
-      const w = px(label, 12);
+      const w = px(label, 14);
       const pos = xp(i);
       if (!room(pos, w)) return;
       kept.push({ pos, w });
@@ -235,8 +235,8 @@ export function renderLine(p: LineChartProps): ChartRender {
       const val = f(e.v);
       const named = series.length > 1;
       o.push(`<text class="c-value c-value--sm" x="100%" y="${ly[k] + 4.5}" dx="10">${esc(val)}${named ? `<tspan class="c-note c-endname" dx="6">${esc(s.label)}</tspan>` : ''}</text>`);
-      padRight = Math.max(padRight, 14 + px(val, 13));
-      if (named) padRightWide = Math.max(padRightWide, 22 + px(val, 13) + px(s.label, 12));
+      padRight = Math.max(padRight, 14 + px(val, 14));
+      if (named) padRightWide = Math.max(padRightWide, 22 + px(val, 14) + px(s.label, 14));
     }
   });
   // labels on points: above the point, below it when the first choice would hit the top or another label
@@ -252,7 +252,7 @@ export function renderLine(p: LineChartProps): ChartRender {
       if (v === null || (mode === 'ends' && i !== first && i !== last)) return;
       const pos = xp(i);
       const label = f(v);
-      const w = px(label, 13);
+      const w = px(label, 14);
       const anchor = pos < 8 ? 'start' : pos > 92 ? 'end' : 'middle';
       const cxPx = (pos / 100) * plotW + (anchor === 'start' ? w / 2 : anchor === 'end' ? -w / 2 : 0);
       const above = yp(v) - 11;
@@ -276,7 +276,7 @@ export function renderLine(p: LineChartProps): ChartRender {
 
   const shapeOf = (s: LineSeries): LegendItem['shape'] => (s.markers === 'hollow' ? 'ring' : s.dashed ? 'dash' : 'line');
   const keyOf = (s: LineSeries, si: number): LegendItem => ({ label: s.label, tone: s.tone, shape: shapeOf(s), ...(s.markers === 'hollow' ? {} : { marker: shapes[si] }) });
-  const u = unit ? ' ' + unit : '';
+  const u = unit ? (unit.trim() === '%' ? '%' : ' ' + unit) : '';
   const cell = (s: LineSeries, i: number) => (s.values[i] === null ? '–' : f(s.values[i] as number));
   return {
     kind: 'line',
@@ -294,7 +294,7 @@ export function renderLine(p: LineChartProps): ChartRender {
           series
             // a sparse series (targets) is only read out where it has a value
             .filter((s) => !(s.connectNulls && s.values[i] === null))
-            .map((s) => `${series.length > 1 ? s.label + ': ' : ''}${cell(s, i)}${s.values[i] === null || p.format ? '' : u}`)
+            .map((s) => `${series.length > 1 ? s.label + (locale === 'zh-TW' ? '：' : ': ') : ''}${cell(s, i)}${s.values[i] === null || p.format ? '' : u}`)
             .join('\n'),
       ),
     },

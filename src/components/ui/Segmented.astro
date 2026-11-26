@@ -106,8 +106,8 @@ const css = [
   .seg__row {
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-    gap: 2px;
-    padding: 2px;
+    gap: var(--tap-gap); /* each segment is a 48 px target of its own, 8 px from the next (brief 6.3) */
+    padding: 3px;
     border: 2px solid var(--ink);
     border-radius: calc(var(--radius-3) + 4px);
     background: var(--surface);

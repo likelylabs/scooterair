@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, axisBreak, esc, fmtSigned, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit } from './shared';
+import { MIN_W, type ChartRender, type Tone, axisBreak, esc, fmtSigned, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit, tip } from './shared';
 import { brokenVLine } from './bar';
 
 export interface RangeDatum {
@@ -89,7 +89,7 @@ export function renderRange(p: RangePlotProps): ChartRender {
   const combined = data.some((d) => {
     if (d.mid === undefined || f(d.min) === f(d.max)) return false;
     const gapPx = ((at(d.max) - at(d.min)) / 100) * MIN_W;
-    return gapPx < (px(f(d.min), 12) + px(f(d.max), 12)) / 2 + 10;
+    return gapPx < (px(f(d.min), 14) + px(f(d.max), 14)) / 2 + 10;
   });
   data.forEach((d) => {
     const lines = wrapLabel(d.label, (MIN_W - valueW - 14) / 14, LABEL_LINES);
@@ -99,8 +99,9 @@ export function renderRange(p: RangePlotProps): ChartRender {
     const a = at(d.min);
     const b = at(d.max);
     const hasMid = d.mid !== undefined && !point(d);
-    const tip = point(d) ? `${d.label}: ${valueText(d)}${unit ? ' ' + unit : ''}` : hasMid ? `${d.label}: ${labels.mid ?? ''} ${f(d.mid as number)}, ${labels.min} ${f(d.min)}, ${labels.max} ${f(d.max)}${unit ? ' ' + unit : ''}` : `${d.label}: ${labels.min} ${f(d.min)}, ${labels.max} ${f(d.max)}${unit ? ' ' + unit : ''}`;
-    let g = `<g class="c-row" data-tip="${esc(tip.replace(/\s+/g, ' '))}">`;
+    const sep = locale === 'zh-TW' ? '、' : ', ';
+    const tipText = point(d) ? tip(locale, d.label, valueText(d), unit) : hasMid ? tip(locale, d.label, `${labels.mid ?? ''} ${f(d.mid as number)}${sep}${labels.min} ${f(d.min)}${sep}${labels.max} ${f(d.max)}`, unit) : tip(locale, d.label, `${labels.min} ${f(d.min)}${sep}${labels.max} ${f(d.max)}`, unit);
+    let g = `<g class="c-row" data-tip="${esc(tipText)}">`;
     g += `<rect class="c-hit" x="0" y="${y}" width="100%" height="${labelH + (hasMid ? 44 : 30)}"/>`;
     lines.forEach((ln, k) => {
       g += text('c-label', 0, y + 14 + k * LINE, ln);
@@ -121,7 +122,7 @@ export function renderRange(p: RangePlotProps): ChartRender {
       const maxT = f(d.max);
       const under = (pos: number, label: string, anchor: string) => {
         g += text('c-tick', `${pos}%`, cy + 22, label, `text-anchor="${anchor}"`);
-        const w = px(label, 12);
+        const w = px(label, 14);
         const x = (pos / 100) * MIN_W;
         boxes.push([anchor === 'start' ? x : anchor === 'end' ? x - w : x - w / 2, anchor === 'start' ? x + w : anchor === 'end' ? x : x + w / 2, cy + 10, cy + 26]);
       };
@@ -148,7 +149,7 @@ export function renderRange(p: RangePlotProps): ChartRender {
     ticks.forEach((t, i) => {
       const pos = at(t);
       const label = f(t);
-      const w = px(label, 12);
+      const w = px(label, 14);
       // drop a tick that would run into its neighbour at the narrowest width (the last one always stays)
       if (i < ticks.length - 1 && kept.some((k) => Math.abs(k.pos - pos) * (MIN_W / 100) < (k.w + w) / 2 + 8)) return;
       kept.push({ pos, w });

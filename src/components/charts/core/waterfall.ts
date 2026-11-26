@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, MINUS, type ChartRender, type Tone, esc, fmt, hbar, niceMax, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
+import { MIN_W, MINUS, type ChartRender, type Tone, esc, fmt, hbar, niceMax, pctN, px, text, LABEL_LINES, wrapLabel, tip } from './shared';
 
 export interface WaterfallProps {
   locale: Locale;
@@ -43,13 +43,13 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
   const table: string[][] = [];
   let y = 4;
 
-  const row = (label: string, amount: string, strong: boolean, draw: (barY: number) => string, tip: string) => {
+  const row = (label: string, amount: string, strong: boolean, draw: (barY: number) => string, tipText: string) => {
     // total rows are set in the heaviest weight, which runs about a tenth wider in Latin text and figures
     const k = strong ? 1.12 : 1;
     const lines = wrapLabel(label, (MIN_W - px(amount, 15) * k - 16) / (14 * k), LABEL_LINES);
     const labelH = lines.length * LINE;
     const barY = y + labelH + 4;
-    let g = `<g class="c-row" data-tip="${esc(tip)}"><rect class="c-hit" x="0" y="${y}" width="100%" height="${labelH + BAR + 8}"/>`;
+    let g = `<g class="c-row" data-tip="${esc(tipText)}"><rect class="c-hit" x="0" y="${y}" width="100%" height="${labelH + BAR + 8}"/>`;
     lines.forEach((ln, k) => (g += text(strong ? 'c-label c-strong' : 'c-label', 0, y + 14 + k * LINE, ln)));
     g += text(strong ? 'c-value c-strong' : 'c-value', '100%', y + 14, amount, 'text-anchor="end"');
     g += draw(barY) + '</g>';
@@ -60,7 +60,7 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
 
   // start
   let running = start.value;
-  let prevBarY = row(start.label, money(start.value), false, (by) => hbar(startTone, pctN(start.value, max), by, BAR, 'c-mark'), `${start.label}: ${money(start.value)}`);
+  let prevBarY = row(start.label, money(start.value), false, (by) => hbar(startTone, pctN(start.value, max), by, BAR, 'c-mark'), tip(locale, start.label, money(start.value)));
   table.push([start.label, money(start.value)]);
 
   // deductions: the removed slice floats at the end of what is left
@@ -82,7 +82,7 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
         ((w / 100) * MIN_W >= 4
           ? `<rect class="c-fill-${stepTone} c-stroke-${stepTone} c-step c-mark" x="${a}%" y="${by + 0.75}" width="${w}%" height="${BAR - 1.5}" rx="2"/>`
           : `<svg x="${a + w / 2}%" y="${by}" width="1" height="${BAR}" overflow="visible"><rect class="c-fill-${stepTone} c-mark" x="-2" y="0" width="4" height="${BAR}" rx="1"/></svg>`),
-      `${s.label}: ${amount}`,
+      tip(locale, s.label, amount),
     );
     table.push([s.label, amount]);
     running = next;
@@ -93,12 +93,12 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
   const from = prevBarY + BAR;
   o.push(`<line class="c-rule" x1="0" x2="100%" y1="${y - 4}" y2="${y - 4}"/>`);
   y += 6;
-  row(p.totalLabel, money(total), true, (by) => connector(edge, from, by) + hbar(totalTone, pctN(total, max), by, BAR, 'c-mark'), `${p.totalLabel}: ${money(total)}`);
+  row(p.totalLabel, money(total), true, (by) => connector(edge, from, by) + hbar(totalTone, pctN(total, max), by, BAR, 'c-mark'), tip(locale, p.totalLabel, money(total)));
   table.push([p.totalLabel, money(total)]);
 
   // comparison + gap
   if (compare) {
-    row(compare.label, money(compare.value), false, (by) => hbar(compareTone, pctN(compare.value, max), by, BAR, 'c-mark'), `${compare.label}: ${money(compare.value)}`);
+    row(compare.label, money(compare.value), false, (by) => hbar(compareTone, pctN(compare.value, max), by, BAR, 'c-mark'), tip(locale, compare.label, money(compare.value)));
     table.push([compare.label, money(compare.value)]);
     if (p.gapLabel) {
       const gap = total - compare.value;
@@ -112,7 +112,7 @@ export function renderWaterfall(p: WaterfallProps): ChartRender {
         (by) =>
           `<line class="c-bracket" x1="${a}%" x2="${b}%" y1="${by + BAR / 2}" y2="${by + BAR / 2}"/>` +
           `<line class="c-bracket" x1="${a}%" x2="${a}%" y1="${by + 2}" y2="${by + BAR - 2}"/><line class="c-bracket" x1="${b}%" x2="${b}%" y1="${by + 2}" y2="${by + BAR - 2}"/>`,
-        `${p.gapLabel}: ${amount}`,
+        tip(locale, p.gapLabel, amount),
       );
       table.push([p.gapLabel, amount]);
     }

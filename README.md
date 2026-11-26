@@ -1,8 +1,9 @@
 # 行人呼吸 / ScooterAir
 
 A bilingual public-service website for Taiwan about what pedestrians breathe beside a queue of
-scooters at a red light: what has been measured, what nobody has measured yet, and what it really
-costs to switch to an electric scooter. Traditional Chinese (zh-TW) is the main language; English
+scooters at a red light: what has been measured, what the site works out from published figures
+(a signed estimate, always shown as 推估 with its range and its working), and what it really costs
+to switch to an electric scooter. Traditional Chinese (zh-TW) is the main language; English
 lives under `/en/`.
 
 Live at <https://likelylabs.com/scooterair/> (GitHub Pages, project path `/scooterair/`). The code
@@ -40,10 +41,30 @@ they follow `BASE_PATH`; never write a bare `/path/` in a page.
 | Step | What fails it |
 | --- | --- |
 | `scripts/check-data.mjs` | the cited data layer in `src/data`: a fact without a source, a source nothing cites, a bad date, URL or DOI, a missing language, wrong punctuation for the language, and more (the script's header lists everything) |
-| `scripts/check-copy.mjs` | reader-facing copy that breaks the editorial rules (causal wording, 臺 for 台, 您, exclamation marks); reviewed exceptions live in `src/i18n/copy-allowlist.json`, each with a reason |
+| `scripts/check-copy.mjs` | reader-facing copy that breaks the editorial rules: the registry's claim rules (`src/data/claims-policy.ts`), the redesign brief's banned strings, banned claims and "not yet measured" wording outside the K sentences (`scripts/brief-rules.mjs`), 臺 for 台, 您, exclamation marks; reviewed exceptions live in `src/i18n/copy-allowlist.json`, each with a reason. `--only home` reports one module; `--vocab` adds the brief's vocabulary advice |
 | `test:calc`, `test:lib` | the subsidy and cost engine (`src/lib/calc`) and the date logic (`src/lib`) |
 | `build-share-cards.mjs --check` | a share image whose text no longer matches the copy |
 | `astro check` | type errors |
+
+**The site check** runs on a built site rather than on the source, so it is not part of
+`npm run check` (yet):
+
+```sh
+npx astro build --outDir /tmp/site      # or npm run build, into dist/
+npm run check:site -- /tmp/site         # default: dist/
+node scripts/check-site.mjs /tmp/site --static          # text and structure only, about 2 s
+node scripts/check-site.mjs /tmp/site --only 11,13 --pages '^/(en/)?$' --progress
+```
+
+It implements the automated acceptance checks of `docs/redesign-brief.md` 9.3 in both languages:
+banned strings and claims, "not yet measured" wording only as the K sentences on their pages,
+estimated values with 約, a range, the 推估 chip and a way to `/estimate/`, air numbers that come
+from `src/data/estimate.ts` or the registry, caveats in sheets, routes, redirects, dead links and
+anchors, the sitemap, the home page's 15 screens and their lengths, and, in Chromium through
+Playwright, type sizes, touch targets, sideways scroll and clipping at 字大, contrast in both
+themes, the page without JavaScript, reduced motion, scene alt text and tags, and the
+calculator's opening state. Each check prints pass or fail with the page and the text.
+`--report file.json` keeps the whole result. The script's header lists the markup hooks it reads.
 
 ## How it is organised
 
@@ -52,18 +73,73 @@ they follow `BASE_PATH`; never write a bare `/path/` in a page.
 | `src/pages/[...lang]/` | one file per route; `[...lang]` gives each route a Chinese and an `/en/` version |
 | `src/pages/404.astro` | the page for a missing address (see "Deployment") |
 | `src/i18n/` | every reader-facing string. Shared strings in `ui.ts`; page copy in `pages/<page>.ts`. Copy is never written inline in a page (`check-copy` enforces this). Read `src/i18n/pages/_copy.ts` before writing a page. |
-| `src/data/` | the evidence registry: `sources.ts` (bibliography), `facts*.ts` (each claim with its numbers, sources and confidence), `series*.ts` (chart data), `gaps.ts` (what has not been measured), `claims-policy.ts` (the wording rules) |
+| `src/data/` | the evidence registry: `sources.ts` (bibliography), `facts*.ts` (each claim with its numbers, sources and confidence), `series*.ts` (chart data), `estimate.ts` (the signed kerbside estimate as typed slots, see below), `answers.ts` (the answer we have now to each former gap), `claims-policy.ts` (the wording rules) |
 | `src/data/econ/` | the subsidy and cost data the calculator uses: `programmes/` (one file per payer: central government, each city and county), `vehicles.ts`, `energy.ts`, `running.ts`, `jurisdictions.ts` |
 | `src/lib/calc/` | the calculation engine; pure functions with tests |
 | `src/lib/site-state.ts` | which subsidy "phase" applies on a given date (see "Dates") |
 | `src/components/charts/` | the chart library: `core/*.ts` draws each chart as an SVG string, the same code at build time and in the browser |
-| `docs/editorial-blueprint.md` | the editorial rules (voice, wording, what may and may not be claimed) |
-| `research/` | the research notes and per-paper checks the registry was built from |
+| `docs/redesign-brief.md` | **the build brief**: the home page's 15 screens, the rules for showing estimates and measurements, wording, pictures, the film, every other page, and the acceptance checks. Its section 12 overrides the rest. `docs/editorial-blueprint.md` is the earlier blueprint, kept for history and superseded where they differ |
+| `research/` | the research notes and per-paper checks the registry was built from; `research/estimate/` is the signed kerbside estimate (below); `research/masks/VERIFIED.json` the checked facts on masks |
 | `scripts/` | the checks, the share-card renderer and the headline-font builder |
 | `public/` | files served as they are: icons, manifest, share images |
 
-The styleguide pages (`/styleguide/`, `/styleguide-art/`, not indexed) show every component and
-chart with notes for builders.
+The styleguide pages (`/styleguide/`, `/styleguide-art/`) show components and charts with notes
+for builders. They exist only under `npm run dev`: their `getStaticPaths` returns nothing in a
+production build, so they never ship.
+
+## The kerbside estimate (推估)
+
+What a pack of idling scooters **adds** to the air at an adult's nose beside it (carbon monoxide,
+benzene, PM2.5; three pack sizes; a 90-second average) is not measured anywhere in Taiwan, so the
+site works it out and says so. The estimate is signed and versioned (推估 v1・2026-11-26).
+
+| Where | What |
+| --- | --- |
+| `research/estimate/METHOD.md` | the method, in words: inputs, assumptions, what may and may not be said |
+| `research/estimate/model.mjs` | the model (no dependencies): a source-and-dispersion simulation run 30,000 times per scenario |
+| `research/estimate/results.json` | the record of the signed run: every scenario, the exact call that reproduces it, the cross-check against the Institute of Transportation's readings, sensitivity runs |
+| `research/estimate/sources.json`, `inputs-*.json` | the sources and input data |
+| `src/data/estimate.ts` | the published, rounded values as typed slots (`est.co.dozen.add`, `est.bg.co.traffic`, …), the rule-based sentences and the drawing rule. Literal values on purpose, so a client script can import it without the 65 kB results file |
+
+**How a number reaches a page.** `results.json` → `src/data/estimate.ts` (the published rounding:
+one significant figure for what the pack adds, one decimal for totals) → components that take the
+slot object, never a typed number: `EstimateValue` prints 約 A 到 B, the unit and the 推估 chip
+and opens the sheet; `formatEstimate()` gives the same text for share cards and the film; the
+illustrations' density comes from the same slots through `src/components/art/air.ts`. Headlines
+that depend on an estimate are chosen by written rules (`kerbRule`, `checkRule` in
+`estimate.ts`), so they change by themselves if the numbers change. `scripts/check-data.mjs`
+re-reads `results.json` and fails if any slot differs; `scripts/check-site.mjs` fails if a page
+prints an air number that is in neither `estimate.ts` nor the registry.
+
+**Re-running it.**
+
+```sh
+cd research/estimate
+node model.mjs            # quick look, n = 6000 per scenario (about 10 s)
+node model.mjs --write    # the full run, n = 30000; rewrites results.json
+cd ../.. && node scripts/check-data.mjs   # lists every slot in estimate.ts that no longer matches
+```
+
+A new run is a new version: update `estimateMeta` (version and date) and the slots in
+`src/data/estimate.ts`, have the method's owner sign `METHOD.md`, add a line to the corrections
+log, and keep the old numbers visible on `/estimate/`. When a real kerbside measurement arrives,
+it is added beside the estimate; the estimate is not deleted.
+
+## The film (`/90/`)
+
+The film is one animation driven by one timeline (`src/components/pages/film/`). Every number in
+it comes from the same slots as the pages; every caption length is checked against the reading
+floor at build time. A vertical MP4 (1080 × 1920, captions burnt in, Chinese and English) is
+exported from the same timeline by capturing frames with Playwright and encoding with `ffmpeg`,
+and committed to `public/film/` with a manifest:
+
+```sh
+node scripts/film-export.mjs            # needs Playwright with Chromium, and ffmpeg
+node scripts/film-export.mjs --check    # fails if the committed MP4s no longer match the timeline
+```
+
+Re-export after any change to the film's beats, captions or the numbers it shows, as for the
+share cards.
 
 ## Deployment
 
@@ -105,6 +181,8 @@ cached for a year. A CDN in front of a custom domain could set that; on bare Git
 stays as it is.
 
 ## Updating facts and sources
+
+(The kerbside estimate has its own procedure: see "The kerbside estimate" above.)
 
 1. Add or correct the source in `src/data/sources.ts` (ids are permanent; never rename one).
 2. Add or correct the fact or series in `src/data/facts*.ts` / `series*.ts`, citing the source id.

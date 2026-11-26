@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmt, px, text, LABEL_LINES, wrapLabel } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmt, px, text, LABEL_LINES, wrapLabel, tip, tipDot } from './shared';
 
 export interface StackedBarProps {
   locale: Locale;
@@ -78,7 +78,7 @@ export function renderStacked(p: StackedBarProps): ChartRender {
   // segment's colour and the values are spaced out in order, on a second line if they need one.
   const keyed = rows.some((row) => {
     const { shares, labels } = split(row);
-    return shares.some((s, i) => s > 0 && (s / 100) * MIN_W < px(labels[i], 12) + 8);
+    return shares.some((s, i) => s > 0 && (s / 100) * MIN_W < px(labels[i], 14) + 8);
   });
 
   rows.forEach((row) => {
@@ -94,9 +94,9 @@ export function renderStacked(p: StackedBarProps): ChartRender {
     const labs: Lab[] = [];
     shares.forEach((s, i) => {
       if (s <= 0) return;
-      const tip = esc(`${row.label ? row.label + ' · ' : ''}${series[i].label}: ${labels[i]}`);
-      o.push(`<g class="c-row" data-tip="${tip}"><rect class="c-seg c-fill-${series[i].tone} c-mark" x="${x.toFixed(2)}%" y="${y}" width="${s.toFixed(2)}%" height="${BAR}" rx="2"/></g>`);
-      labs.push({ i, text: labels[i], seg: (x / 100) * MIN_W, segW: (s / 100) * MIN_W, w: px(labels[i], 12), x: 0 });
+      const tipText = esc(tip(locale, `${row.label ? row.label + tipDot(locale) : ''}${series[i].label}`, labels[i]));
+      o.push(`<g class="c-row" data-tip="${tipText}"><rect class="c-seg c-fill-${series[i].tone} c-mark" x="${x.toFixed(2)}%" y="${y}" width="${s.toFixed(2)}%" height="${BAR}" rx="2"/></g>`);
+      labs.push({ i, text: labels[i], seg: (x / 100) * MIN_W, segW: (s / 100) * MIN_W, w: px(labels[i], 14), x: 0 });
       x += s;
     });
     const lines: Lab[][] = [];

@@ -50,6 +50,7 @@ const sizes = ['md', 'lg', 'xl'] as const;
 <style>
   .settings {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--tap-gap);
     padding-block: var(--sp-3);
   }
@@ -70,11 +71,14 @@ const sizes = ['md', 'lg', 'xl'] as const;
   .settings__sizes {
     display: flex;
     gap: var(--tap-gap);
+    min-inline-size: 0;
+    max-inline-size: 100%;
   }
   .settings__size {
-    min-inline-size: var(--tap);
-    min-block-size: var(--tap);
-    padding: 0 0.7em;
+    flex: 0 1 auto;
+    min-inline-size: 48px;
+    min-block-size: 48px;
+    padding: 0 0.55em;
     border: 2px solid var(--line-strong);
     border-radius: var(--radius-3);
     background: var(--surface);
@@ -88,10 +92,13 @@ const sizes = ['md', 'lg', 'xl'] as const;
     font-size: 16px;
   }
   .settings__size--lg {
-    font-size: 19px;
+    font-size: 18px;
   }
   .settings__size--xl {
-    font-size: 22px;
+    font-size: 20px;
+  }
+  .settings__size:lang(en) {
+    font-stretch: 88%;
   }
   .settings__size[aria-pressed='true'] {
     border-color: var(--ink);
