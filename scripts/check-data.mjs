@@ -251,6 +251,11 @@ for (const [topic, group] of Object.entries(factGroups)) {
         err(w, `confidence 'verified' but input "${dep}" is 'secondary'; a derived fact with any secondary input is 'secondary'`);
       }
     }
+    // Pages reuse statements on their own (study panels, share links, /about/), so a statement
+    // must name its study instead of pointing back at "the same study" row above it.
+    if (/^(?:在|依)?同一/.test(f.statement?.['zh-TW'] ?? '') || /^(?:In |When |Comparing [^,]* in )?the same (?:study|model|tunnel|simulation|cohort|Taipei study|modelled)/i.test(f.statement?.en ?? '')) {
+      warn(w, 'statement opens with "the same study/model…" (同一…); name the study so it stands alone where it is reused');
+    }
     if (!f.data || typeof f.data !== 'object') err(w, 'missing data object');
     for (const [k, d] of Object.entries(f.data ?? {})) {
       const dw = `${w}.data.${k}`;

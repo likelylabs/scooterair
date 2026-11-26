@@ -5,7 +5,8 @@
  * site. Data register only: no scene art.
  *
  * Built from the registry: every fact, chart dataset and gap that evidenceForLink(n) returns for
- * each link appears, strongest first, with its badge, citations and caveat. A fact appears in
+ * each link appears, ordered by kind of evidence (Taiwan measurements first; src/data/chain.ts),
+ * with its badge, citations and caveat. A fact appears in
  * full once (anchor #<fact id>); where it also serves another link, that link points to it.
  * Exceptions, by rule: the never-smoker figures (R14), the 94% day, the regional ranking and the
  * single idle particle datum have their full rows in #not-used; the three-scooter case study is
@@ -42,12 +43,12 @@ import {
   dataAnchor,
   homeOf,
   lf,
+  neverSmokerFacts,
   notUsedSeries,
   readLabel,
   sourceShort,
   sourceUses,
   totals,
-  withheld,
 } from '@/components/pages/evidence/ev';
 import { href, localeFromParam, localeStaticPaths, htmlLang } from '@/i18n';
 import { chain, readerText } from '@/i18n/ui';
@@ -86,6 +87,10 @@ const tot = totals();
 const nf = (v: number, d = 2) => new Intl.NumberFormat(en ? 'en' : 'zh-TW', { maximumFractionDigits: d }).format(v);
 const pct = (v: number, d = 0) => `${nf(v, d)}%`;
 const D = (id: FactId, key: string) => (facts[id].data as Record<string, { value: number }>)[key].value;
+/** A fact's short label for a link to it; R14: never the never-smoker numbers outside #not-used. */
+const factLabel = (id: FactId) => (neverSmokerFacts.includes(id) ? T.row.neverSmokerPointer : lf(id, locale).display);
+/** The name of link n as the eyebrows print it (link 7 is "the link you can break"). */
+const linkName = (n: number) => (n === chain.links.length ? chain.breakable[locale] : chain.links[n - 1][locale]);
 
 // ---- per link -------------------------------------------------------------------------
 /** Charts drawn as the link's featured visuals (blueprint Part 5); the rest go behind a fold. */
@@ -111,19 +116,22 @@ const keyFacts: Record<ChainLink, FactId[]> = {
 
 const links = chainLinks.map((n) => {
   const all = factsForLink(n);
-  let own = all.filter((f) => f.chainLink === n && homeOf(f.id) === n && !casePanelFacts.includes(f.id) && !withheld.includes(f.id)).map((f) => f.id);
+  let own = all.filter((f) => f.chainLink === n && homeOf(f.id) === n && !casePanelFacts.includes(f.id)).map((f) => f.id);
   // Link 5 leads with the international review (blueprint 3.7, 4.5)
   if (n === 5) own = ['hei-sr23-trap-associations' as FactId, ...own.filter((id) => id !== 'hei-sr23-trap-associations')];
   const pointers = all
-    .filter((f) => !own.includes(f.id) && !withheld.includes(f.id) && !(n === 1 && casePanelFacts.includes(f.id)))
+    .filter((f) => !own.includes(f.id) && !(n === 1 && casePanelFacts.includes(f.id)))
     .map((f) => {
       const home = homeOf(f.id);
       return {
         id: f.id,
-        display: lf(f.id, locale).display,
+        // R14: the never-smoker figures are printed only in #not-used
+        display: neverSmokerFacts.includes(f.id) ? T.row.neverSmokerPointer : lf(f.id, locale).display,
         where: home === 'not-used' ? T.row.alsoNotUsed : fill(T.row.alsoIn, { n: home ?? '' }),
       };
-    });
+    })
+    // both never-smoker rows point to the same place: one pointer is enough
+    .filter((p, i, arr) => !neverSmokerFacts.includes(p.id) || arr.findIndex((q) => neverSmokerFacts.includes(q.id)) === i);
   const series = seriesForLink(n, { primaryOnly: true }).map((s) => s.id);
   const others = series.filter((id) => !featured[n].includes(id) && !notUsedSeries.includes(id) && !casePanelSeries.includes(id));
   return {
@@ -190,14 +198,17 @@ const five = T.notClaimed.five.map((claim, i) => {
   const r = claimRules[fiveRules[i]];
   return { claim, why: readerText(r.why[locale]), instead: 'instead' in r && r.instead ? readerText((r.instead as { 'zh-TW': string; en: string })[locale]) : undefined };
 });
+/** The public list leaves out rules that govern only how pages are built (ClaimRule.internal). */
+const publicRules = claimRuleList.filter((r) => !('internal' in r && r.internal));
+const ruleCount = (n: number) => fill(n === 1 ? T.notClaimed.groupCountOne : T.notClaimed.groupCount, { n });
 const byTopic = (kind: 'do-not-claim' | 'qualifier' | 'correction') => {
-  const list = claimRuleList.filter((r) => r.kind === kind);
+  const list = publicRules.filter((r) => r.kind === kind);
   const topics = [...new Set(list.map((r) => r.topic))];
   return topics.map((topic) => ({ topic, label: readerText(topicLabels[topic][locale]), rules: list.filter((r) => r.topic === topic) }));
 };
 const dnc = byTopic('do-not-claim');
-const qualifiers = claimRuleList.filter((r) => r.kind === 'qualifier');
-const corrections = claimRuleList.filter((r) => r.kind === 'correction');
+const qualifiers = publicRules.filter((r) => r.kind === 'qualifier');
+const corrections = publicRules.filter((r) => r.kind === 'correction');
 
 // ---- studies read in full ---------------------------------------------------------------
 const uses = sourceUses();
@@ -218,7 +229,7 @@ const railItems = [
 const toc = [
   { href: '#chain', label: T.toc.chain },
   { href: '#map', label: T.toc.map },
-  ...chainLinks.map((n) => ({ href: `#${chain.anchor(n)}`, label: `${fill(T.toc.linkN, { n })} · ${chain.links[n - 1][locale]}` })),
+  ...chainLinks.map((n) => ({ href: `#${chain.anchor(n)}`, label: `${fill(T.toc.linkN, { n })} · ${linkName(n)}` })),
   { href: '#studies', label: T.toc.studies },
   { href: '#gaps', label: T.toc.gaps },
   { href: '#not-claimed', label: T.toc.notClaimed },
@@ -230,7 +241,8 @@ const toc = [
 <Base locale={locale} title={T.meta.title} description={T.meta.description} share="brief">
   <CountdownRail slot="rail" locale={locale} page="/evidence/" items={railItems} />
 
-  <header class="ev-head" data-rail-chapter data-rail-label={T.head.kicker}>
+  <!-- Each rail chapter carries its own id: the rail tells chapters apart by id (a missing id made them all one) -->
+  <header class="ev-head" id="ev-top" data-rail-chapter data-rail-label={T.head.kicker}>
     <div class="container"><div class="ev-head__inner">
       <p class="eyebrow">{T.head.kicker}</p>
       <h1 class="display ev-title"><Phrased text={T.head.title} /></h1>
@@ -251,7 +263,7 @@ const toc = [
   </header>
 
   <!-- V15: the seven links -->
-  <div data-rail-chapter data-rail-label={T.toc.chain}>
+  <div id="rail-chain" data-rail-chapter data-rail-label={T.toc.chain}>
   <Section id="chain" title={T.chain.title} lead={T.chain.lead} tone="sunken" width="wide">
     <EvidenceChain locale={locale} links={chainItems} label={T.chain.title} />
     <ul class="ev-chaincounts">
@@ -263,7 +275,7 @@ const toc = [
   </div>
 
   <!-- V30: the evidence map -->
-  <div data-rail-chapter data-rail-label={T.toc.map}>
+  <div id="rail-map" data-rail-chapter data-rail-label={T.toc.map}>
   <Section id="map" title={T.map.title} lead={T.map.lead}>
     <EvidenceMap locale={locale} />
   </Section>
@@ -302,7 +314,7 @@ const toc = [
                     const f = lf(s.id, locale);
                     return (
                       <Stat locale={locale} label={s.label} value={s.value} unit={s.unit} prefix={'prefix' in s ? s.prefix : undefined} tone={'tone' in s ? s.tone : 'neutral'} size="md">
-                        {f.statement}{cites(facts[s.id].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)} <a href={`#${s.id}`} class="ev-stat__row">#</a>
+                        {f.statement}{cites(facts[s.id].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)} <a href={`#${s.id}`} class="ev-stat__row" aria-label={`${T.row.permalink}${colon}${s.label}`}>#</a>
                       </Stat>
                     );
                   })}
@@ -397,14 +409,8 @@ const toc = [
           </Fragment>
         )}
 
-        <h3 class="ev-sub">{T.link.table}</h3>
+        <h3 class="ev-sub">{l.n === 5 ? T.link.table5 : T.link.table}</h3>
         <FactList locale={locale} ids={l.own} link={l.n} />
-        {withheld.filter((id) => facts[id].chainLink === l.n).map((id) => (
-          <p class="ev-withheld" id={id}>
-            <b>{T.row.withheldLabel}</b> {T.row.withheld}
-            {cites(facts[id].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}
-          </p>
-        ))}
 
         {l.pointers.length > 0 && (
           <div class="ev-also">
@@ -420,14 +426,14 @@ const toc = [
 
         <p class="ev-link__nav">
           <a href="#chain">{T.link.top}</a>
-          {l.n < chain.links.length && <a href={`#${chain.anchor(l.n + 1)}`}>{T.link.next} →</a>}
+          {l.n < chain.links.length && <a href={`#${chain.anchor(l.n + 1)}`}>{T.link.next}<span class="vh">{colon}{fill(T.toc.linkN, { n: l.n + 1 })} · {linkName(l.n + 1)}</span> →</a>}
         </p>
       </div>
     </section>
   ))}
 
   <!-- Studies read in full -->
-  <div data-rail-chapter data-rail-label={T.toc.studies}>
+  <div id="rail-studies" data-rail-chapter data-rail-label={T.toc.studies}>
   <Section id="studies" title={T.studies.title} lead={T.studies.lead} tone="sunken">
     <div class="grid ev-studies" style="--min: 18rem">
       {fullRead.map((id) => {
@@ -437,16 +443,18 @@ const toc = [
         return (
           <article class="ev-study" aria-labelledby={`study-${id}`}>
             <h3 id={`study-${id}`} class="ev-study__who">[{n}] {sourceShort(id, locale)}</h3>
-            <p class="ev-study__title" lang={s.language !== locale ? htmlLang[s.language] : undefined}>{readerText(s.titleTranslated && s.language !== locale ? s.titleTranslated : s.title)}</p>
+            {/* the original title, always, in its own language; a translation (where the registry has one) under it */}
+            <p class="ev-study__title" lang={s.language !== locale ? htmlLang[s.language] : undefined}>{readerText(s.title)}</p>
+            {s.titleTranslated && s.language !== locale && <p class="ev-study__gloss">{readerText(s.titleTranslated)}</p>}
             <p class="ev-study__read">{readLabel(s, locale)}</p>
             <details class="ev-study__uses">
               <summary>{fill(T.studies.uses, { n: u.facts.length + u.series.length })}</summary>
               <ul>
-                {u.facts.map((f) => <li><a href={`#${f}`}>{lf(f, locale).display}</a></li>)}
+                {u.facts.map((f) => <li><a href={`#${f}`}>{factLabel(f)}</a></li>)}
                 {u.series.map((x) => <li><a href={`#${dataAnchor(x)}`}>{readerText(seriesView(x, locale, T).s.title)}</a></li>)}
               </ul>
             </details>
-            <p><a href={href(`/sources/#${id}`, locale)}>{T.studies.entry} →</a></p>
+            <p><a class="ev-study__entry" href={href(`/sources/#${id}`, locale)}>{T.studies.entry}<span class="vh">{colon}[{n}] {sourceShort(id, locale)}</span> →</a></p>
           </article>
         );
       })}
@@ -455,7 +463,7 @@ const toc = [
   </div>
 
   <!-- Gaps -->
-  <div data-rail-chapter data-rail-label={T.toc.gaps}>
+  <div id="rail-gaps" data-rail-chapter data-rail-label={T.toc.gaps}>
   <Section id="gaps" title={T.gaps.title} lead={T.gaps.lead}>
     <div class="ev-gaps ev-gaps--all">
       {gapList.map((g) => <GapCard locale={locale} id={g.id} full />)}
@@ -465,14 +473,14 @@ const toc = [
   </div>
 
   <!-- V33: what we will not say -->
-  <div data-rail-chapter data-rail-label={T.toc.notClaimed}>
+  <div id="rail-not-claimed" data-rail-chapter data-rail-label={T.toc.notClaimed}>
   <Section id="not-claimed" title={T.notClaimed.title} lead={T.notClaimed.lead} tone="sunken" width="wide">
     <NotClaimedList locale={locale} items={five} label={T.notClaimed.title} />
     <h3 class="ev-sub">{T.notClaimed.fullTitle}</h3>
     <p class="ev-note">{T.notClaimed.fullLead}</p>
     <h4 class="ev-rules__kind">{claimRuleKindLabels['do-not-claim'][locale]}</h4>
     {dnc.map((g) => (
-      <Details summary={`${g.label} · ${fill(T.notClaimed.groupCount, { n: g.rules.length })}`}>
+      <Details summary={`${g.label} · ${ruleCount(g.rules.length)}`}>
         <ul class="ev-rules">
           {g.rules.map((r) => (
             <li id={`rule-${r.id}`}>
@@ -485,7 +493,7 @@ const toc = [
       </Details>
     ))}
     <h4 class="ev-rules__kind">{claimRuleKindLabels.qualifier[locale]}</h4>
-    <Details summary={`${T.notClaimed.qualifiersTitle} · ${fill(T.notClaimed.groupCount, { n: qualifiers.length })}`}>
+    <Details summary={`${T.notClaimed.qualifiersTitle} · ${ruleCount(qualifiers.length)}`}>
       <ul class="ev-rules">
         {qualifiers.map((r) => (
           <li id={`rule-${r.id}`}>
@@ -497,7 +505,7 @@ const toc = [
       </ul>
     </Details>
     <h4 class="ev-rules__kind">{claimRuleKindLabels.correction[locale]}</h4>
-    <Details summary={`${T.notClaimed.correctionsTitle} · ${fill(T.notClaimed.groupCount, { n: corrections.length })}`}>
+    <Details summary={`${T.notClaimed.correctionsTitle} · ${ruleCount(corrections.length)}`}>
       <ul class="ev-rules">
         {corrections.map((r) => (
           <li id={`rule-${r.id}`}>
@@ -512,14 +520,13 @@ const toc = [
   </div>
 
   <!-- #not-used: figures we do not use that way (R14, V31) -->
-  <div data-rail-chapter data-rail-label={T.toc.notUsed}>
+  <div id="rail-not-used" data-rail-chapter data-rail-label={T.toc.notUsed}>
   <Section id="not-used" title={T.notUsed.title} lead={T.notUsed.lead}>
     <div class="ev-nu">
       <article class="ev-nu__item" aria-labelledby="nu-scramble">
         <h3 class="ev-nu__quote" id="nu-scramble"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.scramble.quote, notUsedTokens)}</s></h3>
         <p><b>{T.notUsed.actually}{colon}</b>{fill(NU.scramble.actually, notUsedTokens)}</p>
         <p><b>{T.notUsed.weSay}{colon}</b>{fill(NU.scramble.weSay, notUsedTokens)}</p>
-        <p class="ev-note">{NU.scramble.recheck}</p>
         <SeriesFigure locale={locale} view={V('iot-scramble-summary')} title={fill(NU.scramble.stripTitle, notUsedTokens)} subtitle={NU.scramble.stripSub} caption={NU.scramble.stripCaption} tone="exhaust" />
         <SeriesFigure locale={locale} view={V('iot-scramble-by-day')} />
         <h4 class="ev-nu__rows">{T.notUsed.rowsTitle}</h4>
@@ -576,7 +583,7 @@ const toc = [
   </div>
 
   <!-- Background outside the chain -->
-  <div data-rail-chapter data-rail-label={T.context.title}>
+  <div id="rail-context" data-rail-chapter data-rail-label={T.context.title}>
   <Section id="context" title={T.context.title} lead={T.context.lead} tone="sunken" pad="tight">
     <Details summary={`${T.context.title} · ${fill(T.row.rows, { count: ctx.facts.length + ctx.series.length })}`}>
       <div class="ev-visuals">
@@ -588,7 +595,7 @@ const toc = [
   </div>
 
   <!-- How we checked -->
-  <div data-rail-chapter data-rail-label={T.toc.method}>
+  <div id="rail-method" data-rail-chapter data-rail-label={T.toc.method}>
   <Section id="method" title={T.method.title}>
     <div class="ev-method">
       <div class="prose">
@@ -803,6 +810,12 @@ const toc = [
     grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   }
   .ev-stat__row {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--tap, 44px);
+    min-block-size: var(--tap, 44px);
+    margin-block: calc((var(--tap, 44px) - 1.5em) / -2);
+    vertical-align: middle;
     color: var(--ink-3);
     text-decoration: none;
     font-weight: var(--fw-bold);
@@ -822,7 +835,8 @@ const toc = [
     display: inline-block;
     margin: calc(var(--sp-3) * -1 - 0.85em) 0 var(--sp-2);
     padding: 0.15em 0.6em;
-    background: var(--exhaust);
+    /* the text-safe shade: white on the 500 swatch is 4.4:1, under AA for this size */
+    background: var(--exhaust-ink);
     color: var(--on-accent, #fff);
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
@@ -872,19 +886,6 @@ const toc = [
     .ev-gaps {
       grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
     }
-  }
-  .ev-withheld {
-    margin-block-start: var(--sp-4);
-    padding: var(--sp-3) var(--sp-4);
-    border: 2px dashed var(--line-strong);
-    border-radius: var(--radius-2);
-    font-size: var(--fs-sm);
-    color: var(--ink-2);
-    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
-  }
-  .ev-withheld b {
-    color: var(--ink);
-    margin-inline-end: 0.3em;
   }
   .ev-also {
     margin-block-start: var(--sp-6);
@@ -943,8 +944,17 @@ const toc = [
     line-height: var(--lh-snug);
     overflow-wrap: anywhere;
   }
+  .ev-study__gloss {
+    color: var(--ink-2);
+    line-height: var(--lh-snug);
+  }
   .ev-study__read {
     color: var(--ink-2);
+  }
+  .ev-study__entry {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 44px);
   }
   .ev-study__uses summary {
     cursor: pointer;
@@ -1044,8 +1054,14 @@ const toc = [
   .ev-method__links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--sp-4);
+    gap: 0 var(--sp-4);
     font-weight: var(--fw-bold);
+  }
+  .ev-method__links a,
+  .ev-more a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 44px);
   }
   .ev-reads {
     list-style: none;

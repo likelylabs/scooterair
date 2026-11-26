@@ -34,6 +34,14 @@ const { render, title, desc, locale } = Astro.props;
   .tone-sunken .chart .evc-hollow {
     fill: var(--bg-sunken);
   }
+  /*
+   * On this page a 'light' legend key stands for marks drawn hollow (bars the source qualifies,
+   * waffle cells that did not come): show it as an outline, not as a pale filled square.
+   */
+  .sfig .chart__key--light {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--k);
+  }
   /* a block of the surface behind labels, so a reference line never runs through them */
   .chart .evc-bg {
     fill: var(--here, var(--bg));

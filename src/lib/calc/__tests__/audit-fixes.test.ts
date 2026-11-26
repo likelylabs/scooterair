@@ -25,7 +25,7 @@ test('[taichung-2026-movein-scrap-tier] a household that moved into Taichung in 
   assert.equal(line(settled, 'tc-scrap-two-stroke'), 16000);
   const unknown = evaluate(s);
   assert.equal(line(unknown, 'tc-scrap-two-stroke'), 16000);
-  assert.match(msg(unknown, 'assumption')[0].text.en, /own the old scooter/);
+  assert.match(msg(unknown, 'assumption')[0].text.en, /own the scooter you scrap/);
 });
 
 test('[quota-exhausted-*] each exhausted programme carries its own reason and source', () => {
@@ -60,9 +60,9 @@ test('[taoyuan-income-exclusion-text] the middle-low / Fuxing top-up says what i
   const e = evaluate(situation({ jurisdiction: 'taoyuan', ...heavy, scrap: { engine: 'four-stroke', builtOn: '2017-03' }, household: { age: 30 } }));
   const x = e.electric.purchase.excluded.find((y) => y.id === 'ty-lowincome-or-fuxing');
   assert.ok(x);
-  assert.match(x.reasonText.en, /middle-low income households only/);
+  assert.match(x.reasonText.en, /lower-middle-income households only/);
   assert.match(x.reasonText.en, /Fuxing District/);
-  assert.doesNotMatch(x.reasonText.en, /low or middle-low/);
+  assert.doesNotMatch(x.reasonText.en, /low or lower-middle/);
   assert.match(x.reasonText['zh-TW'], /復興區/);
 });
 
@@ -123,7 +123,7 @@ test('[goods-tax-stack-follows-weaker-reading] the stacked goods-tax cuts are fl
   assert.equal(m.amount, 2000);
   assert.equal(m.severity, 'warning');
   assert.match(m.text.en, /^Gasoline:/);
-  assert.match(msg(e, 'secondary-input')[0].text.en, /goods-tax cuts both counted/);
+  assert.match(msg(e, 'secondary-input')[0].text.en, /both goods-tax cuts counted on the gasoline side/);
 });
 
 test('[nanshan-counted-before-asof] the Nan Shan option is not counted on any date; TSMC is', () => {
@@ -229,7 +229,8 @@ test('[ionex-allowance-*] Ionex plan credits buy energy at NT$52 per kWh when sw
   for (const p of econData.plans.filter((x) => x.operator === 'ionex')) {
     assert.ok(p.usage.kind === 'credit');
     if (p.usage.kind !== 'credit') continue;
-    const kwh = Math.round((p.usage.creditNtd / 52) * 10) / 10;
+    // The exact allowance: rounding it to 0.1 kWh quietly took up to NT$2.6 a month off the credit.
+    const kwh = p.usage.creditNtd / 52;
     assert.deepEqual([p.usage.allowance.low, p.usage.allowance.typical, p.usage.allowance.high], [kwh, kwh, kwh], p.id);
     assert.doesNotMatch(p.usage.allowance.typicalBasis.en, /when you swap/);
   }
@@ -238,11 +239,12 @@ test('[ionex-allowance-*] Ionex plan credits buy energy at NT$52 per kWh when sw
     return e.electric.running.items.filter((i) => i.id === 'energy' || i.id === 'plan-fee').reduce((a, i) => a + i.monthly.typical, 0);
   };
   assert.equal(at('ionex-518-single', 500), 699);
-  assert.equal(at('ionex-318-single', 300), 567);
+  assert.equal(at('ionex-318-single', 300), 566); // 318 + (300 / 31.3 − 250 / 52) × 52 = 566.4
   assert.equal(at('ionex-518-single', 800), 1197);
   const air = evaluate(situation({ electricModel: 'ionex-ione-air', energyPlan: 'ionex-318-single', gasolineModel: 'sym-new-duke-125-drum', monthlyKm: 300 }));
   assert.deepEqual([air.comparison.breakEven.kind, (air.comparison.breakEven as { month?: number }).month], ['gas-catches-up', 54]);
-  assert.equal(economics['econ-swap-vs-petrol-low-mileage'].data.ionex318At300.value, 567);
+  // The published figure must be the engine's (566 since the credit is no longer rounded to 4.8 kWh).
+  assert.equal(economics['econ-swap-vs-petrol-low-mileage'].data.ionex318At300.value, at('ionex-318-single', 300));
 });
 
 test('[gogoro-819-credit-missing / missing-gogoro-819-credit] the 819 plan carries NT$320 a month off for 24 months', () => {
@@ -260,7 +262,7 @@ test('[gogoro-819-credit-missing / missing-gogoro-819-credit] the 819 plan carri
 test('[deadline-message-says-invoice-but-promos-need-plate] dealer offers that count the plate date say so', () => {
   const e = evaluate(situation({ electricModel: 'gogoro-ezzy', energyPlan: 'gogoro-319-single', gasolineModel: 'yamaha-jog-125', monthlyKm: 300 }));
   const m = msg(e, 'deadline', 'yamaha-jog-credit-2026-11')[0];
-  assert.match(m.text.en, /plate-registration date/);
+  assert.match(m.text.en, /must be plated by this date \(the maker counts the plate date/);
   assert.doesNotMatch(m.text.en, /invoice date\) deadline/);
   assert.match(m.text['zh-TW'], /領牌/);
   const k = evaluate(situation({ scrap: fourStroke2012 }));
@@ -354,7 +356,7 @@ test('[gas-maintenance-low-below-schedule / maintenance-low-below-schedule] the 
 
 test('[smoothing-wording] the smoothing texts give the scheduled end and the week of the absorbed amount', () => {
   assert.match(econData.fuel.smoothing.typicalBasis.en, /16–22 November 2026/);
-  assert.match(econData.fuel.smoothing.mechanism.en, /set to end on 31 March 2027 unless extended/);
+  assert.match(econData.fuel.smoothing.mechanism.en, /due to end on 31 March 2027 unless extended/);
   assert.doesNotMatch(economics['econ-petrol-price-smoothing'].statement.en, /no end date/);
 });
 
@@ -382,10 +384,10 @@ test('[moea-after-1210-foreign-national] after 10 December a foreign national ge
   assert.equal(line(evaluate({ ...s, date: '2026-12-10' }), 'moea-new-7000'), 7000);
   // An ROC national after 10 December keeps the money (the portal date is for foreign nationals).
   assert.equal(line(evaluate({ ...s, household: {}, date: '2026-12-11' }), 'moea-new-7000'), 7000);
-  const ionex = evaluate(situation({ electricModel: 'ionex-coolone', energyPlan: 'ionex-318-single', date: '2026-12-11' }));
+  const ionex = evaluate(situation({ electricModel: 'ionex-ione-air', energyPlan: 'ionex-318-single', date: '2026-12-11' }));
   assert.doesNotMatch(msg(ionex, 'moea-filing')[0].text.en, /Gogoro/);
   const b = bestOptions({ jurisdiction: 'taipei', scrap: null, household: { foreignNational: true }, gasolineModel: 'kymco-new-haomai-125-drum', monthlyKm: 500, date: '2026-12-11' });
-  assert.equal(b.byNetPrice.find((o) => o.electricModel === 'ionex-coolone')?.netPrice, 35812);
+  assert.equal(b.byNetPrice.find((o) => o.electricModel === 'ionex-ione-air' && o.energyPlan === 'ionex-318-single')?.netPrice, evaluate(situation({ electricModel: 'ionex-ione-air', energyPlan: 'ionex-318-single', household: { foreignNational: true }, date: '2026-12-11' })).electric.purchase.net.value);
   assert.ok(b.messages.some((m) => m.code === 'moea-filing'));
 });
 
@@ -414,7 +416,7 @@ test('[deadline-omits-confirmedthrough-lines] lines listed to 2027 but confirmed
 test('[plan-credit-expiry-silent] plan credits are in the deadline warning while valid and reported when they end', () => {
   const s = situation({ electricModel: 'gogoro-ezzy', energyPlan: 'gogoro-488', scrap: fourStroke2012 });
   const before = evaluate({ ...s, date: '2026-12-10' });
-  assert.match(msg(before, 'deadline', 'gogoro-ezzy-151-2026')[0].text.en, /Order, pay in full and be invoiced/);
+  assert.match(msg(before, 'deadline', 'gogoro-ezzy-151-2026')[0].text.en, /order, pay in full and be invoiced/i);
   const after = evaluate({ ...s, date: '2027-01-01' });
   const m = msg(after, 'dealer-promo-expired', 'gogoro-ezzy-151-2026')[0];
   assert.equal(m.amount, 3624);
@@ -431,19 +433,25 @@ test('[bestoptions-hides-uncertainty] the ranking returns the warnings that go w
   assert.ok(b.byNetPrice.every((o) => Array.isArray(o.warningCodes)));
 });
 
-test('[deadline-text-understates-requirements] the last valid day reads as the last day, with what is due by then', () => {
+test('[deadline-text-understates-requirements] the deadline gives the date and what is due by then, never a count of days', () => {
   const e = evaluate(situation({ electricModel: 'gogoro-ezzy', energyPlan: 'gogoro-488', scrap: fourStroke2012, date: '2026-12-31' }));
   const m = msg(e, 'deadline', 'tpe-replace-old-light')[0];
-  assert.match(m.text.en, /Today \(31 December 2026\) is the last day/);
-  assert.match(m.text['zh-TW'], /今天（2026年12月31日）是最後一天/);
+  assert.match(m.text.en, /the deadline is 31 December 2026/);
+  assert.match(m.text['zh-TW'], /期限是 2026 年 12 月 31 日/);
+  assert.ok(m.items && m.items.length >= 1, 'one item per rule, for a list');
   assert.match(m.text.en, /plate the new scooter, and scrap and recycle the old one/);
   assert.match(m.text.en, /Register on the MOENV matching platform/);
   assert.doesNotMatch(allText(e), /\b0 days left|還有0天/);
   const l = e.electric.purchase.lines.find((x) => x.id === 'tpe-replace-old-light');
   assert.equal(l?.deadline?.lastDay, true);
   assert.equal(l?.daysLeft, 0, 'daysLeft keeps its old meaning');
-  const one = evaluate(situation({ electricModel: 'gogoro-ezzy', energyPlan: 'gogoro-488', date: '2026-12-30' }));
-  assert.match(msg(one, 'deadline')[0].text.en, /\b1 day left/);
+  // R10: a countdown only beside the reader's city status in a verdict-A panel (the page fills it).
+  for (const date of ['2026-11-26', '2026-12-30', '2026-12-31']) {
+    for (const j of ['kaohsiung', 'kinmen', 'taipei', 'keelung'] as const) {
+      const x = evaluate(situation({ jurisdiction: j, electricModel: 'gogoro-ezzy', energyPlan: 'gogoro-488', gasolineModel: 'yamaha-jog-125', scrap: fourStroke2012, date }));
+      for (const d of msg(x, 'deadline')) assert.doesNotMatch(`${d.text.en} ${d.text['zh-TW']}`, /\d+ days? left|last day|還有\s*\d+\s*天|剩下?\s*\d+\s*天|最後一天|倒數/, `${j} ${date}`);
+    }
+  }
 });
 
 test('[stale-notes-at-later-dates] after 31 March 2027 the smoothing note is in the past tense and the data age is stated', () => {
@@ -453,7 +461,7 @@ test('[stale-notes-at-later-dates] after 31 March 2027 the smoothing note is in 
   assert.doesNotMatch(p.text.en, /currently runs to/);
   assert.match(p.text.en, /which has passed/);
   assert.match(msg(e, 'stale-data')[0].text.en, /25 November 2026/);
-  assert.match(econData.electricity.reviewNote.en, /^As of 25 November 2026/);
+  assert.match(econData.electricity.reviewNote.en, /\(checked 25 November 2026\)/);
   assert.equal(msg(evaluate(situation()), 'stale-data').length, 0);
 });
 

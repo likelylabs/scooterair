@@ -6,8 +6,9 @@
  * the one line that is true of every fact of that evidence type. A caveat the registry marks
  * as required is set beside the number and flagged. The row carries the anchor #<fact id>.
  *
- * On a phone each row is a block with its column names; from 60em it lines up as a table row
- * under the header printed by the list (see FactList).
+ * In a narrow box each row is a block with its column names; once the row itself is 56rem
+ * wide (a container query, so a row in a narrow column never gets the five tracks) it lines
+ * up as a table row under the header printed by the list (see FactList).
  *
  * Props
  *   locale  Locale
@@ -89,6 +90,13 @@ const Tag = as;
   .frow {
     list-style: none;
     scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+    container: frow / inline-size;
+  }
+  /* the badge may wrap inside its cell, so it never runs into the caveat beside it */
+  .frow__kind :global(.ev) {
+    white-space: normal;
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
   }
   .frow__inner {
     position: relative;
@@ -188,9 +196,9 @@ const Tag = as;
   .frow__link:focus-visible {
     color: var(--accent);
   }
-  @media (min-width: 60em) {
+  @container frow (min-width: 56rem) {
     .frow__dl {
-      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 0.9fr) minmax(0, 2fr);
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(7.5rem, 0.9fr) minmax(0, 2fr);
       gap: var(--sp-5);
       align-items: start;
     }

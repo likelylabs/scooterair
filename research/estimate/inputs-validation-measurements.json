@@ -1,0 +1,656 @@
+{
+ "key": "validation-measurements",
+ "checkedOn": "2026-11-26",
+ "author_note": "All verified:true entries were opened by this agent (IOT PDF read in full text by pdftotext; East-West Center PDF; MOENV annual report PDF; Bangkok open page; Europe PMC abstracts; Airiti abstract; PTS news; arXiv). verified:false entries are carried from repo files written by earlier agents or seen only in search-result excerpts.",
+ "anchors_summary": {
+  "how_to_read": "Nearest measurement first. Taiwan kerb data (IOT 2024) are the only measurements at a pedestrian waiting zone in Taiwan. They are multi-day sensors beside the crosswalk, not beside a stopped pack. Everything else is a motorcycle-city or red-light proxy.",
+  "CO_ppm": {
+   "taiwan_kerb_1min_peaks": "0.5-1.3 (IOT Kaohsiung/Banqiao July 2024; 0.5, 0.5, 0.62 and 1.3)",
+   "taiwan_station_hourly_same_days": "0.03-0.90",
+   "taiwan_traffic_station_annual_mean_2025": "0.54 (6 stations); Taipei City 3 stations 0.83 (2023, secondary)",
+   "motorcycle_city_pedestrian_older_fleet": "Hanoi 2006 walking mean 8.5 (GM 5.1), roadside cafes 3.2-11.3; HCMC hourly max ~20 (secondary)",
+   "not_usable": "400-750 ppm (unattributed tailpipe-facing claim)",
+   "span_summary": "kerb 1-min peaks in current Taiwan: about 0.5-1.3 ppm; uncontrolled motorbike cities a decade+ ago: ~3-11 ppm means with ~20 ppm hourly maxima"
+  },
+  "benzene_ppb": {
+   "taiwan": "No kerbside benzene measurement found; Taipei on-road total BTEX 20-34 ppb (route means, moving)",
+   "hanoi_roadside_2014_15": "12.8 mean (82-88% motorbikes), but Phuc 2018 ~3 (9 ug/m3) at other sites",
+   "bangkok_kerb_3m_2010": "~2-3 mean, ~5 at P95 (5.3-9.7 ug/m3 mean; P95 16.7)",
+   "hcmc_hanoi_kl_daily_passive": "~15-27 (48-87 ug/m3), ~2010",
+   "span_summary": "typical roadside benzene means 2-13 ppb; daily means in older motorbike cities up to ~27 ppb; no source gives red-light minute peaks"
+  },
+  "particle_number_per_cm3": {
+   "taiwan_tailpipe": "2.07e4 at idle (one scooter, lab)",
+   "urban_roadside_background_streets": "1-2e4 (Xi'an, 0.3-10 um channels; secondary)",
+   "signalised_junction_mean": "6.6e4 (Texas, red-light idling 3.5x green)",
+   "junction_peaks_UK": "0.7-5.4e5 at pull-away (up to 29x free-flow)",
+   "hcmc_rider_trip_mean": "3.6e5 (secondary)",
+   "span_summary": "1e4 to 1e5 typical urban kerb; 3e5-5e5 in transient peaks; no Taiwanese kerb PN by signal phase"
+  },
+  "PM2.5_ug_m3": {
+   "taiwan_kerb_summer_2024": "4-14 (mostly), stations 1-20",
+   "taipei_sidewalk_median_2019": "40 (10-275; sensor ~30% high)",
+   "taipei_idle_motorcycle_median": "75 (60-105; n=21)",
+   "taipei_motorcycle_stopped_vs_moving_thesis": "14.2 vs 12.5",
+   "span_summary": "PM2.5 does not discriminate: it tracks the regional background; tailpipe PM2.5 from scooters is small"
+  },
+  "bottom_line": "The nearest real measurements put Taiwanese kerbside CO at roughly 0.5-1.3 ppm in 1-min peaks, i.e. a small multiple of the 0.2-0.5 ppm station values, and ordinary roadside aromatics at a few ppb benzene (tens of ppb total BTEX on the road). Higher numbers (CO 8-20 ppm, benzene 15-27 ppb, UFP 3e5) come from older uncontrolled fleets or in-traffic rider measurements. A 90-s estimate for a Taiwanese pedestrian beside a pack should be bracketed by these, with the transient close-pack excess above the 0.5-1.3 ppm kerb peaks being the unmeasured part."
+ },
+ "findings": [
+  {
+   "id": "iot-design-instrument-placement",
+   "group": "1-Taiwan-kerb",
+   "claim": "The IOT field campaign measured CO and PM2.5 once per minute with micro-sensors at pedestrian waiting zones and on the median at 10 intersections (4 in year 1, 6 in year 2), 48 h per intersection (480 h total). It did not report red-phase versus green-phase concentrations in the text I read; its signal-cycle link is by traffic-peak timing only.",
+   "values": {
+    "intersections": 10,
+    "hours_per_intersection": 48,
+    "time_resolution": "1 min",
+    "inlet_height_m": "1.2-1.5",
+    "distance_from_crosswalk_line_m": "1.0-1.5",
+    "sensor_principle": "laser optical (PM2.5) and electrochemical (CO) micro-sensors; model not named in text read; calibrated at ITRI lab and compared with MOENV stations",
+    "station_comparison_instruments": "Horiba APMA-370 (CO), Met-One BAM-1020 (PM2.5)"
+   },
+   "measured": "Fixed micro-sensors at the pedestrian waiting zone beside the crosswalk and on the median island (representing the middle of the crosswalk); traffic counted per minute from video; signal timing recorded.",
+   "place_year": "Kaohsiung (Zuoying, Xinxing, Sanmin) and New Taipei (Banqiao), 1-12 July 2024 (year 2 of 2; year-1 intersections in Taipei/Kaohsiung 2023 are in the (1/2) report)",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, Yeh F-H, Lin Y-C, Wang S-Y, Chen H-L, Chu P-Y, Wu T-C, Huang S-T, Yang C-M. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2)—資料分析與指引研訂. 交通部運輸研究所 (MOTC Institute of Transportation), report IOT-113-TB006 (114-084-6228), December 2025 (ROC 114), 402 pp.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "Section 2.2.3 (p.2-24/2-25): 「本計畫採以微型感測監測儀器架設於路口行穿線旁 1.0 至 1.5 公尺處…並將儀器採樣口（進氣口）架設離地高 1.2 至 1.5 公尺處，以模擬實際人體呼吸之高度」; 「以每分鐘為時間單位記錄 1 筆空氣污染物濃度數據」; Sec 3.4 (p.3-66): 每個路口調查 48 小時，總計調查時間為 480 小時",
+   "applicability": "Closest design to what the site needs (breathing height, 1-1.5 m from crosswalk, 1-min), but the pedestrian-zone sensors sit beside the crosswalk, not beside the scooter stop box, and the report gives no red/green split or per-minute scooter count against CO. The sensors are low-cost; a ~0.5 ppm peak is near the likely noise/resolution of electrochemical sensors, so treat as upper-bound-ish indicators of order of magnitude, not as precise peak values."
+  },
+  {
+   "id": "iot-co-waiting-zone-peaks",
+   "group": "1-Taiwan-kerb",
+   "claim": "Measured CO at the pedestrian waiting zone peaked at about 0.5-0.62 ppm at three Kaohsiung intersections and about 1.3 ppm at one (Mingcheng 1st Rd / Minzu 1st Rd, crosswalk-setback site, 11 July). Waiting-zone CO was higher than the median at some intersections and lower at others.",
+   "values": {
+    "Gaotie Rd/Chongxin Rd (Zuoying)": "peak ~0.5 ppm (5 July 19:13), waiting zone > median",
+    "Qixian 1st/Minzu 2nd (Sanmin)": "peak ~0.62 ppm (5 July ~08:00), waiting zone > median",
+    "Zhongzheng 2nd/Minzu 2nd": "peak 0.5 ppm (3 July 08:00), median > waiting zone",
+    "Mingcheng 1st/Minzu 1st": "max ~1.3 ppm (11 July) after crosswalk setback; setback raised CO slightly",
+    "Boai 2nd/Mingcheng 2nd": "text gives no number; waiting zone higher and more variable than median",
+    "Xianmin Blvd/Minquan Rd (Banqiao)": "text gives no number; median > waiting zone"
+   },
+   "unit": "ppm (1-min records; text states peak values)",
+   "measured": "1-min CO at breathing height 1.0-1.5 m from the crosswalk line, summer 2024, with motorcycles 42-62% of vehicle counts.",
+   "place_year": "Kaohsiung and New Taipei, July 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, Yeh F-H, Lin Y-C, Wang S-Y, Chen H-L, Chu P-Y, Wu T-C, Huang S-T, Yang C-M. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2)—資料分析與指引研訂. 交通部運輸研究所 (MOTC Institute of Transportation), report IOT-113-TB006 (114-084-6228), December 2025 (ROC 114), 402 pp.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "Sec 3.3.2 (p.3-60 to 3-65): 「行人等候區所受到的 CO 污染物的影響是高於分隔島的…在 7 月 5 日的 19 點 13 分達到 0.5ppm」; 「在 7 月 5 日的上午 8 點左右達到 0.62ppm」; 「並在 7 月 3 日上午 8 點達到最高的 0.5ppm」; 「最大值也出現 7 月 11 日退縮後所測得之 1.3ppm 左右」. Figures 3.3.2-1 to 3.3.2-11 hold the series (not digitised).",
+   "applicability": "THE nearest Taiwanese kerbside CO anchor: kerb CO at busy scooter-heavy signalised crossings peaks around 0.5-1.3 ppm (1-min) in summer. Because each waiting-zone sensor sits at a crosswalk edge for 48 h, it averages many scooters, many phases and wind states; a person stood 1-2 m from a pack of 10-30 idling scooters at the stop line for 90 s could briefly see more than these peaks, but the IOT data bound what happens at ordinary waiting positions over days. The study does not isolate scooters from cars."
+  },
+  {
+   "id": "iot-co-station-background",
+   "group": "1-Taiwan-kerb",
+   "claim": "Hourly CO at the nearby regulatory stations during the same July 2024 campaigns spanned 0.03-0.90 ppm (Banqiao 0.16-0.90; Zuoying 0.09-0.56; Aiguo Primary School 0.03-0.28 and 0.08-0.52). Kerb 1-min peaks of 0.5-1.3 ppm therefore sit at roughly 1-2x the upper end of hourly station values.",
+   "values": {
+    "Banqiao (MOENV)": "0.16-0.90 ppm hourly (8-12 Jul)",
+    "Zuoying (MOENV)": "0.09-0.56 ppm hourly (2-5 Jul)",
+    "Aiguo Primary School (Kaohsiung EPB)": "0.03-0.28 ppm (1-5 Jul); 0.08-0.52 ppm (8-11 Jul)"
+   },
+   "unit": "ppm hourly mean",
+   "measured": "Regulatory station CO (NDIR), 0.7-2.9 km from the intersections",
+   "place_year": "Kaohsiung/New Taipei, July 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, Yeh F-H, Lin Y-C, Wang S-Y, Chen H-L, Chu P-Y, Wu T-C, Huang S-T, Yang C-M. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2)—資料分析與指引研訂. 交通部運輸研究所 (MOTC Institute of Transportation), report IOT-113-TB006 (114-084-6228), December 2025 (ROC 114), 402 pp.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "Sec 3.2.1 (p.3-44): 「環境部板橋空品監測站 7 月 8 日至 7 月 12 日之小時平均值介於 0.16ppm 至 0.90ppm；環境部左營…0.09ppm 至 0.56ppm；…愛國國小…0.03ppm 至 0.28ppm；7 月 8 日至 7 月 11 日…0.08ppm 至 0.52ppm」",
+   "applicability": "Shows the contrast between hourly station values and 1-min kerb values; kerb peaks were only modestly above stations, i.e. there is no 10x kerb-to-station enhancement visible at ordinary waiting positions."
+  },
+  {
+   "id": "iot-pm25-waiting-zone",
+   "group": "1-Taiwan-kerb",
+   "claim": "PM2.5 at the waiting zone was low and close to the median and the stations: mostly 4-14 ug/m3 at Gaotie/Chongxin, under 12 at Qixian/Minzu, under 10 at Zhongzheng/Minzu, under 7 at Mingcheng 1st/Minzu 1st, under 8 at Boai/Mingcheng 2nd, 4-10 at Banqiao (median island ~16).",
+   "values": {
+    "Gaotie/Chongxin": "4-14 ug/m3, max 13 (waiting zone); mean 5.9 (low humidity) to 8.7 (high humidity)",
+    "Qixian 1st/Minzu 2nd": "mostly <=12, max 11 (5 Jul 09:00)",
+    "Zhongzheng 2nd/Minzu 2nd": "mostly <=10",
+    "Mingcheng 1st/Minzu 1st": "mostly <=7; mean 3.4-3.8",
+    "Boai 2nd/Mingcheng 2nd": "mostly <=8; mean 3.4-4.1",
+    "Xianmin/Minquan (Banqiao)": "waiting zone 4-10; median-island ~16 at peaks; mean 6.8-8.4"
+   },
+   "unit": "ug/m3 (1-min micro-sensor)",
+   "measured": "PM2.5 micro-sensor beside crosswalk, breathing height",
+   "place_year": "Kaohsiung/New Taipei, July 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, Yeh F-H, Lin Y-C, Wang S-Y, Chen H-L, Chu P-Y, Wu T-C, Huang S-T, Yang C-M. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2)—資料分析與指引研訂. 交通部運輸研究所 (MOTC Institute of Transportation), report IOT-113-TB006 (114-084-6228), December 2025 (ROC 114), 402 pp.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "Sec 3.3.1 (p.3-54 to 3-60), e.g. 「全天的濃度大多落在 4μg/m3 至 14μg/m3 之間」, 「行人等候區所測得之資料則落在 4μg/m3 至 10μg/m3 之間」",
+   "applicability": "PM2.5 mass at the kerb in summer 2024 was near urban background; PM2.5 is a poor discriminator for scooter exhaust (scooters are ~1% of TEDS PM2.5). Do not use PM2.5 as the headline."
+  },
+  {
+   "id": "iot-traffic-counts",
+   "group": "1-Taiwan-kerb",
+   "claim": "Motorcycle counts and shares at the six year-2 intersections: Mingcheng 1st/Minzu 1st 5,974 motorcycles per 12 h (62% of vehicles); Boai 2nd/Mingcheng 2nd 4,811 (59.3%); Gaotie/Chongxin 819 (42.1%); Banqiao Xianmin/Minquan 46.9% share; others majority motorcycles. Mean flows 1,596 PCU/h (Gaotie/Chongxin) to 6,784 PCU/h (Mingcheng 1st). Two-stage-turn waiting counts were also recorded per direction.",
+   "values": {
+    "12h_mean_motorcycles": {
+     "Mingcheng1/Minzu1": 5974.2,
+     "Boai2/Mingcheng2": 4810.7,
+     "Gaotie/Chongxin": 818.7
+    },
+    "motorcycle_share_pct": {
+     "Mingcheng1/Minzu1": 62,
+     "Boai2/Mingcheng2": 59.3,
+     "Gaotie/Chongxin": 42.1,
+     "Xianmin/Minquan": 46.9
+    },
+    "PCU_per_h": {
+     "Gaotie/Chongxin": 1596,
+     "Mingcheng1/Minzu1": 6784
+    }
+   },
+   "unit": "vehicles per 12 h",
+   "measured": "Video counts, 1-min bins, 07:00-19:00 on survey days",
+   "place_year": "Kaohsiung/New Taipei, July 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, Yeh F-H, Lin Y-C, Wang S-Y, Chen H-L, Chu P-Y, Wu T-C, Huang S-T, Yang C-M. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2)—資料分析與指引研訂. 交通部運輸研究所 (MOTC Institute of Transportation), report IOT-113-TB006 (114-084-6228), December 2025 (ROC 114), 402 pp.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "Sec 3.4 (p.3-66/3-67): 「明誠一路/民族一路路口每日 12 小時平均之車流量為…機車為 5,974.2 輛次…機車車種比例為最高的 62%」; 「高鐵路/重信路路口…機車為 818.7 輛次」",
+   "applicability": "Gives the scooter volume that sits behind the 0.5-1.3 ppm CO peaks (roughly 100-500 scooters per hour per direction at the busiest sites; one 12-h count over several approaches). Per-cycle queue size at the stop line is NOT given here (use the 1-min counts in Appendices/video if needed)."
+  },
+  {
+   "id": "iot-model-idle-assumption",
+   "group": "1-Taiwan-kerb",
+   "claim": "The report's own GRAL dispersion model treats a red-light idling vehicle as emitting at the TEDS 12.0 national-average emission factor for 5 km/h, with the tailpipe source height set at 0.5 m. This is a modelling assumption, not a measurement.",
+   "values": {
+    "source_height_m": 0.5,
+    "idle_emission_basis": "TEDS 12.0 EF at 5 km/h"
+   },
+   "unit": "n/a",
+   "measured": "Model setup",
+   "place_year": "Taiwan 2025 report",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, Yeh F-H, Lin Y-C, Wang S-Y, Chen H-L, Chu P-Y, Wu T-C, Huang S-T, Yang C-M. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2)—資料分析與指引研訂. 交通部運輸研究所 (MOTC Institute of Transportation), report IOT-113-TB006 (114-084-6228), December 2025 (ROC 114), 402 pp.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "Sec 4.2.2 (p.4-12/4-13): 「高度參考汽車、機車排氣管的離地高度設定為 0.5m」; 「怠速模式使用車速為 5km/hr 之排放係數進行換算」",
+   "applicability": "A governmental precedent for representing idle by a 5 km/h factor and a 0.5 m source; useful for method consistency, not as validation data."
+  },
+  {
+   "id": "moenv-traffic-station-co-annual-2025",
+   "group": "1-Taiwan-background",
+   "claim": "MOENV's six traffic-type air-quality stations (Datong, Yonghe, Sanchong, Zhongli, Fuxing, Fengshan) averaged 0.54 ppm CO in 2025, down from 0.98 ppm in 2016; general stations 0.24 ppm, park stations 0.15 ppm. Traffic stations also had the highest THC (2.28 ppmC) and NMHC (0.17 ppmC; Yonghe invalid) annual means.",
+   "values": {
+    "CO_traffic_station_annual_mean_ppm": {
+     "2016": 0.98,
+     "2017": 0.88,
+     "2018": 0.81,
+     "2019": 0.8,
+     "2020": 0.75,
+     "2021": 0.69,
+     "2022": 0.65,
+     "2023": 0.63,
+     "2024": 0.61,
+     "2025": 0.54
+    },
+    "CO_general_2025": 0.24,
+    "CO_park_2025": 0.15,
+    "NMHC_traffic_2025_ppmC": 0.17,
+    "THC_traffic_2025_ppmC": 2.28,
+    "NMHC_general_2025_ppmC": 0.07
+   },
+   "unit": "ppm (annual mean of hourly NDIR)",
+   "measured": "Fixed regulatory stations, NDIR CO analyser",
+   "place_year": "Taiwan, 2016-2025",
+   "citation": "環境部 (MOENV). 114年空氣品質監測年報 / Air Quality Annual Report of R.O.C. (Taiwan), 2025, Table 3-23, Table 3-7, Sec 3 summary, station list p.3-9.",
+   "url": "https://service.moenv.gov.tw/File/Get/moenv/zh-tw/VKuWKdIp1pJZHmU",
+   "verified": true,
+   "quote": "「一氧化碳(CO)：以交通測站年平均濃度 0.54 ppm 最高、公園測站 0.15 ppm 最低」; Table 3-23 row 交通測站 6: 0.98 0.88 0.81 0.80 0.75 0.69 0.65 0.63 0.61 0.54",
+   "applicability": "The annual mean at roadside station inlets is about 0.5 ppm; it is the floor against which kerb peaks are read. Station inlets are elevated (typically a few metres) and sited near roads, not at the stop line. Hourly maxima by station were not in this report (hole)."
+  },
+  {
+   "id": "taipei-city-traffic-station-co",
+   "group": "1-Taiwan-background",
+   "claim": "Taipei City's three traffic stations averaged CO 1.07 ppm (2019), 0.86 ppm (2022), 0.83 ppm (2023).",
+   "values": {
+    "2019": 1.07,
+    "2022": 0.86,
+    "2023": 0.83
+   },
+   "unit": "ppm annual mean",
+   "measured": "Taipei City EPB traffic stations",
+   "place_year": "Taipei, 2019-2023",
+   "citation": "臺北市政府環境保護局. 臺北市 空氣品質監測年報 108/111/112 (Air Quality Annual Report of Taipei City).",
+   "url": "https://www.tldep.gov.taipei/Public/DownLoad/AnnualReport/112.pdf",
+   "verified": false,
+   "quote": "Seen only as web-search excerpts: 「交通測站(3 個測站)一氧化碳年平均濃度 1.07 ppm」(108 年), 0.86 (111), 0.83 (112)",
+   "applicability": "Secondary. Taipei kerb-adjacent stations run higher than MOENV's national traffic-station mean, so ~0.5-1 ppm is the multi-year roadside mean in the capital. Open the PDFs to confirm and to get hourly maxima."
+  },
+  {
+   "id": "ntu-thesis-motorcycle-commuters-stop-vs-move",
+   "group": "1-Taiwan-rider",
+   "claim": "In Taipei-Sanchong evening-rush rides, PM10 and PM2.5 while the motorcycle was stopped averaged 65.3 and 14.2 ug/m3, significantly higher than while moving (45.2 and 12.5; p<0.05). CO in the traffic lane was 1.1-30 times CO on the sidewalk (CO exposure per km 0.5 mg/km weekday vs 0.2 holiday).",
+   "values": {
+    "stopped_PM10_ug_m3": 65.3,
+    "stopped_PM2.5_ug_m3": 14.2,
+    "moving_PM10": 45.2,
+    "moving_PM2.5": 12.5,
+    "CO_lane_over_sidewalk_ratio": "1.1-30",
+    "CO_per_km_weekday_mg": 0.5,
+    "CO_per_km_holiday_mg": 0.2
+   },
+   "unit": "ug/m3; ratio",
+   "measured": "Personal monitors on a motorcycle commuter route ~10 km, 17:30-18:30, PM2.5, PM10, CO, pPAHs; instrument not named in abstract",
+   "place_year": "Taipei (NTU to Sanchong), July 2017-April 2018",
+   "citation": "王子瑄 (supervisor 莊振義). 機車通勤族空氣污染個體暴露評估 (Personal Exposure Assessment to Air Pollution for Motorcycle Commuters). 國立臺灣大學地理環境資源學研究所 碩士論文, 2018.",
+   "url": "https://www.airitilibrary.com/Article/Detail/U0001-2607201811255700",
+   "verified": true,
+   "quote": "Abstract (read on Airiti page): 「停等時PM10與PM2.5平均濃度為65.3與14.2 μg/m³，顯著高於移動時的45.2與12.5 μg/m³（p<0.05）」; 「車道上CO濃度為人行道的1.1～30.0倍」. Abstract only; full text and CO ppm not seen.",
+   "applicability": "A Taiwanese stopped-versus-moving contrast for the rider (not the pedestrian): stopping adds particles, and lane CO exceeds sidewalk CO by a factor from barely above 1 to 30 -- a useful scale for the kerb-to-lane gradient that bounds how much more a rider in the queue breathes than a pedestrian. CO ppm values not in the abstract."
+  },
+  {
+   "id": "taipei-sidewalk-and-idle-pm25-wang2021",
+   "group": "1-Taiwan-rider",
+   "claim": "Hand-held PM2.5 on Taipei sidewalks: median 40 ug/m3 (10-275, n=216); on a motorcycle stopped at red lights: median 75 (60-105, n=21 from 3 trips). Low-cost sensor, authors say it may read ~30% high.",
+   "values": {
+    "sidewalk_median": 40,
+    "sidewalk_range": "10-275",
+    "idle_motorcycle_median": 75,
+    "idle_range": "60-105",
+    "n_idle": 21
+   },
+   "unit": "ug/m3, 1-min",
+   "measured": "Temtop P600 laser sensor at mid-chest",
+   "place_year": "Taipei Metropolitan Area, April-July 2019",
+   "citation": "Wang C-Y, Lim B-S, Wang Y-H, Huang Y-C T. Identification of High Personal PM2.5 Exposure during Real Time Commuting in the Taipei Metropolitan Area. Atmosphere 2021, 12(3):396.",
+   "url": "https://doi.org/10.3390/atmos12030396",
+   "verified": false,
+   "quote": "Repo file research/papers/wang-2021-atmosphere.json (full-text read by earlier agent): 「The median PM2.5 concentration was 75 µg/m3 (range: 60–105 µg/m3, n = 21 measurements ...)」",
+   "applicability": "Only Taiwanese figure explicitly from a vehicle stopped at red lights; the other studies cannot separate stop from go. Sparse and uncalibrated."
+  },
+  {
+   "id": "taipei-wu2021-btex-scooter-lane",
+   "group": "1-Taiwan-rider",
+   "claim": "BTEX breathed by commuters riding ELECTRIC scooters in Taipei traffic (so from surrounding vehicles only): total BTEX mean 33.96 ppb (species range 4.02-33.96 ppb); cyclists 20.07 ppb. Rush hour benzene about 1.9x non-rush; benzene 40% lower for cyclists. Per-species benzene values are in the supplement (Table S2), not in the main text.",
+   "values": {
+    "total_BTEX_scooter_ppb": 33.96,
+    "total_BTEX_cyclist_ppb": 20.07,
+    "species_range_scooter_ppb": "4.02-33.96",
+    "rush_over_nonrush_benzene": "~1.87",
+    "benzene_cyclist_vs_scooter_rush_pct": -39.99
+   },
+   "unit": "ppb (40-80 min route averages)",
+   "measured": "Active-pump sorbent tubes, personal breathing zone, on-road",
+   "place_year": "Taipei, Nov 2017-Apr 2018",
+   "citation": "Wu T-G, Chang J-C, Huang S-H, Lin W-Y, Chan C-C, Wu C-F. Exposures and health impact for bicycle and electric scooter commuters in Taipei. Transportation Research Part D 91 (2021) 102696.",
+   "url": "https://doi.org/10.1016/j.trd.2021.102696",
+   "verified": false,
+   "quote": "Repo file research/papers/wu-2021-trd.json (full text read): 「The average exposures of total BTEX and PM2.5 were 20.07 ppb and 23.27 ug/m3 for the cyclists and 33.96 ppb and 27.65 ug/m3 for the motorcyclists」",
+   "applicability": "Nearest Taiwanese measurement of aromatics at breathing height in scooter-dominated traffic, but a 40-80 min route mean while moving, not a red-light peak. Benzene alone is not given in the main text. Supplement Table S2 would give per-route benzene: manual fetch."
+  },
+  {
+   "id": "taiwan-tunnel-co-ting2023",
+   "group": "1-Taiwan-background",
+   "claim": "In a Taipei tunnel with ~52% motorcycles on weekdays (61% at rush hour), CO tracked motorcycle flow (r=0.96); emission factor CO 4.33 g/veh-km for motorcycles vs 2.06 for cars.",
+   "values": {
+    "CO_EF_MC_g_per_km": 4.33,
+    "CO_EF_LDV_g_per_km": 2.06,
+    "r_CO_vs_MC_flow": 0.96
+   },
+   "unit": "g/veh-km",
+   "measured": "Tunnel carbon-balance, 14-23 Mar 2020",
+   "place_year": "Ziqiang Tunnel, Taipei, 2020",
+   "citation": "Ting Y-C, Chang P-K, Hung P-C, Chou C C-K, Chi K-H, Hsiao T-C. Characterizing emission factors and oxidative potential of motorcycle emissions in a real-world tunnel environment. Environmental Research 234 (2023) 116601.",
+   "url": "https://doi.org/10.1016/j.envres.2023.116601",
+   "verified": false,
+   "quote": "Repo file research/papers/ting-2023-envres.json: Table 4 CO 2.06 +/- 0.47 (LDV), 4.33 +/- 0.42 (MC)",
+   "applicability": "Per-km tunnel factor, not idle. In-tunnel concentrations were not reported in a form usable as kerb anchor."
+  },
+  {
+   "id": "taiwan-idle-pn-chien-huang-2010",
+   "group": "1-Taiwan-tailpipe",
+   "claim": "One four-stroke Taiwanese motorcycle emitted 2.07x10^4 particles/cm3 at idle (2.35x10^4 at 15 km/h, 2.60x10^4 at 30 km/h) in a laboratory sizing test.",
+   "values": {
+    "idle": 20700.0,
+    "15_kmh": 23500.0,
+    "30_kmh": 26000.0
+   },
+   "unit": "particles/cm3 (as measured in the sampling system; dilution not stated in repo note)",
+   "measured": "Laboratory particle sizing of exhaust",
+   "place_year": "Taiwan, 2010",
+   "citation": "Chien S-M, Huang Y-J (2010). J. Environ. Sci. Health A 45(13):1768-1774.",
+   "url": "https://doi.org/10.1080/10934529.2010.513289",
+   "verified": false,
+   "quote": "Repo research/redlight/idle-emissions.json (abstract read via OpenAlex/Europe PMC): idle 2.07e4; 15 km/h 2.35e4; 30 km/h 2.60e4 #/cm3",
+   "applicability": "Tailpipe-side figure, not ambient; cannot be compared directly with kerb PN without the dilution used. Idle PN no higher than moving."
+  },
+  {
+   "id": "hanoi-co-pedestrian-2006",
+   "group": "2-motorcycle-cities",
+   "claim": "Hanoi, October 2006: CO breathed while WALKING on four busy roads averaged 8.5 ppm (GM 5.1, CV 83%, n=16 sessions); on motorbikes 18.6 ppm, in cars 18.5, in buses 11.5; roadside cafes 3.2 ppm (Giai Phong Rd) and 11.3 ppm (Pham Van Dong Rd). Rush vs non-rush walking CO differed by ~6 ppm (p=0.084). A fixed rooftop station read 1.5 ppm while travellers on that road averaged 6 ppm.",
+   "values": {
+    "walking_mean_ppm": 8.5,
+    "walking_GM_ppm": 5.1,
+    "motorbike_mean_ppm": 18.6,
+    "car_mean_ppm": 18.5,
+    "bus_mean_ppm": 11.5,
+    "all_mean_ppm": 15.7,
+    "cafe_GiaiPhong_mean_ppm": 3.2,
+    "cafe_PhamVanDong_mean_ppm": 11.3,
+    "station_rooftop_ppm": 1.5,
+    "travellers_on_that_road_ppm": 6,
+    "walking_PM10_ug_m3": 495
+   },
+   "unit": "ppm (1-s logging, session means 7-9 am and 10-12 am)",
+   "measured": "Langan T15n electrochemical CO monitor (resolution 0.055 ppm, 1-200 ppm), carried by investigators; roadside cafes monitored on two days",
+   "place_year": "Hanoi, Vietnam, October 2006 (motorcycles ~60% of trips; carburetted, pre-Euro fleet)",
+   "citation": "Saksena S, Luong PV, Quan DD, Nhat PT, Tho DT, Quang TN, Dang PN, Nguyen T, Quynh LN, Duc DH, Flachsbart P. Commuters' Exposure to Particulate Matter and Carbon Monoxide in Hanoi, Vietnam: A Pilot Study. East-West Center Working Papers, Environmental Change, Vulnerability and Governance Series No. 64, Nov 2006 (rev. Mar 2007); journal version Transportation Research Part D 13 (2008) 148-153.",
+   "url": "https://www.files.ethz.ch/isn/93173/2007_03_Commuters_Exposure.pdf",
+   "verified": true,
+   "quote": "Table 1 (CO ppm): Bus 11.5, Car 18.5, Mobike 18.6, Walking 8.5, All 15.7; Table 4: roadside cafes CO mean 3.2 (Giai Phong, n=148) and 11.3 (Pham Van Dong, n=127). Text: 「the average CO level measured while traveling was 6 ppm, while that measured by the roof-top station was much lower - 1.5 ppm」",
+   "applicability": "Upper-end anchor for motorcycle-city kerbs. Uncontrolled 2006 Hanoi fleet (carburetted 4-stroke and 2-stroke, no catalysts), traffic >80% motorbikes, pedestrians on pavement. Today's Taiwanese Euro-5 era fleet with fuel injection is much cleaner (Taiwan traffic stations fell from 0.98 to 0.54 ppm in 10 years), so treat 8.5 ppm as an upper bound for 'dense scooters, no controls', not as a Taiwan estimate. 1-min peaks inside these sessions are not reported."
+  },
+  {
+   "id": "hanoi-roadside-voc-ly2020",
+   "group": "2-motorcycle-cities",
+   "claim": "Roadside VOCs near nine Hanoi roads (winter 2014-15), motorbikes 82% of vehicles overall and 88% in rush hours: mean benzene 12.8 ppb, toluene 27.4, ethylbenzene 4.8, m,p-xylene 15.9, o-xylene 6.0 ppb; TVOC 305.1 ppb. Motorbike counts correlated strongly with ethylbenzene; COPERT5 says motorbikes give >90% of VOC.",
+   "values": {
+    "benzene_ppb": 12.8,
+    "toluene_ppb": 27.4,
+    "ethylbenzene_ppb": 4.8,
+    "mp_xylene_ppb": 15.9,
+    "o_xylene_ppb": 6.0,
+    "TVOC_ppb": 305.1,
+    "motorbike_share_pct": "82 overall, 88 rush hour",
+    "benzene_ug_m3_equiv_25C": 41
+   },
+   "unit": "ppb (canister/sample bag, GC-FID, 4 per day on weekdays)",
+   "measured": "Roadside sampling, 53 VOC species, vehicle counts",
+   "place_year": "Hanoi, Dec 2014-Jan 2015",
+   "citation": "Ly B-T, Kajii Y, Nguyen T-Y, Shoji K, Van D-A, Do T-N, Nghiem T-D, Sakamoto Y. Characteristics of roadside volatile organic compounds in an urban area dominated by gasoline vehicles, a case study in Hanoi. Chemosphere 254 (2020) 126749.",
+   "url": "https://doi.org/10.1016/j.chemosphere.2020.126749",
+   "verified": true,
+   "quote": "Abstract (via Europe PMC): 「A large share of motorbikes was found, accounted for 82% of overall for all period, and 88% in rush hours. The average TVOC concentration was 305.1 ppb; while those of BTEX were 12.8/27.4/4.8/15.9/6.0 ppb」. Abstract only; sampling duration, inlet height and distance to road not seen.",
+   "applicability": "The best motorbike-dominated roadside benzene anchor with ppb species values: ~13 ppb benzene (~41 ug/m3) as a multi-hour roadside mean when traffic is ~85% motorbikes. Old, less-controlled fleet and winter inversion; the authors note a ~2-3x decline in Hanoi BTEX 2004-2015, and Taiwan's fleet is cleaner still. Short-term kerb peaks would be higher than this mean."
+  },
+  {
+   "id": "hanoi-roadside-benzene-hourly-exceedance-phuc2018",
+   "group": "2-motorcycle-cities",
+   "claim": "Hanoi roadside hourly benzene (winter and transition 2015) exceeded the Vietnamese standard in 45% (site TC), 32% (NN) and 5% (AA) of 120-180 hourly measurements; roadside benzene about 9 +/- 4 ug/m3 quoted second-hand; BTEX 2-3x lower than in 2004.",
+   "values": {
+    "exceed_pct": {
+     "TC": 45,
+     "NN": 32,
+     "AA": 5
+    },
+    "benzene_mean_ug_m3_second_hand": "9 +/- 4"
+   },
+   "unit": "% of hours; ug/m3",
+   "measured": "Hourly roadside sampling at three Hanoi sites",
+   "place_year": "Hanoi, 2015",
+   "citation": "Phuc N H, Kim Oanh N T. Determining factors for levels of volatile organic compounds measured in different microenvironments of a heavy traffic urban area. Science of the Total Environment 627 (2018) 290-303.",
+   "url": "https://www.researchgate.net/publication/322929195_Determining_factors_for_levels_of_volatile_organic_compounds_measured_in_different_microenvironments_of_a_heavy_traffic_urban_area",
+   "verified": false,
+   "quote": "Seen only in a search-engine rendering of the abstract; the 9 +/- 4 ug/m3 value was relayed by a later paper (not opened).",
+   "applicability": "Corroborates a ~10x decline in the share of hours above standard with site; flags that Ly's 12.8 ppb and Phuc's 9 ug/m3 (~3 ppb) differ by ~10x for the same city and year, so Hanoi roadside benzene alone spans 3-13 ppb depending on site and sampler."
+  },
+  {
+   "id": "east-asia-passive-benzene-lan-binh-2012",
+   "group": "2-motorcycle-cities",
+   "claim": "Daily roadside benzene by passive samplers: Ho Chi Minh City 87 ug/m3, Hanoi 52, Kuala Lumpur 48, Singapore 6.9, Nanjing 5.6, small/medium Vietnamese cities 12-32, Kyoto/Osaka <2.3 ug/m3.",
+   "values": {
+    "HCMC_ug_m3": 87,
+    "Hanoi_ug_m3": 52,
+    "Kuala_Lumpur_ug_m3": 48,
+    "Singapore": 6.9,
+    "Nanjing": 5.6,
+    "Kyoto_Osaka": "<2.3",
+    "benzene_ppb_equiv_HCMC": 27,
+    "benzene_ppb_equiv_Hanoi": 16,
+    "benzene_ppb_equiv_KL": 15
+   },
+   "unit": "ug/m3 daily (24 h) mean",
+   "measured": "Lanwatsu, Radiello and SKC Ultra I passive samplers at roadside",
+   "place_year": "East Asia, around 2009-2011 (year not confirmed)",
+   "citation": "Lan T T N, Binh N T T. Daily roadside BTEX concentrations in East Asia measured by the Lanwatsu, Radiello and Ultra I SKS passive samplers. Science of the Total Environment 441 (2012) 248-257.",
+   "url": "https://doi.org/10.1016/j.scitotenv.2012.08.086",
+   "verified": false,
+   "quote": "Seen only via abstract excerpts in search results (publisher page returned 403 to fetch).",
+   "applicability": "Upper bound for motorcycle-city daily roadside benzene a decade or more ago (HCMC 87 ug/m3 = ~27 ppb). Daily means include night; a kerb in a red-light queue could be higher over minutes. Not a Taiwan value."
+  },
+  {
+   "id": "bangkok-roadside-btex-2022",
+   "group": "2-motorcycle-cities",
+   "claim": "Bangkok roadside BTEX (hourly, inlet 3 m high, >3 m from lanes): benzene mean 9.7 +/- 4.5 ug/m3 (urban, wet), 6.9 +/- 2.9 (urban, dry), 5.3 +/- 3.1 (suburban); P50-P95 span 4.7-16.7 ug/m3; toluene up to 51 ug/m3 (P95).",
+   "values": {
+    "benzene_ug_m3_mean": {
+     "urban_wet": 9.7,
+     "urban_dry": 6.9,
+     "suburban_dry": 5.3
+    },
+    "benzene_P50_P95_ug_m3": {
+     "urban_wet": "9.4-16.7",
+     "urban_dry": "7.1-12.2",
+     "suburban_dry": "4.7-12.7"
+    },
+    "toluene_P50_P95_urban_wet": "29.7-51.3",
+    "benzene_ppb_equiv_urban_wet": "3.0 mean, 5.2 at P95",
+    "samples": "380 hourly (Din Daeng) + 110"
+   },
+   "unit": "ug/m3 hourly",
+   "measured": "NIOSH 1501 charcoal tubes, 0.18 L/min, GC-FID, 1-h samples, both sides of road",
+   "place_year": "Bangkok (Din Daeng Rd) and Pathum Thani, June-Dec 2010",
+   "citation": "Health risk assessment of BTEX exposure at roadside and on-road traveling route in Bangkok Metropolitan Region. J. Environ. Expo. Assess. 2022 (oaepublish).",
+   "url": "https://www.oaepublish.com/articles/jeea.2022.38",
+   "verified": true,
+   "quote": "Table 3 (mean +/- SD) and Table 4 (P50-P95) as read on the open page: Din Daeng wet benzene 9.7 +/- 4.5; 「The roadside BTEX samples were collected with the air intake height at approximately 3 m above the ground.」",
+   "applicability": "Low end of what mixed traffic gives at a kerb 3+ m away at 3 m height (3-5 ppb benzene). A pedestrian at 1.5 m height beside a queue is closer and lower than this inlet, and Bangkok traffic is cars-plus-motorcycles, not scooter-dominated. Bangkok data are hourly, not red-light peaks."
+  },
+  {
+   "id": "hanoi-bc-motorcyclists-quang2021",
+   "group": "2-motorcycle-cities",
+   "claim": "Hanoi motorcyclists breathed black carbon of 29.4 ug/m3 on average (34.7 at peak traffic, 27.7 off-peak) vs 10.1 on buses; car cabins 18.1 (open windows) and 11.7 (closed). Concentrations peaked at signals and stops with idling.",
+   "values": {
+    "motorcycle_mean": 29.4,
+    "motorcycle_peak_traffic": 34.7,
+    "motorcycle_offpeak": 27.7,
+    "bus_mean": 10.1,
+    "car_open": 18.1,
+    "car_closed": 11.7
+   },
+   "unit": "ug/m3 BC (microAeth AE51)",
+   "measured": "Personal BC on motorcycles, in car and bus cabins, pilot",
+   "place_year": "Hanoi, ~2019",
+   "citation": "Quang T N, Hue N T, Dat M V, Tran L K, Phi T, Morawska L, Thai P. Motorcyclists have much higher exposure to black carbon compared to other commuters in traffic of Hanoi, Vietnam. Atmospheric Environment 245 (2021) 118029.",
+   "url": "https://doi.org/10.1016/j.atmosenv.2020.118029",
+   "verified": false,
+   "quote": "Repo research/redlight/intersection-peaks.json (hanoi-bc-motorcyclists) and search-engine rendering of the Surrey repository abstract; publisher page not opened by me.",
+   "applicability": "Rider, not pedestrian, and BC (soot), which gasoline scooters emit little of. Included because it is the only Hanoi study that links peaks to signals/stops for motorcycles."
+  },
+  {
+   "id": "hcmc-ufp-commuters",
+   "group": "2-motorcycle-cities",
+   "claim": "Ho Chi Minh City commuters: motorcyclists and cyclists were exposed to the highest UFP number concentrations, 3.6x10^5 and 3.1x10^5 particles/cm3 on average over their trips. A separate HCMC face-mask study with handheld CPC reports rush-hour roadside particle number up to ~14,000 /cm3 mean (extra values conflicting; roadside spikes >10^5 /cm3).",
+   "values": {
+    "motorcyclist_UFP_per_cm3": 360000.0,
+    "cyclist_UFP_per_cm3": 310000.0,
+    "facemask_study_rush_hour_per_cm3": "1.4e4 +/- 2.4e3 (snippet; conflicting 85 +/- 32 also seen)",
+    "spikes": ">1e5"
+   },
+   "unit": "particles/cm3",
+   "measured": "Portable UFP counter on commuter trips",
+   "place_year": "Ho Chi Minh City, ~2022-2024",
+   "citation": "Commuter exposure to ultrafine particles (UFPs), lung deposited surface area (LDSA), and noise in Ho Chi Minh City, Vietnam. Journal (ScienceDirect S2214140524001427); and Effectiveness of wearing face masks against traffic particles on the streets of Ho Chi Minh City, Vietnam, Environ. Sci.: Atmos. 2 (2022) 1450.",
+   "url": "https://www.sciencedirect.com/science/article/abs/pii/S2214140524001427",
+   "verified": false,
+   "quote": "Search-engine summaries only; both publisher pages returned 403/not reachable. See needsManualFetch.",
+   "applicability": "Only SE Asian motorcycle-city UFP numbers found: in-traffic trip means of ~3x10^5 /cm3 for riders. Rider in traffic, not pedestrian at kerb."
+  },
+  {
+   "id": "bangkok-co-commuters-and-police",
+   "group": "2-motorcycle-cities",
+   "claim": "Bangkok: motorcycle commuters exposed to CO of 12.8 ppm (17 min trips) vs 27.2 ppm for closed-window car commuters (38 min); taxi drivers 7.6 +/- 4.9 ppm in another study. Traffic police at inner-city Bangkok intersections had the highest BTEX and carbonyl personal exposure of outdoor workers (cancer risk above acceptable level); a Thai study gave benzene median 6.07 ug/m3 (0.28-9.53).",
+   "values": {
+    "motorcycle_commuter_CO_ppm": 12.8,
+    "car_closed_CO_ppm": 27.2,
+    "taxi_CO_ppm": "7.6 +/- 4.9",
+    "traffic_police_benzene_median_ug_m3": 6.07
+   },
+   "unit": "ppm; ug/m3",
+   "measured": "Personal monitoring",
+   "place_year": "Bangkok, 1990s-2016",
+   "citation": "Search-engine excerpts only: 'Assessment of the exposure of commuters in Bangkok to traffic related air pollutants' (ResearchGate 299488987); Inhalation exposure and health risk levels to BTEX and carbonyl compounds of traffic policeman working in the inner city of Bangkok, Atmos. Environ. (2016/17) S1352231016309529.",
+   "url": "https://www.sciencedirect.com/science/article/abs/pii/S1352231016309529",
+   "verified": false,
+   "quote": "Not opened (403). Figures as relayed by search summaries; the 12.8/27.2 ppm pair could not be located in any source opened.",
+   "applicability": "Weak; listed so the lead can be followed. Trip means, old fleet."
+  },
+  {
+   "id": "hcmc-intersection-co-old-report",
+   "group": "2-motorcycle-cities",
+   "claim": "Ho Chi Minh City major intersections: daily mean CO 2-10 mg/m3 (about 1.7-8.7 ppm), maximum hourly 23.3 mg/m3 (about 20 ppm).",
+   "values": {
+    "daily_mean_mg_m3": "2-10",
+    "max_hourly_mg_m3": 23.3,
+    "ppm_equiv_25C": "1.7-8.7 daily; ~20 max hourly"
+   },
+   "unit": "mg/m3",
+   "measured": "Fixed roadside monitoring, period not stated",
+   "place_year": "Ho Chi Minh City, early 2000s (report)",
+   "citation": "Air quality in Ho Chi Minh City, Viet Nam (ResearchGate 242172622) -- as quoted in a search summary.",
+   "url": "https://www.researchgate.net/publication/242172622_AIR_QUALITY_IN_HO_CHI_MINH_CITY_VIET_NAM",
+   "verified": false,
+   "quote": "Not opened. Search summary: 「Daily averages at important traffic intersections were between 2 and 10 mg/m³, with a maximum hourly value of up to 23.3 mg/m³」",
+   "applicability": "Historical upper bound for a motorbike-city intersection CO with an uncontrolled fleet; hourly, not 1-min."
+  },
+  {
+   "id": "other-asia-police-btex-co",
+   "group": "2-motorcycle-cities",
+   "claim": "Traffic-police and outdoor-worker personal exposures elsewhere: Klang Valley, Malaysia traffic police total BTEX 390 ug/m3 (PM2.5 140) vs 98 ug/m3 for office workers; Milan traffic police CO 3.5 mg/m3 (about 3 ppm), benzene 11.5 ug/m3 (median 9.6); Southern India traffic police COHb >2.5% in 76.5%, >4% in 41.2%; Navi Mumbai CO >25 ppm at signals/highways (low-quality outlet).",
+   "values": {
+    "Malaysia_police_BTEX_ug_m3": 390.12,
+    "Malaysia_office_BTEX_ug_m3": 97.64,
+    "Milan_police_CO_mg_m3": 3.51,
+    "Milan_benzene_ug_m3": 11.5,
+    "India_police_COHb_gt2.5pct": 76.5,
+    "Mumbai_signal_CO_ppm": ">25"
+   },
+   "unit": "mixed",
+   "measured": "Personal sampling, shift-long",
+   "place_year": "Various, 2008-2020",
+   "citation": "Search-engine excerpts: ResearchGate 342331827 (Klang Valley); Cattaneo et al. 2010 J. Occup. Environ. Hyg. 7(6) (Milan); ResearchGate 305923630 (S India); bohrium record (Navi Mumbai).",
+   "url": "https://www.researchgate.net/publication/342331827_BTEX_Exposure_Assessment_and_Inhalation_Health_Risks_to_Traffic_Policemen_in_the_Klang_Valley_Region_Malaysia",
+   "verified": false,
+   "quote": "None opened.",
+   "applicability": "Shift-long exposure of people who stand at junctions all day; they bound the 'worst realistic occupational' level (BTEX in the hundreds of ug/m3 in Malaysia) and show that fixed stations understate it. Not usable for a 90 s dose."
+  },
+  {
+   "id": "corpus-christi-ufp-red-vs-green",
+   "group": "3-signal-phase",
+   "claim": "UFP number at a busy signalised intersection averaged 66x10^3 /cm3 (CPC 3785) and was 3.5 times higher when traffic was idling at a red light than when moving at green. Highest on downwind side, inversely related to wind speed; HDDV flow predicted UFP better than total flow.",
+   "values": {
+    "mean_per_cm3": 66000.0,
+    "red_over_green": 3.5,
+    "traffic_per_h": "9,102 weekdays SPID + 2,795 Staples; 3.7% HDDV"
+   },
+   "unit": "particles/cm3",
+   "measured": "CPC at roadside + SMPS 7-290 nm rotated among four corners",
+   "place_year": "Corpus Christi, Texas, USA, Dec 2006-Jun 2007",
+   "citation": "Wang Y, Zhu Y, Salinas R, Ramirez D, Karnae S, John K. Roadside measurements of ultrafine particles at a busy urban intersection. J. Air & Waste Manage. Assoc. 58(11):1449-1457 (2008).",
+   "url": "https://doi.org/10.3155/1047-3289.58.11.1449",
+   "verified": true,
+   "quote": "Abstract (Europe PMC): 「The particle number concentration was 3.5 times greater when traffic was idling at a red light than moving at a green light.」 Abstract only; inlet height/distance not seen.",
+   "applicability": "Only roadside measurement found that explicitly quantifies red (idling) vs green for UFP number, but the fleet is American cars and diesel trucks, not scooters; its 'idle higher than go' result is the opposite of the pull-away peak seen in UK mobile studies, which is a reason to give wide error bars."
+  },
+  {
+   "id": "shanghai-intersection-pm-by-phase-he2020",
+   "group": "3-signal-phase",
+   "claim": "At a Shanghai signalised intersection, fixed roadside size-resolved particle counts (0.3-10 um) were measured through signal cycles; PM concentrations fell exponentially during the red phase and rose with green-phase traffic; pedestrians' mobile exposure was measured at 1.3 m height across six crosswalk journeys.",
+   "values": {
+    "measurement_height_m": 1.3,
+    "PM1_amplitude_ug_m3_during_red": "23.0-25.1 (journey comparison, text)",
+    "sizes_um": "0.3-10"
+   },
+   "unit": "ug/m3 (derived from particle counts, density 1.65 g/cm3)",
+   "measured": "Optical particle counter, fixed roadside + hand-held mobile in crosswalk",
+   "place_year": "Shanghai (Gonghe Rd/Guangzhong Rd), 2019-2020",
+   "citation": "He et al. Particulate matter exposure at a densely populated urban traffic intersection and crosswalk. Environmental Pollution (2021), preprint arXiv:2011.09286 (DOI 10.1016/j.envpol.2020.115931).",
+   "url": "https://arxiv.org/abs/2011.09286",
+   "verified": true,
+   "quote": "Sec 3 (preprint p.12): 「during the red-light period, the concentrations of all PM sizes decreased to stable values...The variation of PM in all sizes was found to decrease exponentially.」 Absolute fixed-site values are in figures, not text.",
+   "applicability": "A kerbside PM pattern across phases (decays during red once the queue has left, rises when green releases traffic): consistent with pull-away, not idling, as the particle peak. Mass-equivalent from counts, large-particle channel; no UFP and no gases."
+  },
+  {
+   "id": "xian-pedestrian-pnc-wang2021",
+   "group": "3-signal-phase",
+   "claim": "At a signalised intersection in Xi'an the mean PNC was 1.59x10^4 /cm3 at the entrance and 1.34x10^4 /cm3 at the exit; dose rates 8.10 and 7.52 ug/h.",
+   "values": {
+    "entrance_per_cm3": 15900.0,
+    "exit_per_cm3": 13400.0
+   },
+   "unit": "particles/cm3 (size range per paper, not UFP-only)",
+   "measured": "Size-fractionated PNC at intersection",
+   "place_year": "Xi'an, China, ~2020",
+   "citation": "Wang et al. Spatial distribution of the size-fractional PNC and pedestrian exposure to PM at an urban signalized intersection. Building and Environment 204 (2021) 108127.",
+   "url": "https://doi.org/10.1016/j.buildenv.2021.108127",
+   "verified": false,
+   "quote": "Search-engine excerpt of the abstract only.",
+   "applicability": "Low relevance: Chinese car-dominated junction; instrument size range uncertain."
+  },
+  {
+   "id": "uk-intersection-ufp-peaks-goel-kumar",
+   "group": "3-signal-phase",
+   "claim": "At UK signalised intersections peak particle number was up to 29 times free-flow average in a mobile diesel car with 10 Hz DMS50; PM2.5 about 16% higher near intersections; review of peaks 0.7-5.4x10^5 /cm3 at junctions vs ~0.3x10^5 background; pram-height PM up to 44% higher.",
+   "values": {
+    "peak_over_freeflow": 29,
+    "junction_peak_per_cm3": "0.7-5.4e5",
+    "background_per_cm3": "~3e4",
+    "PM2.5_excess_pct": 16,
+    "pram_height_excess_pct": "up to 44"
+   },
+   "unit": "particles/cm3; ratio",
+   "measured": "DMS50 10 Hz (5-560 nm) mobile; fixed ~1.5 m",
+   "place_year": "Guildford, UK, 2013-2019",
+   "citation": "Goel A, Kumar P (2015) Atmos. Environ. 107:374-390; Goel & Kumar (2014) Atmos. Environ. 97; Kumar & Goel (2016) Environ. Sci.: Processes Impacts 18:1220; Sharma & Kumar (2020) Environ. Int. 139:105671.",
+   "url": "https://doi.org/10.1016/j.atmosenv.2015.02.002",
+   "verified": false,
+   "quote": "Repo research/redlight/intersection-peaks.json records these as VERIFIED by an earlier agent; not re-opened by me.",
+   "applicability": "The only second-by-second signal-phase UFP data; UK diesel/gasoline car fleet. Gives an order of magnitude for number peaks (10^5 /cm3, ~10x background) at pull-away, and shows PM2.5 mass barely moves. Whether scooters give a bigger or smaller number peak is unknown."
+  },
+  {
+   "id": "pts-news-400-750-ppm-claim",
+   "group": "3-signal-phase",
+   "claim": "An undated Public Television Service (PTS) news report says an unnamed scholar's experiment found a rider breathes 400 ppm CO within 30 s at peak hours, and 750 ppm within 10 s when directly facing a tailpipe.",
+   "values": {
+    "CO_ppm": "400 (30 s at rush hour), 750 (10 s, facing tailpipe)"
+   },
+   "unit": "ppm",
+   "measured": "Not stated: no instrument, place, distance or scooter count",
+   "place_year": "Taipei report, date unclear",
+   "citation": "公視新聞網 PNN. 機車遇紅燈停 引擎廢氣恐害健康.",
+   "url": "https://news.pts.org.tw/article/106254",
+   "verified": true,
+   "quote": "「如果剛好在上下班尖峰時刻，三十秒內，騎士就會吸入濃度400ppm的一氧化碳」; 「如果還正對著排氣管，十秒內，就會感受到750ppm的高濃度」",
+   "applicability": "DO NOT USE as an anchor. It is unattributed and describes the immediate tailpipe plume (rider directly behind a pipe). It is two orders above every kerb measurement in this file. It is useful only as a reminder that near-tailpipe peak is not what a pedestrian 1-2 m aside breathes."
+  }
+ ],
+ "holes": [
+  "No measurement found of CO, benzene/BTEX or ultrafine particle number at a pedestrian waiting position beside a stationary pack of scooters at a Taiwanese (or any Asian) red light at 1-s to 1-min resolution.",
+  "IOT-113-TB006 text reports peaks but not CO or PM2.5 by signal phase; the 1-min series are in figures 3.3.2-1 to 3.3.2-11 (not digitised) and possibly in appendices of the PDF (402 pp). A per-minute red/green split and a per-minute scooter count against CO would be the most valuable extraction, requiring figure digitising or the underlying data from IOT.",
+  "The CO micro-sensor make/model, its detection limit and its calibration error at 0.5 ppm are not stated in the main text read (ITRI lab certification in Appendix 10).",
+  "Year-1 (2023) IOT intersections (4 sites incl. Taipei Chongqing N Rd/Jiuquan St, Songshan/Yongji, Zhongxiao E/Kunyang, Zhongshan N/Nanjing W) were not extracted here; they are in the (1/2) report.",
+  "MOENV hourly maximum CO by traffic station (Datong, Yonghe, Sanchong, Zhongli, Fuxing, Fengshan) and station inlet heights/distances to kerb were not in the annual report; they need the MOENV open-data API or station tables.",
+  "No Taiwanese roadside benzene by signal phase; Taiwanese roadside VOC data exist in MOENV PAMS and city EPB reports but none searched here was kerbside traffic; Taichung EPB VOC reports found were industrial/residential.",
+  "No benzene species values in the main text of Wu 2021 (Table S2 in supplement).",
+  "Nothing found for Jakarta or Kuala Lumpur kerbside CO/UFP; Indian intersection CO paper (Delhi ITO, 2011) reports only figures, no numbers in text.",
+  "Taiwanese theses on 機車停等區/待轉區 exposure not found in ndltd (site search not reachable by the search tool); only general commuter/maintenance-worker theses surfaced.",
+  "Scooter counts per red-light queue, queue length at stop line and idle duration: not found in measured form."
+ ],
+ "needsManualFetch": [
+  "https://ndltd.ncl.edu.tw/ (search 機車 待轉區 / 停等區 / 路口 暴露 CO / VOC / 超細微粒; search tool could not query it)",
+  "https://aaqr.org/articles/aaqr-23-11-bc-0295 (Taiwan Taoyuan roadside UFP and BC with motorcycle counts; HTTP 403)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S1352231020307627 (Quang 2021 Hanoi BC, 403)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S2214140524001427 (HCMC commuter UFP, 403)",
+  "https://pubs.rsc.org/en/content/articlehtml/2022/ea/d2ea00026a (HCMC face-mask / roadside UFP; HTTP 403) and https://pubs.rsc.org/en/content/articlehtml/2022/ea/d2ea00071g (Hanoi daily BC; not fetched)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S0048969712011801 (Lan & Binh 2012 passive BTEX East Asia, 403)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S1352231016309529 (Bangkok traffic police BTEX, 403)",
+  "https://www.tandfonline.com/doi/abs/10.3155/1047-3289.58.11.1449 (Wang 2008 UFP intersection, full text for inlet height; 403)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S0045653520309425 (Ly 2020 Hanoi VOC full text, 403; abstract read via Europe PMC)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S1352231023004806 (Taipei roadside UFP VT-DMA-APM, near an intersection with motorcycles)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S0304389421031587 (New Taipei intersection LDSA/PNC, motorcycle-dominated)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S1361920908000084 (Hanoi commuters CO journal version, TRD 2008; working-paper PDF was read)",
+  "https://www.tldep.gov.taipei/Public/DownLoad/AnnualReport/112.pdf (Taipei City annual report, to confirm traffic-station CO and get hourly maxima)",
+  "https://data.moenv.gov.tw/ (MOENV open-data API, needs key, for hourly CO at the six traffic stations)",
+  "https://www.iot.gov.tw/ (IOT year-1 report IOT-112 (1/2) for the 2023 intersections; IOT-113-TB006 itself was opened in full)",
+  "Note: one attempt at an RSC page was refused by the permission classifier after a 403; I did not retry with altered headers."
+ ]
+}

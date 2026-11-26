@@ -126,7 +126,7 @@ test('"up to" amounts stay ceilings: Taoyuan widens the net-price range and says
 });
 
 test('unknown subclass: a green-plate model of unknown level gets 5,100 and the 1,900 difference is reported', () => {
-  const e = evaluate(situation({ electricModel: 'ionex-coolone', energyPlan: 'ionex-318-single' }));
+  const e = evaluate(situation({ electricModel: 'ionex-ione-air', energyPlan: 'ionex-318-single' }));
   assert.equal(line(e, 'moea-new-5100'), 5100);
   assert.ok(e.messages.some((m) => m.code === 'ambiguity' && m.amount === 1900));
 });

@@ -27,7 +27,7 @@
 
 import { econData } from '../../data/econ/index.ts';
 import type { EconDataset } from '../../data/econ/types.ts';
-import { bestOptions as rank, evaluate as run, validateSituation as validate } from './evaluate.ts';
+import { bestOptions as rank, bestOptionsInSlices as rankInSlices, changeDates as changes, evaluate as run, validateSituation as validate } from './evaluate.ts';
 import type { BestOptions, Evaluation, InputIssue, Situation } from './types.ts';
 
 export * from './types.ts';
@@ -36,7 +36,8 @@ export { reasonText, ui as calcText, horizonText, daysLeftText } from './text.ts
 export { purchaseLedger, select, programmeDeadline, promoDeadline } from './purchase.ts';
 export { electricRunning, gasolineRunning, evEnergy, gasFuel, maintenanceMonthly } from './running.ts';
 export { breakEven, cumulative, scanInterval, scanIntervals } from './compare.ts';
-export { breakEvenPhrase, DEFAULT_OFF_WINDOW_SHARE, SMALL_QUOTA, STALE_AFTER_DAYS } from './evaluate.ts';
+export { clearParityCache } from './parity.ts';
+export { boundaryDates, breakEvenPhrase, rankingPairs, DEFAULT_OFF_WINDOW_SHARE, SMALL_QUOTA, STALE_AFTER_DAYS } from './evaluate.ts';
 export { todayInTaiwan, taiwanDate, evaluationDate, isCalendarDate, daysBetween, cmp as compareDates } from './dates.ts';
 
 /** Evaluate one situation end to end. */
@@ -52,6 +53,27 @@ export function validateSituation(situation: Partial<Situation>, data: EconDatas
 /** Rank every available electric model and plan by net price and by total cost at the horizon. */
 export function bestOptions(situation: Omit<Situation, 'electricModel' | 'energyPlan'>, data: EconDataset = econData): BestOptions {
   return rank(situation, data);
+}
+
+/**
+ * bestOptions in slices that yield to the browser between them (same result), so a page can rank
+ * every option without freezing input. Or run the engine in a worker: see ./worker.ts.
+ */
+export function bestOptionsInSlices(
+  situation: Omit<Situation, 'electricModel' | 'energyPlan'>,
+  data: EconDataset = econData,
+  opts: { batch?: number; pause?: () => Promise<void>; signal?: AbortSignal } = {},
+): Promise<BestOptions> {
+  return rankInSlices(situation, data, opts);
+}
+
+/**
+ * The later dates on which this situation's result changes (a local programme closing on
+ * 30 November, the 2026 programmes ending on 31 December, an offer or credit ending...), each
+ * with its evaluation, so a page built today can show the variant that is true on the reader's day.
+ */
+export function changeDates(situation: Situation, data: EconDataset = econData, until?: string): { date: string; evaluation: Evaluation }[] {
+  return changes(situation, data, until);
 }
 
 /** Models, plans and jurisdictions available to the calculator (for building pickers). */

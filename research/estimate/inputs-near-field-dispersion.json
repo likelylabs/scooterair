@@ -1,0 +1,416 @@
+{
+ "key": "near-field-dispersion",
+ "checkedOn": "2026-11-26",
+ "target": "Dilution of exhaust from stationary idling vehicles over 0.5-5 m at low wind and 0.5-1.5 m height",
+ "summary": "No source measured concentration versus distance beside an idling vehicle with documented wind; the only idle field study located (Ding et al. 2023) was blocked. What exists: (1) the regulatory CAL3QHC treats an idling queue as a lane-width area with no wake mixing and is validated for 1 h means and wind >= 1 m/s only (NYC, maxima within about -30% to 0%); (2) per-vehicle tailpipe dilution of about 6,000 at 3 m for moving cars (Toronto); (3) kerb NO2 gradients showing only 5-15% higher at 0.8 m than 2 m within about 1.2 m of kerb, with decay strongly wind dependent; (4) Taiwanese data: CWA mean wind 1991-2020 Taipei 2.6, Taichung 1.5, Kaohsiung 2.1 m/s; IOT July 2024 on-site wind 0.4-3.6 m/s; IOT GRAL used 0.5 m sources, 1.5 m receptors, 2 m grid, with idle emissions over-estimated and only moderate skill. Our own arithmetic (box model) gives kerb CO of about 1-6 ppm (up to ~13 ppm in calm) from eight idling scooters at 0.5-1 m/s, an implied dilution of roughly 1,300-3,600, consistent with IOT hourly kerb CO of 0.5-1.3 ppm.",
+ "findings": [
+  {
+   "id": "cal3qhc-queue-link-formulation",
+   "claim": "CAL3QHC (the US regulatory screening model for idling queues at signalised intersections) represents an idling queue as a straight link whose width is the lane width only, with NO added mixing zone, because stationary vehicles produce no wake; moving free-flow links get +3 m each side. Queued vehicles are assumed to idle for exactly the red phase, with idle emission entered in g per vehicle-hour.",
+   "values": {
+    "queue_link_width": "travelled lanes only, 10-12 ft (3-4 m) per lane",
+    "free_flow_link_mixing_zone": "lanes + 3 m (10 ft) each side",
+    "idle_emission_input_unit": "g/veh-hr (example 735 g/veh-hr CO, MOBILE4.1)",
+    "queue_idle_duration": "= red phase duration",
+    "default_receptor_height_m": 1.8,
+    "dispersion_engine": "CALINE-3 Gaussian line source"
+   },
+   "measured": "Model documentation, not a measurement. Formulation of the US EPA regulatory screening model for CO at signalised intersections.",
+   "place_year": "USA; guide revised 1995 (model 1992)",
+   "citation": "U.S. EPA (1995). User's Guide to CAL3QHC Version 2.0: A Modeling Methodology for Predicting Pollutant Concentrations Near Roadway Intersections. EPA-454/R-92-006 (Revised), Sept 1995 (copy hosted by Weblakes; PDF titled CAL3QHCD.PDF).",
+   "url": "https://www.weblakes.com/products/calroads/resources/docs/CAL3QHC.pdf",
+   "verified": true,
+   "quote": "'Link width is determined by the width of the travelled roadway only (width of the lanes on which vehicles are idling). Three meters are not added on each side since vehicles are not moving and no wake is generated.' and 'Since CAL3QHC assumes that the queued vehicles idle only for the duration of the red phase ...' and 'receptors are entered at an assumed breathing height of 1.8 meters.' (Sections 3.2.2, 3.2.3, 3.4.1)",
+   "notes": "Applicability: gives the standard regulatory treatment but with US car idle factors (g/veh-hr) and 1.8 m adult receptors; a scooter stop box 2.5-6 m deep and ~3 m/lane fits the 'lane width only' queue link. Key physical point: an idling queue has no wake mixing, so initial dilution comes only from ambient wind, exhaust jet/buoyancy and traffic movement in adjacent lanes. CALINE-3 requires the receptor to be OUTSIDE the mixing zone (link width), so a pedestrian standing within about 1 m of a queued scooter is at or inside the model's near-field limit."
+  },
+  {
+   "id": "cal3qhc-limits-wind-and-mixing",
+   "claim": "CAL3QHC/CALINE-3 has not been validated for wind speeds below 1 m/s, and receptors must be outside the link (mixing-zone) width; where buildings are closer than 3 m and traffic is very slow a reduced mixing zone is suggested. Regulatory default meteorology is 1 m/s, stability D, sigma-theta 25 deg, worst-case wind angle.",
+   "values": {
+    "min_validated_wind_speed_m_s": 1.0,
+    "default_wind_m_s": 1.0,
+    "default_stability": "D",
+    "default_sigma_theta_deg": 25,
+    "surface_roughness_range_cm": "3 to 400",
+    "link_height_limit_m": "+/-10"
+   },
+   "measured": "Model use limits, from the user's guide.",
+   "place_year": "USA, 1995",
+   "citation": "U.S. EPA (1995). User's Guide to CAL3QHC Version 2.0: A Modeling Methodology for Predicting Pollutant Concentrations Near Roadway Intersections. EPA-454/R-92-006 (Revised), Sept 1995 (copy hosted by Weblakes; PDF titled CAL3QHCD.PDF).",
+   "url": "https://www.weblakes.com/products/calroads/resources/docs/CAL3QHC.pdf",
+   "verified": true,
+   "quote": "'Wind speed should be at least 1 m/s. (CALINE-3 has not been validated for wind speeds below 1 m/s).' 'Receptors should always be located outside of the mixing zone (link width) of the free flow and queue links.' 'The regulatory default meteorological conditions are defined as: Wind Speed = 1 m/s; Stability Class = D; Sigma-Theta = 25 degrees ...' (Sections 4.x and 6.4.1)",
+   "notes": "Applicability: central problem for Taiwan. CWA station means (1.5-2.6 m/s) and kerb-level speeds are often at or below 1 m/s, i.e. at or below the lower edge of where the standard model is validated. The model's 1 m/s default is a worst-case screening value, so it is a defensible LOW-wind anchor for a 'bad-day' estimate but not a typical-day value."
+  },
+  {
+   "id": "cal3qhc-validation-nyc",
+   "claim": "Published validation of CAL3QHC: US EPA evaluated 8 intersection models against 3 months of CO monitoring at 6 New York City intersections (Route 9A study, 1989-90). CAL3QHC was best of the three EPA models. With regulatory default meteorology (1 m/s) its maximum predictions, unpaired in time and space, matched the top observed hourly CO closely at two sites and underpredicted at one.",
+   "values": {
+    "site1_observed_ppm": 10.6,
+    "site1_predicted_ppm": 10.4,
+    "site2_observed_ppm": 11.5,
+    "site2_predicted_ppm": 8.0,
+    "site5_observed_ppm": 15.5,
+    "site5_predicted_ppm": 15.1,
+    "averaging_time": "1 hour",
+    "roughness_length_m": "3.21 (0.03 where flow over river)",
+    "met_height_m": "10 +/- 1",
+    "screening_threshold_ppm": 0.5,
+    "typical_error_summary": "within about -30% to -4% at the three sites for maxima (our arithmetic: 8.0/11.5 = 0.70; 10.4/10.6 = 0.98; 15.1/15.5 = 0.97)"
+   },
+   "measured": "Hourly-average CO at roadside monitors (background subtracted) at urban intersections in Manhattan, top-50/top-25 CO hours per month, with video traffic counts.",
+   "place_year": "New York City, 1989-1990 data; evaluation published 1992/1995",
+   "citation": "U.S. EPA (1995). User's Guide to CAL3QHC Version 2.0: A Modeling Methodology for Predicting Pollutant Concentrations Near Roadway Intersections. EPA-454/R-92-006 (Revised), Sept 1995 (copy hosted by Weblakes; PDF titled CAL3QHCD.PDF). Chapter 6 'Model Validation', Table 6.",
+   "url": "https://www.weblakes.com/products/calroads/resources/docs/CAL3QHC.pdf",
+   "verified": true,
+   "quote": "'At Site #1, the highest observed CO concentration of 10.6 ppm is nearly matched (10.4 ppm) by CAL3QHC unpaired in time or space. At Site #2, the maximum predicted concentration by CAL3QHC of 8.0 ppm underpredicts the maximum observed concentration of 11.5 ppm. ... at Site #5, the maximum observed concentration of 15.5 ppm is nearly matched by CAL3QHC which predicts 15.1 ppm.'",
+   "notes": "Applicability: validation is for ONE-HOUR average CO from cars at monitors a few metres to tens of metres from the road, with a peak-hours selection. It does not validate 90-second concentrations, 1-3 m receptor distances, scooters, or wind below 1 m/s. Gives a reasonable uncertainty band for a well-specified emission input: roughly -30% to +0% on maxima, but pairwise (time-matched) skill was much worse (the guide uses a bootstrap scoring scheme; not extracted)."
+  },
+  {
+   "id": "ospm-formulation-direct-plume",
+   "claim": "OSPM (Danish street-canyon model) computes the direct (non-recirculated) contribution at the pavement receptor by integrating a crosswind-integrated plume along the street-level wind path: dC_dir/dx = sqrt(2/pi) * Q / (W * sigma_w) * 1/(x + u_street*h0/sigma_w), i.e. vertical plume width grows linearly with distance, starting from an initial height h0 in the wake of a car; sigma_w combines street-level wind and traffic-produced turbulence (TPT).",
+   "values": {
+    "h0_initial_dispersion_m": "2 to 4 (depends on wind speed) per Aarhus University OSPM description",
+    "plume_growth": "linear with distance",
+    "street_wind_reduction_factor_fred": "1 for u_street > 2 m/s; sqrt(0.5*u_street) for u_street < 2 m/s (applied to cos(2*fred*theta))",
+    "recirculation_zone_length": "2 x upwind building height (shortened below 2 m/s roof wind)"
+   },
+   "measured": "Model formulation; evaluated by many European street stations (Ketzel et al. 2012, 12 stations, cited but not opened).",
+   "place_year": "Denmark; model Hertel & Berkowicz 1989, Berkowicz 2000; formulation as printed 2015",
+   "citation": "Ottosen T-B, Kakosimos KE, Johansson C, Hertel O, Brandt J, Skov H, Berkowicz R, Ellermann T, Jensen SS, Ketzel M (2015). Analysis of the impact of inhomogeneous emissions in the Operational Street Pollution Model (OSPM). Geosci. Model Dev. 8, 3231-3245. doi:10.5194/gmd-8-3231-2015. And Aarhus University, OSPM description page.",
+   "url": "https://gmd.copernicus.org/articles/8/3231/2015/gmd-8-3231-2015.pdf ; https://envs.au.dk/en/gammelt-indhold/xxtil-gammelt-indhold/knowledge/air/models/ospm/ospm-description",
+   "verified": true,
+   "quote": "GMD paper Eq. (3) (as read from the PDF text layer, layout partly garbled): dCdir/dx = sqrt(2/pi) * Q/(W*sigma_w) * 1/(x + u_street*h0/sigma_w) integrated from x_start to x_end; text: 'h0 is the height of the plume in the wake of a car (usually termed the initial dispersion)... u_street is the street level wind speed; and sigma_w is the vertical turbulence flux calculated as a function of the street level wind speed and the traffic produced turbulence.' Aarhus page: 'ho = 2~4 m (depends on wind speed)'; 'The vertical dispersion is modelled assuming a linear growth of the plume with the distance from the source.' (The sigma_w parameterisation constants are NOT in either source.)",
+   "notes": "Applicability: indicates practitioners start the plume at 2-4 m height (the wake of a moving car) which is a poor description of a stationary scooter exhaust 0.5 m above the road; for a receptor at 1.5 m (below h0) OSPM gives x_start = 0 and the concentration is set by Q/(W*sigma_w), i.e. effectively a well-mixed layer with ventilation velocity sigma_w. Typical sigma_w with traffic turbulence is of order 0.1-0.5 m/s (our reading of the literature; constants not verified). OSPM is a canyon model, not for kerb receptors at crossings."
+  },
+  {
+   "id": "ospm-not-for-crossings-low-wind",
+   "claim": "OSPM's own documentation states it should not be used for crossings or for locations far from the traffic lanes; in windless conditions the only dispersion mechanism is traffic-produced turbulence; for calm conditions the wind averaging sector approaches 360 degrees.",
+   "values": {
+    "qualitative": "not valid at junctions/crossings; calm limit = traffic-produced turbulence only"
+   },
+   "measured": "Model documentation.",
+   "place_year": "Aarhus University, undated web page (archived section)",
+   "citation": "Aarhus University, Department of Environmental Science: OSPM description (archived).",
+   "url": "https://envs.au.dk/en/gammelt-indhold/xxtil-gammelt-indhold/knowledge/air/models/ospm/ospm-description",
+   "verified": true,
+   "quote": "'During windless conditions the ambient turbulence vanishes and the only dispersion mechanism is due to the TPT.' 'should not be used for crossings or for locations far away from the traffic lanes.' 'For roof-level wind speeds below 2 m/s, the length of the vortex decreases linearly with the wind speed.'",
+   "notes": "Applicability: OSPM is the wrong tool for a kerb at a signalised crossing, which is why we do not use it to produce a number; it is cited to show the low-wind limit is governed by traffic turbulence, and that idling scooters (no motion) lose that term."
+  },
+  {
+   "id": "robins-2002-ventilation-velocity",
+   "claim": "Wind-tunnel study of a two-street intersection: air and pollutant exchange between streets is the norm, not the exception; street-canyon box models need an entrainment (ventilation) velocity U_E; the authors estimate U_E/U of order 0.1 (U = undisturbed wind at building height H) and a concentration decay length of about 5H in a lateral street; concentrations were normalised as C U H^2/Q (point source).",
+   "values": {
+    "entrainment_velocity_ratio_UE_over_U": "about 0.1 (author's estimate)",
+    "decay_length_in_lateral_street": "about 5 H",
+    "normalisation": "C*U*H^2/Q (point source), C*U*H/q (line source)",
+    "receptor_height_z_over_H": 0.16,
+    "model_scale": "H = 125 mm blocks, street width = H"
+   },
+   "measured": "Wind-tunnel point-source tracer at ground level in a simple urban intersection (two perpendicular streets of 4 blocks of height H, 6H x 4H blocks).",
+   "place_year": "Wind tunnel, University of Surrey, UK; published 2002",
+   "citation": "Robins A, Savory E, Scaperdas A, Grigoriadis D (2002). Spatial variability and source-receptor relations at a street intersection. Water, Air and Soil Pollution: Focus 2, 381-393.",
+   "url": "https://www.eng.uwo.ca/people/esavory/sourcereceptor.pdf",
+   "verified": true,
+   "quote": "'The entrainment velocity ratio, UE/U, is likely to be of order 0.1 so that in this case the decay length scale for concentrations in the lateral street is of order L approx 5 H. The standard local equilibrium result for a street canyon: C = q/UE W'.",
+   "notes": "Applicability: a box model with ventilation velocity U_E ~ 0.1 U gives, for a street of width W, C = q/(U_E W). With a 10 m/s roof-level flow that is 1 m/s, but with 2.6 m/s CWA wind it is 0.26 m/s: this is the 'whole-street' limit and is much larger than a kerb-scale value, so use only as an upper bound. It also shows low normalised dilution persists to several street widths from the source."
+  },
+  {
+   "id": "wang-2015-tailpipe-to-3m-dilution",
+   "claim": "Roadside CO2-based plume analysis beside a four-lane arterial with signals: individual-vehicle exhaust plumes were diluted about 6,000-fold between the tailpipe and 3 m, and about 10,000-fold by 15 m (assuming 14% CO2 at the tailpipe). Mean plume excess CO2 at the 15 m inlet was 10 ppmv (range 3-330 ppmv) and mean dilution ratio 15,500 (range 424-49,970).",
+   "values": {
+    "dilution_tailpipe_to_3m": "approx 6,000 (mean)",
+    "dilution_tailpipe_to_15m": "approx 10,000 (supplement) / 15,500 mean, 14,000 median, range 424-49,970 (main text)",
+    "assumed_tailpipe_CO2_ppmv": 140000,
+    "mean_plume_excess_CO2_15m_ppmv": 10,
+    "max_plume_excess_CO2_ppmv": 330
+   },
+   "measured": "1 Hz CO2 with particle number and VOCs at 3 m and 15 m from the road edge, plume-by-plume (individual passing vehicles), north side of a 4-lane arterial with traffic lights nearby, mixed cruising/idle/acceleration, speeds up to 50 km/h.",
+   "place_year": "Toronto, Canada (SOCAAR site), four campaigns Nov 2013-Sep 2014; published 2015",
+   "citation": "Wang JM, Jeong C-H, Zimmerman N, Healy RM, Wang DK, Ke F, Evans GJ (2015). Plume-based analysis of vehicle fleet air pollutant emissions and the contribution from high emitters. Atmos. Meas. Tech. 8, 3263-3275. doi:10.5194/amt-8-3263-2015; Supplement.",
+   "url": "https://amt.copernicus.org/articles/8/3263/2015/amt-8-3263-2015.pdf ; https://amt.copernicus.org/articles/8/3263/2015/amt-8-3263-2015-supplement.pdf",
+   "verified": true,
+   "quote": "Supplement: 'Assuming the same output of CO2, based on the average amount of CO2 measured in plumes, the mean dilution ratios from tailpipe to 3 m and 15 m were approximately 6000 and 10000 respectively.' Main text: 'the dilution ratio calculated by assuming 140 000 ppmv (14 %) tailpipe emission of CO2 was 15 500 and 14 000 (424-49 970).'",
+   "notes": "Applicability: gives a per-vehicle dilution of the order 10^3.5-10^4.5 at 3 m for MOVING cars with air entrained by the vehicle wake. A stationary scooter has no wake, so expect lower dilution at the same distance (see our box-model finding, 1,300-3,600). Also plume-by-plume (conditioned on a plume being detected) rather than a time-average. Scooter CO2 at tailpipe about 10.8% (Yilan data) not 14%, a ~25% scale difference."
+  },
+  {
+   "id": "buzzard-2009-drive-by-near-vehicle",
+   "claim": "Mannequin-mouth measurements 0.75 m horizontally from a passing diesel pickup (0.5 m from the kerb): mean plume PM during hard acceleration was 125 ug/m3 (adult mouth 1.65 m) and 199 ug/m3 (stroller 0.85 m), lasting about 5 and 13 s, with 1.5-s peaks of 613 and 1,114 ug/m3. Wind speed was NOT measured. The paper also quotes dilution values from other work: wind-tunnel dilution ratios of 75-125 at 8.5 m downstream of the tailpipe and a chase study that observed dilution as large as 1,000:1 in two seconds at freeway speed.",
+   "values": {
+    "mean_PM_adult_ug_m3": 124.97,
+    "mean_PM_stroller_ug_m3": 199.16,
+    "incident_duration_s": "5.1 (adult), 12.67 (stroller)",
+    "peak_1p5s_ug_m3": "613 (adult), 1114 (stroller)",
+    "stroller_to_adult_ratio": "about 1.6 (mean), 1.8 (peak)",
+    "wind_tunnel_dilution_8p5m": "75-125 (cited from other work, secondary)",
+    "chase_dilution": "up to 1000:1 in 2 s (cited from other work, secondary)",
+    "probe_heights_m": "1.65 (adult mouth), 0.85 (stroller)"
+   },
+   "measured": "Diesel pickup (tailpipe discharging toward sidewalk) drive-by at 5 mph rolling start/25 mph, PM by DMS500 at mannequin mouth beside a two-lane road, August 2007.",
+   "place_year": "Morgantown, West Virginia, USA, 2007; published 2009",
+   "citation": "Buzzard NA, Clark NN, Guffey SE (2009). Investigation into pedestrian exposure to near-vehicle exhaust emissions. Environmental Health 8:13. doi:10.1186/1476-069X-8-13",
+   "url": "https://ehjournal.biomedcentral.com/track/pdf/10.1186/1476-069X-8-13",
+   "verified": true,
+   "quote": "'Wind tunnel studies [16,17] show that ... dilution ratios can range from 75 to 125 at a distance of 8.5 meters downstream of the tailpipe. ... a vehicle chase study [18] observed actual dilution ratios as large as 1,000:1 in two seconds.' 'Wind speed data were not obtained.' 'The average particulate concentrations measured throughout the full load acceleration tests were 124.97 and 199.16 ug/m3 for the adult pedestrian and child in stroller scenarios'",
+   "notes": "Applicability: diesel, moving, tailpipe aimed at the sidewalk: a worst case for near-field plume, not a petrol scooter idling. The two secondary dilution figures are useful only as a bracket: at 8.5 m behind a moving tailpipe, dilution ~100 (wind tunnel), versus ~6,000 at 3 m in the field (Wang 2015); the large spread (factor 60) illustrates why the near-field dilution of an individual exhaust is not a single number. The stroller/adult factor of 1.6-1.8 is for a pipe aimed at the kerb."
+  },
+  {
+   "id": "kenagy-2016-vertical-and-horizontal-profile-kerb",
+   "claim": "Passive-tube NO2 at 0.8 m vs 2.0 m height beside busy Edinburgh roads: concentration at 0.8 m was 5.2 ug/m3 (8.7%, SD 11.9%) higher than at 2.0 m within 5 m of the kerb (n=84, p=8e-12), but showed no significant difference beyond 2.5 m from the kerb; a 5-15% difference persisted out to 1.2 m. Horizontal decay away from the road was strongly wind dependent: decay constant 0.02-0.4 per m, correlated with wind speed (r = 0.98 at 2.0 m, 0.85 at 0.8 m); roadside concentrations were on average 3.3x (2.0 m) and 3.7x (0.8 m) background.",
+   "values": {
+    "vertical_difference_0p8_vs_2p0_within_5m_pct": "+8.7 (SD 11.9); 5-15 by distance class",
+    "vertical_difference_beyond_2p5m": "not significant (+2.0%, p=0.077 for >5 m)",
+    "at_0p4_0p5m_from_kerb_pct": "+14.4 and +14.8",
+    "at_1p2m_pct": "+11.6",
+    "horizontal_decay_constant_per_m": "0.02-0.4 (range with wind 0.76-3.27 m/s)",
+    "avg_wind_during_transects_m_s": "0.76, 1.26, 2.25, 2.83, 3.27",
+    "roadside_to_background_ratio": "3.3 (2.0 m), 3.7 (0.8 m)",
+    "distance_to_background_low_wind_m": "100-150 at 0.76 and 1.26 m/s"
+   },
+   "measured": "NO2 (Palmes tubes, 1-week exposure, duplicates) at two heights at 142 locations along kerbs and transects, Edinburgh busy roads (AADT ~13,000) 0.4-1.2 m from kerb, Jul-Nov 2014; wind from a met station.",
+   "place_year": "Edinburgh, UK, 2014; published 2016",
+   "citation": "Kenagy HS, Lin C, Wu H, Heal MR (2016). Greater nitrogen dioxide concentrations at child versus adult breathing heights close to urban main road kerbside. Air Qual. Atmos. Health 9:589-595. doi:10.1007/s11869-015-0370-3",
+   "url": "https://link.springer.com/content/pdf/10.1007/s11869-015-0370-3.pdf",
+   "verified": true,
+   "quote": "'tubes at 0.8 m measuring concentrations 5-15% (a few ug/m3) greater than at 2.0 m. The vertical NO2 concentration difference was not observable at distances 2.5 m or greater from the kerbside.' 'The decay constant varied between 0.02 and 0.4 m-1 at 2.0 m above the ground ... and was also strongly correlated with wind speed (r = 0.98 and 0.85)'. Table 1.",
+   "notes": "Applicability: NO2 (reactive, weekly mean, mixed traffic ~13,000/day) is a proxy for the vertical gradient of an inert primary pollutant in the first 2 m: at kerb scale the gradient is modest (about +5 to +15% at child height vs adult height), so a single concentration for 0.5-1.5 m is defensible with a +/-15% vertical factor. Its horizontal decay constants (0.02-0.4 /m) are for a whole-road line source with distances of tens of metres, not for 0.5-5 m from a point-like queue; at 0.4 /m the e-folding distance is 2.5 m, at 0.02 /m it is 50 m."
+  },
+  {
+   "id": "ding-2023-idling-field-study-abstract",
+   "claim": "The only field study found that measures concentrations a few metres from the tailpipe of a vehicle held at idle: accelerator controlled to simulate idling and acceleration from a stop; the authors state that a dispersion model must include exhaust buoyancy and enhanced horizontal spreading to match the measured concentrations at a breathing height of 1.2 m, and that people a few metres from an idling vehicle are likely to be exposed to levels of concern.",
+   "values": {
+    "receptor_height_m": 1.2,
+    "distance_range": "a few metres from tailpipe (exact distances and ratios NOT read)",
+    "qualitative_result": "buoyancy and enhanced horizontal spreading needed; exposure of concern at a few metres",
+    "from_search_summary_unverified": "concentrations dropped off rapidly with distance and reached background within about 3 m (CO2 tracer; engine at idle and 3000 rpm)"
+   },
+   "measured": "CO2 (tracer) concentration data at distances of a few metres from a car tailpipe, idle versus acceleration from stop.",
+   "place_year": "Ding, Zhao, Luo, Wu, Venkatram; SSRN preprint 2022 and Atmospheric Pollution Research 2023 (venue and location not confirmed)",
+   "citation": "Ding Y-F, Zhao Y, Luo Z, Wu Y, Venkatram A (2023). Field study to estimate exposure to vehicle exhaust during idling and starting. Atmospheric Pollution Research. doi:10.1016/j.apr.2022.101632 (preprint doi:10.2139/ssrn.4063435)",
+   "url": "https://doi.org/10.1016/j.apr.2022.101632",
+   "verified": false,
+   "quote": "Abstract via Crossref metadata (opened): 'We report on a field study designed to collect concentration data at distances of a few meters from the tailpipe of a vehicle: the accelerator pedal was controlled to simulate idling and acceleration from a stop. Analysis of the data using a dispersion model indicates that it is necessary to include exhaust buoyancy and enhanced horizontal spreading to describe the measured concentrations at a breathing height of 1.2 m.' Full text blocked (403); numbers not seen.",
+   "notes": "HIGHEST-VALUE source to fetch by hand: it is the closest thing to the ask (idle, a few metres, breathing height). Marked verified=false because only the abstract was opened. Applicability: car not scooter; buoyancy implies a hot idle plume lifts and widens, which can lower breathing-height concentrations at a few metres relative to a passive-plume model."
+  },
+  {
+   "id": "iot-2025-gral-setup-and-validation",
+   "claim": "Taiwan MOTC Institute of Transportation (IOT) study used GRAL (2 m grid, 1.5 m receptor layer) with emission sources at 0.5 m height, red-light idling emission taken from the TEDS 12.0 emission factor for 5 km/h, wind input from the nearest CWA station (one value per hour) and Pasquill-Gifford stability from solar radiation. Simulation skill versus on-site sensors was only moderate and the interim review found that the 5 km/h idle factor over-estimated emissions.",
+   "values": {
+    "emission_source_height_m": 0.5,
+    "receptor_height_m": 1.5,
+    "vertical_layers_m": "1.5, 2, 3, 5, 10, 30, 60",
+    "horizontal_grid_m": 2,
+    "idle_emission_basis": "TEDS 12.0 factor at 5 km/h (no idle factor published)",
+    "sources_per_intersection": "28-36 (7 movements x 4 approaches incl. two-stage turn box waiting)",
+    "met_input": "CWA station hourly wind, anemometer height 10 m (report recommends 10 m or above the highest vehicle for site anemometers)",
+    "GRAL_known_issue": "overestimates when wind < 0.5 m/s (cited from Taiwanese community study, r2 = 0.79); GRAL run excluding winds < 1 m/s gave good NOx agreement on a motorway",
+    "pass_criteria": "daily correlation r >= 0.5 (PM2.5) and >= 0.45 (CO), MFB within +/-35%, MFE <= 55%",
+    "outcome": "all 10 intersections had at least one monitor passing r on >= 2 of 4 days; individual daily r ranged about -0.7 to +0.98; MFB/MFE criteria were NOT met in the interim review"
+   },
+   "measured": "Model set-up and performance, 10 intersections in Taipei, New Taipei, Kaohsiung, July 2024 (CO and PM2.5 micro-sensors at waiting zone 1.0-1.5 m beside the crosswalk, inlet 1.2-1.5 m high).",
+   "place_year": "Taiwan, field work July 2024; report Dec 2025",
+   "citation": "Hung P-Y (PI) et al., MOTC Institute of Transportation (2025). 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2)--資料分析與指引研訂 [Studies on the effect of intersection traffic environment on air quality and improvement guidelines (2/2)]. IOT-113-TB006, 114-084-6228.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "Ch. 4.2.2: '高度參考汽車、機車排氣管的離地高度設定為 0.5m。' '紅燈怠速：...怠速模式使用車速為 5km/hr 之排放係數進行換算。' '濃度層垂直尺度為本計畫設定之用路人口鼻高度 1.5 公尺' '水平解析度設定為 2 公尺'. Review table: '考量目前空氣污染排放清冊(TEDS 12.0版)中無公告車輛停止(怠速)狀態的排放係數，本團隊初始規劃以 5 km/hr 排放係數進行設定，惟期中階段完成之各路口模擬結果顯示有高估排放量問題'. Ch.4.1: '在不考慮風速小於 1.0 m/s 情況下...' and '(但在風速小於 0.5 m/s條件下容易有高估的情況發生)'. Table 4.3.1-1 (correlations).",
+   "notes": "Applicability: this is the Taiwanese precedent for exactly the kerb problem and it used GRAL at 2 m resolution, so any dispersion factor we publish should be consistent with it (a 2 m grid cannot resolve the first 0-2 m from a scooter). It reports no standalone dilution factor or concentration per unit emission. The report's own finding that skill is moderate and idle emissions over-estimated is an argument to publish our estimate as a range with a factor-of-~3 uncertainty."
+  },
+  {
+   "id": "iot-2025-field-wind-speeds",
+   "claim": "On-site wind speed during the IOT intersection surveys (July 2024, 4 days per site) ranged 0.4-3.6 m/s across 10 Taiwanese intersections; site-wise ranges: Taipei Songshan Rd/Yongji Rd 0.6-1.3, Taipei Zhongxiao E. Rd/Kunyang St 0.4-1.6, Taipei Zhongshan N. Rd/Nanjing W. Rd 1.7-2.5, Taipei Chongqing N. Rd/Jiuquan St 1.6-3.6, New Taipei Xianmin Blvd/Minquan Rd 1.0-1.3, Kaohsiung Gaotie Rd/Zhongxin Rd 2-3, Kaohsiung Minzu 2nd Rd/Qixian 1st Rd 1.7-3.3, Kaohsiung Minzu 1st Rd/Mingcheng 1st Rd 1.7-2.7, Kaohsiung Bo'ai 2nd Rd/Mingcheng 2nd Rd 1.4-2.8, Kaohsiung Minzu 2nd Rd/Zhongzheng 2nd Rd 1.4-1.9.",
+   "values": {
+    "overall_range_m_s": "0.4 to 3.6",
+    "low_wind_sites_m_s": "0.4-1.6 (Zhongxiao-Kunyang), 0.6-1.3 (Songshan-Yongji), 1.0-1.3 (Xianmin-Minquan)",
+    "example_daily_values_m_s": "Zhongxiao E./Kunyang days 1-3: 1.6, 1.6, 1.1 (survey range 0.4-1.6); Songshan/Yongji days 1-2: 1.3, 0.6; Xianmin/Minquan days 1-2: 1.3, 1.3; Chongqing N./Jiuquan days 1-2: 3.6, 2.9",
+    "station_July_mean_m_s": "Zuoying 1.7, Sanmin 2.3, Xinxing 1.6 (Kaohsiung); Banqiao 1.2 (New Taipei) (CWA, July 2024, as tabulated by IOT)"
+   },
+   "measured": "Wind speed and direction by Jsene AQNA-1000 anemometer at the intersection (second-by-minute data, daily values tabulated; mounting height not stated), plus CWA station July means.",
+   "place_year": "Taipei, New Taipei, Kaohsiung, July 2024",
+   "citation": "IOT-113-TB006 (as above), Ch. 3 intersection surveys Tables 3.x.x-2 and Table 3.2.2-1.",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "'此路口調查實地調查期間氣象狀況如表 3.4.1-1，風速介於每秒 0.6 至 1.3 公尺' (Songshan/Yongji); '風速介於每秒 0.4 至 1.6 公尺' (Zhongxiao E./Kunyang); '風速介於每秒 1.6 至 3.6 公尺' (Chongqing N./Jiuquan); Table 3.2.2-1 (表 3.2.2-1 監測地點鄰近氣象站之7月相關監測數據): 左營站 1.7, 三民站 2.3, 新興站 1.6, 板橋站 1.2 m/s.",
+   "notes": "Applicability: closest thing to a Taiwanese street-level wind number at the intersections of interest. The values are daily values (probably daily means; the report does not say how each daily figure was derived), mounting height unspecified. Gives 0.4-3.6 m/s with central about 1.7 m/s and low-wind intersections 0.6-1.3 m/s. Together with CWA station means this supports a kerb-level working range of 0.3-2 m/s, with 0.5-1 m/s the red-light-bad-case."
+  },
+  {
+   "id": "cwa-1991-2020-mean-wind-speed",
+   "claim": "CWA 1991-2020 climate normals, mean wind speed (m/s) at the main weather stations: annual Taipei 2.6, Taichung 1.5, Kaohsiung 2.1 (old Kaohsiung station 467440), Tainan 3.0, Keelung 3.0, Hsinchu 2.5 (1992-2020), Tamsui 1.9. Monthly range: Taipei 2.0 (June) to 3.2 (Nov); Taichung 1.4-1.6 all year; Kaohsiung 1.9 (Oct-Nov) to 2.4 (July).",
+   "values": {
+    "Taipei_annual_m_s": 2.6,
+    "Taipei_monthly_m_s": "Jan 2.7, Feb 2.6, Mar 2.6, Apr 2.5, May 2.4, Jun 2.0, Jul 2.2, Aug 2.3, Sep 2.8, Oct 3.1, Nov 3.2, Dec 3.0",
+    "Taichung_annual_m_s": 1.5,
+    "Taichung_monthly_m_s": "1.6,1.6,1.5,1.4,1.4,1.5,1.6,1.4,1.4,1.6,1.5,1.6",
+    "Kaohsiung_annual_m_s": 2.1,
+    "Kaohsiung_monthly_m_s": "2.2,2.2,2.1,2.1,2.0,2.2,2.4,2.3,2.2,1.9,1.9,2.1",
+    "Keelung_annual_m_s": 3.0,
+    "Tainan_annual_m_s": 3.0,
+    "Tamsui_annual_m_s": 1.9,
+    "Hsinchu_annual_m_s": 2.5
+   },
+   "measured": "Station-mean wind speed (CWA standard anemometer height, usually about 10 m or the roof; height not stated on the page) 30-year monthly mean.",
+   "place_year": "Taiwan CWA stations, 1991-2020",
+   "citation": "Central Weather Administration (交通部中央氣象署), 氣候月平均資料 - 風速 (Climate monthly means, wind speed), Taiwan table, 1991-2020 normals; page content loaded from /V8/C/C/Statistics/MonthlyMean/MOD/Taiwan_ws.html, retrieved 2026-11-26.",
+   "url": "https://www.cwa.gov.tw/V8/C/C/Statistics/monthlymean.html (select 風速)",
+   "verified": true,
+   "quote": "Table row 臺北: 2.7 2.6 2.6 2.5 2.4 2.0 2.2 2.3 2.8 3.1 3.2 3.0 | 平均 2.6 | 1991~2020; 臺中: ... 平均 1.5; 高雄: ... 平均 2.1 (unit 公尺/秒).",
+   "notes": "Applicability: station means are the upper bound for kerb wind; urban street-level speed is lower (see assumption). Taichung is the calmest of the three big cities at 1.5 m/s, so a Taichung kerb at 0.3-0.8 m/s is common. Note means include typhoon and winter monsoon episodes; the hours that matter (calm, daytime, summer) are lower than the mean."
+  },
+  {
+   "id": "iot-2025-observed-waiting-zone-CO",
+   "claim": "IOT measured hourly-mean CO at waiting zones and medians; kerb/waiting-zone peaks were 0.5-1.3 ppm, versus nearby CWA/EPA station hourly CO of 0.03-0.90 ppm in the same period.",
+   "values": {
+    "peak_waiting_zone_CO_ppm": "0.5 to about 1.3",
+    "station_hourly_CO_ppm": "0.03-0.90",
+    "note": "hourly means, not 90-s"
+   },
+   "measured": "Micro-sensor CO, 1.0-1.5 m beside crosswalk, inlet 1.2-1.5 m, hourly averages, July 2024, Taipei/New Taipei/Kaohsiung intersections where motorcycles are 42-62% of vehicles.",
+   "place_year": "Taiwan, July 2024",
+   "citation": "IOT-113-TB006, Ch. 3.3.2 (CO concentration trend discussion).",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "'最大值也出現 7 月 11 日退縮後所測得之 1.3ppm 左右' (Kaohsiung Mingcheng 1st/Minzu 1st); '在 7 月 3 日上午 8 點達到最高的 0.5ppm'; '左營站...小時平均值介於 0.09ppm 至 0.56ppm; 愛國國小測站...0.03ppm 至 0.28ppm'.",
+   "notes": "Applicability: an observed calibration anchor for our box model. Hourly-mean CO of 0.5-1.3 ppm at the kerb (including the 60-70% of the hour not at red) is consistent with 90-s red-light CO of a few ppm for the calm cases (see derived box-model finding), not tens of ppm. The sensor's response time, accuracy at sub-ppm and the share of each hour spent at red are not given, so this is a consistency check only."
+  },
+  {
+   "id": "he-gao-2022-red-light-decay-pattern",
+   "claim": "Fixed roadside PM measurements at a Shanghai intersection (inlet about 1.3 m) show particle concentrations fall exponentially through the red-light period (rapidly at first, then stable), while peaks occur as the queue accelerates from green; PM1 (finest) decays least and varies least. Wind speeds on the two measurement days were 4.65 m/s (sunny) and 2.73 m/s (cloudy).",
+   "values": {
+    "inlet_height_m": 1.3,
+    "wind_m_s": "4.65 and 2.73",
+    "pattern": "PM10, PM2 decay exponentially during red; PM1 'dispersion pattern is slow'",
+    "pm_units": "ug/m3 by size (numbers in figures, not extracted)"
+   },
+   "measured": "Fixed-site optical particle counter at roadside of an urban intersection by signal phase plus mobile measurements across a crosswalk.",
+   "place_year": "Shanghai, China; arXiv 2020/21; published later in a journal",
+   "citation": "He H-D, Gao HO. Particulate Matter Exposure at a Densely Populated Urban Traffic Intersection and Crosswalk. arXiv:2011.09286.",
+   "url": "https://www.arxiv.org/pdf/2011.09286",
+   "verified": true,
+   "quote": "'Fig. 3 shows that during the red-light period, the concentrations of all PM sizes decreased to stable values.' 'The variation of PM in all sizes was found to decrease exponentially. The PM diffused rapidly at the beginning of the red-light period, but there were no longer changes by the end.' 'PM1 does not fit well with the negative exponential distribution'.",
+   "notes": "Applicability: qualitatively relevant: concentration at the kerb during a red is NOT increasing steadily from idling; it is highest at the start (pull-away tail) and falls as the pull-away puff is flushed. This supports treating the 90-s exposure as a steady state at the idle-emission level plus a decaying carry-over from the previous green, and warns that an idle-only estimate may miss the pull-away peak. Wind speeds there (2.7-4.7 m/s) are above Taiwanese kerb levels."
+  },
+  {
+   "id": "ketzel-traffic-turbulence-low-wind-secondary",
+   "claim": "At rooftop wind speeds below about 10 m/s, street-canyon concentrations deviate from the ideal inverse-wind-speed law because traffic-produced turbulence adds dispersion, increasingly so at low wind; traffic-induced velocity fluctuations dilute street-canyon pollutants in addition to wind-induced motions (moving-belt wind tunnel experiments, Kastner-Klein et al.).",
+   "values": {
+    "qualitative": "traffic-produced turbulence (TPT) matters below roughly 10 m/s roof wind and dominates in calm air",
+    "scaling": "ratio of turbulence production by cars to that by wind (constants not seen)"
+   },
+   "measured": "Field data Hannover and Copenhagen; wind-tunnel moving belts.",
+   "place_year": "Ketzel et al. 2002/2003; Kastner-Klein, Berkowicz, Plate 2000-2001; Di Sabatino et al. 2003",
+   "citation": "Search-result summaries only: Ketzel M, Louka P, Sahm P, Guilloteau E, Sini J-F, Moussiopoulos N (2002) Intercomparison of numerical urban dispersion models, Part II: street canyon in Hannover; Kastner-Klein P, Berkowicz R, Plate EJ (2000/2001); Di Sabatino S, Kastner-Klein P, Berkowicz R, Britter RE, Fedorovich E (2003) The modelling of turbulence from traffic in urban dispersion models, Part I. Environ. Fluid Mech. 3.",
+   "url": "https://link.springer.com/article/10.1023/A:1022049224166",
+   "verified": false,
+   "quote": "Not opened. The summary line used: 'systematic deviation from the idealised inverse wind-speed law when rooftop wind speeds were less than 10 m/s ... attribute this to traffic-induced turbulence'.",
+   "notes": "Applicability: important sign. Idling traffic gives NO motion-produced turbulence (traffic is stationary during the red) - the very reason dilution is lowest at the kerb at a red light, while the adjacent moving lanes (cross traffic, turners) still stir. Constants not obtained."
+  },
+  {
+   "id": "fhwa-1981-wind-tunnel-roadway-initial-mixing",
+   "claim": "Early FHWA wind-tunnel and tracer programme (General Motors, New York State, and wind-tunnel tests with helium as CO simulant) established that the first mixing of roadway exhaust is due to vehicle aerodynamic effects (wake), and that exhaust buoyancy and initial exhaust velocity are negligible compared with wake/ambient mixing for moving traffic. The report reduces to a box model over the roadway.",
+   "values": {
+    "qualitative": "initial vertical mixing from vehicle wake; buoyancy and exhaust velocity negligible in the tests (all with significant wind)"
+   },
+   "measured": "Wind tunnel (1:85 scale cars) and field tracer (SF6) near highways; not idling vehicles.",
+   "place_year": "USA, 1981",
+   "citation": "FHWA-RD-81-051 (1981), Analyses, Experimental Studies, and Evaluations of Control Measures for Air Flow and Air Quality On and Near Highways, Vol. I. (Calspan/Dabberdt et al.).",
+   "url": "https://rosap.ntl.bts.gov/view/dot/29775/dot_29775_DS1.pdf",
+   "verified": true,
+   "quote": "'The second factor, buoyancy, can be neglected in all cases tested since the distance to the farthest measuring point is too small ... All cases tested involved a significant wind velocity so that turbulent mixing in the atmosphere dominated the processes before buoyancy could become important. (Note, however, that this condition may not hold for atmospheric conditions.)' 'the initial mixing that results from vehicle aerodynamic effects'.",
+   "notes": "Applicability: the tests did NOT include stationary vehicles in light wind, where Ding et al. say buoyancy matters; this document is a negative (it excludes the regime of interest) but fixes the origin of the CALINE initial mixing zone (wake). 1,000+ page scan; only a few passages read."
+  },
+  {
+   "id": "derived-exhaust-volume-and-required-dilution",
+   "claim": "Arithmetic: a typical idling Taiwanese 4-stroke scooter emits about 0.49 L/s (1.75 m3/h) of exhaust and CO of about 1.45% (14,500 ppm) at the tailpipe, so diluting to 3 ppm CO requires a dilution of about 4,800-fold (1 ppm: 14,500-fold; 10 ppm: 1,450-fold).",
+   "values": {
+    "exhaust_flow_L_s": 0.49,
+    "exhaust_flow_m3_h": 1.75,
+    "tailpipe_CO_ppm": 14490,
+    "dilution_for_1_ppm": 14490,
+    "dilution_for_3_ppm": 4830,
+    "dilution_for_10_ppm": 1449
+   },
+   "measured": "Our arithmetic from the sister file inputs-emission-rates.json (CO2 340 g/h) and Yilan idle readings (CO2 10.8%, CO 1.449% phase 5; Cheng et al. 2017): mol CO2 = 340/44.01 = 7.73 mol/h; exhaust = 7.73/0.108 = 71.5 mol/h x 0.0245 m3/mol (25 C) = 1.75 m3/h.",
+   "place_year": "Derived 2026",
+   "citation": "Derived from inputs-emission-rates.json (this folder) and Cheng et al. 2017 (BCE 12:33-76).",
+   "url": "n/a (calculation)",
+   "verified": false,
+   "quote": "n/a: arithmetic. Assumes dry-basis analyser readings approximate wet exhaust within about 10-15% and exhaust at 25 C.",
+   "notes": "Use: converts tailpipe concentration to kerb concentration by an observed or modelled dilution ratio. Wang et al. 2015 suggest ~6,000 at 3 m for moving cars; our box model suggests 1,300-3,600 for a stationary queue at 0.5-1 m/s, i.e. CO at the kerb of order 1-10 ppm from a pack of 8."
+  },
+  {
+   "id": "derived-box-model-kerb-concentration",
+   "claim": "Arithmetic screening estimate (ventilated-box, 'uniform area source with a ventilation velocity'): for N idling scooters occupying a stop box of crosswind width ell and depth D, the concentration at the downwind edge at breathing height is C = N*q/(ell * U * H) (D cancels), with q the per-scooter emission rate, U the wind speed through the box and H the effective mixing depth. For N = 8, ell = 7 m, mid CO emission of 5.8 mg/s per scooter (21 g/h), the kerb-edge CO is 1.1-6.5 ppm over U = 0.5-1 m/s and H = 1.5-3 m, and 0.4-3.3 ppm at 2 m/s; up to ~13-30 ppm at U = 0.3 m/s with high emitters. Per scooter, at U = 1 m/s, H = 2 m, ell = 7 m: 0.36 ppm CO.",
+   "values": {
+    "formula": "C [mg/m3] = N*q/(ell*U*H); 1 ppm CO = 1.145 mg/m3 at 25 C",
+    "per_scooter_q_CO_mg_s": "2.2 (8 g/h), 5.8 (21 g/h), 13.3 (48 g/h)",
+    "CO_ppm_N8_ell7_mid_q": {
+     "U0.3_H1.5": 12.9,
+     "U0.3_H2": 9.7,
+     "U0.5_H1.5": 7.8,
+     "U0.5_H2": 5.8,
+     "U0.5_H3": 3.9,
+     "U1_H1.5": 3.9,
+     "U1_H2": 2.9,
+     "U1_H3": 1.9,
+     "U2_H2": 1.5
+    },
+    "CO_ppm_N8_U1_H2_low_q_high_q": "1.1 to 6.6",
+    "CO_ppm_N8_U0.5_H2_low_q_high_q": "2.2 to 13.3",
+    "implied_dilution_from_tailpipe": "1,350 (U 0.5, H 1.5) to 3,600 (U 1, H 2); for N=8, ell=7 m",
+    "scale_with": "proportional to N/ell, inversely to U and H; benzene and THC scale with their emission ratios to CO (benzene about 0.0033 x CO mass, THC about 0.11 x CO mass using the sister file central values 0.07 and 2.4 g/h vs 21 g/h CO)"
+   },
+   "measured": "Our calculation. Inputs: CO per scooter from inputs-emission-rates.json (8-48 g/h, central 21); stop box 2.5-6 m deep (D drops out); N = 8 and ell = 7 m are assumptions (two scooter lanes ~3.5 m each); wind 0.3-2 m/s (see wind findings); H 1.5-3 m: assumption, bracketed by CAL3QHC's 1.8 m receptor/typical exhaust at 0.5 m and OSPM h0 2-4 m.",
+   "place_year": "Derived 2026",
+   "citation": "Our arithmetic; formula is the classic box/ventilation model (e.g. CAL3QHC-type 'uniform area source' limit; Robins et al. 2002 C = q/(UE W)).",
+   "url": "n/a (calculation)",
+   "verified": false,
+   "quote": "n/a. Assumptions labelled: N (low 4, central 8, high 15 scooters), ell 7 m (5-10), H 2 m (1.5-3), U 0.5-1 m/s (0.3-2), q as above.",
+   "notes": "This is an UPPER-LEANING estimate for a receptor at the downwind edge of the stop box with wind from the queue to the pedestrian; for wind from other directions the contribution falls toward the background. Cross-check: IOT measured hourly kerb CO 0.5-1.3 ppm (finding iot-2025-observed-waiting-zone-CO), consistent with a 90-s red-light excursion of 1-6 ppm followed by lower values for the rest of the hour. Wide ranges: factor ~10 either way for wind direction, queue size and the high-emitter tail."
+  },
+  {
+   "id": "assumption-kerb-wind-speed",
+   "claim": "ASSUMPTION: wind at kerb level (about 1 m) at Taiwanese intersections is typically 0.2-0.6 times the CWA station mean and falls to 0.3-1 m/s on calm days; a working kerb-speed range for the estimate is 0.3-2 m/s with 0.5-1 m/s as the red-light central case and 1 m/s as the CAL3QHC default.",
+   "values": {
+    "low_m_s": 0.3,
+    "central_m_s": 0.8,
+    "high_m_s": 2.0,
+    "ratio_street_to_station": "0.2-0.6 (assumed)",
+    "implied_by_CWA_means_m_s": "Taipei 0.5-1.6, Taichung 0.3-0.9, Kaohsiung 0.4-1.3"
+   },
+   "measured": "Assumption. Basis: IOT on-site wind speeds 0.4-3.6 m/s (central about 1.7), the Edinburgh kerb study that fitted kerb decay against station wind 0.8-3.3 m/s (Kenagy 2016), and a search-summary statement of an in-canyon/ambient ratio of about 0.16 at one canyon (secondary, not opened). No Taiwanese measurement of the pedestrian-level to station ratio found.",
+   "place_year": "Assumption 2026",
+   "citation": "n/a",
+   "url": "n/a",
+   "verified": false,
+   "quote": "n/a. Assumption.",
+   "notes": "Sensitive input: concentration scales as 1/U in the box model, so 0.3 vs 2 m/s is a factor 6.7. Wind DIRECTION relative to the queue is as important: a kerb upwind of the queue sees almost no plume."
+  }
+ ],
+ "holes": [
+  "No measurement of concentration versus distance (0.5-5 m) beside or behind a stationary idling vehicle with simultaneous wind speed was found in readable full text; the closest (Ding et al., Atmospheric Pollution Research 2023) was blocked.",
+  "No tracer-gas normalised concentration (C U L / Q or s/m2) for kerb receptors at a signalised intersection with an idling queue was found; DAPPLE/Robins wind-tunnel results give non-dimensional street-scale values only; DAPPLE UCL PDF returned a placeholder.",
+  "No Taiwanese measurement of pedestrian-level or kerb-level wind speed versus station wind (CWA) was found; the 2024 Forests Taipei street-canyon paper and an NCKU thesis on Taiwanese street-canyon pedestrian wind were blocked.",
+  "CALINE3/CALINE4 default initial vertical dispersion (sigma_z0, often cited as 1.5 m) and the Benson 1984 CALINE4 intersection option text were not obtained in readable form; only the CAL3QHC user's guide was read, which does not state them.",
+  "OSPM sigma_w parameterisation constants (a, b, traffic-produced turbulence) were not obtained: Berkowicz et al. 1997/2000 PDF is behind a bot challenge.",
+  "No kerbside vertical profile data for 0-2 m for an inert primary pollutant at the 0.3-0.5 m level; Kenagy et al. measure NO2 at 0.8 m and 2.0 m only.",
+  "No measurement or model of the turbulence produced by idling engines themselves or by scooters filtering/leaving; only qualitative statements (OSPM: no motion = no traffic-produced turbulence).",
+  "No measurement of exhaust plume buoyancy lift for scooter exhaust (temperatures ~100-300 C at tailpipe presumed); Ding et al. state buoyancy matters for a car.",
+  "Number of scooters queued per red light and spatial layout of the stop box relative to the pedestrian (N, ell) are inputs from other workstreams; the box model used N=8, ell=7 m as assumptions.",
+  "CWA station anemometer heights for Taipei, Taichung, Kaohsiung were not stated on the climate page.",
+  "Goel & Kumar (Guildford) and Choi et al. (AAQR 2013, UFP at 10 signalised intersections at 5 m resolution) report vertical (1-4.7 m) and horizontal (5-90 m) decay at signalised junctions; only search summaries seen, full texts not opened."
+ ],
+ "needsManualFetch": [
+  "https://doi.org/10.1016/j.apr.2022.101632 (Ding, Zhao, Luo, Wu, Venkatram: Field study to estimate exposure to vehicle exhaust during idling and starting; ScienceDirect 403; SSRN preprint https://doi.org/10.2139/ssrn.4063435 behind Cloudflare challenge)",
+  "https://www.tandfonline.com/doi/pdf/10.3155/1047-3289.59.6.704 (Wind Tunnel Measurements of the Dilution of Tailpipe Emissions, JA&WMA 59(6); 403)",
+  "https://www.mdpi.com/2073-4433/14/3/558 (URANS Simulations of Vehicle Exhaust Plumes, Atmosphere 2023; 403)",
+  "https://www.researchsquare.com/article/rs-11075409/v1 (Vehicle motion matters for modelling the near-field dispersion of tailpipe emissions; page returned title only)",
+  "https://core.ac.uk/download/13785472.pdf (Berkowicz et al. 1997 Modelling traffic pollution in streets; Cloudflare challenge) or the DTU Orbit record",
+  "https://doi.org/10.3390/f15122221 (Effects of Street Spatial Structure on Micrometeorological Condition and Air Quality, a Case Study of Taipei City, Forests 2024; mdpi 403)",
+  "https://thesis.lib.ncku.edu.tw/thesis/detail/346b98e97f4208e894e2e5907813219d (NCKU thesis on pedestrian-level wind in Taiwanese street canyons, Taipei/Taichung/Kaohsiung summer 2003-2007; timed out/503)",
+  "https://pmc.ncbi.nlm.nih.gov/articles/PMC7116918/table/tbl1 (table of in-canyon vs ambient wind speeds; bot challenge)",
+  "https://discovery-pp.ucl.ac.uk/1383723/1/DAPPLE_ffid_mass-balance_PP.pdf (DAPPLE tracer mass balance at Marylebone Rd/Gloucester Pl; returned ~4 kB placeholder)",
+  "https://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/207652/1/aaqr.2013.08.0278.pdf (Choi et al. UFP at signalised intersections; returned a 3 kB non-PDF)",
+  "https://link.springer.com/article/10.1023/A:1022049224166 and doi 10.1023/A:1022063608237 (Di Sabatino et al. 2003, traffic-produced turbulence, Parts I and II)",
+  "CALINE4 report: Benson PE (1984) FHWA/CA/TL-84/15, NTIS PB85-211498 (no open PDF found); CALINE3 background: https://www.osti.gov/biblio/5876729",
+  "https://ww2.arb.ca.gov/sites/default/files/barcu/regact/sbidling/appc.pdf (CARB school bus idling health-risk appendix with dispersion at 20-60 m; not opened)"
+ ]
+}

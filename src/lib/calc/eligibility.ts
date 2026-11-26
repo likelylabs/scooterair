@@ -11,7 +11,11 @@ import { date, t } from './text.ts';
 import type { L10n } from './text.ts';
 import type { Situation } from './types.ts';
 
-export type CondResult = { ok: true; assumptions: L10n[] } | { ok: false; failed: string; why: L10n; ambiguous?: boolean };
+/**
+ * `ambiguous`: the rule itself is unclear for this buyer (reported as possible extra money).
+ * `missing`: the buyer did not give the answer the rule needs (an age for an age band).
+ */
+export type CondResult = { ok: true; assumptions: L10n[] } | { ok: false; failed: string; why: L10n; ambiguous?: boolean; missing?: boolean };
 
 export interface EligibilityContext {
   s: Situation;
@@ -28,18 +32,41 @@ const OK: CondResult = { ok: true, assumptions: [] };
 const fail = (failed: string, why: L10n, ambiguous = false): CondResult => ({ ok: false, failed, why, ...(ambiguous ? { ambiguous: true } : {}) });
 const assume = (a: L10n): CondResult => ({ ok: true, assumptions: [a] });
 
+// Who a household rule is for, as a noun ("only for …" / "限…" and "not for …" / "不適用於…").
 const flagLabels: Record<string, L10n> = {
-  childUnder12: t('家中有12歲以下兒童', 'a child aged 12 or under in the household'),
-  schoolChild: t('子女就讀國小至高中職', 'a child in elementary to senior high school'),
-  deliveryRider: t('外送員', 'working as a delivery rider'),
-  indigenous: t('原住民身分', 'indigenous status'),
-  medicalWorker: t('醫護機構工作者', 'working at a medical or nursing institution'),
-  neighbourhoodWatch: t('守望相助隊隊員', 'neighbourhood-watch membership'),
-  disasterAffected: t('天然災害災損戶', 'a disaster-affected household'),
-  remoteDistrict: t('居住在偏遠地區', 'living in a designated remote district'),
-  previousLocalSubsidy: t('曾領過這項規定排除的機車補助（本縣市的，部分縣市也包括環境部的）', 'having received a scooter subsidy this rule excludes (this city\'s, and in some places MOENV\'s)'),
-  foreignNational: t('外籍人士', 'being a foreign national'),
+  childUnder12: t('家中有12歲以下兒童的家庭', 'households with a child aged 12 or under'),
+  schoolChild: t('子女就讀國小到高中職的家庭', 'households with a child in elementary to senior high school'),
+  deliveryRider: t('外送員', 'delivery riders'),
+  indigenous: t('原住民', 'indigenous people'),
+  medicalWorker: t('醫護機構工作者', 'people who work at a medical or nursing institution'),
+  neighbourhoodWatch: t('守望相助隊隊員', 'neighbourhood-watch members'),
+  disasterAffected: t('天然災害災損戶', 'households hit by a natural disaster'),
+  remoteDistrict: t('住在偏遠地區的人', 'people living in a designated remote district'),
+  previousLocalSubsidy: t('以前領過這項規定排除的機車補助的人（本縣市的，部分縣市也包括環境部的）', 'people who have received a scooter subsidy this rule excludes (this city\'s, and in some places MOENV\'s)'),
+  foreignNational: t('外籍人士', 'foreign nationals'),
 };
+
+/** What a scrap condition asks for, for a reader who has no scooter to scrap (R12: never just "an old scooter"). */
+function scrapNeeded(c: Condition): L10n {
+  switch (c.kind) {
+    case 'scrap-engine':
+      return c.engines.includes('two-stroke') && !c.engines.includes('four-stroke')
+        ? t('要報廢一台二行程機車', 'requires scrapping a two-stroke scooter')
+        : t('要報廢一台四行程機車', 'requires scrapping a four-stroke scooter');
+    case 'scrap-min-age':
+      return t(`要報廢一台出廠滿${c.years}年的燃油機車`, `requires scrapping a gasoline scooter at least ${c.years} years old`);
+    case 'scrap-built':
+      if (c.onOrBefore && c.onOrAfter) return t(`要報廢一台 ${date(c.onOrAfter)['zh-TW']}到 ${date(c.onOrBefore)['zh-TW']}之間出廠的燃油機車`, `requires scrapping a gasoline scooter built between ${date(c.onOrAfter).en} and ${date(c.onOrBefore).en}`);
+      if (c.onOrBefore) return t(`要報廢一台 ${date(c.onOrBefore)['zh-TW']}以前出廠的燃油機車`, `requires scrapping a gasoline scooter built on or before ${date(c.onOrBefore).en}`);
+      return t(`要報廢一台 ${date(c.onOrAfter as string)['zh-TW']}以後出廠的燃油機車`, `requires scrapping a gasoline scooter built on or after ${date(c.onOrAfter as string).en}`);
+    case 'scrap-registered-locally':
+      return t('要報廢一台在本縣市設籍的燃油機車', 'requires scrapping a gasoline scooter registered here');
+    case 'scrap-max-cc':
+      return t(`要報廢一台${c.cc}cc以下的燃油機車`, `requires scrapping a gasoline scooter of ${c.cc}cc or less`);
+    default:
+      return t('要報廢一台燃油機車（車齡規定見這項補助的條件）', 'requires scrapping a gasoline scooter (see this line\'s conditions for the age rule)');
+  }
+}
 
 export function checkCondition(c: Condition, ctx: EligibilityContext): CondResult {
   const { s } = ctx;
@@ -47,54 +74,54 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
   const old = s.scrap;
   switch (c.kind) {
     case 'scrap':
-      return old ? OK : fail(c.kind, t('需要淘汰一輛舊燃油機車', 'requires scrapping an old gasoline scooter'));
+      return old ? OK : fail(c.kind, scrapNeeded(c));
     case 'scrap-engine':
-      if (!old) return fail(c.kind, t('需要淘汰一輛舊燃油機車', 'requires scrapping an old gasoline scooter'));
+      if (!old) return fail(c.kind, scrapNeeded(c));
       return c.engines.includes(old.engine)
         ? OK
-        : fail(c.kind, c.engines.includes('two-stroke') ? t('舊車必須是二行程機車', 'the old scooter must be a two-stroke') : t('舊車必須是四行程機車', 'the old scooter must be a four-stroke'));
+        : fail(c.kind, c.engines.includes('two-stroke') ? t('要報廢的機車必須是二行程機車', 'the scooter you scrap must be a two-stroke') : t('要報廢的機車必須是四行程機車', 'the scooter you scrap must be a four-stroke'));
     case 'scrap-min-age': {
-      if (!old) return fail(c.kind, t('需要淘汰一輛舊燃油機車', 'requires scrapping an old gasoline scooter'));
+      if (!old) return fail(c.kind, scrapNeeded(c));
       const years = fullYears(normalise(old.builtOn), s.date as string);
-      return years >= c.years ? OK : fail(c.kind, t(`舊車須出廠滿${c.years}年（目前${years}年）`, `the old scooter must be at least ${c.years} years old (it is ${years})`));
+      return years >= c.years ? OK : fail(c.kind, t(`要報廢的機車須出廠滿${c.years}年（目前${years}年）`, `the scooter you scrap must be at least ${c.years} years old (it is ${years})`));
     }
     case 'scrap-built': {
-      if (!old) return fail(c.kind, t('需要淘汰一輛舊燃油機車', 'requires scrapping an old gasoline scooter'));
+      if (!old) return fail(c.kind, scrapNeeded(c));
       const built = normalise(old.builtOn);
       if (c.onOrBefore && !onOrBefore(built, c.onOrBefore)) {
         const d = date(c.onOrBefore);
-        return fail(c.kind, t(`舊車須在${d['zh-TW']}以前出廠`, `the old scooter must be built on or before ${d.en}`));
+        return fail(c.kind, t(`要報廢的機車須在 ${d['zh-TW']}以前出廠`, `the scooter you scrap must be built on or before ${d.en}`));
       }
       if (c.onOrAfter && !onOrBefore(c.onOrAfter, built)) {
         const d = date(c.onOrAfter);
-        return fail(c.kind, t(`舊車須在${d['zh-TW']}以後出廠`, `the old scooter must be built on or after ${d.en}`));
+        return fail(c.kind, t(`要報廢的機車須在 ${d['zh-TW']}以後出廠`, `the scooter you scrap must be built on or after ${d.en}`));
       }
       return OK;
     }
     case 'scrap-registered-locally': {
-      if (!old) return fail(c.kind, t('需要淘汰一輛舊燃油機車', 'requires scrapping an old gasoline scooter'));
+      if (!old) return fail(c.kind, scrapNeeded(c));
       if (!old.registeredLocallySince) {
         const rule = c.byDate
           ? t(`${date(c.byDate)['zh-TW']}前已在本縣市設籍`, `registered locally by ${date(c.byDate).en}`)
           : c.minYears
             ? t(`在本縣市設籍滿${c.minYears}年`, `registered locally for at least ${c.minYears} year${c.minYears > 1 ? 's' : ''}`)
             : t('在本縣市設籍', 'registered locally');
-        return assume(t(`假設舊車${rule['zh-TW']}`, `Assumes the old scooter is ${rule.en}`));
+        return assume(t(`假設要報廢的機車${rule['zh-TW']}`, `Assumes the scooter you scrap is ${rule.en}`));
       }
       if (c.byDate && !onOrBefore(old.registeredLocallySince, c.byDate)) {
-        return fail(c.kind, t(`舊車須在${date(c.byDate)['zh-TW']}前設籍本縣市`, `the old scooter must be registered locally by ${date(c.byDate).en}`));
+        return fail(c.kind, t(`要報廢的機車須在 ${date(c.byDate)['zh-TW']}前設籍本縣市`, `the scooter you scrap must be registered locally by ${date(c.byDate).en}`));
       }
       if (c.minYears && fullYears(old.registeredLocallySince, s.date as string) < c.minYears) {
-        return fail(c.kind, t(`舊車須在本縣市設籍滿${c.minYears}年`, `the old scooter must have been registered locally for ${c.minYears} year(s)`));
+        return fail(c.kind, t(`要報廢的機車須在本縣市設籍滿${c.minYears}年`, `the scooter you scrap must have been registered locally for ${c.minYears} year(s)`));
       }
       return OK;
     }
     case 'scrap-max-cc': {
-      if (!old) return fail(c.kind, t('需要淘汰一輛舊燃油機車', 'requires scrapping an old gasoline scooter'));
-      return (old.displacementCc ?? 125) <= c.cc ? OK : fail(c.kind, t(`舊車須為${c.cc}cc以下`, `the old scooter must be ${c.cc}cc or less`));
+      if (!old) return fail(c.kind, scrapNeeded(c));
+      return (old.displacementCc ?? 125) <= c.cc ? OK : fail(c.kind, t(`要報廢的機車須為${c.cc}cc以下`, `the scooter you scrap must be ${c.cc}cc or less`));
     }
     case 'scrap-second-scooter':
-      return old?.secondScooter ? OK : fail(c.kind, t('須同時淘汰第二輛舊機車', 'requires scrapping a second old scooter'));
+      return old?.secondScooter ? OK : fail(c.kind, t('要同時報廢第二台符合規定的機車', 'requires scrapping a second qualifying scooter'));
     case 'ev-plate-class':
       if (!ctx.ev) return fail(c.kind, t('只適用電動機車', 'electric scooters only'));
       return c.classes.includes(ctx.ev.plateClass) ? OK : fail(c.kind, t('不適用這個車種等級', 'does not cover this vehicle class'));
@@ -125,34 +152,40 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       if (c.why) return fail(c.kind, c.why, Boolean(c.ambiguous));
       const label =
         c.flag === 'remoteDistrict' && ctx.remoteDistricts
-          ? t(`居住在${ctx.remoteDistricts['zh-TW']}`, `living in ${ctx.remoteDistricts.en}`)
+          ? t(`住在${ctx.remoteDistricts['zh-TW']}的人`, `people living in ${ctx.remoteDistricts.en}`)
           : (flagLabels[c.flag] ?? t(c.flag, c.flag));
       return want
-        ? fail(c.kind, t(`須符合：${label['zh-TW']}`, `requires ${label.en}`), Boolean(c.ambiguous))
-        : fail(c.kind, t(`不適用於${label['zh-TW']}`, `not available when ${label.en}`), Boolean(c.ambiguous));
+        ? fail(c.kind, t(`限${label['zh-TW']}`, `only for ${label.en}`), Boolean(c.ambiguous))
+        : fail(c.kind, t(`不適用於${label['zh-TW']}`, `not for ${label.en}`), Boolean(c.ambiguous));
     }
     case 'income': {
       const level = h.income ?? 'none';
       if (c.levels.includes(level)) return OK;
       if (c.ambiguous?.includes(level)) {
-        return fail(c.kind, t('公告只寫「中低收入戶」，低收入戶是否適用不明確，未計入；請向承辦單位確認', 'the notice says only "middle-low income"; whether low-income households qualify is unclear, so it is not counted (ask the bureau)'), true);
+        return fail(c.kind, t('公告只寫「中低收入戶」，低收入戶是否適用不明確，未計入；請向承辦單位確認', 'the notice names only lower-middle-income households (中低收入戶); whether low-income households qualify is unclear, so it is not counted (ask the bureau)'), true);
       }
       const only = (lv: string) => c.levels.length === 1 && c.levels[0] === lv;
       return fail(
         c.kind,
         only('low')
-          ? t('限低收入戶（中低收入戶不適用）', 'low-income households only (middle-low does not qualify)')
+          ? t('限低收入戶（中低收入戶不適用）', 'low-income households only (lower-middle-income households do not qualify)')
           : only('middle-low')
             ? c.ambiguous?.includes('low')
-              ? t('限中低收入戶（低收入戶是否適用請向承辦單位確認）', 'middle-low income households only (ask the bureau whether low-income households qualify)')
-              : t('限中低收入戶', 'middle-low income households only')
-            : t('限中低收入戶或低收入戶', 'low or middle-low income households only'),
+              ? t('限中低收入戶（低收入戶是否適用請向承辦單位確認）', 'lower-middle-income households only (ask the bureau whether low-income households qualify)')
+              : t('限中低收入戶', 'lower-middle-income households only')
+            : t('限中低收入戶或低收入戶', 'low or lower-middle-income households only'),
       );
     }
     case 'age': {
       if (h.age === undefined) {
         if (c.max === undefined && c.min !== undefined && c.min <= 18) return assume(t(`假設申請人已滿${c.min}歲`, `Assumes the applicant is at least ${c.min}`));
-        return fail(c.kind, t('未提供年齡，年齡專案不計入', 'age not given, so age-band schemes are not counted'));
+        const band =
+          c.min !== undefined && c.max !== undefined
+            ? t(`這一項限 ${c.min} 到 ${c.max} 歲`, `this one is for ages ${c.min} to ${c.max}`)
+            : c.max !== undefined
+              ? t(`這一項限 ${c.max} 歲以下`, `this one is for ages ${c.max} and under`)
+              : t(`這一項限 ${c.min} 歲以上`, `this one is for ages ${c.min} and over`);
+        return { ok: false, failed: c.kind, why: t(`你沒有填年齡；${band['zh-TW']}`, `you did not give your age; ${band.en}`), missing: true };
       }
       if (c.min !== undefined && h.age < c.min) return fail(c.kind, t(`須年滿${c.min}歲`, `must be at least ${c.min}`));
       if (c.max !== undefined && h.age > c.max) return fail(c.kind, t(`限${c.min ?? 0}至${c.max}歲`, `ages ${c.min ?? 0}–${c.max} only`));
@@ -169,7 +202,7 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
         return assume(t(`假設你已${rule['zh-TW']}`, `Assumes your household is ${rule.en}`));
       }
       if (c.registeredBy && !onOrBefore(h.residentSince, c.registeredBy)) {
-        return fail(c.kind, c.why ?? t(`須在${date(c.registeredBy)['zh-TW']}前設籍`, `household must be registered by ${date(c.registeredBy).en}`));
+        return fail(c.kind, c.why ?? t(`須在 ${date(c.registeredBy)['zh-TW']}前設籍`, `household must be registered by ${date(c.registeredBy).en}`));
       }
       if (c.minYears && fullYears(h.residentSince, s.date as string) < c.minYears) {
         return fail(c.kind, t(`須設籍滿${c.minYears}年`, `household must have been registered for ${c.minYears} year(s)`));
@@ -196,12 +229,23 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
   }
 }
 
+/**
+ * All conditions together. A clear failure wins over an unclear one wherever it comes in the
+ * list: a line is "unclear for you" (and offered as possible extra money) only when every other
+ * condition is met. Otherwise a Taichung low-income line whose prior-subsidy rule happened to be
+ * checked first was offered to a buyer who is not on a low income.
+ */
 export function checkAll(conditions: Condition[], ctx: EligibilityContext): CondResult {
   const assumptions: L10n[] = [];
+  let unclear: CondResult | null = null;
   for (const c of conditions) {
     const r = checkCondition(c, ctx);
-    if (!r.ok) return r;
-    assumptions.push(...r.assumptions);
+    if (r.ok) {
+      assumptions.push(...r.assumptions);
+      continue;
+    }
+    if (!r.ambiguous && !r.missing) return r;
+    unclear ??= r;
   }
-  return { ok: true, assumptions };
+  return unclear ?? { ok: true, assumptions };
 }

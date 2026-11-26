@@ -2,11 +2,13 @@
 
 import type { EconDataset, EnergyPlan, EvModel, GasModel } from '../../data/econ/types.ts';
 import { incomeLevels } from '../../data/econ/types.ts';
-import { addMonths, cmp, daysBetween, evaluationDate, isCalendarDate, todayInTaiwan } from './dates.ts';
+import { addMonths, cmp, daysBetween, evaluationDate, fullYears, isCalendarDate, normalise, todayInTaiwan } from './dates.ts';
 import { breakEven as classify, cumulative, scanIntervals, series } from './compare.ts';
-import { purchaseLedger } from './purchase.ts';
+import { purchaseLedger, select as selectProgrammes } from './purchase.ts';
+import { checkAll } from './eligibility.ts';
 import { electricRunning, gasolineRunning } from './running.ts';
-import { date, daysLeftText, horizonText, join, list, n, ntd, t } from './text.ts';
+import { electricTotals, gasolineTotals, parityFunction, SCAN_MAX_KM, SCAN_STEP } from './parity.ts';
+import { date, horizonText, join, list, lowerFirst, n, ntd, t } from './text.ts';
 import type { L10n } from './text.ts';
 import { CalcInputError } from './types.ts';
 import type { BestOptions, Comparison, Evaluation, Household, InputIssue, LedgerLine, Message, Option, Situation, SourceId } from './types.ts';
@@ -29,10 +31,10 @@ const MAX_MONTHLY_KM = 20000;
 const issue = (field: string, code: InputIssue['code'], zh: string, en: string): InputIssue => ({ field, code, message: t(zh, en) });
 
 function checkNumber(out: InputIssue[], field: string, v: unknown, rule: { min?: number; minExclusive?: number; max?: number; integer?: boolean }, label: [string, string]) {
-  if (typeof v !== 'number' || Number.isNaN(v)) return out.push(issue(field, 'not-a-number', `${label[0]}必須是數字`, `${label[1]} must be a number`));
+  if (typeof v !== 'number' || Number.isNaN(v)) return out.push(issue(field, 'not-a-number', `請填${label[0]}（一個數字）`, `Please enter ${lowerFirst(label[1])} (a number)`));
   if (!Number.isFinite(v)) return out.push(issue(field, 'not-finite', `${label[0]}必須是有限的數字`, `${label[1]} must be a finite number`));
   if (rule.integer && !Number.isInteger(v)) return out.push(issue(field, 'not-integer', `${label[0]}必須是整數`, `${label[1]} must be a whole number`));
-  if (rule.minExclusive !== undefined && v <= rule.minExclusive) return out.push(issue(field, v < 0 ? 'negative' : 'not-positive', `${label[0]}必須大於${rule.minExclusive}`, `${label[1]} must be greater than ${rule.minExclusive}`));
+  if (rule.minExclusive !== undefined && v <= rule.minExclusive) return out.push(issue(field, v < 0 ? 'negative' : 'not-positive', `${label[0]}要大於 ${rule.minExclusive}`, `${label[1]} must be more than ${rule.minExclusive}`));
   if (rule.min !== undefined && v < rule.min) return out.push(issue(field, v < 0 ? 'negative' : 'out-of-range', `${label[0]}不能小於${rule.min}`, `${label[1]} must be at least ${rule.min}`));
   if (rule.max !== undefined && v > rule.max) return out.push(issue(field, 'out-of-range', `${label[0]}不能大於${n(rule.max)}`, `${label[1]} must be at most ${n(rule.max)}`));
   return 0;
@@ -52,9 +54,9 @@ export function validateSituation(input: Partial<Situation>, data: EconDataset, 
   const requireModels = opts.requireModels ?? true;
   if (!input || typeof input !== 'object') return [issue('situation', 'missing', '缺少試算條件', 'the situation is missing')];
   if (!input.jurisdiction || !data.jurisdictions[input.jurisdiction]) out.push(issue('jurisdiction', 'unknown-id', `不認得的縣市「${String(input.jurisdiction)}」`, `unknown jurisdiction "${String(input.jurisdiction)}"`));
-  checkNumber(out, 'monthlyKm', input.monthlyKm, { minExclusive: 0, max: MAX_MONTHLY_KM }, ['每月里程', 'monthlyKm']);
-  if (input.horizonMonths !== undefined) checkNumber(out, 'horizonMonths', input.horizonMonths, { min: 1, max: MAX_HORIZON, integer: true }, ['試算月數', 'horizonMonths']);
-  if (input.offWindowShare !== undefined) checkNumber(out, 'offWindowShare', input.offWindowShare, { min: 0, max: 1 }, ['免費時段外換電比例', 'offWindowShare']);
+  checkNumber(out, 'monthlyKm', input.monthlyKm, { minExclusive: 0, max: MAX_MONTHLY_KM }, ['每個月大約騎幾公里', 'The distance you ride a month']);
+  if (input.horizonMonths !== undefined) checkNumber(out, 'horizonMonths', input.horizonMonths, { min: 1, max: MAX_HORIZON, integer: true }, ['試算月數', 'The number of months to work out']);
+  if (input.offWindowShare !== undefined) checkNumber(out, 'offWindowShare', input.offWindowShare, { min: 0, max: 1 }, ['免費時段外換電的比例', 'The share of swaps outside the free windows']);
   if (input.date !== undefined) {
     try {
       evaluationDate(input.date);
@@ -65,17 +67,24 @@ export function validateSituation(input: Partial<Situation>, data: EconDataset, 
   const h = input.household;
   if (h !== undefined && h !== null && typeof h !== 'object') out.push(issue('household', 'missing', '家戶資料格式不對', 'household must be an object'));
   if (h && typeof h === 'object') {
-    if (h.age !== undefined) checkNumber(out, 'household.age', h.age, { min: 0, max: 120, integer: true }, ['年齡', 'household.age']);
+    if (h.age !== undefined) checkNumber(out, 'household.age', h.age, { min: 0, max: 120, integer: true }, ['年齡', 'Your age']);
     if (h.income !== undefined && !incomeLevels.includes(h.income)) out.push(issue('household.income', 'unknown-id', `不認得的收入別「${String(h.income)}」`, `unknown income level "${String(h.income)}"`));
     checkDate(out, 'household.residentSince', h.residentSince);
   }
   const sc = input.scrap;
   if (sc !== undefined && sc !== null) {
-    if (typeof sc !== 'object') out.push(issue('scrap', 'missing', '舊車資料格式不對', 'scrap must be an object or null'));
+    if (typeof sc !== 'object') out.push(issue('scrap', 'missing', '要報廢機車的資料格式不對', 'scrap must be an object or null'));
     else {
-      if (sc.engine !== 'two-stroke' && sc.engine !== 'four-stroke') out.push(issue('scrap.engine', 'unknown-id', '舊車須是二行程或四行程', 'scrap.engine must be two-stroke or four-stroke'));
+      if (sc.engine !== 'two-stroke' && sc.engine !== 'four-stroke') out.push(issue('scrap.engine', 'unknown-id', '要報廢的機車須是二行程或四行程', 'scrap.engine must be two-stroke or four-stroke'));
       checkDate(out, 'scrap.builtOn', sc.builtOn ?? '', true);
-      if (sc.displacementCc !== undefined) checkNumber(out, 'scrap.displacementCc', sc.displacementCc, { minExclusive: 0, max: 2000 }, ['舊車排氣量', 'scrap.displacementCc']);
+      // A scooter cannot be scrapped before it is built (the form offers every month of this year).
+      if (isCalendarDate(sc.builtOn, true) && (input.date === undefined || isCalendarDate(input.date))) {
+        const on = input.date ?? todayInTaiwan();
+        const built = normalise(sc.builtOn);
+        const builtMonth = sc.builtOn.length === 7 ? `${sc.builtOn}-01` : built;
+        if (cmp(builtMonth, on) > 0) out.push(issue('scrap.builtOn', 'out-of-range', '要報廢的機車出廠日期不能晚於今天', 'the build date of the scooter you scrap cannot be later than today'));
+      }
+      if (sc.displacementCc !== undefined) checkNumber(out, 'scrap.displacementCc', sc.displacementCc, { minExclusive: 0, max: 2000 }, ['要報廢機車的排氣量', 'The engine size of the scooter you scrap']);
       checkDate(out, 'scrap.registeredLocallySince', sc.registeredLocallySince);
     }
   }
@@ -160,20 +169,23 @@ export function evaluate(input: Situation, data: EconDataset): Evaluation {
   const gasR = gasolineRunning(s, data, horizon);
   const ser = series(evP.ledger.net, gasP.ledger.net.value, evR, gasR);
 
-  // Parity mileages (typical values).
-  const runAt = (km: number) => {
-    const k = { ...s, monthlyKm: km };
-    return { e: electricRunning(k, data, horizon, offWindowShare), g: gasolineRunning(k, data, horizon) };
-  };
-  const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
-  const runningParityIntervals = scanIntervals((km) => {
-    const r = runAt(km);
-    return sum(r.e.schedule.typical) + r.e.upfront - sum(r.g.schedule.typical);
-  });
-  const totalParityIntervals = scanIntervals((km) => {
-    const r = runAt(km);
-    return evP.ledger.net.value + r.e.upfront + sum(r.e.schedule.typical) - (gasP.ledger.net.value + sum(r.g.schedule.typical));
-  });
+  // Parity mileages (typical values), from cached numbers-only totals (parity.ts). The setup fee
+  // does not depend on distance, so it is the one from this result.
+  const eT = electricTotals(ev, plan, s.date, data, horizon, offWindowShare);
+  const gT = gasolineTotals(gas, data, horizon);
+  const upE = evR.upfront;
+  const evNet = evP.ledger.net.value;
+  const gasNet = gasP.ledger.net.value;
+  const runningParityIntervals = scanIntervals(
+    parityFunction(eT, gT, (e, g) => e + upE - g),
+    SCAN_MAX_KM,
+    SCAN_STEP,
+  );
+  const totalParityIntervals = scanIntervals(
+    parityFunction(eT, gT, (e, g) => evNet + upE + e - (gasNet + g)),
+    SCAN_MAX_KM,
+    SCAN_STEP,
+  );
 
   // Without the temporary pump-price smoothing (same month-0 baseline as the main series).
   const base = data.fuel.petrol95.value;
@@ -267,7 +279,7 @@ function buildMessages(c: Ctx): Message[] {
   const excludedAll = [...evP.ledger.excluded, ...gasP.ledger.excluded];
   const names = (ls: { label: L10n }[]) => list(uniqueText(ls.map((l) => l.label)));
   const SIDE = { electric: t('電動機車', 'Electric'), gasoline: t('燃油機車', 'Gasoline') } as const;
-  const sided = (side: 'electric' | 'gasoline', text: L10n) => t(`${SIDE[side]['zh-TW']}：${text['zh-TW']}`, `${SIDE[side].en}: ${text.en}`);
+  const sided = (side: 'electric' | 'gasoline', text: L10n) => t(`${SIDE[side]['zh-TW']}：${text['zh-TW']}`, `${SIDE[side].en}: ${lowerFirst(text.en)}`);
   const isGogoro = ev.brand.en === 'Gogoro';
 
   // Programmes over.
@@ -277,7 +289,7 @@ function buildMessages(c: Ctx): Message[] {
       severity: 'critical',
       text: join(
         t(
-          `2026年的電動機車補助已在${date(data.meta.programmeYearEnd)['zh-TW']}結束。資料最後查證日（${date(data.meta.checkedOn)['zh-TW']}）時，尚未有2027年方案獲得確認，所以試算不列入任何2027年補助。`,
+          `2026 年的電動機車補助已在 ${date(data.meta.programmeYearEnd)['zh-TW']}結束。資料最後查證日（${date(data.meta.checkedOn)['zh-TW']}）時，尚未有 2027 年方案獲得確認，所以試算不列入任何 2027 年補助。`,
           `The 2026 electric scooter subsidies ended on ${date(data.meta.programmeYearEnd).en}. When the data was last checked (${date(data.meta.checkedOn).en}) no 2027 programme had been confirmed, so no 2027 subsidy is counted.`,
         ),
         data.meta.nextYear,
@@ -293,7 +305,7 @@ function buildMessages(c: Ctx): Message[] {
       code: 'stale-data',
       severity: 'warning',
       text: t(
-        `價格、優惠、名額與方案資料是在${date(data.meta.checkedOn)['zh-TW']}查證的，比這個日期早${n(age)}天，之後可能已有變動；請以官方最新公告為準。`,
+        `價格、優惠、名額與方案資料是在 ${date(data.meta.checkedOn)['zh-TW']}查證的，比這個日期早${n(age)}天，之後可能已有變動；請以官方最新公告為準。`,
         `Prices, offers, quotas and programmes were checked on ${date(data.meta.checkedOn).en}, ${n(age)} days before this date, and may have changed since; check the latest official notices.`,
       ),
     });
@@ -306,7 +318,7 @@ function buildMessages(c: Ctx): Message[] {
       severity: 'warning',
       text: join(
         ended
-          ? t(`${jur.name['zh-TW']}的地方補助未能查證；2026年方案結束後，試算不計任何補助。`, `${jur.name.en}'s local subsidy could not be verified; after the 2026 programmes ended no subsidy is counted.`)
+          ? t(`${jur.name['zh-TW']}的地方補助未能查證；2026 年方案結束後，試算不計任何補助。`, `${jur.name.en}'s local subsidy could not be verified; after the 2026 programmes ended no subsidy is counted.`)
           : t(`${jur.name['zh-TW']}的地方補助未能查證，試算只計中央補助。`, `${jur.name.en}'s local subsidy could not be verified, so only central money is counted.`),
         jur.statusNote,
       ),
@@ -335,16 +347,24 @@ function buildMessages(c: Ctx): Message[] {
           : [];
       return [...fromLines, ...credits].filter((d) => d.daysLeft >= 0 && d.daysLeft <= 120);
     };
-    // One message per side and date; within it, each rule is stated for the lines it applies to.
+    // One message per side and date; within it, one item per rule, for the lines it applies to.
+    // The date only, never a count of days: a countdown may stand only beside the reader's city
+    // status in a result where electric really comes out level or ahead (the page's verdict A
+    // panel fills it), and never on the gasoline side, where it would hurry a purchase along.
     for (const side of ['electric', 'gasoline'] as const) {
       for (const [, ds] of groupBy(dues(side), (d) => d.date)) {
         const d = ds[0];
-        const when = daysLeftText(d.daysLeft, d.date);
-        const rules = [...groupBy(ds, (x) => x.rule.en).values()].map((rs) => t(`${names(rs)['zh-TW']}：${rs[0].rule['zh-TW']}`, `${names(rs).en}: ${rs[0].rule.en}`));
+        const on = date(d.date);
+        const items = [...groupBy(ds, (x) => x.rule.en).values()].map((rs) => t(`${names(rs)['zh-TW']}：${rs[0].rule['zh-TW']}`, `${names(rs).en}: ${lowerFirst(rs[0].rule.en)}`));
+        const head =
+          side === 'electric'
+            ? t(`電動機車：期限是 ${on['zh-TW']}。`, `Electric: the deadline is ${on.en}.`)
+            : t(`燃油機車：下面這些優惠或減稅只到 ${on['zh-TW']}，之後燃油機車的價格可能不一樣。`, `Gasoline: these offers or tax cuts end on ${on.en}; after that the gasoline scooter's price may be different.`);
         push({
           code: 'deadline',
           severity: d.daysLeft <= 45 ? 'warning' : 'info',
-          text: sided(side, join(t(`${when['zh-TW']}。`, `${when.en}.`), ...rules)),
+          text: join(head, ...items),
+          items,
           about: ds.map((x) => x.id),
         });
       }
@@ -354,8 +374,8 @@ function buildMessages(c: Ctx): Message[] {
       const docs = ls.find((l) => l.documentsDeadline)?.documentsDeadline;
       const notes = uniqueText(ls.flatMap((l) => (l.applicationNote ? [l.applicationNote] : [])));
       const head = docs
-        ? t(`第一階段申請期限${date(deadline)['zh-TW']}（逾期不受理），第二階段補件至${date(docs)['zh-TW']}`, `Application deadline ${date(deadline).en} (stage 1; late applications are refused), stage 2 documents by ${date(docs).en}`)
-        : t(`申請期限${date(deadline)['zh-TW']}`, `Application deadline ${date(deadline).en}`);
+        ? t(`第一階段申請期限 ${date(deadline)['zh-TW']}（逾期不受理），第二階段補件至 ${date(docs)['zh-TW']}`, `Application deadline ${date(deadline).en} (stage 1; late applications are refused), stage 2 documents by ${date(docs).en}`)
+        : t(`申請期限 ${date(deadline)['zh-TW']}`, `Application deadline ${date(deadline).en}`);
       push({
         code: 'application-deadline',
         severity: days <= 45 ? 'warning' : 'info',
@@ -376,7 +396,7 @@ function buildMessages(c: Ctx): Message[] {
       code: 'moea-filing',
       severity: 'critical',
       text: t(
-        `經濟部補助入口網要求外籍人士在2026年12月10日前提出申請；這個日期已過，所以經濟部補助（約${ntd(amount)['zh-TW']}）不計入。`,
+        `經濟部補助入口網要求外籍人士在 2026 年 12 月 10 日前提出申請；這個日期已過，所以經濟部補助（約${ntd(amount)['zh-TW']}）不計入。`,
         `The MOEA portal required foreign nationals to apply by 10 December 2026; that date has passed, so the MOEA subsidy (about ${ntd(amount).en}) is not counted.`,
       ),
       about: moeaLate.map((x) => x.id),
@@ -387,13 +407,13 @@ function buildMessages(c: Ctx): Message[] {
   if (moea.length && !ended) {
     const foreign = Boolean(s.household.foreignNational);
     const parts: L10n[] = [];
-    if (foreign) parts.push(t('你是外籍人士：經濟部補助入口網要求在2026年12月10日前提出申請，否則拿不到這筆錢。', 'As a foreign national you must apply to the MOEA portal by 10 December 2026, or you will not get this money.'));
-    else parts.push(t('經濟部補助的購車期限是2026年12月31日，通常由經銷商代為申請；入口網另要求外籍人士在12月10日前申請。', 'The MOEA purchase window runs to 31 December 2026 and the dealer usually files the claim; the portal asks foreign nationals to apply by 10 December.'));
+    if (foreign) parts.push(t('你是外籍人士：經濟部補助入口網要求在 2026 年 12 月 10 日前提出申請，否則拿不到這筆錢。', 'As a foreign national you must apply to the MOEA portal by 10 December 2026, or you will not get this money.'));
+    else parts.push(t('經濟部補助的購車期限是 2026 年 12 月 31 日，通常由經銷商代為申請；入口網另要求外籍人士在 12 月 10 日前申請。', 'The MOEA purchase window runs to 31 December 2026 and the dealer usually files the claim; the portal asks foreign nationals to apply by 10 December.'));
     if (isGogoro)
       parts.push(
         afterForeign
-          ? t('Gogoro表示只代辦到2026年12月10日，這個日期已過：購車前請先問門市由誰、怎麼申請經濟部補助。', 'Gogoro said it would file applications only until 10 December 2026, which has passed: before buying, ask the store who will file the MOEA claim and how.')
-          : t('Gogoro表示只代辦到2026年12月10日，建議在那之前送件。', 'Gogoro says it files applications only until 10 December 2026, so file before then.'),
+          ? t('Gogoro表示只代辦到 2026 年 12 月 10 日，這個日期已過：購車前請先問門市由誰、怎麼申請經濟部補助。', 'Gogoro said it would file applications only until 10 December 2026, which has passed: before buying, ask the store who will file the MOEA claim and how.')
+          : t('Gogoro表示只代辦到 2026 年 12 月 10 日，建議在那之前送件。', 'Gogoro says it files applications only until 10 December 2026, so file before then.'),
       );
     push({
       code: 'moea-filing',
@@ -415,11 +435,61 @@ function buildMessages(c: Ctx): Message[] {
       code: 'unconfirmed',
       severity: 'info',
       text: t(
-        `${names(unconfirmed)['zh-TW']}在官方表上列到2027年底，但環境部的汰舊換新補助辦法只確認延長到2026年底，所以不計入；若2027年仍受理，可再多領。`,
+        `${names(unconfirmed)['zh-TW']}在官方表上列到 2027 年底，但環境部的汰舊換新補助辦法只確定延長到 2026 年底，所以沒有算進去；如果 2027 年還受理，可以再多領。`,
         `${names(unconfirmed).en} ${unconfirmed.length === 1 ? 'is' : 'are'} listed to the end of 2027, but the MOENV scrap-and-replace rule is only confirmed to the end of 2026, so ${unconfirmed.length === 1 ? 'it is' : 'they are'} not counted; if still accepted in 2027 you could get more.`,
       ),
       about: unconfirmed.map((x) => x.id),
     });
+  }
+  // A scooter that becomes old enough only after 2026 for a programme that is listed beyond 2026
+  // but confirmed only to the end of 2026 (MOENV options in Kaohsiung and elsewhere): name them,
+  // with the day the scooter qualifies, instead of saying nothing is listed.
+  if (s.scrap && isCalendarDate(s.scrap.builtOn, true)) {
+    const built = normalise(s.scrap.builtOn);
+    const [by, bm, bd] = built.split('-').map(Number);
+    // The day the scooter reaches an age (28 February for a 29 February build in a common year).
+    const turns = (years: number) => {
+      const y = by + years;
+      const last = new Date(Date.UTC(y, bm, 0)).getUTCDate();
+      return `${y}-${String(bm).padStart(2, '0')}-${String(Math.min(bd, last)).padStart(2, '0')}`;
+    };
+    // Lines that fail only because the scooter is too young today, listed past the end of 2026
+    // but confirmed only to it, and which this buyer would meet on the day the scooter is old enough.
+    const byDay = new Map<string, { years: number; to: string; cands: { p: (typeof data.programmes)[number]; amount: number; assumptions: L10n[] }[] }>();
+    for (const x of evP.ledger.excluded) {
+      if (x.failedCondition !== 'scrap-min-age') continue;
+      const p = data.programmes.find((q) => q.id === x.id);
+      if (!p?.confirmedThrough || cmp(p.validTo, p.confirmedThrough) <= 0 || p.calculator !== true || p.quota.status === 'exhausted') continue;
+      const age = p.conditions.find((c): c is Extract<typeof c, { kind: 'scrap-min-age' }> => c.kind === 'scrap-min-age');
+      if (!age || fullYears(built, today) >= age.years) continue;
+      const reaches = turns(age.years);
+      if (cmp(reaches, p.confirmedThrough) <= 0 || cmp(reaches, p.validTo) > 0) continue;
+      const then = { ...s, date: reaches };
+      const r = checkAll(p.conditions, { s: then, side: 'electric', ev, programmeJurisdiction: p.jurisdiction, remoteDistricts: data.jurisdictions[s.jurisdiction]?.remoteDistricts });
+      if (!r.ok) continue;
+      const key = `${reaches}|${p.validTo}`;
+      const slot = byDay.get(key) ?? { years: age.years, to: p.validTo, cands: [] };
+      slot.cands.push({ p, amount: x.amount, assumptions: [] });
+      byDay.set(key, slot);
+    }
+    for (const [key, slot] of byDay) {
+      const reaches = key.split('|')[0];
+      // Only one carbon reward and one air subsidy can be taken: the most the buyer could get.
+      const best = selectProgrammes(slot.cands, data, s.jurisdiction);
+      if (!best.chosen.length || best.total <= 0) continue;
+      const ls = best.chosen.map((c) => ({ label: c.p.name }));
+      const one = ls.length === 1;
+      push({
+        code: 'unconfirmed',
+        severity: 'info',
+        text: t(
+          `你的機車在 ${date(reaches)['zh-TW']}出廠滿 ${slot.years} 年。${names(ls)['zh-TW']}（最多約${ntd(best.total)['zh-TW']}）在官方表上列到 ${date(slot.to)['zh-TW']}，但它所依據的補助辦法只確定到 2026 年底，所以現在不能算進來；等你的機車滿 ${slot.years} 年，請再到環境部的媒合平台查一次。`,
+          `Your scooter turns ${slot.years} on ${date(reaches).en}. ${names(ls).en} (up to about ${ntd(best.total).en}) ${one ? 'is' : 'are'} listed on the official table to ${date(slot.to).en}, but the rule ${one ? 'it rests' : 'they rest'} on is confirmed only to the end of 2026, so ${one ? 'it cannot' : 'they cannot'} be counted now; once your scooter is ${slot.years}, check the MOENV matching platform again.`,
+        ),
+        about: best.chosen.map((c) => c.p.id),
+        amount: best.total,
+      });
+    }
   }
   // Each exhausted programme with its own reason and source (Kaohsiung's city money and an MOENV
   // buyer's lots run out for different reasons on different dates).
@@ -515,13 +585,13 @@ function buildMessages(c: Ctx): Message[] {
       const g = data.groups[a.group];
       if (!g?.ambiguity) continue;
       if (g.secondaryStacking) secondaryStacked.push(g.label);
-      push({ code: 'ambiguity', severity: 'warning', text: sided(side, join(g.ambiguity, t(`（約${ntd(a.amount)['zh-TW']}）`, `(about ${ntd(a.amount).en})`))), amount: a.amount, sources: g.sources, about: [a.group, ...a.ids] });
+      push({ code: 'ambiguity', severity: 'warning', text: sided(side, join(g.ambiguity, t(`這筆金額約${ntd(a.amount)['zh-TW']}。`, `That amount is about ${ntd(a.amount).en}.`))), amount: a.amount, sources: g.sources, about: [a.group, ...a.ids] });
     }
     // Ambiguities resolved conservatively.
     for (const u of P.upside) {
       const g = data.groups[u.group];
       if (!g?.ambiguity) continue;
-      push({ code: 'ambiguity', severity: 'info', text: sided(side, join(g.ambiguity, t(`（約${ntd(u.amount)['zh-TW']}）`, `(about ${ntd(u.amount).en})`))), amount: u.amount, sources: g.sources, about: [u.group, ...u.ids] });
+      push({ code: 'ambiguity', severity: 'info', text: sided(side, join(g.ambiguity, t(`這筆金額約${ntd(u.amount)['zh-TW']}。`, `That amount is about ${ntd(u.amount).en}.`))), amount: u.amount, sources: g.sources, about: [u.group, ...u.ids] });
     }
     // Lines left out because a rule is unclear for this buyer.
     if (P.ambiguousUpside) {
@@ -552,7 +622,7 @@ function buildMessages(c: Ctx): Message[] {
         text: sided(
           side,
           t(
-            `${pu.label['zh-TW']}（${ntd(pu.amount)['zh-TW']}）沒有寫明是否須汰舊，沒有舊車時試算不計入；若車行不要求汰舊，實付約${ntd(now - pu.amount)['zh-TW']}，不是${ntd(now)['zh-TW']}。請先問車行。`,
+            `${pu.label['zh-TW']}（${ntd(pu.amount)['zh-TW']}）沒有寫明是否須汰舊，沒有機車可報廢時試算不計入；若車行不要求汰舊，實付約${ntd(now - pu.amount)['zh-TW']}，不是${ntd(now)['zh-TW']}。請先問車行。`,
             `${pu.label.en} (${ntd(pu.amount).en}) does not say whether it needs scrapping, so with nothing to scrap it is not counted; if the dealer grants it without scrapping you would pay about ${ntd(now - pu.amount).en}, not ${ntd(now).en}. Ask the dealer.`,
           ),
         ),
@@ -569,7 +639,7 @@ function buildMessages(c: Ctx): Message[] {
       severity: 'info',
       text: t(
         `無法確認${ev.name['zh-TW']}是普通輕型第1級還是第2級，經濟部補助先以5,100元計；若是第1級，補助為7,000元，可多1,900元。`,
-        `We could not confirm whether ${ev.name.en} is 普通輕型 level 1 or 2, so the MOEA subsidy is counted at NT$5,100; if it is level 1 it is NT$7,000, NT$1,900 more.`,
+        `We could not confirm whether ${ev.name.en} is light class (green plate, 普通輕型) level 1 or 2, so the MOEA subsidy is counted at NT$5,100; if it is level 1 it is NT$7,000, NT$1,900 more.`,
       ),
       amount: 1900,
       about: ['moea-new-5100'],
@@ -649,8 +719,8 @@ function buildMessages(c: Ctx): Message[] {
     text: join(
       smoothingOver ? (data.fuel.smoothing.mechanismAfterEnd ?? data.fuel.smoothing.mechanism) : data.fuel.smoothing.mechanism,
       t(
-        `以每月${n(s.monthlyKm)}公里計，這台燃油機車每月油錢約${ntd(fuelNow)['zh-TW']}；若平穩措施取消（每公升多${data.fuel.smoothing.typical}元），每月總開銷多約${ntd(fuelDelta)['zh-TW']}。沒有平穩措施時的結果：${be(comparison.withoutSmoothing.breakEven)['zh-TW']}（${smoothingOver ? '以查證時的油價計' : '目前'}：${be(comparison.breakEven)['zh-TW']}）。`,
-        `At ${n(s.monthlyKm)} km a month this gasoline scooter uses about ${ntd(fuelNow).en} of fuel; if the smoothing ended (NT$${data.fuel.smoothing.typical} more per litre) it would cost about ${ntd(fuelDelta).en} more a month. Result without smoothing: ${be(comparison.withoutSmoothing.breakEven).en} (${smoothingOver ? 'at the checked price' : 'now'}: ${be(comparison.breakEven).en}).`,
+        `以每月${n(s.monthlyKm)}公里計，這台燃油機車每月油錢約${ntd(fuelNow)['zh-TW']}；如果這項壓低油價的措施結束（每公升多${data.fuel.smoothing.typical}元），每個月要多花約${ntd(fuelDelta)['zh-TW']}，結果會是：${be(comparison.withoutSmoothing.breakEven)['zh-TW']}（${smoothingOver ? '以查證時的油價計' : '現在'}：${be(comparison.breakEven)['zh-TW']}）。`,
+        `At ${n(s.monthlyKm)} km a month this gasoline scooter uses about ${ntd(fuelNow).en} of fuel. If this help with the pump price ended (NT$${data.fuel.smoothing.typical} more a litre), it would cost about ${ntd(fuelDelta).en} more a month, and the result would be: ${be(comparison.withoutSmoothing.breakEven).en} (${smoothingOver ? 'at the price we checked' : 'now'}: ${be(comparison.breakEven).en}).`,
       ),
     ),
     amount: Math.round(fuelDelta),
@@ -673,8 +743,8 @@ function buildMessages(c: Ctx): Message[] {
       text: join(
         data.fees.roadFeeElectric.futureNote,
         t(
-          `若比照${band['zh-TW']}燃油機車每年${n(rate)}元，試算期內電動機車約多付${ntd(extra)['zh-TW']}（未計入）。`,
-          `If charged at the ${band.en} gasoline rate of NT$${n(rate)} a year, electric would pay about ${ntd(extra).en} more within the horizon (not counted).`,
+          `如果以後照${band['zh-TW']}燃油機車每年${n(rate)}元收，在這裡算的${horizonText(s.horizonMonths)['zh-TW']}裡，電動機車大約要多付${ntd(extra)['zh-TW']}（沒有算進去）。`,
+          `If it were charged at the ${band.en} gasoline rate of NT$${n(rate)} a year, electric would pay about ${ntd(extra).en} more within the ${horizonText(s.horizonMonths).en} counted here (not included).`,
         ),
       ),
       amount: extra,
@@ -727,8 +797,15 @@ function buildMessages(c: Ctx): Message[] {
   }
 
   // Plan lock-in.
-  if (plan.lockInMonths) {
-    push({ code: 'plan-lock-in', severity: 'info', text: join(t(`${plan.name['zh-TW']}綁約${plan.lockInMonths}個月。`, `${plan.name.en} has a ${plan.lockInMonths}-month contract.`), plan.terms), sources: plan.sources });
+  // The contract, as the operator states it (or that it does not): one true sentence per plan.
+  if (plan.operator !== 'household') {
+    // The terms often open with the same contract phrase: do not say it twice.
+    const rest = (terms: string, lead: string) => {
+      const cut = terms.startsWith(lead) ? terms.slice(lead.length).replace(/^[；;，,。.]\s*/, '') : terms;
+      return cut.charAt(0).toUpperCase() + cut.slice(1);
+    };
+    const terms = t(rest(plan.terms['zh-TW'], plan.contract['zh-TW']), rest(plan.terms.en, plan.contract.en));
+    push({ code: 'plan-lock-in', severity: 'info', text: join(t(`${plan.name['zh-TW']}：${plan.contract['zh-TW']}。`, `${plan.name.en}: ${lowerFirst(plan.contract.en)}.`), terms), sources: plan.sources });
   }
 
   // Cash flow: subsidies paid after approval.
@@ -777,50 +854,151 @@ const RANKING_CODES = new Set<Message['code']>([
 /** Messages that describe one option's own result: taken from the first option only. */
 const FIRST_ONLY_CODES = new Set<Message['code']>(['petrol-smoothing']);
 
-/** Rank every available electric model + plan for a situation. */
-export function bestOptions(base: Omit<Situation, 'electricModel' | 'energyPlan'>, data: EconDataset): BestOptions {
-  const issues = validateSituation(base as Situation, data, { requireModels: false });
-  if (issues.length) throw new CalcInputError(issues);
-  const options: Option[] = [];
-  const evaluations: Evaluation[] = [];
+/** Every electric model and plan the calculator offers, in ranking order. */
+export function rankingPairs(data: EconDataset): { model: EvModel; plan: EnergyPlan }[] {
+  const out: { model: EvModel; plan: EnergyPlan }[] = [];
   for (const m of data.evModels) {
     if (m.calculator !== true) continue;
     for (const pid of m.plans) {
       const p = data.plans.find((x) => x.id === pid);
       if (!p || p.calculator !== true) continue;
-      const e = evaluate({ ...base, electricModel: m.id, energyPlan: p.id } as Situation, data);
-      evaluations.push(e);
-      const H = e.comparison.cumulative.months.length - 1;
-      const total = e.comparison.cumulative.electric[H];
-      const gasTotal = e.comparison.cumulative.gasoline[H];
-      options.push({
-        electricModel: m.id,
-        energyPlan: p.id,
-        modelName: m.name,
-        planName: p.name,
-        plateClass: m.plateClass,
-        likeForLike: e.comparison.likeForLike.verdict,
-        netPrice: e.electric.purchase.net.value,
-        netPriceHigh: e.electric.purchase.net.high,
-        purchaseGap: e.comparison.purchaseGap,
-        fiveYearTotal: total,
-        fiveYearGap: total.typical - gasTotal.typical,
-        horizonTotal: total,
-        horizonGap: total.typical - gasTotal.typical,
-        breakEven: e.comparison.breakEven,
-        usesSecondaryInputs:
-          m.listPrice.confidence === 'secondary' ||
-          m.efficiency.confidence === 'secondary' ||
-          m.plateClassBasis.confidence === 'secondary' ||
-          p.setupFee?.confidence === 'secondary' ||
-          p.confidence === 'secondary' ||
-          m.battery.basis.confidence === 'secondary' ||
-          e.electric.purchase.lines.some((l: LedgerLine) => l.confidence === 'secondary'),
-        hasUpToAmounts: e.electric.purchase.net.high > e.electric.purchase.net.value,
-        warningCodes: [...new Set(e.messages.filter((x) => x.severity !== 'info').map((x) => x.code))],
-      });
+      out.push({ model: m, plan: p });
     }
   }
+  return out;
+}
+
+/** Evaluate one model and plan for a ranking. */
+function rankOne(base: Omit<Situation, 'electricModel' | 'energyPlan'>, m: EvModel, p: EnergyPlan, data: EconDataset): { option: Option; evaluation: Evaluation } {
+  const e = evaluate({ ...base, electricModel: m.id, energyPlan: p.id } as Situation, data);
+  const H = e.comparison.cumulative.months.length - 1;
+  const total = e.comparison.cumulative.electric[H];
+  const gasTotal = e.comparison.cumulative.gasoline[H];
+  const option: Option = {
+    electricModel: m.id,
+    energyPlan: p.id,
+    modelName: m.name,
+    planName: p.name,
+    plateClass: m.plateClass,
+    likeForLike: e.comparison.likeForLike.verdict,
+    netPrice: e.electric.purchase.net.value,
+    netPriceHigh: e.electric.purchase.net.high,
+    purchaseGap: e.comparison.purchaseGap,
+    fiveYearTotal: total,
+    fiveYearGap: total.typical - gasTotal.typical,
+    horizonTotal: total,
+    horizonGap: total.typical - gasTotal.typical,
+    breakEven: e.comparison.breakEven,
+    usesSecondaryInputs:
+      m.listPrice.confidence === 'secondary' ||
+      m.efficiency.confidence === 'secondary' ||
+      m.plateClassBasis.confidence === 'secondary' ||
+      p.setupFee?.confidence === 'secondary' ||
+      p.confidence === 'secondary' ||
+      m.battery.basis.confidence === 'secondary' ||
+      e.electric.purchase.lines.some((l: LedgerLine) => l.confidence === 'secondary'),
+    hasUpToAmounts: e.electric.purchase.net.high > e.electric.purchase.net.value,
+    warningCodes: [...new Set(e.messages.filter((x) => x.severity !== 'info').map((x) => x.code))],
+  };
+  return { option, evaluation: e };
+}
+
+// ---------------------------------------------------------------------------
+// When a result changes with the date
+// ---------------------------------------------------------------------------
+
+const nextDay = (d: string): string => {
+  const [y, m, day] = d.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, day + 1)).toISOString().slice(0, 10);
+};
+
+/** Every date in the dataset on which some line, offer, credit or note can start or stop applying. */
+export function boundaryDates(data: EconDataset): string[] {
+  const out = new Set<string>();
+  const add = (d: string | undefined, after = false) => d && isCalendarDate(d) && out.add(after ? nextDay(d) : d);
+  for (const p of data.programmes) {
+    add(p.validFrom);
+    add(p.validTo, true);
+    add(p.confirmedThrough, true);
+    add(p.applicationDeadline, true);
+    if (p.quota.status === 'exhausted') add(p.quota.asOf);
+    for (const c of p.conditions) if (c.kind === 'applicant-deadline') add(c.date, true);
+  }
+  for (const m of [...data.evModels, ...data.gasModels]) for (const pr of m.promos) (add(pr.validFrom), add(pr.validTo, true));
+  for (const c of data.planCredits) (add(c.validFrom), add(c.validTo, true));
+  add(data.fuel.smoothing.scheduledEnd, true);
+  add(data.meta.programmeYearEnd, true);
+  const stale = new Date(Date.parse(`${data.meta.checkedOn}T00:00:00Z`) + (STALE_AFTER_DAYS + 1) * 86_400_000).toISOString().slice(0, 10);
+  add(stale);
+  return [...out].sort((a, b) => cmp(a, b));
+}
+
+const resultKey = (e: Evaluation) =>
+  JSON.stringify([
+    e.electric.purchase.lines.map((l) => [l.id, l.amount]),
+    e.gasoline.purchase.lines.map((l) => [l.id, l.amount]),
+    e.electric.running.planCredits.applied.map((c) => c.id),
+    e.comparison.breakEven,
+    e.messages.map((m) => m.code),
+  ]);
+
+/**
+ * The dates after `situation.date` (up to `until`, default the end of 2027) on which this
+ * situation's result changes: a line or an offer stops counting, a credit ends, the 2026
+ * programmes close, a note changes tense. A page built on one day can render a variant for each
+ * and show the one that is true on the reader's day (as site-state does for the money copy), so a
+ * worked example never shows money that has already gone. Each entry carries the evaluation.
+ */
+export function changeDates(situation: Situation, data: EconDataset, until = '2027-12-31'): { date: string; evaluation: Evaluation }[] {
+  const start = evaluate(situation, data);
+  let key = resultKey(start);
+  const out: { date: string; evaluation: Evaluation }[] = [];
+  for (const d of boundaryDates(data)) {
+    if (cmp(d, start.situation.date) <= 0 || cmp(d, until) > 0) continue;
+    const e = evaluate({ ...situation, date: d }, data);
+    const k = resultKey(e);
+    if (k !== key) out.push({ date: d, evaluation: e });
+    key = k;
+  }
+  return out;
+}
+
+/** Rank every available electric model + plan for a situation. */
+export function bestOptions(base: Omit<Situation, 'electricModel' | 'energyPlan'>, data: EconDataset): BestOptions {
+  const issues = validateSituation(base as Situation, data, { requireModels: false });
+  if (issues.length) throw new CalcInputError(issues);
+  const done = rankingPairs(data).map(({ model, plan }) => rankOne(base, model, plan, data));
+  return rankResults(base, done, data);
+}
+
+/**
+ * bestOptions in slices, for a page that must stay responsive: it evaluates `batch` options, then
+ * awaits `pause()` (by default a zero-delay timeout, which lets the browser handle input and
+ * paint) before the next slice. Same result as bestOptions. `signal` stops it early (it then
+ * rejects with the signal's reason).
+ */
+export async function bestOptionsInSlices(
+  base: Omit<Situation, 'electricModel' | 'energyPlan'>,
+  data: EconDataset,
+  opts: { batch?: number; pause?: () => Promise<void>; signal?: AbortSignal } = {},
+): Promise<BestOptions> {
+  const issues = validateSituation(base as Situation, data, { requireModels: false });
+  if (issues.length) throw new CalcInputError(issues);
+  const batch = Math.max(1, opts.batch ?? 4);
+  const pause = opts.pause ?? (() => new Promise<void>((r) => setTimeout(r, 0)));
+  const pairs = rankingPairs(data);
+  const done: { option: Option; evaluation: Evaluation }[] = [];
+  for (let i = 0; i < pairs.length; i++) {
+    if (opts.signal?.aborted) throw opts.signal.reason ?? new Error('aborted');
+    done.push(rankOne(base, pairs[i].model, pairs[i].plan, data));
+    if ((i + 1) % batch === 0 && i + 1 < pairs.length) await pause();
+  }
+  return rankResults(base, done, data);
+}
+
+function rankResults(base: Omit<Situation, 'electricModel' | 'energyPlan'>, done: { option: Option; evaluation: Evaluation }[], data: EconDataset): BestOptions {
+  const options = done.map((d) => d.option);
+  const evaluations = done.map((d) => d.evaluation);
   const first = evaluations[0] ?? null;
   const byNet = [...options].sort((a, b) => a.netPrice - b.netPrice || a.netPriceHigh - b.netPriceHigh || a.fiveYearTotal.typical - b.fiveYearTotal.typical);
   const byTotal = [...options].sort((a, b) => a.fiveYearTotal.typical - b.fiveYearTotal.typical || a.netPrice - b.netPrice);

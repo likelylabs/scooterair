@@ -142,7 +142,7 @@ function excluded(p: Programme, reason: ExclusionReason, more: L10n | undefined,
 }
 
 const PROMO_RULE: Record<NonNullable<DealerPromo['windowBasis']>, L10n> = {
-  plate: t('車廠以領牌日為準：新車須在這天以前完成領牌，只開發票不算。', 'The maker counts the plate-registration date: the new scooter must be plated by then; an invoice alone is not enough.'),
+  plate: t('新車須在這天以前領好牌（車廠看的是領牌日，只開發票不算）。', 'The new scooter must be plated by this date (the maker counts the plate date; an invoice alone is not enough).'),
   invoice: t('以發票日為準：須在這天以前開立發票。', 'The invoice date counts: invoice by then.'),
   order: t('須在這天以前下訂並付款。', 'Order and pay by then.'),
   unknown: t('優惠在這天結束；官方沒有寫以發票日還是領牌日為準，請先問車行。', 'The offer ends that day; it does not say whether the invoice or the plate date counts, so ask the dealer.'),
@@ -153,12 +153,12 @@ export function promoDeadline(pr: DealerPromo, s: Situation): LineDeadline {
   const basis = pr.windowBasis ?? 'unknown';
   const days = daysBetween(s.date as string, pr.validTo);
   const scrapRule = pr.scrapBy
-    ? t(`舊車也須在${date(pr.scrapBy)['zh-TW']}以前完成報廢。`, `The old scooter must also be scrapped by ${date(pr.scrapBy).en}.`)
+    ? t(`要報廢的機車也須在 ${date(pr.scrapBy)['zh-TW']}以前完成報廢。`, `The scooter you are replacing must also be scrapped by ${date(pr.scrapBy).en}.`)
     : undefined;
   return { date: pr.validTo, daysLeft: days, lastDay: days === 0, basis: PROMO_BASIS[basis], rule: scrapRule ? join(PROMO_RULE[basis], scrapRule) : PROMO_RULE[basis] };
 }
 
-const DEFAULT_RULE = t('這是購車期限；其他須在期限前完成的條件請見各項說明。', 'This is the purchase deadline; see each line\'s conditions for anything else that must be done by then.');
+const DEFAULT_RULE = t('這天以前要買好車。', 'Buy by this date.');
 
 /** The date that decides a programme line, and what must be done by then. */
 export function programmeDeadline(p: Programme, s: Situation): LineDeadline {
@@ -167,7 +167,7 @@ export function programmeDeadline(p: Programme, s: Situation): LineDeadline {
   const days = daysBetween(s.date as string, on);
   const rule = confirmedOnly
     ? join(
-        t(`官方表列到${date(p.validTo)['zh-TW']}，但上位辦法只確認到這天；要確定拿到，請在這天以前完成。`, `Listed to ${date(p.validTo).en} but its umbrella rule is only confirmed to this date: to be sure of it, complete it by then.`),
+        t(`官方表列到 ${date(p.validTo)['zh-TW']}，但它所依據的補助辦法只確定到這一天；要確定拿得到，請在這天以前辦好。`, `Listed to ${date(p.validTo).en}, but the rule it rests on is only confirmed to this date: to be sure of it, complete it by then.`),
         p.validToRule ?? t('', ''),
       )
     : (p.validToRule ?? DEFAULT_RULE);
@@ -246,13 +246,20 @@ export function purchaseLedger(side: 'electric' | 'gasoline', input: Situation, 
   for (const p of relevant) {
     const r = checkAll(p.conditions, ctx(p));
     const nominal = programmeAmount(p, ev, gas) ?? 0;
+    // Money that is used up is used up for everyone: say so, rather than the first condition this
+    // buyer misses (which would suggest that ticking a box or waiting would bring it back).
+    const inWindow = cmp(s.date as string, p.validFrom) >= 0 && cmp(s.date as string, p.validTo) <= 0 && !(p.confirmedThrough && cmp(s.date as string, p.confirmedThrough) > 0);
+    if (!r.ok && r.failed !== 'applicant-deadline' && p.calculator === true && inWindow && p.quota.status === 'exhausted' && cmp(s.date as string, p.quota.asOf) >= 0) {
+      exclusions.push(excluded(p, 'quota-exhausted', p.quota.text, {}, nominal));
+      continue;
+    }
     if (!r.ok) {
       if (r.failed === 'applicant-deadline') {
         // e.g. MOEA: foreign nationals had to apply by 10 December 2026.
         exclusions.push({ ...excluded(p, 'expired', undefined, { failedCondition: r.failed }, nominal), reasonText: detail(t('已過申請期限', 'Application deadline passed'), r.why) });
         continue;
       }
-      exclusions.push(excluded(p, r.ambiguous ? (r.failed === 'domestic-cells' ? 'model-unknown' : 'ambiguous') : 'not-eligible', r.why, { failedCondition: r.failed }, nominal));
+      exclusions.push(excluded(p, r.missing ? 'needs-answer' : r.ambiguous ? (r.failed === 'domestic-cells' ? 'model-unknown' : 'ambiguous') : 'not-eligible', r.why, { failedCondition: r.failed }, nominal));
       if (r.ambiguous && r.failed !== 'domestic-cells') unclear.push({ p, why: r.why });
       continue;
     }
@@ -267,11 +274,11 @@ export function purchaseLedger(side: 'electric' | 'gasoline', input: Situation, 
       continue;
     }
     if (cmp(s.date as string, p.validFrom) < 0) {
-      exclusions.push(excluded(p, 'not-yet-valid', t(`自${date(p.validFrom)['zh-TW']}起`, `from ${date(p.validFrom).en}`), {}, nominal));
+      exclusions.push(excluded(p, 'not-yet-valid', t(`自 ${date(p.validFrom)['zh-TW']}起`, `from ${date(p.validFrom).en}`), {}, nominal));
       continue;
     }
     if (cmp(s.date as string, p.validTo) > 0) {
-      exclusions.push(excluded(p, 'expired', t(`購車期限為${date(p.validTo)['zh-TW']}`, `purchases had to be made by ${date(p.validTo).en}`), {}, nominal));
+      exclusions.push(excluded(p, 'expired', t(`購車期限為 ${date(p.validTo)['zh-TW']}`, `purchases had to be made by ${date(p.validTo).en}`), {}, nominal));
       continue;
     }
     if (p.confirmedThrough && cmp(s.date as string, p.confirmedThrough) > 0) {
@@ -363,8 +370,22 @@ export function purchaseLedger(side: 'electric' | 'gasoline', input: Situation, 
         amount: pr.amount,
         reason: before ? 'not-yet-valid' : 'expired',
         reasonText: before
-          ? detail(reasonText['not-yet-valid'], t(`優惠期間為${from['zh-TW']}至${to['zh-TW']}`, `the offer runs ${from.en} to ${to.en}`))
-          : detail(t('優惠已結束', 'Offer has ended'), t(`優惠期間為${from['zh-TW']}至${to['zh-TW']}`, `the offer ran ${from.en} to ${to.en}`)),
+          ? detail(reasonText['not-yet-valid'], t(`優惠期間為 ${from['zh-TW']}至 ${to['zh-TW']}`, `the offer runs ${from.en} to ${to.en}`))
+          : detail(t('優惠已結束', 'Offer has ended'), t(`優惠期間為 ${from['zh-TW']}至 ${to['zh-TW']}`, `the offer ran ${from.en} to ${to.en}`)),
+        sources: pr.sources,
+        confidence: pr.confidence,
+      });
+      continue;
+    }
+    if (pr.notIn?.jurisdictions.includes(s.jurisdiction)) {
+      exclusions.push({
+        id: pr.id,
+        label: pr.name,
+        payer: t('車廠或經銷商', 'Manufacturer or dealer'),
+        amount: pr.amount,
+        reason: 'not-eligible',
+        reasonText: detail(reasonText['not-eligible'], pr.notIn.why),
+        failedCondition: 'region',
         sources: pr.sources,
         confidence: pr.confidence,
       });

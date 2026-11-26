@@ -8,7 +8,9 @@
 //   <select data-money-city>                                   the reader's city (value = JurisdictionId, '' = none)
 //   <… data-money-when="A B">                                  shown by CSS from <html data-money-phase> (no script needed)
 //   <… data-money-state="A-city-open A-city-restricted">       shown only in those states (hidden without JavaScript)
-//   <… data-money-fill="daysLeft | daysSince | today | deadline | filingDeadline | checkedOn | city | cityDate">
+//   <… data-money-fill="daysLeft | daysSince | today | deadline | cityDeadline | filingDeadline | checkedOn | city | cityDate">
+//        cityDeadline: the chosen city's own last purchase day while its money is open (Keelung and
+//        Kinmen close on 30 November, before the central 31 December); the central deadline otherwise.
 //   <… data-money-template="…{city}…{date}…{n}…">               text rebuilt from the template on every update
 //   <… data-money-if="dayCount | stale | nothingConfirmed | filingOpen">  shown only while the flag is true
 // After every update the script dispatches `money:state` on document with the MoneyState as detail
@@ -60,6 +62,7 @@ export function applyMoneyState(): MoneyState | null {
     n: String(state.phase === 'A' ? state.daysLeft : state.daysSince),
     today: formatDate(state.date, locale, true),
     deadline: formatDate(state.deadline, locale),
+    cityDeadline: formatDate(state.cityDeadline ?? state.deadline, locale),
     filingDeadline: formatDate(state.filingDeadline, locale),
     checkedOn: formatDate(state.checkedOn, locale, true),
     city: state.city?.name[locale] ?? '',

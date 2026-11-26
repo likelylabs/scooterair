@@ -13,7 +13,19 @@ export function daysInMonth(y: number, mo: number): number {
   return new Date(Date.UTC(y, mo, 0)).getUTCDate();
 }
 
+// The engine compares the same few dozen date strings thousands of times per answer: parse each once.
+const parsed = new Map<string, [number, number, number]>();
+
 function parts(d: string): [number, number, number] {
+  const hit = typeof d === 'string' ? parsed.get(d) : undefined;
+  if (hit) return hit;
+  const out = parse(d);
+  if (parsed.size > 5000) parsed.clear();
+  parsed.set(d, out);
+  return out;
+}
+
+function parse(d: string): [number, number, number] {
   const m = typeof d === 'string' ? /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(d) : null;
   if (!m) throw new Error(`[calc] Bad date "${d}" (expected YYYY-MM-DD or YYYY-MM)`);
   const y = Number(m[1]);

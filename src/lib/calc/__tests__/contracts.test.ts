@@ -93,7 +93,7 @@ test('evaluation is in Taiwan time whatever the caller\'s time zone', () => {
 
 test('[test-gaps 1] the chart labels always agree with the engine, including ev-ahead and lines that cross back', () => {
   const cases = [
-    situation({ scrap: twoStroke2002, household: { childUnder12: true, age: 38 }, electricModel: 'ionex-coolone', energyPlan: 'ionex-318-single', monthlyKm: 300 }),
+    situation({ scrap: twoStroke2002, household: { childUnder12: true, age: 38 }, electricModel: 'gogoro-ezzy', energyPlan: 'gogoro-319-single', monthlyKm: 300 }),
     situation({ scrap: { engine: 'two-stroke', builtOn: '2001-01' }, monthlyKm: 2500, date: '2027-01-01' }),
     situation({ jurisdiction: 'hualien', gasolineModel: 'yamaha-jog-125', monthlyKm: 1000 }),
     situation({ jurisdiction: 'tainan', monthlyKm: 1500 }),

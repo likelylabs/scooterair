@@ -16,8 +16,9 @@ import Section from '@/components/ui/Section.astro';
 import Phrased from '@/components/ui/Phrased.astro';
 import Tag from '@/components/ui/Tag.astro';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
+import Icon from '@/components/ui/Icon.astro';
 import Mixed from '@/components/pages/evidence/Mixed.astro';
-import { citeN, dataAnchor, lf, lg, ls, readLabel, sourceUses, withheld } from '@/components/pages/evidence/ev';
+import { citeN, dataAnchor, lf, lg, ls, neverSmokerFacts, readLabel, sourceShort, sourceUses } from '@/components/pages/evidence/ev';
 import evidenceCopy from '@/i18n/pages/evidence';
 import { href, htmlLang, localeFromParam, localeStaticPaths } from '@/i18n';
 import { readerText, ui } from '@/i18n/ui';
@@ -40,20 +41,41 @@ const readableUrl = (u: string) => {
 };
 const total = sourceIds.length;
 
+/** Rules that govern only how pages are built are not on the public list, so they are not linked here either. */
+const isPublicRule = (id: string) => !(claimRules[id as ClaimRuleId] as { internal?: boolean }).internal;
+/**
+ * The citation is written in the reader's language; only the original title (and the journal or
+ * series name) are in the source's. Split those out so each part carries the right lang (WCAG 3.1.2).
+ */
+const citeParts = (citation: string, s: ReturnType<typeof getSource>): { text: string; lang?: string }[] => {
+  if (s.language === locale) return [{ text: citation }];
+  const lang = htmlLang[s.language];
+  const foreign = [s.title, s.container].filter((x): x is string => !!x && !s.titleIsDescriptive).map((x) => readerText(x));
+  let parts: { text: string; lang?: string }[] = [{ text: citation }];
+  for (const f of foreign) {
+    parts = parts.flatMap((p) => {
+      if (p.lang || !f || !p.text.includes(f)) return [p];
+      const i = p.text.indexOf(f);
+      return [{ text: p.text.slice(0, i) }, { text: f, lang }, { text: p.text.slice(i + f.length) }].filter((x) => x.text);
+    });
+  }
+  return parts;
+};
 const entries = sourceIds.map((id) => {
   const s = getSource(id);
   const u = uses.get(id)!;
+  const citation = readerText(formatCitation(id, locale)).replace(sourceUrl(id), readableUrl(sourceUrl(id)));
   return {
     id,
     n: citeN(id),
     s,
-    u,
-    citation: readerText(formatCitation(id, locale)).replace(sourceUrl(id), readableUrl(sourceUrl(id))),
+    u: { ...u, rules: u.rules.filter(isPublicRule) },
+    citation,
+    parts: citeParts(citation, s),
     url: sourceUrl(id),
-    lang: s.language !== locale ? htmlLang[s.language] : undefined,
     kind: readerText(sourceKindLabels[s.kind][locale]),
     read: readLabel(s, locale),
-    count: u.facts.length + u.series.length + u.gaps.length + u.rules.length,
+    count: u.facts.length + u.series.length + u.gaps.length + u.rules.filter(isPublicRule).length,
   };
 });
 const kindsUsed = sourceKinds.filter((k) => entries.some((e) => e.s.kind === k));
@@ -79,7 +101,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
       <p class="lead">{fill(T.head.lead, { n: total })}</p>
       <p>{T.head.evidence} <a href={href('/evidence/', locale)}>{T.head.evidenceLink} →</a></p>
       <details class="sx-reads">
-        <summary>{T.reads.title}</summary>
+        <summary><span>{T.reads.title}</span><Icon name="chevron-down" size="1.25rem" /></summary>
         <p>{T.reads.lead}</p>
         <ul>
           {readCounts.map((r) => <li><span>{r.label}</span><b>{fill(T.reads.count, { n: r.n })}</b></li>)}
@@ -130,17 +152,17 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
             data-l6={e.u.links.includes(6) ? '' : undefined}
             data-l7={e.u.links.includes(7) ? '' : undefined}
           >
-            <p class="sx-src__n" aria-label={fill(T.entry.number, { n: e.n })}>{e.n}</p>
+            <p class="sx-src__n"><span class="vh">{fill(T.entry.number, { n: '' }).trim()} </span>{e.n}</p>
             <div class="sx-src__body">
               <p class="sx-src__tags">
                 <Tag>{e.kind}</Tag>
                 <span class="sx-src__read"><span class="vh">{T.entry.read} </span>{e.read}</span>
                 {e.s.titleIsDescriptive && <Tag tone="signal">{T.entry.descriptive}</Tag>}
               </p>
-              <p class="sx-src__cite" lang={e.lang}>{e.citation}</p>
+              <p class="sx-src__cite">{e.parts.map((p) => (p.lang ? <span lang={p.lang}>{p.text}</span> : p.text))}</p>
               {e.s.titleIsDescriptive && <p class="sx-src__help">{T.entry.descriptiveHelp}</p>}
               <p class="sx-src__actions">
-                <a href={e.url} rel="noopener noreferrer" target="_blank">{e.s.doi && !e.s.url ? `${T.entry.doi} ${e.s.doi}` : T.entry.open}<span class="vh"> {ui.externalLink[locale]}</span> ↗</a>
+                <a href={e.url} rel="noopener noreferrer" target="_blank">{e.s.doi && !e.s.url ? `${T.entry.doi} ${e.s.doi}` : T.entry.open}<span class="vh">{locale === 'en' ? ': ' : '：'}{sourceShort(e.id, locale)} {ui.externalLink[locale]}</span> ↗</a>
                 <span class="sx-src__checked">{fill(T.entry.checked, { date: e.s.accessed })}</span>
               </p>
               <p class="sx-src__links">
@@ -156,7 +178,8 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
                       <ul>
                         {e.u.facts.map((f) => {
                           const x = lf(f, locale);
-                          if (withheld.includes(f)) return <li><a href={href(`/evidence/#${f}`, locale)}>{evidenceCopy.row.withheldLabel[locale]}</a> <span class="sx-src__st">{evidenceCopy.row.withheld[locale]}</span></li>;
+                          // R14: the never-smoker figures are printed only on /evidence/#not-used
+                          if (neverSmokerFacts.includes(f)) return <li><a href={href(`/evidence/#${f}`, locale)}>{evidenceCopy.row.neverSmokerPointer[locale]}</a> <span class="sx-src__st">{evidenceCopy.row.alsoNotUsed[locale]}</span></li>;
                           return <li><a href={href(`/evidence/#${f}`, locale)}>{x.display}</a> <EvidenceBadge locale={locale} kind={x.evidence} variant="icon" /> <span class="sx-src__st"><Mixed text={x.statement} locale={locale} /></span></li>;
                         })}
                       </ul>
@@ -196,11 +219,11 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
         const x = lg(g.id, locale);
         return (
           <li id={g.id} class="sx-gap">
-            <p class="sx-src__tags"><EvidenceBadge locale={locale} kind="gap" /> <span class="sx-src__checked">{fill(T.gaps.searched, { date: x.searchedOn })}</span></p>
+            <p class="sx-src__tags"><EvidenceBadge locale={locale} kind="gap" label={x.badge} /> <span class="sx-src__checked">{fill(T.gaps.searched, { date: x.searchedOn })}</span></p>
             <h3 class="sx-gap__title">{x.title}</h3>
             <p>{x.statement}</p>
-            {x.whoCouldMeasure && <p class="sx-gap__who"><b>{T.gaps.who}</b>{x.whoCouldMeasure}</p>}
-            <p><a href={href(`/evidence/#${g.id}`, locale)}>{T.gaps.more} →</a></p>
+            {x.whoCouldMeasure && <p class="sx-gap__who"><b>{x.whoLabel}{locale === 'en' ? ': ' : '：'}</b>{x.whoCouldMeasure}</p>}
+            <p><a class="sx-gap__more" href={href(`/evidence/#${g.id}`, locale)}>{T.gaps.more}<span class="vh">{locale === 'en' ? ': ' : '：'}{x.title}</span> →</a></p>
           </li>
         );
       })}
@@ -241,8 +264,18 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
     min-block-size: var(--tap, 44px);
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
     font-weight: var(--fw-bold);
+    color: var(--accent);
     cursor: pointer;
+    list-style: none;
+  }
+  .sx-reads summary::-webkit-details-marker {
+    display: none;
+  }
+  .sx-reads[open] summary :global(svg) {
+    transform: rotate(180deg);
   }
   .sx-reads p {
     color: var(--ink-2);
@@ -338,7 +371,8 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
   }
   .sx-src {
     display: grid;
-    grid-template-columns: 2.75rem minmax(0, 1fr);
+    /* wide enough for three heavy digits (sources 100–222) on one line */
+    grid-template-columns: 4rem minmax(0, 1fr);
     gap: var(--sp-3);
     padding-block: var(--sp-5);
     border-block-start: 1px solid var(--line);
@@ -355,6 +389,7 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
     line-height: 1;
     font-variant-numeric: tabular-nums;
     color: var(--ink-2);
+    white-space: nowrap;
   }
   .sx-src__body {
     display: grid;
@@ -478,5 +513,10 @@ const ruleText = (id: string) => readerText(claimRules[id as ClaimRuleId].rule[l
   }
   .sx-gap__who b {
     color: var(--ink);
+  }
+  .sx-gap__more {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 44px);
   }
 </style>

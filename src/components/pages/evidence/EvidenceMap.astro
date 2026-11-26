@@ -14,7 +14,7 @@
 import type { Locale } from '@/i18n';
 import { href } from '@/i18n';
 import { chain, evidence } from '@/i18n/ui';
-import { chainLinks, factsForLink, gapsForLink, seriesForLink, type Evidence, type SourceId } from '@/data';
+import { chainLinks, factsForLink, gapBadge, gapsForLink, seriesForLink, type Evidence, type SourceId } from '@/data';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
 import evidenceCopy from '@/i18n/pages/evidence';
 import { fill, localize } from '@/i18n/pages/_copy';
@@ -36,19 +36,20 @@ const rows = chainLinks.map((n) => {
     ss.filter((s) => s.evidence === e).forEach((s) => seriesSources(s.id).forEach((x) => ids.add(x)));
     return [...ids].sort((a, b) => citeN(a) - citeN(b));
   });
-  return { n, name: chain.links[n - 1][locale], cells, gaps: gapsForLink(n).map((g) => lg(g.id, locale)) };
+  // link 7 is named as its eyebrow names it everywhere on the page
+  return { n, name: n === chain.links.length ? chain.breakable[locale] : chain.links[n - 1][locale], cells, gaps: gapsForLink(n).map((g) => lg(g.id, locale)) };
 });
 const usedCols = cols.filter((_, i) => rows.some((r) => r.cells[i].length > 0));
 const colIdx = usedCols.map((c) => cols.indexOf(c));
 ---
 
-<div class="emap">
+<div class:list={['emap', locale === 'en' && 'emap--late']}>
   <table class="emap__table" role="table" aria-describedby="emap-caption">
     <thead role="rowgroup">
       <tr role="row">
         <th scope="col" role="columnheader">{M.linkColumn}</th>
         {usedCols.map((c) => <th scope="col" role="columnheader"><EvidenceBadge locale={locale} kind={kindOf(c)} /></th>)}
-        <th scope="col" role="columnheader"><EvidenceBadge locale={locale} kind="gap" /></th>
+        <th scope="col" role="columnheader"><EvidenceBadge locale={locale} kind="gap" label={gapBadge[locale]} /></th>
       </tr>
     </thead>
     <tbody role="rowgroup">
@@ -96,10 +97,20 @@ const colIdx = usedCols.map((c) => cols.indexOf(c));
 </div>
 
 <style>
+  .emap {
+    /* last resort only: the fixed layout below keeps the table inside its box at every width */
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
   .emap__table {
     inline-size: 100%;
     border-collapse: collapse;
     font-size: var(--fs-sm);
+  }
+  /* column headers are badges: they wrap inside their column instead of widening the table */
+  .emap__table thead :global(.ev) {
+    white-space: normal;
+    max-inline-size: 100%;
   }
   .emap__table th,
   .emap__table td {
@@ -226,8 +237,32 @@ const colIdx = usedCols.map((c) => cols.indexOf(c));
     .emap__gapcell--central {
       padding-inline: var(--sp-2);
     }
+    /* phone tap targets: 44px chips, 8px apart */
+    .emap__chips {
+      gap: var(--sp-2);
+    }
+    .emap__chip {
+      min-inline-size: var(--tap, 44px);
+      min-block-size: var(--tap, 44px);
+    }
+    .emap__label {
+      line-height: var(--tap, 44px);
+    }
+    .emap__link a,
+    .emap__gaps a {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--tap, 44px);
+    }
+    .emap__link a {
+      display: grid;
+      align-content: center;
+    }
   }
   @media (min-width: 60em) {
+    .emap__table {
+      table-layout: fixed;
+    }
     .emap__label {
       display: none;
     }
@@ -241,11 +276,76 @@ const colIdx = usedCols.map((c) => cols.indexOf(c));
       padding: var(--sp-3) var(--sp-2);
       border-block-end: 1px solid var(--line);
     }
-    .emap__table tbody th {
-      inline-size: 11rem;
+    /* fixed layout takes its widths from the header row: link names and the gap column get room, the rest share */
+    .emap__table thead th:first-child {
+      inline-size: 9.5rem;
     }
-    .emap__gapcell {
-      inline-size: 14rem;
+    .emap__table thead th:last-child {
+      inline-size: 13rem;
+    }
+    .emap__table td {
+      overflow-wrap: anywhere;
+    }
+    .emap__table thead th {
+      hyphens: auto;
+      overflow-wrap: break-word;
+    }
+  }
+  /*
+   * English column names are long ("International evidence", "Official Taiwan data"): the table
+   * fits only from 80em. Between 60em and 80em the English map keeps the stacked layout.
+   */
+  @media (min-width: 60em) and (max-width: 79.99em) {
+    .emap--late .emap__table,
+    .emap--late .emap__table tbody,
+    .emap--late .emap__table tr,
+    .emap--late .emap__table th,
+    .emap--late .emap__table td {
+      display: block;
+    }
+    .emap--late .emap__table thead {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .emap--late .emap__table tr {
+      padding-block: var(--sp-3) var(--sp-4);
+      border-block-start: 2px solid var(--ink);
+    }
+    .emap--late .emap__table tbody th,
+    .emap--late .emap__table tbody td {
+      padding: 0;
+      border-block-end: 0;
+    }
+    .emap--late .emap__link {
+      margin-block-end: var(--sp-2);
+    }
+    .emap--late .emap__cell {
+      display: grid !important;
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: var(--sp-2);
+      align-items: start;
+      padding-block: var(--sp-2);
+      border-block-start: 1px solid var(--line);
+    }
+    .emap--late .emap__cell--empty {
+      display: none !important;
+    }
+    .emap--late .emap__label {
+      display: block;
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-bold);
+      color: var(--ink-2);
+      line-height: 1.75rem;
+    }
+    .emap--late .emap__gapcell .emap__ped,
+    .emap--late .emap__gapcell .emap__gaps {
+      grid-column: 2;
+    }
+    .emap--late .emap__gapcell--central {
+      padding-inline: var(--sp-2);
     }
   }
 </style>

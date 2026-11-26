@@ -30,6 +30,18 @@ const G = T.gaps;
 const g = lg(id, locale);
 const n = gapN(id);
 const H = `h${level}` as 'h3' | 'h4';
+/**
+ * Gaps a measurement at a street crossing would help fill: only these end with the "ask them to
+ * measure my crossing" link. Laboratory, health-study and legal gaps do not.
+ */
+const CROSSING_GAPS: GapId[] = [
+  'gap-pedestrian-red-light-exposure',
+  'gap-pull-away-spike',
+  'gap-scooters-per-red-light',
+  'gap-tw-child-height',
+  'gap-school-commute-pillion',
+  'gap-roadside-co-vs-who',
+];
 const closest = [
   ...g.closest.facts.map((f) => ({ href: `#${f}`, label: lf(f, locale).display })),
   ...g.closest.series.map((s) => ({ href: `#${dataAnchor(s)}`, label: ls(s, locale).title })),
@@ -39,7 +51,7 @@ const closest = [
 <article class:list={['gap', full && 'gap--full']} id={full ? id : undefined} aria-labelledby={`${full ? '' : 'l-'}${id}-t`}>
   <p class="gap__meta">
     <span class="gap__n">{fill(G.gapN, { n })}</span>
-    <EvidenceBadge locale={locale} kind="gap" />
+    <EvidenceBadge locale={locale} kind="gap" label={g.badge} />
   </p>
   <H class="gap__title" id={`${full ? '' : 'l-'}${id}-t`}>
     {full ? g.title : <a href={`#${id}`}>{g.title}</a>}
@@ -47,7 +59,7 @@ const closest = [
   <p class="gap__statement">{g.statement}</p>
   {full && <p class="gap__line"><b>{G.why}</b>{g.whyItMatters}</p>}
   <p class="gap__line"><b>{G.close}</b>{g.wouldClose}</p>
-  {g.whoCouldMeasure && <p class="gap__line"><b>{G.who}</b>{g.whoCouldMeasure}</p>}
+  {g.whoCouldMeasure && <p class="gap__line"><b>{g.whoLabel}{locale === 'en' ? ': ' : '：'}</b>{g.whoCouldMeasure}</p>}
   {full && closest.length > 0 && (
     <p class="gap__line gap__closest">
       <b>{G.closest}</b>
@@ -57,7 +69,7 @@ const closest = [
     </p>
   )}
   {full && <p class="gap__date">{fill(G.searched, { date: g.searchedOn })}</p>}
-  {full && <p class="gap__ask"><a href={href('/unmeasured/#ask', locale)}>{G.ask} →</a></p>}
+  {full && CROSSING_GAPS.includes(id) && <p class="gap__ask"><a href={href('/unmeasured/#ask', locale)}>{G.ask}<span class="vh">{locale === 'en' ? ': ' : '：'}{g.title}</span> →</a></p>}
 </article>
 
 <style>
@@ -93,6 +105,9 @@ const closest = [
   }
   .gap__title a {
     color: inherit;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 44px);
   }
   .gap__statement {
     font-size: var(--fs-base);
@@ -115,6 +130,9 @@ const closest = [
     color: var(--ink-3);
   }
   .gap__ask a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 44px);
     font-weight: var(--fw-bold);
     color: var(--accent);
   }

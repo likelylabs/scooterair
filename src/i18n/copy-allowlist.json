@@ -289,9 +289,9 @@
     {
       "id": "evidence.link5.ruler",
       "rule": "associations-not-causes-tw",
-      "reason": "The honesty statement for link 5 (blueprint 3.7 wording): it says the studies show association, NOT cause; the word appears only to be ruled out.",
-      "reviewedBy": "Q2 evidence builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
+      "reason": "The honesty statement for link 5: it says the TAIWANESE studies show association, not cause. 'Cause' appears otherwise only for the three international statements that use causal wording themselves (HEI SR17 'sufficient evidence for a causal relationship', ATS 'a cause of childhood asthma', AHA 'consistent with a causal relationship'; facts hei-sr17-asthma-exacerbation, ats-2020-childhood-asthma, aha-2010-pm25-cardiovascular), each said to mean air or traffic pollution in general, not scooters.",
+      "reviewedBy": "Q2 evidence builder; reworded by evidence-pages fixer (needs editor countersign)",
+      "reviewedOn": "2026-11-26"
     },
     {
       "id": "evidence.notUsed.items.neverSmokers.actually",

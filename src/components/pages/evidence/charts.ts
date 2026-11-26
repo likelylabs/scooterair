@@ -338,8 +338,10 @@ export function renderSpans(p: SpanProps): ChartRender {
 
 // ---------------------------------------------------------------------------------------
 // A true time axis: observed series as solid lines (breaking where a year has no verified
-// figure), targets as a dashed line through hollow points. Years are spaced by their value,
-// not by their order, so 2013 → 2016 → 2019 → 2021 is drawn as it happened.
+// figure), each with its own point shape, targets as a dashed line through hollow points.
+// Years are spaced by their value, not by their order, so 2013 → 2016 → 2019 → 2021 is drawn
+// as it happened. (The shared renderLine now has a value x-scale too, but names its lines only
+// in wide containers; this one keeps a key with the real marks at every width.)
 // ---------------------------------------------------------------------------------------
 
 export interface TimeSeries {
@@ -347,6 +349,25 @@ export interface TimeSeries {
   tone: Tone;
   points: { x: number; y: number | null }[];
   target?: boolean;
+  /** the point mark of an observed series; each series gets its own, so lines are told apart without colour */
+  marker?: TimeMarker;
+}
+export type TimeMarker = 'circle' | 'square' | 'diamond' | 'triangle';
+export const TIME_MARKERS: TimeMarker[] = ['circle', 'square', 'diamond', 'triangle'];
+
+/** A point mark centred on (x, y), drawn in a zero-size nested svg so x can be a percentage. */
+function timeMark(shape: TimeMarker | 'ring', tone: Tone, x: string | number, y: number): string {
+  const inner =
+    shape === 'ring'
+      ? `<circle class="c-cap c-stroke-${tone}" r="5" fill="var(--here, var(--bg))"/>`
+      : shape === 'square'
+        ? `<rect class="c-fill-${tone}" x="-4.25" y="-4.25" width="8.5" height="8.5"/>`
+        : shape === 'diamond'
+          ? `<path class="c-fill-${tone}" d="M0,-6L6,0L0,6L-6,0Z"/>`
+          : shape === 'triangle'
+            ? `<path class="c-fill-${tone}" d="M0,-5.5L5.5,4.5L-5.5,4.5Z"/>`
+            : `<circle class="c-dot c-fill-${tone}" r="4.5"/>`;
+  return `<svg x="${x}" y="${r2(y)}" width="1" height="1" overflow="visible">${inner}</svg>`;
 }
 export interface TimeProps {
   locale: Locale;
@@ -407,15 +428,10 @@ export function renderTime(p: TimeProps): ChartRender {
   o.push(`<svg class="c-stretch" x="0" y="0" width="100%" height="${TOP + H}" viewBox="0 0 1000 ${TOP + H}" preserveAspectRatio="none">${paths.join('')}</svg>`);
   // points and end labels (pushed apart so they never collide)
   const endLabels: { y: number; text: string; x: number; anchor: string }[] = [];
+  const shapeOf = (s: TimeSeries): TimeMarker | 'ring' => (s.target ? 'ring' : s.marker ?? 'circle');
   series.forEach((s) => {
     const shown = s.points.filter((q): q is { x: number; y: number } => q.y !== null);
-    shown.forEach((q) => {
-      o.push(
-        s.target
-          ? `<circle class="c-cap c-stroke-${s.tone}" cx="${xp(q.x)}%" cy="${yp(q.y)}" r="5" fill="var(--here, var(--bg))"/>`
-          : `<circle class="c-dot c-fill-${s.tone}" cx="${xp(q.x)}%" cy="${yp(q.y)}" r="4"/>`,
-      );
-    });
+    shown.forEach((q) => o.push(timeMark(shapeOf(s), s.tone, `${xp(q.x)}%`, yp(q.y))));
     if (s.target) {
       shown.forEach((q) => o.push(text('c-value c-value--sm', `${xp(q.x)}%`, yp(q.y) - 10, `${f(q.y)}`, `text-anchor="${xp(q.x) > 92 ? 'end' : 'middle'}"`)));
     } else if (shown.length) {
@@ -436,6 +452,19 @@ export function renderTime(p: TimeProps): ChartRender {
     });
   }
   endLabels.forEach((e) => o.push(text('c-value c-value--sm', `${e.x}%`, e.y, e.text, `text-anchor="${e.anchor}" dx="${e.anchor === 'start' ? 2 : e.anchor === 'end' ? -2 : 0}"`)));
+  // The key, drawn under the axis with the very marks the lines use (stroke, dash and point
+  // shape), so each line can be told apart in greyscale and with red-green colour blindness.
+  let keyY = TOP + H + 28 + 10;
+  if (series.length > 1) {
+    series.forEach((s) => {
+      const lines = wrapLabel(s.label, (MIN_W - 46 - 36) / 14, 3);
+      const cy = keyY + 9;
+      o.push(`<line class="c-line c-stroke-${s.tone}" x1="0" x2="28" y1="${cy}" y2="${cy}"${s.target ? ' stroke-dasharray="6 4"' : ''}/>`);
+      o.push(timeMark(shapeOf(s), s.tone, 14, cy));
+      lines.forEach((ln, k) => o.push(text('c-label', 36, keyY + 14 + k * LINE, ln)));
+      keyY += lines.length * LINE + 8;
+    });
+  }
   const head = [p.xLabel, ...series.map((s) => s.label)];
   const rows = xs.map((x) => [String(x), ...series.map((s) => {
     const v = s.points.find((q) => q.x === x)?.y;
@@ -444,10 +473,11 @@ export function renderTime(p: TimeProps): ChartRender {
   return {
     kind: 'evc-time',
     body: o.join(''),
-    height: TOP + H + 28,
+    height: series.length > 1 ? keyY : TOP + H + 28,
     padLeft: 40,
     padRight: 6,
-    legend: series.map((s) => ({ label: s.label, tone: s.tone, shape: s.target ? 'dot' : 'line' })),
+    // the key is in the drawing (above), with the real marks; a separate legend would repeat it with other glyphs
+    legend: undefined,
     table: { head: head.map((h, i) => (i ? `${h} (${unit})` : h)), rows },
   };
 }
@@ -458,7 +488,8 @@ export function renderTime(p: TimeProps): ChartRender {
 
 export interface OdourRow {
   label: string;
-  marks: { low: number; high?: number; source: string; tone: Tone }[];
+  /** each source has its own mark shape as well as its colour (circle or square), matching its legend key */
+  marks: { low: number; high?: number; source: string; tone: Tone; shape?: 'circle' | 'square' }[];
   none?: string;
 }
 export interface OdourProps {
@@ -498,11 +529,13 @@ export function renderOdour(p: OdourProps): ChartRender {
     }
     r.marks.forEach((m, k) => {
       const dy = r.marks.length > 1 ? (k === 0 ? -4 : 4) : 0;
+      const shape = m.shape ?? 'circle';
       if (m.high !== undefined && m.high > m.low) {
         g += `<rect class="c-fill-${m.tone} c-mark" x="${xp(m.low)}%" y="${cy + dy - 3}" width="${r2(xp(m.high) - xp(m.low))}%" height="6" rx="3"/>`;
-        g += `<circle class="c-dot c-fill-${m.tone}" cx="${xp(m.low)}%" cy="${cy + dy}" r="4.5"/>`;
+        g += timeMark(shape, m.tone, `${xp(m.low)}%`, cy + dy);
+        if (shape !== 'circle') g += timeMark(shape, m.tone, `${xp(m.high)}%`, cy + dy);
       } else {
-        g += `<circle class="c-dot c-fill-${m.tone} c-mark" cx="${xp(m.low)}%" cy="${cy + dy}" r="5.5"/>`;
+        g += timeMark(shape, m.tone, `${xp(m.low)}%`, cy + dy);
       }
     });
     body.push(g + '</g>');

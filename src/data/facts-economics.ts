@@ -13,7 +13,7 @@ const SIX_CITIES = t('全國與六都', "Taiwan and the six special municipaliti
 const NOV_2026 = t('2026年11月', 'November 2026');
 const PROMO_CAVEAT = t(
   '車廠的月度優惠，11月30日結束；最低價須汰舊並通過國稅局核定，金額不含牌照與保險費。12月以後的優惠在查證時尚未公布。',
-  'Monthly manufacturer offers that ended on 30 November; the lowest prices require scrapping and tax-office approval and exclude plate and insurance. Later offers had not been published when we checked.',
+  'Monthly manufacturer offers that run until 30 November; the lowest prices require scrapping and tax-office approval and exclude plate and insurance. Later offers had not been published when we checked.',
 );
 
 export const economics = {
@@ -64,7 +64,7 @@ export const economics = {
     confidence: 'verified',
     evidence: 'market-tw',
     caveat: t(
-      'Ionex的價格取自官網補助試算頁的程式欄位，Gogoro的價格取自它自己的補助試算資料，ZAU是零售網站價格；都不是印出的建議售價，請向車行確認。',
+      'Ionex的價格取自官網的補助試算頁，Gogoro的價格取自它自己的補助試算資料，ZAU是購物網站的售價；都不是公布的建議售價，請向車行確認。',
       'The Ionex prices come from its subsidy calculator, the Gogoro prices from Gogoro\'s own calculator data and the ZAU price from a retail site; none is a printed list price, so confirm with the dealer.',
     ),
     requiresCaveat: true,
@@ -80,8 +80,8 @@ export const economics = {
     },
     display: t('最高 8,000 元，至 2026 年底', 'up to NT$8,000, until the end of 2026'),
     statement: t(
-      '經濟部2026年新購電動機車補助7,000元（普通輕型第2級與小型輕型為5,100元），淘汰10年以上燃油機車再加1,000元，購車期限到2026年12月31日。補助表另列國產電池芯加碼3,000元，但認可車款清單上查不到任何符合的車款，所以不算在內。',
-      'The 2026 MOEA subsidy for a new electric scooter is NT$7,000 (NT$5,100 for 普通輕型 level 2 and small-light), plus NT$1,000 for scrapping a gasoline scooter at least 10 years old; purchases must be made by 31 December 2026. The MOEA table also lists a NT$3,000 bonus for Taiwan-made battery cells, but the approved-model list shows no model that qualifies, so it is not counted.',
+      '經濟部2026年新購電動機車補助7,000元（普通輕型第2級與小型輕型為5,100元），淘汰10年以上燃油機車再加1,000元，購車期限到2026年12月31日。補助表另列國產電池芯加碼3,000元，但沒有任何車款被證實符合，所以不算在內。',
+      'The 2026 MOEA subsidy for a new electric scooter is NT$7,000 (NT$5,100 for the light class level 2 (普通輕型第2級) and small-light class), plus NT$1,000 for scrapping a gasoline scooter at least 10 years old; purchases must be made by 31 December 2026. The MOEA table also lists a NT$3,000 bonus for Taiwan-made battery cells, but no model has been shown to qualify, so it is not counted.',
     ),
     period: t('2022年12月11日至2026年12月31日', '11 December 2022 to 31 December 2026'),
     place: TW,
@@ -90,8 +90,8 @@ export const economics = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '8,000元是新購7,000元加汰舊1,000元。國產電池芯加碼3,000元，至今沒有任何品牌的車款被證實符合；除非車行書面確認，或經濟部補助專線（0800-527-027）證實你的車款符合，最好不要把這筆錢算進去。外籍人士須在2026年12月10日前申請。環境部另有汰舊獎勵（見下）。',
-      'NT$8,000 is the NT$7,000 new-purchase amount plus the NT$1,000 scrap bonus. No model of any brand has been shown to qualify for the NT$3,000 Taiwan-made cell bonus; unless the shop confirms in writing, or the MOEA subsidy line (0800-527-027) confirms your model qualifies, it is safest to leave it out of your sums. Foreign nationals must apply by 10 December 2026. MOENV pays a separate scrap reward (see below).',
+      '8,000元是新購7,000元加汰舊1,000元。國產電池芯加碼3,000元，至今沒有任何品牌的車款被證實符合；除非車行書面確認，或經濟部補助專線（0800-527-027）證實你的車款符合，最好不要把這筆錢算進去。外籍人士須在2026年12月10日前申請。環境部另有減碳與空污的汰舊獎勵，是另一筆錢。',
+      'NT$8,000 is the NT$7,000 new-purchase amount plus the NT$1,000 scrap bonus. No model of any brand has been shown to qualify for the NT$3,000 Taiwan-made cell bonus; unless the shop confirms in writing, or the MOEA subsidy line (0800-527-027) confirms your model qualifies, it is safest to leave it out of your sums. Foreign nationals must apply by 10 December 2026. MOENV pays separate carbon and air scrap rewards on top.',
     ),
     requiresCaveat: true,
     research: 'econ/central#moea-new-purchase-heavy-light',
@@ -115,8 +115,8 @@ export const economics = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '環境部說可同步申請的那句話出現在汽車段落，2025年也有報導說不能併領，請向平臺確認。減碳獎勵有名額（2026年11月25日台積電全國選項剩43,847輛），空污補助2027年起是否延長仍是草案。',
-      'The MOENV sentence saying both can be applied for sits in a paragraph about cars and a 2025 report said they could not be combined, so confirm with the platform. The carbon reward has quotas (43,847 TSMC nationwide places left on 25 November 2026); extending the air subsidy beyond 2026 is still a draft.',
+      '環境部說可同步申請的那句話出現在汽車段落，2025年也有報導說不能併領，請向平臺確認。減碳獎勵有名額：其中由台積電出資、全國都能申請的選項（平臺把企業出資的名額媒合給買車的人），2026年11月25日還剩43,847輛。空污補助2027年起是否延長仍是草案。',
+      'The MOENV sentence saying both can be applied for sits in a paragraph about cars and a 2025 report said they could not be combined, so confirm with the platform. The carbon reward has quotas: the nationwide option funded by TSMC (the platform matches company-funded places to buyers) had 43,847 places left on 25 November 2026. Extending the air subsidy beyond 2026 is still a draft.',
     ),
     requiresCaveat: true,
     research: 'econ/central#stacking-central',
@@ -125,22 +125,22 @@ export const economics = {
     data: { programmeEnd: v(2026, 'year'), draftExtensionTo: v(2030, 'year'), airSubsidy2026: v(1000, 'ntd', { note: 'the 2026 nationwide amount of the payment the draft would extend; the draft table\'s scooter amount was not seen' }) },
     display: t('2027 年還沒有確定的方案', 'nothing confirmed for 2027'),
     statement: t(
-      '2026年的中央與地方電動機車補助都要求在2026年12月31日前購車（多數受理申請到2027年1月10日）；截至2026年11月25日，沒有任何2027年的補助已經確定。唯一的訊號是一份草案：環境部11月11日預告，擬把汰舊換新的空污補助（2026年全國為1,000元）延長到2030年底，尚未定案。',
-      'Every 2026 central and local electric scooter subsidy requires purchase by 31 December 2026 (most accept claims until 10 January 2027); as of 25 November 2026 nothing was confirmed for 2027. The one signal is a draft: on 11 November MOENV pre-announced a plan to extend one small scrap-and-replace payment, its air subsidy (NT$1,000 nationwide in 2026), to the end of 2030. It is not final.',
+      '經濟部與各縣市2026年的電動機車補助都要求在2026年12月31日前購車（多數受理申請到2027年1月10日）；環境部有幾個由企業或園區出資的汰舊獎勵選項列到2027年底，但補助規定只確定到2026年底。截至2026年11月25日，沒有任何2027年的補助已經確定。另一個訊號是一份草案：環境部11月11日預告，擬把汰舊換新的空污補助（2026年全國為1,000元）延長到2030年底，尚未定案。',
+      'The 2026 MOEA and city electric scooter subsidies require purchase by 31 December 2026 (most accept claims until 10 January 2027); a few MOENV scrap-reward options funded by companies or science parks are listed to the end of 2027, but the rule behind them is confirmed only to the end of 2026. As of 25 November 2026 nothing was confirmed for 2027. Another signal is a draft: on 11 November MOENV pre-announced a plan to extend one small scrap-and-replace payment, its air subsidy (NT$1,000 nationwide in 2026), to the end of 2030. It is not final.',
     ),
     period: t('截至2026年11月25日', 'As of 25 November 2026'),
     place: TW,
-    sources: ['meid-lev-subsidy-portal', 'ey-ev-industry-subsidy-112-115', 'chinatimes-2026-11-moenv-draft', 'udn-2026-08-new-taipei-2027-plan', 'bnext-2026-taoyuan-survey', 'taipei-dep-ev-subsidy-plan'],
+    sources: ['meid-lev-subsidy-portal', 'meid-lev-2026-subsidy-table', 'ey-ev-industry-subsidy-112-115', 'chinatimes-2026-11-moenv-draft', 'udn-2026-08-new-taipei-2027-plan', 'bnext-2026-taoyuan-survey', 'taipei-dep-ev-subsidy-plan'],
     locator: '中時 2026-11-11: 「鑑於現行補助期限即將屆滿，預先規劃延長補助4年」; EY page: 「電動機車產業環境加值補助計畫（112-115年」',
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
       '經濟部的購車補助到2026年12月31日結束，沒有找到2027年的後續計畫，但這是查詢結果，不是官方說明。環境部的延長只是預告的草案，草案中機車的金額我們沒有在原文中看到；新北市說正在研擬2027年的計畫，桃園市正在調查，都沒有金額。金門、基隆的購車期限更早（11月30日）。',
-      'The MOEA purchase subsidy ends on 31 December 2026 and no 2027 successor was found, though that rests on our searches, not an official statement. The MOENV extension is only a pre-announced draft, and we have not seen the scooter amount in the draft itself; New Taipei says it is drafting a 2027 plan and Taoyuan is surveying, neither with an amount. Kinmen and Keelung closed purchases earlier (30 November).',
+      'The MOEA purchase subsidy ends on 31 December 2026 and no 2027 successor was found, though that rests on our searches, not an official statement. The MOENV extension is only a pre-announced draft, and we have not seen the scooter amount in the draft itself; New Taipei says it is drafting a 2027 plan and Taoyuan is surveying, neither with an amount. Kinmen\'s and Keelung\'s purchase deadlines are earlier: 30 November 2026.',
     ),
     requiresCaveat: true,
     editorNote: 'Never write "none announced" / 未公布: a draft has been pre-announced. Write "nothing confirmed" / 還沒有確定.',
-    research: 'econ/outlook-2027-r2#s2-moenv-116-extension-draft; econ/outlook-2027-r2#s2-moea-no-116-phase-found; econ/outlook-2027-r2#added-new-taipei-2027-plan; econ/central#added-moea-expiry-imminent',
+    research: 'econ/outlook-2027-r2#s2-moenv-116-extension-draft; econ/outlook-2027-r2#s2-moea-no-116-phase-found; econ/outlook-2027-r2#added-new-taipei-2027-plan; econ/central#added-moea-expiry-imminent; econ/central#moenv-carbon-reward-options; econ/central#moenv-air-pollution-options',
   },
   'econ-scrap-age-rules': {
     data: {
@@ -154,7 +154,7 @@ export const economics = {
     },
     display: t('出廠滿 10 年；各縣市自訂期限', 'built 10 or more years ago; each city sets its own cut-off'),
     statement: t(
-      '中央的汰舊補助（經濟部加碼1,000元與環境部的減碳、空污獎勵）都要求淘汰出廠滿10年以上的燃油機車；各縣市的汰舊補助另訂條件：台北市、高雄市是出廠滿10年，新北市與台南市是2015年12月31日以前出廠，桃園市是2016年12月31日以前出廠的1至5期機車，台中市則依舊車的出廠日期與期別分級補助。',
+      '中央的汰舊補助（經濟部加碼1,000元與環境部的減碳、空污獎勵），都要求淘汰出廠滿10年以上的燃油機車。各縣市的汰舊補助另訂條件：台北市、高雄市是出廠滿10年；新北市與台南市是2015年12月31日以前出廠；桃園市是2016年12月31日以前出廠的1至5期機車；台中市則依舊車的出廠日期與期別分級補助。',
       'The central scrap payments (the MOEA NT$1,000 bonus and MOENV\'s carbon and air rewards) all require scrapping a gasoline scooter built 10 or more years ago; city schemes set their own cut-offs: at least 10 years old in Taipei and Kaohsiung, built by 31 December 2015 in New Taipei and Tainan, a phase 1–5 scooter built by 31 December 2016 in Taoyuan, and in Taichung a sliding scale by build date and emission phase.',
     ),
     period: t('2026年', '2026'),
@@ -211,8 +211,8 @@ export const economics = {
     data: { newPurchaseMax: v(33000, 'ntd'), twoStrokeReplaceMax: v(49300, 'ntd'), oldHeavySlotsLeft: v(194, 'count') },
     display: t('最高 49,300 元', 'up to NT$49,300'),
     statement: t(
-      '台北市公布的2026年最高補助（含中央）是新購33,000元、淘汰二行程機車換購49,300元，兩者都需要家中有12歲以下兒童；沒有孩子、汰換10年以上四行程機車的人，依本站計算約38,300元。',
-      'Taipei\'s published 2026 maximums, including central money, are NT$33,000 for a new purchase and NT$49,300 for replacing a two-stroke, both requiring a child aged 12 or under; someone without a child replacing a 10-year-old four-stroke gets about NT$38,300 by our arithmetic.',
+      '台北市公布的2026年最高補助（含中央）是新購33,000元、淘汰二行程機車換購49,300元，兩者都需要家中有12歲以下兒童；沒有孩子、汰換10年以上四行程機車並換購重型電動機車的人，依本站計算約38,300元。',
+      'Taipei\'s published 2026 maximums, including central money, are NT$33,000 for a new purchase and NT$49,300 for replacing a two-stroke, both requiring a child aged 12 or under; someone without a child replacing a 10-year-old four-stroke with a heavy-class electric scooter gets about NT$38,300 by our arithmetic.',
     ),
     period: t('2026年（11月20日新聞稿）', '2026 (press release of 20 November)'),
     place: TAIPEI,
@@ -228,11 +228,11 @@ export const economics = {
     research: 'econ/taipei#tpe-max-replace',
   },
   'econ-taichung-subsidy-2026': {
-    data: { newPurchase: v(3000, 'ntd'), scrapTwoStroke: v(16000, 'ntd'), scrapPhase5: v(5000, 'ntd'), lowIncomeScrap: v(30000, 'ntd'), child: v(3000, 'ntd') },
-    display: t('3,000 至 30,000 元', 'NT$3,000–30,000'),
+    data: { newPurchase: v(3000, 'ntd'), scrapTwoStroke: v(16000, 'ntd'), scrapPhase5: v(5000, 'ntd'), lowIncomeScrap: v(30000, 'ntd'), child: v(3000, 'ntd'), max: v(33000, 'ntd', { derived: true, note: '30,000 low-income scrap + 3,000 child (taichung-r2#tc2-headline-31500)' }) },
+    display: t('3,000 至 33,000 元', 'NT$3,000–33,000'),
     statement: t(
       '台中市2026年新購電動機車補助3,000元；汰舊換購依舊車期別為16,000（二行程）、13,000、10,000或5,000元（取代而非加在3,000元上），中低收入戶換購30,000元，育有12歲以下兒童再加3,000元；城市、環境部與經濟部補助合計不超過車價。',
-      'In 2026 Taichung pays NT$3,000 for a new electric scooter; scrap-and-replace pays NT$16,000 (two-stroke), 13,000, 10,000 or 5,000 by the old scooter\'s age (instead of, not on top of, the 3,000), NT$30,000 for low-income households, plus NT$3,000 for a guardian of a child aged 12 or under; city, MOENV and MOEA money together may not exceed the price.',
+      'In 2026 Taichung pays NT$3,000 for a new electric scooter; scrap-and-replace pays NT$16,000 (two-stroke), 13,000, 10,000 or 5,000 by the old scooter\'s emission phase (instead of, not on top of, the 3,000), NT$30,000 for low-income households, plus NT$3,000 for a guardian of a child aged 12 or under; city, MOENV and MOEA money together may not exceed the price.',
     ),
     period: t('2026年', '2026'),
     place: t('台中市', 'Taichung City'),
@@ -240,7 +240,10 @@ export const economics = {
     locator: '附表1: 新購 3,000 / 25,000; 二行程 16,000; 1至3期 13,000; 4期 10,000; 5期 5,000; 中(低)收入戶 30,000; 兒童加碼 3,000',
     confidence: 'verified',
     evidence: 'official-tw',
-    caveat: t('經費依申請順序核撥至用完，是否已用罄未查證；媒體報導的「最高31,500元」不是官方數字。', 'Money is paid in order until it runs out, and whether it has was not checked; the "up to NT$31,500" in media reports is not an official figure.'),
+    caveat: t(
+      '33,000元是中低收入戶換購30,000元加兒童加碼3,000元，只有少數人符合。經費依申請順序核撥至用完，是否已用罄我們沒有查到；媒體報導的「最高31,500元」不是官方數字。',
+      'NT$33,000 is the low-income replacement amount (30,000) plus the child top-up (3,000), which few buyers qualify for. Money is paid in order until it runs out, and we did not find whether it has; the "up to NT$31,500" in media reports is not an official figure.',
+    ),
     research: 'econ/taichung-r2#tc2-new-general',
   },
   'econ-kaohsiung-budget-exhausted': {
@@ -281,9 +284,9 @@ export const economics = {
     research: 'econ/outlook-2027-r2#s2-petrol-goods-tax-cut-expiry',
   },
   'econ-petrol-cost-per-km': {
-    data: { atOfficial: v(0.55, 'ntd-per-km', { derived: true, note: '32.7 / 60' }), atRealWorld: v(0.73, 'ntd-per-km', { derived: true, note: '32.7 / 45' }) },
-    display: t('每公里約 0.55 至 0.73 元', 'about NT$0.55–0.73 per km'),
-    statement: t('以每公升32.7元計，新款125cc燃油機車的油錢約每公里0.55元（官方油耗每公升60公里）到0.73元（實際騎乘每公升45公里）。', 'At NT$32.7 a litre, fuel for a modern 125cc scooter costs about NT$0.55 per km (official 60 km/L) to NT$0.73 (45 km/L in real riding).'),
+    data: { atOfficial: v(0.53, 'ntd-per-km', { derived: true, note: '32.7 / 61.5 (KYMCO New Haomai 125, official test)' }), atRealWorld: v(0.73, 'ntd-per-km', { derived: true, note: '32.7 / 45' }) },
+    display: t('每公里約 0.53 至 0.73 元', 'about NT$0.53–0.73 per km'),
+    statement: t('以每公升32.7元計，新款125cc燃油機車的油錢約每公里0.53元（光陽新豪邁125的官方測試油耗，每公升61.5公里）到0.73元（實際騎乘每公升45公里）。', 'At NT$32.7 a litre, fuel for a modern 125cc scooter costs about NT$0.53 per km (the official test figure for the KYMCO New Haomai 125, 61.5 km/L) to NT$0.73 (45 km/L in real riding).'),
     period: t('2026年11月油價', 'November 2026 prices'),
     place: TW,
     sources: ['kingautos-2026-11-fuel-price', 'tvbs-cars-2026-06-fuel-ranking', 'kikinote-fuel-cost-assumption'],
@@ -291,40 +294,54 @@ export const economics = {
     evidence: 'derived',
     derivedFrom: ['econ-petrol-price-smoothing'],
     caveat: t('每公升45公里是常見估計而非實測；交通部調查所有燃油機車車主自報平均每公升只有24.7公里（約每公里1.32元），但涵蓋舊車與大排氣量車。若平穩措施取消，油錢約增加近兩成。', '45 km/L is a common estimate, not a measurement; the MOTC owner survey averages only 24.7 km/L across all gasoline motorcycles (about NT$1.32 per km), including old and large bikes. If the smoothing ends, fuel costs rise by about a fifth.'),
-    research: 'econ/running-costs#fuel-cost-per-km-derived',
+    research: 'econ/running-costs#fuel-cost-per-km-derived; econ/energy-prices-r2#lab-fueleco-2026-ranking',
   },
   'econ-home-charging-cost-per-km': {
-    data: { lowTier: v(0.07, 'ntd-per-km', { derived: true, approx: true, note: '0.06–0.08 at 1.78–2.26 NTD/kWh' }), high: v(0.19, 'ntd-per-km', { derived: true }) },
-    display: t('低級距每公里約 0.06 至 0.08 元', 'about NT$0.06–0.08 per km in low tariff tiers'),
-    statement: t('能在家插電、不必付電池月租的電動機車，用電落在低級距時電費約每公里0.06至0.08元，高級距約0.19元，遠低於油錢；但我們查到的這類車只有一款（ZAU ES-1000，極速53 km/h），主流車款多數須付換電月租。', 'For an electric scooter charged at home with no battery plan, electricity costs about NT$0.06–0.08 per km in low tariff tiers and about NT$0.19 in high ones, far below fuel; but we verified only one such model (ZAU ES-1000, 53 km/h top speed), and most mainstream models need a swap plan.'),
+    data: {
+      lowTier: v(0.06, 'ntd-per-km', { derived: true, approx: true, low: 0.05, high: 0.07, note: 'ZAU ES-1000 at 35.8 km/kWh + 10% losses: 1.78 → 0.055, 2.26 → 0.069 NTD/kWh' }),
+      high: v(0.16, 'ntd-per-km', { derived: true, approx: true, note: '5.14 / 35.8 × 1.1 = 0.158 (summer 501–700 kWh tier)' }),
+    },
+    display: t('低級距每公里約 0.05 至 0.07 元', 'about NT$0.05–0.07 per km in low tariff tiers'),
+    statement: t(
+      '能在家插電、不必付電池月租的電動機車，以ZAU ES-1000計算，用電落在低級距時電費約每公里0.05至0.07元，夏季高級距約0.16元，遠低於油錢；但我們查到的這類車只有同一家廠商的兩款（ES-1000極速53 km/h、白牌ES-2000極速80 km/h），都沒有證實等同125cc燃油機車，主流車款多數須付換電月租。',
+      'For an electric scooter charged at home with no battery plan, taking the ZAU ES-1000, electricity costs about NT$0.05–0.07 per km in low tariff tiers and about NT$0.16 in the summer high tier, far below fuel; but we found only two such models, both from one maker (ES-1000, 53 km/h top speed; the white-plate ES-2000, 80 km/h), neither verified as a match for a 125cc, and most mainstream models need a swap plan.',
+    ),
     period: t('2026年4月起電價', 'Tariffs from April 2026'),
     place: TW,
-    sources: ['tvbs-2026-electricity-tariff', 'ionex-plans', 'zau-es1000-spec', 'wantrich-2026-09-tariff-freeze'],
+    sources: ['tvbs-2026-electricity-tariff', 'zau-es1000-spec', 'zau-es2000-spec', 'wantrich-2026-09-tariff-freeze'],
     confidence: 'secondary',
     evidence: 'derived',
-    caveat: t('電價取自媒體轉述（台電官網未能開啟），以每度約31.4公里並加計一成左右的充電損耗推算；12月電價審議可能調整。', 'Tariffs as reported by the media (the Taipower site could not be opened), at about 31.4 km per kWh plus roughly 10% charging losses; the December review may change tariffs.'),
+    caveat: t(
+      '電價取自媒體轉述（台電官網我們沒能打開）。ZAU沒有公布每度電可跑幾公里，這裡用推估範圍（每度25至46.5公里）的中點35.8公里，另加一成充電損耗；12月電價審議可能調整。ES-2000耗電較多（推估每度約28公里），低級距約每公里0.07至0.09元。',
+      'Tariffs as reported by the media (we could not open the Taipower site). ZAU publishes no km-per-kWh figure, so this uses 35.8 km per kWh, the midpoint of an estimated 25–46.5, plus 10% charging losses; the December review may change tariffs. The ES-2000 uses more (an estimated 28 km per kWh), about NT$0.07–0.09 per km in a low tier.',
+    ),
     requiresCaveat: true,
-    research: 'econ/running-costs#home-charge-cost-per-km',
+    editorNote: 'Same efficiency as the calculator (src/data/econ/vehicles.ts zau-es1000 typical 35.8; es2000 28). Previously computed with Ionex\'s 31.4 km/kWh fleet average, which gave 0.06-0.08 and 0.19; that was the wrong scooter.',
+    research: 'econ/energy-prices-r2#calc-home-charge-per-km; econ/home-charge-evs-r2#zau-es1000-cost-per-km',
   },
   'econ-swap-vs-petrol-low-mileage': {
     data: {
       petrolAt300: v(160, 'ntd-per-month', { derived: true }),
       gogoro488: v(488, 'ntd-per-month'),
-      ionex318At300: v(567, 'ntd-per-month', { derived: true, note: '318 + (300 / 31.3 − 250 / 52) × 52 (CoolOne, swapping)' }),
+      ionex318At300: v(566, 'ntd-per-month', { derived: true, note: '318 + (300 / 31.3 − 250 / 52) × 52 = 566.4 (CoolOne, swapping; exact allowance, as the calculator)' }),
     },
     display: t('每月300公里：油錢約160至220元，換電月租488元起', '300 km a month: fuel about NT$160–220, swap plans from NT$488'),
     statement: t(
-      '騎得少的人，換電月租比油錢貴：每月騎300公里，新款125cc的油錢約160至220元，而Gogoro 488方案即使全部在免費時段換電也要488元，Ionex 318方案（換電）約567元。',
-      'For low-mileage riders a swap subscription costs more than fuel: at 300 km a month a modern 125cc uses about NT$160–220 of fuel, while the Gogoro 488 plan costs NT$488 even if every swap is in a free window, and the Ionex 318 plan (swapping) about NT$567.',
+      '騎得少的人，換電月租比油錢貴：每月騎300公里，新款125cc的油錢約160至220元，而Gogoro單電池的488方案（綠牌EZZY用）即使全部在免費時段換電也要488元，白牌雙電池車的888方案更貴，Ionex 318方案（換電）約566元。',
+      'For low-mileage riders a swap subscription costs more than fuel: at 300 km a month a modern 125cc uses about NT$160–220 of fuel, while Gogoro\'s single-battery 488 plan (for the green-plate EZZY) costs NT$488 even if every swap is in a free window, the 888 plan for white-plate two-battery models costs more, and the Ionex 318 plan (swapping) about NT$566.',
     ),
     period: NOV_2026,
     place: TW,
-    sources: ['gogoro-488-888-promo', 'ionex-plans', 'kingautos-2026-11-fuel-price', 'tvbs-cars-2026-06-fuel-ranking'],
-    confidence: 'verified',
+    sources: ['gogoro-488-888-promo', 'gogoro-network-payg-page', 'ionex-plans', 'kingautos-2026-11-fuel-price', 'tvbs-cars-2026-06-fuel-ranking', 'kikinote-fuel-cost-assumption'],
+    confidence: 'secondary',
     evidence: 'derived',
     derivedFrom: ['econ-petrol-cost-per-km'],
-    caveat: t('Gogoro按用量計費的0月租方案（每安時1.1元，另收一次性設定費）在低里程時較便宜，約每公里0.85元，仍高於油錢。月租方案都要綁約24個月。', 'Gogoro\'s pay-per-use plan (NT$1.1 per Ah plus a one-off setup fee) is cheaper at low mileage, about NT$0.85 per km, still above fuel. Subscription plans carry 24-month contracts.'),
-    research: 'econ/running-costs#swap-vs-petrol-lowmileage',
+    caveat: t(
+      '油錢上限220元用的是每公升45公里的常見估計，不是實測。Gogoro按用量計費的0月租方案每安時1.1元（單電池約每公里0.85元），但要先付設定費（單電池6,000元、雙電池9,000元，每24個月續約再付），單電池攤下來約每月250元；算進設定費，每月300公里約504元，比488方案貴，也比油錢貴。騎到飽（488、888）與0月租方案綁約24個月，高用量自由省18個月，官方頁面沒有寫自由省319的綁約期。',
+      'The NT$220 upper end of fuel uses a common estimate of 45 km/L, not a measurement. Gogoro\'s pay-per-use plan charges NT$1.1 per Ah (about NT$0.85 per km for one battery) but needs a setup fee (NT$6,000 for one battery, NT$9,000 for two, paid again at each 24-month renewal), about NT$250 a month for one battery; with the fee, 300 km a month costs about NT$504, more than the 488 plan and more than fuel. The 488/888 and pay-per-use plans are 24-month contracts, the high-use plans 18 months, and Gogoro\'s pages state no term for the 319 plan.',
+    ),
+    editorNote: 'Pay-per-use at 300 km: 300 / 1.3 km per Ah × 1.1 = 254 + 6,000 / 24 = 250 → about 504 (single battery). Sources: gogoro-official-r2#gogoro-payg-plan, #plan-table-2025-07, #gogoro-official-tariff-plans; running-costs#gogoro-zero-perkm.',
+    research: 'econ/running-costs#swap-vs-petrol-lowmileage; econ/gogoro-official-r2#gogoro-payg-plan; econ/gogoro-official-r2#gogoro-official-tariff-plans',
   },
   'econ-motc-annual-spend': {
     data: { electric: v(10506, 'ntd-per-year'), gasolineHeavy: v(8389, 'ntd-per-year'), electricEnergy: v(7717, 'ntd-per-year'), gasolineHeavyEnergy: v(5502, 'ntd-per-year') },
@@ -355,7 +372,10 @@ export const economics = {
     sources: ['moj-road-fee-regulation', 'udn-2026-road-fee-ev', 'mof-licence-tax-act'],
     confidence: 'verified',
     evidence: 'official-tw',
-    caveat: t('450元出自全國法規資料庫的費率表；法規條文只寫電動汽車免徵，電動機車免徵依交通部說法，機車何時、收多少尚未訂定。', 'NT$450 is from the official rate table; the regulation names only electric cars as exempt, the scooter exemption rests on MOTC statements, and when and how much scooters will pay is undecided.'),
+    caveat: t(
+      '450元出自全國法規資料庫的費率表。條文只寫電動汽車免徵；電動機車免徵是交通部的說法。2030年以後電動機車要不要收、收多少，還沒有規定。',
+      'NT$450 is from the official rate table. The regulation names only electric cars as exempt; the scooter exemption rests on MOTC statements. Whether, and how much, electric scooters will pay after 2030 has not been set.',
+    ),
     research: 'econ/maintenance-fees#fee-road-125',
   },
   'econ-gogoro-network': {

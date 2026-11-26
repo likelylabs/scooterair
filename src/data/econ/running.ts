@@ -4,7 +4,7 @@
 // Tyres and brake pads are left out of both sides: the research found no sourced difference
 // between gasoline and electric, and prices are the same.
 
-import { t } from '../types.ts';
+import { t } from './l10n.ts';
 import type { FixedFees, MaintenanceProfile, SpendReference } from './types.ts';
 
 export const maintenance: MaintenanceProfile[] = [
@@ -49,7 +49,7 @@ export const maintenance: MaintenanceProfile[] = [
       low: 385,
       typical: 433,
       high: 587,
-      typicalBasis: t('Gogoro Care官方價格資料：EZZY每5,000公里一次、到4萬公里共8次3,460元，平均每次約433元；EZZY 500平均約385元；高值取2020年舊款發票的587元，因為耗材另計。', 'Gogoro Care price data: EZZY visits every 5,000 km cost NT$3,460 over eight visits to 40,000 km, about NT$433 each; EZZY 500 about NT$385; the high end uses an older 2020 invoice (NT$587) because consumables are extra.'),
+      typicalBasis: t('Gogoro Care官方價格資料：EZZY每5,000公里一次、到4萬公里共8次3,460元，平均每次約433元；EZZY 500平均約385元；高值取 2020 年舊款發票的587元，因為耗材另計。', 'Gogoro Care price data: EZZY visits every 5,000 km cost NT$3,460 over eight visits to 40,000 km, about NT$433 each; EZZY 500 about NT$385; the high end uses an older 2020 invoice (NT$587) because consumables are extra.'),
       sources: ['gogoro-care-maintenance-prices', 'pixnet-2020-gogoro2-service'],
       confidence: 'verified',
       research: ['gogoro-official-r2#gogoro-maintenance-official-prices'],
@@ -78,7 +78,7 @@ export const maintenance: MaintenanceProfile[] = [
       low: 427,
       typical: 507,
       high: 587,
-      typicalBasis: t('2020年Gogoro 2保養發票每次427至587元，取中間值；2026年價格可能更高，視為下限參考。', 'Gogoro 2 service invoices from 2020 of NT$427–587 per visit; the middle value is the midpoint. 2026 prices are probably higher, so treat it as a floor.'),
+      typicalBasis: t('2020 年Gogoro 2保養發票每次427至587元，取中間值；2026 年價格可能更高，視為下限參考。', 'Gogoro 2 service invoices from 2020 of NT$427–587 per visit; the middle value is the midpoint. 2026 prices are probably higher, so treat it as a floor.'),
       sources: ['pixnet-2020-gogoro2-service'],
       confidence: 'secondary',
       research: ['maintenance-fees#price-gogoro2-invoice', 'maintenance-fees#derived-gogoro-5k10k'],
@@ -113,8 +113,8 @@ export const fees: FixedFees = {
     value: 0,
     expectedFromYear: 2031,
     futureNote: t(
-      '電動車目前免繳公路養管費，交通部表示免徵到2030年底、最快2030年起才開徵，機車費率尚未訂定（法規條文只寫電動汽車，電動機車免徵依交通部說法）。',
-      'Electric vehicles do not pay the road maintenance fee now; MOTC says the exemption runs to the end of 2030 and charging could start in 2030 at the earliest, with no scooter rate set (the regulation names only electric cars; the scooter exemption rests on MOTC statements).',
+      '電動車現在不用繳燃料費（公路養管費）。交通部表示免繳延長到 2030 年底，之後才可能開始收，機車要收多少還沒有訂（法規條文只寫電動汽車，電動機車免繳是交通部的說法）。',
+      'Electric vehicles pay no fuel-use fee (road maintenance fee) now. MOTC says the exemption runs to the end of 2030 and a fee could follow after that; no scooter rate has been set (the regulation names only electric cars; the scooter exemption rests on MOTC statements).',
     ),
     sources: ['udn-2026-road-fee-ev', 'businesstoday-2026-06-road-fee', 'moj-road-fee-regulation'],
     confidence: 'verified',
@@ -132,7 +132,7 @@ export const fees: FixedFees = {
     sources: ['udn-2026-compulsory-insurance', 'money101-compulsory-insurance'],
     confidence: 'verified',
     research: ['gas-baseline-r2#r2-insurance-gas-2026'],
-    note: t('重型機車一年約658元，2026年7月起保費不變。電動機車的費率沒有官方說明（563元是微型電動二輪車的費率，不適用）；兩邊以同一金額計入，不影響差額。', 'About NT$658 a year for a heavy-class scooter, unchanged from July 2026. There is no official statement for electric scooters (NT$563 is the micro e-two-wheeler rate and does not apply); counted equally on both sides, so it does not change the difference.'),
+    note: t('重型機車一年約658元，2026 年 7 月起保費不變。電動機車的保費沒有官方說明，兩邊都以同一金額計入，所以不影響兩邊的差額。', 'About NT$658 a year for a heavy-class scooter, unchanged from July 2026. There is no official figure for electric scooters, so both sides are counted at the same amount and the difference is not affected.'),
   },
   inspection: {
     gasolineFromAgeYears: 5,
@@ -145,7 +145,7 @@ export const fees: FixedFees = {
 };
 
 export const spendReference: SpendReference = {
-  label: t('交通部113年機車使用狀況調查：每輛機車每年變動支出', 'MOTC 2024 survey: yearly variable spend per scooter'),
+  label: t('交通部 2024 年機車使用狀況調查：每輛機車每年變動支出', 'MOTC 2024 survey: yearly variable spend per scooter'),
   electric: 10506,
   gasolineHeavy: 8389,
   gasolineLight: 5585,

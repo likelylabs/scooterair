@@ -135,11 +135,10 @@ export const casePanelFacts: FactId[] = ['tsai2026-three-scooter-case'];
 export const casePanelSeries: SeriesId[] = ['tsai2026-three-scooter-case'];
 
 /**
- * Rows not printed as they stand because their wording breaks a binding correction (2027 is
- * "nothing confirmed", never "nothing announced"). /evidence/ keeps the anchor with a note, so
- * links from other pages still land; /sources/ shows the same note instead of the statement.
+ * R14: the never-smoker lung cancer figures appear only in #not-used. Pointers to them elsewhere
+ * (link 5's "also used" list, /sources/) carry a number-free label and no statement.
  */
-export const withheld: FactId[] = ['econ-no-2027-programme'];
+export const neverSmokerFacts: FactId[] = ['tseng2019-never-smokers', 'huang2021-never-smoker-lung-cancer'];
 
 /** Where a fact's full row is: '#not-used', or link n. */
 export function homeOf(id: FactId): 'not-used' | ChainLink | null {
@@ -151,11 +150,14 @@ export function homeOf(id: FactId): 'not-used' | ChainLink | null {
 // Chain-wide counts
 // ---------------------------------------------------------------------------------------
 
+/** Everything the registry holds (the same counts /about/ prints), with the on-chain share of the facts. */
 export function totals() {
   const linked = factList.filter((f) => f.chainLink !== null);
   return {
-    facts: linked.length,
-    series: seriesList.filter((s) => s.chainLink !== null).length,
+    facts: factList.length,
+    chained: linked.length,
+    context: factList.length - linked.length,
+    series: seriesList.length,
     gaps: gapList.length,
     sources: sourceIds.length,
     rules: claimRuleList.filter((r) => r.kind === 'do-not-claim').length,

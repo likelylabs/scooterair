@@ -1,6 +1,6 @@
 // Small builders that keep the programme files readable. Data only.
 
-import { t } from '../../types.ts';
+import { t } from '../l10n.ts';
 import type { Amount, Condition, ISODate, L10n, Quota, SourceId } from '../types.ts';
 
 export { t };
@@ -33,6 +33,14 @@ export const residency = (minYears?: number, registeredBy?: ISODate): Condition 
 export const notPreviouslySubsidised: Condition = { kind: 'household', flag: 'previousLocalSubsidy', value: false };
 /** The same, with an assumption that names every subsidy the rule excludes (e.g. MOENV's too). */
 export const notSubsidisedBefore = (assumption: L10n): Condition => ({ kind: 'household', flag: 'previousLocalSubsidy', value: false, assumption });
+/**
+ * A prior-subsidy rule that looks back over a set period only (Taichung: since 2016; Yilan:
+ * 2023–2025; Yunlin: the past 3 years; Kinmen's swap route: a Kinmen application over 5 years
+ * ago is allowed). The form's "had a subsidy before" box does not say when, so a reader who ticks
+ * it is not refused: the line is left out as unclear, with `why` saying who the rule really
+ * excludes and what the reader would get if theirs falls outside it.
+ */
+export const notSubsidisedInWindow = (assumption: L10n, why: L10n): Condition => ({ kind: 'household', flag: 'previousLocalSubsidy', value: false, assumption, why, ambiguous: true });
 export const rocNational: Condition = { kind: 'household', flag: 'foreignNational', value: false };
 
 export type Src = SourceId[];

@@ -70,9 +70,9 @@ test('Taichung: the plan\'s cap example (NT$35,000 scooter, NT$37,100 total) lea
   const data = {
     ...econData,
     programmes: econData.programmes.filter((p) => ['tc-scrap-lowincome', 'moea-new-5100', 'moenv-carbon-moea'].includes(p.id)),
-    evModels: econData.evModels.map((m) => (m.id === 'ionex-coolone' ? { ...m, listPrice: { ...m.listPrice, value: 35000 } } : m)),
+    evModels: econData.evModels.map((m) => (m.id === 'ionex-ione-air' ? { ...m, listPrice: { ...m.listPrice, value: 35000 } } : m)),
   };
-  const e = evaluate(situation({ jurisdiction: 'taichung', electricModel: 'ionex-coolone', energyPlan: 'ionex-318-single', scrap: fourStroke2012, household: { income: 'low' } }), data);
+  const e = evaluate(situation({ jurisdiction: 'taichung', electricModel: 'ionex-ione-air', energyPlan: 'ionex-318-single', scrap: fourStroke2012, household: { income: 'low' } }), data);
   assert.equal(government(e), 35000);
   assert.equal(line(e, 'tc-scrap-lowincome'), 27900);
   assert.equal(e.electric.purchase.lines.find((l) => l.id === 'tc-scrap-lowincome')?.cappedFrom, 30000);

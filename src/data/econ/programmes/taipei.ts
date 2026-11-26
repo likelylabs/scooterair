@@ -6,27 +6,27 @@ import { age, builtBy, fixed, flag, heavy, heavyOrLight, light, lowIncome, quota
 const PAYER = t('臺北市政府環境保護局', 'Taipei City Department of Environmental Protection');
 const PLAN = ['taipei-dep-ev-subsidy-plan'] as const;
 const LIVE = 'taipei-envimac-application-system' as const;
-const STATUS_2027 = t('計畫期間至115年12月31日，未見116年計畫。', 'The plan ends on 31 December 2026; no 2027 plan seen.');
-const APPLY = t('購車、領牌、報廢都須在115年12月31日前完成，116年1月10日前線上申請（115年12月31日起網址改為 www.subsidy.gov.taipei）。', 'Buy, register and scrap by 31 December 2026 and apply online by 10 January 2027 (the site moves to www.subsidy.gov.taipei from 31 December 2026).');
+const STATUS_2027 = t('計畫期間至 2026 年 12 月 31 日，未見 2027 年計畫。', 'The plan ends on 31 December 2026; no 2027 plan seen.');
+const APPLY = t('購車、領牌、報廢都須在 2026 年 12 月 31 日前完成，2027 年 1 月 10 日前線上申請（2026 年 12 月 31 日起網址改為 www.subsidy.gov.taipei）。', 'Buy, register and scrap by 31 December 2026 and apply online by 10 January 2027 (the site moves to www.subsidy.gov.taipei from 31 December 2026).');
 
 const general = [residency(1), age(18)];
 const GENERAL_TEXT =
   '年滿18歲、設籍台北市滿1年（以發票日為準），購買經濟部認可的國產電動機車並在台北市首次領牌；每人限1輛，依申請順序核撥至預算用罄，補助總額不超過購車金額。';
 const GENERAL_TEXT_EN =
   'Aged 18+, registered in Taipei for at least a year at the invoice date, buying an MOEA-approved domestic model first plated in Taipei; one per person, paid in order until the budget runs out, never more than the purchase price.';
-const OLD_TEXT = '舊車為出廠滿10年以上的燃油機車，114年12月31日前已設籍台北市且115年未遷出，並於115年內報廢回收。';
-const OLD_TEXT_EN = 'The old scooter is a gasoline scooter at least 10 years old, registered in Taipei by 31 December 2025 with no move-out in 2026, and scrapped and recycled in 2026.';
-const TWO_TEXT = '舊車為民國92年12月31日以前出廠的二行程機車，設籍與報廢規定同上。';
-const TWO_TEXT_EN = 'The old scooter is a two-stroke built on or before 31 December 2003, with the same registration and scrapping rules.';
+const OLD_TEXT = '要報廢的機車須是出廠滿10年以上的燃油機車，2025 年 12 月 31 日前已設籍台北市且 2026 年未遷出，並於 2026 年內報廢回收。';
+const OLD_TEXT_EN = 'The scooter you scrap must be a gasoline scooter at least 10 years old, registered in Taipei by 31 December 2025 with no move-out in 2026, and scrapped and recycled in 2026.';
+const TWO_TEXT = '要報廢的機車須是 2003 年（民國 92 年）12 月 31 日以前出廠的二行程機車，設籍與報廢規定同上。';
+const TWO_TEXT_EN = 'The scooter you scrap must be a two-stroke built on or before 31 December 2003, with the same registration and scrapping rules.';
 const oldReg = { kind: 'scrap-registered-locally' as const, byDate: '2025-12-31' };
-const BUY_PLATE = t('購車與新車領牌須在這天以前完成，並在2027年1月10日前線上申請。', 'Buy and plate the new scooter by this date, and apply online by 10 January 2027.');
-const BUY_PLATE_SCRAP = t('購車、新車領牌與舊車報廢回收都須在這天以前完成，並在2027年1月10日前線上申請。', 'Buy and plate the new scooter, and scrap and recycle the old one, by this date; apply online by 10 January 2027.');
+const BUY_PLATE = t('購車與新車領牌須在這天以前完成，並在 2027 年 1 月 10 日前線上申請。', 'Buy and plate the new scooter by this date, and apply online by 10 January 2027.');
+const BUY_PLATE_SCRAP = t('購車、新車領牌與要報廢機車的報廢回收都須在這天以前完成，並在 2027 年 1 月 10 日前線上申請。', 'Buy and plate the new scooter, and scrap and recycle the old one, by this date; apply online by 10 January 2027.');
 
 const slots = (remaining: number, label: [string, string]) =>
   quota(
     remaining < 300 ? 'nearly-exhausted' : 'limited',
     '2026-11-25',
-    t(`2026年11月25日線上系統顯示${label[0]}剩餘${remaining.toLocaleString('en')}個名額（個人申請）。`, `On 25 November 2026 the online system showed ${remaining.toLocaleString('en')} ${label[1]} places left (individual applicants).`),
+    t(`2026 年 11 月 25 日線上系統顯示${label[0]}剩餘${remaining.toLocaleString('en')}個名額（個人申請）。`, `On 25 November 2026 the online system showed ${remaining.toLocaleString('en')} ${label[1]} places left (individual applicants).`),
     { remaining, sources: [LIVE] },
   );
 
@@ -89,7 +89,7 @@ export const taipeiProgrammes: Programme[] = [
   base({
     id: 'tpe-replace-old-heavy',
     validToRule: BUY_PLATE_SCRAP,
-    name: t('台北市汰購老舊機車換電動（重型）', 'Taipei scrap old scooter and buy electric (heavy)'),
+    name: t('台北市汰購老舊機車換電動（重型）', 'Taipei: scrap a scooter 10+ years old and buy electric (heavy)'),
     amount: fixed(19000),
     conditions: [...general, heavy, scrap, scrapAge(10), oldReg],
     conditionText: t(`${GENERAL_TEXT}${OLD_TEXT}`, `${GENERAL_TEXT_EN} ${OLD_TEXT_EN}`),
@@ -100,7 +100,7 @@ export const taipeiProgrammes: Programme[] = [
   base({
     id: 'tpe-replace-old-light',
     validToRule: BUY_PLATE_SCRAP,
-    name: t('台北市汰購老舊機車換電動（輕型）', 'Taipei scrap old scooter and buy electric (light)'),
+    name: t('台北市汰購老舊機車換電動（輕型）', 'Taipei: scrap a scooter 10+ years old and buy electric (light)'),
     amount: fixed(10000),
     conditions: [...general, light, scrap, scrapAge(10), oldReg],
     conditionText: t(`${GENERAL_TEXT}${OLD_TEXT}`, `${GENERAL_TEXT_EN} ${OLD_TEXT_EN}`),
@@ -149,9 +149,9 @@ export const taipeiProgrammes: Programme[] = [
     kind: 'battery-credit',
     amount: fixed(8000),
     conditions: [...general, heavyOrLight],
-    conditionText: t('115年新購或汰購電動機車（重型、輕型）都可加領，不限定用於電池月租。', 'Added to any 2026 new purchase or replacement (heavy or light); the plan does not require it to be spent on battery fees.'),
+    conditionText: t('2026 年新購或汰購電動機車（重型、輕型）都可加領，不限定用於電池月租。', 'Added to any 2026 new purchase or replacement (heavy or light); the plan does not require it to be spent on battery fees.'),
     quota: quota('limited', '2026-11-25', t('隨新購或汰購申請核撥，依申請順序至預算用罄。', 'Paid with the purchase claim, in order of application until the budget runs out.'), { sources: [LIVE] }),
-    status2027: t('計畫文字限115年購車。', 'Limited by the plan text to 2026 purchases.'),
+    status2027: t('計畫文字限 2026 年購車。', 'Limited by the plan text to 2026 purchases.'),
     research: ['taipei#tpe-battery-topup'],
   }),
   base({
@@ -161,19 +161,19 @@ export const taipeiProgrammes: Programme[] = [
     kind: 'top-up',
     amount: fixed(8000),
     conditions: [...general, heavyOrLight, flag('childUnder12')],
-    conditionText: t('申請人是設籍台北市、民國103年1月1日以後出生幼童的法定代理人；一名幼童只能使用一次。', 'The applicant is the legal guardian of a Taipei-registered child born on or after 1 January 2014; each child can be used once.'),
+    conditionText: t('申請人是設籍台北市、2014 年 1 月 1 日以後出生幼童的法定代理人；一名幼童只能使用一次。', 'The applicant is the legal guardian of a Taipei-registered child born on or after 1 January 2014; each child can be used once.'),
     quota: quota('limited', '2026-11-25', t('隨新購或汰購申請核撥，依申請順序至預算用罄。', 'Paid with the purchase claim, in order of application until the budget runs out.'), { sources: [LIVE] }),
-    status2027: t('計畫文字限115年購車。', 'Limited by the plan text to 2026 purchases.'),
+    status2027: t('計畫文字限 2026 年購車。', 'Limited by the plan text to 2026 purchases.'),
     research: ['taipei#tpe-kangaroo'],
   }),
   base({
     id: 'tpe-lowincome-topup',
     exclusiveGroups: ['tpe-lowincome-stacking'],
-    name: t('台北市中低及低收入戶加碼', 'Taipei low and middle-low income top-up'),
+    name: t('台北市中低及低收入戶加碼', 'Taipei low and lower-middle-income top-up'),
     kind: 'top-up',
     amount: fixed(10000),
     conditions: [...general, heavyOrLight, lowIncome(['low', 'middle-low'])],
-    conditionText: t('檢附申請年度有效的區公所中低或低收入戶證明，限新購或汰購。', 'With a district-office low or middle-low income certificate valid in the application year; new purchase or replacement only.'),
+    conditionText: t('檢附申請年度有效的區公所中低或低收入戶證明，限新購或汰購。', 'With a district-office low or lower-middle-income certificate valid in the application year; new purchase or replacement only.'),
     quota: quota('limited', '2026-11-25', t('依申請順序至預算用罄。', 'In order of application until the budget runs out.'), { sources: [LIVE] }),
     sources: [...PLAN, 'taiwannews-2026-04-taipei-subsidy'],
     note: t('計畫把這筆列為獨立項目但沒有寫可與其他加碼疊加；英文媒體Taiwan News引述環保局說可再加領。', 'The plan lists this as a separate line without saying it stacks; Taiwan News quotes the bureau saying it is paid on top.'),
@@ -182,7 +182,7 @@ export const taipeiProgrammes: Programme[] = [
   {
     ...base({
       id: 'tpe-scrap-only-bonus',
-      validToRule: t('舊車須在這天以前完成報廢回收，並在2027年1月10日前線上申請。', 'Scrap and recycle the old scooter by this date, and apply online by 10 January 2027.'),
+      validToRule: t('要報廢的機車須在這天以前完成報廢回收，並在 2027 年 1 月 10 日前線上申請。', 'Scrap and recycle the scooter you scrap by this date, and apply online by 10 January 2027.'),
       name: t('台北市淘汰老舊機車汰舊獎勵金', 'Taipei scrap bonus (no electric purchase)'),
       kind: 'scrap-only-bonus',
       amount: fixed(3600),

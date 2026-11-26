@@ -1,0 +1,241 @@
+{
+ "scope": "gap-answers-b",
+ "writtenOn": "2026-11-26",
+ "note": "Best available answers for four gaps in src/data/gaps.ts. Central kerb-concentration estimate left to the modelling team. Arithmetic is shown in each basis. Sources marked unverified were only seen through search summaries.",
+ "answers": [
+  {
+   "gapId": "gap-brief-exposure-harm",
+   "question": "What does a short, repeated exposure of a minute or two do to the body, and what does daily repetition add up to?",
+   "kind": "measured-tw",
+   "bestAnswer": "Nobody has shown that one red light makes you ill, but in Taiwan the body has been measured reacting within five minutes to small rises in fine dust (a small, temporary dip in heart-rate steadiness, about 1-2.5% per 10 ug/m3), the clearest harm in experiments appears after 1-2 hours in traffic, and a few red lights a day add up to roughly 12-55 hours a year.",
+   "bestAnswerZh": "沒有人證明過等一個紅燈就會生病；但在台灣已經量到，細懸浮微粒只要在五分鐘內升高一點，心跳的穩定度就會立刻小幅、暫時地下降（每多10微克約降0.9至2.5%），實驗裡明確的傷害要在交通中待一至兩小時才看得到，而每天等幾次紅燈，一年累積起來大約是12至55小時。",
+   "basis": "Shortest measured effect: Lung et al. 2025 wore PM sensors and heart-rate-variability sensors on 55 people in Kaohsiung (2019-2020) and 50 in Bandung; 5-minute PM2.5/PM1 exposure had statistically significant immediate effects on HRV and heart rate in all Taiwanese subjects; HRV change for a 10 ug/m3 increase ranged -0.9% to -2.5% (not for LF/HF ratio). Dominant sources there were incense, factories, agricultural burning, so it is not scooter-specific. Controlled and field experiments with clear effects use 1-2 hours: 1 h cycling in Ottawa traffic (UFP IQR 18,200/cm3 lowered HF by 140 msec2 at 2 h and 224 at 4 h); 2 h walking on Oxford Street (FEV1 down up to 6.1% in asthmatics); German diary study: time in traffic within the previous hour OR 2.92 for heart attack (association, mostly car travel). Peak share: Goel & Kumar 2015 (Guildford): about 2% of commuting time at junction delays gave about 25% of respiratory dose in one run. Arithmetic for accumulation (assumption: 60-90 s wait per red light; 2, 4 or 6 red lights a day; the wait length is a reader assumption, Taipei summer reductions of 21-30 s and Taichung cycle cuts of 180->150 s in news reports show reds of the order of one to two minutes): 2 lights = 2-3 min/day = 12-18 h/yr; 4 lights = 4-6 min/day = 24-36 h/yr; 6 lights = 6-9 min/day = 36-55 h/yr (x365). These are minutes of exposure, not minutes of high concentration.",
+   "sources": [
+    "Lung S-C C, et al. 2025. Peaks, sources, and immediate health impacts of PM2.5 and PM1 exposure in Indonesia and Taiwan with microsensors. J Expo Sci Environ Epidemiol. doi:10.1038/s41370-024-00689-4 (PMID 38806636). Opened abstract via Europe PMC; found figures. [verified]",
+    "Weichenthal S, et al. 2011. Traffic-related air pollution and acute changes in heart rate variability and respiratory function in urban cyclists. Environ Health Perspect. https://pmc.ncbi.nlm.nih.gov/articles/PMC3230442/ Opened; found figures. [verified]",
+    "McCreanor J, et al. 2007. N Engl J Med 357:2348. doi:10.1056/NEJMoa071535. Figures from repo research/redlight/acute-health.json (checked earlier against abstract). [verified via repo]",
+    "Peters A, et al. 2004. N Engl J Med 351:1721. doi:10.1056/NEJMoa040203. Via repo research. [verified via repo]",
+    "Goel A, Kumar P. 2015. Atmos Environ 107:374-390. doi:10.1016/j.atmosenv.2015.02.002. Via repo research/redlight/intersection-peaks.json. [verified via repo]",
+    "Chuang K-J, et al. 2020. Atmos Environ X 7:100084. doi:10.1016/j.aeaoa.2020.100084 (one hour of walking; per 24.4 ug/m3 PM2.5: SBP +6.5%, HR +3.4%, 8-OHdG +8.1%). Via repo. [verified via repo]"
+   ],
+   "verified": true,
+   "caveat": "The five-minute change is a small, temporary signal in healthy adults from all sources of fine dust, not an illness and not scooter-specific, and there is still no measurement of a minute or two beside idling scooters.",
+   "findings": [
+    {
+     "value": "HRV -0.9% to -2.5% per 10 ug/m3 rise in 5-min PM2.5/PM1; 5-min mean PM2.5 in Taiwan 14.9 +/- 11.2; max 5-min peak 467.4 ug/m3",
+     "measured": "5-minute personal PM2.5/PM1 and HRV, generalized additive mixed models",
+     "place": "Kaohsiung, Taiwan (55 subjects) and Bandung, Indonesia (50)",
+     "year": "2018-2020, pub 2025",
+     "citation": "Lung SC et al. J Expo Sci Environ Epidemiol 2025",
+     "url": "https://doi.org/10.1038/s41370-024-00689-4",
+     "verified": true,
+     "quote": "5-min PM2.5 and PM1 exposure had statistically significantly immediate impacts on the HRV indices and heart rates of all subjects in Taiwan"
+    },
+    {
+     "value": "UFP IQR 18,200/cm3: HF -140 msec2 (2 h), -224 msec2 (4 h); pNN50 -4.5% (2 h); no strong respiratory effects",
+     "measured": "1 h cycling on high-/low-traffic route, HRV and spirometry 1-4 h",
+     "place": "Ottawa, Canada, 42 adults",
+     "year": "2011",
+     "citation": "Weichenthal S et al. Environ Health Perspect 2011",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3230442/",
+     "verified": true,
+     "quote": "Short-term exposures to traffic pollution may contribute to altered autonomic modulation of the heart"
+    },
+    {
+     "value": "about 2% of commuting time at junction delay = about 25% of respiratory dose (one run); peak particle number up to 29x free-flow average",
+     "measured": "mobile particle number at 10 signalised junctions",
+     "place": "Guildford, UK",
+     "year": "2015",
+     "citation": "Goel A, Kumar P. Atmos Environ 107:374",
+     "url": "https://doi.org/10.1016/j.atmosenv.2015.02.002",
+     "verified": true,
+     "quote": "Short-term exposure for ~2% of total commuting time in car corresponded to ~25% of total respiratory doses."
+    },
+    {
+     "value": "2 h Oxford Street: FEV1 down up to 6.1% in adults with asthma",
+     "measured": "randomised crossover walk",
+     "place": "London",
+     "year": "2007",
+     "citation": "McCreanor J et al. N Engl J Med 357:2348",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/18057337/",
+     "verified": true,
+     "quote": "Walking for 2 hours on Oxford Street induced asymptomatic but consistent reductions in the forced expiratory volume in 1 second (FEV1) (up to 6.1%)"
+    },
+    {
+     "value": "Controlled diesel exhaust: systolic BP +4.4 mmHg when readings 30-90 min combined (45 non-smokers)",
+     "measured": "meta-analysis of controlled exposures",
+     "place": "lab",
+     "year": "2012",
+     "citation": "Blood Pressure Response to Controlled Diesel Exhaust Exposure in Human Subjects. Hypertension 2012",
+     "url": "https://www.ahajournals.org/doi/full/10.1161/HYPERTENSIONAHA.111.186593",
+     "verified": false,
+     "quote": "(only from a search-tool summary; page returned HTTP 403)"
+    }
+   ]
+  },
+  {
+   "gapId": "gap-tw-health-isolating-scooters",
+   "question": "What health effects can be attributed to scooter exhaust specifically in Taiwan?",
+   "kind": "estimate",
+   "bestAnswer": "No Taiwanese study separates scooter exhaust from other traffic, but the closest answer is a 2022 Taiwanese roadside study beside a scooter-dominated road, which traced 57% of the lung-reaching particle surface (74% at rush hour, when 83% of vehicles were scooters) to traffic and estimated about 16 extra cancers per 100,000 people over a lifetime from that traffic exhaust.",
+   "bestAnswerZh": "沒有任何台灣研究能把機車廢氣和其他交通分開；最接近的答案是2022年在北台灣機車為主的路邊所做的研究：進入肺部的微粒表面積有57%來自交通（尖峰時段機車占83%時達74%），並估算這種交通廢氣一輩子下來，每十萬人約多16人罹癌。",
+   "basis": "Chang et al. 2022 (J Hazard Mater 427:128188): roadside station in northern Taiwan; PMF + regression attributed 57% of LDSA to traffic overall; at rush hour the motorcycle fraction rose to 0.83, LDSA 77.6 +/- 9.9 um2/cm3, PNC 14,000 +/- 2,400/cm3, traffic share 74%; excess lifetime cancer risk from traffic 1.56e-4 = 15.6 per 100,000. Opened abstract via Europe PMC. This is a risk calculation using LDSA and assumed unit risk and exposure duration (full text not opened), and 'traffic' includes all vehicles, so it is an upper-bound-type indication for scooter-heavy streets, not a scooter-only attributable number. Supporting Taiwan evidence on scooters: Chuang 2020 (scooter commuters, PM2.5 53.6 vs subway 21.7 ug/m3, small BP/HR/8-OHdG rises per PM2.5). What Taiwan cohorts show about gasoline traffic: Pan et al. 2021 (12,098 adults, REVEAL-HBV, 22.9 y follow-up): per log-unit vehicle count trucks HR 1.24 (1.03-1.51) for CVD death, small cars HR 1.10 (0.94-1.27, not significant), total HR 1.13 (0.96-1.33); scooters were counted as a gasoline source but not reported separately. Source shares (TEDS 13.0, 2023, repo digest): motorcycles are 15.6% of CO and 10.0% of hydrocarbon emissions but only 1.3% of primary PM2.5 and 2.2% of NOx, so PM2.5-based health figures should not be assigned to scooters. Not found despite searching Europe PMC, NTU/NCL repositories: any Taiwanese cohort using motorcycle counts as the exposure.",
+   "sources": [
+    "Chang et al. 2022. Particulate matter in a motorcycle-dominated urban area: source apportionment and cancer risk of lung deposited surface area (LDSA) concentrations. J Hazard Mater 427:128188. doi:10.1016/j.jhazmat.2021.128188; PMID 35007803. Opened abstract via Europe PMC; found figures. [verified]",
+    "Pan W-C, Yeh S-Y, Wu C-D, Huang Y-T, Chen Y-C, Chen C-J, Yang H-I. 2021. Association between traffic count and cardiovascular mortality: a prospective cohort study in Taiwan. J Epidemiol 31(5):343-349. https://pmc.ncbi.nlm.nih.gov/articles/PMC8021879 Opened; found figures (note: printed CI for small cars in the adjusted ridge model looks mis-typed). [verified]",
+    "Chuang K-J et al. 2020, doi:10.1016/j.aeaoa.2020.100084. Via repo. [verified via repo]",
+    "TEDS 13.0 (base year 2023) shares, from repo evidence-digest.md. [verified via repo]"
+   ],
+   "verified": true,
+   "caveat": "This is a calculated risk for traffic as a whole at one roadside, not proof that scooters caused any actual cases, and no Taiwanese health study uses scooters alone.",
+   "findings": [
+    {
+     "value": "57% of LDSA from traffic; 74% at rush hour (motorcycle fraction 0.83); excess lifetime cancer risk 1.56e-4 (15.6 per 100,000)",
+     "measured": "roadside LDSA, PM1, eBC, PNC, size distribution; PMF source apportionment",
+     "place": "urban roadside, northern Taiwan",
+     "year": "2022",
+     "citation": "Chang et al., J Hazard Mater 427:128188",
+     "url": "https://doi.org/10.1016/j.jhazmat.2021.128188",
+     "verified": true,
+     "quote": "the excess lifetime cancer risk linked with traffic emission was 1.56 x 10-4 (i.e. 15.6 excess cancer cases for a population of 100,000 people)"
+    },
+    {
+     "value": "CVD death HR per log-unit count: trucks 1.24 (1.03-1.51); small cars 1.10 (0.94-1.27); total 1.13 (0.96-1.33)",
+     "measured": "traffic count at nearest highway monitoring site vs CVD mortality, 382 deaths",
+     "place": "Taipei, Hsinchu, Chiayi, Pingtung",
+     "year": "2021",
+     "citation": "Pan et al., J Epidemiol 31(5):343",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8021879",
+     "verified": true,
+     "quote": "Exposure to exhaust from trucks or gasoline-powered cars is positively associated with CVD mortality"
+    },
+    {
+     "value": "PM2.5 scooter 53.6 vs subway 21.7 ug/m3; per 24.4 ug/m3 SBP +7.9%, HR +6.4% (scooter mode)",
+     "measured": "personal PM2.5 and BP/HR/8-OHdG, 120 adults",
+     "place": "Taipei",
+     "year": "2020",
+     "citation": "Chuang et al., Atmos Environ X 7:100084",
+     "url": "https://doi.org/10.1016/j.aeaoa.2020.100084",
+     "verified": true,
+     "quote": "The PM2.5 level (Mean +/- SD) was the highest in the scooter mode (53.6 +/- 26.1 ug/m3)"
+    }
+   ]
+  },
+  {
+   "gapId": "gap-tw-child-height",
+   "question": "How much more does a child or a baby in a pushchair breathe at 0.6-1.0 m than an adult at 1.5 m?",
+   "kind": "measured-elsewhere",
+   "bestAnswer": "Measured abroad, air at pushchair or child height typically holds about 10% more traffic particles than at adult height (from 5% lower to 59% higher depending on the study), and because children breathe 1.5 to 2 times more air for their body weight, a child at a kerb takes in roughly 1.7 to 2.2 times the adult dose per kilogram.",
+   "bestAnswerZh": "國外實測顯示，嬰兒車或兒童高度的空氣，交通微粒通常比大人高度多約10%（各研究從低5%到高59%不等）；而且孩子每公斤體重吸進的空氣是大人的1.5至2倍，所以站在路邊的孩子，每公斤體重吸入的量大約是大人的1.7至2.2倍。",
+   "basis": "Height effect (not Taiwan; cars/diesel mainly): study-by-study series already on site: Morgantown +59% (PM2.5), Guildford pram up to +44% (fine particles), Mainz over +20% on 6 of 8 days (1.0 vs 1.6 m), Barcelona about +10% (UFP, 0.55 vs 1.70 m), Edinburgh NO2 5-15%, Guildford 2017 afternoon about +10% and morning about -5%, one Edinburgh PM2.5 study no consistent difference. These cannot be averaged, so 'about 10%' is the middle of the cluster, not a mean. A Tokyo roadside study reportedly found particles <0.5 um at 0.5 m about 2.9x those at 2.0 m (Nakashima et al., Aerosol Air Qual Res 2014) but NOx showed no height dependence; I could only see this in a search-tool summary (publisher page 403), so it is not used in the headline. Breathing: US EPA Exposure Factors Handbook 2011 Table 6-7 (per kg body weight, males): 0.5 to <1 y 0.48 m3/kg-day; 2 to <5 y 0.44; 5 to <7 y 0.42; 7 to <11 y 0.37; 30 to <40 y 0.24 (females 0.24 at 30-40). Ratios to adult 0.24: infant 2.0, age 2-5 1.8, age 5-7 1.75, age 7-11 1.5. Combined arithmetic: 1.10 x 1.5 = 1.7 (school-age); 1.10 x 2.0 = 2.2 (baby). Using the extremes of the height range: 0.95 x 1.5 = 1.4 to 1.59 x 2.0 = 3.2. The per-kg ratio is for daily average breathing, and children and adults breathe about the same absolute volume per minute when sedentary (EPA Table 6-2 light activity 6-<11 y 0.011 vs 21-<31 y 0.012 m3/min), so the extra is per kilogram of body, not per breath. Taiwan scooter tailpipes: no height measurement found.",
+   "sources": [
+    "Sharma R, Kumar P (and co-authors). 2018 review Environ Int and 2020 pram study Environ Int 139:105671, doi:10.1016/j.envint.2020.105671: figures via repo research/papers/sharma-kumar-2018-envint.json and research/03-health.md. [verified via repo]",
+    "Harr et al. 2022, Mainz, via repo series 'stroller-height-studies'. [verified via repo]",
+    "Rafiepourgatabi M et al. 2021, Int J Environ Res Public Health 18(15):7808, quoting the Barcelona study (children 0.55 m vs adults 1.70 m, 10% higher). Opened; the 10% is second-hand there. [partly verified]",
+    "US EPA. 2011. Exposure Factors Handbook, Chapter 6 Inhalation, Tables 6-2 and 6-7. https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf Opened PDF text; found figures. [verified]",
+    "Nakashima et al. 2014. Near-surface vertical profiles of urban roadside NOx and fine particles. Aerosol Air Qual Res. doi:10.4209/aaqr.2013.08.0278. Not opened (403). [unverified]"
+   ],
+   "verified": true,
+   "caveat": "No one has measured child-height air in Taiwan, the height studies disagree (one found children lower), and the breathing ratio is a daily average, so treat 1.7-2.2 times as a rough scale.",
+   "findings": [
+    {
+     "value": "range -5% to +59%; typical about +10%",
+     "measured": "child/pram height vs adult height particles or NO2",
+     "place": "UK, Spain, Germany, USA",
+     "year": "2009-2022",
+     "citation": "see series stroller-height-studies; Sharma & Kumar 2018, 2020; Harr 2022",
+     "url": "https://doi.org/10.1016/j.envint.2020.105671",
+     "verified": true,
+     "quote": "The average in-pram concentration of fine particles was always higher by up to 44% compared with adult breathing height"
+    },
+    {
+     "value": "inhalation per kg body weight: age 0.5-<1 0.48; 2-<5 0.44; 5-<7 0.42; 7-<11 0.37; 30-<40 0.24 m3/kg-day (males)",
+     "measured": "physiological daily inhalation rates from energy expenditure",
+     "place": "USA (Brochu et al.)",
+     "year": "2011 handbook",
+     "citation": "US EPA Exposure Factors Handbook Table 6-7",
+     "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+     "verified": true,
+     "quote": "Table 6-7 Distribution Percentiles of Physiological Daily Inhalation Rates per Unit of Body Weight (m3/kg-day)"
+    },
+    {
+     "value": "light activity inhalation 6-<11 y 0.011 vs 21-<31 y 0.012 m3/min",
+     "measured": "short-term inhalation by activity",
+     "place": "USA",
+     "year": "2011",
+     "citation": "US EPA EFH Table 6-2",
+     "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+     "verified": true,
+     "quote": "Light Intensity 6 to <11 1.1E-02; 21 to <31 1.2E-02 (m3/minute)"
+    },
+    {
+     "value": "particles <0.5 um at 0.5 m about 2.9x those at 2.0 m; NOx no height dependence",
+     "measured": "roadside heights 0.25-2.0 m",
+     "place": "central Tokyo",
+     "year": "2014",
+     "citation": "Nakashima et al. AAQR",
+     "url": "https://doi.org/10.4209/aaqr.2013.08.0278",
+     "verified": false,
+     "quote": "(search-tool summary only; page 403)"
+    }
+   ]
+  },
+  {
+   "gapId": "gap-school-commute-pillion",
+   "question": "What are children exposed to riding pillion or walking to school?",
+   "kind": "measured-elsewhere",
+   "bestAnswer": "Nobody has measured it in Taiwan, but in other scooter cities (Ho Chi Minh City, Bandung) children's own sensors show the scooter or motorbike ride to school is the highest-exposure part of a child's trip, and in Taipei adults on scooters breathed about 2.5 times the fine dust of people on the MRT (53.6 vs 21.7 micrograms per cubic metre), so a child on the back seat should be assumed to breathe what the rider breathes.",
+   "bestAnswerZh": "台灣還沒有人量過；但在胡志明市、萬隆等同樣機車很多的城市，孩子自己背的感測器顯示，騎機車上學那一段是整趟路中暴露最高的；在台北，騎機車的成人吸到的細懸浮微粒約是搭捷運的2.5倍（每立方公尺53.6對21.7微克），所以坐在後座的孩子，可以當作吸到的和騎士差不多。",
+   "basis": "Direct child measurements in motorbike cities: (1) Ho Chi Minh City, 64 children aged 11-12, AirBeam3 personal PM2.5, Dec 2022-Jan 2023: median 25 ug/m3 overall; peaks at 06:00-07:00 and 18:00-20:30; microenvironments with highest median 36.7-71.1 ug/m3 included commuting by motorbike; road commuting raised exposure 21.1%; 'motorbike commuting resulted in higher PM2.5 levels than walking or cycling'. (2) Bandung and Kathmandu, 61 children aged 6-13, PurpleAir, 2023: mean personal PM2.5 48.0 and 45.8 ug/m3; commuting-microenvironment means 46.7 and 49.0 ug/m3 (Table 4; city order as printed); 'travelling by scooter/motorbike resulted in the highest mean PM2.5 concentration for all commuting methods'; mean scooter/motorbike and walking commute 13 min vs bus 49 min and car 52 min; school classroom lowest (41.2 and 33.7). Taiwan adult proxy: Chuang 2020, 120 adults, Taipei, 9-10 am: scooter 53.6 +/- 26.1, walking 42.7 +/- 22.6, subway 21.7 +/- 5.8 ug/m3; ratio scooter:subway 53.6/21.7 = 2.5. Taipei 2017 EPA commuter monitoring: motorcycle 32.1, bus 23.5, MRT 21.9, car 7.6 ug/m3. Child dose adds: breathing per kg is about 1.5 times an adult's at age 7-11 (EPA Table 6-7: 0.37 vs 0.24 m3/kg-day). Inference (not measured): a pillion child sits in the same traffic stream, and a helmet or mask changes little for fine particles. The 13 min mean commute and Taiwan trip times are other countries' data. Taiwan pillion share of school trips: no verified official figure found.",
+   "sources": [
+    "Assessing personal PM2.5 exposure from various microenvironments among schoolchildren in Vietnam. Environ Res 2025. doi:10.1016/j.envres.2025.122115; PMID 40505946. Opened abstract via Europe PMC; found figures. [verified]",
+    "Carson FS, Horwell CJ, et al. 2026. Assessment of personal PM2.5 exposure of children living in Bandung, Indonesia and Kathmandu, Nepal. Environ Res Health 4:035009. doi:10.1088/2752-5309/ae8050 (open PDF read in full via ccc.itb.ac.id/asset/foto_publik/1785133456_file.pdf). Found figures except per-mode means, which are only in Figure 4. [verified]",
+    "Chuang K-J et al. 2020, Atmos Environ X 7:100084. Via repo. [verified via repo]",
+    "MOENV (EPA) 2018-05-31 press release on Taipei commuter exposure, https://enews.moenv.gov.tw/Page/3B3C62C78849F32F/2650cb9c-feaa-4a42-8be5-cd13b0895104 via repo. [verified via repo]",
+    "US EPA Exposure Factors Handbook 2011 Table 6-7. [verified]"
+   ],
+   "verified": true,
+   "caveat": "The children measured were in Vietnam, Indonesia and Nepal and the Taipei figures are for adult riders, so what a Taiwanese child on a pillion seat breathes is inferred, not measured.",
+   "findings": [
+    {
+     "value": "median PM2.5 36.7-71.1 ug/m3 in top microenvironments incl. motorbike commuting; road commuting +21.1%; motorbike > walking or cycling",
+     "measured": "personal PM2.5, 64 children 11-12 y with activity diaries",
+     "place": "Ho Chi Minh City, Vietnam",
+     "year": "2022-2023, pub 2025",
+     "citation": "Envir Res 2025 doi:10.1016/j.envres.2025.122115",
+     "url": "https://doi.org/10.1016/j.envres.2025.122115",
+     "verified": true,
+     "quote": "Notably, motorbike commuting resulted in higher PM2.5 levels than walking or cycling."
+    },
+    {
+     "value": "commuting means 46.7 and 49.0 ug/m3; scooter/motorbike highest commute mode; mean commute 13 min",
+     "measured": "personal PM2.5, 61 children 6-13 y, GPS microenvironments",
+     "place": "Bandung, Indonesia and Kathmandu, Nepal",
+     "year": "2023, pub 2026",
+     "citation": "Carson FS et al. Environ Res Health 4:035009",
+     "url": "https://doi.org/10.1088/2752-5309/ae8050",
+     "verified": true,
+     "quote": "travelling by scooter/motorbike resulted in the highest mean PM2.5 concentration for all commuting methods"
+    },
+    {
+     "value": "scooter 53.6 +/- 26.1; subway 21.7 +/- 5.8 ug/m3",
+     "measured": "personal PM2.5, 120 adults, 09:00-10:00",
+     "place": "Taipei",
+     "year": "2020",
+     "citation": "Chuang et al., Atmos Environ X 7:100084",
+     "url": "https://doi.org/10.1016/j.aeaoa.2020.100084",
+     "verified": true,
+     "quote": "The PM2.5 level (Mean +/- SD) was the highest in the scooter mode (53.6 +/- 26.1 ug/m3) but the lowest in the subway mode (21.7 +/- 5.8 ug/m3)."
+    }
+   ]
+  }
+ ],
+ "needsManualFetch": [
+  "https://www.ahajournals.org/doi/full/10.1161/HYPERTENSIONAHA.111.186593 (HTTP 403)",
+  "https://aaqr.org/articles/aaqr-13-08-oa-0278 (HTTP 403; Nakashima Tokyo height profile)",
+  "https://pubmed.ncbi.nlm.nih.gov/35007803/ (cookie wall; abstract read via Europe PMC instead)",
+  "Per-mode means in Figure 4 of Carson 2026 (figure only)",
+  "Full text of Chang 2022 J Hazard Mater 128188 for unit-risk and exposure-duration assumptions",
+  "Garcia-Algar 2015 Barcelona original (10% at 0.55 vs 1.70 m); only second-hand"
+ ]
+}

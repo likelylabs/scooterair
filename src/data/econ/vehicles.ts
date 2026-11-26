@@ -4,8 +4,8 @@
 // Gasoline list prices are compared ex plate and insurance: KYMCO and Yamaha publish them that
 // way; SYM's appear to include about NT$2,000, which `plateInsuranceIncluded` removes.
 
-import { t } from '../types.ts';
-import type { EvModel, GasModel } from './types.ts';
+import { t } from './l10n.ts';
+import type { EvModel, GasModel, JurisdictionId } from './types.ts';
 
 const KYMCO = t('光陽', 'KYMCO');
 const SYM = t('三陽', 'SYM');
@@ -16,15 +16,21 @@ const IONEX = t('光陽Ionex', 'KYMCO Ionex');
 const FUEL = ['tvbs-cars-2026-06-fuel-ranking'] as const;
 const fuelResearch = ['gas-prices#fuel-ranking-2026'];
 const KYMCO_SCRAP_PROMO_TEXT = t(
-  '須於2026年11月30日前完成舊車報廢，並在6個月內通過國稅局汰舊換新貨物稅核定，核定後才享有。',
-  'The old scooter must be scrapped by 30 November 2026 and the goods-tax scrap-and-replace claim approved by the tax office within six months; paid only after approval.',
+  '須於 2026 年 11 月 30 日前完成要報廢機車的報廢，並在6個月內通過國稅局汰舊換新貨物稅核定，核定後才享有。',
+  'The scooter being replaced must be scrapped by 30 November 2026 and the goods-tax scrap-and-replace claim approved by the tax office within six months; paid only after approval.',
 );
 // What each November offer's window applies to (gas-prices / gas-baseline-r2 periods):
 // New Haomai 「領牌完成」, SYM DUKE 「領牌日期」, Yamaha Jog 「以領牌為主」 -> plate registration;
 // K1 and GP 125 state no basis -> unknown. KYMCO's scrap bonuses also need the old scooter
 // scrapped by 30 November (promo-condition-scrap).
-const NOV_PLATE = t('2026年11月領牌即享，現場直接折抵；只開發票、12月才領牌不算。', 'For scooters plated in November 2026, deducted at the shop; an invoice in November with plating in December does not count.');
-const NOV_UNKNOWN = t('2026年11月的優惠，現場直接折抵；官方沒有寫以發票日還是領牌日為準，請問車行。', 'A November 2026 offer, deducted at the shop; the offer does not say whether the invoice or the plate date counts, so ask the dealer.');
+const NOV_PLATE = t('2026 年 11 月領牌即享，現場直接折抵；只開發票、12月才領牌不算。', 'For scooters plated in November 2026, deducted at the shop; an invoice in November with plating in December does not count.');
+// r2-yamaha-jog-nov-official: "Authorised physical dealers on Taiwan main island only; online purchase not eligible."
+const YAMAHA_MAIN_ISLAND = {
+  jurisdictions: ['kinmen', 'penghu', 'lienchiang'] as JurisdictionId[],
+  why: t('Yamaha這個月的優惠只限台灣本島的實體經銷商，離島買不到', "Yamaha's offers this month are only at physical dealers on Taiwan's main island, so not on the outlying islands"),
+};
+const YAMAHA_TAX_TIMING = t('官網沒有寫這筆錢什麼時候給；它要等國稅局核定汰舊換新資格，所以可能要核定後才拿得到，請問車行。', 'The page does not say when this is paid; it depends on the tax office approving the scrap-and-replace claim, so it may come only after approval. Ask the dealer.');
+const NOV_UNKNOWN = t('2026 年 11 月的優惠，現場直接折抵；官方沒有寫以發票日還是領牌日為準，請問車行。', 'A November 2026 offer, deducted at the shop; the offer does not say whether the invoice or the plate date counts, so ask the dealer.');
 
 export const gasModels: GasModel[] = [
   {
@@ -73,7 +79,7 @@ export const gasModels: GasModel[] = [
   {
     id: 'sym-duke-125-drum',
     brand: SYM,
-    name: t('迪爵125 鼓煞（2026年式）', 'DUKE 125, drum brake (2026)'),
+    name: t('迪爵125 鼓煞（2026 年式）', 'DUKE 125, drum brake (2026)'),
     displacementCc: 125,
     listPrice: { value: 78500, sources: ['nownews-2026-08-duke-price-sales'], confidence: 'secondary', research: ['gas-prices#sym-duke125-list'], note: t('三陽官網未列原價，此為媒體報導的原價。', 'SYM does not publish the price on its site; this is the price reported by the media.') },
     plateInsuranceIncluded: {
@@ -131,32 +137,34 @@ export const gasModels: GasModel[] = [
   {
     id: 'yamaha-jog-125',
     brand: YAMAHA,
-    name: t('Jog 125（2026年式）前後鼓煞', 'Jog 125 (2026), drum brakes'),
+    name: t('Jog 125（2026 年式，前後鼓煞）', 'Jog 125 (2026, drum brake)'),
     displacementCc: 125,
     listPrice: { value: 66000, sources: ['yamaha-jog-2026-11-offer', 'tvbs-cars-2026-05-jog'], confidence: 'verified', research: ['gas-prices#yamaha-jog125-list'], note: t('建議售價，不含牌險。', 'Suggested price, excluding plate and insurance.') },
     goodsTaxScrapCut: { value: 4000, sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
     promos: [
-      { id: 'yamaha-jog-credit-2026-11', name: t('YAMAHA購車金', 'Yamaha purchase credit'), amount: 7000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', conditionText: t('11月在本島實體經銷商領牌即享；網購不適用。', 'Any buyer plating in November at a physical dealer on the main island; not for online purchases.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
+      { id: 'yamaha-jog-credit-2026-11', name: t('YAMAHA購車金', 'Yamaha purchase credit'), amount: 7000, when: 'always', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', notIn: YAMAHA_MAIN_ISLAND, conditionText: t('11 月在台灣本島的實體經銷商領牌就有；網購不適用。', 'Any buyer plating in November at a physical dealer on Taiwan\'s main island; not for online purchases.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
       {
         id: 'yamaha-jog-conditional-2026-11',
         name: t('YAMAHA符合貨物稅減免資格加碼購車金', 'Yamaha extra credit for buyers qualifying for the goods-tax cut'),
         amount: 5000,
         when: 'goods-tax-scrap',
         ambiguousScrap: true,
-        paid: 'at-purchase',
+        paid: 'after-approval',
         validFrom: '2026-11-01',
         validTo: '2026-11-30',
         windowBasis: 'plate',
-        conditionText: t('官網只寫「符合政府貨物稅減免資格」，沒寫是否須汰舊；試算保守地當作須汰舊，沒有舊車的人也可能拿到（價格會再低5,000元），請問車行。', 'The page says only "qualifying for the government goods-tax cut" without saying whether scrapping is needed; we treat it as scrap-only, but a buyer with nothing to scrap may also get it (NT$5,000 less), so ask the dealer.'),
+        notIn: YAMAHA_MAIN_ISLAND,
+        conditionText: t('官網只寫「符合政府貨物稅減免資格」，沒寫是否須汰舊；試算保守地當作須汰舊，沒有機車可報廢的人也可能拿到（價格會再低5,000元），請問車行。', 'The page says only "qualifying for the government goods-tax cut" without saying whether scrapping is needed; we treat it as scrap-only, but a buyer with nothing to scrap may also get it (NT$5,000 less), so ask the dealer.'),
+        note: YAMAHA_TAX_TIMING,
         sources: ['yamaha-jog-2026-11-offer'],
         confidence: 'verified',
         research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'],
       },
-      { id: 'yamaha-jog-scrap-2026-11', name: t('YAMAHA 40週年汰舊加碼感謝金', 'Yamaha 40th-anniversary scrap bonus'), amount: 1000, when: 'goods-tax-scrap', paid: 'at-purchase', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', conditionText: t('須汰舊並符合國稅局汰舊換新資格。', 'Requires scrapping and tax-office scrap-and-replace eligibility.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
+      { id: 'yamaha-jog-scrap-2026-11', name: t('YAMAHA 40週年汰舊加碼感謝金', 'Yamaha 40th-anniversary scrap bonus'), amount: 1000, when: 'goods-tax-scrap', paid: 'after-approval', validFrom: '2026-11-01', validTo: '2026-11-30', windowBasis: 'plate', notIn: YAMAHA_MAIN_ISLAND, note: YAMAHA_TAX_TIMING, conditionText: t('要報廢機車，並符合國稅局的汰舊換新資格。', 'Requires scrapping a scooter and qualifying for the tax office\'s scrap-and-replace cut.'), sources: ['yamaha-jog-2026-11-offer'], confidence: 'verified', research: ['gas-baseline-r2#r2-yamaha-jog-nov-official'] },
     ],
     fuelEconomy: { value: 57.6, sources: [...FUEL], confidence: 'verified', research: fuelResearch },
     calculator: true,
-    note: t('沒有舊車可汰換時，Yamaha 11月優惠價約57,000元（若5,000元加碼不必汰舊則約52,000元）；46,700元的廣告價須汰舊。2025年全年第二暢銷的機車。', 'With nothing to scrap, the November price is about NT$57,000 (about NT$52,000 if the NT$5,000 extra does not need scrapping); the advertised NT$46,700 needs scrapping. The second best-selling scooter of 2025.'),
+    note: t('沒有機車可報廢時，Yamaha 11月優惠價約57,000元（若5,000元加碼不必汰舊則約52,000元）；46,700元的廣告價須汰舊。2025 年全年第二暢銷的機車。', 'With nothing to scrap, the November price is about NT$57,000 (about NT$52,000 if the NT$5,000 extra does not need scrapping); the advertised NT$46,700 needs scrapping. The second best-selling scooter of 2025.'),
   },
 ];
 
@@ -179,10 +187,10 @@ export const evModels: EvModel[] = [
     brand: GOGORO,
     name: t('EZZY（綠牌）', 'EZZY (green plate)'),
     plateClass: 'light',
-    plateClassBasis: { text: t('經濟部認可車款清單：GE3GS為普通輕型第1級；Gogoro官網以「綠牌」宣傳。', 'MOEA approved-model list: GE3GS is 普通輕型 level 1; Gogoro markets it as green plate.'), sources: ['meid-approved-models-csv', 'gogoro-ezzy-page'], confidence: 'verified', research: ['gogoro-official-r2#moea-gogoro-approved-models', 'gogoro-official-r2#gogoro-model-battery-plate'] },
+    plateClassBasis: { text: t('經濟部認可車款清單：GE3GS為普通輕型第1級；Gogoro官網以「綠牌」宣傳。', 'MOEA approved-model list: GE3GS is light class (普通輕型) level 1; Gogoro markets it as green plate.'), sources: ['meid-approved-models-csv', 'gogoro-ezzy-page'], confidence: 'verified', research: ['gogoro-official-r2#moea-gogoro-approved-models', 'gogoro-official-r2#gogoro-model-battery-plate'] },
     moeaClass: 'light-1',
     moeaClassBasis: {
-      text: t('經濟部認可車款清單列GE3GS為普通輕型第1級（7,000元級）；Gogoro自己的補助試算也套用7,000元。清單沒有直接寫出車名，GE3GS即EZZY是依官網圖檔與規格比對。', 'The MOEA approved list gives GE3GS as 普通輕型 level 1 (the NT$7,000 tier), and Gogoro\'s own calculator applies NT$7,000. The list does not print model names; GE3GS = EZZY is matched from portal images and specifications.'),
+      text: t('經濟部認可車款清單列GE3GS為普通輕型第1級（7,000元級）；Gogoro自己的補助試算也套用7,000元。清單沒有直接寫出車名，GE3GS即EZZY是依官網圖檔與規格比對。', 'The MOEA approved list gives GE3GS as light class (普通輕型) level 1 (the NT$7,000 tier), and Gogoro\'s own calculator applies NT$7,000. The list does not print model names; GE3GS = EZZY is matched from portal images and specifications.'),
       sources: ['meid-approved-models-csv', 'gogoro-subsidy-calculator-data'],
       confidence: 'verified',
       research: ['gogoro-official-r2#moea-gogoro-approved-models', 'gogoro-official-r2#gogoro-official-list-prices'],
@@ -193,7 +201,7 @@ export const evModels: EvModel[] = [
       sources: ['gogoro-subsidy-calculator-data', 'gogoro-2026-ezzy-promo'],
       confidence: 'verified',
       research: ['gogoro-official-r2#gogoro-official-list-prices', 'gogoro-official-r2#list-prices-roo-cash'],
-      note: t('基本色59,980元（Gogoro自己的價格資料）；四款新色原價61,980元，活動期間至2026年12月31日同樣折到59,980元。', 'Base colours NT$59,980 (Gogoro\'s own price data); the four new colours list at NT$61,980 and are discounted to NT$59,980 until 31 December 2026.'),
+      note: t('基本色59,980元（Gogoro自己的價格資料）；四款新色原價61,980元，活動期間至 2026 年 12 月 31 日同樣折到59,980元。', 'Base colours NT$59,980 (Gogoro\'s own price data); the four new colours list at NT$61,980 and are discounted to NT$59,980 until 31 December 2026.'),
     },
     promos: [],
     domesticCells: 'unknown',
@@ -217,9 +225,9 @@ export const evModels: EvModel[] = [
     plateClass: 'heavy',
     plateClassBasis: { text: t('Gogoro官網：「白牌動力新選擇」；Gogoro價格資料列為125cc級。', 'Gogoro\'s page: "a new white-plate choice"; Gogoro\'s price data lists it in the 125cc class.'), sources: ['gogoro-ezzy-500-page', 'gogoro-subsidy-calculator-data'], confidence: 'verified', research: ['gogoro-official-r2#gogoro-model-battery-plate'] },
     moeaClass: 'heavy-1-2',
-    moeaClassBasis: { text: t('經濟部清單上的Gogoro白牌車款都是普通重型第1級（7,000元級）；Gogoro自己的試算也套用7,000元。', 'Every Gogoro white-plate code on the MOEA list is 普通重型 level 1 (NT$7,000 tier); Gogoro\'s own calculator applies NT$7,000.'), sources: ['meid-approved-models-csv', 'gogoro-subsidy-calculator-data'], confidence: 'verified', research: ['gogoro-official-r2#moea-gogoro-approved-models'] },
+    moeaClassBasis: { text: t('經濟部清單上的Gogoro白牌車款都是普通重型第1級（7,000元級）；Gogoro自己的試算也套用7,000元。', 'Every Gogoro white-plate code on the MOEA list is heavy class (普通重型) level 1 (NT$7,000 tier); Gogoro\'s own calculator applies NT$7,000.'), sources: ['meid-approved-models-csv', 'gogoro-subsidy-calculator-data'], confidence: 'verified', research: ['gogoro-official-r2#moea-gogoro-approved-models'] },
     moeaListed: 'yes',
-    listPrice: { value: 74980, sources: ['gogoro-subsidy-calculator-data'], confidence: 'verified', research: ['gogoro-official-r2#gogoro-official-list-prices'], note: t('Gogoro自己的補助試算價格資料（2026年11月23日）。', 'Gogoro\'s own subsidy-calculator price data (23 November 2026).') },
+    listPrice: { value: 74980, sources: ['gogoro-subsidy-calculator-data'], confidence: 'verified', research: ['gogoro-official-r2#gogoro-official-list-prices'], note: t('Gogoro自己的補助試算價格資料（2026 年 11 月 23 日）。', 'Gogoro\'s own subsidy-calculator price data (23 November 2026).') },
     promos: [],
     domesticCells: 'unknown',
     battery: { system: 'gogoro', count: 2, basis: { text: t('Gogoro官網：「雙電池配置」。', 'Gogoro\'s page: "dual-battery configuration".'), sources: ['gogoro-ezzy-500-page'], confidence: 'verified', research: ['gogoro-official-r2#gogoro-model-battery-plate'] } },
@@ -239,11 +247,14 @@ export const evModels: EvModel[] = [
   {
     id: 'ionex-coolone',
     brand: IONEX,
-    name: t('CoolOne換電版 輕型（EE15AA）', 'CoolOne swappable, light class (EE15AA)'),
+    name: t('CoolOne 換電版，綠牌（EE15AA）', 'CoolOne swap version, green plate (EE15AA)'),
     plateClass: 'light',
     plateClassBasis: { text: t('產品頁：輕型（EE15AA）。', 'Product page: light class (EE15AA).'), sources: ['ionex-coolone-product'], confidence: 'verified', research: ['other-ev-brands#ionex-coolone-price'] },
     moeaClass: 'light-unknown',
-    moeaClassBasis: { text: t('Ionex官網的政府補助試算把經濟部補助套用在這款車上（廠商說法）；普通輕型第1級或第2級未能查證，經濟部補助先以5,100元計。', 'Ionex\'s own subsidy calculator applies MOEA money to this model (a maker\'s statement); whether it is 普通輕型 level 1 or 2 could not be checked, so MOEA money is counted at NT$5,100.'), sources: ['meid-lev-2026-subsidy-table', 'ionex-gov-calculator'], confidence: 'verified', research: ['central#moea-new-purchase-small-light'] },
+    // Not in the MEID approved-model file of 6 November 2026 (meid-approved-models-csv: 46 rows; it
+    // lists Ionex's EB10DA, EB15CG, EB15F and EB15GA, but not EE15AA). Only Ionex's own calculator
+    // applies MOEA money to it, so neither MOEA nor local money is counted until that is confirmed.
+    moeaClassBasis: { text: t('經濟部 2026 年 11 月 6 日的認可車款檔案裡找不到這款車（EE15AA）；只有 Ionex 自己的補助試算把經濟部補助套用在這款車上。在確認它在認可清單上以前，經濟部和縣市的補助都不算進去。', 'This model (EE15AA) is not in the MOEA approved-model file of 6 November 2026; only Ionex\'s own subsidy calculator applies MOEA money to it. Until it is confirmed on the approved list, neither MOEA nor local money is counted.'), sources: ['meid-approved-models-csv', 'ionex-gov-calculator'], confidence: 'secondary', research: ['gogoro-official-r2#moea-gogoro-approved-models', 'other-ev-brands#ionex-coolone-price'] },
     listPrice: {
       value: 49812,
       sources: ['ionex-gov-calculator'],
@@ -252,7 +263,7 @@ export const evModels: EvModel[] = [
       note: t('取自Ionex補助試算頁的程式內價格欄位，不是印出的建議售價，請向門市確認。', 'Taken from the price field in Ionex\'s subsidy calculator, not a printed list price; confirm the shop price.'),
     },
     promos: [],
-    moeaListed: 'yes',
+    moeaListed: 'unknown',
     domesticCells: 'unknown',
     battery: { system: 'ionex', count: 1, basis: { text: t('產品頁：單顆1,743 Wh換電電池。', 'Product page: one 1,743 Wh swappable battery.'), sources: ['ionex-coolone-product'], confidence: 'verified', research: ['other-ev-brands#ionex-coolone-spec'] } },
     efficiency: { unit: 'km-per-kWh', low: 31.3, typical: 31.3, high: 31.3, typicalBasis: t('產品頁的能源效率31.3公里／度。', 'Product page energy efficiency of 31.3 km per kWh.'), sources: ['ionex-coolone-product'], confidence: 'verified', research: ['other-ev-brands#ionex-coolone-spec'] },
@@ -269,7 +280,9 @@ export const evModels: EvModel[] = [
     plateClass: 'light',
     plateClassBasis: { text: t('產品頁：輕盈綠牌電動機車。', 'Product page: green-plate electric scooter.'), sources: ['ionex-ione-air-product'], confidence: 'verified', research: ['other-ev-brands#ionex-air-spec'] },
     moeaClass: 'light-unknown',
-    moeaClassBasis: { text: t('Ionex官網的政府補助試算把經濟部補助套用在這款車上（廠商說法）；普通輕型第1級或第2級未能查證，經濟部補助先以5,100元計。', 'Ionex\'s own subsidy calculator applies MOEA money to this model (a maker\'s statement); whether it is 普通輕型 level 1 or 2 could not be checked, so MOEA money is counted at NT$5,100.'), sources: ['meid-lev-2026-subsidy-table', 'ionex-gov-calculator'], confidence: 'verified', research: ['central#moea-new-purchase-small-light'] },
+    // In the MEID approved-model file of 6 November 2026 (meid-approved-models-csv row 40: 光陽 EB10DA,
+    // 普通輕型第1級). The level is not yet in the research, so MOEA money stays at the lower NT$5,100.
+    moeaClassBasis: { text: t('Ionex 的補助試算把經濟部補助套用在這款車上；經濟部 2026 年 11 月 6 日的認可車款檔案也列了這款車（EB10DA）。它是普通輕型第 1 級還是第 2 級我們還沒有查證，所以經濟部補助先以 5,100 元計（第 1 級是 7,000 元）。', 'Ionex\'s subsidy calculator applies MOEA money to this model, and the MOEA approved-model file of 6 November 2026 lists it (EB10DA). We have not yet confirmed whether it is light-class level 1 or 2, so MOEA money is counted at NT$5,100 (level 1 would be NT$7,000).'), sources: ['meid-approved-models-csv', 'meid-lev-2026-subsidy-table', 'ionex-gov-calculator'], confidence: 'secondary', research: ['central#moea-new-purchase-small-light', 'gogoro-official-r2#moea-gogoro-approved-models'] },
     listPrice: {
       value: 59808,
       sources: ['ionex-gov-calculator'],
@@ -340,9 +353,9 @@ export const evModels: EvModel[] = [
   {
     id: 'zau-es1000',
     brand: t('泓創ZAU', 'ZAU'),
-    name: t('ES-1000（在家充電，免月租）', 'ES-1000 (charged at home, no monthly fee)'),
+    name: t('ES-1000', 'ES-1000'),
     plateClass: 'light',
-    plateClassBasis: { text: t('零售頁標題寫普通輕型，但商品名稱只寫輕型；請向車行確認車種。', 'The retail listing title says 普通輕型 but the product name says only 輕型; confirm the class with a dealer.'), sources: ['pchome-zau-es1000'], confidence: 'secondary', research: ['home-charge-evs-r2#zau-es1000-price'] },
+    plateClassBasis: { text: t('零售頁標題寫普通輕型，但商品名稱只寫輕型；請向車行確認車種。', 'The retail listing title says light class (普通輕型, green plate) but the product name says only "light" (輕型); confirm the class with a dealer.'), sources: ['pchome-zau-es1000'], confidence: 'secondary', research: ['home-charge-evs-r2#zau-es1000-price'] },
     moeaClass: 'light-unknown',
     moeaClassBasis: { text: t('是否在經濟部認可車款清單、屬哪一級都未能查證。', 'Whether it is on the MOEA approved list, and in which class, could not be checked.'), sources: ['meid-approved-models-csv'], confidence: 'secondary', research: ['home-charge-evs-r2#substitute-verdict'] },
     moeaListed: 'unknown',
@@ -390,16 +403,17 @@ export const evModels: EvModel[] = [
       research: ['other-ev-brands#ionex-flyt-news-price', 'other-ev-brands#ionex-ione-price'],
     },
     moeaClass: 'heavy-1-2',
-    moeaClassBasis: { text: t('推定為普通重型（白牌）。', 'Inferred heavy class (white plate).'), sources: ['ionex-gov-calculator', 'ctee-2025-09-ionex-fly-techno'], confidence: 'secondary', research: ['other-ev-brands#ionex-ione-price', 'other-ev-brands#ionex-flyt-news-price'] },
+    // Not in the MEID approved-model file of 6 November 2026 (no EB15DB2 row), like the CoolOne.
+    moeaClassBasis: { text: t('推定為普通重型（白牌）；但經濟部 2026 年 11 月 6 日的認可車款檔案裡找不到這款車（EB15DB2），在確認它在認可清單上以前，經濟部和縣市的補助都不算進去。', 'Inferred heavy class (white plate); but this model (EB15DB2) is not in the MOEA approved-model file of 6 November 2026, so until it is confirmed on the approved list neither MOEA nor local money is counted.'), sources: ['meid-approved-models-csv', 'ionex-gov-calculator', 'ctee-2025-09-ionex-fly-techno'], confidence: 'secondary', research: ['other-ev-brands#ionex-ione-price', 'other-ev-brands#ionex-flyt-news-price', 'gogoro-official-r2#moea-gogoro-approved-models'] },
     listPrice: {
       value: 75810,
       sources: ['ionex-gov-calculator', 'ctee-2025-09-ionex-fly-techno'],
       confidence: 'verified',
       research: ['other-ev-brands#ionex-ione-price', 'other-ev-brands#ionex-flyt-news-price'],
-      note: t('取自Ionex補助試算頁的程式內價格欄位（2026年11月25日）；2025年9月上市時的建議售價為75,800元。請向門市確認。', 'From the price field in Ionex\'s subsidy calculator (25 November 2026); the launch list price in September 2025 was NT$75,800. Confirm the shop price.'),
+      note: t('取自Ionex補助試算頁的程式內價格欄位（2026 年 11 月 25 日）；2025 年 9 月上市時的建議售價為75,800元。請向門市確認。', 'From the price field in Ionex\'s subsidy calculator (25 November 2026); the launch list price in September 2025 was NT$75,800. Confirm the shop price.'),
     },
     promos: [],
-    moeaListed: 'yes',
+    moeaListed: 'unknown',
     domesticCells: 'unknown',
     battery: {
       system: 'ionex',
@@ -422,9 +436,9 @@ export const evModels: EvModel[] = [
   {
     id: 'zau-es2000',
     brand: t('泓創ZAU', 'ZAU'),
-    name: t('ES-2000（在家充電，免月租）', 'ES-2000 (charged at home, no monthly fee)'),
+    name: t('ES-2000', 'ES-2000'),
     plateClass: 'heavy',
-    plateClassBasis: { text: t('只有零售頁標題寫「普通重型」，未在官方文件查證；請向車行確認車種。', 'Only the retail listing title says 普通重型 (heavy class); not checked in an official document, so confirm the class with a dealer.'), sources: ['pchome-zau-es2000'], confidence: 'secondary', research: ['home-charge-evs-r2#zau-es2000-price'] },
+    plateClassBasis: { text: t('只有零售頁標題寫「普通重型」，未在官方文件查證；請向車行確認車種。', 'Only the retail listing title says heavy class (普通重型, white plate); not checked in an official document, so confirm the class with a dealer.'), sources: ['pchome-zau-es2000'], confidence: 'secondary', research: ['home-charge-evs-r2#zau-es2000-price'] },
     moeaClass: 'heavy-1-2',
     moeaClassBasis: { text: t('是否在經濟部認可車款清單、屬哪一級都未能查證；試算不計入任何需要經濟部認可的補助。', 'Whether it is on the MOEA approved list, and in which class, could not be checked; no subsidy that needs MOEA approval is counted.'), sources: ['meid-approved-models-csv'], confidence: 'secondary', research: ['home-charge-evs-r2#substitute-verdict'] },
     moeaListed: 'unknown',

@@ -5,7 +5,7 @@
 //   const link3 = evidenceForLink(3, 'zh-TW');
 //   link3.label                 // '街上的人吸進什麼'
 //   link3.facts[0].badges       // { confidence: '已查證', evidence: '台灣實測', ... }
-//   link3.gaps[0].badge         // '沒人量過'
+//   link3.gaps[0].badge         // '證據缺口'
 //   evidenceForLink(3, 'en', { primaryOnly: true })   // skip facts that only list 3 in alsoLinks
 //
 // Ordering: primary-link items first, then by evidence strength (measured in Taiwan, official,

@@ -37,8 +37,9 @@ export type Confidence = (typeof confidences)[number];
  *  - international: evidence from outside Taiwan (WHO, IARC, HEI, and single non-Taiwan studies;
  *                   the statement wording says which, so a single study is never presented as consensus)
  *  - derived:       our own arithmetic on cited figures (the fact lists its inputs in `derivedFrom`)
- *  - market-tw:     prices and terms published by Taiwanese manufacturers, dealers or energy
- *                   operators (scooter prices, battery plans, pump prices)
+ *  - market-tw:     figures published by Taiwanese manufacturers, dealers, energy operators or
+ *                   industry associations (scooter prices, battery plans, pump prices, company
+ *                   results, association sales tallies), as opposed to government statistics
  */
 export const evidenceTypes = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived', 'market-tw'] as const;
 export type Evidence = (typeof evidenceTypes)[number];
@@ -82,8 +83,11 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
     description: t('由本站根據引用的數字自行計算，計算所用的數字均附出處。', 'Our own arithmetic on cited figures; every input is itself cited.'),
   },
   'market-tw': {
-    label: t('市場公開價格', 'Published prices'),
-    description: t('台灣的車廠、經銷商或能源業者公布的售價、優惠與資費。', 'Prices, offers and plan terms published by Taiwanese manufacturers, dealers or energy operators.'),
+    label: t('業者公布資料', 'Industry figures'),
+    description: t(
+      '台灣的車廠、經銷商、能源業者或產業團體公布的售價、優惠、資費、銷售與營運數字，不是政府統計。',
+      'Prices, offers, plan terms, sales and company figures published by Taiwanese manufacturers, dealers, energy operators or industry associations; not government statistics.',
+    ),
   },
 };
 
@@ -110,7 +114,7 @@ export const chainLinkLabels: Record<ChainLink, { short: L10n; question: L10n }>
   4: { short: t('這些物質有什麼作用', 'What those compounds do'), question: t('廢氣中的物質對人體有什麼危害？聞得到又代表什麼？', 'What can these compounds do to the body, and what does the smell tell you?') },
   5: { short: t('吸入交通廢氣的人怎麼了', 'What happens to people who breathe traffic exhaust'), question: t('研究在吸入交通廢氣的人身上看到了什麼？', 'What have studies seen in people who breathe traffic exhaust?') },
   6: { short: t('誰離得最近', 'Who is closest to it'), question: t('誰離排氣管最近？誰最容易受到影響？', 'Who is closest to the tailpipes, and who is most susceptible?') },
-  7: { short: t('可以斬斷的一環', 'The link you can break'), question: t('換成更乾淨的機車或電動機車，能斬斷哪一環？', 'What would cleaner or electric scooters remove from the chain?') },
+  7: { short: t('可以切斷的一環', 'The link you can break'), question: t('換成更乾淨的機車或電動機車，能切斷哪一環？', 'What would cleaner or electric scooters remove from the chain?') },
 };
 
 // ---------------------------------------------------------------------------
