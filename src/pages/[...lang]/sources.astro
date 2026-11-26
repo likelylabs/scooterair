@@ -43,6 +43,9 @@ const readableUrl = (u: string) => {
   }
 };
 const total = sourceIds.length;
+/** A link of the chain is named by its topic ("排氣管排出什麼"), not its number. */
+const TE = localize(evidenceCopy, locale);
+const topic = (n: number) => { const t = TE.answerLink.topics[n - 1]; return t.charAt(0).toUpperCase() + t.slice(1); };
 
 /** The answers (former gaps) that rest on a source, through their facts or their own sources. */
 const answersBySource = new Map<SourceId, AnswerId[]>();
@@ -72,7 +75,11 @@ const citeParts = (citation: string, s: ReturnType<typeof getSource>): { text: s
 const entries = sourceIds.map((id) => {
   const s = getSource(id);
   const u = uses.get(id)!;
-  const citation = readerText(formatCitation(id, locale)).replace(sourceUrl(id), readableUrl(sourceUrl(id)));
+  // The address and the date we checked it are shown by the link and the line under it, so the
+  // printed citation stops before the address (a long URL is unreadable on a phone).
+  const full = readerText(formatCitation(id, locale)).replace(sourceUrl(id), readableUrl(sourceUrl(id)));
+  const at = full.indexOf(readableUrl(sourceUrl(id)));
+  const citation = at > 0 ? full.slice(0, at).trim() : full;
   return {
     id,
     n: citeN(id),
@@ -130,7 +137,7 @@ const css = [
         <div class="sx-chips">
           <span class="sx-chip"><input type="radio" name="link" id="sx-l-all" value="" checked /><label for="sx-l-all">{T.filter.all} <span>{total}</span></label></span>
           {chainLinks.map((n) => (
-            <span class="sx-chip"><input type="radio" name="link" id={`sx-l-${n}`} value={String(n)} /><label for={`sx-l-${n}`}>{fill(T.filter.linkN, { n })} <span>{linkCount(n)}</span></label></span>
+            <span class="sx-chip"><input type="radio" name="link" id={`sx-l-${n}`} value={String(n)} /><label for={`sx-l-${n}`}>{topic(n)} <span>{linkCount(n)}</span></label></span>
           ))}
           <span class="sx-chip"><input type="radio" name="link" id="sx-l-0" value="0" /><label for="sx-l-0">{T.filter.none} <span>{linkCount(0)}</span></label></span>
           <span class="sx-chip"><input type="radio" name="link" id="sx-l-est" value="est" /><label for="sx-l-est">{T.filter.estimate} <span>{entries.filter((e) => e.estimate).length}</span></label></span>
@@ -181,7 +188,7 @@ const css = [
               </div>
               <div class="sx-src__links">
                 <b>{T.entry.links}</b>
-                {e.u.links.length ? e.u.links.map((n) => <a href={href(`/evidence/#link-${n}`, locale)}>{fill(T.entry.linkN, { n })}</a>) : !e.estimate && <span>{T.entry.noLink}</span>}
+                {e.u.links.length ? e.u.links.map((n) => <a href={href(`/evidence/#link-${n}`, locale)}>{topic(n)}</a>) : !e.estimate && <span>{T.entry.noLink}</span>}
                 {e.estimate && <a href={href('/estimate/#recipe', locale)}>{T.entry.estimate}</a>}
               </div>
               {e.count > 0 && (
@@ -374,6 +381,15 @@ const css = [
   .sx-src:target {
     background: var(--mark-bg);
     box-shadow: 0 0 0 var(--sp-2) var(--mark-bg);
+  }
+  @media (max-width: 40em) {
+    .sx-src {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-1);
+    }
+    .sx-src__n {
+      font-size: var(--fs-lg) !important;
+    }
   }
   .sx-src__n {
     font-family: var(--font-en-display, inherit);

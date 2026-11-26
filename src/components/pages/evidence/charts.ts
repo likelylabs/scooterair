@@ -293,7 +293,7 @@ export function renderSpans(p: SpanProps): ChartRender {
   const body: string[] = [];
   let y = (p.marks?.length ?? 0) > 0 ? 24 : 6;
   rows.forEach((r) => {
-    const lines = wrapLabel(r.label, (MIN_W - valW - 8) / 14, 3);
+    const lines = wrapLabel(r.label, (MIN_W - valW - 8) / 14, 4);
     const cy = y + lines.length * LINE + 12;
     const tone = r.tone ?? 'exhaust';
     let g = `<g class="c-row" data-tip="${esc(`${r.label}: ${vt(r)}`)}">`;
@@ -511,11 +511,17 @@ export function renderOdour(p: OdourProps): ChartRender {
   const f = (v: number) => nf(locale, v, v < 0.01 ? 4 : v < 1 ? 2 : 1);
   const o: string[] = [];
   const body: string[] = [];
-  o.push(`<rect class="c-track" x="0" y="0" width="${xp(1)}%" height="20" rx="3"/>`);
-  o.push(text('c-tick', 0, 14, p.ppbLabel, 'dx="6"'));
-  o.push(`<rect class="c-track" x="${xp(1)}%" y="0" width="${r2(100 - xp(1))}%" height="20" rx="3"/>`);
-  o.push(text('c-tick', `${xp(1)}%`, 14, p.ppmLabel, 'dx="6"'));
-  let y = 30;
+  // a band label may carry '|' line breaks: the ppm band is only 40% of the width, and on a
+  // 320 px phone at the largest text size one line of English does not fit in it
+  const ppb = p.ppbLabel.split('|');
+  const ppm = p.ppmLabel.split('|');
+  const bandLines = Math.max(ppb.length, ppm.length);
+  const trackH = 20 + (bandLines - 1) * 16;
+  o.push(`<rect class="c-track" x="0" y="0" width="${xp(1)}%" height="${trackH}" rx="3"/>`);
+  ppb.forEach((ln, k) => o.push(text('c-tick', 0, 14 + k * 16, ln, 'dx="6"')));
+  o.push(`<rect class="c-track" x="${xp(1)}%" y="0" width="${r2(100 - xp(1))}%" height="${trackH}" rx="3"/>`);
+  ppm.forEach((ln, k) => o.push(text('c-tick', `${xp(1)}%`, 14 + k * 16, ln, 'dx="6"')));
+  let y = trackH + 10;
   rows.forEach((r) => {
     const lines = wrapLabel(r.label, MIN_W / 14);
     const cy = y + lines.length * LINE + 12;
@@ -544,7 +550,7 @@ export function renderOdour(p: OdourProps): ChartRender {
   const axisY = y;
   [0.001, 0.01, 0.1, 1, 10, 100].forEach((t, i, arr) => {
     const x = xp(t);
-    o.push(`<line class="c-grid" x1="${x}%" x2="${x}%" y1="24" y2="${axisY}"/>`);
+    o.push(`<line class="c-grid" x1="${x}%" x2="${x}%" y1="${trackH + 4}" y2="${axisY}"/>`);
     o.push(text('c-tick', `${x}%`, axisY + 17, nf(locale, t, 3), `text-anchor="${i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle'}"`));
   });
   o.push(...body);

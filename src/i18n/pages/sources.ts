@@ -36,7 +36,6 @@ export default copy({
     all: { 'zh-TW': '全部', en: 'All' },
     none: { 'zh-TW': '不在鏈上', en: 'Outside the chain' },
     estimate: { 'zh-TW': '推估用到的', en: 'Used by our estimate' },
-    linkN: { 'zh-TW': '第 {n} 環', en: 'Link {n}' },
     showing: { 'zh-TW': '顯示 {n} 個來源，共 {total} 個', en: 'Showing {n} of {total} sources' },
     hint: {
       'zh-TW': '選了之後，下面只留下符合的來源。兩組可以一起用。',
@@ -55,7 +54,6 @@ export default copy({
       en: 'Our research notes did not record this item’s title. The words in square brackets are our description; use the author or publisher, where it was published, and the link to find the original.',
     },
     links: { 'zh-TW': '用在：', en: 'Used in:' },
-    linkN: { 'zh-TW': '第 {n} 環', en: 'link {n}' },
     noLink: { 'zh-TW': '背景資料', en: 'background' },
     uses: { 'zh-TW': '網站用它說的事（{n}）', en: 'What the site says on its strength ({n})' },
     facts: { 'zh-TW': '事實', en: 'Facts' },

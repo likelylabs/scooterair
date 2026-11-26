@@ -17,8 +17,8 @@ export default copy({
     kicker: { 'zh-TW': '證據', en: 'Evidence' },
     title: { 'zh-TW': '證據鏈，|一環一環看', en: 'The chain, |link by link' },
     lead: {
-      'zh-TW': '這一頁給想查證的大人。網站上每一個有出處的數字都在這裡：誰做的、怎麼做的、是哪一種證據，還有它沒有說什麼。本站自己算的推估，也標出來，算法在「怎麼算的」那一頁。',
-      en: 'This page is for adults who want to check our work. Every sourced figure on the site is here: who produced it, how, what kind of evidence it is, and what it does not show. Where a figure is this site’s own estimate, it says so, and the working is on the “How we worked it out” page.',
+      'zh-TW': '想查證的人看這一頁。網站上每個有出處的數字都在這裡：誰做的、怎麼做的、是哪一種證據，還有它沒有說什麼。',
+      en: 'This page is for anyone who wants to check our work. Every sourced figure on the site is here: who produced it, how, what kind of evidence it is, and what it does not show.',
     },
     estimate: { 'zh-TW': '本站的推估怎麼算的', en: 'How our estimate was worked out' },
     tocLabel: { 'zh-TW': '這一頁有什麼', en: 'On this page' },
@@ -39,8 +39,8 @@ export default copy({
   howTo: {
     title: { 'zh-TW': '怎麼讀這一頁', en: 'How to read this page' },
     body: {
-      'zh-TW': '每一環先放圖，再放問題的答案，最後是證據表。表上每一列有五欄：我們說什麼、數字、誰做的和怎麼做的、證據類型，以及這一項沒有說什麼。每一列都有自己的連結，可以直接分享。每一個數字旁邊的小標籤，說它是哪一種：',
-      en: 'Each link opens with its charts, then the answers we have, then a table of evidence. Every row has five columns: what we say, the number, who produced it and how, the kind of evidence, and what it does not show. Every row has its own link you can share. The small label beside each number says what kind it is:',
+      'zh-TW': '每一環先講一句話，再放一個重要的數字和一張圖。想看更多，按「看這一環的細節」：裡面有常見問題的答案、證據表和出處。證據表每一列都寫著：我們說什麼、數字、誰做的、哪一種證據，還有它沒有說什麼。每一列都有自己的連結，可以分享。數字旁邊的小標籤，說它是哪一種：',
+      en: 'Each link starts with one sentence, then one key number and one chart. For more, press “See the detail for this link”: inside are answers to common questions, the table of evidence and the sources. Each row of the table says what we say, the number, who did it, what kind of evidence it is, and what it does not show. Every row has its own link you can share. The small label beside a number says what kind it is:',
     },
   },
 
@@ -84,8 +84,8 @@ export default copy({
   chain: {
     title: { 'zh-TW': '七環一覽', en: 'The seven links at a glance' },
     lead: {
-      'zh-TW': '網站說的事，是一條七環的鏈。下面每一環一句話，旁邊的標籤是那一環主要證據的種類。第 3 環是完整的：運研所量過行人等候區，機車旁邊多出來的部分，由本站推估。',
-      en: 'What the site says is a chain of seven links. Each line below is one sentence, with the kind of evidence behind it. Link 3 is whole: the Institute of Transportation measured the pedestrian waiting areas, and what the scooters add right beside them is this site’s estimate.',
+      'zh-TW': '網站說的事，像七個環扣成的一條鏈。點一環，就跳過去。',
+      en: 'What the site says is like a chain of seven links. Tap one to jump to it.',
     },
     see: { 'zh-TW': '看第 {n} 環的證據', en: 'See the evidence for link {n}' },
   },
@@ -97,6 +97,7 @@ export default copy({
       en: 'Each row is a link; each column is a kind of evidence. A cell lists the sources that link uses. The last column is this site’s own estimates, each linking to its working. Link 3’s estimate is outlined in dashes: what the scooters add right beside you is worked out.',
     },
     open: { 'zh-TW': '打開證據地圖', en: 'Open the evidence map' },
+    short: { 'zh-TW': '每一環用了哪幾種證據、哪些來源，一張表看完。', en: 'Which kinds of evidence and which sources each link uses, in one table.' },
     estimateColumn: { 'zh-TW': '本站推估', en: 'Our estimate' },
     estimateKerb: { 'zh-TW': '機車旁邊多出來的廢氣', en: 'What the scooters add beside you' },
     linkColumn: { 'zh-TW': '環', en: 'Link' },
@@ -123,6 +124,37 @@ export default copy({
     },
     { title: { 'zh-TW': '同一個路口，|沒有排氣管', en: 'Same crossing. |No tailpipes.' } },
   ],
+
+  // Before each link's fold: its one key number (the value, chip and period come from the registry)
+  key: {
+    labels: [
+      { 'zh-TW': '燃油機車排的一氧化碳，占全台灣排放量', en: 'Petrol scooters’ share of Taiwan’s carbon monoxide emissions' },
+      { 'zh-TW': '規定：待轉區和斑馬線之間要留', en: 'The rule: the gap between the turn box and the crosswalk' },
+      { 'zh-TW': '機車旁邊：本站的推估', en: 'Beside the scooters: our estimate' },
+      { 'zh-TW': '一氧化碳是什麼樣子', en: 'What carbon monoxide is like' },
+      { 'zh-TW': '國際回顧整理的研究', en: 'Studies in the international review' },
+      { 'zh-TW': '台北早上通勤一小時，身上量到的 PM2.5 平均', en: 'PM2.5 measured on people during a Taipei morning commute (average)' },
+      { 'zh-TW': '新掛牌的機車裡，電動的比例', en: 'Electric share of newly registered scooters' },
+    ],
+    source: { 'zh-TW': '看這個數字的出處', en: 'Where this number comes from' },
+  },
+  // Links from an answer card to its link of the chain name the topic, not a number
+  answerLink: {
+    label: { 'zh-TW': '更多證據：{topic}', en: 'More evidence: {topic}' },
+    topics: [
+      { 'zh-TW': '排氣管排出什麼', en: 'what leaves the tailpipe' },
+      { 'zh-TW': '廢氣排在哪裡', en: 'where the exhaust comes out' },
+      { 'zh-TW': '旁邊的人吸進什麼', en: 'what people beside it breathe' },
+      { 'zh-TW': '這些成分對身體做什麼', en: 'what those compounds do' },
+      { 'zh-TW': '吸廢氣的人怎麼了', en: 'what happens to people who breathe it' },
+      { 'zh-TW': '誰離得最近', en: 'who is closest' },
+      { 'zh-TW': '換電動機車', en: 'going electric' },
+    ],
+  },
+  more: {
+    open: { 'zh-TW': '看這一環的細節', en: 'See the detail for this link' },
+    count: { 'zh-TW': '問答、證據表、出處，{count} 項', en: 'answers, evidence, sources ({count})' },
+  },
 
   link: {
     question: { 'zh-TW': '這一環問的是：', en: 'This link asks:' },
@@ -306,13 +338,17 @@ export default copy({
     date: { 'zh-TW': '開始日期', en: 'Start date' },
     phase: { 'zh-TW': '第 {n} 期', en: 'Phase {n}' },
     download: { 'zh-TW': '下載這張圖的資料（CSV）', en: 'Download this chart’s data (CSV)' },
+    more: { 'zh-TW': '這張圖沒有說什麼、資料和出處', en: 'What this chart does not show; data and sources' },
+    sources: { 'zh-TW': '出處：', en: 'Sources:' },
     hollowNs: { 'zh-TW': '外框：統計上不顯著', en: 'Outline: not statistically significant' },
     hollowModel: { 'zh-TW': '外框：未通過模式效能檢核', en: 'Outline: failed the model-performance check' },
     filled: { 'zh-TW': '實心：研究報告的數值', en: 'Filled: the value as reported' },
     significant: { 'zh-TW': '＊ 統計顯著', en: '* statistically significant' },
     sigFilled: { 'zh-TW': '實心：統計顯著', en: 'Filled: statistically significant' },
-    sigHollow: { 'zh-TW': '空心：統計上不顯著', en: 'Hollow: not statistically significant' },    ppb: { 'zh-TW': '十億分之幾就聞得到', en: 'smelled at parts per billion' },
-    ppm: { 'zh-TW': '要到百萬分之幾', en: 'needs parts per million' },
+    sigHollow: { 'zh-TW': '空心：統計上不顯著', en: 'Hollow: not statistically significant' },
+    // '|' breaks the band label into two lines (the ppm band is narrow on a phone)
+    ppb: { 'zh-TW': '十億分之幾|就聞得到', en: 'smelled at|parts per billion' },
+    ppm: { 'zh-TW': '要到|百萬分之幾', en: 'needs parts|per million' },
     noSmell: { 'zh-TW': '沒有味道', en: 'no smell' },
     asTable: { 'zh-TW': '這組資料用表格呈現，因為數值相差太大，畫成同一張圖會誤導。', en: 'This dataset is shown as a table because its values differ too widely to draw honestly on one chart.' },
     reduction: { 'zh-TW': '降低的百分比', en: 'Reduction (%)' },
@@ -321,6 +357,7 @@ export default copy({
   // V31 and the rest of #not-used (blueprint 4.5, section 6)
   notUsed: {
     title: { 'zh-TW': '常被引用、|但我們不這樣用的數字', en: 'Figures often quoted |that we do not use that way' },
+    short: { 'zh-TW': '新聞裡常見的六個數字，原本的條件是什麼。', en: 'Six figures often seen in the news, and the conditions they came with.' },
     lead: {
       'zh-TW': '這幾個數字在新聞和網路上很常見。有的是真的，但只在很窄的條件下成立；有的根本不是那個意思。我們把它們拆開來放在這裡，附上原本的條件。',
       en: 'These figures turn up often in the news and online. Some are true, but only under narrow conditions; some do not mean what they are taken to mean. We take them apart here, with their conditions attached.',
@@ -397,6 +434,7 @@ export default copy({
   // change our mind.
   notClaimed: {
     title: { 'zh-TW': '我們不會說的話', en: 'What we will not say' },
+    short: { 'zh-TW': '每一句說得太過頭的話，和我們改說的話。', en: 'Each claim that goes too far, and what we say instead.' },
     lead: {
       'zh-TW': '下面這些話，網站上不會出現。每一句後面寫著我們說的是什麼。網站上的每一段文字，在建置時都會自動比對這些規則。',
       en: 'None of these sentences appears on the site. Each is followed by what we say instead. Every piece of copy on the site is checked against these rules automatically when the site is built.',
@@ -483,6 +521,7 @@ export default copy({
   // together are on /estimate/#answers. The anchor #gaps stays for old links.
   answers: {
     title: { 'zh-TW': '常被問的問題', en: 'Questions people often ask' },
+    short: { 'zh-TW': '{n} 個常見問題，一題一題列出來。', en: '{n} common questions, listed one by one.' },
     lead: {
       'zh-TW': '常被問的 {n} 個問題，答案放在它所屬的那一環；要一次看全部，請到「怎麼算的」那一頁。',
       en: '{n} questions people often ask, each answered under its link; to see them all together, go to the “How we worked it out” page.',
@@ -492,7 +531,6 @@ export default copy({
 
   // Link 3 is whole: the institute's readings, then the site's estimate beside the scooters (brief 7.3)
   link3: {
-    estTitle: { 'zh-TW': '機車旁邊：本站的推估', en: 'Beside the scooters: our estimate' },
     estLead: {
       'zh-TW': '運研所量的是行人等候區一整天的空氣。紅燈時站在一排機車旁邊，多吸到多少，是本站算的：',
       en: 'The Institute of Transportation measured the air in the waiting areas over whole days. How much more a person standing beside a row of scooters breathes at a red light is worked out by this site:',
@@ -513,12 +551,14 @@ export default copy({
       en: 'For these papers we read the full text and checked every figure the site uses against the page. How far we got into every other source is stated on its entry on the sources page.',
     },
     open: { 'zh-TW': '看這 {n} 篇研究', en: 'See these {n} studies' },
+    short: { 'zh-TW': '我們讀完全文、一頁一頁核對過的 {n} 篇。', en: 'The {n} we read in full and checked page by page.' },
     uses: { 'zh-TW': '網站用到的 {n} 項', en: 'Used on the site ({n})' },
     entry: { 'zh-TW': '資料來源頁的這一筆', en: 'Its entry on the sources page' },
   },
 
   method: {
     title: { 'zh-TW': '怎麼查證的', en: 'How we checked' },
+    short: { 'zh-TW': '數字從哪裡來、怎麼核對、發現錯誤怎麼改。', en: 'Where the numbers come from, how we checked them, and how we fix mistakes.' },
     badges: { 'zh-TW': '證據的細分類', en: 'The finer kinds of evidence' },
     body: [
       {

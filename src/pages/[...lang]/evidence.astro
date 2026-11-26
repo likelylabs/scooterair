@@ -29,7 +29,6 @@ import Callout from '@/components/ui/Callout.astro';
 import Card from '@/components/ui/Card.astro';
 import Cite from '@/components/ui/Cite.astro';
 import CompareTable from '@/components/ui/CompareTable.astro';
-import Details from '@/components/ui/Details.astro';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
 import EvidenceLegend from '@/components/ui/EvidenceLegend.astro';
 import Figure from '@/components/ui/Figure.astro';
@@ -43,6 +42,8 @@ import FactList from '@/components/pages/evidence/FactList.astro';
 import FactRow from '@/components/pages/evidence/FactRow.astro';
 import AnswerCard from '@/components/pages/evidence/AnswerCard.astro';
 import SeriesFigure from '@/components/pages/evidence/SeriesFigure.astro';
+import Fold from '@/components/pages/evidence/Fold.astro';
+import Mixed from '@/components/pages/evidence/Mixed.astro';
 import { seriesView, strollerView, sgn } from '@/components/pages/evidence/figures';
 import {
   casePanelFacts,
@@ -206,8 +207,8 @@ const ctx = contextItems();
 
 const toc = [
   { href: '#chain', label: T.toc.chain },
-  { href: '#map', label: T.toc.map },
   ...chainLinks.map((n) => ({ href: `#${chain.anchor(n)}`, label: `${fill(T.toc.linkN, { n })} · ${linkName(n)}` })),
+  { href: '#map', label: T.toc.map },
   { href: '#answers', label: T.toc.answers },
   { href: '#not-claimed', label: T.toc.notClaimed },
   { href: '#change-mind', label: T.toc.changeMind },
@@ -215,6 +216,20 @@ const toc = [
   { href: '#not-used', label: T.toc.notUsed },
   { href: '#method', label: T.toc.method },
 ];
+
+// ---- each link's key number (shown before the fold) -------------------------------------
+/** The one number each link leads with; link 3 leads with the site's estimate instead. */
+const keyFact: Record<ChainLink, FactId | null> = {
+  1: 'teds13-mc-co-share',
+  2: 'marking-rules-turn-box',
+  3: null,
+  4: 'co-odourless',
+  5: 'hei-sr23-trap-associations',
+  6: 'commute-scooter-vs-subway-chuang2020',
+  7: 'ev-share-2025',
+};
+/** How many items wait behind each link's fold: answers, table rows, more charts, pointers. */
+const foldItems = (l: (typeof links)[number]) => l.answers.length + l.own.length + foldCount(l.n, l.others.length) + l.pointers.length;
 ---
 
 <Base locale={locale} title={T.meta.title} description={T.meta.description} share="brief">
@@ -224,217 +239,234 @@ const toc = [
       <h1 class="display ev-title"><Phrased text={T.head.title} /></h1>
       <p class="lead">{T.head.lead}</p>
       <p class="ev-est"><a href={href('/estimate/', locale)}>{T.head.estimate}<Icon name="arrow-right" size="1.05em" /></a></p>
-      <nav class="ev-toc" aria-label={T.head.tocLabel}>
-        <h2 class="ev-toc__title">{T.head.tocLabel}</h2>
-        <ol>
-          {toc.map((it) => <li><a href={it.href}>{it.label}</a></li>)}
-        </ol>
-      </nav>
-      <div class="ev-howto">
-        <h2 class="ev-howto__title">{T.howTo.title}</h2>
-        <p>{T.howTo.body}</p>
-        <ul class="ev-chips">
-          {readerKinds.map((k) => <li><KindChip locale={locale} kind={k} /> <span>{readerKindLabels[k].meaning[locale]}</span></li>)}
-        </ul>
-      </div>
+      <details class="ev-mini" data-ev-fold>
+        <summary><span>{T.head.tocLabel}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+        <nav class="ev-toc" aria-label={T.head.tocLabel}>
+          <ol>
+            {toc.map((it) => <li><a href={it.href}>{it.label}</a></li>)}
+          </ol>
+        </nav>
+      </details>
+      <details class="ev-mini" data-ev-fold>
+        <summary><span>{T.howTo.title}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+        <div class="ev-howto">
+          <p>{T.howTo.body}</p>
+          <ul class="ev-chips">
+            {readerKinds.map((k) => <li><KindChip locale={locale} kind={k} /> <span>{readerKindLabels[k].meaning[locale]}</span></li>)}
+          </ul>
+        </div>
+      </details>
     </div></div>
   </header>
 
-  <!-- The connect board: seven lines, each with its chip(s) -->
-  <Section id="chain" title={T.chain.title} lead={T.chain.lead} tone="sunken" width="wide">
+  <!-- The seven links at a glance: one tap each (each link's sentence is at the top of its section) -->
+  <Section id="chain" title={T.chain.title} lead={T.chain.lead} tone="sunken" width="wide" pad="tight">
     <ol class="ev-board">
       {board.map((b) => (
         <li class="ev-board__row">
           <a class="ev-board__link" href={`#${chain.anchor(b.n)}`}>
             <span class="ev-board__n" aria-hidden="true">{b.n}</span>
-            <span class="ev-board__body">
-              <span class="ev-board__name">{fill(T.toc.linkN, { n: b.n })}　{b.name}</span>
-              <span class="ev-board__text">{b.text}</span>
+            <span class="ev-board__name"><span class="vh">{fill(T.toc.linkN, { n: b.n })}　</span>{b.name}</span>
+            <span class="ev-board__chips">
+              {b.chips.length ? b.chips.map((c) => <KindChip locale={locale} kind={c} size="sm" />) : <span class="ev-board__machine">{chain.noBadge[locale]}</span>}
             </span>
           </a>
-          <span class="ev-board__chips">
-            {b.chips.length ? b.chips.map((c) => <KindChip locale={locale} kind={c} size="sm" />) : <span class="ev-board__machine">{chain.noBadge[locale]}</span>}
-          </span>
         </li>
       ))}
     </ol>
   </Section>
 
-  <!-- V30: the evidence map -->
-  <Section id="map" title={T.map.title} lead={T.map.lead}>
-    <details class="ev-fold ev-fold--map" data-ev-fold>
-      <summary><span>{T.map.open}</span><Icon name="chevron-down" size="1.25rem" /></summary>
-      <EvidenceMap locale={locale} />
-    </details>
-  </Section>
-
-  {links.map((l, li) => (
+  {links.map((l, li) => {
+    const kf = keyFact[l.n];
+    const k = kf ? lf(kf, locale) : null;
+    const b = board[l.n - 1];
+    return (
     <section id={chain.anchor(l.n)} class:list={['ev-link', li % 2 === 1 && 'tone-sunken']} aria-labelledby={`${chain.anchor(l.n)}-title`} data-link={l.n}>
       <div class="container">
         <header class="ev-link__head">
-          <p class="eyebrow">{fill(chain.linkOf[locale], { n: l.n, total: chain.links.length })} · {l.n === chain.links.length ? chain.breakable[locale] : chain.links[l.n - 1][locale]}</p>
+          <p class="eyebrow">{fill(chain.linkOf[locale], { n: l.n, total: chain.links.length })} · {linkName(l.n)}</p>
           <h2 class="h1 ev-link__title" id={`${chain.anchor(l.n)}-title`}><Phrased text={l.title} /></h2>
-          <p class="ev-link__q"><b>{T.link.question}</b> {l.question}</p>
+          {/* link 2's one-line summary says what its headline and key number already say */}
+          {l.n !== 2 && <p class="ev-link__claim">{b.text}</p>}
         </header>
 
-        {l.n === 3 && (
-          <div class="ev-l3">
-            <div class="ev-l3__est">
-              <h3 class="ev-sub ev-sub--first">{T.link3.estTitle}</h3>
+        <div class="ev-link__grid">
+          {kf && k ? (
+            <div class="ev-key">
+              <p class="ev-key__label">{T.key.labels[l.n - 1]}</p>
+              <p class="ev-key__value"><Mixed text={k.display} locale={locale} /></p>
+              <p class="ev-key__meta"><KindChip locale={locale} of={facts[kf]} /><span>{k.period}</span></p>
+              <a class="ev-key__go" href={`#${kf}`}>{T.key.source}<span class="vh">{colon}{k.display}</span><Icon name="arrow-down" size="1.05em" /></a>
+            </div>
+          ) : (
+            <div class="ev-key ev-key--est">
+              <p class="ev-key__label">{T.key.labels[2]}</p>
               <p class="ev-l3__p">{T.link3.estLead}</p>
               <div class="ev-l3__row">
                 <span class="ev-l3__label">{estimateText.addedByPack[locale]}</span>
                 <EstimateValue locale={locale} slotId="co.dozen.add" />
               </div>
               <p class="ev-l3__p">{kSentences.K2[locale]}</p>
-              <div><a class="ev-go" href={href('/estimate/', locale)}>{T.link3.estMore}<Icon name="arrow-right" size="1.05em" /></a></div>
+              <a class="ev-key__go" href={href('/estimate/', locale)}>{T.link3.estMore}<Icon name="arrow-right" size="1.05em" /></a>
             </div>
-            <div class="ev-l3__mask">
-              <h3 class="ev-sub ev-sub--first">{T.link3.masksTitle}</h3>
-              <p class="ev-l3__p">{T.link3.masks}</p>
-              <div><a class="ev-go" href={href('/questions/mask/', locale)}>{T.link3.masksLink}<Icon name="arrow-right" size="1.05em" /></a></div>
-            </div>
-          </div>
-        )}
+          )}
 
-        {l.n === 5 && (
-          <div class="ev-l5">
-            <Callout tone="note" label={T.link5.leadTitle}>
-              <p>{fill(T.link5.lead, { studies: nf(studies, 0) })}</p>
-              <p><b>{kSentences.K5[locale]}</b></p>
-            </Callout>
-            <Callout tone="exhaust" label={T.link5.rulerLabel}>
-              <p>{T.link5.ruler}</p>
-            </Callout>
+          <div class="ev-visuals ev-visuals--lead">
+            {l.n === 1 && <SeriesFigure brief locale={locale} view={V('teds13-motorcycle-share')} title={T.v5.title} subtitle={T.v5.subtitle} caption={T.v5.caption} tone="exhaust" />}
+            {l.n === 2 && <SeriesFigure brief locale={locale} view={V('wu2021-quiet-route')} title={T.v32.title} subtitle={T.v32.subtitle} caption={T.v32.caption} />}
+            {l.n === 3 && <SeriesFigure brief locale={locale} view={V('taipei-traffic-vs-general-stations')} title={T.v9.title} subtitle={T.v9.subtitle} caption={T.v9.caption} />}
+            {l.n === 4 && <SeriesFigure brief locale={locale} view={V('odour-thresholds')} />}
+            {l.n === 5 && <SeriesFigure brief locale={locale} view={V('hei-sr23-outcomes')} />}
+            {l.n === 6 && <SeriesFigure brief locale={locale} view={strollerView(locale, T, strollerBand)} title={T.v29.title} subtitle={T.v29.subtitle} caption={T.v29.caption} />}
+            {l.n === 7 && <SeriesFigure brief locale={locale} view={V('ev-share-new-registrations')} title={T.v17.title} subtitle={T.v17.subtitle} caption={T.v17.caption} tone="clean" />}
           </div>
-        )}
-
-        <h3 class="ev-sub">{T.link.visuals}</h3>
-        <div class="ev-visuals">
-          {l.n === 1 && <SeriesFigure locale={locale} view={V('teds13-motorcycle-share')} title={T.v5.title} subtitle={T.v5.subtitle} caption={T.v5.caption} tone="exhaust" />}
-          {l.n === 2 && <SeriesFigure locale={locale} view={V('wu2021-quiet-route')} title={T.v32.title} subtitle={T.v32.subtitle} caption={T.v32.caption} />}
-          {l.n === 3 && <SeriesFigure locale={locale} view={V('taipei-traffic-vs-general-stations')} title={T.v9.title} subtitle={T.v9.subtitle} caption={T.v9.caption} />}
-          {l.n === 4 && <SeriesFigure locale={locale} view={V('odour-thresholds')} />}
-          {l.n === 5 && <SeriesFigure locale={locale} view={V('hei-sr23-outcomes')} />}
-          {l.n === 6 && <SeriesFigure locale={locale} view={strollerView(locale, T, strollerBand)} title={T.v29.title} subtitle={T.v29.subtitle} caption={T.v29.caption} />}
-          {l.n === 7 && <SeriesFigure locale={locale} view={V('ev-share-new-registrations')} title={T.v17.title} subtitle={T.v17.subtitle} caption={T.v17.caption} tone="clean" />}
         </div>
 
-        {l.answers.length > 0 && (
-          <Fragment>
-            <h3 class="ev-sub">{T.link.answers}</h3>
-            <div class="ev-gaps">
-              {l.answers.map((a) => <AnswerCard locale={locale} id={a} level={4} k={['K5']} legacy />)}
-            </div>
-          </Fragment>
-        )}
+        <details class="ev-more" data-section-fold data-ev-fold>
+          <summary class="ev-more__sum">
+            <span class="ev-more__text"><b>{T.more.open}</b><span>{fill(T.more.count, { count: foldItems(l) })}</span></span>
+            <span class="ev-more__btn" aria-hidden="true"><Icon name="chevron-down" size="1.4rem" /></span>
+          </summary>
+          <div class="ev-more__body">
+            <p class="ev-link__q"><b>{T.link.question}</b> {l.question}</p>
 
-        <h3 class="ev-sub">{l.n === 5 ? T.link.table5 : T.link.table}</h3>
-        <FactList locale={locale} ids={l.own} link={l.n} visible={3} />
-
-        {foldCount(l.n, l.others.length) > 0 && (
-          <details class="ev-fold" data-ev-fold>
-            <summary><span>{fill(T.row.moreData, { n: l.n, count: foldCount(l.n, l.others.length) })}</span><Icon name="chevron-down" size="1.25rem" /></summary>
-            <div class="ev-visuals ev-visuals--fold">
-          {l.n === 1 && (
-            <Fragment>
-              <figure class="ev-stats" aria-labelledby="v34-t">
-                <h4 class="ev-stats__title" id="v34-t">{T.v34.title}</h4>
-                <div class="ev-stats__grid">
-                  {v34.map((s) => {
-                    const f = lf(s.id, locale);
-                    return (
-                      <Stat locale={locale} label={s.label} value={s.value} unit={s.unit} prefix={'prefix' in s ? s.prefix : undefined} tone={'tone' in s ? s.tone : 'neutral'} size="md">
-                        {f.statement}{cites(facts[s.id].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)} <a href={`#${s.id}`} class="ev-stat__row" aria-label={`${T.row.permalink}${colon}${s.label}`}>#</a>
-                      </Stat>
-                    );
-                  })}
-                </div>
-                <p class="ev-stats__src"><EvidenceBadge locale={locale} kind="official-tw" /></p>
-              </figure>
-              <SeriesFigure locale={locale} view={V('tunnel-co-by-vehicle-class-ting2023')} title={T.v20.title} subtitle={T.v20.subtitle} caption={T.v20.caption} />
-              <div class="ev-pair">
-                <p class="ev-pair__title">{fill(T.v21.title, v21).replaceAll('|', '')}</p>
-                <p class="ev-pair__sub">{T.v21.subtitle}</p>
-                <div class="ev-pair__grid">
-                  <SeriesFigure locale={locale} view={V('tsai2023-benzene-by-class')} caption={T.v21.caption} />
-                  <SeriesFigure locale={locale} view={V('tsai2023-hc-by-class')} />
-                </div>
-              </div>
-              <div class="ev-pair">
-                <p class="ev-pair__title">{T.v22.title}</p>
-                <div class="ev-pair__grid">
-                  <SeriesFigure locale={locale} view={V('tsai2018-older-phase-excess')} caption={T.v22.caption} />
-                  <SeriesFigure locale={locale} view={V('tsai2018-by-mileage')} />
-                </div>
-              </div>
-              <aside class="ev-case" aria-labelledby="case-title">
-                <p class="ev-case__tab">{T.casePanel.label}</p>
-                <div class="ev-case__inner">
-                  <h4 class="ev-case__title" id="case-title"><Phrased text={T.casePanel.title} /></h4>
-                  <p>{T.casePanel.lead}</p>
-                  <SeriesFigure locale={locale} view={V('tsai2026-three-scooter-case')} subtitle={T.casePanel.chartSub} tone="exhaust" />
-                  <FactRow locale={locale} id="tsai2026-three-scooter-case" as="div" />
-                </div>
-              </aside>
-              <SeriesFigure locale={locale} view={V('idle-test-limits-by-build-date')} title={T.v23.title} subtitle={T.v23.subtitle} caption={T.v23.caption} />
-              <SeriesFigure locale={locale} view={perHundred} title={fill(T.v24.title, { total: perHundredTotal })} subtitle={T.v24.subtitle} caption={T.v24.caption} />
-            </Fragment>
-          )}
-          {l.n === 3 && (
-            <Fragment>
-              <SeriesFigure locale={locale} view={V('wu2021-station-correlation')} title={T.v25.title} subtitle={T.v25.subtitle} caption={T.v25.caption} />
-              <div class="ev-pair">
-                <p class="ev-pair__title">{T.v26.title}</p>
-                <p class="ev-pair__sub">{T.v26.subtitle}</p>
-                <div class="ev-pair__grid ev-pair__grid--3">
-                  <SeriesFigure locale={locale} view={V('scooter-lane-vs-cyclist-wu2021')} title={T.v26.a} caption={`${T.v26.diffLabel}${T.v26.aDiff}`} />
-                  <SeriesFigure locale={locale} view={V('commute-pm25-chuang2020')} title={T.v26.b} caption={`${T.v26.diffLabel}${T.v26.bDiff}`} />
-                  <SeriesFigure locale={locale} view={V('commute-pm25-wang2021')} title={T.v26.c} caption={`${T.v26.diffLabel}${T.v26.cDiff}`} />
-                </div>
-              </div>
-            </Fragment>
-          )}
-          {l.n === 4 && (
-            <Fragment>
-              <Figure locale={locale} title={T.v28.title} subtitle={T.v28.subtitle} level={4} badge="international">
-                <CompareTable caption={plain(T.v28.title)} hideCaption rowHeader={T.v28.item} columns={[{ label: T.v28.group }]} rows={iarc.map((r) => ({ label: r.label, values: [lf(r.id, locale).display] }))} numeric={false} />
-                <Fragment slot="caption">{T.v28.foot}</Fragment>
-                <Fragment slot="source">{cites(iarc.flatMap((r) => facts[r.id].sources)).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-              </Figure>
-            </Fragment>
-          )}
-          {l.n === 5 && (
-            <Fragment>
-              <SeriesFigure locale={locale} view={V('chuang2020-effects-per-iqr')} />
-            </Fragment>
-          )}
-          {l.n === 6 && (
-            <Fragment>
-              <SeriesFigure locale={locale} view={V('commute-pm25-chuang2020')} title={T.v13.title} subtitle={T.v13.subtitle} caption={T.v13.caption} anchor={false} />
-            </Fragment>
-          )}
-            </div>
-
-            {l.others.length > 0 && (
-              <div class="ev-visuals ev-visuals--fold">
-                {l.others.map((id) => <SeriesFigure locale={locale} view={V(id)} />)}
+            {l.n === 3 && (
+              <div class="ev-l3__mask">
+                <h3 class="ev-sub ev-sub--first">{T.link3.masksTitle}</h3>
+                <p class="ev-l3__p">{T.link3.masks}</p>
+                <div><a class="ev-go" href={href('/questions/mask/', locale)}>{T.link3.masksLink}<Icon name="arrow-right" size="1.05em" /></a></div>
               </div>
             )}
-          </details>
-        )}
 
-        {l.pointers.length > 0 && (
-          <div class="ev-also">
-            <h4 class="ev-also__title">{T.row.alsoTitle}</h4>
-            <p class="ev-also__lead ev-note">{T.row.alsoLead}</p>
-            <ul>
-              {l.pointers.map((p) => (
-                <li><a href={`#${p.id}`}>{p.display}</a> <span>· {p.where}</span></li>
-              ))}
-            </ul>
+            {l.n === 5 && (
+              <div class="ev-l5">
+                <Callout tone="note" label={T.link5.leadTitle}>
+                  <p>{fill(T.link5.lead, { studies: nf(studies, 0) })}</p>
+                  <p><b>{kSentences.K5[locale]}</b></p>
+                </Callout>
+                <Callout tone="exhaust" label={T.link5.rulerLabel}>
+                  <p>{T.link5.ruler}</p>
+                </Callout>
+              </div>
+            )}
+
+            {l.answers.length > 0 && (
+              <Fragment>
+                <h3 class="ev-sub">{T.link.answers}</h3>
+                <div class="ev-gaps">
+                  {l.answers.map((a) => <AnswerCard locale={locale} id={a} level={4} k={['K5']} legacy />)}
+                </div>
+              </Fragment>
+            )}
+
+            <h3 class="ev-sub">{l.n === 5 ? T.link.table5 : T.link.table}</h3>
+            <FactList locale={locale} ids={l.own} link={l.n} visible={3} />
+
+            {foldCount(l.n, l.others.length) > 0 && (
+              <details class="ev-fold" data-ev-fold>
+                <summary><span>{fill(T.row.moreData, { n: l.n, count: foldCount(l.n, l.others.length) })}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+                <div class="ev-visuals ev-visuals--fold">
+              {l.n === 1 && (
+                <Fragment>
+                  <figure class="ev-stats" aria-labelledby="v34-t">
+                    <h4 class="ev-stats__title" id="v34-t">{T.v34.title}</h4>
+                    <div class="ev-stats__grid">
+                      {v34.map((s) => {
+                        const f = lf(s.id, locale);
+                        return (
+                          <Stat locale={locale} label={s.label} value={s.value} unit={s.unit} prefix={'prefix' in s ? s.prefix : undefined} tone={'tone' in s ? s.tone : 'neutral'} size="md">
+                            {f.statement}{cites(facts[s.id].sources).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)} <a href={`#${s.id}`} class="ev-stat__row" aria-label={`${T.row.permalink}${colon}${s.label}`}>#</a>
+                          </Stat>
+                        );
+                      })}
+                    </div>
+                    <p class="ev-stats__src"><EvidenceBadge locale={locale} kind="official-tw" /></p>
+                  </figure>
+                  <SeriesFigure locale={locale} view={V('tunnel-co-by-vehicle-class-ting2023')} title={T.v20.title} subtitle={T.v20.subtitle} caption={T.v20.caption} />
+                  <div class="ev-pair">
+                    <p class="ev-pair__title">{fill(T.v21.title, v21).replaceAll('|', '')}</p>
+                    <p class="ev-pair__sub">{T.v21.subtitle}</p>
+                    <div class="ev-pair__grid">
+                      <SeriesFigure locale={locale} view={V('tsai2023-benzene-by-class')} caption={T.v21.caption} />
+                      <SeriesFigure locale={locale} view={V('tsai2023-hc-by-class')} />
+                    </div>
+                  </div>
+                  <div class="ev-pair">
+                    <p class="ev-pair__title">{T.v22.title}</p>
+                    <div class="ev-pair__grid">
+                      <SeriesFigure locale={locale} view={V('tsai2018-older-phase-excess')} caption={T.v22.caption} />
+                      <SeriesFigure locale={locale} view={V('tsai2018-by-mileage')} />
+                    </div>
+                  </div>
+                  <aside class="ev-case" aria-labelledby="case-title">
+                    <p class="ev-case__tab">{T.casePanel.label}</p>
+                    <div class="ev-case__inner">
+                      <h4 class="ev-case__title" id="case-title"><Phrased text={T.casePanel.title} /></h4>
+                      <p>{T.casePanel.lead}</p>
+                      <SeriesFigure locale={locale} view={V('tsai2026-three-scooter-case')} subtitle={T.casePanel.chartSub} tone="exhaust" />
+                      <FactRow locale={locale} id="tsai2026-three-scooter-case" as="div" />
+                    </div>
+                  </aside>
+                  <SeriesFigure locale={locale} view={V('idle-test-limits-by-build-date')} title={T.v23.title} subtitle={T.v23.subtitle} caption={T.v23.caption} />
+                  <SeriesFigure locale={locale} view={perHundred} title={fill(T.v24.title, { total: perHundredTotal })} subtitle={T.v24.subtitle} caption={T.v24.caption} />
+                </Fragment>
+              )}
+              {l.n === 3 && (
+                <Fragment>
+                  <SeriesFigure locale={locale} view={V('wu2021-station-correlation')} title={T.v25.title} subtitle={T.v25.subtitle} caption={T.v25.caption} />
+                  <div class="ev-pair">
+                    <p class="ev-pair__title">{T.v26.title}</p>
+                    <p class="ev-pair__sub">{T.v26.subtitle}</p>
+                    <div class="ev-pair__grid ev-pair__grid--3">
+                      <SeriesFigure locale={locale} view={V('scooter-lane-vs-cyclist-wu2021')} title={T.v26.a} caption={`${T.v26.diffLabel}${T.v26.aDiff}`} />
+                      <SeriesFigure locale={locale} view={V('commute-pm25-chuang2020')} title={T.v26.b} caption={`${T.v26.diffLabel}${T.v26.bDiff}`} />
+                      <SeriesFigure locale={locale} view={V('commute-pm25-wang2021')} title={T.v26.c} caption={`${T.v26.diffLabel}${T.v26.cDiff}`} />
+                    </div>
+                  </div>
+                </Fragment>
+              )}
+              {l.n === 4 && (
+                <Fragment>
+                  <Figure locale={locale} title={T.v28.title} subtitle={T.v28.subtitle} level={4} badge="international">
+                    <CompareTable caption={plain(T.v28.title)} hideCaption rowHeader={T.v28.item} columns={[{ label: T.v28.group }]} rows={iarc.map((r) => ({ label: r.label, values: [lf(r.id, locale).display] }))} numeric={false} />
+                    <Fragment slot="caption">{T.v28.foot}</Fragment>
+                    <Fragment slot="source">{cites(iarc.flatMap((r) => facts[r.id].sources)).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+                  </Figure>
+                </Fragment>
+              )}
+              {l.n === 5 && (
+                <Fragment>
+                  <SeriesFigure locale={locale} view={V('chuang2020-effects-per-iqr')} />
+                </Fragment>
+              )}
+              {l.n === 6 && (
+                <Fragment>
+                  <SeriesFigure locale={locale} view={V('commute-pm25-chuang2020')} title={T.v13.title} subtitle={T.v13.subtitle} caption={T.v13.caption} anchor={false} />
+                </Fragment>
+              )}
+                </div>
+
+                {l.others.length > 0 && (
+                  <div class="ev-visuals ev-visuals--fold">
+                    {l.others.map((id) => <SeriesFigure locale={locale} view={V(id)} />)}
+                  </div>
+                )}
+              </details>
+            )}
+
+            {l.pointers.length > 0 && (
+              <div class="ev-also">
+                <h4 class="ev-also__title">{T.row.alsoTitle}</h4>
+                <p class="ev-also__lead ev-note">{T.row.alsoLead}</p>
+                <ul>
+                  {l.pointers.map((p) => (
+                    <li><a href={`#${p.id}`}>{p.display}</a> <span>· {p.where}</span></li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-        )}
+        </details>
 
         <div class="ev-link__nav">
           <a href="#chain">{T.link.top}</a>
@@ -442,50 +474,27 @@ const toc = [
         </div>
       </div>
     </section>
-  ))}
+    );
+  })}
 
-  <!-- Studies read in full -->
-  <Section id="studies" title={T.studies.title} lead={T.studies.lead} tone="sunken">
-    <details class="ev-fold" data-ev-fold>
-      <summary><span>{fill(T.studies.open, { n: fullRead.length })}</span><Icon name="chevron-down" size="1.25rem" /></summary>
-    <div class="grid ev-studies" style="--min: 18rem">
-      {fullRead.map((id) => {
-        const s = getSource(id);
-        const u = uses.get(id)!;
-        const n = cites([id])[0].n;
-        return (
-          <article class="ev-study" aria-labelledby={`study-${id}`}>
-            <h3 id={`study-${id}`} class="ev-study__who">[{n}] {sourceShort(id, locale)}</h3>
-            {/* the original title, always, in its own language; a translation (where the registry has one) under it */}
-            <p class="ev-study__title" lang={s.language !== locale ? htmlLang[s.language] : undefined}>{readerText(s.title)}</p>
-            {s.titleTranslated && s.language !== locale && <p class="ev-study__gloss">{readerText(s.titleTranslated)}</p>}
-            <p class="ev-study__read">{readLabel(s, locale)}</p>
-            <details class="ev-study__uses">
-              <summary>{fill(T.studies.uses, { n: u.facts.length + u.series.length })}</summary>
-              <ul>
-                {u.facts.map((f) => <li><a href={`#${f}`}>{factLabel(f)}</a></li>)}
-                {u.series.map((x) => <li><a href={`#${dataAnchor(x)}`}>{readerText(seriesView(x, locale, T).s.title)}</a></li>)}
-              </ul>
-            </details>
-            <div><a class="ev-study__entry" href={href(`/sources/#${id}`, locale)}>{T.studies.entry}<span class="vh">{colon}[{n}] {sourceShort(id, locale)}</span> →</a></div>
-          </article>
-        );
-      })}
-    </div>
-    </details>
-  </Section>
+  <!-- The reference blocks: each a title and a 48 px button; a link to anything inside opens it -->
+  <div class="ev-ref">
+  <Fold id="map" title={T.map.title} lead={T.map.short}>
+    <p class="ev-note ev-fold-lead">{T.map.lead}</p>
+    <EvidenceMap locale={locale} />
+  </Fold>
 
-  <!-- The former gap list: each answer is under its link; all of them on /estimate/#answers -->
-  <Section id="answers" title={T.answers.title} lead={fill(T.answers.lead, { n: answerList.length })} width="wide" pad="tight">
+  <Fold id="answers" title={T.answers.title} lead={fill(T.answers.short, { n: answerList.length })} tone="sunken">
     <span id="gaps" class="ev-alias" aria-hidden="true"></span>
+    <p class="ev-note ev-fold-lead">{fill(T.answers.lead, { n: answerList.length })}</p>
     <ul class="ev-anslist">
-      {answerList.map((a) => <li><a href={`#${a.id}`}>{localizeAnswer(a, locale).question}</a> <span>· {fill(T.toc.linkN, { n: a.chainLink })}</span></li>)}
+      {answerList.map((a) => <li><a href={`#${a.id}`}>{localizeAnswer(a, locale).question}</a> <span>· {linkName(a.chainLink)}</span></li>)}
     </ul>
     <div><a class="ev-go" href={href('/estimate/#answers', locale)}>{fill(T.answers.all, { n: answerList.length })}<Icon name="arrow-right" size="1.05em" /></a></div>
-  </Section>
+  </Fold>
 
-  <!-- What we will not say (brief 4.6), and what would change our mind -->
-  <Section id="not-claimed" title={T.notClaimed.title} lead={T.notClaimed.lead} tone="sunken" width="wide">
+  <Fold id="not-claimed" title={T.notClaimed.title} lead={T.notClaimed.short}>
+    <p class="ev-note ev-fold-lead">{T.notClaimed.lead}</p>
     <ul class="ev-nc">
       {T.notClaimed.items.map((x) => (
         <li class="ev-nc__item">
@@ -499,10 +508,10 @@ const toc = [
     <ul class="ev-cm">
       {T.notClaimed.changeMind.map((x) => <li>{x}</li>)}
     </ul>
-  </Section>
+  </Fold>
 
-  <!-- #not-used: figures we do not use that way (R14, V31) -->
-  <Section id="not-used" title={T.notUsed.title} lead={T.notUsed.lead}>
+  <Fold id="not-used" title={T.notUsed.title} lead={T.notUsed.short} tone="sunken">
+    <p class="ev-note ev-fold-lead">{T.notUsed.lead}</p>
     <div class="ev-nu">
       <details class="ev-nu__item" data-ev-fold>
         <summary class="ev-nu__quote" id="nu-scramble"><span class="ev-nu__label">{T.notUsed.quoted}</span><s>{fill(NU.scramble.quote, notUsedTokens)}</s><Icon name="chevron-down" size="1.25rem" /></summary>
@@ -560,20 +569,44 @@ const toc = [
         <p class="ev-note"><a href="#netzero-ev-sales-targets">{lf('netzero-ev-sales-targets', locale).display}</a> · {fill(T.row.alsoIn, { n: 7 })}</p>
       </details>
     </div>
-  </Section>
+  </Fold>
 
-  <!-- Background outside the chain -->
-  <Section id="context" title={T.context.title} lead={T.context.lead} tone="sunken" pad="tight">
-    <Details summary={`${T.context.title} · ${fill(T.row.rows, { count: ctx.facts.length + ctx.series.length })}`}>
-      <div class="ev-visuals">
-        {ctx.series.map((s) => <SeriesFigure locale={locale} view={V(s.id)} level={3} />)}
-      </div>
-      <FactList locale={locale} ids={ctx.facts.map((f) => f.id)} visible={ctx.facts.length} />
-    </Details>
-  </Section>
+  <Fold id="studies" title={T.studies.title} lead={fill(T.studies.short, { n: fullRead.length })}>
+    <p class="ev-note ev-fold-lead">{T.studies.lead}</p>
+    <div class="grid ev-studies" style="--min: 18rem">
+      {fullRead.map((id) => {
+        const s = getSource(id);
+        const u = uses.get(id)!;
+        const n = cites([id])[0].n;
+        return (
+          <article class="ev-study" aria-labelledby={`study-${id}`}>
+            <h3 id={`study-${id}`} class="ev-study__who">[{n}] {sourceShort(id, locale)}</h3>
+            {/* the original title, always, in its own language; a translation (where the registry has one) under it */}
+            <p class="ev-study__title" lang={s.language !== locale ? htmlLang[s.language] : undefined}>{readerText(s.title)}</p>
+            {s.titleTranslated && s.language !== locale && <p class="ev-study__gloss">{readerText(s.titleTranslated)}</p>}
+            <p class="ev-study__read">{readLabel(s, locale)}</p>
+            <details class="ev-study__uses">
+              <summary>{fill(T.studies.uses, { n: u.facts.length + u.series.length })}</summary>
+              <ul>
+                {u.facts.map((f) => <li><a href={`#${f}`}>{factLabel(f)}</a></li>)}
+                {u.series.map((x) => <li><a href={`#${dataAnchor(x)}`}>{readerText(seriesView(x, locale, T).s.title)}</a></li>)}
+              </ul>
+            </details>
+            <div><a class="ev-study__entry" href={href(`/sources/#${id}`, locale)}>{T.studies.entry}<span class="vh">{colon}[{n}] {sourceShort(id, locale)}</span> →</a></div>
+          </article>
+        );
+      })}
+    </div>
+  </Fold>
 
-  <!-- How we checked -->
-  <Section id="method" title={T.method.title}>
+  <Fold id="context" title={T.context.title} lead={T.context.lead} tone="sunken">
+    <div class="ev-visuals">
+      {ctx.series.map((s) => <SeriesFigure locale={locale} view={V(s.id)} level={3} />)}
+    </div>
+    <FactList locale={locale} ids={ctx.facts.map((f) => f.id)} visible={ctx.facts.length} />
+  </Fold>
+
+  <Fold id="method" title={T.method.title} lead={T.method.short}>
     <div class="ev-method">
       <div class="prose">
         {T.method.body.map((p) => <p>{p}</p>)}
@@ -592,7 +625,8 @@ const toc = [
         </ul>
       </div>
     </div>
-  </Section>
+  </Fold>
+  </div>
 
   <Section id="next" title={T.cta.title} tone="sunken" pad="tight">
     <ul class="ev-next">
@@ -604,31 +638,39 @@ const toc = [
 </Base>
 
 <script>
-  // A link to a row inside a closed fold opens the fold (current browsers do this natively;
-  // this covers the rest) and brings the row into view.
-  const open = () => {
-    const id = decodeURIComponent(location.hash.slice(1));
+  // A link to anything inside a closed fold opens every fold around it and brings it into view
+  // (current browsers open the fold natively; this covers the rest, and a second tap on a link
+  // whose address is already in the bar, which fires no hashchange).
+  const open = (hash: string) => {
+    let id = '';
+    try {
+      id = decodeURIComponent(hash.slice(1));
+    } catch {
+      return;
+    }
     if (!id) return;
     const el = document.getElementById(id);
     if (!el) return;
-    let p: HTMLElement | null = el.parentElement;
     let changed = false;
-    while (p) {
+    for (let p = el.parentElement; p; p = p.parentElement) {
       if (p instanceof HTMLDetailsElement && !p.open) {
         p.open = true;
         changed = true;
       }
-      p = p.parentElement;
     }
-    if (changed) el.scrollIntoView({ block: 'start' });
+    if (changed) requestAnimationFrame(() => el.scrollIntoView({ block: 'start' }));
   };
-  window.addEventListener('hashchange', open);
-  open();
+  window.addEventListener('hashchange', () => open(location.hash));
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element | null)?.closest?.('a[href*="#"]') as HTMLAnchorElement | null;
+    if (a && a.pathname === location.pathname && a.hash && a.hash === location.hash) open(a.hash);
+  });
+  open(location.hash);
 </script>
 
 <style>
   .ev-head {
-    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-7);
+    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-5);
   }
   .ev-head__inner {
     display: grid;
@@ -693,7 +735,7 @@ const toc = [
     font-weight: var(--fw-bold);
   }
   .ev-link {
-    padding-block: var(--section-y, 4rem);
+    padding-block: var(--sp-6) var(--sp-4);
     border-block-start: var(--rule-stop, 6px) solid var(--ink);
     scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
   }
@@ -701,7 +743,7 @@ const toc = [
     display: grid;
     gap: var(--sp-3);
     max-inline-size: 48rem;
-    margin-block-end: var(--sp-6);
+    margin-block-end: var(--sp-4);
   }
   .ev-link__title {
     text-wrap: balance;
@@ -783,7 +825,7 @@ const toc = [
   .ev-stats__grid {
     display: grid;
     gap: var(--sp-6);
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   }
   .ev-stat__row {
     display: inline-grid;
@@ -899,7 +941,7 @@ const toc = [
     flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--sp-4);
-    margin-block-start: var(--sp-7);
+    margin-block-start: var(--sp-3);
     font-weight: var(--fw-bold);
   }
   .ev-link__nav a {
@@ -1115,29 +1157,23 @@ const toc = [
     display: grid;
     gap: var(--sp-2);
   }
-  .ev-board__row {
-    display: grid;
-    gap: var(--sp-2);
-    padding: var(--sp-3) var(--sp-4);
+  .ev-board__link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    min-block-size: var(--tap);
+    padding: var(--sp-2) var(--sp-3);
     border: 1.5px solid var(--line-strong);
     border-radius: var(--radius-2);
     background: var(--surface);
-  }
-  @media (min-width: 48em) {
-    .ev-board__row {
-      grid-template-columns: 1fr auto;
-      align-items: center;
-    }
-  }
-  .ev-board__link {
-    display: flex;
-    gap: var(--sp-3);
-    align-items: flex-start;
     color: var(--ink);
     text-decoration: none;
-    min-block-size: var(--tap);
   }
-  .ev-board__link:hover .ev-board__text {
+  .ev-board__link:hover {
+    border-color: var(--ink);
+  }
+  .ev-board__link:hover .ev-board__name {
     text-decoration: underline;
   }
   .ev-board__n {
@@ -1152,34 +1188,173 @@ const toc = [
     font-weight: var(--fw-black);
     font-variant-numeric: tabular-nums;
   }
-  .ev-board__body {
-    display: grid;
-    gap: var(--sp-1);
-  }
   .ev-board__name {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    color: var(--ink-2);
-  }
-  .ev-board__text {
+    flex: 1 1 10rem;
     font-size: var(--fs-base);
-    line-height: var(--lh-read);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
   }
   .ev-board__chips {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--sp-2);
-    padding-inline-start: calc(2rem + var(--sp-3));
-  }
-  @media (min-width: 48em) {
-    .ev-board__chips {
-      padding-inline-start: 0;
-      justify-content: flex-end;
-    }
+    gap: var(--sp-1);
+    margin-inline-start: auto;
   }
   .ev-board__machine {
     font-size: var(--fs-sm);
     color: var(--ink-2);
+  }
+  /* ---- each link: claim, key number, one chart; the rest behind one button ---- */
+  .ev-link__claim {
+    font-size: var(--fs-md);
+    line-height: var(--lh-read);
+    max-inline-size: 44rem;
+  }
+  .ev-link__grid {
+    display: grid;
+    gap: var(--sp-5);
+    align-items: start;
+  }
+  @media (min-width: 60em) {
+    .ev-link__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    }
+  }
+  .ev-key {
+    display: grid;
+    gap: var(--sp-1);
+    padding: var(--sp-3) var(--sp-4) var(--sp-1);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .ev-key--est {
+    border: 2px dashed var(--estimate);
+  }
+  .ev-key p {
+    margin: 0;
+  }
+  .ev-key__label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+    line-height: var(--lh-snug);
+  }
+  .ev-key__value {
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-black);
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  .ev-key__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-key__go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-btn);
+    justify-self: start;
+  }
+  .ev-visuals--lead {
+    min-inline-size: 0;
+  }
+  .ev-more {
+    margin-block-start: var(--sp-4);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-2);
+    background: var(--bg);
+  }
+  .tone-sunken .ev-more {
+    background: var(--bg-sunken);
+  }
+  .ev-more__sum {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    padding: var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);
+    cursor: pointer;
+    list-style: none;
+    color: var(--accent);
+  }
+  .ev-more__sum::-webkit-details-marker {
+    display: none;
+  }
+  .ev-more__text {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--sp-2);
+  }
+  .ev-more__text b {
+    font-size: var(--fs-btn);
+  }
+  .ev-more__text span {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ev-more__btn {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--on-accent, #fff);
+  }
+  .ev-more[open] .ev-more__btn :global(svg) {
+    transform: rotate(180deg);
+  }
+  .ev-more__body {
+    padding: 0 var(--sp-3) var(--sp-5);
+    min-inline-size: 0;
+  }
+  .ev-more__body > .ev-link__q {
+    margin-block: var(--sp-2) var(--sp-4);
+    font-size: var(--fs-base);
+  }
+  .ev-mini {
+    border-block: 1px solid var(--line-strong);
+  }
+  .ev-mini + .ev-mini {
+    border-block-start: 0;
+  }
+  .ev-mini > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    cursor: pointer;
+    list-style: none;
+  }
+  .ev-mini > summary::-webkit-details-marker {
+    display: none;
+  }
+  .ev-mini[open] > summary :global(svg) {
+    transform: rotate(180deg);
+  }
+  .ev-mini > :not(summary) {
+    margin-block: var(--sp-2) var(--sp-4);
+  }
+  .ev-fold-lead {
+    margin-block-end: var(--sp-4);
+  }
+  .ev-ref {
+    padding-block: var(--sp-2);
   }
   .ev-l3 {
     display: grid;
@@ -1299,9 +1474,9 @@ const toc = [
   }
   .ev-next a {
     display: grid;
-    gap: var(--sp-1);
+    gap: 0;
     block-size: 100%;
-    padding: var(--sp-4);
+    padding: var(--sp-2) var(--sp-4);
     border: 1.5px solid var(--line-strong);
     border-radius: var(--radius-2);
     background: var(--surface);

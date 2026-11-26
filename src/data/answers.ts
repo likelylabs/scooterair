@@ -166,7 +166,7 @@ export const answers = {
       'For their body weight, children breathe 1.5 to 2 times the air an adult does. Measurements abroad mostly find the exhaust the same or higher lower down.',
     ),
     basis: t('美國環保署的呼吸量資料；英國、西班牙、美國、德國的高度比較研究。', "US EPA breathing-rate data; height comparisons from the UK, Spain, the US and Germany."),
-    caveat: t('台灣沒有小孩高度的量測，各研究的結果也不一致，所以本站自己不算小孩高度的倍數；國外研究各自的數字，放在證據頁第 6 環。', "There are no child-height measurements in Taiwan and the studies disagree, so this site works out no child-height multiple of its own; each foreign study's own figures are in link 6 of the evidence page."),
+    caveat: t('台灣沒有小孩高度的量測，各研究的結果也不一致，所以本站自己不算小孩高度的倍數；國外研究各自的數字，放在證據頁「誰離得最近」那一環。', "There are no child-height measurements in Taiwan and the studies disagree, so this site works out no child-height multiple of its own; each foreign study's own figures are on the evidence page, under “who is closest”."),
     chips: [chip('study', 'international')],
     kSentence: 'K4',
     facts: ['child-air-per-kg', 'stroller-height-review', 'child-height-harr2022'],

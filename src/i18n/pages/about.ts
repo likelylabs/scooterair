@@ -126,17 +126,17 @@ export default copy({
     eyebrow: { 'zh-TW': '修改紀錄', en: 'Corrections' },
     title: { 'zh-TW': '修改紀錄', en: 'Corrections log' },
     lead: {
-      'zh-TW': '最新的在最上面。每一條寫明：原來的說法、我們改成怎麼說、為什麼。',
-      en: 'Newest first. Each entry says what was said, what we say instead, and why.',
+      'zh-TW': '最新的在最上面。每一條寫三件事：以前的說法、哪裡不對、現在怎麼說。',
+      en: 'Newest first. Each entry says three things: what was said, what was wrong, and what we say now.',
     },
-    said: { 'zh-TW': '原來的說法', en: 'What was said' },
+    said: { 'zh-TW': '以前的說法', en: 'What was said' },
     saidSr: { 'zh-TW': '我們不再這樣說：', en: 'We no longer say: ' },
-    instead: { 'zh-TW': '我們的說法', en: 'What we say' },
-    why: { 'zh-TW': '為什麼', en: 'Why' },
-    basis: { 'zh-TW': '根據', en: 'Based on' },
+    wrong: { 'zh-TW': '哪裡不對', en: 'What was wrong' },
+    now: { 'zh-TW': '現在怎麼說', en: 'What we say now' },
+    basis: { 'zh-TW': '看出處', en: 'See the sources' },
     ours: { 'zh-TW': '本站自己改過的', en: 'Our own correction' },
     common: { 'zh-TW': '常見的說法', en: 'A common claim' },
-    /** What was said. Struck through on the page; each is refused by the entry below it. */
+    /** What was said. Struck through on the page. */
     claims: {
       'crossings-measured': {
         'zh-TW': '本站以前寫：行人在台灣路口吸到的一氧化碳和 PM2.5，還沒有任何量測。',
@@ -153,33 +153,102 @@ export default copy({
       'ufp-smell': { 'zh-TW': '超細微粒聞不到。', en: 'Ultrafine particles have no smell.' },
       'no-2027': { 'zh-TW': '2027 年的補助，什麼都還沒公布。', en: 'Nothing at all has been announced for 2027.' },
     },
-    /** For the entries that correct our own earlier wording (not a claim-policy rule). */
-    ownInstead: {
+    /**
+     * What was wrong, in plain words. The facts behind each entry are listed under it (from
+     * src/components/pages/action/corrections.ts and the claims-policy rule it names).
+     * {tokens} are filled from the registry on the page.
+     */
+    wrongText: {
       'crossings-measured': {
-        'zh-TW': '交通部運輸研究所在路口的行人等候區量過一氧化碳和 PM2.5。網站現在把這些量測，和本站自己的推估放在一起。',
-        en: 'The Institute of Transportation has measured carbon monoxide and PM2.5 in the pedestrian waiting areas of junctions. The site now shows those readings beside its own estimate.',
+        'zh-TW': '交通部運輸研究所其實量過路口行人等候區的一氧化碳和 PM2.5。我們漏看了。',
+        en: 'The Institute of Transportation had in fact measured carbon monoxide and PM2.5 in the pedestrian waiting areas of junctions. We missed it.',
+      },
+      'iot-94': {
+        'zh-TW': '這個數字只出現在高雄一個路口、一個模擬的日子，報告自己說這一天不正常。而且這是電腦模擬，不是在路口量的。',
+        en: 'That figure comes from one simulated day at one Kaohsiung junction, and the report itself calls that day an outlier. And it is a computer simulation, not a reading at a real junction.',
+      },
+      'pm25-source': {
+        'zh-TW': '照環境部的排放清冊，機車排的 PM2.5 只占全國的 {pm25}。',
+        en: 'By the environment ministry’s inventory, scooters give off only {pm25} of the country’s PM2.5.',
+      },
+      'ev-cheaper': {
+        'zh-TW': '能在家插電的車，電費比油錢便宜很多，但這種車我們只找到一家廠商的兩款。大多數車要付換電月租；騎得少的人，月租比油錢貴。',
+        en: 'A scooter you can plug in at home costs far less in electricity than petrol, but we found only two such models, from one maker. Most need a battery-swap plan, and for people who ride little the plan costs more than petrol.',
+      },
+      densest: {
+        'zh-TW': '這個說法只靠一份非官方、沒寫年份的排名，台灣只比第二名多一點點。',
+        en: 'It rests on one unofficial ranking with no year on it, and Taiwan is only just ahead of second place.',
+      },
+      'netzero-2035': {
+        'zh-TW': '淨零路徑訂的是目標，沒有禁止賣燃油機車。',
+        en: 'The net-zero pathway sets targets for sales. Nothing in it stops the sale of petrol scooters.',
+      },
+      'child-44': {
+        'zh-TW': '這個數字是英國一個實驗裡最高的一個，量的是嬰兒車高度的空氣，不是小孩比大人多吸多少。',
+        en: 'That figure is the highest one in a single UK experiment. It is about the air at stroller height, not how much more a child breathes than an adult.',
+      },
+      'ev-zero': {
+        'zh-TW': '電動機車沒有排氣管，但輪胎、煞車和路上的灰塵還是有微粒。把發電也算進來，有一項研究發現硫氧化物比較多。',
+        en: 'An electric scooter has no tailpipe, but tyres, brakes and road dust still give off particles. Counting the power stations too, one study found more sulphur oxides.',
+      },
+      'idling-legal': {
+        'zh-TW': '現在的規定，管的是停下來等超過三分鐘的車，因為交通管制而停下來的不算。它管不管機車，官方也沒有說明。',
+        en: 'The current rule covers vehicles stopped for more than three minutes, and stops for traffic control do not count. There is no official word on whether it covers scooters.',
       },
       'ufp-smell': {
-        'zh-TW': '我們只說一氧化碳沒有味道。苯要到百萬分之幾才聞得到，路邊的量不太可能聞得到。超細微粒聞不聞得到，我們找不到查證過的出處，所以不寫。',
-        en: 'We say only that carbon monoxide has no smell. Benzene can be smelled only at parts per million, so it is unlikely to be smelled at roadside levels. We found no checked source on whether ultrafine particles can be smelled, so we do not say.',
+        'zh-TW': '「聞不到」要有出處。超細微粒聞不聞得到，我們找不到查證過的資料。',
+        en: '“Cannot be smelled” needs a source. We found no checked source on whether ultrafine particles can be smelled.',
       },
       'no-2027': {
-        'zh-TW': '2027 年的補助，還沒有一項定案；環境部預告了一項草案，擬延長一筆汰舊的補助。',
-        en: 'Nothing is confirmed for 2027; the environment ministry has pre-announced a draft that would extend one scrappage payment.',
+        'zh-TW': '環境部已經預告了一份草案，要延長一筆汰舊換新的補助，只是還沒定案。',
+        en: 'The environment ministry has already pre-announced a draft that would extend one scrappage payment; it is just not final.',
       },
     },
-    ownWhy: {
+    /** What we say now, in plain words. */
+    nowText: {
       'crossings-measured': {
-        'zh-TW': '運研所的報告裡有等候區的量測結果，舊的說法不對。另外，「紅燈時站在機車旁邊吸到多少」，現在改成本站的推估，標明是算的。',
-        en: 'The Institute’s report gives the waiting-area readings, so the old wording was wrong. “How much you breathe beside the scooters at a red light” is now this site’s estimate, labelled as worked out.',
+        'zh-TW': '網站把運研所的量測，和本站自己的推估放在一起。紅燈時站在機車旁邊吸到多少，是本站算的，標著「推估」。',
+        en: 'The site shows the Institute’s readings beside our own estimate. How much you breathe beside the scooters at a red light is worked out by us, and labelled Estimate.',
+      },
+      'iot-94': {
+        'zh-TW': '在運研所的模擬裡，這個路口其他幾天，PM2.5 少的比例小很多；台北和新北的路口少得更少，有幾天反而變多。',
+        en: 'In the Institute’s simulation, the other days at that junction showed much smaller falls; the Taipei and New Taipei junctions fell even less, and on some days PM2.5 rose.',
+      },
+      'pm25-source': {
+        'zh-TW': '機車的問題是一氧化碳、油氣和苯，不是 PM2.5。',
+        en: 'The problem with scooters is carbon monoxide, fuel vapour and benzene, not PM2.5.',
+      },
+      'ev-cheaper': {
+        'zh-TW': '划不划算，要看你一個月騎多少、在哪裡充電。「換電動」那一頁可以幫你算。',
+        en: 'Whether it pays depends on how far you ride each month and where you charge. The “Go electric” page works it out for you.',
+      },
+      densest: {
+        'zh-TW': '台灣{per100}機車，名列前茅。',
+        en: 'Taiwan has {per100} motorcycles: among the highest.',
+      },
+      'netzero-2035': {
+        'zh-TW': '目標是 {y1} 年新機車裡電動占 {t1}，{y2} 年占 {t2}。這是目標，不是預測。',
+        en: 'The targets are an electric share of new scooters of {t1} in {y1} and {t2} in {y2}. They are targets, not forecasts.',
+      },
+      'child-44': {
+        'zh-TW': '小孩離地面比較近，有些污染物在低的地方比較濃；小孩呼吸也比大人快。我們不寫「多幾成」這種數字。',
+        en: 'Children are closer to the ground, where some pollutants are thicker, and they breathe faster than adults. We do not give a figure for how much more.',
+      },
+      'ev-zero': {
+        'zh-TW': '換一台電動機車，路口就少一支排氣管；但它也不是完全沒有污染。',
+        en: 'Each electric scooter means one tailpipe fewer at the crossing; but it still gives off some pollution.',
+      },
+      'idling-legal': {
+        'zh-TW': '等一個普通的紅燈，不在這條規定要管的範圍裡，我們也不這樣寫。',
+        en: 'An ordinary red light is not what this rule is written for, and we do not say it is.',
       },
       'ufp-smell': {
-        'zh-TW': '「聞不到」要有出處。一氧化碳有世界衛生組織的說明；超細微粒沒有。',
-        en: '“Cannot be smelled” needs a source. For carbon monoxide the WHO says so; for ultrafine particles we found nothing checked.',
+        'zh-TW': '我們只說一氧化碳沒有味道；路邊那麼少的苯，也不太聞得出來。',
+        en: 'We say only that carbon monoxide has no smell, and that the little benzene at the roadside is unlikely to be noticed by smell.',
       },
       'no-2027': {
-        'zh-TW': '「沒有公布」和「沒有定案」不一樣：已經有一份草案預告了，只是還沒定。',
-        en: '“Not announced” and “not confirmed” are different: a draft has been pre-announced, but nothing is final.',
+        'zh-TW': '2027 年的補助還沒有確定。',
+        en: 'Nothing is settled yet for 2027.',
       },
     },
   },

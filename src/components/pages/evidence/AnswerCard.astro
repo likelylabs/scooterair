@@ -31,6 +31,8 @@ import { estRange } from '@/data/estimate';
 import KindChip from '@/components/ui/KindChip.astro';
 import EstimateValue from '@/components/ui/EstimateValue.astro';
 import Icon from '@/components/ui/Icon.astro';
+import evidenceCopy from '@/i18n/pages/evidence';
+import { fill, localize } from '@/i18n/pages/_copy';
 
 interface Props {
   locale: Locale;
@@ -58,7 +60,9 @@ const kText = a.kSentence && (k.includes(a.kSentence) || (a.kSentence === 'K5fil
 const estSlots = a.slots.filter((s) => estRange(s).kind === 'estimate');
 const working = a.anchor ? (on === 'estimate' ? `#${a.anchor}` : href(`/estimate/#${a.anchor}`, locale)) : undefined;
 const evidence = href(`/evidence/#link-${a.chainLink}`, locale);
-const evidenceLabel = en ? `Evidence for link ${a.chainLink}` : `第 ${a.chainLink} 環的證據`;
+const TE = localize(evidenceCopy, locale);
+/** Names the topic of the link ("更多證據：排氣管排出什麼"), not its number. */
+const evidenceLabel = fill(TE.answerLink.label, { topic: TE.answerLink.topics[a.chainLink - 1] });
 ---
 
 <article class:list={['ans', cls]} id={a.id} aria-labelledby={`${a.id}-q`} data-answer={a.id}>
