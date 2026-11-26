@@ -38,7 +38,10 @@ const scene = (name: string) => scenes[`/src/components/art/${name}.astro`]?.def
 const fromC: Partial<Record<CardPicture, any>> = { smell: scene('TailpipeMarks'), mask: scene('MaskScene'), rider: scene('RiderScene'), body: scene('BodyFigure') };
 const C = fromC[c.picture];
 const own: 'kerb' | 'kerb-electric' | 'heights' = c.picture === 'kerb-electric' ? 'kerb-electric' : c.picture === 'heights' || c.picture === 'film' ? 'heights' : 'kerb';
-const host = new URL(Astro.site ?? 'https://scooterair.tw').host;
+// The address printed on the card is where the site lives today. The PNGs are rendered once and
+// committed, so this is not read from the build's SITE_URL (a local build has none). Override
+// with SHARE_CARD_HOST if the site moves.
+const host = process.env.SHARE_CARD_HOST || 'likelylabs.com/scooterair';
 const tagText = illustration.tag[locale];
 ---
 
@@ -185,8 +188,20 @@ const tagText = illustration.tag[locale];
   .card__est .est .chip {
     font-size: calc(24px * var(--k));
   }
-  .card__est .est__go {
-    display: none;
+  /* EstimateValue's own (scoped) sizes are for a phone page; on a card the range must read at
+     link-preview size (about 500 px wide), so the value takes the card's size */
+  .card .card__est .est :is(.est__line, .est__value, .est__n, .est__word, .est__unit, .est__end) {
+    font-size: calc(40px * var(--k)) !important;
+    line-height: 1.2;
+  }
+  .card .card__est .est .est__n {
+    font-weight: 900;
+  }
+  .card .card__est .est .chip {
+    font-size: calc(26px * var(--k)) !important;
+  }
+  .card .card__est .est .est__go {
+    display: none !important;
   }
   .card__caveat {
     font-size: calc(22px * var(--k));

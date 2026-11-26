@@ -413,62 +413,12 @@ export function breath(x: number, y: number, r = 9): string {
 /* ------------------------------------------------------------------------ */
 /* Old air vocabulary — retired                                               */
 /*                                                                            */
-/* fumes(), coRings(), ufpDots() and puffs() serve only Haze.astro, which is  */
-/* being removed. New scenes draw air with ./air.ts and nothing else.         */
+/* puffs() is the last of the old air vocabulary. New scenes draw air with   */
+/* ./air.ts and nothing else.                                                 */
 /* ------------------------------------------------------------------------ */
 
-/**
- * What you can smell: fumes. Wavy horizontal ribbons, thick and many near the
- * ground, thinning with height (exponential, scale height ~45 cm).
- */
-export function fumes(o: { width: number; count: number; seed?: number; x0?: number; scale?: number; top?: number; len?: [number, number] }): string {
-  const { width, count, seed = 1, x0 = 0, scale = 45, top = 190, len: lenRange = [110, 410] } = o;
-  const r = rng(seed);
-  const out: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const h = Math.min(top, -Math.log(1 - r() * 0.985) * scale + 3);
-    const low = 1 - h / top; // 1 at the ground, 0 at the top
-    const len = lenRange[0] + r() * (lenRange[1] - lenRange[0]);
-    const x = x0 + r() * width - len / 2;
-    const wl = Math.min(70 + r() * 80, len / 1.5);
-    const amp = 2.5 + r() * 5;
-    const half = Math.max(2, Math.round(len / (wl / 2)));
-    let d = `M${n(x)},${n(-h)} q${n(wl / 4)},${n(-amp)} ${n(wl / 2)},0`;
-    for (let k = 1; k < half; k++) d += ` t${n(wl / 2)},0`;
-    const sw = 1.6 + low * low * 5.5 + r() * 1.6;
-    const op = 0.14 + low * 0.26 + r() * 0.08;
-    out.push(`<path d="${d}" stroke-width="${n(sw)}" opacity="${op.toFixed(2)}"/>`);
-  }
-  return out.join('');
-}
 
-/** The gas you can't smell (CO): hollow rings, spread higher than the fumes. */
-export function coRings(o: { width: number; count: number; seed?: number; x0?: number; scale?: number; top?: number }): string {
-  const { width, count, seed = 2, x0 = 0, scale = 75, top = 230 } = o;
-  const r = rng(seed);
-  const out: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const h = Math.min(top, -Math.log(1 - r() * 0.97) * scale + 6);
-    const x = x0 + r() * width;
-    const rad = 2.6 + r() * 2.6;
-    out.push(`<circle cx="${n(x)}" cy="${n(-h)}" r="${n(rad)}" opacity="${(0.45 + r() * 0.5).toFixed(2)}"/>`);
-  }
-  return out.join('');
-}
 
-/** The particles you can't see (ultrafines): pin-point stipple, reaching highest. */
-export function ufpDots(o: { width: number; count: number; seed?: number; x0?: number; scale?: number; top?: number }): string {
-  const { width, count, seed = 3, x0 = 0, scale = 110, top = 280 } = o;
-  const r = rng(seed);
-  let d = '';
-  for (let i = 0; i < count; i++) {
-    const h = Math.min(top, -Math.log(1 - r() * 0.96) * scale + 2);
-    const x = x0 + r() * width;
-    const rad = 0.8 + r() * 0.7;
-    d += `M${n(x - rad)},${n(-h)}a${n(rad)},${n(rad)} 0 1,0 ${n(rad * 2)},0a${n(rad)},${n(rad)} 0 1,0 ${n(-rad * 2)},0`;
-  }
-  return `<path d="${d}"/>`;
-}
 
 /** Puffs leaving a tailpipe. Place at the pipe opening; they drift rearward (−x). */
 export function puffs(seed = 1): string {
@@ -601,20 +551,9 @@ export function ledDots(d: string, o: { pitch?: number; r?: number; cls?: string
 /* ./air.ts. What still holds: nothing drawn changes with time through the    */
 /* red, and every function is deterministic.                                  */
 /*                                                                            */
-/* hatchBand(), ringsInBand() and stipple() serve only the old StreetScene,   */
-/* MeasurementDiagram and PollutantKey. They go when those scenes are         */
-/* replaced (brief 5.4; phase 3). Do not use them in new work.                */
+/* The old hatched band and its rings and stipple were removed in phase 3.    */
 /* ------------------------------------------------------------------------ */
 
-/**
- * @deprecated The old hatched band. Replaced by air.ts; removed with StreetScene.
- */
-export function hatchBand(o: { x0?: number; width: number; top?: number; pitch?: number }): string {
-  const { x0 = 0, width, top = 100, pitch = 15 } = o;
-  let d = '';
-  for (let x = x0 - top; x < x0 + width; x += pitch) d += `M${n(x)},0l${top},${-top}`;
-  return `<path class="a-hatch" d="${d}"/><path class="a-hatch-edge" d="M${x0},${-top}H${x0 + width}"/>`;
-}
 
 /**
  * The warm ribbon at a tailpipe mouth: three short strokes of fixed length
@@ -631,39 +570,7 @@ export function ribbon(small = false): string {
   return `<g class="a-ribbon"${small ? ' transform="scale(0.6)"' : ''}>${g}</g>`;
 }
 
-/** Hollow rings (carbon monoxide): a fixed count, spread evenly inside the hatched band. */
-export function ringsInBand(o: { x0?: number; width: number; count: number; top?: number; seed?: number }): string {
-  const { x0 = 0, width, count, top = 100, seed = 21 } = o;
-  const r = rng(seed);
-  const cell = width / count;
-  let out = '';
-  for (let i = 0; i < count; i++) {
-    const x = x0 + cell * (i + 0.2 + r() * 0.6);
-    const y = -(12 + r() * (top - 24));
-    out += `<circle cx="${n(x)}" cy="${n(y)}" r="${n(3.6 + r() * 1.4)}"/>`;
-  }
-  return out;
-}
 
-/**
- * Stipple (ultrafine particles in traffic): one uniform density over the whole
- * street, top to bottom. It does not rise from the scooters and it does not
- * change between the gasoline and the electric frame.
- */
-export function stipple(o: { x0?: number; width: number; top: number; bottom?: number; seed?: number; cell?: number }): string {
-  const { x0 = 0, width, top, bottom = 0, seed = 33, cell = 52 } = o;
-  const r = rng(seed);
-  let d = '';
-  // jittered grid: even coverage without visible rows
-  for (let gy = top; gy < bottom; gy += cell)
-    for (let gx = x0; gx < x0 + width; gx += cell) {
-      const x = gx + r() * cell;
-      const y = gy + r() * cell;
-      const rad = 1.1 + r() * 0.5;
-      d += `M${n(x - rad)},${n(y)}a${n(rad)},${n(rad)} 0 1,0 ${n(rad * 2)},0a${n(rad)},${n(rad)} 0 1,0 ${n(-rad * 2)},0`;
-    }
-  return `<path d="${d}"/>`;
-}
 
 /* ------------------------------------------------------------------------ */
 /* Other traffic                                                              */

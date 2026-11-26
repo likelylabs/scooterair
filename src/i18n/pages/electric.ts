@@ -11,6 +11,10 @@
 import { copy } from './_copy.ts';
 
 export default copy({
+  /** Number formats the page builds (kept here so check-copy reads them). */
+  fmt: {
+    perKm: { 'zh-TW': '{n} 元', en: 'NT${n}' },
+  },
   meta: {
     title: { 'zh-TW': '電動機車補助怎麼算？換電動，把帳攤開', en: 'Electric scooter subsidies 2026: the full bill' },
     description: {

@@ -16,20 +16,26 @@
  *   label    link text, shown to a reader whose browser does not follow the refresh
  *   hashMap  old fragment → new fragment, without '#': { ask: 'measure' }.
  *            A fragment not in the map is carried over unchanged
+ *   share    optional share-card id: the page keeps its old og:image / og:title, so a link to the
+ *            old address shared in LINE or Facebook still shows its picture (brief 7.5)
  *
  *   src/pages/[...lang]/unmeasured.astro →
  *     <Redirect locale={locale} to="/estimate/" label={t.moved} hashMap={{ ask: 'measure' }} />
  */
-import { href, htmlLang, type Locale } from '@/i18n';
+import { asset, href, htmlLang, type Locale } from '@/i18n';
 import { site } from '@/i18n/ui';
+import { shareCard, shareCardContent, type ShareCardId } from '@/lib/share-cards';
 
 interface Props {
   locale: Locale;
   to: string;
   label: string;
   hashMap?: Record<string, string>;
+  share?: ShareCardId;
 }
-const { locale, to, label, hashMap = {} } = Astro.props;
+const { locale, to, label, hashMap = {}, share } = Astro.props;
+const card = share ? shareCard(share, locale) : null;
+const cardText = share ? shareCardContent(share, locale) : null;
 const target = href(to, locale);
 const abs = new URL(target, Astro.site).href;
 // Three lines, inline, before anything else can navigate: append location.hash (through the map).
@@ -46,6 +52,19 @@ const carry = `(function(){var h=location.hash.slice(1),m=${JSON.stringify(hashM
     <link rel="canonical" href={abs} />
     <script is:inline set:html={carry} />
     <meta http-equiv="refresh" content={`0; url=${target}`} />
+    {card && cardText && (
+      <Fragment>
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={site.name[locale]} />
+        <meta property="og:title" content={cardText.title.replaceAll('|', '')} />
+        <meta property="og:url" content={abs} />
+        <meta property="og:image" content={new URL(asset(card.wide), Astro.site).href} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={card.alt} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Fragment>
+    )}
   </head>
   <body>
     <p><a href={target}>{label}</a></p>

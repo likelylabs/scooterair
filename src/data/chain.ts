@@ -15,7 +15,6 @@ import type { ChainLink, Evidence, Locale } from './types.ts';
 import { chainLinkLabels, chainLinks } from './types.ts';
 import { factList, localizeFact, type Fact, type LocalizedFact } from './facts.ts';
 import { seriesList, localizeSeries, type Series, type LocalizedSeries } from './series.ts';
-import { gapsForLink, localizeGap, type EvidenceGap, type LocalizedGap } from './gaps.ts';
 
 const evidenceOrder: Record<Evidence, number> = {
   'measured-tw': 0,
@@ -60,33 +59,29 @@ export interface LinkEvidence {
   question: string;
   facts: LocalizedFact[];
   series: LocalizedSeries[];
-  gaps: LocalizedGap[];
-  counts: { facts: number; series: number; gaps: number };
+  counts: { facts: number; series: number };
 }
 
 /** Everything for one link, localized, with badges. */
 export function evidenceForLink(link: ChainLink, locale: Locale, opts: { primaryOnly?: boolean } = {}): LinkEvidence {
   const facts = factsForLink(link, opts).map((f) => localizeFact(f, locale));
   const series = seriesForLink(link, opts).map((s) => localizeSeries(s, locale));
-  const gaps = gapsForLink(link).map((g: EvidenceGap) => localizeGap(g, locale));
   return {
     link,
     label: chainLinkLabels[link].short[locale],
     question: chainLinkLabels[link].question[locale],
     facts,
     series,
-    gaps,
-    counts: { facts: facts.length, series: series.length, gaps: gaps.length },
+    counts: { facts: facts.length, series: series.length },
   };
 }
 
 /** One line per link, for an overview of the whole chain. */
-export function chainSummary(locale: Locale): { link: ChainLink; label: string; facts: number; series: number; gaps: number }[] {
+export function chainSummary(locale: Locale): { link: ChainLink; label: string; facts: number; series: number }[] {
   return chainLinks.map((link) => ({
     link,
     label: chainLinkLabels[link].short[locale],
     facts: factsForLink(link, { primaryOnly: true }).length,
     series: seriesForLink(link, { primaryOnly: true }).length,
-    gaps: gapsForLink(link).length,
   }));
 }

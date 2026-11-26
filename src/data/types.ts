@@ -73,7 +73,7 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
     description: t('台灣政府公布的統計、排放清冊、標準或政策目標。', 'Statistics, inventories, standards or policy targets published by the Taiwanese government.'),
   },
   'modelled-tw': {
-    label: t('台灣模式推估', 'Modelled for Taiwan'),
+    label: t('台灣模式研究', 'Modelled for Taiwan'),
     description: t('以電腦模式或推估方法針對台灣計算，並非直接量測。', 'Calculated for Taiwan with a computer model or estimation method rather than read directly off an instrument.'),
   },
   international: {

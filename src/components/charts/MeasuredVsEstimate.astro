@@ -84,11 +84,11 @@ const whoLabel = m.who.label.split(' ');
         const head = (
           <Fragment>
             <span class="hc-row__head">
-              <span class="hc-row__label">{r.label}</span>
+              <span class="hc-row__label">{r.label}</span>{' '}
               <span class="hc-row__value">
                 <span class="hc-row__n">{r.value}</span> <span class="hc-row__unit">{r.unit}</span>
               </span>
-            </span>
+            </span>{' '}
             <span class="hc-row__sub">
               <span class="hc-row__tail">
                 <Fragment set:html={chipHtml(r.kind, locale)} />
@@ -99,7 +99,7 @@ const whoLabel = m.who.label.split(' ');
                     </svg>
                   </span>
                 )}
-              </span>
+              </span>{' '}
               <span>{r.sub}</span>
             </span>
           </Fragment>
@@ -107,7 +107,7 @@ const whoLabel = m.who.label.split(' ');
         return r.id === 'estimate' ? (
           <li class="hc-row hc-row--estimate">
             <a class="hc-row__link" href={target} data-kind="estimate" data-slot={r.slot} data-how={full} data-sheet-open={sheet}>
-              {head}
+              {head}{' '}
               <span class="vh">{chartText.mve.how[locale]}</span>
             </a>
             {plot}

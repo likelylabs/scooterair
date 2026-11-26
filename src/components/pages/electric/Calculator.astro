@@ -248,20 +248,58 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
     padding: 0;
     margin: 0;
     display: grid;
-    gap: var(--sp-1);
+    gap: 0.5rem;
   }
+  /* The whole row is the target (at least 48 px, brief 6.3): the native box is kept for the
+     keyboard and screen readers but drawn by the label, so a 22 px box is not the thing to hit. */
   .el-check {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--sp-3);
     min-block-size: var(--tap);
+    padding-inline-start: 2.6rem;
     cursor: pointer;
   }
   .el-check input {
-    inline-size: 1.35rem;
-    block-size: 1.35rem;
-    flex: none;
-    accent-color: var(--accent);
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block: 0;
+    inline-size: 2.6rem;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .el-check::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.35rem;
+    inset-block-start: 50%;
+    translate: 0 -50%;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    background: var(--surface);
+  }
+  .el-check:has(input:checked)::before {
+    background: var(--ink);
+  }
+  .el-check:has(input:checked)::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.85rem;
+    inset-block-start: 50%;
+    inline-size: 0.5rem;
+    block-size: 0.9rem;
+    border: solid var(--bg);
+    border-width: 0 3px 3px 0;
+    translate: 0 -62%;
+    rotate: 45deg;
+  }
+  .el-check:has(input:focus-visible)::before {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
   }
   .el-age {
     display: grid;

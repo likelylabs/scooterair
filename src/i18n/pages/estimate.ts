@@ -8,6 +8,12 @@
 import { copy } from './_copy.ts';
 
 export default copy({
+  /** Formats the page builds around numbers (kept here so check-copy reads them). */
+  fmt: {
+    sheetTitle: { 'zh-TW': '「{v}」|怎麼來的', en: '“{v}” |where it comes from' },
+    metres: { 'zh-TW': '{lo} 到 {hi} 公尺', en: '{lo} to {hi} m' },
+    ppmRange: { 'zh-TW': '約 {lo} 到 {hi} ppm', en: 'about {lo} to {hi} ppm' },
+  },
   meta: {
     title: { 'zh-TW': '怎麼算的', en: 'How we worked it out' },
     description: {

@@ -44,7 +44,8 @@ interface Props {
 }
 const { locale, figures = ['pushchair', 'adult', 'schoolchild', 'rider'], band = true, tag = false, id, class: cls } = Astro.props;
 
-const VB: Box = { x: -88, y: -262, w: 572, h: 374 };
+// x starts far enough left that the ruler's numbers and 「公分」 sit inside the picture at 320 px and 特大
+const VB: Box = { x: -100, y: -262, w: 584, h: 374 };
 const TOP = 180; // the ruler's last tick
 const RULER = 0;
 const X: Record<Who, number> = { pushchair: 4, schoolchild: 206, adult: 138, rider: 296 };

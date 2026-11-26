@@ -188,7 +188,6 @@ export const chartText = {
       s: t('秒', 'seconds'),
       days: t('天', 'days'),
       h: t('小時', 'hours'),
-      reds: t('個', ''),
     },
   },
 } as const;

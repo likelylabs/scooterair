@@ -83,6 +83,20 @@ const line = `https://social-plugins.line.me/lineit/share?url=${encodeURICompone
   .share--plain {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* the picture beside the words while the words keep at least 9rem; on a narrow phone or at a
+     large text size the picture goes above them, so the buttons keep the whole width */
+  @supports (display: flex) {
+    .share:not(.share--plain) {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .share:not(.share--plain) .share__card {
+      flex: 0 0 6.5rem;
+    }
+    .share:not(.share--plain) .share__side {
+      flex: 1 1 9rem;
+    }
+  }
   .share__card {
     display: block;
     border-radius: var(--radius-1);
@@ -107,7 +121,7 @@ const line = `https://social-plugins.line.me/lineit/share?url=${encodeURICompone
   }
   .share__lead {
     margin: 0;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-base);
     line-height: var(--lh-read);
     color: var(--ink-2);
   }

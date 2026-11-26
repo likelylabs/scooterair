@@ -72,7 +72,7 @@ export const pageLinks = (locale: Locale) => ({
   closer: href('/electric/#closer', locale),
   noSocket: href('/electric/#no-socket', locale),
   act: href('/act/', locale),
-  actKeep: href('/act/#keep', locale),
+  actKeep: href('/act/#ride', locale),
   actPolicy: href('/act/#policy', locale),
 });
 

@@ -81,6 +81,8 @@ export function homeFigures(locale: Loc) {
     studies: datum('hei-sr23-trap-associations', 'studies'),
     walkHours: datum('mccreanor2007-london-walk', 'exposureHours'),
     walkPeople: datum('mccreanor2007-london-walk', 'participants'),
+    peakMinutes: datum('lung2025-peaks-hrv', 'peakMinutes'),
+    peakPeople: datum('lung2025-peaks-hrv', 'participants'),
     dosePct: dose.dayShare.underPct,
     child: est.child.airPerKg,
     commute: est.commute.pm25,

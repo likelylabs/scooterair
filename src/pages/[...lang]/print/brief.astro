@@ -31,7 +31,7 @@ const shortUrl = estimatePage.replace(/^https?:\/\//, '');
 const child = formatEstimate('child.airPerKg', locale);
 const pollutants = [
   { key: 'co', name: b.co, street: formatReference(est.bg.co.traffic.shown, 'ppm', locale), conf: est.confidence.co.word[locale] },
-  { key: 'benzene', name: b.benzene, street: `${locale === 'en' ? 'about' : '約'} ${est.bg.benzene.lo}${locale === 'en' ? ' to ' : ' 到 '}${est.bg.benzene.hi} ppb`, conf: est.confidence.benzene.word[locale] },
+  { key: 'benzene', name: b.benzene, street: fill(t.fmt.ppbRange, { lo: est.bg.benzene.lo, hi: est.bg.benzene.hi }), conf: est.confidence.benzene.word[locale] },
   { key: 'pm25', name: b.pm25, street: formatReference(est.bg.pm25.shown, 'ug/m3', locale), conf: est.confidence.pm25.word[locale] },
 ] as const;
 ---

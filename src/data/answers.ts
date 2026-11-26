@@ -1,6 +1,6 @@
 // The answers we have now for the thirteen questions that used to be listed as evidence gaps
 // (brief section 7.2 #answers, as corrected in section 7). Replaces gaps.ts for the redesigned
-// pages: gaps.ts keeps exporting until phase 3, when nothing imports it any more.
+// pages: gaps.ts was deleted in phase 3; `formerGap` keeps each question's old id as a record.
 //
 //   import { answerList, localizeAnswer } from '@/data';
 //   const a = localizeAnswer('answer-idle-emission-rate', 'zh-TW');
@@ -20,7 +20,6 @@ import type { ChainLink, L10n, Locale, ReaderKind } from './types.ts';
 import { chainLinkLabels, readerKindLabels, readerPlaceLabels, t, type ReaderPlace } from './types.ts';
 import type { SourceId } from './sources.ts';
 import type { FactId } from './facts.ts';
-import type { GapId } from './gaps.ts';
 import type { EstimateAnchor, EstimateRangeSlot } from './estimate.ts';
 
 /**
@@ -48,8 +47,8 @@ export interface AnswerChip {
 }
 
 export interface AnswerInput {
-  /** The gap this answer replaces (gaps.ts id). */
-  formerGap: GapId;
+  /** The id the question had in the old gap list (gaps.ts, deleted in phase 3); kept as a record. */
+  formerGap: `gap-${string}`;
   chainLink: ChainLink;
   /** The question, as a reader would ask it. */
   question: L10n;
@@ -92,7 +91,7 @@ export const answers = {
     basis: t('本站的推估（模擬 3 萬次），放在運研所 3 個路口的實測旁邊。', "This site's estimate (30,000 simulated reds), beside the Institute of Transportation's readings at 3 junctions."),
     caveat: t(
       '推估是算的，不是量的；運研所的讀數是整天、所有來源的空氣，不是紅燈時機車旁邊那 90 秒。',
-      'The estimate is worked out, not measured; the Institute\'s readings are all-source air over whole days, not the 90 seconds beside the scooters at a red.',
+      'The estimate is worked out, not read off an instrument; the Institute\'s readings are all-source air over whole days, not the 90 seconds beside the scooters at a red.',
     ),
     chips: [est(), chip('measured', 'tw')],
     kSentence: 'K1',
@@ -321,7 +320,7 @@ export function answer(id: AnswerId): Answer {
 }
 
 /** The answer that replaces a former gap. */
-export function answerForGap(gapId: GapId): Answer | undefined {
+export function answerForGap(gapId: `gap-${string}`): Answer | undefined {
   return answerList.find((a) => a.formerGap === gapId);
 }
 
@@ -331,7 +330,7 @@ export function answersForLink(link: ChainLink): Answer[] {
 
 export interface LocalizedAnswer {
   id: AnswerId;
-  formerGap: GapId;
+  formerGap: `gap-${string}`;
   chainLink: ChainLink;
   linkLabel: string;
   question: string;

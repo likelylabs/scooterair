@@ -15,8 +15,9 @@ import Wordmark from './Wordmark.astro';
 
 interface Props {
   locale: Locale;
+  switchTo?: string;
 }
-const { locale } = Astro.props;
+const { locale, switchTo } = Astro.props;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
 // Render the credits line only when the slot has real content: Base forwards the slot even when
 // a page leaves it empty, and an empty line would announce a bare "製作：" to screen readers.
@@ -61,7 +62,7 @@ const credits = Astro.slots.has('credits') ? (await Astro.slots.render('credits'
       </div>
     </div>
     <div class="container site-footer__base">
-      <a data-lang-switch href={switchLocalePath(Astro.url.pathname, other)} lang={htmlLang[other]} hreflang={htmlLang[other]}>{ui.switchLanguage[locale]}</a>
+      <a data-lang-switch href={switchTo ?? switchLocalePath(Astro.url.pathname, other)} lang={htmlLang[other]} hreflang={htmlLang[other]}>{ui.switchLanguage[locale]}</a>
       <a href="#top">{ui.backToTop[locale]}</a>
     </div>
   </div>

@@ -132,7 +132,7 @@ export const kerb = {
     readerPlace: 'international',
     caveat: t(
       '這是一整天平均的呼吸量，以美國的資料算出，不是在路口量的；它說的是小孩照體重吸進比較多空氣，不是小孩高度的空氣比較髒。',
-      'These are whole-day average breathing rates from US data, not measured at a junction; they say children take in more air for their weight, not that the air at a child\'s height is dirtier.',
+      'These are whole-day average breathing rates from US data, not readings taken at a junction; they say children take in more air for their weight, not that the air at a child\'s height is dirtier.',
     ),
     chainLink: 6,
     editorNote: `${OPENED} Ratios are our arithmetic on Table 6-7 means, rounded to 1.5 and 2. Never print 1.7–2.2 (that multiplied this by an unpublished height factor). Chip: 研究・國際.`,
@@ -280,8 +280,8 @@ export const kerb = {
     evidence: 'international',
     readerKind: 'measured',
     caveat: t(
-      '量的是印尼和尼泊爾的孩子，PM2.5來自各種來源；台灣小孩坐在機車後座吸到多少，是推論，沒有量過。',
-      'The children were in Indonesia and Nepal and the PM2.5 came from every source; what a Taiwanese child on a scooter\'s back seat breathes is inferred, not measured.',
+      '量的是印尼和尼泊爾的孩子，PM2.5來自各種來源；台灣小孩坐在機車後座吸到多少，是從這些研究推論出來的。',
+      'The children were in Indonesia and Nepal and the PM2.5 came from every source; what a Taiwanese child on a scooter\'s back seat breathes is inferred from these studies.',
     ),
     requiresCaveat: true,
     chainLink: 6,

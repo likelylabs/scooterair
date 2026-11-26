@@ -12,8 +12,7 @@
 //
 // Every number is a {token} filled at build time from the estimate, the registry or the
 // calculator. The few figures that are written out are names, not values: 「15 分鐘指引值」,
-// 「125cc」, 「N95」, 「PM2.5」, a study's own design (5 minutes, 55 people; lane A has been asked
-// to put these in the registry's data), and the day-words of screen 7, which the page checks
+// 「125cc」, 「N95」, 「PM2.5」, and the day-words of screen 7, which the page checks
 // against time.hoursPerYear at build time and refuses to print if the arithmetic moves.
 
 import { copy } from './_copy.ts';
@@ -228,8 +227,8 @@ export default copy({
     stepperOption: { 'zh-TW': '一天 {n} 個', en: '{n} a day' },
     posts: {
       minutes: {
-        when: { 'zh-TW': '5 分鐘', en: '5 minutes' },
-        text: { 'zh-TW': '心跳的節奏小小變了一下（高雄，55 人）', en: 'The heart’s rhythm shifted a little (Kaohsiung, 55 people)' },
+        when: { 'zh-TW': '{min} 分鐘', en: '{min} minutes' },
+        text: { 'zh-TW': '心跳的節奏小小變了一下（高雄，{people} 人）', en: 'The heart’s rhythm shifted a little (Kaohsiung, {people} people)' },
       },
       hours: {
         when: { 'zh-TW': '{h} 小時', en: '{h} hours' },
@@ -247,8 +246,8 @@ export default copy({
         { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
       ],
       minutes: {
-        'zh-TW': '5 分鐘：高雄 55 人戴著感測器。髒空氣的高峰，多半來自工廠、蚊香、燒稻草和燒香；心跳節奏的變化很小，是暫時的訊號，不是生病。',
-        en: 'Five minutes: 55 people in Kaohsiung wore sensors. The peaks of dirty air came mostly from factories, mosquito coils, burning straw and incense; the change in heart rhythm was small and temporary, a signal, not an illness.',
+        'zh-TW': '{min} 分鐘：高雄 {people} 人戴著感測器。髒空氣的高峰，多半來自工廠、蚊香、燒稻草和燒香；心跳節奏的變化很小，是暫時的訊號，不是生病。',
+        en: '{min} minutes: {people} people in Kaohsiung wore sensors. The peaks of dirty air came mostly from factories, mosquito coils, burning straw and incense; the change in heart rhythm was small and temporary, a signal, not an illness.',
       },
       hours: {
         'zh-TW': '{h} 小時：倫敦 {people} 位有氣喘的大人，沿著柴油車很多的街走。',

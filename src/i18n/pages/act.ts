@@ -26,6 +26,13 @@ export default copy({
     },
     jump: { 'zh-TW': '我是', en: 'I am' },
   },
+  /** Number formats used by the page (kept here so check-copy reads them). */
+  fmt: {
+    wan: { 'zh-TW': '{n}萬', en: '{n}' },
+    target: { 'zh-TW': '{year} 年 {pct}%', en: '{pct}% by {year}' },
+    listSep: { 'zh-TW': '、', en: ', ' },
+    ppbRange: { 'zh-TW': '約 {lo} 到 {hi} ppb', en: 'about {lo} to {hi} ppb' },
+  },
   first: { 'zh-TW': '先做這一件', en: 'Do this first' },
   more: { 'zh-TW': '還可以做', en: 'You can also' },
   why: { 'zh-TW': '為什麼', en: 'Why' },

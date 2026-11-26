@@ -24,7 +24,7 @@ const ctx = (locale: 'zh-TW' | 'en') => ({
   cite: () => null,
   id: 't',
   tableLabel: 'table',
-  links: { checklist: '#c', notYet: '#n', closer: '#closer', noSocket: '#s', act: '/act/', actKeep: '/act/#keep', actPolicy: '/act/#policy' },
+  links: { checklist: '#c', notYet: '#n', closer: '#closer', noSocket: '#s', act: '/act/', actKeep: '/act/#ride', actPolicy: '/act/#policy' },
 });
 const run = (a: Record<string, unknown>, locale: 'zh-TW' | 'en' = 'zh-TW') => {
   const answers = { scrap: null, household: {}, plate: 'heavy', power: 'subscription', date: DATE, ...a } as Parameters<typeof M.choose>[0];

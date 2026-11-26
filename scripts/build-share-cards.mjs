@@ -174,15 +174,20 @@ try {
       const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1, colorScheme: 'light' });
       await page.goto(`${base}${job.locale === 'en' ? '/en' : ''}/print/card/${job.id}/`, { waitUntil: 'networkidle' });
       await page.addStyleTag({ content: bodyFont });
+      // the site's motion setting gives every property a 0.01 ms transition; a transition keeps the
+      // old size until the next frame, so the fitting loop below would never see its own change
+      await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
       await page.evaluate(() => document.fonts.ready);
       // shrink the words until they fit, so no line is ever clipped
       const k = await page.evaluate(async () => {
-        const card = document.querySelector('.card');
+        const card = document.querySelector('[data-card]');
         const text = document.querySelector('.card__text');
         // the square card is seen smaller (LINE): start larger and shrink to fit
         let k = innerHeight > innerWidth * 0.8 ? 1.45 : 1;
         card.style.setProperty('--k', String(k));
-        const over = () => text.scrollHeight > text.clientHeight + 1 || text.scrollWidth > text.clientWidth + 1;
+        // also against the picture's own bottom edge: a text box taller than the card is not "overflowing" itself
+        const last = () => [...text.querySelectorAll('.card__fit > *, .card__head')].reduce((m, e) => Math.max(m, e.getBoundingClientRect().bottom), 0);
+        const over = () => text.scrollHeight > text.clientHeight + 1 || text.scrollWidth > text.clientWidth + 1 || last() > innerHeight - 24;
         while (over() && k > 0.55) card.style.setProperty('--k', String((k -= 0.03)));
         await document.fonts.ready;
         return k;

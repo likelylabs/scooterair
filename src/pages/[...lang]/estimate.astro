@@ -53,6 +53,7 @@ import { estText, kSentences } from '@/i18n/ui';
 import { answerList, facts, type SourceId } from '@/data';
 import { est, estimateText, formatEstimate, scenarioKeys } from '@/data/estimate';
 import estimateCopy from '@/i18n/pages/estimate';
+import { chipWhere } from '@/i18n/ui';
 import { fill, localize } from '@/i18n/pages/_copy';
 
 export const getStaticPaths = localeStaticPaths;
@@ -72,7 +73,7 @@ const sheetMeasured = fill(t.sheet.measured, {
   sites: est.meas.iot.co.peakSites,
   peaks: est.meas.iot.co.peaks.map((p) => nf(p)).join(en ? ', ' : '、'),
 });
-const sheetTitle = `「${formatEstimate('co.dozen.total', locale).text}」|${en ? 'where it comes from' : '怎麼來的'}`;
+const sheetTitle = fill(t.fmt.sheetTitle, { v: formatEstimate('co.dozen.total', locale).text });
 const mve = mveModel(locale);
 const toc = (['numbers', 'recipe', 'count', 'check', 'range', 'drawing', 'limits', 'answers', 'measure'] as const).map((id) => ({
   id,
@@ -82,13 +83,13 @@ const toc = (['numbers', 'recipe', 'count', 'check', 'range', 'drawing', 'limits
 // ---- #recipe --------------------------------------------------------------------------------
 const srcLink = (id: SourceId) => ({ href: href(`/sources/#${id}`, locale), label: sourceShort(id, locale) });
 const nearestText = (s: (typeof scenarioKeys)[number]) =>
-  en ? `${nf(est.scn[s].nearest_m.lo)} to ${nf(est.scn[s].nearest_m.hi)} m` : `${nf(est.scn[s].nearest_m.lo)} 到 ${nf(est.scn[s].nearest_m.hi)} 公尺`;
+  fill(t.fmt.metres, { lo: nf(est.scn[s].nearest_m.lo), hi: nf(est.scn[s].nearest_m.hi) });
 const inputs = [
   {
     key: 'readings',
     name: t.recipe.inputs.readings.name,
     value: fill(t.recipe.inputs.readings.value, { n: nf(est.recipe.inspectionReadings, 0) }),
-    chip: { kind: 'official' as const, where: en ? 'Taiwan' : '台灣' },
+    chip: { kind: 'official' as const, where: chipWhere.taiwan[locale] },
     note: fill(t.recipe.inputs.readings.note, { year: year('inspection-2025') }),
     sources: ['moenv-co-inspection-2025'] as SourceId[],
   },
@@ -96,7 +97,7 @@ const inputs = [
     key: 'fuel',
     name: t.recipe.inputs.fuel.name,
     value: fill(t.recipe.inputs.fuel.value, { lo: nf(est.recipe.fuelFlow_gph.lo), hi: nf(est.recipe.fuelFlow_gph.hi) }),
-    chip: { kind: 'study' as const, where: en ? 'abroad' : '國外' },
+    chip: { kind: 'study' as const, where: chipWhere.abroad[locale] },
     note: t.recipe.inputs.fuel.note,
     sources: ['nguyen-2025-jcie', 'nguyen-2021-ijus'] as SourceId[],
   },
@@ -133,9 +134,7 @@ const iot = lf('iot-study-design', locale);
 const checkLead = fill(t.check.lead, { place: iot.place, sites: est.meas.iot.sites.value, hours: D('iot-study-design', 'hoursEach') });
 // A's cross-check paragraph, one sentence per line, so the measured rise and our working never share a sentence
 const crossSentences = estimateText.crossCheck[locale].split(en ? /(?<=\.)\s+/ : /(?<=。)/).filter(Boolean);
-const observed = en
-  ? `about ${nf(est.xcheck.iot.observed.lo)} to ${nf(est.xcheck.iot.observed.hi)} ppm`
-  : `約 ${nf(est.xcheck.iot.observed.lo)} 到 ${nf(est.xcheck.iot.observed.hi)} ppm`;
+const observed = fill(t.fmt.ppmRange, { lo: nf(est.xcheck.iot.observed.lo), hi: nf(est.xcheck.iot.observed.hi) });
 const pmMeasured = fill(t.check.pmMeasured, { lo: est.meas.iot.pm25.lo, hi: est.meas.iot.pm25.hi });
 // printed to two decimals, as the station report gives it (0.80)
 const taipei = fill(t.check.taipei, { year: est.meas.taipei.co.year, v: new Intl.NumberFormat(en ? 'en' : 'zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(est.meas.taipei.co.roadside.value) });
@@ -294,7 +293,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     <h3 class="es-h3"><Phrased text={t.count.busiestTitle} /></h3>
     <WorkingSum {...workingBusiest(locale)} />
     <p class="es-p es-quietp">{t.count.busiestNote}</p>
-    <div class="es-withchip"><p class="es-p">{wait}</p><KindChip locale={locale} kind="official" where={en ? 'Taiwan' : '台灣'} /></div>
+    <div class="es-withchip"><p class="es-p">{wait}</p><KindChip locale={locale} kind="official" where={chipWhere.taiwan[locale]} /></div>
   </Section>
 
   <!-- ===================================================== 4 CHECK -->
@@ -303,7 +302,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     <div class="es-pair">
       <div class="es-pair__cell">
         <p class="es-pair__label">{t.check.observed}</p>
-        <div class="es-pair__val"><span class="es-pair__num">{observed}</span> <KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></div>
+        <div class="es-pair__val"><span class="es-pair__num">{observed}</span> <KindChip locale={locale} kind="measured" where={chipWhere.taiwan[locale]} /></div>
       </div>
       <div class="es-pair__cell es-pair__cell--est">
         <p class="es-pair__label">{t.check.model}</p>
@@ -315,11 +314,11 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     </ul>
 
     <h3 class="es-h3"><Phrased text={t.check.pmTitle} /></h3>
-    <div class="es-withchip"><p class="es-p">{pmMeasured}</p><KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></div>
+    <div class="es-withchip"><p class="es-p">{pmMeasured}</p><KindChip locale={locale} kind="measured" where={chipWhere.taiwan[locale]} /></div>
     <p class="es-p">{t.check.pmOurs}</p>
 
     <h3 class="es-h3"><Phrased text={t.check.taipeiTitle} /></h3>
-    <div class="es-withchip"><p class="es-p">{taipei}</p><KindChip locale={locale} kind="measured" where={en ? 'Taiwan' : '台灣'} /></div>
+    <div class="es-withchip"><p class="es-p">{taipei}</p><KindChip locale={locale} kind="measured" where={chipWhere.taiwan[locale]} /></div>
     <div class="es-inline">
       <p class="es-p">{t.check.taipeiOurs}</p>
       <EstimateValue locale={locale} slotId="co.dozen.total" anchor="check" />

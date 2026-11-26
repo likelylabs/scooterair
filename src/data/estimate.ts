@@ -42,7 +42,7 @@ export const estimateMeta = {
     "An adult's nose (1.5 m), averaged over 90 seconds, standing beside the pack.",
   ),
   /** The first-use gloss (brief 4.2 rule 8). */
-  gloss: t('這是算的，不是量的，所以給一個範圍。', 'This is worked out, not measured, so we give a range.'),
+  gloss: t('這是算的，不是量的，所以給一個範圍。', 'This is worked out, not read off an instrument, so we give a range.'),
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -240,7 +240,7 @@ export const est = {
   /** How far to trust each (METHOD §11). */
   confidence: {
     co: { level: 'medium' as const, word: t('中', 'medium'), why: t('大小對了；中間那個數字可能差到三倍左右。', 'The size is right; the middle value could be off about three-fold.') },
-    benzene: { level: 'low' as const, word: t('低', 'low'), why: t('可能差五到十倍；台灣機車廢氣裡的苯還沒有人量過。', 'Could be off five- to ten-fold; the benzene in Taiwanese scooter exhaust has not been measured.') },
+    benzene: { level: 'low' as const, word: t('低', 'low'), why: t('可能差五到十倍；機車廢氣裡苯占多少，只能參考少數實驗室的數字。', 'Could be off five- to ten-fold; how much of scooter exhaust is benzene rests on a few laboratory readings.') },
     pm25: { level: 'low' as const, word: t('低', 'low'), why: t('數字本身不準；「比街上原本就有的少很多」這句話比較可靠。', 'The value itself is uncertain; "much less than the street already holds" is the reliable part.') },
   },
   /** One idling scooter (results.json → fleet.fleetMeanCO_gph, P5 / P50 / P95). */
@@ -625,7 +625,7 @@ export const estimateText = {
     t('是 90 秒的平均，不是每一秒的最高點。', 'A 90-second average, not second-by-second peaks.'),
     t('只算機車，不算同一排的汽車、公車和貨車。', 'Scooters only, not the cars, buses and lorries in the same queue.'),
     t('不是哪一個特定的路口。', 'Not any particular junction.'),
-    t('不是健康評估，也不代表會造成什麼健康影響。', 'Not a health assessment, and it shows no health effect.'),
+    t('不是健康評估，也不能拿來說會讓人生什麼病。', 'Not a health assessment, and it shows no health effect.'),
   ],
 } as const;
 

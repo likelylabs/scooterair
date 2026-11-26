@@ -265,7 +265,7 @@ export const redlightSeries = {
     sources: ['tsai-2023-atmosphere'],
     confidence: 'verified',
     evidence: 'modelled-tw',
-    caveat: t('學術研究的模式推估，只算了2013、2016、2019與2021四個年度，點與點之間的連線不是量測到的趨勢；這是排放量，不是行人吸入的濃度。', 'An academic modelled estimate for four years only (2013, 2016, 2019 and 2021); the lines between points are not measured trends. These are emissions, not what pedestrians breathe.'),
+    caveat: t('學術研究的模式推估，只算了2013、2016、2019與2021四個年度，點與點之間的連線不是量測到的趨勢；這是排放量，不是行人吸入的濃度。', 'An academic modelled estimate for four years only (2013, 2016, 2019 and 2021); the lines between points are drawn, not a trend anyone observed. These are emissions, not what pedestrians breathe.'),
     requiresCaveat: true,
     relatedFacts: ['tsai2023-benzene-tonnes-2021', 'tsai2023-trend-2013-2021'],
     chainLink: 1,

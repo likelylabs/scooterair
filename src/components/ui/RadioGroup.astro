@@ -66,10 +66,13 @@ const { name, legend, options, value, variant = 'segmented', hint, class: cls } 
   }
 
   /* segmented */
+  /* each option is its own target, 8 px from the next (brief 6.3), as in Segmented */
   .radios--segmented .radios__list {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.25rem;
     border: 2px solid var(--line-strong);
     border-radius: var(--radius-2);
     background: var(--surface);
@@ -84,7 +87,8 @@ const { name, legend, options, value, variant = 'segmented', hint, class: cls } 
     display: grid;
     block-size: 100%;
     place-items: center;
-    min-block-size: calc(3rem - 4px);
+    /* the option itself is the target: a full 48 px inside the 2 px frame (brief 6.3) */
+    min-block-size: var(--tap);
     padding: 0.25rem 0.5rem;
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
@@ -92,8 +96,8 @@ const { name, legend, options, value, variant = 'segmented', hint, class: cls } 
     text-align: center;
     color: var(--ink-2);
   }
-  .radios--segmented .radios__opt + .radios__opt .radios__face {
-    border-inline-start: 1px solid var(--line-strong);
+  .radios--segmented .radios__face {
+    border-radius: calc(var(--radius-2) - 2px);
   }
   .radios--segmented input:checked + .radios__face {
     background: var(--ink);

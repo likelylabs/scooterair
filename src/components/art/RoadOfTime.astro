@@ -96,7 +96,8 @@ const pct = (x: number) => `${((x / W) * 100).toFixed(2)}%`;
           <svg class="road__sign" viewBox="0 0 72 80" aria-hidden="true" focusable="false" set:html={icons[i]} />
           <div class="road__words">
             <b class="road__when">{p.when}</b>
-            <span class="road__text">{p.text}</span>
+            {/* a closing bracket (「（高雄，55 人）」, "(London)") stays on one line with what it holds */}
+            <span class="road__text">{(() => { const m = /^(.*?)([（(][^（()）]*[)）])$/.exec(p.text); return m && locale !== 'en' ? <Fragment>{m[1]}<span style="white-space:nowrap">{m[2]}</span></Fragment> : p.text; })()}</span>
             <KindChip locale={locale} kind={p.kind as never} where={p.where} size="sm" />
           </div>
         </li>

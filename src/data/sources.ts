@@ -44,7 +44,7 @@ export const readLevelLabels: Record<ReadLevel, L10n> = {
   'official-document-read': t('已閱讀官方文件原文', 'Official document read'),
   'official-page-read': t('已閱讀官方網頁', 'Official web page read'),
   'dataset-read': t('已下載並讀取原始資料', 'Original dataset downloaded and read'),
-  'dataset-metadata-only': t('僅讀取資料集說明（未取得數據）', 'Dataset description only (no data rows)'),
+  'dataset-metadata-only': t('僅讀取資料集說明（未取得數據）', 'Dataset description only (the rows were not downloaded)'),
   'press-release-read': t('已閱讀官方新聞稿', 'Official press release read'),
   'executive-summary-read': t('已閱讀執行摘要（未讀全文）', 'Executive summary read (not the full report)'),
   'section-read': t('已閱讀相關章節', 'Relevant section read'),

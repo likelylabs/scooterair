@@ -55,7 +55,7 @@ const deadline = d(yearEnd);
 const checked = d(data.meta.checkedOn);
 const filing = d(snapshot.filingEnd);
 const nf = (v: number, digits = 0) => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'zh-TW', { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(v);
-const perKm = (v: number) => (locale === 'en' ? `NT$${nf(v, 2)}` : `${nf(v, 2)} 元`);
+const perKm = (v: number) => fill(T.fmt.perKm, { n: nf(v, 2) });
 const links = pageLinks(locale);
 
 // ---- city select (#status): every place with how far we could check it ----------------------
@@ -145,7 +145,7 @@ const useOf = (x: (typeof ex)[number]) => JSON.stringify({ ...x.answers, charge:
 const notYetBadge = (k: string) => k as EvidenceKind;
 ---
 
-<Base locale={locale} title={T.meta.title} description={T.meta.description} share="electric" money>
+<Base locale={locale} title={T.meta.title} description={T.meta.description} share="money" money>
   <header class="el-head">
     <div class="container container--wide el-head__inner">
       <p class="eyebrow">{T.head.eyebrow}</p>
@@ -189,7 +189,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- How to get closer: the levers for the chosen place, from the engine -->
-  <Section id="closer" title={T.closer.title} lead={T.closer.lead} width="wide" tone="sunken">
+  <Section fold id="closer" title={T.closer.title} lead={T.closer.lead} width="wide" tone="sunken">
     <div class="el-two">
       <div>
         <p class="el-small" data-js-only>{T.closer.leverNote}</p>
@@ -206,7 +206,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Worked examples: complete results without JavaScript, on both sides of the deadline -->
-  <Section id="examples" title={T.examples.title} lead={T.examples.lead} width="wide">
+  <Section fold id="examples" title={T.examples.title} lead={T.examples.lead} width="wide">
     <Tabs label={T.examples.tabsLabel}>
       {ex.map((x, i) => (
         <TabPanel id={`example-${x.key}`} label={x.tab}>
@@ -241,7 +241,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- What to do next: the ordered, dated checklist -->
-  <Section id="checklist" title={T.checklist.title} lead={T.checklist.lead} width="wide" tone="sunken">
+  <Section fold id="checklist" title={T.checklist.title} lead={T.checklist.lead} width="wide" tone="sunken">
     <p data-money-when="B" class="el-phase-note">{fill(T.checklist.phaseB, { deadline, filing })}</p>
     <p data-money-when="C" class="el-phase-note">{T.checklist.phaseC}</p>
     <ol class="el-steps">
@@ -262,7 +262,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Running costs, on their own -->
-  <Section id="monthly" title={T.monthly.title} width="wide">
+  <Section fold id="monthly" title={T.monthly.title} width="wide">
     <p class="el-opener">{T.monthly.opener}</p>
     <p class="lead">{run.suitsFrom !== null ? fill(T.monthly.leadFrom, { km: nf(run.suitsFrom) }) : T.monthly.lead}</p>
 
@@ -356,7 +356,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- No socket where you park -->
-  <Section id="no-socket" title={T.noSocket.title} width="wide" tone="sunken">
+  <Section fold id="no-socket" title={T.noSocket.title} width="wide" tone="sunken">
     <p class="lead">{T.noSocket.body}</p>
     <h3 class="el-h3">{T.noSocket.modelsTitle}</h3>
     <p>{T.noSocket.modelsLead}</p>
@@ -374,7 +374,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Who it adds up for -->
-  <Section id="who" title={T.who.title} width="wide">
+  <Section fold id="who" title={T.who.title} width="wide">
     <CompareTable
       caption={T.who.caption}
       hideCaption
@@ -388,7 +388,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Before you buy -->
-  <Section id="risks" title={T.risks.title} width="wide" tone="sunken">
+  <Section fold id="risks" title={T.risks.title} width="wide" tone="sunken">
     <ul class="el-facts">
       <li>{T.risks.class}</li>
       <li>
@@ -410,7 +410,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Not this year -->
-  <Section id="not-yet" title={T.notYet.title} lead={T.notYet.lead} width="wide">
+  <Section fold id="not-yet" title={T.notYet.title} lead={T.notYet.lead} width="wide">
     <ul class="el-cards">
       {T.notYet.items.map((it, i) => (
         <li class="el-card">
@@ -421,7 +421,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
       ))}
     </ul>
     <p class="el-actions">
-      <Button href={href('/act/#keep', locale)} variant="secondary" arrow>{T.notYet.act}</Button>
+      <Button href={href('/act/#ride', locale)} variant="secondary" arrow>{T.notYet.act}</Button>
     </p>
   </Section>
 
@@ -430,7 +430,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     <TileMap locale={locale} name="el-city-tile">
       {ids.map((id) => (
         <Fragment slot={id}>
-          <p class="el-small">{cities[id].statusNote}</p>
+          <Details summary={T.status.statusNote.replace(/[：:]\s*$/, '')}><p class="el-small">{cities[id].statusNote}</p></Details>
           {cities[id].lines.length ? (
             <ul class="el-citylines">
               {cities[id].lines.map((l) => (
@@ -462,7 +462,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Our asks -->
-  <Section id="asks" title={T.asks.title} lead={T.asks.lead} width="wide">
+  <Section fold id="asks" title={T.asks.title} lead={T.asks.lead} width="wide">
     <ol class="el-list">
       {T.asks.items.map((a) => <li>{fill(a, { deadline })}</li>)}
     </ol>
@@ -471,7 +471,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Questions -->
-  <Section id="faq" title={T.faq.title} width="prose" tone="sunken">
+  <Section fold id="faq" title={T.faq.title} width="prose" tone="sunken">
     {T.faq.items.map((f, i) => (
       <Details summary={f.q} name="el-faq">
         <p>{f.a}</p>
@@ -488,7 +488,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     ))}
   </Section>
 
-  <Section id="sources" title={T.sources.title} lead={T.sources.lead} width="prose">
+  <Section fold id="sources" title={T.sources.title} lead={T.sources.lead} width="prose">
     <ol class="el-sources">
       {pageSources.map((s) => (
         <li><a href={sourceUrl(s)} rel="noopener" target="_blank">{readerText(formatCitation(s, locale))}</a></li>
@@ -496,6 +496,58 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     </ol>
   </Section>
 </Base>
+
+<style is:global>
+  /* Reading and touch rules (brief 6.1, 6.3) for the detailed calculator below the opening.
+     The result is drawn by script (electric/render.ts), so its rows are styled here. */
+  #calc .el-calc-lead,
+  #calc .el-live__status,
+  #calc .el-asof,
+  #calc .el-plan {
+    font-size: var(--fs-base);
+  }
+  #el-live-panel .el-src a,
+  #el-live-panel .el-next__links a,
+  #status .el-citynote a,
+  #calc .el-nosocket a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    /* 8 px from the next link, also on the next line (brief 6.3) */
+    margin-block: 0.25rem;
+    margin-inline-end: 0.5rem;
+  }
+  #calc .el-num {
+    font-size: var(--fs-base);
+  }
+  #el-live-panel .el-next__links a {
+    color: var(--ink);
+  }
+  #el-live-panel .el-jump {
+    gap: 0.5rem;
+  }
+  #el-live-panel .el-jump a,
+  #el-live-panel .el-row__more > summary {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    min-inline-size: var(--tap);
+    justify-content: center;
+  }
+  /* a select sizes itself to its longest option; in a one-column grid that pushed the opening
+     past a 320 px screen at the largest text size */
+  .el-head .op :is(.op-grid, .op-county) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .el-head .op .op-select {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  #el-live-panel .el-note {
+    min-inline-size: var(--tap);
+    min-block-size: var(--tap);
+  }
+</style>
 
 <style>
   .el-head {

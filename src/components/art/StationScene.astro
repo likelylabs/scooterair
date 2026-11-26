@@ -85,7 +85,7 @@ const alt = sceneAlt(locale, fill(art.station.alt, locale, { inlet: inletLabel }
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--station', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + station + fg} />
   <Fragment slot="labels">
-    <SceneLabel box={VB} x={pipeX - 44} y={inletY} anchor="end middle" plate max={46}>{inletLabel}</SceneLabel>
-    <SceneLabel box={VB} x={pipeX} y={-44} anchor="center middle" class="st-name">{art.station.cabinet[locale]}</SceneLabel>
+    <SceneLabel box={VB} x={pipeX - 44} y={inletY - 14} anchor="end top" plate max={46}>{inletLabel}</SceneLabel>
+    <SceneLabel box={VB} x={VB.x + VB.w - 10} y={-44} anchor="end middle" class="st-name">{art.station.cabinet[locale]}</SceneLabel>
   </Fragment>
 </SceneFrame>

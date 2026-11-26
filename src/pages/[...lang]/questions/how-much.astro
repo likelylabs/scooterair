@@ -12,4 +12,4 @@ export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 ---
 
-<Redirect locale={locale} to="/estimate/" label={questions.page.moved.howMuch[locale]} />
+<Redirect locale={locale} to="/estimate/" label={questions.page.moved.howMuch[locale]} share="how-much" />

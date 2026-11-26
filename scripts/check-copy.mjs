@@ -96,6 +96,8 @@ const modules = [];
 for (const f of readdirSync(join(root, 'src/i18n'))) if (f.endsWith('.ts') && f !== 'index.ts') modules.push({ file: `src/i18n/${f}`, name: f.replace(/\.ts$/, ''), page: false });
 const pagesDir = join(root, 'src/i18n/pages');
 if (existsSync(pagesDir)) for (const f of readdirSync(pagesDir).sort()) if (f.endsWith('.ts') && !f.startsWith('_')) modules.push({ file: `src/i18n/pages/${f}`, name: f.replace(/\.ts$/, ''), page: true });
+// Copy modules outside src/i18n that export plain { 'zh-TW', en } leaves (lane D's chart words).
+for (const f of ['src/components/charts/strings.ts']) if (existsSync(join(root, f))) modules.push({ file: f, name: 'charts', page: false });
 
 for (const m of modules) {
   let mod;

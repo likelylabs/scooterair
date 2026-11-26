@@ -31,23 +31,25 @@ const ffState = (st: HudState): string => (st.hold ? 'hold' : st.ff ? (st.ffWord
 const count = (text: FilmText, n: number): string => text.scooters.replace('{n}', String(n));
 
 /**
- * `link: false` prints the estimate row as plain text that still names where its working is
- * (data-how): for the stills, which are pictures and hold nothing to press.
+ * `link: false` is for the stills, which are pictures hidden from screen readers: the estimate
+ * row stays a link to its working but leaves the tab order (the still's caption carries the
+ * estimate as a button).
  */
 export function hudHTML(text: HudText, st: HudState, o: { link?: boolean } = {}): string {
-  const tag = o.link === false ? 'span' : 'a';
   const p = text.panel;
   const vis = (v: number): string => `style="opacity:${v};visibility:${v > 0 ? 'visible' : 'hidden'}"`;
   return (
     '<div class="hud__left">' +
     `<p class="hud__count" data-hud-scooters ${vis(st.scooters === null ? 0 : 1)}><svg class="hud__sc" viewBox="-4 -118 196 122" aria-hidden="true" focusable="false"><use href="#f-sc-gas-bare"/></svg><span data-hud-n>${esc(count(text, st.scooters ?? 0))}</span></p>` +
     `<div class="hud__panel" data-hud-panel ${vis(st.panel)}>` +
-    `<${tag} class="hud__row hud__row--est" data-hud-est data-kind="estimate" data-slot="co.dozen.add" data-how="${esc(p.howHref)}"${tag === 'a' ? ` href="${esc(p.howHref)}"` : ''}${st.zero ? ' hidden' : ''}>` +
-    `<span class="hud__name">${esc(p.added)}</span>` +
+    // in a still (a picture, hidden from screen readers) the row still leads to the working for a mouse or a finger, but
+    // stays out of the tab order: the caption under that still carries the estimate as a proper button
+    `<a class="hud__row hud__row--est" data-hud-est data-kind="estimate" data-slot="co.dozen.add" href="${esc(p.howHref)}"${o.link === false ? ' tabindex="-1"' : ''}${st.zero ? ' hidden' : ''}>` +
+    `<span class="hud__name">${esc(p.added)}</span> ` +
     `<span class="hud__val"><b>${esc(p.addedValue)}</b><span class="hud__kind hud__kind--est">${text.glyphs.estimate}${esc(p.estimate)}</span><span class="vh">：${esc(p.how)}</span></span>` +
-    `</${tag}>` +
-    `<p class="hud__row hud__row--zero" data-hud-zero${st.zero ? '' : ' hidden'}><span class="hud__name">${esc(p.addedElectric)}</span><span class="hud__val"><b>${esc(p.zero)}</b></span></p>` +
-    `<p class="hud__row hud__row--street"><span class="hud__name">${esc(p.street)}</span><span class="hud__val"><b>${esc(p.streetValue)}</b><span class="hud__kind">${text.glyphs.measured}${esc(p.measured)}</span></span></p>` +
+    '</a>' +
+    `<p class="hud__row hud__row--zero" data-hud-zero${st.zero ? '' : ' hidden'}><span class="hud__name">${esc(p.addedElectric)}</span> <span class="hud__val"><b>${esc(p.zero)}</b></span></p>` +
+    `<p class="hud__row hud__row--street"><span class="hud__name">${esc(p.street)}</span> <span class="hud__val"><b>${esc(p.streetValue)}</b><span class="hud__kind">${text.glyphs.measured}${esc(p.measured)}</span></span></p>` +
     '</div></div>' +
     `<div class="hud__clock" data-hud-clock data-lamp="${st.lamp}" ${vis(st.clock)}>` +
     `<svg viewBox="0 0 26 18" aria-hidden="true" focusable="false"><path class="hud__led" data-hud-led d="${ledD(st.led === null ? 0 : st.led)}"/></svg>` +

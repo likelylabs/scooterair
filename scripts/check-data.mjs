@@ -23,11 +23,10 @@
 //  - a fact or series without `chainLink` (unless its topic has a default), or a bad chain link
 //  - a `research` reference 'papers/<file>#<finding>' or 'redlight/<file>#<finding>' that does not
 //    exist or whose verdict is not CONFIRMED, CORRECTED or ADDED
-//  - evidence gaps: bad chain link, missing fields, unknown facts/series/sources, bad dates
 //  - the estimate (src/data/estimate.ts): any slot that differs from research/estimate/results.json
 //    (published 1 s.f. values, 1 d.p. totals, the emission-per-red arithmetic, the cross-check,
 //    the inputs the recipe prints) or from the registry fact that backs a measured value
-//  - answers (src/data/answers.ts): unknown gap, fact, slot or source; missing chip without a
+//  - answers (src/data/answers.ts): a malformed former-gap id, unknown fact, slot or source; missing chip without a
 //    K sentence; one answer per former gap
 //  - 'masks/VERIFIED#<id>' research references that are not in research/masks/VERIFIED.json
 
@@ -39,14 +38,13 @@ process.removeAllListeners('warning'); // silence the type-stripping Experimenta
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const load = (p) => import(pathToFileURL(resolve(root, p)).href);
 
-let types, sourcesMod, factsMod, seriesMod, policyMod, gapsMod, estimateMod, answersMod;
+let types, sourcesMod, factsMod, seriesMod, policyMod, estimateMod, answersMod;
 try {
   types = await load('src/data/types.ts');
   sourcesMod = await load('src/data/sources.ts');
   factsMod = await load('src/data/facts.ts');
   seriesMod = await load('src/data/series.ts');
   policyMod = await load('src/data/claims-policy.ts');
-  gapsMod = await load('src/data/gaps.ts');
   estimateMod = await load('src/data/estimate.ts');
   answersMod = await load('src/data/answers.ts');
 } catch (err) {
@@ -63,7 +61,6 @@ const warn = (where, msg) => warnings.push(`${where}: ${msg}`);
 const { sources, sourceKinds, readLevels } = sourcesMod;
 const { factGroups, facts, topicLabels, topicDefaultChainLink } = factsMod;
 const { series, pointFlags, seriesTopicDefaultChainLink } = seriesMod;
-const { gaps } = gapsMod;
 const CHAIN_LINKS = new Set(types.chainLinks);
 const { claimRules } = policyMod;
 const CONFIDENCES = new Set(types.confidences);
@@ -371,24 +368,7 @@ for (let i = 1; i <= 16; i++) {
   if (!Object.values(claimRules).some((r) => r.blueprintRule === `R${i}`)) err(`claims policy`, `blueprint copy rule R${i} has no claim rule (set blueprintRule on one)`);
 }
 
-// ---------------------------------------------------------------------------
-// Evidence gaps
-// ---------------------------------------------------------------------------
-
 const seriesIds = new Set(Object.keys(series));
-for (const [id, g] of Object.entries(gaps)) {
-  const w = `gap ${id}`;
-  if (!ID_RE.test(id) || !id.startsWith('gap-')) err(w, "id must be kebab-case and start with 'gap-'");
-  if (!CHAIN_LINKS.has(g.chainLink)) err(w, `chainLink must be 1-7, got ${g.chainLink}`);
-  for (const key of ['title', 'statement', 'whyItMatters', 'wouldClose']) checkL10n(`${w}.${key}`, g[key]);
-  checkL10n(`${w}.whoCouldMeasure`, g.whoCouldMeasure, { optional: true });
-  if (g.sources) citeSources(w, g.sources, { required: false });
-  for (const fid of g.closest?.facts ?? []) if (!factIds.has(fid)) err(w, `closest.facts references unknown fact "${fid}"`);
-  for (const sid of g.closest?.series ?? []) if (!seriesIds.has(sid)) err(w, `closest.series references unknown series "${sid}"`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(g.searchedOn ?? '')) err(w, 'searchedOn must be yyyy-mm-dd');
-  if (!g.research) err(w, 'missing research reference');
-  checkResearchRefs(w, g.research);
-}
 
 // ---------------------------------------------------------------------------
 // Economics dataset (src/data/econ): the calculator's inputs
@@ -791,7 +771,7 @@ const deferredVoice = [];
   for (const [id, a] of Object.entries(answers)) {
     const w = `answer ${id}`;
     if (!ID_RE.test(id) || !id.startsWith('answer-')) err(w, "id must be kebab-case and start with 'answer-'");
-    if (!gaps[a.formerGap]) err(w, `formerGap "${a.formerGap}" is not a gap in gaps.ts`);
+    if (!/^gap-[a-z0-9-]+$/.test(a.formerGap)) err(w, `formerGap "${a.formerGap}" must be the old gap id (gap-…)`);
     if (seenGap.has(a.formerGap)) err(w, `formerGap "${a.formerGap}" already answered by ${seenGap.get(a.formerGap)}`);
     seenGap.set(a.formerGap, id);
     if (!CHAIN_LINKS.has(a.chainLink)) err(w, `chainLink must be 1-7, got ${a.chainLink}`);
@@ -807,7 +787,7 @@ const deferredVoice = [];
     if (/沒人量過|最髒|違規|合法|愈|車流廢氣|車隊/.test(a.answer['zh-TW'] + a.caveat['zh-TW'])) err(w, 'zh-TW uses a banned word (brief 6.6)');
     deferredVoice.push([w, { question: a.question, answer: a.answer, basis: a.basis, caveat: a.caveat }]);
   }
-  for (const gid of Object.keys(gaps)) if (!seenGap.has(gid)) err(`answers`, `former gap ${gid} has no answer`);
+  if (seenGap.size !== 13) err('answers', `brief 7.2 lists thirteen former gaps; ${seenGap.size} have an answer`);
 }
 
 // ---------------------------------------------------------------------------
@@ -820,12 +800,11 @@ for (const [id, n] of cited) if (n === 0) err(`source ${id}`, 'is not cited by a
 for (const [id, f] of Object.entries(facts)) walkL10n(`fact ${id}`, f);
 for (const [id, s] of Object.entries(series)) walkL10n(`series ${id}`, s);
 for (const [id, r] of Object.entries(claimRules)) walkL10n(`claim rule ${id}`, r);
-for (const [id, g] of Object.entries(gaps)) walkL10n(`gap ${id}`, g);
 
 // ---------------------------------------------------------------------------
 // Reader voice: no editor instructions in reader-facing text
 // ---------------------------------------------------------------------------
-// Pages print facts' captions, statements and caveats, series text and gap text to readers.
+// Pages print facts' captions, statements and caveats, series text and answers to readers.
 // Instructions to editors ("never write…", "不可說成…", "只能用在證據頁…") belong in
 // `editorNote` (never rendered) or in claims-policy.ts. A reader-facing caveat states the limit
 // of the evidence in plain words a reader can use.
@@ -890,7 +869,6 @@ function walkReaderVoice(where, obj, report = err) {
 }
 for (const [id, f] of Object.entries(facts)) walkReaderVoice(`fact ${id}`, f);
 for (const [id, s] of Object.entries(series)) walkReaderVoice(`series ${id}`, s);
-for (const [id, g] of Object.entries(gaps)) walkReaderVoice(`gap ${id}`, g);
 for (const [l, lab] of Object.entries(types.chainLinkLabels)) walkReaderVoice(`chainLinkLabels.${l}`, lab);
 walkReaderVoice('confidenceLabels', types.confidenceLabels);
 walkReaderVoice('evidenceLabels', types.evidenceLabels);
@@ -916,13 +894,12 @@ const count = (list, key) => list.reduce((m, x) => ((m[x[key]] = (m[x[key]] ?? 0
 const factArr = Object.values(facts);
 const seriesArr = Object.values(series);
 const seriesResolved = seriesMod.seriesList;
-const gapArr = Object.values(gaps);
 const summary = [
   `sources ${sourceIds.size} ${JSON.stringify(count(Object.values(sources), 'readLevel'))}`,
   `facts ${factArr.length} ${JSON.stringify(count(factArr, 'confidence'))} ${JSON.stringify(count(factArr, 'evidence'))}`,
   `facts by chain link ${JSON.stringify(count(factArr, 'chainLink'))}`,
   `series ${seriesArr.length} ${JSON.stringify(count(seriesArr, 'confidence'))} by chain link ${JSON.stringify(count(seriesResolved, 'chainLink'))}`,
-  `gaps ${gapArr.length} by chain link ${JSON.stringify(count(gapArr, 'chainLink'))}`,
+  `answers ${Object.keys(answersMod.answers).length} (the former gaps, brief 7.2)`,
   `claim rules ${Object.keys(claimRules).length}`,
 ].join('\n  ');
 

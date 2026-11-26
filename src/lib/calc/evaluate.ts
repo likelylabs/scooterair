@@ -89,7 +89,7 @@ export function validateSituation(input: Partial<Situation>, data: EconDataset, 
     }
   }
   const gas = data.gasModels.find((m) => m.id === input.gasolineModel);
-  if (!gas) out.push(issue('gasolineModel', 'unknown-id', `不認得的燃油車款「${String(input.gasolineModel)}」`, `Unknown model or plan: gasoline model "${String(input.gasolineModel)}"`));
+  if (!gas) out.push(issue('gasolineModel', 'unknown-id', `不認得的燃油機車款「${String(input.gasolineModel)}」`, `Unknown model or plan: gasoline model "${String(input.gasolineModel)}"`));
   else if (gas.calculator !== true) out.push(issue('gasolineModel', 'unknown-id', `「${gas.id}」不在試算中：${gas.calculator.excluded['zh-TW']}`, `Model "${gas.id}" is not available in the calculator: ${gas.calculator.excluded.en}`));
   if (requireModels) {
     const ev = data.evModels.find((m) => m.id === input.electricModel);

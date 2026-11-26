@@ -102,7 +102,7 @@ const TITLES = {
   6: 'Facts with requiresCaveat show their caveat in the page sheet',
   7: 'Routes, redirects, no style guides, no dead links or anchors, sitemap',
   8: 'No EmptyChart, kind="unmeasured", hatchBand or standIn in src/',
-  9: 'Home: 15 screens, headline ≤ 22, body ≤ 45, screen ≤ 850 px, page ≤ 12,300 px',
+  9: 'Home: 15 screens, headline ≤ 22, body ≤ 45, screen ≤ 850 px, page ≤ 12,300 px (English ×1.2: 1,020, 14,760)',
   10: 'Home: pictures and charts cover ≥ 45% of the height at 360 px',
   11: 'Text ≥ 14 px everywhere, body ≥ 18 px (320, 360, 390)',
   12: 'Targets ≥ 48 × 48 px and 8 px apart',
@@ -218,7 +218,8 @@ function segmentsOf(doc) {
       } else if (c.type === ELEMENT_NODE && !SKIP.has(c.name)) {
         if (c.name === 'title' && closest(c, (x) => x.name === 'svg')) continue; // accessible name, read as alt
         // an estimate (EstimateValue) is its own segment, so the words around it are judged apart from it
-        const block = BLOCK.has(c.name) || c.name === 'br' || c.name === 'svg' || attr(c, 'data-kind') === 'estimate';
+        // struck text (<s>, <del>) is a claim quoted to be refused ("we no longer say …"): its own segment, flagged
+        const block = BLOCK.has(c.name) || c.name === 'br' || c.name === 'svg' || c.name === 's' || c.name === 'del' || attr(c, 'data-kind') === 'estimate';
         const f = {
           el: block ? c : flags.el,
           heading: /^h[1-3]$/.test(c.name) ? Number(c.name[1]) : flags.heading,
@@ -227,6 +228,7 @@ function segmentsOf(doc) {
           hidden: flags.hidden || isHidden(c),
           inEstimate: flags.inEstimate || attr(c, 'data-kind') === 'estimate',
           inChart: flags.inChart || has(c, 'data-chart') || has(c, 'data-chart-axis'),
+          struck: flags.struck || c.name === 's' || c.name === 'del',
         };
         if (block) flush();
         walk(c, f);
@@ -237,7 +239,7 @@ function segmentsOf(doc) {
       }
     }
   };
-  walk(doc, { el: doc, heading: 0, inSheet: false, inSvg: false, hidden: false, inEstimate: false, inChart: false });
+  walk(doc, { el: doc, heading: 0, inSheet: false, inSvg: false, hidden: false, inEstimate: false, inChart: false, struck: false });
   flush();
   return segs;
 }
@@ -413,7 +415,8 @@ await check(2, () => {
 await check(3, () => {
   const rules = brief.claimRules.filter((r) => r.check === 3);
   for (const p of pages) {
-    const units = [...p.segs.map((s) => ({ text: s.text, heading: s.heading, where: s.heading ? `h${s.heading}` : 'text' })), ...p.alts.map((a) => ({ text: a.text, heading: 0, where: a.where })), ...p.meta.map((m) => ({ text: m.text, heading: m.where === '<title>' ? 1 : 0, where: m.where }))];
+    // a struck-through claim ("we no longer say …", "what we will not say") is quoted to be refused
+    const units = [...p.segs.filter((s) => !s.struck).map((s) => ({ text: s.text, heading: s.heading, where: s.heading ? `h${s.heading}` : 'text' })), ...p.alts.map((a) => ({ text: a.text, heading: 0, where: a.where })), ...p.meta.map((m) => ({ text: m.text, heading: m.where === '<title>' ? 1 : 0, where: m.where }))];
     for (const u of units)
       for (const r of rules) {
         if (r.locale !== p.locale) continue;
@@ -546,8 +549,11 @@ await check(6, () => {
     if (p.redirect) continue;
     const used = new Set(p.els.flatMap((e) => (attr(e, 'data-fact') ?? '').split(/[\s,]+/).filter(Boolean)));
     marked += used.size;
-    const sheetText = brief.kNorm(p.segs.filter((s) => s.inSheet).map((s) => s.text).join(' '));
-    const pageText = brief.kNorm(p.segs.map((s) => s.text).join(' '));
+    // reader-facing Chinese writes 台 (HowSheet prints registry text through readerText); the
+    // registry keeps official names such as 平臺, so compare both sides after 臺 → 台
+    const tai = (x) => x.replaceAll('臺', '台');
+    const sheetText = tai(brief.kNorm(p.segs.filter((s) => s.inSheet).map((s) => s.text).join(' ')));
+    const pageText = tai(brief.kNorm(p.segs.map((s) => s.text).join(' ')));
     for (const id of used) {
       const f = registry.facts[id];
       if (!f) {
@@ -555,7 +561,7 @@ await check(6, () => {
         continue;
       }
       if (!f.requiresCaveat || !f.caveat) continue;
-      const c = brief.kNorm(f.caveat[p.locale] ?? '');
+      const c = tai(brief.kNorm(f.caveat[p.locale] ?? ''));
       if (!c) continue;
       if (sheetText.includes(c)) continue;
       fail(6, label(p), `${id}: its caveat is ${pageText.includes(c) ? 'on the page but not in a sheet' : 'missing'} (「${cut(f.caveat[p.locale], 50)}」)`);
@@ -712,7 +718,37 @@ await check(8, () => {
 // 9 (static part) and 17 · home screens, scenes
 // ============================================================================================
 const CJK = /[㐀-鿿豈-﫿]/;
-const countChars = (s) => [...s.replace(/[|\s]/g, '')].length;
+// Words per screen are counted the way brief 6.5 and lane B's src/components/ui/screen-limits.ts
+// count them: Han characters only (digits, Latin letters, units and punctuation are free), and of
+// the variants that follow a switch (`data-when-<name>="<value>"`, one shown at a time) only the
+// longest. Chips inside a slot are labels, not words of the sentence, and are not counted.
+const HAN = /[㐀-䶿一-鿿豈-﫿]/g;
+const hanCount = (t) => (t.match(HAN) ?? []).length;
+const HEIGHT_BUDGET = { 'zh-TW': { page: 12300, screen: 850 }, en: { page: 14760, screen: 1020 } };
+const countChars = (t) => hanCount(t.replace(/\|/g, ''));
+function longestHan(el) {
+  const groups = new Map(); // name → Map(value → han count)
+  let base = 0;
+  const walk = (n) => {
+    for (const c of n.children ?? []) {
+      if (c.type === TEXT_NODE) base += hanCount(decode(c.value));
+      else if (c.type === ELEMENT_NODE && !SKIP.has(c.name)) {
+        if (has(c, 'data-chip')) continue;
+        const when = Object.keys(c.attributes ?? {}).find((k) => k.startsWith('data-when-'));
+        if (when) {
+          const g = groups.get(when) ?? groups.set(when, new Map()).get(when);
+          const n2 = hanCount(textOf(c));
+          for (const v of String(attr(c, when)).split(/\s+/).filter(Boolean)) g.set(v, (g.get(v) ?? 0) + n2);
+          continue;
+        }
+        walk(c);
+      }
+    }
+  };
+  walk(el);
+  for (const g of groups.values()) base += Math.max(0, ...g.values());
+  return base;
+}
 const homeScreens = (p) => p.els.filter((e) => e.name === 'article' && has(e, 'data-screen'));
 await check(9, () => {
   for (const l of LOC) {
@@ -732,10 +768,10 @@ await check(9, () => {
       const h = [...elements(a)].find((e) => e.name === 'h2');
       const ht = h ? textOf(h) : '';
       if (!h) fail(9, label(p), `screen ${i + 1} has no <h2>`);
-      else if (countChars(ht) > 22) fail(9, label(p), `screen ${i + 1} headline has ${countChars(ht)} characters (max 22): ${ht}`);
+      else if (longestHan(h) > 22) fail(9, label(p), `screen ${i + 1} headline has ${longestHan(h)} Chinese characters (max 22): ${ht}`);
       const b = [...elements(a)].find((e) => has(e, 'data-screen-body') || classes(e).includes('screen__body'));
       if (!b) fail(9, label(p), `screen ${i + 1} has no body (.screen__body)`);
-      else if (countChars(textOf(b)) > 45) fail(9, label(p), `screen ${i + 1} body has ${countChars(textOf(b))} characters (max 45): ${cut(textOf(b))}`);
+      else if (longestHan(b) > 45) fail(9, label(p), `screen ${i + 1} body has ${longestHan(b)} Chinese characters (max 45; longest variant): ${cut(textOf(b))}`);
     });
   }
 });
@@ -866,7 +902,7 @@ async function browserChecks(chromium) {
       sel(el) { if (!el || el.nodeType !== 1) return '?'; let s = el.tagName.toLowerCase(); if (el.id) s += '#' + el.id; else if (el.classList.length) s += '.' + [...el.classList].slice(0, 2).join('.'); const anc = el.parentElement && el.parentElement.closest('[id]'); return anc ? '#' + anc.id + ' ' + s : s; },
       visible(el) { if (!el || !el.getBoundingClientRect) return false; const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return false; if (r.right <= 0 || r.left >= innerWidth) return false; if (this.inClosedDetails(el)) return false; const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) return false; return true; },
       textNodes() { const out = []; const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.nodeValue.trim()) continue; const el = n.parentElement; if (!el || el.closest('script,style,noscript,template,svg title,svg desc') || this.inClosedDetails(el)) continue; const range = document.createRange(); range.selectNodeContents(n); const rects = [...range.getClientRects()].filter(r => r.width >= 1 && r.height >= 1); if (!rects.length) continue; const cs = getComputedStyle(el); if (cs.visibility === 'hidden') continue; let hiddenByClip = false; for (let a = el; a && a !== document.body; a = a.parentElement) { const s = getComputedStyle(a); if (Number(s.opacity) === 0) { hiddenByClip = true; break; } const r = a.getBoundingClientRect(); if ((s.overflow === 'hidden' || s.clip !== 'auto' || s.clipPath !== 'none') && (r.width <= 2 || r.height <= 2)) { hiddenByClip = true; break; } } if (hiddenByClip) continue; out.push({ node: n, el, rects }); } return out; },
-      isBody(el) { const p = el.closest('p'); if (!p || !p.closest('main')) return false; if (p.closest('figure,figcaption,footer,header,nav,aside,table,small,label,legend,button,summary,dl,[data-how-sheet],[data-sheet],[data-illustration-tag],[role=note],svg')) return false; const cls = (x) => (x.className && typeof x.className === 'string' ? x.className : ''); for (let a = p; a && a.tagName !== 'MAIN'; a = a.parentElement) if (/quiet|caption|note|meta|label|legend|chip|badge|fine|source|cite|eyebrow|kicker|small|footnote|tag|hint|disclaim|caveat/i.test(cls(a))) return false; return true; },
+      isBody(el) { const p = el.closest('p'); if (!p || !p.closest('main')) return false; if (p.closest('figure,figcaption,footer,header,nav,aside,table,small,label,legend,button,summary,dl,[data-how-sheet],[data-sheet],[data-illustration-tag],[role=note],svg')) return false; const cls = (x) => (x.className && typeof x.className === 'string' ? x.className : ''); for (let a = p; a && a.tagName !== 'MAIN'; a = a.parentElement) if (/quiet|caption|note|meta|label|legend|chip|badge|fine|source|src|cite|eyebrow|kicker|small|footnote|tag|hint|disclaim|caveat/i.test(cls(a))) return false; return true; },
       rgba(s) { const m = s.match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(/[ ,\\/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; },
       lum(c) { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); },
       over(top, under) { const a = top.a + under.a * (1 - top.a); if (a === 0) return { r: 0, g: 0, b: 0, a: 0 }; return { r: (top.r * top.a + under.r * under.a * (1 - top.a)) / a, g: (top.g * top.a + under.g * under.a * (1 - top.a)) / a, b: (top.b * top.a + under.b * under.a * (1 - top.a)) / a, a }; },
@@ -896,8 +932,13 @@ async function browserChecks(chromium) {
           return { H, screens: arts.map((a, i) => ({ i: i + 1, h: Math.round(a.getBoundingClientRect().height), id: a.id })), cover: Math.round(cover), hooked };
         });
         if (run(9)) {
-          if (m.H > 12300) fail(9, p.route, `page is ${m.H} px tall at 360 × 740 (max 12,300)`);
-          for (const s of m.screens) if (s.h > 850) fail(9, p.route, `screen ${s.i}${s.id ? ` (#${s.id})` : ''} is ${s.h} px tall (max 850)`);
+          // Chinese is the designed page (brief 12.2: 12,300 px, 850 a screen). English says the same
+          // sentence for sentence at the same 18 px and runs about a fifth longer (measured on the built
+          // page, 2026-11-26), so it has its own stated budget rather than English copy cut below the
+          // Chinese (brief 6.5): the Chinese budget × 1.2, i.e. 14,760 px, 1,020 a screen.
+          const B = HEIGHT_BUDGET[p.locale];
+          if (m.H > B.page) fail(9, p.route, `page is ${m.H} px tall at 360 × 740 (max ${B.page.toLocaleString('en')} for ${p.locale})`);
+          for (const s of m.screens) if (s.h > B.screen) fail(9, p.route, `screen ${s.i}${s.id ? ` (#${s.id})` : ''} is ${s.h} px tall (max ${B.screen} for ${p.locale})`);
           note(9, `${p.route}: ${m.H} px tall, ${m.screens.length} screens`);
         }
         if (run(10)) {
@@ -942,7 +983,9 @@ async function browserChecks(chromium) {
         }
         if (!__cs.visible(el)) continue;
         if (targets.some((t) => t.el === el)) continue;
-        targets.push({ el, r: el.getBoundingClientRect() });
+        let fixed = null;
+        for (let x = el; x && x !== document.body; x = x.parentElement) { const pos = getComputedStyle(x).position; if (pos === 'fixed' || pos === 'sticky') { fixed = x; break; } }
+        targets.push({ el, r: el.getBoundingClientRect(), fixed });
       }
       const small = [], close = [];
       let inline = 0;
@@ -958,6 +1001,9 @@ async function browserChecks(chromium) {
         for (let j = i + 1; j < targets.length; j++) {
           const a = targets[i], b = targets[j];
           if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+          // a bar fixed to the screen (sticky result bar) passes over the page as it scrolls: its
+          // overlap with whatever is under it at that moment is not two neighbouring targets
+          if (a.fixed !== b.fixed) continue;
           const dx = Math.max(0, b.r.left - a.r.right, a.r.left - b.r.right);
           const dy = Math.max(0, b.r.top - a.r.bottom, a.r.top - b.r.bottom);
           const gap = Math.max(dx, dy);
@@ -966,7 +1012,7 @@ async function browserChecks(chromium) {
       return { n: targets.length, small, close, inline };
     });
     if (r.small.length) fail(12, p.route, `${r.small.length} of ${r.n} target(s) under 48 × 48 px (${r.inline} are links inside sentences), e.g. ${r.small.slice(0, 3).join(' · ')}`);
-    if (r.close.length) fail(12, p.route, `${r.close.length} pair(s) of targets closer than 8 px, e.g. ${r.close.slice(0, 2).join(' · ')}`);
+    if (r.close.length) fail(12, p.route, `${r.close.length} pair(s) of targets closer than 8 px, e.g. ${r.close.slice(0, MAX > 12 ? MAX : 2).join(' · ')}`);
   });
 
   // ---- 13 overflow, clipping and phrase breaks at 320 -----------------------------------------

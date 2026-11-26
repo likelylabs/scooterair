@@ -29,7 +29,7 @@ import { localize, fill } from '@/i18n/pages/_copy';
 import filmCopy from '@/i18n/pages/film';
 import { chipWhere, illustration, kSentences, site } from '@/i18n/ui';
 import { est, estimateText } from '@/data/estimate';
-import { fact } from '@/data';
+import { fact, type FactId } from '@/data';
 import { AIR_EXTRA } from '@/components/art/air-slots';
 import EstimateValue from '@/components/ui/EstimateValue.astro';
 import HowButton from '@/components/ui/HowButton.astro';
@@ -39,7 +39,7 @@ import KindChip from '@/components/ui/KindChip.astro';
 import { createFilm, SVG_LAYERS } from './scene';
 import { hudHTML } from './hud';
 import { signGlyphs } from './glyphs';
-import { BEATS, DURATION, DURATION_MINUTES, POSTER_T, beatAt, clock, cueAt, type CueId } from './timeline';
+import { BEATS, DURATION, DURATION_MINUTES, beatAt, clock, cueAt, type CueId } from './timeline';
 import { filmData, filmLengthLabel, filmPeriods } from './film-data';
 
 interface Props {
@@ -78,6 +78,8 @@ const stills = stillTimes.map(({ time, beat }, i) => {
     tag: hud.tag,
     cue,
     scene,
+    // the panel is in the picture: its estimate, pressable, goes in the caption (the picture holds nothing to press)
+    panel: hud.panel > 0.5 && !hud.zero,
     alt: fill(t.still.alt, { n: i + 1, line }) + (scene ? (en ? ' ' : '') + (hud.tag === 'body' ? illustration.body[locale] : illustration.altNote[locale]) : ''),
   };
 });
@@ -94,7 +96,7 @@ const pageUrl = new URL(href('/90/', locale), Astro.site).href;
 const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(fill(t.player.lineText, { min: DURATION_MINUTES }))}`;
 
 // ---- transcript: every cue, what the picture adds to it, and what it rests on --------------
-type Ref = { chip?: { fact?: string; kind?: string; where?: string }; href?: string; sheet?: string; estimate?: boolean };
+type Ref = { chip?: { fact?: FactId; kind?: string; where?: string }; href?: string; sheet?: string; estimate?: boolean };
 const dr = t.transcript.drawn;
 const m = d.money.money;
 const tagLine = (g: (typeof m.tags)[number]) => fill(dr.tag, { where: g.where, plate: g.plate, sum: [g.before, g.amount, g.after].filter(Boolean).join(' ') });
@@ -202,7 +204,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
       <button type="button" class="film__btn" data-film-toggle aria-label={t.player.play}><svg class="ico--play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z"></path></svg><svg class="ico--pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z"></path></svg></button>
       <button type="button" class="film__btn" data-film-restart aria-label={t.player.restart}><svg class="ico--line" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12a7 7 0 1 0 2.2-5.1M4.5 4.5v4h4"></path></svg></button>
       <input class="film__seek" type="range" min="0" max={DURATION} step="0.1" value="0" aria-label={t.player.seek} data-film-seek />
-      <span class="film__time"><span data-film-time>0:00</span> / {clock(DURATION)}</span>
+      <span class="film__time"><span data-film-time>0:00</span><span class="film__total"> / {clock(DURATION)}</span></span>
       <button type="button" class="film__speed" data-film-speed aria-pressed="false" aria-label={`${t.player.speed.label}${en ? ': ' : '：'}${t.player.speed.slow}`}>{t.player.speed.slow}</button>
     </div>
     <p class="vh" aria-live="polite" data-film-say></p>
@@ -211,11 +213,11 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   <div class="film__under">
     <p class="film__notes">{fill(t.player.notes, { red: d.slots.red })} <a class="film__inline" href={text.panel.howHref}>{t.player.how} →</a></p>
     <p class="film__notes film__keys">{t.player.keys}</p>
-    <p class="film__share">
+    <div class="film__share">
       <a class="film__cta" href={lineHref} target="_blank" rel="noopener">{t.player.line}</a>
       {mp4Href && <a class="film__cta" href={mp4Href} download>{t.player.download}</a>}
       {mp4Href && <span class="film__share-note">{fill(t.player.downloadNote, { size: mp4Size })}</span>}
-    </p>
+    </div>
     <p class="film__stills-note">{t.still.note} <button type="button" class="film__optin" data-film-optin hidden>{t.still.optIn}</button></p>
     <ol class="film__stills">
       {stills.map((s) => (
@@ -232,6 +234,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
               <p class="still__when">{fill(t.still.frameN, { n: s.n })} · {clock(s.time)} · {t.beats[s.beat.id]}</p>
               <p class="still__line">{s.cue.main}</p>
               {s.cue.note && <p class="still__note">{s.cue.note}{s.cue.chip && <Fragment> <KindChip locale={locale} kind={s.cue.chip.kind} size="sm" /></Fragment>}</p>}
+              {s.panel && <p class="still__est"><EstimateValue locale={locale} slotId="co.dozen.add" label={text.panel.added} sheet="how-film-estimate" /></p>}
             </figcaption>
           </figure>
         </li>
@@ -303,8 +306,8 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
    */
   .film {
     --cap-h: 6.25rem;
-    /* two rows of controls on a phone: the scrubber, then the buttons */
-    --ctl-h: 6.75rem;
+    /* two rows of controls on a phone: the scrubber, then the buttons (48 + 8 + 48 + padding) */
+    --ctl-h: 7rem;
     /* room for the picture: the viewport less the site header, the caption band and the controls */
     /* (the header's own height plus its 1 px bottom rule) */
     --avail: calc(100svh - var(--header-h) - 1px - var(--cap-h) - var(--ctl-h));
@@ -317,6 +320,20 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     .film {
       --cap-h: 6rem;
       --ctl-h: 3.5rem;
+    }
+  }
+  /* 大 and 特大 (brief 6.4): the words over the picture grow with the text, so the picture keeps a
+     floor height and the stage may run taller than the screen; nothing in it is cut */
+  :root:is([data-text='lg'], [data-text='xl']) .film {
+    --pic-h: clamp(17rem, var(--avail), 40rem);
+  }
+  /* a narrow stage (a small phone, or large text): the clock shows the position only, so the speed button fits */
+  @container (max-width: 22rem) {
+    .film__total {
+      display: none;
+    }
+    .film__controls .film__speed {
+      padding-inline: 0.6rem;
     }
   }
   .film .vh {
@@ -369,6 +386,18 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .film-live .film__stills-note {
     display: none;
   }
+  /* words inside the picture are bounded by the picture, like words in a drawing: they keep their
+     standard size when the reader picks 大 or 特大 (the captions and the transcript grow instead) */
+  .film__pic,
+  .still__pic {
+    --pr: min(1rem, 16px);
+    /* the site's tokens, at their standard sizes, for everything drawn over the picture (the tag, the cards, the buttons) */
+    --fs-xs: calc(0.875 * var(--pr));
+    --fs-sm: calc(0.9375 * var(--pr));
+    --fs-btn: calc(1.0625 * var(--pr));
+    --fs-md: calc(1.25 * var(--pr));
+    --tap: calc(3 * var(--pr));
+  }
   .film__pic {
     --here: var(--bg);
     position: relative;
@@ -392,12 +421,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     will-change: transform;
   }
   /* the scenario steps of art.css fade with a CSS transition; in the film the timeline alone decides */
-  /* a ring or dot carries its light halo as its own stroke, painted under the fill (scene.ts, oneMark) */
-  .film :is([class~='air-ring'], [class~='air-dot'])[stroke-width] {
-    stroke: var(--air-halo, var(--here, var(--bg)));
-    stroke-linejoin: round;
-    paint-order: stroke;
-  }
   .film :is(.air-b, .air-wash) {
     transition: none;
   }
@@ -422,7 +445,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .fo-ruler {
     translate: -100% -50%;
     font-family: var(--font-latin), sans-serif;
-    font-size: clamp(0.875rem, 4cqw, 1.375rem);
+    font-size: clamp(calc(0.875 * var(--pr, 1rem)), 4cqw, calc(1.375 * var(--pr, 1rem)));
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     /* a paper edge keeps the figures readable over the pavement */
@@ -430,13 +453,13 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   }
   .fo-ruler--unit {
     font-family: inherit;
-    font-size: clamp(0.875rem, 3.6cqw, 1.125rem);
+    font-size: clamp(calc(0.875 * var(--pr, 1rem)), 3.6cqw, calc(1.125 * var(--pr, 1rem)));
     color: var(--ink-2);
   }
   .fo-side {
     inset-block-end: 14%;
     padding: 0.2em 0.6em;
-    font-size: clamp(0.875rem, 4.2cqw, 1.375rem);
+    font-size: clamp(calc(0.875 * var(--pr, 1rem)), 4.2cqw, calc(1.375 * var(--pr, 1rem)));
     font-weight: 800;
     white-space: nowrap;
     color: #fff;
@@ -463,10 +486,10 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .fo-pin b {
     display: grid;
     place-items: center;
-    inline-size: clamp(1.75rem, 9cqw, 3.25rem);
+    inline-size: clamp(calc(1.75 * var(--pr, 1rem)), 9cqw, calc(3.25 * var(--pr, 1rem)));
     aspect-ratio: 1;
     font-family: var(--font-latin), sans-serif;
-    font-size: clamp(0.9375rem, 5cqw, 1.75rem);
+    font-size: clamp(calc(0.9375 * var(--pr, 1rem)), 5cqw, calc(1.75 * var(--pr, 1rem)));
     font-weight: 800;
     color: var(--bg);
     background: var(--ink);
@@ -475,7 +498,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   }
   .fo-name {
     translate: -50% 0;
-    font-size: clamp(0.9375rem, 5cqw, 1.75rem);
+    font-size: clamp(calc(0.9375 * var(--pr, 1rem)), 5cqw, calc(1.75 * var(--pr, 1rem)));
     font-weight: 800;
     white-space: nowrap;
   }
@@ -488,7 +511,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     inset: 50% 5% auto;
     translate: 0 -50%;
     display: grid;
-    gap: 0.45rem;
+    gap: calc(0.45 * var(--pr, 1rem));
     justify-items: center;
   }
   .fo-tag {
@@ -500,7 +523,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     background: var(--surface);
     border: 2px solid var(--ink);
     border-radius: 0.5em;
-    font-size: clamp(0.875rem, 4.3cqw, 1.5rem);
+    font-size: clamp(calc(0.875 * var(--pr, 1rem)), 4.3cqw, calc(1.5 * var(--pr, 1rem)));
     transform-origin: 1em 50%;
     box-shadow: 0 2px 0 color-mix(in srgb, var(--ink) 25%, transparent);
   }
@@ -546,7 +569,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .fo-plate {
     margin-inline-start: auto;
     padding: 0.05em 0.5em;
-    font-size: 0.875rem;
+    font-size: calc(0.875 * var(--pr, 1rem));
     font-style: normal;
     font-weight: 700;
     white-space: nowrap;
@@ -569,7 +592,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     gap: 0.35em;
     max-inline-size: 100%;
     padding: 0.15em 0.7em;
-    font-size: clamp(0.875rem, 3.7cqw, 1.125rem);
+    font-size: clamp(calc(0.875 * var(--pr, 1rem)), 3.7cqw, calc(1.125 * var(--pr, 1rem)));
     font-weight: 500;
     line-height: 1.3;
     color: var(--ink-2);
@@ -584,7 +607,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   }
   .fo-permonth {
     translate: -50% 0;
-    font-size: clamp(0.9375rem, 4.6cqw, 1.5rem);
+    font-size: clamp(calc(0.9375 * var(--pr, 1rem)), 4.6cqw, calc(1.5 * var(--pr, 1rem)));
     font-weight: 800;
     white-space: nowrap;
   }
@@ -592,7 +615,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     display: grid;
     gap: 0.2em;
     inline-size: 74%;
-    font-size: clamp(0.9375rem, 4.6cqw, 1.5rem);
+    font-size: clamp(calc(0.9375 * var(--pr, 1rem)), 4.6cqw, calc(1.5 * var(--pr, 1rem)));
     line-height: 1.2;
   }
   .fo-bar__label {
@@ -607,7 +630,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   }
   .fo-bar__track {
     display: block;
-    block-size: clamp(1rem, 7.6cqw, 2.5rem);
+    block-size: clamp(calc(1 * var(--pr, 1rem)), 7.6cqw, calc(2.5 * var(--pr, 1rem)));
   }
   .fo-bar__track i {
     display: block;
@@ -646,10 +669,10 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    gap: calc(0.5 * var(--pr, 1rem));
+    padding: calc(0.5 * var(--pr, 1rem));
     pointer-events: none;
-    font-size: clamp(0.875rem, 1.75cqw, 1.125rem);
+    font-size: clamp(calc(0.875 * var(--pr, 1rem)), 1.75cqw, calc(1.125 * var(--pr, 1rem)));
     line-height: 1.3;
     color: var(--ink);
   }
@@ -681,7 +704,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .hud__panel {
     display: grid;
     inline-size: max-content;
-    max-inline-size: calc(100cqw - 1rem);
+    max-inline-size: calc(100cqw - calc(1 * var(--pr, 1rem)));
     background: var(--surface);
     border: 1.5px solid var(--ink);
     border-radius: var(--radius-2);
@@ -729,7 +752,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   /* brief 8.2, change 2: the one number, 20 px or more */
   .hud__row--est .hud__val b,
   .hud__row--zero .hud__val b {
-    font-size: max(1.25rem, 1.45em);
+    font-size: max(calc(1.25 * var(--pr, 1rem)), 1.45em);
     line-height: 1.2;
   }
   .hud__kind {
@@ -813,12 +836,12 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     display: grid;
     place-content: center;
     justify-items: center;
-    padding: 0.75rem;
+    padding: calc(0.75 * var(--pr, 1rem));
     text-align: center;
     color: var(--ink);
   }
   .film__poster {
-    gap: 0.35rem;
+    gap: calc(0.35 * var(--pr, 1rem));
     /* the ruler shot shows through, paler where the words are */
     background: radial-gradient(ellipse 62% 48% at 50% 50%, color-mix(in srgb, var(--bg) 92%, transparent), color-mix(in srgb, var(--bg) 62%, transparent));
   }
@@ -835,7 +858,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .film__title {
     margin: 0;
     font-family: var(--font-heading);
-    font-size: clamp(1.75rem, 8cqw, 3rem);
+    font-size: clamp(calc(1.75 * var(--pr, 1rem)), 8cqw, calc(3 * var(--pr, 1rem)));
     font-weight: 900;
     font-stretch: var(--display-stretch);
     line-height: var(--lh-heading);
@@ -843,10 +866,10 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .film__big {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    min-block-size: 3.5rem;
-    margin-block-start: 0.5rem;
-    padding: 0.6rem 1.5rem 0.6rem 1.1rem;
+    gap: calc(0.6 * var(--pr, 1rem));
+    min-block-size: calc(3.5 * var(--pr, 1rem));
+    margin-block-start: calc(0.5 * var(--pr, 1rem));
+    padding: calc(0.6 * var(--pr, 1rem)) calc(1.5 * var(--pr, 1rem)) calc(0.6 * var(--pr, 1rem)) calc(1.1 * var(--pr, 1rem));
     font: inherit;
     font-size: var(--fs-md);
     font-weight: 800;
@@ -857,21 +880,21 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     cursor: pointer;
   }
   .film__big svg {
-    inline-size: 1.6rem;
-    block-size: 1.6rem;
+    inline-size: calc(1.6 * var(--pr, 1rem));
+    block-size: calc(1.6 * var(--pr, 1rem));
     fill: currentColor;
   }
   .film__big:hover {
     background: var(--accent-hover);
   }
   .film__len {
-    margin: 0.2rem 0 0;
+    margin: calc(0.2 * var(--pr, 1rem)) 0 0;
     font-size: var(--fs-sm);
     font-weight: 500;
     color: var(--ink);
   }
   .film__end {
-    gap: 0.5rem;
+    gap: calc(0.5 * var(--pr, 1rem));
     align-content: center;
     justify-items: stretch;
     background: color-mix(in srgb, var(--bg) 88%, transparent);
@@ -881,19 +904,19 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     overflow-y: auto;
   }
   .film__end > * {
-    inline-size: min(100%, 26rem);
+    inline-size: min(100%, calc(26 * var(--pr, 1rem)));
     margin-inline: auto;
   }
   .film__end[data-on] {
     visibility: visible;
   }
   .film__end > .film__end-title {
-    inline-size: min(100%, 44rem);
+    inline-size: min(100%, calc(44 * var(--pr, 1rem)));
   }
   .film__end-title {
-    margin: 0 0 0.2rem;
+    margin: 0 0 calc(0.2 * var(--pr, 1rem));
     font-family: var(--font-heading);
-    font-size: clamp(1.125rem, 5.4cqw, 1.875rem);
+    font-size: clamp(calc(1.125 * var(--pr, 1rem)), 5.4cqw, calc(1.875 * var(--pr, 1rem)));
     font-weight: 900;
     line-height: var(--lh-heading);
     text-wrap: balance;
@@ -901,14 +924,14 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .film__end-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    gap: calc(0.5 * var(--pr, 1rem));
   }
   .film__cta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-block-size: var(--tap);
-    padding: 0.35rem 0.9rem;
+    padding: calc(0.35 * var(--pr, 1rem)) calc(0.9 * var(--pr, 1rem));
     font: inherit;
     font-size: var(--fs-sm);
     font-weight: 700;
@@ -1001,7 +1024,8 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     grid-template-columns: auto auto 1fr auto;
     grid-template-areas: 'seek seek seek seek' 'play again time speed';
     align-items: center;
-    gap: 0.25rem 0.5rem;
+    /* 8 px between the scrubber and the buttons under it */
+    gap: 0.5rem;
     block-size: var(--ctl-h);
     padding: 0.25rem 0.5rem;
     color: var(--film-ink);
@@ -1216,6 +1240,9 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     color: var(--ink-2);
     font-variant-numeric: tabular-nums;
   }
+  .still__est {
+    margin: 0.4rem 0 0;
+  }
   .still__line {
     margin: 0;
     font-family: var(--font-heading);
@@ -1289,6 +1316,12 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     font-size: var(--fs-sm);
     line-height: var(--lh-read);
     color: var(--ink-2);
+  }
+  /* at 特大 on a narrow phone the buttons in a source line wrap their words rather than overflow */
+  .film__under .film__line-source > * {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    white-space: normal;
   }
   .film__under .film__line-source {
     display: flex;

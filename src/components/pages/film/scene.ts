@@ -45,26 +45,23 @@ import * as P from '../../art/parts.ts';
 import { AIR, air as airAll, airDot as airDot1, airRibbon, airRing as airRing1, airWisp, type AirScenario, type Box } from '../../art/air.ts';
 import { T, signalAt, type Signal } from './timeline.ts';
 
-/* ---- one element per mark ------------------------------------------------------------
+/* ---- a mark and its halo ------------------------------------------------------------
  * air.ts draws the light halo of a ring or a dot as a second drawing of the same path
- * underneath it (a <use>, or a second <path>). The film moves, fades and reveals each mark on
- * its own (a data-n per element), and finds the kerb's extra rings and each tailpipe's cluster
- * by their markup, so it folds every pair back into ONE path: the halo becomes that path's
- * own stroke, painted under its fill (Film.astro: `.film [class~='air-ring'][stroke-width]`).
- * Same look, same rule, same counts; only the markup is flatter.
+ * underneath it: `<use class="air-halo …" href="#id"/><path id="id" class="air-ring …"/>` (or two
+ * <path>s from airRing/airDot). The mark keeps its own paint, which is what the contrast check
+ * reads. The film moves marks one element at a time, so wherever it animates a mark it moves the
+ * PAIR: it wraps the pair in a <g> or gives both elements the same motion. These patterns find
+ * the pairs; air() below stops the build if air.ts ever draws a mark the film cannot find.
  */
-const HALO_USE = /<use class="air-halo([^"]*)" href="#([^"]+)" stroke-width="([^"]+)"([^>]*)\/><path id="\2" class="(air-(?:ring|dot))\1" d="([^"]+)"\4\/>/g;
-const HALO_PATH = /<path class="air-halo([^"]*)" stroke-width="([^"]+)" d="([^"]+)"([^>]*)\/><path class="(air-(?:ring|dot))\1" d="\3"\4\/>/g;
-const oneMark = (html: string): string =>
-  html.replace(HALO_USE, (_m, cls: string, _id, w: string, attrs: string, kind: string, d: string) => `<path class="${kind}${cls.trimEnd()}" stroke-width="${w}" d="${d}"${attrs}/>`).replace(HALO_PATH, (_m, cls: string, w: string, d: string, attrs: string, kind: string) => `<path class="${kind}${cls.trimEnd()}" stroke-width="${w}" d="${d}"${attrs}/>`);
+const PAIR = /<use class="air-halo([^"]*)" href="#([^"]+)"([^>]*)\/><path id="\2" class="(air-(?:ring|dot))([^"]*)"([^>]*)\/>/g;
 function air(o: Parameters<typeof airAll>[0]): ReturnType<typeof airAll> {
   const a = airAll(o);
-  const out = { ...a, marks: oneMark(a.marks), cores: oneMark(a.cores) };
-  if (/class="air-halo/.test(out.marks + out.cores)) throw new Error('film: air.ts drew a halo the film cannot fold into its mark (its markup changed)');
-  return out;
+  const loose = (a.marks.match(/class="air-(?:ring|dot)[ "]/g) ?? []).length - (a.marks.match(PAIR) ?? []).length;
+  if (loose !== 0) throw new Error(`film: air.ts drew ${loose} ring(s) or dot(s) without the halo pair the film expects (its markup changed)`);
+  return a;
 }
-const airRing = (...a: Parameters<typeof airRing1>): string => oneMark(airRing1(...a));
-const airDot = (...a: Parameters<typeof airDot1>): string => oneMark(airDot1(...a));
+const airRing = airRing1;
+const airDot = airDot1;
 
 /* ---- small maths ------------------------------------------------------------------ */
 const clamp = (v: number, a = 0, b = 1): number => (v < a ? a : v > b ? b : v);
@@ -717,7 +714,8 @@ export function createFilm(opt: FilmOptions) {
     // the kerb's extra rings and its ribbons arrive one after another as the layer forms
     const kerb = /<g class="air-kerb">(.*?)<\/g>/.exec(a.marks)?.[1] ?? '';
     const ribs = [...kerb.matchAll(/<path class="air-rib air-b[^"]*" data-k="(\d+)"[^>]*\/>/g)];
-    const rings = [...kerb.matchAll(/<path class="air-ring air-b[^"]*"[^>]*data-k="(\d+)"\/>/g)];
+    // a ring is a halo pair (<use> + <path>), both marked with its data-k
+    const rings = [...kerb.matchAll(/<use class="air-halo air-b[^"]*" href="#([^"]+)"[^>]*data-k="(\d+)"\/><path id="\1" class="air-ring air-b[^"]*"[^>]*\/>/g)];
     const reveal = (k: number, n: number, wave: number) => (c: Context): Attrs => {
       const th = (k + 0.6) / (n + 0.4);
       const on = seg(c.form, th - 0.1, th);
@@ -725,7 +723,7 @@ export function createFilm(opt: FilmOptions) {
       return on <= 0 ? HIDE : { opacity: r2(on), transform: `translate(${r1(d * Math.sin(c.wt * 0.6 + k * 1.7 + wave))} ${r1(d * 0.7 * Math.sin(c.wt * 0.8 + k * 2.3))})`, display: null };
     };
     for (const m of ribs) out.kerb += m[0].replace(/ data-k="\d+"/, dyn(reveal(+m[1], ribs.length, 1), ...AIR_T));
-    for (const m of rings) out.kerb += m[0].replace(/ data-k="\d+"/, dyn(reveal(+m[1], rings.length, 0), ...AIR_T));
+    for (const m of rings) out.kerb += `<g${dyn(reveal(+m[2], rings.length, 0), ...AIR_T)}>${m[0].replace(/ data-k="\d+"/g, '')}</g>`;
     return out;
   }
   /** One of the two sizes of mark: the wide-shot set shows when the camera is wide, the close-shot set when it is close. */
@@ -877,13 +875,16 @@ export function createFilm(opt: FilmOptions) {
       const a = air({ frame, upp, id: `${ID}-s${tag}`, seed: 21, avoid: keep });
       // three drift groups of each kind, each a few pixels, each at its own pace
       let k = 0;
-      const marks = a.marks.replace(/<path class="air-(dot|ring) air-d(\d)"/g, (_m, kind: string, d: string) => {
-        const g = +d + (kind === 'dot' ? 0 : 3);
+      // each drift group is a halo pair: the halo and the mark get the same motion (one function, two elements)
+      const marks = a.marks.replace(PAIR, (_m, hcls: string, hid: string, hattrs: string, kind: string, cls: string, attrs: string) => {
+        const d = /air-d(\d)/.exec(cls)?.[1] ?? '0';
+        const g = +d + (kind === 'air-dot' ? 0 : 3);
         const ph = k++;
-        return `<path class="air-${kind}"${dyn((c) => {
+        const fn = (c: Context): Attrs => {
           const amp = AIR.driftPx * upp * 0.5;
           return { transform: `translate(${r1(amp * Math.sin(c.wt * (0.5 + g * 0.06) + ph * 1.3))} ${r1(amp * 0.8 * Math.sin(c.wt * (0.62 + g * 0.05) + ph * 2.1))})` };
-        })}`;
+        };
+        return `<use class="air-halo${hcls}" href="#${hid}"${hattrs}${dyn(fn)}/><path id="${hid}" class="${kind}${cls}"${attrs}${dyn(fn)}/>`;
       });
       return grp(dyn((c) => {
         const w = near ? c.near : 1 - c.near;
@@ -1131,10 +1132,10 @@ export function createFilm(opt: FilmOptions) {
       [-26, -110, 8], [-48, -100, 9], [-62, -80, 10], [-70, -56, 10], [-44, -62, 10], [-58, -38, 11], [-36, -36, 12], [-22, -52, 11], [-24, -84, 9], [-46, -80, 10], [-66, -30, 12], [-30, -66, 11],
       [28, -112, 8], [48, -106, 9], [64, -88, 10], [72, -62, 10], [56, -70, 11], [66, -42, 11], [52, -30, 12], [60, -26, 12], [70, -30, 12], [50, -50, 11], [34, -96, 9],
     ];
-    const dots = dotAt.map(([x, y, i]) => airDot(x, y, U, { size: 0.8 + r() * 0.2, attrs: go(i, x, y, 1) })).join('');
+    const dots = dotAt.map(([x, y, i]) => `<g${go(i, x, y, 1)}>${airDot(x, y, U, { size: 0.8 + r() * 0.2 })}</g>`).join('');
     // 3 · rings: through a lung, into the blood, and on with it
     const ringAt: [number, number, number][] = [[200, -238, 0], [174, -256, 0], [146, -234, 1], [120, -252, 1], [96, -236, 2], [1, -188, 6], [0, -146, 7], [-34, -96, 9], [26, -100, 9], [46, -84, 10], [17, -50, 13], [17, -13, 15]];
-    const rings = ringAt.map(([x, y, i]) => airRing(x, y, U, { size: 0.8, attrs: go(i, x, y, 2) })).join('');
+    const rings = ringAt.map(([x, y, i]) => `<g${go(i, x, y, 2)}>${airRing(x, y, U, { size: 0.8 })}</g>`).join('');
     const body =
       `${FULL} class="f-freeze f-freeze--solid"/><g${dyn(fit(400, 300, 0.98))}><g transform="translate(${BODY_AT.x} ${BODY_AT.y}) scale(${BODY_AT.k})">` +
       `<g class="f-halo">${P.bodyFigure()}</g>${dots}${rings}${ribbons}</g></g>`;

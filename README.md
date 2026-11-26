@@ -42,8 +42,9 @@ they follow `BASE_PATH`; never write a bare `/path/` in a page.
 | --- | --- |
 | `scripts/check-data.mjs` | the cited data layer in `src/data`: a fact without a source, a source nothing cites, a bad date, URL or DOI, a missing language, wrong punctuation for the language, and more (the script's header lists everything) |
 | `scripts/check-copy.mjs` | reader-facing copy that breaks the editorial rules: the registry's claim rules (`src/data/claims-policy.ts`), the redesign brief's banned strings, banned claims and "not yet measured" wording outside the K sentences (`scripts/brief-rules.mjs`), 臺 for 台, 您, exclamation marks; reviewed exceptions live in `src/i18n/copy-allowlist.json`, each with a reason. `--only home` reports one module; `--vocab` adds the brief's vocabulary advice |
-| `test:calc`, `test:lib` | the subsidy and cost engine (`src/lib/calc`) and the date logic (`src/lib`) |
-| `build-share-cards.mjs --check` | a share image whose text no longer matches the copy |
+| `test:calc`, `test:lib` | the subsidy and cost engine (`src/lib/calc`); the date logic and the home-page money tables (`src/lib`); the calculator's opening (`src/components/pages/electric`); the air rule of the drawings (`src/components/art`); the charts (`src/components/charts`) |
+| `build-share-cards.mjs --check` | a share image whose words or picture sources changed since it was rendered (see "Share cards") |
+| `film-export.mjs --check` | an MP4 of the film whose timeline, captions, numbers or drawings changed since it was exported (see "The film") |
 | `astro check` | type errors |
 
 **The site check** runs on a built site rather than on the source, so it is not part of
@@ -66,6 +67,19 @@ themes, the page without JavaScript, reduced motion, scene alt text and tags, an
 calculator's opening state. Each check prints pass or fail with the page and the text.
 `--report file.json` keeps the whole result. The script's header lists the markup hooks it reads.
 
+Three of its rules are this project's reading of the brief, stated so nobody is surprised:
+
+- **Words per screen** (check 9) count Han characters only, and of the sentences that follow a
+  switch only the longest, the way `src/components/ui/screen-limits.ts` counts them when the page
+  is built. Chinese is the designed page: at most 850 px a screen and 12,300 px in all at
+  360 × 740. English says the same sentence for sentence and runs about a fifth longer, so it has
+  its own budget, the Chinese one × 1.2 (1,020 and 14,760 px), rather than English copy cut short.
+- **Body text** (checks 11 and 14) is a `<p>` in `<main>` outside labels, captions, chips, sheets
+  and source lines; a block whose class names it as one of those (`quiet`, `caption`, `note`,
+  `source` or `src`, `chip`, …) is held to the label rules (14 px, 4.5:1) instead of 18 px and 7:1.
+- **Targets 8 px apart** (check 12): a bar fixed to the screen (the calculator's result bar) is
+  not compared with whatever it happens to cover as the page scrolls.
+
 ## How it is organised
 
 | Where | What |
@@ -77,8 +91,11 @@ calculator's opening state. Each check prints pass or fail with the page and the
 | `src/data/econ/` | the subsidy and cost data the calculator uses: `programmes/` (one file per payer: central government, each city and county), `vehicles.ts`, `energy.ts`, `running.ts`, `jurisdictions.ts` |
 | `src/lib/calc/` | the calculation engine; pure functions with tests |
 | `src/lib/site-state.ts` | which subsidy "phase" applies on a given date (see "Dates") |
-| `src/components/charts/` | the chart library: `core/*.ts` draws each chart as an SVG string, the same code at build time and in the browser |
-| `docs/redesign-brief.md` | **the build brief**: the home page's 15 screens, the rules for showing estimates and measurements, wording, pictures, the film, every other page, and the acceptance checks. Its section 12 overrides the rest. `docs/editorial-blueprint.md` is the earlier blueprint, kept for history and superseded where they differ |
+| `src/components/ui/` | the shared frame: `Screen`, `ScreenRail`, `KindChip` (the five chips), `EstimateValue`, `HowSheet` (the 怎麼知道的？ sheet), `NextButton`, `Segmented`, `ScenarioSwitch`, `IllustrationTag` |
+| `src/components/art/` | the drawings: `air.ts` (the one rule for drawing exhaust as an amount, brief 5.1) and one scene per picture (`HeroStreet`, `TailpipeMarks`, `KerbScene`, `BodyFigure`, `RoadOfTime`, `HeightsScene`, `RiderScene`, `MaskScene`, `SwapScene`, `TenScooters`, …) |
+| `src/components/charts/` | the chart library: `core/*.ts` draws each chart as an SVG string, the same code at build time and in the browser; `MeasuredVsEstimate`, `PriceBars`, `MonthlyBars`, `WorkingSum` are the redesign's charts |
+| `src/lib/home-money.ts` | every money figure on the home page, the film and `/electric/`, from the calculator engine, for today and for each coming date on which the sums change |
+| `docs/redesign-brief.md` | **the build brief**: the home page's 15 screens, the rules for showing estimates and measurements, wording, pictures, the film, every other page, and the acceptance checks. Its section 12 overrides the rest; section 13 says what was built differently and why. `docs/editorial-blueprint.md` is the earlier blueprint, kept for history and superseded where they differ |
 | `research/` | the research notes and per-paper checks the registry was built from; `research/estimate/` is the signed kerbside estimate (below); `research/masks/VERIFIED.json` the checked facts on masks |
 | `scripts/` | the checks, the share-card renderer and the headline-font builder |
 | `public/` | files served as they are: icons, manifest, share images |
@@ -140,6 +157,26 @@ node scripts/film-export.mjs --check    # fails if the committed MP4s no longer 
 
 Re-export after any change to the film's beats, captions or the numbers it shows, as for the
 share cards.
+
+## Share cards
+
+Every page has a link-preview picture in two sizes, 1200 × 630 (`og:image`) and 1080 × 1080
+(LINE), in both languages, under `public/share/`. Each card is drawn by a page of the site,
+`/print/card/<id>/`, which is only built when the renderer asks for it, so the cards use the same
+scenes and the same air rule as the pages. A card with an estimated number carries 推估 and its
+range inside the picture. Words come from `src/lib/share-cards.ts` and `src/i18n/pages/share.ts`.
+
+```sh
+npm run share-cards                 # render every card (Playwright with Chromium), then commit public/share/
+npm run share-cards -- mask         # only the cards whose id contains "mask"
+npm run share-cards -- --out /tmp/cards   # a preview somewhere else; the manifest is not touched
+```
+
+`--check` (part of `npm run check`) fails when a card's words or the drawings it is made from
+changed since it was rendered. The address printed on a card is the live one,
+`likelylabs.com/scooterair`; set `SHARE_CARD_HOST` when rendering if the site moves. The old
+addresses `/questions/how-much/` and `/questions/electric/` are redirects that keep their own
+card, so an old share still shows its picture.
 
 ## Deployment
 

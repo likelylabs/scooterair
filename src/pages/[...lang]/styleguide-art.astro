@@ -1,552 +1,99 @@
 ---
 /**
- * Art styleguide — every frame, prop and piece of the art workstream
- * (blueprint 3.0, V1, V6, V7, V10, V14, V16, V35), in both languages.
- * noindex. Page builders: read this before placing a scene.
+ * /styleguide-art/ — every scene of the redesign on one page (brief 5.2), for `astro dev` only.
+ * Not built in production (brief section 2): getStaticPaths returns nothing when PROD.
+ *
+ * The scenes are shown as the pages use them, outside a Screen, so each carries its own tag.
+ * Copy here is a developer's caption, not reader copy (the file is in the copy guard's
+ * inlineCopyAllowed list).
  */
 import Base from '@/layouts/Base.astro';
 import { localeFromParam, localeStaticPaths } from '@/i18n';
-import { art } from '@/i18n/art';
-
+import { chipWhere } from '@/i18n/ui';
+import HeroStreet from '@/components/art/HeroStreet.astro';
+import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
+import AirKey from '@/components/art/AirKey.astro';
 import ApproachPlan from '@/components/art/ApproachPlan.astro';
-import Haze from '@/components/art/Haze.astro';
-import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
-import PollutantKey from '@/components/art/PollutantKey.astro';
-import SceneCompare from '@/components/art/SceneCompare.astro';
-import Scooter from '@/components/art/Scooter.astro';
-import ScrambleCrossing from '@/components/art/ScrambleCrossing.astro';
-import Signal from '@/components/art/Signal.astro';
-import SignalCycle from '@/components/art/SignalCycle.astro';
+import KerbScene from '@/components/art/KerbScene.astro';
+import AirRange from '@/components/art/AirRange.astro';
+import BodyFigure from '@/components/art/BodyFigure.astro';
+import RoadOfTime from '@/components/art/RoadOfTime.astro';
+import HeightsScene from '@/components/art/HeightsScene.astro';
+import RiderScene from '@/components/art/RiderScene.astro';
+import MaskScene from '@/components/art/MaskScene.astro';
+import SwapScene from '@/components/art/SwapScene.astro';
+import TenScooters from '@/components/art/TenScooters.astro';
+import StationScene from '@/components/art/StationScene.astro';
 import SmellStrip from '@/components/art/SmellStrip.astro';
-import StreetScene from '@/components/art/StreetScene.astro';
+import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
+import Signal from '@/components/art/Signal.astro';
 
-// A builders' page: served by `astro dev` only. The production build makes no page for it
-// (redesign brief section 2), so it can never ship to readers.
 export const getStaticPaths = () => (import.meta.env.PROD ? [] : localeStaticPaths());
 const locale = localeFromParam(Astro.params.lang);
-const en = locale === 'en';
-const L = (zh: string, enText: string) => (en ? enText : zh);
-
-const frames = [
-  {
-    id: 'empty',
-    k: 'K0',
-    use: L('序、結尾', 'Prologue, close'),
-    note: L(
-      '紅燈，倒數 90。停等區和待轉區都空著。轉角是戴黃帽的小學生和拄拐杖的年長女性；一個大人推著嬰兒車走向斑馬線。沒有斜線、沒有波紋、沒有圓圈。細點和每一格一樣。',
-      'Red, countdown 90. The stop box and the turn box are empty. On the corner: the schoolchild in the yellow cap and an older woman with a cane; an adult pushes a stroller toward the crosswalk. No hatching, no ribbons, no rings. The stipple is as in every frame.',
-    ),
-  },
-  {
-    id: 'pack',
-    k: 'K1',
-    use: L('第 1 環', 'Link 1'),
-    note: L(
-      '車陣到了：停等區停滿，待轉區四台，車尾朝著斑馬線。前排一位騎士把鏡片掀起來，看得到臉。行人從車陣前面過馬路。路面到一公尺是斜線，畫面裡直接寫著「有廢氣｜多濃沒人量過」。波紋只在排氣管口。',
-      'The pack has arrived: the stop box is full and four scooters wait in the turn box with their tails toward the crosswalk. One front-row rider has the visor up and a visible face. People cross in front of the pack. From the road to one metre is hatching, labelled in the frame “exhaust present | amount not measured”. Ribbons sit only at tailpipe mouths.',
-    ),
-  },
-  {
-    id: 'kerb',
-    k: 'K2',
-    use: L('第 2、4、6 環', 'Links 2, 4, 6'),
-    note: L(
-      '路緣高度的近景。0 到 180 公分的尺；第一公尺是同一層斜線，標「排氣管在這一公尺裡」；嬰兒車高度 55–85 公分用括號和一條平塗的帶子標出；口鼻高度是刻度，不是圓圈（圓圈是一氧化碳）。小學生比嬰兒車那一段高。待轉區和斑馬線之間標出 50 公分。',
-      'Kerb-level close-up. A ruler from 0 to 180 cm; the first metre is the same hatching, labelled “tailpipes are in this first metre”; the stroller band, 55–85 cm, is a bracket and a flat strip; mouths are ticks, never rings (rings mean carbon monoxide). The schoolchild stands above the stroller band. The 50 cm between crosswalk and turn box is dimensioned.',
-    ),
-  },
-  {
-    id: 'paused',
-    k: 'K3',
-    use: L('第 3、5 環（放在資料後面）', 'Links 3 and 5 (behind data)'),
-    note: L(
-      'K1 轉成灰階並淡化，號誌旁寫「倒數暫停」，LED 預設停在 38。斜線的標籤拿掉，讓圖表疊在上面。',
-      'K1 in greyscale and dimmed, with the chip “countdown paused” by the signal; the LED defaults to 38. The band label is dropped so a chart can sit on top.',
-    ),
-  },
-  {
-    id: 'green',
-    k: 'K4',
-    use: L('綠燈亮的那一秒', 'The second it turns green'),
-    note: L(
-      '號誌轉綠。前排機車已經過了斑馬線，待轉區的車走了；小黃帽一隻腳踏下路緣。斜線、圓圈、波紋和 K1 完全一樣：沒有多出來的煙，沒有起步的高峰。停止線上的標籤寫明，起步那一下國外量的是汽車和柴油車。',
-      'The signal is green. The front scooters are past the crosswalk and the turn-box riders have gone; the yellow cap has one foot off the kerb. Hatching, rings and ribbons are exactly as in K1: no extra puffs, no pull-away surge. The tag at the stop line says pull-away was measured abroad, for cars and diesel vehicles.',
-    ),
-  },
-  {
-    id: 'clean',
-    k: 'K5',
-    use: L('第 7 環', 'Link 7'),
-    note: L(
-      '同一個路口、同一個紅燈、同一群人，機車換成電動的。這一排沒有波紋、沒有圓圈、沒有斜線。細點不變。遠處車道的汽車還留著一小段波紋：其他車流還在。',
-      'The same crossing, the same red light, the same people, with electric scooters. This row has no ribbons, no rings and no hatching. The stipple is unchanged. The car in the far lane keeps one small ribbon: other traffic is still there.',
-    ),
-  },
+const L = (zh: string, en: string) => (locale === 'en' ? en : zh);
+const posts = [
+  { when: L('5 分鐘', '5 minutes'), text: L('心跳的節奏小小變了一下', 'The heart’s rhythm shifted a little'), kind: 'study', where: chipWhere.taiwan[locale] },
+  { when: L('2 小時', '2 hours'), text: L('氣喘的人，肺功能小幅下降', 'Lung function dipped slightly'), kind: 'study', where: chipWhere.abroad[locale] },
+  { when: L('很多年', 'Many years'), text: L('氣喘、心臟病、肺癌比較多', 'More asthma, heart disease, lung cancer'), kind: 'study', where: chipWhere.international[locale] },
 ] as const;
+const scenes = [
+  { id: 'g1', name: 'G1 · HeroStreet (red)' },
+  { id: 'g14', name: 'G14 · HeroStreet (green)' },
+  { id: 'g2', name: 'G2 · TailpipeMarks + AirKey' },
+  { id: 'g3', name: 'G3 · ApproachPlan' },
+  { id: 'g4', name: 'G4 · KerbScene (all scenarios) + AirRange' },
+  { id: 'g6', name: 'G6 · BodyFigure' },
+  { id: 'g7', name: 'G7 · RoadOfTime' },
+  { id: 'g8', name: 'G8 · HeightsScene' },
+  { id: 'g9', name: 'G9 · RiderScene' },
+  { id: 'g17', name: 'G17 · MaskScene' },
+  { id: 'g10', name: 'G10 · SwapScene' },
+  { id: 'g11', name: 'G11 · TenScooters' },
+  { id: 'other', name: 'StationScene · SmellStrip · MeasurementDiagram · Signal' },
+];
 ---
 
-<Base
-  locale={locale}
-  title={L('插畫：紅燈現場', 'Art: the red light')}
-  description={L('紅燈現場的六個畫面、空氣的畫法，以及所有插畫元件的用法。', 'The six frames of the red light, how air is drawn, and how to use every art component.')}
-  noindex
->
-  <div class="container sa-hero">
-    <p class="eyebrow">{L('插畫工作流 · 設計系統', 'Art workstream · design system')}</p>
-    <h1 class="display">{L('紅燈現場', 'The red light')}</h1>
-    <p class="lead">
-      {L(
-        '首頁的每一章放一格靜態畫面，一共六格。這一頁列出每一格、每個屬性，以及配套的平面圖、標示和圖例。',
-        'Each chapter of the home page places one static frame; there are six. This page shows every frame and prop, with the plan, the strips and the key that go with them.',
-      )}
-    </p>
-    <div class="sa-rule">
-      <p class="sa-rule__h">{L('唯一不能破的規則', 'The one rule that cannot bend')}</p>
-      <p>
-        {L(
-          '沒有人量過行人在這個路口吸進多少，所以畫面永遠不畫「濃度」。斜線只有一種密度，圓圈只有一個數量，細點整條街一樣密，波紋只有一種長度；它們不隨倒數改變。畫面之間的差別只有「有什麼」，沒有「有多少」。',
-          'Nobody has measured what pedestrians breathe at this crossing, so the scene never draws a concentration. The hatching has one density, the rings one count, the stipple one density across the street, the ribbons one length, and none of them changes with the countdown. Frames differ in what is present, never in how much.',
-        )}
-      </p>
-    </div>
-    <nav class="sa-toc" aria-label={L('本頁目錄', 'On this page')}>
-      <a href="#geometry">{L('路口', 'The crossing')}</a>
-      <a href="#frames">{L('六格畫面', 'Six frames')}</a>
-      <a href="#props">{L('屬性', 'Props')}</a>
-      <a href="#air">{L('空氣的畫法', 'How air is drawn')}</a>
-      <a href="#compare">{L('對照與帳本', 'Compare and ledger')}</a>
-      <a href="#strips">{L('標示', 'Strips')}</a>
-      <a href="#measure">{L('量測建議圖', 'Measurement diagram')}</a>
-      <a href="#pieces">{L('零件', 'Pieces')}</a>
-    </nav>
+<Base locale={locale} title={L('場景樣張', 'Scene sheet')} noindex>
+  <div class="container sg">
+    <h1>{L('場景樣張（只在開發時）', 'Scene sheet (development only)')}</h1>
+    <ol class="sg__toc">{scenes.map((s) => <li><a href={`#${s.id}`}>{s.name}</a></li>)}</ol>
+
+    <section id="g1"><h2>G1</h2><HeroStreet locale={locale} tag="street" /></section>
+    <section id="g14"><h2>G14</h2><HeroStreet locale={locale} phase="green" tag="street" /></section>
+    <section id="g2"><h2>G2</h2><TailpipeMarks locale={locale} tag="street" /><AirKey locale={locale} layout="row" /></section>
+    <section id="g3"><h2>G3</h2><ApproachPlan locale={locale} tag="street" /></section>
+    <section id="g4">
+      <h2>G4</h2>
+      <KerbScene locale={locale} scenario="dozen" tag="street" />
+      <div class="sg__row"><AirRange locale={locale} scenario="dozen" /></div>
+    </section>
+    <section id="g6"><h2>G6</h2><BodyFigure locale={locale} tag="body" /></section>
+    <section id="g7"><h2>G7</h2><RoadOfTime locale={locale} posts={posts as any} /></section>
+    <section id="g8"><h2>G8</h2><HeightsScene locale={locale} tag="street" /></section>
+    <section id="g9"><h2>G9</h2><RiderScene locale={locale} tag="street" /></section>
+    <section id="g17"><h2>G17</h2><MaskScene locale={locale} tag="street" /></section>
+    <section id="g10"><h2>G10</h2><SwapScene locale={locale} tag="street" /></section>
+    <section id="g11"><h2>G11</h2><TenScooters locale={locale} tag="street" /></section>
+    <section id="other">
+      <h2>{L('其他', 'Others')}</h2>
+      <StationScene locale={locale} tag="street" />
+      <SmellStrip locale={locale} />
+      <MeasurementDiagram locale={locale} />
+      <Signal state="red" count={90} label={L("紅燈", "Red")} />
+    </section>
   </div>
-
-  <!-- ============================================================ GEOMETRY -->
-  <section id="geometry" class="sa-section">
-    <div class="container">
-      <p class="eyebrow">V6 · ApproachPlan</p>
-      <h2>{L('路口，講一次，大家畫同一個', 'The crossing, stated once')}</h2>
-      <div class="sa-two">
-        <div class="prose">
-          <p>
-            {L(
-              '兩條街 A 和 B。畫面從 B 街的右側人行道看過去，B 是紅燈，車行方向由左到右。',
-              'Two streets, A and B. The scene is seen from the right-hand pavement of street B while B is red; traffic runs left to right.',
-            )}
-          </p>
-          <ul>
-            <li>{L('B 的車陣停在停止線後方的機慢車停等區。排氣管朝後，對著後面的車，不是行人。', 'B’s pack waits in the scooter stop box behind the stop line. Their tailpipes point back at the queue, not at pedestrians.')}</li>
-            <li>{L('停止線前面是斑馬線。B 紅燈的時候，過 B 街的人走這裡，從車陣前面過。', 'Ahead of the line is the crosswalk. People crossing street B walk it during B’s red, in front of the pack.')}</li>
-            <li>{L('斑馬線再往前、路口裡面，是待轉區。從 A 街來的騎士在這裡等同一個綠燈，車頭朝 B 的行進方向，車尾朝著斑馬線。', 'Beyond the crosswalk, inside the junction, is the two-stage turn box. Riders from street A wait in it for the same green, facing B’s direction of travel, tails toward the crosswalk.')}</li>
-            <li>{L('小黃帽站在轉角，等著過 A 街。他和車陣等的是同一個紅燈，綠燈一亮，和機車平行往前走。', 'The yellow cap stands on the corner, waiting to cross street A. The child shares the pack’s red and, on its green, walks forward parallel to the scooters.')}</li>
-          </ul>
-          <p class="meta">
-            {L(
-              '依據：道路交通標誌標線號誌設置規則第 174-2 條（停等區在停止線後方，縱深 2.5 到 6 公尺）、第 191 條（待轉區在行人穿越道前方，後緣距穿越道線 50 公分以上，得酌予調整）。停止線到斑馬線的距離、車道寬、待轉區的縱深不在這幾條裡，圖上沒有標尺寸。',
-              'Basis: marking rules Art. 174-2 (stop box behind the stop line, 2.5 to 6 m deep) and Art. 191 (turn box beyond the crosswalk, rear edge at least 50 cm from the crosswalk line, adjustable). The stop-line-to-crosswalk distance, lane widths and turn-box depth are not in those articles and are not dimensioned.',
-            )}
-          </p>
-        </div>
-        <div>
-          <ApproachPlan locale={locale} />
-          <pre class="sa-code" tabindex="0"><code>{`<ApproachPlan locale={locale} />
-<ApproachPlan locale={locale} kind="electric" labels={false} caption={false} />`}</code></pre>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ FRAMES -->
-  <section id="frames" class="sa-section">
-    <div class="container">
-      <p class="eyebrow">V1 · StreetScene</p>
-      <h2>{L('六格畫面', 'Six frames')}</h2>
-      <p class="lead">
-        {L(
-          '每一格都是靜態的，沒有動畫。窄容器（小於 44rem）自動換成精簡構圖。每一格左下角都印著「示意圖・不是量測」。',
-          'Every frame is static; nothing animates. Containers narrower than 44rem get a compact composition automatically. Every frame prints “Illustration, not a measurement” in its corner.',
-        )}
-      </p>
-    </div>
-    {frames.map((f) => (
-      <article class="sa-frame" id={`frame-${f.id}`}>
-        <div class="container sa-frame__head">
-          <h3><span class="sa-k">{f.k}</span> <code>frame="{f.id}"</code></h3>
-          <p class="meta">{L('用在：', 'Used in: ')}{f.use}</p>
-          <p class="sa-frame__note">{f.note}</p>
-        </div>
-        <div class="sa-frame__art"><StreetScene locale={locale} frame={f.id} /></div>
-      </article>
-    ))}
-    <div class="container">
-      <pre class="sa-code" tabindex="0"><code>{`<Chapter locale={locale} id="link-1" link={1} haze={0.5} hazeKind="unmeasured" title="…">
-  <StreetScene slot="art" locale={locale} frame="pack" count={90} />
-</Chapter>`}</code></pre>
-    </div>
-  </section>
-
-  <!-- ============================================================ PROPS -->
-  <section id="props" class="sa-section tone-sunken">
-    <div class="container">
-      <p class="eyebrow">StreetScene</p>
-      <h2>{L('屬性', 'Props')}</h2>
-
-      <h3 class="sa-h"><code>emphasis</code></h3>
-      <p class="sa-p">
-        {L(
-          '讓其中一層保持完整對比，其他層退後。K2 預設是 heights。它只改變對比，不增加任何東西：圓圈還是那幾個，細點還是一樣密。',
-          'Keeps one layer at full contrast and lets the others recede. K2 defaults to heights. It changes contrast only and adds nothing: the same rings, the same stipple.',
-        )}
-      </p>
-      <div class="grid sa-grid">
-        {(['heights', 'fumes', 'co', 'ufp'] as const).map((e) => (
-          <figure>
-            <StreetScene locale={locale} frame="kerb" emphasis={e} variant="compact" />
-            <figcaption class="meta"><code>frame="kerb" emphasis="{e}"</code></figcaption>
-          </figure>
-        ))}
-      </div>
-
-      <h3 class="sa-h"><code>count</code></h3>
-      <p class="sa-p">
-        {L(
-          'LED 上的數字，0 到 99。預設：empty、pack、clean 是 90，paused 是 38，green 和 kerb 不顯示。倒數怎麼走由頁面決定（章節的 kicker 也要用文字寫出秒數）；畫面本身不會因為數字不同而改變。',
-          'The LED number, 0 to 99. Defaults: 90 for empty, pack and clean; 38 for paused; none for green and kerb. The page decides how the countdown runs (and each chapter’s kicker prints the seconds as text); the picture itself never changes with the number.',
-        )}
-      </p>
-      <div class="grid sa-grid">
-        {[78, 64, 5].map((n) => (
-          <figure>
-            <StreetScene locale={locale} frame="pack" count={n} variant="compact" />
-            <figcaption class="meta"><code>frame="pack" count={`{${n}}`}</code> {L('：除了數字，三張圖一模一樣', ': apart from the number, the three pictures are identical')}</figcaption>
-          </figure>
-        ))}
-      </div>
-
-      <h3 class="sa-h"><code>variant</code> · <code>labels</code> · <code>state</code></h3>
-      <ul class="prose sa-list">
-        <li><code>variant="auto"</code> {L('（預設）依容器寬度切換；也可以固定成 compact 或 wide。', '(default) switches on container width; or force compact or wide.')}</li>
-        <li><code>labels={`{false}`}</code> {L('拿掉畫面裡的說明文字。「示意圖・不是量測」和 K2 尺上的數字一定會留著。', 'drops the in-frame labels. “Illustration, not a measurement” and the ruler numbers in K2 always stay.')}</li>
-        <li><code>state</code> {L('是舊屬性：red 等於 frame="pack"，clean 等於 frame="clean"。新頁面請用 frame。', 'is the old prop: red maps to frame="pack", clean to frame="clean". New pages use frame.')}</li>
-      </ul>
-    </div>
-
-    <div class="tone-inverse sa-night">
-      <div class="container">
-        <p class="eyebrow">tone="night"</p>
-        <p class="sa-p">{L('K3 放在深色章節（第 3 環）裡，上面疊圖表。', 'K3 inside a night chapter (Link 3), with a chart to be laid over it.')}</p>
-      </div>
-      <StreetScene locale={locale} frame="paused" />
-    </div>
-  </section>
-
-  <!-- ============================================================ AIR -->
-  <section id="air" class="sa-section">
-    <div class="container">
-      <p class="eyebrow">Haze · PollutantKey</p>
-      <h2>{L('空氣的畫法', 'How air is drawn')}</h2>
-      <div class="sa-two">
-        <div class="prose">
-          <p>
-            {L(
-              '斜線是地圖上「沒有資料」的畫法：它說「在哪裡」，不說「有多少」。上緣是虛線，因為這一層到多高也沒有人量過。',
-              'Hatching is what a map uses for “no data”: it says where, and declines to say how much. Its top edge is dashed because how high the layer reaches has not been measured either.',
-            )}
-          </p>
-          <p>
-            {L(
-              'Chapter 用 haze={0.5} hazeKind="unmeasured" 把這一層放在章節底部。對這個種類來說，haze 只決定畫或不畫：大於 0 就畫出同一條帶子，數值不改變它的樣子。',
-              'Chapter places it along its bottom edge with haze={0.5} hazeKind="unmeasured". For this kind, haze only switches the band on or off: any value above 0 draws the same band.',
-            )}
-          </p>
-          <p class="meta">
-            {L(
-              '舊的種類（all、fumes、co、ufp）是有濃淡的霧，還留著只是為了不讓舊頁面壞掉，不要再用在紅燈現場旁邊。',
-              'The older kinds (all, fumes, co, ufp) are density-graded washes. They remain only so older pages keep building; do not use them beside the red-light scene.',
-            )}
-          </p>
-        </div>
-        <div class="stack">
-          <div class="sa-hazebox"><code>kind="unmeasured" density={`{0.5}`}</code><Haze kind="unmeasured" density={0.5} locale={locale} /></div>
-          <div class="sa-hazebox"><code>kind="unmeasured" density={`{1}`}</code> {L('（一樣）', '(the same)')}<Haze kind="unmeasured" density={1} locale={locale} /></div>
-          <div class="sa-hazebox tone-inverse"><code>tone="night"</code><Haze kind="unmeasured" density={0.5} locale={locale} /></div>
-        </div>
-      </div>
-
-      <h3 class="sa-h">PollutantKey</h3>
-      <PollutantKey locale={locale} />
-      <pre class="sa-code" tabindex="0"><code>{`<PollutantKey locale={locale} />
-<PollutantKey locale={locale} layers={['fumes', 'co', 'ufp']} note={false} />   {/* 第 4 環：三層 */}`}</code></pre>
-    </div>
-  </section>
-
-  <!-- ============================================================ COMPARE -->
-  <section id="compare" class="sa-section tone-clean">
-    <div class="container">
-      <p class="eyebrow">V16 · SceneCompare</p>
-      <h2>{L('同一個紅燈，再來一次', 'The same red light, again')}</h2>
-      <p class="lead">
-        {L(
-          '開關切換 K1 和 K5（單選鈕，不需要 JavaScript）。下面的帳本固定三欄：消失的、留下的、搬走的。',
-          'The switch swaps K1 and K5 (radio buttons; no JavaScript needed). The ledger under it always has three columns: gone, still here, moved elsewhere.',
-        )}
-      </p>
-    </div>
-    <SceneCompare locale={locale} name="sa-compare" />
-    <div class="container">
-      <pre class="sa-code" tabindex="0"><code>{`<SceneCompare locale={locale} />
-<SceneCompare locale={locale} initial="clean" ledger={false} />
-<SceneCompare locale={locale}><Fragment slot="ledger"> …自己的帳本，可以放 <Cite /> … </Fragment></SceneCompare>`}</code></pre>
-    </div>
-  </section>
-
-  <!-- ============================================================ STRIPS -->
-  <section id="strips" class="sa-section">
-    <div class="container">
-      <p class="eyebrow">V10 · V14</p>
-      <h2>{L('兩條標示', 'Two strips')}</h2>
-      <div class="sa-two">
-        <div>
-          <h3 class="sa-h">SmellStrip <span class="meta">V10</span></h3>
-          <SmellStrip locale={locale} />
-          <p class="meta sa-p">{L('只在第 4 環用一次。它不替任何一樣東西排名，只說哪些聞得到、哪些聞不到。', 'Used once, in Link 4. It ranks nothing; it says only what can and cannot be smelled.')}</p>
-          <pre class="sa-code" tabindex="0"><code>{`<SmellStrip locale={locale} />`}</code></pre>
-        </div>
-        <div>
-          <h3 class="sa-h">SignalCycle <span class="meta">V14</span></h3>
-          <SignalCycle locale={locale} />
-          <p class="meta sa-p">{L('沒有曲線，也沒有數值軸：它只說兩件事各發生在什麼時候。badge 和 gap 兩個插槽可以換成正式的證據徽章。', 'No curve and no value axis: it says only when two things happen. The badge and gap slots take the real evidence badges.')}</p>
-          <pre class="sa-code" tabindex="0"><code>{`<SignalCycle locale={locale}>
-  <EvidenceBadge slot="badge" … />
-  <EvidenceBadge slot="gap" … />
-</SignalCycle>`}</code></pre>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ MEASURE -->
-  <section id="measure" class="sa-section tone-sunken">
-    <div class="container">
-      <p class="eyebrow">V35 · MeasurementDiagram</p>
-      <h2>{L('要怎麼量，才填得滿那一格', 'What it would take to fill the empty box')}</h2>
-      <p class="lead">{L('給「沒有人量過的事」那一頁。蓋著「本站提議」的章，因為還沒有任何單位採用。', 'For the “what nobody has measured” page. It is stamped “our proposal” because no agency has adopted it.')}</p>
-      <MeasurementDiagram locale={locale} level={3} />
-      <pre class="sa-code" tabindex="0"><code>{`<MeasurementDiagram locale={locale} />
-<MeasurementDiagram locale={locale} level={3} />   {/* 四個小標的標題層級，預設 4；設成上一層標題的下一級 */}`}</code></pre>
-      <p class="meta">{L('level 只改四個小標在大綱裡的層級（h2 到 h6），樣子不變。這一頁的圖放在 h2 底下，所以用 level={3}。', 'level changes only where the four panel titles sit in the outline (h2 to h6); they look the same. Here the diagram sits under an h2, so it uses level={3}.')}</p>
-    </div>
-  </section>
-
-  <!-- ============================================================ PIECES -->
-  <section id="pieces" class="sa-section">
-    <div class="container">
-      <p class="eyebrow">Scooter · Signal · ScrambleCrossing</p>
-      <h2>{L('零件', 'Pieces')}</h2>
-      <div class="grid sa-grid">
-        <figure><Scooter kind="gas" label={art.scooter.gas[locale]} /><figcaption class="meta"><code>kind="gas"</code> {L('：排氣管口一段固定長度的波紋', ': one ribbon of fixed length at the tailpipe mouth')}</figcaption></figure>
-        <figure><Scooter kind="electric" label={art.scooter.electric[locale]} /><figcaption class="meta"><code>kind="electric"</code> {L('：後輪後面什麼都沒有', ': nothing behind the rear wheel')}</figcaption></figure>
-        <figure><Scooter kind="gas" rider face label={art.scooter.gas[locale]} /><figcaption class="meta"><code>rider face</code> {L('：鏡片掀起，看得到臉', ': visor up, a visible face')}</figcaption></figure>
-        <figure><Scooter kind="electric" rider flip label={art.scooter.electric[locale]} /><figcaption class="meta"><code>rider flip</code></figcaption></figure>
-      </div>
-      <p class="meta sa-p">
-        {L(
-          '兩台都是通用的速克達造型，沒有任何品牌的線條、標誌或代表色。軸距和姿態相同，可以並排比較。',
-          'Both are generic step-through scooters with no brand’s lines, badge or signature colour. They share a wheelbase and stance so they can sit side by side.',
-        )}
-      </p>
-      <div class="sa-two" style="margin-block-start: var(--sp-6)">
-        <div>
-          <h3 class="sa-h">Signal</h3>
-          <div class="cluster">
-            <Signal state="red" count={90} size="4.5rem" label={L('紅燈，倒數 90', 'Red, 90')} />
-            <Signal state="red" count={38} size="4.5rem" />
-            <Signal state="green" size="2.8rem" label={L('綠燈', 'Green')} />
-            <Signal state="red" size="2.8rem" />
-          </div>
-        </div>
-        <div>
-          <h3 class="sa-h">ScrambleCrossing</h3>
-          <div class="sa-scramble"><ScrambleCrossing kind="gas" label={L('行人專用時相路口的俯視示意圖。', 'Illustrative top view of a pedestrian-scramble junction.')} /></div>
-          <p class="meta sa-p">{L('已改成新的畫法：廢氣色只出現在每台車的車尾。', 'Updated to the new vocabulary: the exhaust colour appears only at each scooter’s tail.')}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ RULES -->
-  <section class="sa-section tone-sunken">
-    <div class="container">
-      <p class="eyebrow">{L('給之後畫圖的人', 'For whoever draws next')}</p>
-      <h2>{L('和第一版畫法的差別', 'What changed from the first art direction')}</h2>
-      <ul class="prose sa-list">
-        <li>{L('霧不再是由下往上變淡的漸層，也不再隨倒數變濃。低層是一條斜線帶，每一格相同。', 'The haze is no longer a gradient that fades upward, and it no longer thickens with the countdown. The low layer is one hatched band, the same in every frame.')}</li>
-        <li>{L('暖色波紋只畫在排氣管口，長度固定；不再鋪滿地面。', 'Warm ribbons are drawn only at tailpipe mouths, at one length; they no longer carpet the ground.')}</li>
-        <li>{L('空心圓（一氧化碳）在斜線帶裡，數量固定。', 'Hollow rings (carbon monoxide) sit inside the band, at a fixed count.')}</li>
-        <li>{L('細點（超細微粒）整條街一樣密，不從機車往上飄；它屬於車流，電動那一格也有。', 'Stipple (ultrafine particles) has one density across the street and does not rise from the scooters; it belongs to traffic and stays in the electric frame.')}</li>
-        <li>{L('口鼻不再用圓圈標，改成刻度：圓圈現在只代表一氧化碳。', 'Mouths are no longer ringed; they are ticks. A ring now only ever means carbon monoxide.')}</li>
-        <li>{L('小學生畫成大約 120 公分，比嬰兒車那一段（55–85 公分）高。', 'The schoolchild is drawn about 120 cm tall, above the stroller band (55–85 cm).')}</li>
-        <li>{L('過馬路的人畫成正面：他們是橫越鏡頭看過去的那條街。等在轉角的人和騎士維持側面。', 'People crossing are drawn from the front: they are crossing the street the camera looks along. People waiting on the corner, and riders, stay in profile.')}</li>
-        <li>{L('每個車陣畫面裡有一位前排騎士看得到臉。騎士是人，不是「煙」。', 'One front-row rider in every pack frame has a visible face. Riders are people, not “the smoke”.')}</li>
-        <li>{L('畫面是靜態的。沒有飄移、沒有噴煙、沒有會跑的倒數。', 'The scene is static. No drift, no puffs, no running countdown.')}</li>
-      </ul>
-    </div>
-  </section>
 </Base>
 
 <style>
-  .sa-hero {
-    display: grid;
-    gap: var(--sp-4);
-    justify-items: start;
-    padding-block: var(--sp-7) var(--sp-5);
+  .sg section {
+    margin-block: 2.5rem;
+    max-width: 40rem;
   }
-  .sa-rule {
-    max-inline-size: 46rem;
-    padding: var(--sp-4);
-    border: var(--rule-paint) solid var(--ink);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
+  .sg__toc {
+    columns: 2 14rem;
   }
-  .sa-rule__h {
-    margin-block-end: var(--sp-2);
-    font-weight: var(--fw-black);
-    font-size: var(--fs-md);
-  }
-  .sa-toc {
+  .sg__row {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-4);
-    padding-block-start: var(--sp-3);
-    border-block-start: 1px solid var(--line-strong);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-  }
-  .sa-toc a {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: 2.25rem;
-  }
-  .sa-section {
-    padding-block: var(--section-y);
-    border-block-start: 1px solid var(--line);
-  }
-  .sa-section h2 {
-    margin-block: var(--sp-2) var(--sp-4);
-  }
-  .sa-two {
-    display: grid;
-    gap: var(--sp-6);
-    align-items: start;
-  }
-  .sa-two > * {
-    min-inline-size: 0;
-  }
-  @media (min-width: 60em) {
-    .sa-two {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-      gap: var(--sp-7);
-    }
-  }
-  .sa-code {
-    margin: var(--sp-4) 0 0;
-    padding: var(--sp-3) var(--sp-4);
-    overflow-x: auto;
-    background: var(--bg-sunken);
-    border-inline-start: 3px solid var(--line-strong);
-    font-size: 0.8125rem;
-    line-height: 1.55;
-  }
-  .tone-sunken .sa-code {
-    background: var(--bg);
-  }
-  .sa-code code {
-    background: none;
-    padding: 0;
-    font-size: inherit;
-  }
-  .sa-frame {
-    margin-block-start: var(--sp-7);
-  }
-  .sa-frame__head {
-    display: grid;
-    gap: var(--sp-1);
-    margin-block-end: var(--sp-3);
-  }
-  .sa-frame__head h3 {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--sp-2);
-    font-size: var(--fs-lg);
-  }
-  .sa-k {
-    padding: 0 0.4em;
-    background: var(--ink);
-    color: var(--bg);
-    font-weight: var(--fw-black);
-  }
-  .sa-frame__note {
-    max-inline-size: 46rem;
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-    color: var(--ink-2);
-  }
-  .sa-frame__art {
-    max-inline-size: 110rem;
-    margin-inline: auto;
-    border-block: 1px solid var(--line);
-  }
-  .sa-h {
-    margin-block: var(--sp-6) var(--sp-2);
-    font-size: var(--fs-md);
-  }
-  .sa-h:first-child {
-    margin-block-start: 0;
-  }
-  .sa-p {
-    max-inline-size: 46rem;
-    margin-block: var(--sp-2) var(--sp-4);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-  }
-  .sa-grid {
-    --min: 17rem;
-    --grid-gap: var(--sp-4);
-    align-items: start;
-  }
-  .sa-grid figure {
-    min-inline-size: 0;
-  }
-  .sa-grid figcaption {
-    margin-block-start: var(--sp-2);
-  }
-  .sa-list {
-    padding-inline-start: 1.2em;
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-  }
-  .sa-list li + li {
-    margin-block-start: 0.5em;
-  }
-  .sa-night {
-    margin-block-start: var(--sp-7);
-    padding-block-start: var(--sp-5);
-  }
-  .sa-hazebox {
-    position: relative;
-    block-size: 10.5rem;
-    padding: var(--sp-2) var(--sp-3);
-    border: 1px solid var(--line);
-    overflow: hidden;
-    font-size: var(--fs-xs);
-    --gutter: 0.75rem;
-  }
-  .sa-hazebox:not(.tone-inverse) {
-    background: var(--bg);
-    --here: var(--bg);
-  }
-  .sa-scramble {
-    max-inline-size: 20rem;
+    gap: 1rem;
   }
 </style>

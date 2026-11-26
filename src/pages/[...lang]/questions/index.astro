@@ -175,6 +175,9 @@ const cards = slugs.map((slug) => ({
     text-wrap: balance;
   }
   .qi-card__q a {
+    /* the whole card is the target (::after), and the link itself is at least 48 px tall */
+    display: block;
+    min-block-size: var(--tap);
     color: var(--ink);
     text-decoration: none;
   }

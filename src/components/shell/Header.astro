@@ -11,7 +11,9 @@
  * four controls, so they always fit a 320 px screen. Every control is 48 × 48 px, 8 px apart.
  *
  * Props
- *   locale  Locale
+ *   locale     Locale
+ *   switchTo   optional href for the language button (a page with no twin at the same path,
+ *              such as the 404 page, sends it to the other language's home page)
  */
 import { href, htmlLang, switchLocalePath, type Locale } from '@/i18n';
 import { nav, ui } from '@/i18n/ui';
@@ -22,8 +24,9 @@ import Settings from './Settings.astro';
 
 interface Props {
   locale: Locale;
+  switchTo?: string;
 }
-const { locale } = Astro.props;
+const { locale, switchTo } = Astro.props;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
 const path = Astro.url.pathname;
 const items = nav.map((item) => {
@@ -48,7 +51,7 @@ const items = nav.map((item) => {
 
     <div class="site-header__tools">
       <TextSize locale={locale} />
-      <a class="tool lang-switch" data-lang-switch href={switchLocalePath(path, other)} lang={htmlLang[other]} hreflang={htmlLang[other]} title={ui.switchLanguageHint[locale]}>
+      <a class="tool lang-switch" data-lang-switch href={switchTo ?? switchLocalePath(path, other)} lang={htmlLang[other]} hreflang={htmlLang[other]} title={ui.switchLanguageHint[locale]}>
         <span class="lang-switch__short" aria-hidden="true">{ui.switchLanguageShort[locale]}</span>
         <span class="lang-switch__long">{ui.switchLanguage[locale]}</span>
       </a>

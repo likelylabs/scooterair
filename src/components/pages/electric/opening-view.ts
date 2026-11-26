@@ -124,7 +124,8 @@ export function caseText(d: OpenData, T: OpenText, s: OpenState, withCharge = fa
 /** A headline whose '|' marks where it may break (each phrase stays whole in Chinese). */
 export const headHtml = (text: string) =>
   text.includes('|')
-    ? `<h3 class="op-head op-head--phrased">${text.split('|').map((x) => `<span>${esc(x.trimEnd())}</span>${x.endsWith(' ') ? ' ' : ''}`).join('')}</h3>`
+    ? // Chinese phrases stay whole (.phrase, as ui/Phrased marks them); English wraps at its spaces
+      `<h3 class="op-head op-head--phrased">${text.split('|').map((x) => `<span${/[\u4e00-\u9fff]/.test(text) ? ' class="phrase"' : ''}>${esc(x.trimEnd())}</span>${x.endsWith(' ') ? ' ' : ''}`).join('')}</h3>`
     : `<h3 class="op-head">${esc(text)}</h3>`;
 
 /** Screen 12's headline rule, from the difference ('|' marks phrase breaks). */

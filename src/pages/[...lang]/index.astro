@@ -105,7 +105,7 @@ const pins = (['nose', 'lungs', 'blood'] as const).filter((p) => verified(pinFac
 
 // ---- screen 7 --------------------------------------------------------------------------------
 const posts: [any, any, any] = [
-  { when: t.s7.posts.minutes.when, text: t.s7.posts.minutes.text, kind: 'study', where: chipWhere.taiwan[locale] },
+  { when: fill(t.s7.posts.minutes.when, { min: F.peakMinutes }), text: fill(t.s7.posts.minutes.text, { people: F.peakPeople }), kind: 'study', where: chipWhere.taiwan[locale] },
   { when: fill(t.s7.posts.hours.when, { h: F.walkHours }), text: t.s7.posts.hours.text, kind: 'study', where: chipWhere.abroad[locale] },
   { when: t.s7.posts.years.when, text: fill(t.s7.posts.years.text, { n: F.studies }), kind: 'study', where: chipWhere.international[locale] },
 ];
@@ -280,7 +280,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
       <HowSheet slot="sheet" id="how-7" locale={locale} kind="study" heads={t.s7.sheet.heads as [string, string, string]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: evidence(5) }}>
         <ul slot="block1">
-          <li>{t.s7.sheet.minutes}</li>
+          <li>{fill(t.s7.sheet.minutes, { min: F.peakMinutes, people: F.peakPeople })}</li>
           <li>{fill(t.s7.sheet.hours, { h: F.walkHours, people: F.walkPeople })}</li>
           <li>{fill(t.s7.sheet.years, { n: F.studies })}</li>
         </ul>

@@ -603,8 +603,8 @@ export const intersection = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      IOT_SENSOR['zh-TW'] + '本站換算：1.3 ppm約為每立方公尺1.5毫克，遠低於WHO一氧化碳的1小時指引值（35毫克）與15分鐘指引值（100毫克）；但這是夏天、少數幾天、低成本感測器的讀數，不是用校正過的標準儀器量的。',
-      IOT_SENSOR.en + ' Our arithmetic: 1.3 ppm is about 1.5 mg/m³, far below WHO\'s 1-hour (35 mg/m³) and 15-minute (100 mg/m³) carbon monoxide values; but these are low-cost sensor readings on a few summer days, not measurements with calibrated reference analysers.',
+      '量的是路口所有來源的空氣，不只機車，也沒有分紅燈和綠燈。每個路口只量兩天，而且是在夏天；用的是小型感測器，不是標準儀器。最高的一分鐘約 1.3 ppm，遠低於世界衛生組織的 15 分鐘指引值。',
+      'All-source air at the junction, not scooters alone, and not split by red and green. Each junction was measured for two days, in summer, with small sensors rather than reference instruments. The highest minute, about 1.3 ppm, is far below the WHO 15-minute guideline.',
     ),
     requiresCaveat: true,
     chainLink: 3,
@@ -855,6 +855,8 @@ export const acute = {
       maxPeak: v(467.4, 'ug/m3'),
       hrvLow: v(-0.9, 'percent', { note: 'per 10 µg/m3, pooled across both countries' }),
       hrvHigh: v(-2.5, 'percent'),
+      participants: v(55, 'count', { note: 'Kaohsiung participants (abstract)' }),
+      peakMinutes: v(5, 'minutes', { note: 'length of the PM2.5 peak window' }),
     },
     display: t('5分鐘高峰後心率變異度略降', 'slight HRV drop after 5-minute peaks'),
     statement: t(
@@ -1009,7 +1011,7 @@ export const longterm = {
     evidence: 'measured-tw',
     caveat: t(
       '所有車輛，不只機車：這是整體交通的占比，是用統計方法從一個路邊測站的量測拆出來的，沒有單獨量機車。它說的是空氣裡有多少來自交通，不是健康影響。' + ABSTRACT_ONLY['zh-TW'],
-      'All traffic, not scooters alone: this is the share for traffic as a whole, split out statistically from readings at one roadside station; scooters were not measured on their own. It describes where the air came from, not a health effect. ' + ABSTRACT_ONLY.en,
+      'All traffic, not scooters alone: this is the share for traffic as a whole, split out statistically from readings at one roadside station; scooter exhaust was not split out on its own. It describes where the air came from, not a health effect. ' + ABSTRACT_ONLY.en,
     ),
     requiresCaveat: true,
     chainLink: 5,
@@ -1195,7 +1197,7 @@ export const levers = {
     locator: 'APCA arts. 3, 38, 76 para 1; revoked standard in force 2012-03-01 to 2019-08-19',
     confidence: 'verified',
     evidence: 'official-tw',
-    caveat: t('罰則存在不代表紅燈怠速會被罰：現行規定只管等候超過3分鐘的車，而且是否適用於機車沒有定論；實際上有沒有對機車開罰，我們沒有查到資料。', 'A penalty on the books does not mean red-light idling is fined: the current rule covers waits over three minutes, its reach to scooters is unresolved, and we found no data on whether it is enforced against scooters.'),
+    caveat: t('罰則存在不代表紅燈怠速會被罰：現行規定只管等候超過3分鐘的車，而且是否適用於機車沒有定論；實際上有沒有對機車開罰，我們沒有查到資料。', 'A penalty on the books does not mean red-light idling is fined: the current rule covers waits over three minutes, its reach to scooters is unresolved, and we found no record of whether it is enforced against scooters.'),
     chainLink: 7,
     research: 'redlight/policy-idling#apca-idling-fine-definition; redlight/policy-idling#idling-fine-standard-revoked',
   },

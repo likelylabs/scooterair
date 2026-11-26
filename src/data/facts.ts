@@ -106,7 +106,7 @@ const TEDS_COMBINED = t(
 );
 const IOT_CAVEAT = t(
   '這是模擬結果：運輸研究所把路口實測資料輸入擴散模式，比較「有」和「沒有」這項措施兩種情況，不是在路口實際改前改後量到的。報告封面註明結論不代表交通部意見。',
-  'This is a simulation: the Institute of Transportation fed its field measurements into a dispersion model and compared the situation with and without the measure; it was not measured before and after a real change at the intersection. The report cover states its conclusions do not represent the Ministry\'s views.',
+  'This is a simulation: the Institute of Transportation fed its field measurements into a dispersion model and compared the situation with and without the measure; it is not a before-and-after reading at a real intersection. The report cover states its conclusions do not represent the Ministry\'s views.',
 );
 const ASSOCIATION_TW = t(
   '觀察性研究只能顯示關聯，不能證明因果；研究量的是所有來源或整體交通的污染，沒有單獨區分機車廢氣。',
@@ -1557,7 +1557,7 @@ const exposure = {
     evidence: 'measured-tw',
     caveat: t(
       '感測器是固定在路口的微型感測器，不是戴在行人身上；只量PM2.5與一氧化碳，沒有量苯或超細微粒。改善措施的效果是模擬，不是改前改後實測。報告封面註明結論不代表交通部意見。',
-      'The sensors were fixed micro-sensors at the intersection, not worn by pedestrians; they measured only PM2.5 and carbon monoxide, not benzene or ultrafine particles. The effects of the measures were simulated, not measured before and after. The report cover states its conclusions do not represent the Ministry\'s views.',
+      'The sensors were fixed micro-sensors at the intersection, not worn by pedestrians; they measured only PM2.5 and carbon monoxide, not benzene or ultrafine particles. The effects of the measures were simulated, not read before and after a real change. The report cover states its conclusions do not represent the Ministry\'s views.',
     ),
     editorNote: 'Split from the modelled scenario facts: the design sentence is mostly measurement, so evidence is measured-tw; the dispersion-model part is stated in the caveat. The red-light sweep (redlight/intersection-peaks) could not re-open the PDF; figures rest on the first, verified reading (research/02 §1a). iot.gov.tw also reset the connection when tried again on 2026-11-26.',
     chainLink: 3,
@@ -2136,8 +2136,8 @@ const exposure = {
     },
     display: t('9歲兒童約為成人的 2 倍（模式指標）', '9-year-olds about 2× adults (modelled indicator)'),
     statement: t(
-      '在新北市中和的超細微粒模擬（Chang 與 Hsiao，2026）中，濃度最高的地點，9歲兒童的終身超額致癌風險指標約為成人的兩倍（冬季約4.5×10⁻⁴對2.2×10⁻⁴），原因是模式假設兒童每公斤體重吸入較多空氣、肺部沉積率較高；作者稱之為潛在風險指標，不是發生率預測。',
-      'In a simulation of ultrafine particles in Zhonghe, New Taipei (Chang and Hsiao, 2026), a 9-year-old at the worst locations had about twice the adult lifetime excess cancer risk indicator (winter about 4.5×10⁻⁴ against 2.2×10⁻⁴), because the model assumes children breathe more air per kilogram and deposit more particles in the lung; the authors call it a potential risk indicator, not a prediction of incidence.',
+      '在新北市中和的超細微粒模擬（Chang 與 Hsiao，2026）中，濃度最高的地點，9歲兒童的終身超額致癌風險指標約為成人的兩倍（冬季約萬分之4.5對萬分之2.2），原因是模式假設兒童每公斤體重吸入較多空氣、肺部沉積率較高；作者稱之為潛在風險指標，不是發生率預測。',
+      'In a simulation of ultrafine particles in Zhonghe, New Taipei (Chang and Hsiao, 2026), a 9-year-old at the worst locations had about twice the adult lifetime excess cancer risk indicator (winter about 4.5 against 2.2 in 10,000), because the model assumes children breathe more air per kilogram and deposit more particles in the lung; the authors call it a potential risk indicator, not a prediction of incidence.',
     ),
     period: t('2026年發表（模式情境）', 'Published 2026 (modelled scenarios)'),
     place: t('新北市中和區（模擬範圍）', 'Zhonghe, New Taipei City (model domain)'),

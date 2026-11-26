@@ -305,59 +305,8 @@ export const chain = {
 
 export type ChainPip = 'filled' | 'outline' | 'open' | 'go';
 
-/** @deprecated Strings of the old CountdownRail. ScreenRail uses `screenText`. Delete in phase 3. */
-export const rail = {
-  label: { 'zh-TW': '紅燈倒數與章節選單', en: 'Countdown and chapter menu' } as L10n,
-  jump: { 'zh-TW': '跳到', en: 'Jump to' } as L10n,
-  /** The strip's label when no chapter is current: without JavaScript, and above the first chapter. */
-  menu: { 'zh-TW': '跳到章節', en: 'Jump to a chapter' } as L10n,
-  /** Accessible name of the strip while a chapter is current: what it opens, then where the reader is. */
-  named: { 'zh-TW': '跳到章節，目前在：{name}', en: 'Jump to a chapter. Now reading: {name}' } as L10n,
-  idle: { 'zh-TW': '一個紅燈，90 秒', en: 'One red light, ninety seconds' } as L10n,
-  secondsLeft: { 'zh-TW': '紅燈剩 {n} 秒', en: '{n} seconds of red left' } as L10n,
-  paused: { 'zh-TW': '鏡頭拉遠', en: 'Pulling back' } as L10n,
-  green: { 'zh-TW': '綠燈亮的那一秒', en: 'The second it turns green' } as L10n,
-  connect: { 'zh-TW': '接起來', en: 'Joining it up' } as L10n,
-  money: { 'zh-TW': '算錢', en: 'The money' } as L10n,
-  act: { 'zh-TW': '行動', en: 'Take action' } as L10n,
-  /** Pip legend, printed once at the foot of the jump menu. */
-  pips: {
-    filled: { 'zh-TW': '台灣的資料', en: 'Taiwan data' },
-    outline: { 'zh-TW': '推估、模式或國際證據', en: 'Estimated, modelled or international' },
-    open: { 'zh-TW': '證據缺口', en: 'Evidence gap' },
-    go: { 'zh-TW': '可以切斷', en: 'Can be broken' },
-  } as Record<ChainPip, L10n>,
-} as const;
 
-/** @deprecated Fixed labels inside the old <Chapter>. <Screen> needs none. Delete in phase 3. */
-export const chapterText = {
-  caveat: { 'zh-TW': '這一段沒有說的事', en: 'What this does not say' } as L10n,
-  action: { 'zh-TW': '你現在可以做的', en: 'What you can do now' } as L10n,
-  more: { 'zh-TW': '看這一環的全部證據', en: 'See all the evidence for this link' } as L10n,
-  paused: { 'zh-TW': '鏡頭拉遠', en: 'Pulling back' } as L10n,
-} as const;
 
-/**
- * @deprecated with QuestionChips.astro (the question index is a grid of picture cards now).
- * Question chips (V4), in the reader's words, in blueprint order. `path` is
- * locale-neutral: pass it through href(). The last chip is not a question page.
- */
-export const questions = {
-  chips: [
-    { slug: 'smell', path: '/questions/smell/', label: { 'zh-TW': '為什麼那麼臭？', en: 'Why does it smell so bad?' } },
-    { slug: 'my-child', path: '/questions/my-child/', label: { 'zh-TW': '小孩吸得比我多嗎？', en: 'Does my child breathe more of it?' } },
-    { slug: 'app', path: '/questions/app/', label: { 'zh-TW': 'App 說「良好」，是它錯了嗎？', en: 'The app says “Good”. Is it wrong?' } },
-    { slug: 'one-red-light', path: '/questions/one-red-light/', label: { 'zh-TW': '只是等個紅燈，有差嗎？', en: 'It’s only a red light. Does it matter?' } },
-    { slug: 'rider', path: '/questions/rider/', label: { 'zh-TW': '騎車的人自己呢？', en: 'What about the riders themselves?' } },
-    { slug: 'afford', path: '/electric/', label: { 'zh-TW': '我換得起嗎？', en: 'Can I afford to switch?' } },
-  ] as { slug: string; path: string; label: L10n }[],
-  // count-free: /questions/ answers eight and points to two more on other pages
-  all: { 'zh-TW': '看全部問題', en: 'All the questions' } as L10n,
-  allPath: '/questions/',
-  label: { 'zh-TW': '直接問', en: 'Go straight to a question' } as L10n,
-  askMeasure: { 'zh-TW': '把推估換成實測', en: 'Turn the estimate into a measurement' } as L10n,
-  askMeasurePath: '/estimate/#measure',
-} as const;
 
 // ---------------------------------------------------------------------------
 // Evidence badges
@@ -651,41 +600,7 @@ export const settings = {
 // Component strings
 // ---------------------------------------------------------------------------
 
-/**
- * @deprecated There is no empty chart any more (brief 5.4): a chart always has a value, and a
- * pollutant with no publishable estimate gets a sentence. These strings stay, in neutral
- * wording, only so the old EmptyChart and Figure `empty` mode build until phase 3.
- */
-export const emptyData = {
-  caption: { 'zh-TW': '這張圖沒有實測可以畫；本站的推估在「怎麼算的」。', en: 'There is no measurement to draw here; this site’s estimate is under “How we worked it out”.' } as L10n,
-  where: { 'zh-TW': '來源', en: 'Source' } as L10n,
-  none: { 'zh-TW': '這一項沒有實測可以引用，本站用推估。', en: 'There is no measurement to cite for this; the site uses an estimate.' } as L10n,
-  who: { 'zh-TW': '誰量得出來', en: 'Who could measure it' } as L10n,
-  /** Appended to the graphic's accessible description. */
-  sr: { 'zh-TW': '這張圖沒有資料點：這一項沒有實測，本站用推估。', en: 'Nothing is plotted on this chart: there is no measurement for this, and the site uses an estimate.' } as L10n,
-  panel: { 'zh-TW': '見推估', en: 'see the estimate' } as L10n,
-  xLabel: { 'zh-TW': '紅燈倒數（秒）', en: 'Red-light countdown (seconds)' } as L10n,
-  red: { 'zh-TW': '紅燈', en: 'Red' } as L10n,
-  green: { 'zh-TW': '綠燈', en: 'Green' } as L10n,
-  stroller: { 'zh-TW': '嬰兒車高度（約 0.6 公尺）', en: 'Pushchair height (about 0.6 m)' } as L10n,
-  adult: { 'zh-TW': '大人的高度（約 1.5 公尺）', en: 'Adult height (about 1.5 m)' } as L10n,
-  heights: { 'zh-TW': '兩個高度', en: 'Two heights' } as L10n,
-  tableHeight: { 'zh-TW': '高度', en: 'Height' } as L10n,
-  tablePanel: { 'zh-TW': '量什麼', en: 'What would be measured' } as L10n,
-  tableValue: { 'zh-TW': '量測值', en: 'Measured value' } as L10n,
-} as const;
 
-/** The chain board (V15): open link, reveal, stance boxes, struck-through list. */
-export const board = {
-  open: { 'zh-TW': '沒有接上的一環', en: 'The link that is not joined' } as L10n,
-  reveal: { 'zh-TW': '看我們怎麼接', en: 'See how we join them' } as L10n,
-  sources: { 'zh-TW': '看來源', en: 'See sources' } as L10n,
-  notSaying: { 'zh-TW': '我們沒有說', en: 'What we are not saying' } as L10n,
-  changeMind: { 'zh-TW': '什麼會讓我們改口', en: 'What would change our mind' } as L10n,
-  notClaimed: { 'zh-TW': '我們不會說的話', en: 'What we will not say' } as L10n,
-  notClaimedPrefix: { 'zh-TW': '我們不會說：', en: 'We will not say: ' } as L10n,
-  why: { 'zh-TW': '為什麼：', en: 'Why: ' } as L10n,
-} as const;
 
 /** Calculator verdicts (V36). The sentence itself is page copy, built from engine output. */
 export const verdict = {
@@ -702,13 +617,17 @@ export const verdict = {
 export const tiles = {
   label: { 'zh-TW': '各縣市電動機車補助狀態', en: 'Electric-scooter subsidy status by city and county' } as L10n,
   legend: { 'zh-TW': '圖例', en: 'Key' } as L10n,
+  /** The one subsidy-status legend of brief 7.7, as short chips. */
   states: {
-    available: { 'zh-TW': '有名額', en: 'Places left' },
-    restricted: { 'zh-TW': '只限汰舊或特定身分', en: 'Scrap-and-replace or certain groups only' },
+    available: { 'zh-TW': '還有名額', en: 'Places left' },
+    restricted: { 'zh-TW': '有條件', en: 'With conditions' },
+    unpublished: { 'zh-TW': '官網沒有公布名額', en: 'No quota published' },
     exhausted: { 'zh-TW': '已用完', en: 'Used up' },
-    unknown: { 'zh-TW': '查不到', en: 'Could not be checked' },
-  } as Record<'available' | 'restricted' | 'exhausted' | 'unknown', L10n>,
-  unknownDetail: { 'zh-TW': '查不到，請洽環保局', en: 'We could not check this. Please ask the environmental bureau.' } as L10n,
+    ended: { 'zh-TW': '已截止', en: 'Closed' },
+    unknown: { 'zh-TW': '查不到官網', en: 'Official site not reachable' },
+  } as Record<'available' | 'restricted' | 'unpublished' | 'exhausted' | 'ended' | 'unknown', L10n>,
+  /** A place whose official site could not be reached on the check date: the sums use central subsidies only. */
+  unknownDetail: { 'zh-TW': '{date} 查不到官網；下面的金額只算中央的補助。', en: 'Official site not reachable on {date}; the sums use central subsidies only.' } as L10n,
   checked: { 'zh-TW': '{date}查', en: 'checked {date}' } as L10n,
   pick: { 'zh-TW': '點一個縣市，看金額和查證日期。', en: 'Choose a city or county for amounts and the date we checked.' } as L10n,
   official: { 'zh-TW': '官方頁面', en: 'Official page' } as L10n,
@@ -722,13 +641,6 @@ export const decision = {
   all: { 'zh-TW': '所有可能的結果', en: 'Every possible result' } as L10n,
 } as const;
 
-/** @deprecated with TimeLadder.astro (RoadOfTime replaces it; no rung is ever empty). */
-export const ladder = {
-  label: { 'zh-TW': '時間的尺', en: 'The ruler of time' } as L10n,
-  empty: { 'zh-TW': '沒有研究', en: 'No study' } as L10n,
-  scopeTraffic: { 'zh-TW': '整體車流', en: 'Traffic as a whole' } as L10n,
-  scopeAllSources: { 'zh-TW': '所有來源的 PM2.5', en: 'PM2.5 from all sources' } as L10n,
-} as const;
 
 /** Convenience: translate a ui string, with optional {token} replacement. */
 export function t(value: L10n, locale: Locale, vars?: Record<string, string | number>): string {
