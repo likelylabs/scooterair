@@ -287,13 +287,17 @@ const chosen = fill(T.chosenDefault, { case: caseText(D, T, def) });
     background: repeating-linear-gradient(135deg, var(--clean) 0 3px, transparent 3px 6px);
     opacity: 0.6;
   }
-  .op-card :global(.op-mbar--thin .op-mbar__track) {
+  .op-card :global(.op-mbar--swap .op-mbar__track) {
     block-size: 0.875rem;
   }
-  .op-card :global(.op-mbar--thin .op-mbar__fill) {
-    background: transparent;
-    border: 2px solid var(--ink-2);
+  .op-card :global(.op-mbar--swap .op-mbar__fill) {
+    background: var(--chart-swap);
     border-radius: var(--radius-1);
+  }
+  .op-card :global(.op-mbar__sub) {
+    display: block;
+    font-weight: var(--fw-regular, 400);
+    color: var(--ink-2);
   }
   .op-card :global(.op-bar__value),
   .op-card :global(.op-mbar__value) {

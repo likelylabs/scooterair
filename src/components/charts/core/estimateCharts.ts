@@ -95,7 +95,7 @@ export function mveModel(locale: Loc, scenario: ScenarioKey = 'dozen'): MveModel
   const roadSub = fill(T.roadside.sub, locale, { year: yearOf(bg.factId) });
   const waitSub = fill(T.waiting.sub, locale, { n: est.meas.iot.co.peakSites });
   const estSub = fill(T.estimate.sub, locale, { s: est.signal.redLength_s });
-  const peakText = peaks.map((v) => num(v, locale, 1));
+  const peakText = peaks.map((v) => num(v, locale));
 
   const rows: MveRow[] = [
     { id: 'roadside', kind: bg.kind, label: T.roadside.label[locale], sub: roadSub, value: num(bg.shown, locale), unit: ppm, dots: [bg.value], factId: bg.factId },
@@ -221,9 +221,10 @@ export function bandsModel(pollutant: Pollutant, locale: Loc, opts: { zhuyin?: b
     rows.push({
       id: 'measured-rise',
       group: 'added',
-      kind: rise.kind,
+      // the highest reading minus the station: our arithmetic on two measurements (本站計算)
+      kind: 'derived',
       label: T.measuredRise.label[locale],
-      sub: fill(T.measuredRise.sub, locale, { n: est.xcheck.iot.sitesCompared }),
+      sub: fill(T.measuredRise.sub, locale, { n: est.meas.iot.co.peakSites }),
       value: fmt(rise).text,
       mark: 'bar',
       at: [rise.lo, rise.hi],

@@ -70,7 +70,11 @@ export function breakEvenMonth(a: CostLine, b: CostLine): number | null {
 
 /** Cumulative cost over time for two options: two straight lines and where they cross. */
 export function renderBreakEven(p: BreakEvenProps): ChartRender {
-  const { locale, a, b, prefix = 'NT$' } = p;
+  // Chinese money reads 元, never NT$ (brief 6.6): the axis carries 元 and each value ends in it
+  const zhYuan = p.locale === 'zh-TW' && (p.prefix ?? 'NT$') === 'NT$';
+  const { locale, a, b } = p;
+  const prefix = zhYuan ? '元' : (p.prefix ?? 'NT$');
+  const cash = (v: string) => (zhYuan ? `${v} 元` : `${prefix} ${v}`);
   const months = p.months ?? 60;
   const H = p.height ?? 230;
   const real = p.series && p.series.a.length > months && p.series.b.length > months ? p.series : null;
@@ -183,7 +187,7 @@ export function renderBreakEven(p: BreakEvenProps): ChartRender {
   const table: string[][] = [];
   for (let m = 0; m <= months; m += 6) {
     xs.push(+xp(m).toFixed(2));
-    rows.push(`${p.tickLabel(m)}\n${tip(locale, a.label, `${prefix} ${f(at(a, m))}`)}\n${tip(locale, b.label, `${prefix} ${f(at(b, m))}`)}`);
+    rows.push(`${p.tickLabel(m)}\n${tip(locale, a.label, cash(f(at(a, m))))}\n${tip(locale, b.label, cash(f(at(b, m))))}`);
     if (m % 12 === 0) table.push([p.tickLabel(m), f(at(a, m)), f(at(b, m))]);
   }
 

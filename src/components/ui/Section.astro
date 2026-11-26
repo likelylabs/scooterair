@@ -69,8 +69,10 @@ const container = width === 'page' ? 'container' : `container container--${width
 </section>
 
 <script>
-  // A folded section opens when the address (or a link) points at it or at anything inside it.
-  const openFor = (hash: string) => {
+  // A folded section opens when the address (or a link) points at it, at its own heading, or at
+  // anything inside it. On a deep link the page above may still grow (the calculator renders its
+  // result after load), so the target is kept in view until the reader scrolls or a few seconds pass.
+  const openFor = (hash: string, settle = false) => {
     if (!hash || hash === '#') return;
     let el: Element | null = null;
     try {
@@ -78,10 +80,23 @@ const container = width === 'page' ? 'container' : `container container--${width
     } catch {
       return;
     }
-    for (let d = el?.closest('details[data-section-fold]'); d; d = d.parentElement?.closest('details[data-section-fold]') ?? null) (d as HTMLDetailsElement).open = true;
-    if (el && el.closest('details[data-section-fold]')) el.scrollIntoView();
+    if (!el) return;
+    const own = el.matches('section') ? el.querySelector<HTMLDetailsElement>(':scope > .container > details[data-section-fold], :scope details[data-section-fold]') : null;
+    if (own) own.open = true;
+    for (let d = el.closest('details[data-section-fold]'); d; d = d.parentElement?.closest('details[data-section-fold]') ?? null) (d as HTMLDetailsElement).open = true;
+    const target = el;
+    const go = () => target.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'start' });
+    if (!own && !el.closest('details[data-section-fold]')) return;
+    requestAnimationFrame(go);
+    if (!settle) return;
+    let stop = false;
+    const quit = () => (stop = true);
+    for (const ev of ['wheel', 'touchstart', 'keydown', 'mousedown']) addEventListener(ev, quit, { once: true, passive: true });
+    const ro = new ResizeObserver(() => !stop && go());
+    ro.observe(document.body);
+    setTimeout(() => ro.disconnect(), 4000);
   };
-  openFor(location.hash);
+  openFor(location.hash, true);
   addEventListener('hashchange', () => openFor(location.hash));
   document.addEventListener('click', (e) => {
     const a = (e.target as Element | null)?.closest?.('a[href*="#"]') as HTMLAnchorElement | null;

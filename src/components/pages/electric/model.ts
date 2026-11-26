@@ -297,6 +297,10 @@ export interface Rendered {
   prefix: string;
   value: string;
   unit: string;
+  /** the sentence a screen reader hears when this result appears */
+  spoken: string;
+  /** the answer in a few words, for the bar at the bottom of the screen */
+  short: string;
   note: string;
   /** inside the verdict A deadline slot (day count filled in the browser, R10) */
   deadlineHtml: string;
@@ -568,7 +572,8 @@ function waterfallHtml(e: Evaluation, ctx: RenderCtx): string {
   const T = localize(electric, locale).result;
   const w = toWaterfall(e, locale);
   const render = renderWaterfall({ ...w, start: { ...w.start, label: readerText(w.start.label) }, steps: w.steps.map((s) => ({ ...s, label: readerText(s.label) })) });
-  const desc = `${w.totalLabel}: ${money(locale, e.electric.purchase.net.value)}; ${w.compare.label}: ${money(locale, w.compare.value)}`;
+  const [colon, semi] = locale === 'zh-TW' ? ['：', '；'] : [': ', '; '];
+  const desc = `${w.totalLabel}${colon}${money(locale, e.electric.purchase.net.value)}${semi}${w.compare.label}${colon}${money(locale, w.compare.value)}`;
   return figure(T.sections.waterfall, T.sections.waterfallSub, chart(render, `${ctx.id}-wf`, T.sections.waterfall.replaceAll('|', ''), desc, ctx.tableLabel));
 }
 
@@ -606,6 +611,10 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
   let prefix = 'NT$';
   let value = '';
   let unit = '';
+  let spoken = '';
+  let short = '';
+  const SP = T.spoken;
+  const BS = T.barShort;
   const sep = locale === 'en' ? ' ' : '';
   // What it costs to start: with a pay-per-use plan the battery setup fee is paid on day one, so the
   // gap at purchase is the price gap plus that fee, and the sentence says so (the ledger shows both).
@@ -630,6 +639,8 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
       sentence = fill(T.verdict.parity, { gap: money(locale, -v.purchaseGap) });
       title = T.panel.parity;
       value = nf(locale, -v.purchaseGap);
+      spoken = fill(SP.parity, { v: money(locale, -v.purchaseGap) });
+      short = fill(BS.parity, { v: money(locale, -v.purchaseGap) });
       break;
     case 'month':
       sentence = [
@@ -641,6 +652,8 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
         crossTail,
       ].join(sep);
       title = T.panel.month;
+      spoken = fill(SP.month, { n: v.month! });
+      short = fill(BS.month, { n: v.month! });
       prefix = T.panel.monthPrefix;
       value = String(v.month);
       unit = locale === 'en' ? '' : T.panel.monthUnit;
@@ -653,12 +666,16 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
       sentence = [head, avg, tail, maintEv < maintGas ? T.verdict.bBuysMaint : T.verdict.bBuys].filter(Boolean).join(sep);
       title = ph.later !== null ? fill(T.panel.bAverage, { h }) : T.panel.b;
       value = nf(locale, v.monthlyGap);
+      spoken = fill(same ? SP.bSame : SP.bLess, { gap: money(locale, -v.purchaseGap), v: money(locale, v.monthlyGap) });
+      short = fill(BS.b, { v: money(locale, v.monthlyGap) });
       break;
     }
     case 'c':
       sentence = fill(T.verdict.c, { gap: gapText(v.upfrontGap) });
       title = T.panel.c;
       value = nf(locale, v.upfrontGap);
+      spoken = fill(SP.c, { v: money(locale, v.upfrontGap) });
+      short = fill(BS.c, { v: money(locale, v.upfrontGap) });
       break;
     case 'c-slow': {
       const k = e.comparison.totalParityKm;
@@ -666,12 +683,16 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
       sentence = fill(T.verdict.cSlow, { gap: gapText(v.upfrontGap), monthly: monthlyNow(false), h, more });
       title = T.panel.c;
       value = nf(locale, v.upfrontGap);
+      spoken = fill(SP.c, { v: money(locale, v.upfrontGap) });
+      short = fill(BS.c, { v: money(locale, v.upfrontGap) });
       break;
     }
     case 'c-briefly':
       sentence = fill(T.verdict.cBriefly, { n: v.month!, h, gap: money(locale, e.comparison.breakEven.gapAtHorizon ?? 0) });
       title = T.panel.c;
       value = nf(locale, v.upfrontGap);
+      spoken = fill(SP.c, { v: money(locale, v.upfrontGap) });
+      short = fill(BS.c, { v: money(locale, v.upfrontGap) });
       break;
   }
   const note = fill(T.panel.note, { km, plan: planName, gas: gasName });
@@ -768,7 +789,7 @@ export function renderResult(e: Evaluation, choice: Pick<Choice, 'evAuto' | 'gas
     prefix = '';
     unit = '元';
   }
-  return { verdict: v.verdict, sentence, title, prefix, value, unit, note, deadlineHtml, nextHtml, bodyHtml: parts.filter(Boolean).join('\n') };
+  return { verdict: v.verdict, sentence, title, prefix, value, unit, spoken, short, note, deadlineHtml, nextHtml, bodyHtml: parts.filter(Boolean).join('\n') };
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -92,9 +92,9 @@ export interface FilmData {
 /* Money                                                                      */
 /* ------------------------------------------------------------------------ */
 
-function tagOf(c: BuyCase, locale: Locale): HudText['money']['tags'][number] {
+function tagOf(c: BuyCase, locale: Locale, worst = false): HudText['money']['tags'][number] {
   const t = film.hud.tag;
-  const where = fill(t.where[locale], {
+  const where = (worst ? t.worst[locale] : '') + fill(t.where[locale], {
     county: need(c.countyName as L10n, 'money.buy.countyName')[locale].replace(/市$|縣$| City$| County$/, ''),
     scrap: (c.scrap === 'yes' ? t.scrap : t.noScrap)[locale],
   });
@@ -127,7 +127,7 @@ function moneyPart(m: HomeMoney, locale: Locale): MoneyPart {
     note: fill(c.monthly.note[locale], { petrol: int(petrol, locale), km: int(km, locale) }),
   };
   const b = film.hud.bars;
-  const tags = [tagOf(first, locale), tagOf(worst, locale)];
+  const tags = [tagOf(first, locale), tagOf(worst, locale, true)];
   const moneyText: HudText['money'] = {
     tags,
     chip: fill(film.hud.checked[locale], { kind: chips.derived.label[locale], date: formatDate(m.checkedOn, locale, m.checkedOn.slice(0, 4) !== m.date.slice(0, 4)) }),

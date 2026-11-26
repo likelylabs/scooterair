@@ -28,6 +28,8 @@ export interface OpenCase {
   p: number;
   /** whether any subsidy or recycling line is counted */
   sub: boolean;
+  /** 1 = the electric model can only swap batteries (it needs a monthly battery plan) */
+  sw: 0 | 1;
   /** [label word id, amount, 1 = "up to"] for each line off the list price */
   eLines: [number, number, 0 | 1][];
   gLines: [number, number, 0 | 1][];
@@ -48,6 +50,9 @@ export interface OpenMonth {
   homeHi: number;
   plan: number;
   payg: number;
+  /** word ids: "scooter · plan" of the cheapest monthly plan and of the cheapest pay-as-you-go plan */
+  planN: number;
+  paygN: number;
 }
 export interface OpenTable {
   buy: Record<string, Record<Scrap, OpenCase>>;
@@ -173,7 +178,7 @@ ${bar('op-bar--ev', fill(T.barEv, { plate: W(c.p) }), c.e, c.el, max, loc, T, tr
   return `${headHtml(buyHeadline(T, c, scrap))}
 ${figure}
 ${bars}
-<p class="op-body">${esc(fill(T.bodyClass, { model: shortName(W(c.en)) }))}${esc(worst)}</p>
+<p class="op-body">${esc(fill(T.bodyClass, { model: shortName(W(c.en)) }))}${c.sw ? esc(T.swapOnly) : ''}${esc(worst)}</p>
 ${working}`;
 }
 
@@ -193,8 +198,8 @@ export function monthHtml(d: OpenData, T: OpenText, t: OpenTable, km: number): s
   const m = t.month[km];
   const max = Math.max(m.petrol, m.homeHi, m.plan, m.payg);
   const w = (v: number) => `${Math.max(0.8, (100 * v) / max).toFixed(2)}%`;
-  const row = (cls: string, label: string, v: number, text: string, extra = '') =>
-    `<div class="op-mbar ${cls}"><p class="op-mbar__label">${esc(label)}</p><div class="op-mbar__track" aria-hidden="true"><span class="op-mbar__fill" style="inline-size:${w(v)}"></span>${extra}</div><p class="op-mbar__value"><b>${esc(text)}</b></p></div>`;
+  const row = (cls: string, label: string, v: number, text: string, extra = '', sub = '') =>
+    `<div class="op-mbar ${cls}"><p class="op-mbar__label">${esc(label)}${sub ? `<span class="op-mbar__sub">${esc(sub)}</span>` : ''}</p><div class="op-mbar__track" aria-hidden="true"><span class="op-mbar__fill" style="inline-size:${w(v)}"></span>${extra}</div><p class="op-mbar__value"><b>${esc(text)}</b></p></div>`;
   const homeText = m.homeLo === m.homeHi ? yuan(loc, m.homeLo) : fill(T.rangeShort, { lo: loc === 'en' ? `NT$${num(loc, m.homeLo)}` : num(loc, m.homeLo), hi: yuan(loc, m.homeHi) });
   const homeExtra = m.homeHi > m.homeLo ? `<span class="op-mbar__more" style="inline-size:${((100 * (m.homeHi - m.homeLo)) / max).toFixed(2)}%"></span>` : '';
   return `${headHtml(monthHeadline(d, T, m))}
@@ -202,8 +207,8 @@ export function monthHtml(d: OpenData, T: OpenText, t: OpenTable, km: number): s
 ${row('op-mbar--petrol', T.mPetrol, m.petrol, yuan(loc, m.petrol))}
 ${row('op-mbar--home', T.mHome, m.homeLo, homeText, homeExtra)}
 <p class="op-divider">${esc(T.mDivider)}</p>
-${row('op-mbar--thin', T.mPlan, m.plan, yuan(loc, m.plan))}
-${row('op-mbar--thin', T.mPayg, m.payg, yuan(loc, m.payg))}
+${row('op-mbar--swap', T.mPlan, m.plan, yuan(loc, m.plan), '', d.words[m.planN])}
+${row('op-mbar--swap', T.mPayg, m.payg, yuan(loc, m.payg), '', d.words[m.paygN])}
 </div>
 <p class="op-small">${esc(fill(T.monthNote, { km: num(loc, km) }))}</p>`;
 }

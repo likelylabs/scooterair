@@ -55,7 +55,7 @@ const gap = locale === 'en' ? ' ' : '';
       <span class="q-box__val"><b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} where="" size="sm" /></span>
     </div>
     <div class="q-box__row q-box__row--est">
-      {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-2" data-when-scenario={s} />)}
+      {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-2" data-when-scenario={s} data-say />)}
     </div>
     <p class="q-box__gloss">{estimateText.ppmGloss[locale]}</p>
   </div>
@@ -71,10 +71,10 @@ const gap = locale === 'en' ? ' ' : '';
         <KindChip locale={locale} of={fact('moenv-co-stations-2025')} size="sm" />
       </p>
     </Fragment>
-    <WorkingSum slot="block2" locale={locale} {...workingKerbFlow(locale)} />
+    <Fragment slot="block2">{scenarioKeys.map((s) => <div data-when-scenario={s}><WorkingSum {...workingKerbFlow(locale, s)} /></div>)}</Fragment>
     <Fragment slot="block3">
       <p>{est.meta.appliesTo[locale]}</p>
-      <AirRange locale={locale} scenario="dozen" />
+      {scenarioKeys.map((s) => <div data-when-scenario={s}><AirRange locale={locale} scenario={s} /></div>)}
     </Fragment>
   </HowSheet>
 </Screen>

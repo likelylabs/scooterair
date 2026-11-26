@@ -28,7 +28,7 @@ interface Props {
   hidden?: boolean;
 }
 const { id, locale, rendered, city, hidden = false } = Astro.props;
-const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix: 'NT$', value: '', unit: '', note: '', deadlineHtml: '', nextHtml: '', bodyHtml: '' };
+const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix: 'NT$', value: '', unit: '', spoken: '', short: '', note: '', deadlineHtml: '', nextHtml: '', bodyHtml: '' };
 ---
 
 <div class="el-result" id={id} data-el-result data-city={city} hidden={hidden}>

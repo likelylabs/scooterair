@@ -822,7 +822,8 @@ html:not(.js) [data-js-only] { display: none; }
   line-height: 1;
   cursor: pointer;
 }
-.swapctl__btn:disabled {
+.swapctl__btn:disabled,
+.swapctl__btn[aria-disabled='true'] {
   border-color: var(--line-strong, var(--ink-3));
   color: var(--ink-3);
   cursor: default;
@@ -1116,7 +1117,7 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value=
 [data-mask='surgical'] .mk-t.mk-on-surgical,
 [data-mask='carbon'] .mk-t.mk-on-carbon,
 [data-mask='n95'] .mk-t.mk-on-n95 { display: block; }
-[data-pick-mask] .mk-t { display: none; }
+[data-pick-mask] .mk-t.mk-t { display: none; }
 [data-pick-mask='cloth'] .mk-t.mk-on-cloth,
 [data-pick-mask='surgical'] .mk-t.mk-on-surgical,
 [data-pick-mask='carbon'] .mk-t.mk-on-carbon,
@@ -1130,3 +1131,9 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checke
 /* G8: the second row of names under the figures */
 .scene--heights .hs-row2 { margin-block-start: 1.45em; }
 .scene--plan .plan3-gap { white-space: nowrap; }
+
+/* a picture scrolled off screen: its looping motion waits (arrive.client.ts sets the class) */
+.scene.is-offscreen,
+.scene.is-offscreen * {
+  animation-play-state: paused !important;
+}

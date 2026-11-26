@@ -38,6 +38,14 @@ const { label, class: cls } = Astro.props;
     scrollbar-width: thin;
     scrollbar-color: var(--line-strong) transparent;
   }
+  /* with large text, or on a narrow phone, the tabs wrap onto more lines instead of scrolling sideways */
+  html[data-text='lg'] .tabs__list,
+  html[data-text='xl'] .tabs__list {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
   /* more tabs off either edge (set by the script): fade that edge so the strip visibly continues */
   .tabs__list[data-more~='end'] {
     mask-image: linear-gradient(to left, transparent, #000 3rem);

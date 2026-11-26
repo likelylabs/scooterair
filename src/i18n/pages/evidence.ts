@@ -482,10 +482,10 @@ export default copy({
   // The former gap list, now answers (brief 7.3): each answer sits under its link; all of them
   // together are on /estimate/#answers. The anchor #gaps stays for old links.
   answers: {
-    title: { 'zh-TW': '以前的問題，現在的答案', en: 'Former questions, and the answers we have now' },
+    title: { 'zh-TW': '常被問的問題', en: 'Questions people often ask' },
     lead: {
-      'zh-TW': '本站以前把 {n} 個問題列成「證據缺口」。現在每一個都有答案，放在它所屬的那一環；要一次看全部，請到「怎麼算的」那一頁。',
-      en: 'This site used to list {n} questions as gaps in the evidence. Each now has an answer, placed under its link; to see them all together, go to the “How we worked it out” page.',
+      'zh-TW': '常被問的 {n} 個問題，答案放在它所屬的那一環；要一次看全部，請到「怎麼算的」那一頁。',
+      en: '{n} questions people often ask, each answered under its link; to see them all together, go to the “How we worked it out” page.',
     },
     all: { 'zh-TW': '一次看全部 {n} 個答案', en: 'See all {n} answers together' },
   },

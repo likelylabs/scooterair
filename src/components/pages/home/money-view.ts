@@ -25,6 +25,12 @@ export interface HomeChoice {
 /** The home page's own words for these two screens (home.ts → s13, s14, common), localised. */
 export interface HomeMoneyText {
   bodyClass: string;
+  /** added when the electric scooter of the case can only swap batteries */
+  swapOnly: string;
+  /** the least favourable case, in the screen's short form: {county} {scrap} {plate} {n} */
+  worst: string;
+  worstScrapYes: string;
+  worstScrapNo: string;
   bodyKm: string;
   swapDearer: string;
   swapCheaper: string;
@@ -105,13 +111,19 @@ export function figureHtml(p: Pick<HomeMoneyPayload, 'D' | 'T' | 'H'>, t: OpenTa
   return `${who}<span class="h-fig__line h-fig__line--${less ? 'go' : 'dear'}">${line}</span>`;
 }
 
-/** The body: what kind of scooter this is, then the least favourable case in the table, whatever the reader chose. */
-export function buyBody(p: HomeMoneyPayload, t: OpenTable): string {
+/**
+ * The body: what kind of scooter this is (and, when it can only swap batteries, that it comes with
+ * a monthly plan), then the least favourable case in the table, named as such.
+ */
+export function buyBody(p: HomeMoneyPayload, t: OpenTable, c: HomeChoice): string {
   const { D, T, H } = p;
+  const x = caseOf(t, c);
   const w = t.worst;
-  const county = D.counties.find((x) => x.id === w.county)?.name ?? w.county;
-  const worst = w.d > 0 ? fill(T.worst, { scrap: w.scrap === 'yes' ? T.worstScrapYes : T.worstScrapNo, plate: D.words[w.plate], county, n: yuan(D.locale, w.d) }) : T.worstNone;
-  return join(D.locale, H.bodyClass, worst);
+  const county = D.counties.find((y) => y.id === w.county)?.name ?? w.county;
+  const worst = w.d > 0 ? fill(H.worst, { scrap: w.scrap === 'yes' ? H.worstScrapYes : H.worstScrapNo, plate: D.words[w.plate], county, n: yuan(D.locale, w.d) }) : T.worstNone;
+  // the class sentence runs on into the swap clause in Chinese (…小一級，只能換電池…); alone it ends there
+  const cls = x.sw ? H.bodyClass : H.bodyClass.replace(/，$/, '。');
+  return join(D.locale, cls, x.sw ? H.swapOnly : '', worst);
 }
 
 /** The deadline strip of the reader's case (brief 7.7). */

@@ -73,13 +73,15 @@ export default copy({
     electric: { 'zh-TW': '電動機車', en: 'Electric scooters' },
     /** The panel's first row: lane A's 這排機車多出來 with the gas named. */
     added: { 'zh-TW': '{added}的一氧化碳', en: '{added}: carbon monoxide' },
-    addedElectric: { 'zh-TW': '這排電動機車多出來的', en: 'Added by these electric scooters' },
+    addedElectric: { 'zh-TW': '這排電動機車多出來的一氧化碳', en: 'Carbon monoxide added by these electric scooters' },
     zero: { 'zh-TW': '0', en: '0' },
     /** The two price tags. {county}, {amount} from the money module. */
     tag: {
       scrap: { 'zh-TW': '報廢滿 10 年的機車', en: 'scrapping one 10+ years old' },
       noScrap: { 'zh-TW': '沒有機車可報廢', en: 'nothing to scrap' },
       where: { 'zh-TW': '{county}・{scrap}', en: '{county} · {scrap}' },
+      /** In front of the second tag: it is the least favourable case in the table, not the reader's county. */
+      worst: { 'zh-TW': '最不划算：', en: 'Worst case: ' },
       less: { 'zh-TW': '少付 {amount}', en: '{amount} less' },
       more: { 'zh-TW': '多付 {amount}', en: '{amount} more' },
       same: { 'zh-TW': '差不多，只差 {amount}', en: 'about the same: {amount} apart' },

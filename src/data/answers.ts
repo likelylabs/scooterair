@@ -4,7 +4,7 @@
 //
 //   import { answerList, localizeAnswer } from '@/data';
 //   const a = localizeAnswer('answer-idle-emission-rate', 'zh-TW');
-//   a.answer   // '每輛機車怠速，每小時約排 15 公克一氧化碳（8 到 27 公克）…'
+//   a.answer   // '平均一輛機車怠速，每小時約排 15 公克一氧化碳…'
 //   a.chips    // [{ kind: 'estimate', text: '推估' }]
 //   a.caveat   // one or two sentences; print it on the card
 //   a.kSentence // 'K4' → print ui.kSentences.K4[locale] beside it
@@ -105,8 +105,8 @@ export const answers = {
     chainLink: 1,
     question: t('一輛機車怠速，排多少？', 'How much does one idling scooter give off?'),
     answer: t(
-      '每輛機車怠速，每小時約排 15 公克一氧化碳（8 到 27 公克）；等一個 90 秒的紅燈，約 0.2 到 0.7 公克，大約裝滿一個鋁罐。',
-      'An idling scooter gives off about 15 g of carbon monoxide an hour (8 to 27 g); through one 90-second red that is about 0.2 to 0.7 g, roughly enough to fill one drinks can.',
+      '平均一輛機車怠速，每小時約排 15 公克一氧化碳（這個平均值在 8 到 27 公克之間；排得最多的車多很多）；等一個 90 秒的紅燈，約 0.2 到 0.7 公克，大約裝滿一個鋁罐。',
+      'On average an idling scooter gives off about 15 g of carbon monoxide an hour (the average lies between 8 and 27 g; the dirtiest scooters give off far more); through one 90-second red that is about 0.2 to 0.7 g, roughly enough to fill one drinks can.',
     ),
     basis: t('2025 年 907 萬筆定檢讀數，乘上國外實驗室量的怠速耗油量。', "Taiwan's 9.07 million inspection readings from 2025, multiplied by idle fuel use measured in laboratories abroad."),
     caveat: t(
@@ -129,10 +129,10 @@ export const answers = {
       '運研所量過最忙的路口，一個紅燈每個方向約停 34 輛；冷清的路口約 3 到 10 輛。本站用三種情況來算：幾輛（2 到 5）、十來輛（8 到 20）、停滿（25 到 45）。行人大約要等 85 到 115 秒。',
       'At the busiest junction the Institute of Transportation counted, about 34 scooters stop per direction through one red; at a quiet one, 3 to 10. This site works with three cases: a few (2 to 5), a dozen or so (8 to 20) and a full box (25 to 45). Pedestrians wait about 85 to 115 seconds.',
     ),
-    basis: t('運研所的錄影車流計數和號誌時制；每小時約 1,500 輛 × 83 秒的紅燈 ÷ 3,600 秒 ≈ 34 輛。', "The Institute's video counts and signal plans: about 1,500 scooters an hour × an 83-second red ÷ 3,600 seconds ≈ 34."),
+    basis: t('運研所的錄影車流計數和號誌時制；一個方向每小時約 1,500 輛（路口每小時的機車 ÷ 4）× 83 秒的紅燈 ÷ 3,600 秒 ≈ 34 輛。', "The Institute's video counts and signal plans: about 1,500 scooters an hour in one direction (the junction's hourly count ÷ 4) × an 83-second red ÷ 3,600 seconds ≈ 34."),
     caveat: t(
-      '34 輛是把一小時的車流平均分到四個方向算的，不是數某一個紅燈；實際的路口會多也會少。',
-      'The 34 spreads an hour of traffic evenly over four directions; it is not a count of one red, and real junctions vary.',
+      '34 輛是把路口一小時的車流平均分到四個方向，再平均分給每個紅燈算的，不是數某一個紅燈；實際的路口會多也會少。',
+      'The 34 spreads the junction\'s hourly traffic evenly over four directions and then over each red; it is not a count of one red, and real junctions vary.',
     ),
     chips: [est()],
     facts: ['iot-motorcycle-counts-2024', 'iot-pedestrian-wait'],
@@ -166,7 +166,7 @@ export const answers = {
       'For their body weight, children breathe 1.5 to 2 times the air an adult does. Measurements abroad mostly find the exhaust the same or higher lower down.',
     ),
     basis: t('美國環保署的呼吸量資料；英國、西班牙、美國、德國的高度比較研究。', "US EPA breathing-rate data; height comparisons from the UK, Spain, the US and Germany."),
-    caveat: t('台灣沒有小孩高度的量測，各研究的結果也不一致，所以本站不印高度的倍數。', "There are no child-height measurements in Taiwan and the studies disagree, so this site prints no height multiple."),
+    caveat: t('台灣沒有小孩高度的量測，各研究的結果也不一致，所以本站自己不算小孩高度的倍數；國外研究各自的數字，放在證據頁第 6 環。', "There are no child-height measurements in Taiwan and the studies disagree, so this site works out no child-height multiple of its own; each foreign study's own figures are in link 6 of the evidence page."),
     chips: [chip('study', 'international')],
     kSentence: 'K4',
     facts: ['child-air-per-kg', 'stroller-height-review', 'child-height-harr2022'],
@@ -216,7 +216,7 @@ export const answers = {
     ),
     basis: t('義大利的機車隨車量測，看得到起步時一氧化碳和油氣變多，但沒有給數字。', 'On-board measurements of motorcycles in Italy show the rise at pull-away but give no rates.'),
     caveat: t('機車起步的排放沒有公開的量測數字，本站的推估也只算紅燈那 90 秒。', 'No published measurement gives scooter emissions at pull-away, and this site\'s estimate covers only the 90 seconds of red.'),
-    chips: [],
+    chips: [chip('study', 'abroad')],
     kSentence: 'K6',
     facts: [],
     sources: ['vojtisek-lom-2020-amt'],
@@ -228,13 +228,13 @@ export const answers = {
     chainLink: 5,
     question: t('等一兩分鐘的紅燈，會傷身體嗎？', 'Can a minute or two at a red light do harm?'),
     answer: t(
-      '高雄一項研究看到，細懸浮微粒升高後 5 分鐘內，心跳的節奏就小小變了一下；國外的實驗要在車多的路上待 1 到 2 小時，才看得到肺功能下降。一天等 2 到 6 個紅燈，一年加起來約 12 到 55 小時。',
-      'A Kaohsiung study saw a small change in the heart\'s rhythm within 5 minutes of a rise in fine particles; experiments abroad needed 1 to 2 hours in heavy traffic before lung function fell. Two to six red lights a day add up to about 12 to 55 hours a year.',
+      '高雄和印尼萬隆的研究看到，細懸浮微粒升高後 5 分鐘內，心跳的節奏就小小變了一下；國外的實驗要在車多的路上待 1 到 2 小時，才看得到肺功能下降。一天等 2 到 6 個紅燈，一年加起來約 12 到 55 小時。',
+      'Studies in Kaohsiung and Bandung, Indonesia, saw a small change in the heart\'s rhythm within 5 minutes of a rise in fine particles; experiments abroad needed 1 to 2 hours in heavy traffic before lung function fell. Two to six red lights a day add up to about 12 to 55 hours a year.',
     ),
-    basis: t('Lung 等（2025）的高雄研究、倫敦的步行實驗，加上本站的時間計算。', "Lung et al. (2025) in Kaohsiung, the London walking experiment, and this site's arithmetic on time."),
+    basis: t('Lung 等（2025）在高雄和萬隆的研究、倫敦的步行實驗，加上本站的時間計算。', "Lung et al. (2025) in Kaohsiung and Bandung, the London walking experiment, and this site's arithmetic on time."),
     caveat: t(
-      '5 分鐘的變化很小、很快就回復，不是生病；高雄的微粒大多來自工廠、蚊香、燃燒和燒香，不是只有機車。',
-      'The five-minute change is small and passes, not an illness; most of the Kaohsiung particles came from factories, mosquito coils, burning and incense, not scooters alone.',
+      '5 分鐘的變化很小，是身體的訊號，不是生病；高雄找到的高峰，主要來自工廠、蚊香、燒稻草和燒香；研究沒有在機車旁邊量。',
+      'The five-minute change is small, a signal and not an illness; the peaks found in Kaohsiung came mainly from factories, mosquito coils, burning straw and incense; the study did not measure beside scooters.',
     ),
     chips: [chip('study', 'tw'), chip('derived')],
     kSentence: 'K5',
@@ -253,7 +253,7 @@ export const answers = {
     ),
     basis: t('把台灣機車廢氣的成分，和日本量的嗅覺門檻放在一起比。', 'Taiwanese scooter-exhaust composition set against odour thresholds measured in Japan.'),
     caveat: t('這是用門檻排出來的順序，不是真的去聞廢氣的測試；真正的味道是混在一起的。', 'This is a ranking from thresholds, not a smell test of real exhaust; real smells are mixtures.'),
-    chips: [est()],
+    chips: [chip('derived')],
     facts: ['odour-thresholds', 'scooter-exhaust-carbonyls', 'co-odourless'],
     anchor: 'answers',
     editorNote: 'English must not say more than the Chinese ("probably aldehydes" overreached). The 1.5 ppb belongs to acetaldehyde, not formaldehyde.',

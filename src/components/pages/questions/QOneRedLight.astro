@@ -41,7 +41,7 @@ const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung', 'route
 <Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} quiet={f(s1.quiet[locale])}>
   <RoadOfTime slot="picture" locale={locale} posts={posts} reds={defaultRedsPerDay} class="q-plate" />
   <Segmented slot="controls" name="reds" legend={s1.stepper[locale]} value={String(defaultRedsPerDay)} options={redsPerDayOptions.map((n) => ({ value: String(n), label: f(s1.stepperOption[locale], { n }) }))} />
-  <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={n}>{f(s1.body[`reds${n}`][locale], yearHours(n, locale))}</span>)}{gap}{f(s1.body.posts[locale])}</p>
+  <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={n} data-say>{f(s1.body[`reds${n}`][locale], yearHours(n, locale))}</span>)}{gap}{f(s1.body.posts[locale])}</p>
   <KindChip slot="chips" locale={locale} kind="derived" />
   <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: href('/evidence/#link-5', locale) }}>
     <p slot="block1">{f(s1.sheet.b1[locale])}</p>

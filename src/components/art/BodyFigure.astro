@@ -98,6 +98,19 @@ const kindOf: Record<BodyPin, string> = { nose: 'ribbon', lungs: 'dot', blood: '
 </SceneFrame>
 
 <script>
+  // With scripting a pin is a toggle button (its href stays for no-JavaScript readers), so
+  // assistive technology hears its pressed state; Space presses it like any button.
+  document.querySelectorAll<HTMLAnchorElement>('a[data-body-pin]').forEach((a) => {
+    a.setAttribute('role', 'button');
+    if (!a.hasAttribute('aria-pressed')) a.setAttribute('aria-pressed', 'false');
+  });
+  document.addEventListener('keydown', (e) => {
+    const pin = (e.target as Element).closest?.('a[data-body-pin]') as HTMLAnchorElement | null;
+    if (pin && e.key === ' ') {
+      e.preventDefault();
+      pin.click();
+    }
+  });
   // A pin lights its kind of mark and marks its sentence; the same pin again shows all three.
   document.addEventListener('click', (e) => {
     const pin = (e.target as Element).closest<HTMLAnchorElement>('a[data-body-pin]');

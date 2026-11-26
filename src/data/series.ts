@@ -606,7 +606,7 @@ const baseSeries = {
         ],
       },
     ],
-    period: t('2019–2025年（缺2020、2022年）', '2019–2025 (2020 and 2022 missing)'),
+    period: t('2019、2021、2023–2025 年', '2019, 2021 and 2023–2025'),
     place: TW,
     sources: [
       'cnyes-2019-registrations',

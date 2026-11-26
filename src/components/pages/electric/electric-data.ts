@@ -87,7 +87,7 @@ const ym = (years: number, monthShift = 0) => {
 /** The oldest build date any programme in the data still treats as a two-stroke era scooter. */
 const twoStrokeYear = Math.min(...data.programmes.flatMap((p) => p.conditions.flatMap((c) => (c.kind === 'scrap-built' && c.onOrBefore ? [Number(c.onOrBefore.slice(0, 4))] : [])))) - 1;
 
-export type ExampleKey = 'judge' | 'ntpc' | 'taitung' | 'low' | 'close' | 'parent' | 'delivery';
+export type ExampleKey = 'judge' | 'ntpc' | 'yilan' | 'low' | 'close' | 'parent' | 'delivery';
 interface Spec {
   key: ExampleKey;
   answers: Omit<Answers, 'date'>;
@@ -100,7 +100,7 @@ const specs: Spec[] = [
   // the blueprint's rider judge: a nine-year-old 125cc, about 400 km, nowhere to charge
   { key: 'judge', answers: { jurisdiction: 'kaohsiung', scrap: { engine: 'four-stroke', builtOn: ym(10, 3) }, household: {}, monthlyKm: 400, plate: 'heavy', power: 'subscription' }, charge: false, who: { year: ym(10, 3).slice(0, 4), km: 400 } },
   { key: 'ntpc', answers: { jurisdiction: 'new-taipei', scrap: null, household: {}, monthlyKm: 300, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 300 } },
-  { key: 'taitung', answers: { jurisdiction: 'taitung', scrap: null, household: {}, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 500 } },
+  { key: 'yilan', answers: { jurisdiction: 'yilan', scrap: null, household: {}, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 500 } },
   { key: 'low', answers: { jurisdiction: 'taipei', scrap: { engine: 'four-stroke', builtOn: ym(14, -6) }, household: {}, monthlyKm: 200, plate: 'heavy', power: 'subscription' }, charge: false, who: { year: ym(14, -6).slice(0, 4), km: 200 } },
   { key: 'close', answers: { jurisdiction: 'taipei', scrap: null, household: {}, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 500 } },
   { key: 'parent', answers: { jurisdiction: 'taipei', scrap: { engine: 'two-stroke', builtOn: `${twoStrokeYear}-06` }, household: { childUnder12: true }, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { year: twoStrokeYear, km: 500 } },

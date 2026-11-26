@@ -30,6 +30,7 @@ function table(m: HomeMoney, locale: Locale, word: (s: string) => number): OpenT
     gn: word(readerText(c.gasoline.name[locale])),
     p: word(plateName(c.plate, locale)),
     sub: c.electric.lines.some((l) => l.kind === 'subsidy' || l.kind === 'recycling'),
+    sw: c.swapOnly ? 1 : 0,
     eLines: c.electric.lines.map((l) => [word(readerText(l.label[locale])), l.amount, l.isMaximum ? 1 : 0]),
     gLines: c.gasoline.lines.map((l) => [word(readerText(l.label[locale])), l.amount, l.isMaximum ? 1 : 0]),
     strip: word(stripText(stripOf(c), locale)),
@@ -49,7 +50,15 @@ function table(m: HomeMoney, locale: Locale, word: (s: string) => number): OpenT
   const month = {} as OpenTable['month'];
   for (const km of HOME_KM) {
     const x = m.month[km];
-    month[km] = { petrol: x.petrol.monthly.typical, homeLo: x.home.typical.lo, homeHi: x.home.typical.hi, plan: x.swapPlan.monthly.typical, payg: x.swapPayg.monthly.typical };
+    month[km] = {
+      petrol: x.petrol.monthly.typical,
+      homeLo: x.home.typical.lo,
+      homeHi: x.home.typical.hi,
+      plan: x.swapPlan.monthly.typical,
+      payg: x.swapPayg.monthly.typical,
+      planN: word(readerText(`${x.swapPlan.name[locale]} · ${x.swapPlan.planName[locale]}`)),
+      paygN: word(readerText(`${x.swapPayg.name[locale]} · ${x.swapPayg.planName[locale]}`)),
+    };
   }
   return {
     buy,

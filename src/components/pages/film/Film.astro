@@ -184,7 +184,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
       <div class="film__poster" data-poster>
         <p class="film__kicker">{t.player.kicker}</p>
         <p class="film__title" aria-hidden="true">{t.player.title}</p>
-        <button type="button" class="film__big" data-film-big><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z"></path></svg>{t.player.play}</button>
+        <button type="button" class="film__big" data-film-big aria-label={`${t.player.play}${locale === 'en' ? ': ' : '：'}${t.player.title}`}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z"></path></svg>{t.player.play}</button>
         <p class="film__len">{filmLengthLabel(locale)}</p>
       </div>
       <div class="film__end" data-end>
@@ -221,7 +221,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     <p class="film__stills-note">{t.still.note} <button type="button" class="film__optin" data-film-optin hidden>{t.still.optIn}</button></p>
     <ol class="film__stills">
       {stills.map((s) => (
-        <li>
+        <li data-still-t={s.time} tabindex="-1">
           <figure class="still">
             <div class="still__pic" data-tag={s.tag} role="img" aria-label={s.alt} data-scene={s.scene ? '' : undefined}>
               {SVG_LAYERS.map((k) => s.r[k] && <svg class="film__layer" viewBox={VB} aria-hidden="true" focusable="false" set:html={s.r[k]} />)}
@@ -249,7 +249,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
           <Fragment>
             {c.head && <li class="film__lines-head"><h3>{t.beats[c.beat.id]}</h3></li>}
             <li data-line={c.id}>
-              <button type="button" class="film__jump" data-film-jump={c.t} aria-label={fill(t.transcript.jump, { time: clock(c.t) })}>{clock(c.t)}</button>
+              <button type="button" class="film__jump" data-film-jump={c.t} data-js-only aria-label={fill(t.transcript.jump, { time: clock(c.t) })}>{clock(c.t)}</button>
               <div class="film__line">
                 <p class="film__line-text">{c.main}</p>
                 {c.note && <p class="film__line-note">{c.note}</p>}
@@ -1226,6 +1226,18 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   }
   .still__pic .film__layer {
     will-change: auto;
+  }
+  /* a still is smaller than the player on a phone: the words drawn over it scale with the still
+     (as they would in a photograph of the frame), so the cards keep the layout they have in the film */
+  .still__pic > .film__over,
+  .still__pic > .hud,
+  .still__pic > .film__tag {
+    --pr: clamp(9px, 4.4cqw, 16px);
+    --fs-xs: calc(0.875 * var(--pr));
+    --fs-sm: calc(0.9375 * var(--pr));
+    --fs-btn: calc(1.0625 * var(--pr));
+    --fs-md: calc(1.25 * var(--pr));
+    --tap: calc(3 * var(--pr));
   }
   .still__pic .hud__row--est {
     pointer-events: none;

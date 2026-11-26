@@ -487,7 +487,7 @@ export const illustration = {
   body: { 'zh-TW': '示意圖・不是醫學圖', en: 'Illustration, not a medical drawing' } as L10n,
   /** The sentence every scene's alt text ends with. Name the scenario before it. */
   altNote: {
-    'zh-TW': '這是示意圖：人站的地方畫了多少，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
+    'zh-TW': '這是示意圖：人站的地方畫了多少，照本站的推估；排氣管後面的深色只是讓你看清楚，不照比例。',
     en: 'This is an illustration: how much is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
   } as L10n,
 } as const;

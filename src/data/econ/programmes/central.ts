@@ -349,7 +349,7 @@ export const centralProgrammes: Programme[] = [
     confidence: 'verified',
     research: ['central#goods-tax-scrap-replace-4000', 'gas-prices#kymco-gov-tax-table', 'gas-prices#sym-duke125-nov-promo'],
     note: t(
-      '財政部網頁把新購2,000元與汰舊4,000元分開列，沒有寫可以相加；光陽與三陽的11月官方優惠與台中市環保局的金額表則兩者都算。試算依車廠做法相加，這會讓燃油車看起來較便宜，對電動車的比較是保守的；但相加只有次級依據，財政部未確認。',
+      '財政部網頁把新購2,000元與汰舊4,000元分開列，沒有寫可以相加；光陽與三陽的11月官方優惠與台中市環保局的金額表則兩者都算。試算依車廠做法相加，這會讓燃油機車看起來較便宜，對電動機車的比較是保守的；但相加只有次級依據，財政部未確認。',
       'The MOF page lists the new-purchase NT$2,000 and scrap NT$4,000 separately and does not say they add up; KYMCO\'s and SYM\'s official November offers and Taichung\'s EPB amount table count both. We follow the manufacturers, which makes the gasoline scooter look cheaper and keeps the comparison conservative for electric; but the stacking rests on secondary evidence and the MOF has not confirmed it.',
     ),
     calculator: true,

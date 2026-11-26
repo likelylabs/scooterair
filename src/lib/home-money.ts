@@ -139,6 +139,13 @@ export interface BuyCase {
   /** Whether the electric model stands in for a 125 cc, with the engine's note. */
   likeForLike: Evaluation['comparison']['likeForLike'];
   deadlines: Deadlines;
+  /** The electric model can only swap batteries (no home charging): it comes with a monthly battery plan. */
+  swapOnly: boolean;
+  /**
+   * When the electric model counts no subsidy but another calculator model of the same plate class
+   * does on these terms: the last day those subsidies accept a purchase. Null otherwise.
+   */
+  otherSubsidy: string | null;
   /**
    * The engine's messages for this case, most severe first: deadlines, quotas, the "check first"
    * ambiguities (the carbon reward stacked on the air subsidy), payout timing, like-for-like...
@@ -203,7 +210,7 @@ export interface Breakeven {
   engine: BreakEven;
 }
 
-export type StripKind = 'subsidy-and-promo' | 'subsidy' | 'nothing-confirmed' | 'next-programme' | 'no-subsidy';
+export type StripKind = 'subsidy-and-promo' | 'subsidy' | 'nothing-confirmed' | 'next-programme' | 'no-subsidy' | 'other-subsidy' | 'other-subsidy-and-promo';
 export interface Strip {
   kind: StripKind;
   date: string;
@@ -349,6 +356,18 @@ export function buyCase(county: JurisdictionId, scrap: ScrapKey, opts: { date?: 
   const e = evaluate({ ...base, gasolineModel, electricModel: ev.model, energyPlan: ev.plan }, data);
   const electric = sideOf(e, 'electric', data);
   const gasoline = sideOf(e, 'gasoline', data);
+  const evModel = data.evModels.find((m) => m.id === ev.model);
+  const counted = (l: { kind: string }) => l.kind === 'subsidy' || l.kind === 'recycling';
+  let otherSubsidy: string | null = null;
+  if (!electric.lines.some(counted)) {
+    const ends: string[] = [];
+    for (const { model, plan } of rankingPairs(data)) {
+      if (model.plateClass !== plate || model.id === ev.model) continue;
+      const l = purchaseLedger('electric', { ...base, gasolineModel, electricModel: model.id, energyPlan: plan.id } as Situation, data).ledger;
+      for (const x of l.lines) if (counted(x)) ends.push(x.deadline?.date ?? x.validTo);
+    }
+    otherSubsidy = maxDate(ends);
+  }
   return {
     county,
     countyName: rz(e.jurisdiction.name),
@@ -365,6 +384,8 @@ export function buyCase(county: JurisdictionId, scrap: ScrapKey, opts: { date?: 
     verdict: verdictOf(e.comparison.purchaseGap),
     likeForLike: { verdict: e.comparison.likeForLike.verdict, note: rz(e.comparison.likeForLike.note) },
     deadlines: deadlinesOf(electric, gasoline),
+    swapOnly: !!evModel && evModel.battery.system !== 'home',
+    otherSubsidy,
     messages: e.messages.map(rzMsg),
   };
 }
@@ -472,15 +493,19 @@ export function breakevenCase(county: JurisdictionId, scrap: ScrapKey, km: numbe
 // money.deadline and the strip (brief 7.7)
 
 /** Which strip sentence is true on `date` for a buy case. */
-export function stripOf(c: Pick<BuyCase, 'date' | 'deadlines'>, data: EconDataset = econData): Strip {
+export function stripOf(c: Pick<BuyCase, 'date' | 'deadlines'> & Partial<Pick<BuyCase, 'otherSubsidy'>>, data: EconDataset = econData): Strip {
   const { date, deadlines } = c;
   const before = cmp(date, data.meta.programmeYearEnd) <= 0;
-  const subsidy = deadlines.subsidy?.last ?? null;
+  const own = deadlines.subsidy?.last ?? null;
+  const other = !own && before && c.otherSubsidy && cmp(date, c.otherSubsidy) <= 0 ? c.otherSubsidy : null;
+  const subsidy = own ?? other;
   const promo = deadlines.promo && cmp(date, deadlines.promo) <= 0 ? deadlines.promo : null;
   let kind: StripKind;
-  if (subsidy) kind = !before ? 'next-programme' : promo ? 'subsidy-and-promo' : 'subsidy';
+  // the cheapest model counts no subsidy, but other models do on these terms: say so, never "no subsidy"
+  if (other) kind = promo ? 'other-subsidy-and-promo' : 'other-subsidy';
+  else if (own) kind = !before ? 'next-programme' : promo ? 'subsidy-and-promo' : 'subsidy';
   else kind = before ? 'no-subsidy' : 'nothing-confirmed';
-  return { kind, date, subsidy, promo: kind === 'subsidy-and-promo' ? promo : null };
+  return { kind, date, subsidy, promo: kind === 'subsidy-and-promo' || kind === 'other-subsidy-and-promo' ? promo : null };
 }
 
 /** The strip as one sentence. Dates carry their year when it is not the reader's year. */

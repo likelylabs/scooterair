@@ -43,7 +43,7 @@ export const art = {
       full: { 'zh-TW': '畫的是旁邊停滿機車（{lo} 到 {hi} 輛）的情境。', en: 'It draws a full box of scooters beside you ({lo} to {hi}).' } as L10n,
     },
     pack: {
-      'zh-TW': '這是示意圖：人站的地方畫了多少，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
+      'zh-TW': '這是示意圖：人站的地方畫了多少，照本站的推估；排氣管後面的深色只是讓你看清楚，不照比例。',
       en: 'This is an illustration: how much is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
     } as L10n,
     electric: {
@@ -55,7 +55,7 @@ export const art = {
 
   /** The three kinds of mark, named once (screen 2's key, any legend). */
   marks: {
-    ribbon: { 'zh-TW': '聞得到：油氣（沒燒完的汽油）', en: 'You can smell it: fuel vapour (unburnt petrol)' } as L10n,
+    ribbon: { 'zh-TW': '聞得到：油氣和醛（ㄑㄩㄢˊ）類', en: 'You can smell it: vapour and aldehydes' } as L10n,
     ring: { 'zh-TW': '聞不到：一氧化碳', en: 'No smell: carbon monoxide' } as L10n,
     dot: { 'zh-TW': '看不到：微粒', en: 'Too small to see: particles' } as L10n,
   },
@@ -223,8 +223,8 @@ export const art = {
     /** One line per mask, shown in the picture while that mask is chosen. From research/masks/VERIFIED.json → tableRows. */
     says: {
       cloth: { 'zh-TW': '氣體穿過去；微粒也大多穿過去', en: 'Gases pass through; so do most particles' } as L10n,
-      surgical: { 'zh-TW': '氣體穿過去；微粒擋下一些，其他從邊緣漏進去', en: 'Gases pass through; some particles stop, the rest leak in at the edges' } as L10n,
-      carbon: { 'zh-TW': '一氧化碳穿過去；油氣只擋下一點點，而且不久', en: 'Carbon monoxide passes through; a little vapour is held, and not for long' } as L10n,
+      surgical: { 'zh-TW': '氣體穿過去；微粒擋住一些，其他從邊緣漏進去', en: 'Gases pass through; some particles stop, the rest leak in at the edges' } as L10n,
+      carbon: { 'zh-TW': '一氧化碳穿過去；油氣只擋住一點點，而且撐不久', en: 'Carbon monoxide passes through; a little vapour is held, and not for long' } as L10n,
       n95: { 'zh-TW': '氣體照樣穿過去；戴得貼合，微粒大多擋得住', en: 'Gases still pass through; if it fits, most particles stop' } as L10n,
     },
     gapNose: { 'zh-TW': '鼻子旁邊的縫', en: 'Gap beside the nose' } as L10n,

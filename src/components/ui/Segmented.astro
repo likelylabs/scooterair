@@ -85,6 +85,7 @@ const css = [
       </label>
     ))}
   </div>
+  <p class="vh" aria-live="polite" data-seg-say></p>
 </fieldset>
 <style is:inline set:html={css}></style>
 
@@ -146,6 +147,8 @@ const css = [
   .seg__label {
     font-size: var(--fs-btn);
     font-weight: var(--fw-bold);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
   .seg__sub {
     font-size: var(--fs-xs);
@@ -191,7 +194,16 @@ const css = [
     scope.querySelectorAll<HTMLInputElement>(`input[data-pick-input="${name}"]`).forEach((other) => {
       if (other !== input && other.value === input.value && other.closest('[data-pick-scope]') === input.closest('[data-pick-scope]')) other.checked = true;
     });
-    if (announce) input.closest('[data-seg]')?.dispatchEvent(new CustomEvent('sa:pick', { bubbles: true, detail: { name, value: input.value } }));
+    if (announce) {
+      const seg = input.closest<HTMLElement>('[data-seg]');
+      // what changed because of this choice, spoken once: every variant marked data-say for this value
+      const say = seg?.querySelector<HTMLElement>('[data-seg-say]');
+      if (say) {
+        const parts = [...scope.querySelectorAll<HTMLElement>(`[data-say][data-when-${name}]`)].filter((el) => (el.getAttribute(`data-when-${name}`) ?? '').split(/\s+/).includes(input.value));
+        say.textContent = parts.map((el) => (el.textContent ?? '').replace(/\s+/g, ' ').trim()).filter(Boolean).join(' ');
+      }
+      seg?.dispatchEvent(new CustomEvent('sa:pick', { bubbles: true, detail: { name, value: input.value } }));
+    }
   };
   // at load: whatever is checked (the first choice, or a choice the browser restored on reload)
   document.querySelectorAll<HTMLInputElement>('input[data-pick-input]:checked').forEach((i) => stamp(i, false));

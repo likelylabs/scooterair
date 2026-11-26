@@ -59,7 +59,7 @@ const tagText = illustration.tag[locale];
   </script>
   <div class="card" data-card={id} style="--k:1">
     <div class="card__pic">
-      {C ? <C locale={locale} tag={c.picture === 'body' ? 'body' : 'street'} /> : <Picture locale={locale} kind={own} scenario="dozen" labels={own === 'heights'} />}
+      {C ? <C locale={locale} tag={c.picture === 'body' ? 'body' : 'street'} {...(c.picture === 'mask' ? { says: false } : {})} /> : <Picture locale={locale} kind={own} scenario="dozen" labels={own === 'heights'} />}
     </div>
     <div class="card__text">
       <p class="card__head"><span class="card__name">{site.name[locale]}</span><span class="card__host">{host}</span></p>

@@ -642,13 +642,14 @@ a.hc-row__link .hc-row__n {
 .hc-off--clean {
   stroke: var(--chart-clean);
 }
-/* a thin outlined bar: the second-choice options of G13 */
+/* a thin bar for the second-choice options of G13 (battery swapping): filled in its own darker
+   shade, so a real value never reads as an empty bar */
 .hc-outline {
-  fill: var(--here, var(--bg));
+  fill: var(--chart-swap);
   stroke-width: 2;
 }
 .hc-outline--clean {
-  stroke: var(--chart-clean);
+  stroke: var(--chart-swap);
 }
 .hc-outline--exhaust {
   stroke: var(--chart-exhaust);

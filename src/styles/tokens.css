@@ -104,6 +104,7 @@
   /* Charts. Order of the categorical slots is fixed: never cycle or reorder. */
   --chart-exhaust: #b0651a; /* slot 1: gasoline / exhaust */
   --chart-clean: #00897a; /* slot 2: electric / clean */
+  --chart-swap: #004d45; /* battery swapping: a darker shade of slot 2, filled (never an empty outline) */
   --chart-blue: #3a6fd8; /* slot 3 */
   --chart-lime: #6e9b12; /* slot 4 */
   --chart-magenta: #b8327d; /* slot 5 */
@@ -262,6 +263,8 @@
 
     --chart-exhaust: #d08234;
     --chart-clean: #17ad96;
+  --chart-swap: #9ae6d6;
+    --chart-swap: #9ae6d6;
     --chart-blue: #5b8def;
     --chart-lime: #86ad32;
     --chart-magenta: #dc5b9f;

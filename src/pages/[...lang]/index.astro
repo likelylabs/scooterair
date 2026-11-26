@@ -69,7 +69,7 @@ import { formatDate } from '@/lib/site-state';
 import electric from '@/i18n/pages/electric';
 import home from '@/i18n/pages/home';
 import { fill, localize } from '@/i18n/pages/_copy';
-import { chipWhere, how, kSentences, num, site } from '@/i18n/ui';
+import { chipWhere, how, kSentences, num, site, ui } from '@/i18n/ui';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -121,6 +121,10 @@ const checkedDate = formatDate(checkedOn, locale, checkedOn.slice(0, 4) !== D.bu
 const T = localize(electric, locale).open as unknown as OpenText;
 const H: V.HomeMoneyText = {
   bodyClass: t.s13.bodyClass,
+  swapOnly: t.s13.swapOnly,
+  worst: t.s13.worst,
+  worstScrapYes: t.s13.worstScrapYes,
+  worstScrapNo: t.s13.worstScrapNo,
   bodyKm: t.s14.bodyKm,
   swapDearer: t.s14.swapDearer,
   swapCheaper: t.s14.swapCheaper,
@@ -188,7 +192,10 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
           <WorkingSum locale={locale} {...workingPerRedCan(locale)} />
           <p>{fill(t.s2.sheet.can, { litres: formatEstimate('emit.co.perRed_L', locale).text, ml: F.canMl, cans: est.emit.co.canWords[locale] })}</p>
         </Fragment>
-        <p slot="block3">{t.s2.sheet.care}</p>
+        <Fragment slot="block3">
+          <p>{t.s2.sheet.care}</p>
+          <p><a href={evidence(1)}>{how.fullEvidence[locale]}</a></p>
+        </Fragment>
       </HowSheet>
     </Screen>
 
@@ -215,7 +222,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
             <span class="h-box__val"><b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} where="" size="sm" /></span>
           </div>
           <div class="h-box__row h-box__row--est">
-            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" data-when-scenario={s} />)}
+            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" data-when-scenario={s} data-say />)}
           </div>
           <p class="h-box__gloss"><b>{t.s4.box}</b><span aria-hidden="true">｜</span>{estimateText.ppmGloss[locale]}</p>
         </div>
@@ -226,10 +233,10 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       <p slot="body">{est.meta.gloss[locale]}{sp}{scenarioKeys.map((s) => <span data-when-scenario={s}>{kerbSentence(s, locale)}</span>)}</p>
       <HowSheet slot="sheet" id="how-4" locale={locale} kind="estimate" pollutant="co" anchor="recipe" title={t.s4.sheet.title} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']}>
         <p slot="block1">{fill(t.s4.sheet.measured, { sites: F.sites, n: F.peakSites, lo: F.peakLo, hi: F.peakHi })}</p>
-        <WorkingSum slot="block2" locale={locale} {...workingKerbFlow(locale)} />
+        <Fragment slot="block2">{scenarioKeys.map((s) => <div data-when-scenario={s}><WorkingSum {...workingKerbFlow(locale, s)} /></div>)}</Fragment>
         <Fragment slot="block3">
           <p>{est.meta.appliesTo[locale]}{sp}{t.s4.sheet.care}</p>
-          <AirRange locale={locale} scenario="dozen" />
+          {scenarioKeys.map((s) => <div data-when-scenario={s}><AirRange locale={locale} scenario={s} /></div>)}
         </Fragment>
       </HowSheet>
     </Screen>
@@ -276,7 +283,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <RoadOfTime locale={locale} posts={posts} />
         <div class="h-pic__ctl"><Segmented name="reds" legend={t.s7.stepper} hideLegend value={String(defaultRedsPerDay)} options={redsPerDayOptions.map((n) => ({ value: String(n), label: fill(t.s7.stepperOption, { n }) }))} /></div>
       </div>
-      <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={String(n)}>{t.s7.body[n]}</span>)}</p>
+      <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={String(n)} data-say>{t.s7.body[n]}</span>)}</p>
       <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
       <HowSheet slot="sheet" id="how-7" locale={locale} kind="study" heads={t.s7.sheet.heads as [string, string, string]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: evidence(5) }}>
         <ul slot="block1">
@@ -366,7 +373,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <div class="h-pic__ctl">
           <SwapControl locale={locale} />
           <div class="h-swapnote">
-            <span class="h-swapnote__n">{t.s11.chipBefore}<b data-swap-out="pct">100</b>{t.s11.chipAfter}</span>
+            <span class="h-swapnote__n" data-swap-all><span data-swap-when="part" hidden>{t.s11.chipBefore}<b data-swap-out="pct">100</b>{t.s11.chipAfter}</span><span data-swap-when="all">{t.s11.chipAll}</span></span>
             <KindChip locale={locale} kind="derived" size="sm" />
             <span class="h-swapnote__if">{t.s11.assume}</span>
           </div>
@@ -391,7 +398,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       </div>
       <Fragment slot="chips">
         <KindChip size={chipSize} locale={locale} of={fact('inspection-top-tenth-co-share')} />
-        <span class="h-chipnote h-chipnote--one">{formatEstimate('inspect.top10share', locale).text}</span>
+        <span class="h-chipnote h-chipnote--one">{fill(t.s12.shareLabel, { share: formatEstimate('inspect.top10share', locale).text.replace(/ (?=\d|%)/g, '\u00a0') })}</span>
       </Fragment>
       <HowSheet slot="sheet" id="how-12" locale={locale} kind="derived" facts="inspection-top-tenth-co-share" primary={{ href: evidence(1) }} secondary={{ href: href('/act/#ride', locale), label: t.s12.sheet.ride }}>
         <p slot="block1">{fill(t.s12.sheet.used, { readings: F.readings })}</p>
@@ -418,7 +425,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <div class="h-fig" data-hm-fig aria-live="polite" set:html={V.figureHtml(P, table, choice)} />
         <PriceBars locale={locale} id="hm-price" petrol={price.petrol} electric={price.electric} plate={price.plate} table={false} />
       </div>
-      <p slot="body" data-hm-body13>{V.buyBody(P, table)}</p>
+      <p slot="body" data-hm-body13>{V.buyBody(P, table, choice)}</p>
       <p class="h-deadline-note" data-hm-strip>{V.stripOf(P, table, choice)}</p>
       <p class="h-checked-note">{H.checked}</p>
       <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
@@ -472,7 +479,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
               <span>{t.common.filmShort}</span>
             </a>
           </li>
-          <li><a class="h-act" href={lineHref} target="_blank" rel="noopener noreferrer"><span set:html={V.phrasedHtml(t.s15.line)} /></a></li>
+          <li><a class="h-act" href={lineHref} target="_blank" rel="noopener noreferrer"><span set:html={V.phrasedHtml(t.s15.line)} /><span class="vh">{ui.externalLink[locale]}</span></a></li>
           <li><a class="h-act" href={href('/act/', locale)}><span set:html={V.phrasedHtml(t.s15.act)} /></a></li>
           <li><a class="h-act" href={href('/estimate/#measure', locale)}><span>{how.toMeasure[locale]}</span></a></li>
         </ul>

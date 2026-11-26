@@ -8,7 +8,7 @@
  */
 import type { Locale } from '@/i18n';
 import { href } from '@/i18n';
-import { chipWhere } from '@/i18n/ui';
+import { chipWhere, how } from '@/i18n/ui';
 import Screen from '@/components/ui/Screen.astro';
 import HowSheet from '@/components/ui/HowSheet.astro';
 import KindChip from '@/components/ui/KindChip.astro';
@@ -33,15 +33,15 @@ const s2 = t.s2;
 <Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
   <TailpipeMarks slot="picture" locale={locale} can={false} />
   <AirKey slot="controls" locale={locale} tap />
-  <KindChip slot="chips" locale={locale} kind="estimate" />
-  <HowSheet slot="sheet" id="how-1" locale={locale} kind="estimate" anchor="answers" title={s1.sheet.title[locale]} facts={['scooter-exhaust-carbonyls', 'odour-thresholds']}>
+  <KindChip slot="chips" locale={locale} kind="derived" />
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['scooter-exhaust-carbonyls', 'odour-thresholds']} primary={{ href: href('/evidence/#link-4', locale) }} secondary={{ href: href('/estimate/#answers', locale), label: how.fullMethod[locale] }}>
     <p slot="block1">{f(s1.sheet.b1[locale])}</p>
     <Fragment slot="block2">
       <WorkingSum
         locale={locale}
         mode="flow"
         steps={s1.sheet.flow.map((x) => ({ value: x.value[locale], label: x.label[locale], chip: 'measured' as const }))}
-        result={{ value: s1.sheet.result.value[locale], label: s1.sheet.result.label[locale], kind: 'estimate' }}
+        result={{ value: s1.sheet.result.value[locale], label: s1.sheet.result.label[locale], kind: 'derived' }}
       />
       <p>{f(s1.sheet.b2[locale])}</p>
     </Fragment>

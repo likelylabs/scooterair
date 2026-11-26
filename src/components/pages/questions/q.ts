@@ -28,7 +28,7 @@ export const moved = { 'how-much': '/estimate/', electric: '/electric/' } as con
 
 /** The chip an index card carries: the kind of answer the page gives (brief 7.5). */
 export const cardChip: Record<Slug, { kind: ChipKind; fact?: FactId }> = {
-  smell: { kind: 'estimate' },
+  smell: { kind: 'derived' },
   'beside-me': { kind: 'measured', fact: 'iot-setback-measured' },
   app: { kind: 'measured', fact: 'taipei-roadside-co-2024' },
   'one-red-light': { kind: 'derived' },

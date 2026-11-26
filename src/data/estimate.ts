@@ -15,7 +15,7 @@
 // - An estimate is a range. `mid` exists only for drawing density (air.ts) and rule choices;
 //   never print it.
 // - What the pack adds is rounded to one significant figure, totals to one decimal place.
-// - A value under 0.01 prints as 不到 0.01 / under 0.01.
+// - A low end under 0.01 prints as 0 (約 0 到 0.3 ppm / about 0 to 0.3 ppm).
 // - Where it applies: an adult's nose at 1.5 m, a 90-second average, beside the pack.
 
 import type { L10n, Locale, ReaderKind } from './types.ts';
@@ -149,8 +149,8 @@ export const scenarios: Record<ScenarioKey, Scenario> = {
     name: t('十來輛', 'A dozen or so'),
     longName: t('十來輛（8 到 20 輛）', 'A dozen or so (8 to 20 scooters)'),
     basis: t(
-      '停等區停了一部分：離你 10 公尺內大約 8 輛（4 到 13 輛）。',
-      'A partly filled stop box: about 8 scooters (4 to 13) within 10 metres of you.',
+      '停等區停了一部分：離你 10 公尺內大約 8 輛（4 到 13 輛），算的時候，整排用 8 到 20 輛。',
+      'A partly filled stop box: about 8 scooters (4 to 13) within 10 metres of you; the estimate uses 8 to 20 in the row.',
     ),
   },
   full: {
@@ -399,7 +399,7 @@ export function formatEstNumber(n: number, rounding: EstRange['rounding'], local
 }
 
 export interface FormattedRange {
-  /** '0.05' or '不到 0.01' / 'under 0.01'. */
+  /** '0.05', or '0' for a low end under 0.01. */
   lo: string;
   hi: string;
   /** Unit as printed beside the number: 'ppm', '微克／立方公尺', 'µg/m³' … */
@@ -408,7 +408,7 @@ export interface FormattedRange {
   text: string;
   /** The phrase without the unit: '約 0.05 到 1'. */
   textNoUnit: string;
-  /** True when the low end printed as 不到 0.01. */
+  /** True when the low end is under 0.01 (printed as 0). */
   loUnder: boolean;
   kind: ReaderKind;
   /** /estimate/#… for the sheet's 完整算法 button (estimates only). */
@@ -418,7 +418,7 @@ export interface FormattedRange {
 /**
  * A range as a reader sees it. Pass a slot id or an EstRange.
  *   formatEstimate('co.dozen.add', 'zh-TW').text   // '約 0.05 到 1 ppm'
- *   formatEstimate('co.few.add', 'en').text         // 'under 0.01 to about 0.3 ppm'
+ *   formatEstimate('co.few.add', 'en').text         // 'about 0 to 0.3 ppm'
  * `unitStyle: 'symbol'` prints µg/m³ instead of 微克／立方公尺 (beside a big number).
  */
 export function formatEstimate(
@@ -429,14 +429,15 @@ export function formatEstimate(
   const r = typeof slotOrRange === 'string' ? estRange(slotOrRange) : slotOrRange;
   const zh = locale === 'zh-TW';
   const loUnder = r.lo < UNDER;
-  const lo = loUnder ? (zh ? '不到 0.01' : 'under 0.01') : formatEstNumber(r.lo, r.rounding, locale);
+  // a low end under 0.01 reads as 0 at the precision printed: 「約 0 到 0.3 ppm」 (never an upper bound inside a range)
+  const lo = loUnder ? '0' : formatEstNumber(r.lo, r.rounding, locale);
   const hi = formatEstNumber(r.hi, r.rounding, locale);
   const unitL10n = (opts.unitStyle === 'symbol' && estUnitSymbol[r.unit]) || estUnitLabels[r.unit];
   const unit = unitL10n[locale];
   const sp = unit === '%' ? '' : ' ';
   let textNoUnit: string;
-  if (zh) textNoUnit = loUnder ? `${lo} 到約 ${hi}` : `約 ${lo} 到 ${hi}`;
-  else textNoUnit = loUnder ? `${lo} to about ${hi}` : `about ${lo} to ${hi}`;
+  if (zh) textNoUnit = `約 ${lo} 到 ${hi}`;
+  else textNoUnit = `about ${lo} to ${hi}`;
   const text = unit ? `${textNoUnit}${sp}${unit}` : textNoUnit;
   return { lo, hi, unit, text, textNoUnit, loUnder, kind: r.kind, anchor: r.anchor };
 }
@@ -554,9 +555,9 @@ export const kerbSentenceTable = kerbSentences;
 export type CheckRule = 'overlap' | 'higher' | 'lower';
 
 const checkHeadlines: Record<CheckRule, L10n> = {
-  overlap: t('有人量過嗎？有，和我們算的差不多', 'Has anyone measured it? Yes, and it roughly matches our estimate'),
-  higher: t('有人量過嗎？有，我們算的比較高', 'Has anyone measured it? Yes. Our estimate is higher'),
-  lower: t('有人量過嗎？有，我們算的比較低', 'Has anyone measured it? Yes. Our estimate is lower'),
+  overlap: t('行人等候區量過嗎？有，和我們算的差不多', 'Measured where people wait to cross? Yes, and it roughly matches our estimate'),
+  higher: t('行人等候區量過嗎？有，我們算的比較高', 'Measured where people wait to cross? Yes. Our estimate is higher'),
+  lower: t('行人等候區量過嗎？有，我們算的比較低', 'Measured where people wait to cross? Yes. Our estimate is lower'),
 };
 
 /** Screen 5: compare co.dozen.total with the lowest and highest measured peak. Today: overlap. */
@@ -609,15 +610,17 @@ export const estimateText = {
   coTracksVapour: t('一氧化碳多的地方，剛排出來的油氣和苯也多。', 'Where there is more carbon monoxide, there is more fresh fuel vapour and benzene too.'),
   /** The flow the recipe sheet draws (no operators: the kerb estimate is a simulation). */
   flow: [
-    t('每輛每小時排約 15 公克（8 到 27）', 'Each scooter gives off about 15 g an hour (8 to 27)'),
+    t('平均每輛每小時排約 15 公克（平均值在 8 到 27 之間）', 'On average each scooter gives off about 15 g an hour (the average lies between 8 and 27)'),
     t('旁邊停 8 到 20 輛', '8 to 20 scooters beside you'),
     t('風和距離把它吹淡', 'Wind and distance thin it'),
     t('大人鼻子的高度，多出約 0.05 到 1 ppm', "At an adult's nose: about 0.05 to 1 ppm added"),
   ],
+  /** The flow's last box for any scenario ({range} from formatEstimate). */
+  flowResult: t('大人鼻子的高度，多出{range}', "At an adult's nose: {range} added"),
   /** The cross-check paragraph (4.5), worded truthfully. */
   crossCheck: t(
-    '運研所量的路口裡，只有最忙的一個看得出機車讓一氧化碳變多：最高的一分鐘，多出約 0.8 到 1.2 ppm。把我們的算法放到那支儀器的位置和當時的風，算出來差不多。照行人站的位置算，大約是它的兩倍，所以我們的數字比較可能偏高，不是偏低。另外三個路口看不出差別。',
-    "Of the junctions the Institute of Transportation measured, only the busiest shows scooters raising carbon monoxide: about 0.8 to 1.2 ppm more in the highest minute. Run at that sensor's position and that day's wind, our method gives about the same. At the spot where pedestrians stand it gives about twice that, so our figures are more likely too high than too low. The other three junctions show no difference.",
+    '運研所量了 10 個路口，報告寫出等候區一氧化碳最高值的，是高雄 3 個路口；其中只有最忙的一個看得出機車讓一氧化碳變多，最高的一分鐘多出約 0.8 到 1.2 ppm。把我們的算法放到那支儀器的位置和當時的風，算出來差不多。照行人站的位置算，大約是它的兩倍，所以我們的數字比較可能偏高，不是偏低。另外兩個路口，最高值沒有比附近的測站高。這個比對只檢查了離儀器 2 到 8 公尺、風不小時的算法；行人身邊 0.3 到 3 公尺的部分，是照同樣的算法推出來的，所以這不算驗證。',
+    "The Institute of Transportation measured 10 junctions and gives the highest waiting-area carbon monoxide for 3 of them, all in Kaohsiung; only the busiest of those shows scooters raising carbon monoxide, about 0.8 to 1.2 ppm more in the highest minute. Run at that sensor's position and that day's wind, our method gives about the same. At the spot where pedestrians stand it gives about twice that, so our figures are more likely too high than too low. At the other two junctions the highest reading was no higher than the nearby station's. This checks the method only 2 to 8 metres from the sensor in a fair wind; the 0.3 to 3 metres beside a pedestrian is extrapolated by the same method, so this is not a validation.",
   ),
   /** What the estimate cannot say (METHOD §8), for /estimate/#limits. */
   limits: [
@@ -658,7 +661,6 @@ export const estimateSourceIds = [
   'cheung-2013-acp',
   'abdillah-2024-aaqr',
   'wu-2021-trd',
-  'ncku-thesis-hap-benzene',
   'who-2021-aqg',
   'saksena-2007-hanoi',
   'he-gao-2020-arxiv',

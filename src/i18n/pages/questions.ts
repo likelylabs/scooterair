@@ -68,7 +68,7 @@ export default copy({
     },
     'beside-me': {
       q: { 'zh-TW': '站遠一點|有用嗎？', en: 'Does standing back |help?' },
-      card: { 'zh-TW': '離排氣管遠一點，通常比較淡；差多少，本站不印數字。', en: 'Further from the tailpipe it is usually thinner. We print no figure for how much.' },
+      card: { 'zh-TW': '離排氣管遠一點，通常比較淡；差多少要看風，沒有準確的數字。', en: 'Further from the tailpipe it is usually thinner. How much depends on the wind; there is no exact figure.' },
     },
     app: {
       q: { 'zh-TW': '空氣品質 App |為什麼看不出來？', en: 'Why doesn’t the |air-quality app show it?' },
@@ -101,7 +101,7 @@ export default copy({
   smell: {
     s1: {
       chapter: { 'zh-TW': '味道', en: 'The smell' },
-      headline: { 'zh-TW': '臭的是油氣。|一氧化碳和微粒，|聞不到', en: 'The smell is fuel vapour. |Carbon monoxide and particles |have no smell' },
+      headline: { 'zh-TW': '臭的是油氣和醛類。|一氧化碳和微粒，|聞不到', en: 'The smell is fuel vapour and sharp aldehydes. |Carbon monoxide and particles |have no smell' },
       body: {
         'zh-TW': '臭的是沒燒完的汽油和刺鼻的醛（ㄑㄩㄢˊ）類，最可能的主角是乙醛。味道只告訴你一件事：你正站在廢氣裡。',
         en: 'The smell is unburnt petrol and sharp aldehydes; the likeliest main contributor is acetaldehyde. It tells you one thing: you are standing in exhaust.',
@@ -173,8 +173,8 @@ export default copy({
       chapter: { 'zh-TW': '站遠一點', en: 'Standing back' },
       headline: { 'zh-TW': '離排氣管遠一點，|通常比較淡', en: 'Further from the tailpipe, |it is usually thinner' },
       body: {
-        'zh-TW': '差多少，要看風和距離，本站不印數字。別站在車陣正後方，是不花錢就做得到的事。',
-        en: 'How much depends on wind and distance, and we print no figure. Not standing right behind the pack costs nothing.',
+        'zh-TW': '差多少要看風和距離，沒有準確的數字。別站在車陣正後方，是不花錢就做得到的事。',
+        en: 'How much depends on wind and distance; there is no exact figure. Not standing right behind the pack costs nothing.',
       },
       quiet: {
         'zh-TW': '運研所把等候區往後退，尖峰時段的 PM2.5 每立方公尺少了 {a} 和 {b} 微克。',
@@ -182,7 +182,7 @@ export default copy({
       },
       sheet: {
         b1: {
-          'zh-TW': '交通部運輸研究所（運研所）。它在路口把行人等候區移開機車待轉區，尖峰時段實際去量。',
+          'zh-TW': '交通部運輸研究所（運研所）。它把幾個路口的行人等候區往後移，離機車待轉區遠一點，在尖峰時段去量。',
           en: 'Taiwan’s Institute of Transportation, part of the transport ministry. It moved a pedestrian waiting area away from the scooters’ turn box and measured there at rush hour.',
         },
         b2: {
@@ -190,8 +190,8 @@ export default copy({
           en: 'PM2.5 in the waiting area fell by {a} and {b} µg/m³ on average: a small change.',
         },
         b3: {
-          'zh-TW': '這量的是 PM2.5，而機車讓 PM2.5 變多的量本來就不大。離多遠會少多少，要看風；本站沒有一條算得準的規則，所以不印距離的數字。',
-          en: 'This is PM2.5, and scooters raise PM2.5 only a little to begin with. How much thinner the air is further away depends on the wind; we have no rule that holds, so we print no figure for distance.',
+          'zh-TW': '這量的是 PM2.5，而機車讓 PM2.5 變多的量本來就不大。離多遠會少多少，要看風；沒有一條算得準的規則，所以這裡沒有距離的數字。',
+          en: 'This is PM2.5, and scooters raise PM2.5 only a little to begin with. How much thinner the air is further away depends on the wind; no rule holds, so there is no distance figure here.',
         },
       },
     },
@@ -229,12 +229,12 @@ export default copy({
       },
       sheet: {
         b1: {
-          'zh-TW': '台北市環保局的交通測站（{coYear} 年年報），和交通部運輸研究所（運研所）放在路口行人等候區的感測器（2024 年 7 月）。',
-          en: 'Taipei’s roadside air-quality stations (the city’s {coYear} annual report), and the sensors Taiwan’s Institute of Transportation put in pedestrian waiting areas (July 2024).',
+          'zh-TW': '台北市環保局的交通測站（{coYear} 年年報）、交通部運輸研究所（運研所）放在路口行人等候區的感測器（2024 年 7 月），和環境部的全台一般測站（2025 年平均）。',
+          en: 'Taipei’s roadside air-quality stations (the city’s {coYear} annual report), the sensors Taiwan’s Institute of Transportation put in pedestrian waiting areas (July 2024), and the environment ministry’s general stations across Taiwan (2025 average).',
         },
         b2: {
-          'zh-TW': '測站的進氣口離地 {lo} 到 {hi} 公尺，報的是每小時的平均。運研所在路口等候區量到的 PM2.5，大多是每立方公尺 {pmLo} 到 {pmHi} 微克；全台一般測站 2025 年的平均是 {pmBg} 微克，差不多大。',
-          en: 'Station inlets are {lo} to {hi} m above the ground and report hourly averages. The Institute’s waiting-area PM2.5 was mostly {pmLo} to {pmHi} µg/m³; Taiwan’s general stations averaged {pmBg} µg/m³ in 2025, much the same size.',
+          'zh-TW': '測站的進氣口離地 {lo} 到 {hi} 公尺，報的是每小時的平均。運研所在路口等候區量到的 PM2.5，大多是每立方公尺 {pmLo} 到 {pmHi} 微克；環境部的全台一般測站 2025 年的平均是 {pmBg} 微克，大小差不多（不同年份、不同季節，只能看大小）。',
+          en: 'Station inlets are {lo} to {hi} m above the ground and report hourly averages. The Institute’s waiting-area PM2.5 was mostly {pmLo} to {pmHi} µg/m³; the environment ministry’s general stations across Taiwan averaged {pmBg} µg/m³ in 2025, much the same size (a different year and season, so a comparison of size only).',
         },
         b3: {
           'zh-TW': 'App 上最常看到的數字是 PM2.5。機車在紅燈時排的，主要是一氧化碳和油氣，這兩樣 App 的 PM2.5 看不出來。',
@@ -310,8 +310,8 @@ export default copy({
         studiesTitle: { 'zh-TW': '三個路牌，各是什麼研究', en: 'The study behind each signpost' },
         studies: [
           {
-            'zh-TW': '高雄：{people} 個人戴著感測器過日子。PM2.5 突然升高的那 {minutes} 分鐘，心跳的節奏小小變了一下，很快就回復，這不是生病。那些高峰大多來自工廠、蚊香、燒稻草和燒香。',
-            en: 'Kaohsiung: {people} people wore sensors through their days. In the {minutes} minutes after PM2.5 jumped, the heart’s rhythm changed a little and soon recovered; this is not an illness. Most of those peaks came from factories, mosquito coils, straw burning and incense.',
+            'zh-TW': '高雄：{people} 個人戴著感測器過日子。PM2.5 突然升高的那 {minutes} 分鐘，心跳的節奏小小變了一下；這是身體的訊號，不是生病。高雄找到的高峰，主要來自工廠、蚊香、燒稻草和燒香。',
+            en: 'Kaohsiung: {people} people wore sensors through their days. In the {minutes} minutes after PM2.5 jumped, the heart’s rhythm shifted a little: a signal, not an illness. The peaks found in Kaohsiung came mainly from factories, mosquito coils, straw burning and incense.',
           },
           {
             'zh-TW': '倫敦：{asthma} 個有氣喘的大人，在柴油車很多的街上走了 {hours} 小時，肺功能小幅下降，本人沒有感覺。',
@@ -335,7 +335,7 @@ export default copy({
         en: 'That is the finding of a review of {studies} long-term studies of exhaust from all traffic, not scooters alone. The picture shows where exhaust goes once it is inside the body.',
       },
       pins: {
-        nose: { 'zh-TW': '鼻子、喉嚨：聞得到的油氣和醛類，會刺激鼻子和喉嚨。', en: 'Nose and throat: the vapour and aldehydes you can smell irritate them.' },
+        nose: { 'zh-TW': '鼻子、喉嚨：聞得到的油氣和醛（ㄑㄩㄢˊ）類，會刺激鼻子和喉嚨。', en: 'Nose and throat: the vapour and aldehydes you can smell irritate them.' },
         lungs: { 'zh-TW': '肺：很小的微粒，可以進到肺的深處。', en: 'Lungs: very small particles reach deep into the lungs.' },
         blood: {
           'zh-TW': '血液：一氧化碳從肺進到血液，占掉載氧氣的位子。',
@@ -393,8 +393,8 @@ export default copy({
           en: 'A study published in {year} gave children in Bandung and Kathmandu sensors to carry to school and back.',
         },
         b2: {
-          'zh-TW': '一天裡面，坐機車和走路的那一段，PM2.5 最高。',
-          en: 'Over the day, the stretches on a scooter and on foot had the highest PM2.5.',
+          'zh-TW': '上學、放學的路上，坐機車和走路的那一段，PM2.5 最高。',
+          en: 'On the way to and from school, the stretches on a scooter or on foot had the highest PM2.5.',
         },
       },
     },
@@ -421,11 +421,11 @@ export default copy({
           en: 'A Taipei study (Chuang et al., published {year}) had healthy young adults commute in different ways for one morning hour, carrying the instrument with them.',
         },
         b2: {
-          'zh-TW': '一小時的 PM2.5 平均，每立方公尺：騎燃油機車 {scooter} 微克、走路 {walking}、搭公車 {bus}、開車 {car}、搭捷運 {metro}。',
+          'zh-TW': '一小時的 PM2.5 平均，每立方公尺：騎燃油機車 {scooter} 微克、走路 {walking}、搭公車 {bus}、坐汽車 {car}、搭捷運 {metro}。',
           en: 'Mean PM2.5 over the hour, in µg/m³: petrol scooter {scooter}, walking {walking}, bus {bus}, car {car}, metro {metro}.',
         },
         b3: {
-          'zh-TW': '這是各種來源的 PM2.5，只量早上一小時。騎機車和走路都明顯比搭捷運、開車多；這兩種之間差多少，統計上分不出來。量的是每個人自己吸到的；這項研究只量 PM2.5，不包括一氧化碳和苯。',
+          'zh-TW': '這是各種來源的 PM2.5，只量早上一小時。騎機車和走路都明顯比搭捷運、坐汽車多；這兩種之間差多少，統計上分不出來。量的是每個人自己吸到的；這項研究只量 PM2.5，不包括一氧化碳和苯。',
           en: 'This is PM2.5 from all sources, over one morning hour only. Scooter and walking were clearly higher than metro and car, but did not differ significantly from each other. It is what each person breathed; the study covered PM2.5 only, not carbon monoxide or benzene.',
         },
       },
@@ -449,7 +449,7 @@ export default copy({
           scooter: { 'zh-TW': '騎燃油機車', en: 'Petrol scooter' },
           walking: { 'zh-TW': '走路', en: 'Walking' },
           bus: { 'zh-TW': '搭公車', en: 'Bus' },
-          car: { 'zh-TW': '開車', en: 'Car' },
+          car: { 'zh-TW': '坐汽車', en: 'Car' },
           metro: { 'zh-TW': '搭捷運', en: 'Metro' },
         },
         summary: {
@@ -554,7 +554,7 @@ export default copy({
       sheet: {
         title: { 'zh-TW': '這張表|是怎麼來的', en: 'Where this table |comes from' },
         b1: {
-          'zh-TW': '荷蘭、美國、英國的口罩實驗，還有台灣勞動部研究所的兩次測試。',
+          'zh-TW': '荷蘭、美國、英國的口罩實驗，還有台灣勞動部勞動及職業安全衛生研究所（勞安所）的兩次測試。',
           en: 'Mask experiments in the Netherlands, the United States and Britain, and two tests by the research institute of Taiwan’s labour ministry.',
         },
         tests: [
@@ -563,11 +563,11 @@ export default copy({
             en: 'A Dutch study tested masks on real people: with surgical and cloth masks a good share of the smallest particles still got in. An FFP2 (the European N95) did far better on adults, and much less well on children.',
           },
           {
-            'zh-TW': '台灣，{molYear} 年：勞委會的研究所測了 {molTested} 款拋棄式活性碳口罩，沒有一款撐得過國家標準要求的 {molMinutes} 分鐘。',
+            'zh-TW': '台灣，{molYear} 年：當時勞委會的勞工安全衛生研究所測了 {molTested} 款拋棄式活性碳口罩，沒有一款撐得過國家標準要求的 {molMinutes} 分鐘。',
             en: 'Taiwan, {molYear}: the labour ministry’s institute tested {molTested} disposable activated-carbon masks, and none lasted the {molMinutes} minutes the national standard asks for.',
           },
           {
-            'zh-TW': '台灣，{iloshYear} 年：勞動部的研究所找 {iloshPeople} 個大人實測。比的是分數，不是百分比：頭帶式 N95 是 {headband}，耳掛式 N95 是 {earloop}，一般醫用口罩是 {medical}。{iloshPeople} 個人裡，只有 {fitPassed} 個人戴耳掛式 N95 能貼合。',
+            'zh-TW': '台灣，{iloshYear} 年：勞安所找 {iloshPeople} 位大人實測。比的是分數，不是百分比：頭帶式 N95 是 {headband}，耳掛式 N95 是 {earloop}，一般醫用口罩是 {medical}。{iloshPeople} 位裡，只有 {fitPassed} 位戴耳掛式 N95 能貼合。',
             en: 'Taiwan, {iloshYear}: the labour ministry’s institute tested {iloshPeople} adults. These are scores for comparing masks, not percentages: headband N95 {headband}, ear-loop N95 {earloop}, an ordinary medical mask {medical}. Only {fitPassed} of the {iloshPeople} got a proper seal with an ear-loop N95.',
           },
         ],

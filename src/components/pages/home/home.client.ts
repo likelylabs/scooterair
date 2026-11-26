@@ -79,7 +79,7 @@ if (raw) {
     setHtml('[data-hm-fig]', V.figureHtml(P, table, c));
     const price = $('#hm-price');
     if (price) updateHtmlChart(price, renderPriceBars(V.priceBarsProps(P, table, c)));
-    setText('[data-hm-body13]', V.buyBody(P, table));
+    setText('[data-hm-body13]', V.buyBody(P, table, c));
     setText('[data-hm-strip]', V.stripOf(P, table, c));
     setHtml('[data-hm-lines]', V.buyLinesHtml(P, table, c));
     // 14 · each month

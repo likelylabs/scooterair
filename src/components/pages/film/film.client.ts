@@ -280,6 +280,12 @@ function start(root: HTMLElement): void {
     if (!target.closest('[data-stage]') && target !== root) return;
     const onSeek = target === seek;
     const onControl = target.closest('button, a, input, summary') !== null;
+    // on the seek bar the arrows move 5 seconds, as the keyboard hint says (the range's own step is 0.1 s)
+    if (onSeek && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      e.preventDefault();
+      go(t + (e.key === 'ArrowRight' ? 5 : -5));
+      return;
+    }
     if ((e.key === ' ' || e.key === 'k') && !(onControl && e.key === ' ' && !onSeek)) {
       e.preventDefault();
       toggle();
@@ -355,6 +361,21 @@ if (root) {
 
 /** Reduced motion: the film stays laid out as stills. The reader may still ask for it to play. */
 function offer(root: HTMLElement): void {
+  // the transcript's time buttons go to the still nearest that second (the player is not running)
+  root.querySelectorAll<HTMLElement>('[data-film-jump]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      if (html.classList.contains('film-live')) return;
+      const at = Number(btn.dataset.filmJump);
+      let best: HTMLElement | null = null;
+      root.querySelectorAll<HTMLElement>('[data-still-t]').forEach((li) => {
+        if (Number(li.dataset.stillT) <= at + 0.01) best = li;
+      });
+      const target = (best ?? root.querySelector<HTMLElement>('[data-still-t]')) as HTMLElement | null;
+      if (!target) return;
+      target.scrollIntoView({ block: 'start' });
+      target.focus({ preventScroll: true });
+    }),
+  );
   const optIn = root.querySelector<HTMLButtonElement>('[data-film-optin]');
   if (!optIn) return;
   optIn.hidden = false;

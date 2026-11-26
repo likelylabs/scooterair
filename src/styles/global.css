@@ -329,6 +329,11 @@ input[type='number'] {
 .phrase {
   display: inline-block;
 }
+/* a phrase longer than the line (320 px, 特大) breaks only at its own spaces and punctuation, not mid-word */
+:lang(zh) .phrase {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 
 a {
   color: var(--accent);

@@ -48,7 +48,9 @@
   color: var(--ink-2);
 }
 .h-chipnote--one {
-  white-space: nowrap;
+  /* a labelled figure: it may wrap, but its number and unit stay together */
+  min-inline-size: 0;
+  flex: 1 1 12em;
 }
 
 /* ---- a picture with its own control ---- */

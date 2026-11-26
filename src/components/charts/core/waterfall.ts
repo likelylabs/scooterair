@@ -36,7 +36,8 @@ const connector = (xPct: number, fromY: number, barY: number) =>
  */
 export function renderWaterfall(p: WaterfallProps): ChartRender {
   const { locale, start, steps, compare, prefix = 'NT$', startTone = 'neutral', stepTone = 'clean', totalTone = 'ink', compareTone = 'exhaust' } = p;
-  const money = (v: number) => `${prefix} ${fmt(locale, v)}`;
+  // Chinese money reads 59,980 元, never NT$ (brief 6.6)
+  const money = (v: number) => (locale === 'zh-TW' && prefix === 'NT$' ? `${fmt(locale, v)} 元` : `${prefix} ${fmt(locale, v)}`);
   const total = steps.reduce((acc, s) => acc - s.value, start.value);
   const max = niceMax(Math.max(start.value, total, compare?.value ?? 0));
   const o: string[] = [];

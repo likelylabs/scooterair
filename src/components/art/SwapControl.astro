@@ -40,9 +40,9 @@ const text = (n: number) => fill(art.swap.value, locale, { n, rest: total - n })
 <div class:list={['swapctl', cls]} data-swap-control data-total={total} data-value={value} data-js-only>
   <label class="swapctl__q" for={id}>{fill(art.swap.question, locale, { total })}</label>
   <div class="swapctl__row">
-    <button type="button" class="swapctl__btn" data-step="-1" aria-label={art.swap.fewer[locale]} disabled={value <= 0}><span aria-hidden="true">−</span></button>
+    <button type="button" class="swapctl__btn" data-step="-1" aria-label={art.swap.fewer[locale]} aria-disabled={value <= 0 ? "true" : "false"}><span aria-hidden="true">−</span></button>
     <input class="swapctl__range" id={id} type="range" min="0" max={total} step="1" value={value} style={`--fill:${(value / total) * 100}%`} aria-describedby={`${id}-out`} />
-    <button type="button" class="swapctl__btn" data-step="1" aria-label={art.swap.more[locale]} disabled={value >= total}><span aria-hidden="true">＋</span></button>
+    <button type="button" class="swapctl__btn" data-step="1" aria-label={art.swap.more[locale]} aria-disabled={value >= total ? "true" : "false"}><span aria-hidden="true">＋</span></button>
   </div>
   <p class="swapctl__out" id={`${id}-out`} aria-live="polite"><span data-swap-text data-template={art.swap.value[locale]}>{text(value)}</span></p>
 </div>

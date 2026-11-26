@@ -41,10 +41,16 @@ const { locale, marks = ['ribbon', 'ring', 'dot'], layout = 'list', tap = false,
     marks.map((m) => (
       <li>
         {tap ? (
-          <button type="button" class="air-key__item" data-mark={m} aria-pressed="false">
-            <svg class="air-glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={airGlyph(m)} />
-            <span>{art.marks[m][locale]}</span>
-          </button>
+          <Fragment>
+            <button type="button" class="air-key__item" data-mark={m} aria-pressed="false" data-js-only>
+              <svg class="air-glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={airGlyph(m)} />
+              <span>{art.marks[m][locale]}</span>
+            </button>
+            <span class="air-key__item" data-nojs-legend>
+              <svg class="air-glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={airGlyph(m)} />
+              <span>{art.marks[m][locale]}</span>
+            </span>
+          </Fragment>
         ) : (
           <span class="air-key__item">
             <svg class="air-glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={airGlyph(m)} />
@@ -55,6 +61,13 @@ const { locale, marks = ['ribbon', 'ring', 'dot'], layout = 'list', tap = false,
     ))
   }
 </ul>
+
+<style is:global>
+  /* the static legend is for readers without scripting; with it, the buttons above take its place */
+  html.js .air-key__item[data-nojs-legend] {
+    display: none;
+  }
+</style>
 
 <script>
   document.addEventListener('click', (e) => {

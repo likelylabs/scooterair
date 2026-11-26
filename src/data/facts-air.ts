@@ -154,8 +154,8 @@ export const kerb = {
     readerKind: 'official',
     readerPlace: 'abroad',
     caveat: t(
-      '這是乙醛本身的性質，說的是一般的吸入；路口的乙醛有多少，台灣沒有量測，所以不知道等一個紅燈會不會刺激到。',
-      'This is what acetaldehyde itself does when breathed; how much is in the air at a Taiwanese junction is not known, so whether one red light is enough to irritate is not known either.',
+      '這是乙醛本身的性質，說的是一般的吸入。路口的乙醛跟著油氣一起排出來；聞得到，表示它就在你身邊，但一個紅燈會不會刺激到，要看濃度，這份資料沒有給。',
+      'This is what acetaldehyde itself does when breathed. At a junction it comes out with the fuel vapour; if you can smell it, it is around you, but whether one red light is enough to irritate depends on the amount, which this source does not give.',
     ),
     chainLink: 4,
     editorNote: `${OPENED} Backs home screen 6 pin ①. Word the pin as the smell (油氣和刺鼻的醛類), not as fuel vapour alone: the irritant named by the source is acetaldehyde. Never put a disease name on the pin.`,

@@ -33,14 +33,14 @@ export const chartText = {
       sub: t('交通測站，{year} 年平均', 'traffic stations, {year} average'),
     },
     waiting: {
-      label: t('路口等過馬路的地方', 'Where pedestrians wait to cross'),
+      label: t('路口的行人等候區', 'Where pedestrians wait to cross'),
       sub: t('運研所，{n} 個路口，最高的一分鐘', 'Institute of Transportation, {n} junctions, highest minute'),
     },
     estimate: {
       few: t('紅燈時，幾輛機車旁邊', 'Beside a few scooters at a red light'),
       dozen: t('紅燈時，十來輛機車旁邊', 'Beside a dozen scooters at a red light'),
       full: t('紅燈時，停滿的機車旁邊', 'Beside a full box of scooters at a red light'),
-      sub: t('{s} 秒平均，含街上原本就有的', '{s}-second average, including what the street already holds'),
+      sub: t('{s} 秒平均，含街上原本就有的（各地不同）', '{s}-second average, including what the street already holds (varies by place)'),
     },
     how: t('看這個數字怎麼算的', 'See how this figure was worked out'),
     zoomHere: t('上面整張圖，在這一小段', 'The whole chart above fits in this small piece'),
@@ -50,10 +50,10 @@ export const chartText = {
     tableKind: t('怎麼來的', 'What kind of figure'),
     // the text alternative: one sentence per row, then the finding, chosen by rule
     sumRoadside: t('一氧化碳，單位是 ppm。平常的路邊（{sub}）量到 {v}。', 'Carbon monoxide, in ppm. An ordinary roadside ({sub}): {v}, measured.'),
-    sumWaiting: t('路口等過馬路的地方（{sub}）量到 {v}。', 'Where pedestrians wait to cross ({sub}): {v}, measured.'),
+    sumWaiting: t('路口的行人等候區（{sub}）量到 {v}。', 'Where pedestrians wait to cross ({sub}): {v}, measured.'),
     sumEstimate: t('{label}（{sub}），本站推估{v}。', '{label} ({sub}): our estimate is {v}.'),
     sumRule: {
-      overlap: t('量到的和算出來的差不多。', 'The readings and the estimate roughly match.'),
+      overlap: t('量到的和算出來的差不多；這是比大小，不是驗證。', 'The readings and the estimate roughly match; this compares size, it does not validate the estimate.'),
       higher: t('算出來的比量到的高。', 'The estimate is higher than the readings.'),
       lower: t('算出來的比量到的低。', 'The estimate is lower than the readings.'),
     },
@@ -73,13 +73,13 @@ export const chartText = {
     benzeneZhuyin: t('苯（ㄅㄣˇ）', 'Benzene'),
     compare: t('拿來比一比', 'For comparison'),
     measuredRise: {
-      label: t('運研所量到多出來的', 'The rise the Institute of Transportation measured'),
+      label: t('運研所量到的最高值，減去附近測站', 'The Institute of Transportation’s highest reading, minus the nearby station'),
       sub: t('{n} 個路口裡最忙的一個，最高的一分鐘', 'the busiest of {n} junctions, highest minute'),
     },
     streetSub: {
       co: t('交通測站，{year} 年平均', 'traffic stations, {year} average'),
       pm25: t('一般測站，{year} 年平均', 'general stations, {year} average'),
-      benzene: t('都市的空氣，大概的範圍', 'city air, a rough range'),
+      benzene: t('都市的空氣，大概的範圍（台灣和國外的量測，出處不完整）', 'city air, a rough range (readings from Taiwan and abroad; sources incomplete)'),
     },
     who: t('世界衛生組織 15 分鐘指引值', 'WHO 15-minute guideline'),
     whoSub: t('15 分鐘的平均不要超過這個量', 'a 15-minute average should stay under this'),
@@ -87,7 +87,7 @@ export const chartText = {
     logNote: t('橫的刻度每一格是前一格的十倍，所以很小和很大的數字可以放在同一張圖。', 'Each step along the scale is ten times the one before, so very small and very large amounts fit on one chart.'),
     scenarioHead: t('旁邊停了幾輛', 'Scooters beside you'),
     addedHead: t('這排機車多出來', 'Added by these scooters'),
-    totalLine: t('含街上原本就有的：{v}', 'Including what the street already holds: {v}'),
+    totalLine: t('含街上原本就有的（各地不同，不是固定加 0.5）：{v}', 'Including what the street already holds (it varies by place; not a fixed 0.5 added): {v}'),
     streetLine: t('街上原本就有：{v}', 'Already in the street: {v}'),
     tableCaption: t('這排機車多出來的量（{stamp}）', 'What the scooters add ({stamp})'),
     tableMark: t('怎麼來的', 'What kind of figure'),
@@ -166,7 +166,7 @@ export const chartText = {
       result: t('一輛機車等一個紅燈排出的一氧化碳', 'Carbon monoxide from one scooter through one red light'),
     },
     busiest: {
-      perHour: t('最忙的路口，一個方向一小時的機車', 'Scooters an hour in one direction at the busiest junction'),
+      perHour: t('最忙的路口，一個方向一小時的機車（路口的車流 ÷ 4）', 'Scooters an hour in one direction at the busiest junction (the junction’s count ÷ 4)'),
       red: t('一個紅燈的長度', 'The length of one red light'),
       hour: t('一小時', 'One hour'),
       result: t('一個紅燈停下來的機車', 'Scooters stopped through one red light'),

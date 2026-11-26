@@ -455,6 +455,11 @@ const dot = locale === 'en' ? ' · ' : '　';
     if (current) closeNow(false);
     const d = ensureDialog();
     d.setAttribute('aria-labelledby', `${id}-title`);
+    // the sheet leaves its screen while open: carry the screen's choices (data-pick-*) with it, so
+    // a variant chosen by a switch (data-when-scenario …) shows the reader's choice, not all three
+    for (const a of [...d.attributes]) if (a.name.startsWith('data-pick-')) d.removeAttribute(a.name);
+    const scope = home.closest<HTMLElement>('[data-pick-scope]');
+    if (scope) for (const a of [...scope.attributes]) if (a.name.startsWith('data-pick-') && a.name !== 'data-pick-scope') d.setAttribute(a.name, a.value);
     d.append(panel);
     current = { id, home, panel, trigger, pushed: false };
     // keep the page from scrolling under the sheet, without a sideways jump where scrollbars take room
@@ -500,7 +505,13 @@ const dot = locale === 'en' ? ' · ' : '　';
     const id = hashId();
     if (sheetOf(id)) {
       if (current?.id === id) return;
-      if (open(id, null, false) && initial) sheetOf(id)?.closest<HTMLElement>('[data-screen], section, article')?.scrollIntoView({ block: 'start' });
+      if (open(id, null, false) && initial) {
+        sheetOf(id)?.closest<HTMLElement>('[data-screen], section, article')?.scrollIntoView({ block: 'start' });
+        // on a deep link the browser may move focus after this script runs: put it on the title once the page settles
+        const focusTitle = () => current?.panel.querySelector<HTMLElement>('.how__title')?.focus({ preventScroll: true });
+        requestAnimationFrame(focusTitle);
+        if (document.readyState !== 'complete') addEventListener('load', () => requestAnimationFrame(focusTitle), { once: true });
+      }
     } else if (current) closeNow();
   }
 

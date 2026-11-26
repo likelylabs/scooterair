@@ -421,8 +421,8 @@ async function run(): Promise<void> {
     section.removeAttribute('aria-busy');
     // one line that a screen reader always hears, and the same answer in the bar
     const head = `${r.title} ${r.prefix && r.prefix !== 'NT$' ? r.prefix : r.prefix === 'NT$' ? 'NT$' : ''}${r.value}${r.unit ? ` ${r.unit}` : ''}`.replace(/[ \t\n]+/g, ' ').trim();
-    if (status) status.textContent = fill(cfg.text.announce, { title: r.title, value: head.slice(r.title.length).trim() });
-    setBar(head, true);
+    if (status) status.textContent = r.spoken || fill(cfg.text.announce, { title: r.title, value: head.slice(r.title.length).trim() });
+    setBar(r.short || head, true);
     // the levers (#closer) take a few more engine runs: when the browser is free
     idle(() => {
       if (mine !== seq) return;

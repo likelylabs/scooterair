@@ -34,7 +34,7 @@ const stripShare = `${((MAX / who) * 100).toFixed(2)}%`;
 ---
 
 <figure class="cc">
-  <div class="cc__plot" role="img" aria-label={`${b.rowStreet}: ${n1(est.bg.co.traffic.shown)} ppm. ${b.rowIot}: ${peaks.map(n1).join(', ')} ppm. ${b.rowEst}: ${total.lo}–${total.hi} ppm.`}>
+  <div class="cc__plot" role="group" aria-label={`${b.rowStreet}: ${n1(est.bg.co.traffic.shown)} ppm. ${b.rowIot}: ${peaks.map(n1).join(', ')} ppm. ${b.rowEst}: ${total.lo}–${total.hi} ppm.`}>
     <div class="cc__row">
       <p class="cc__label"><b>{b.rowStreet}</b><span>{b.rowStreetSub}</span></p>
       <div class="cc__track"><span class="cc__dot" style={`left:${x(est.bg.co.traffic.shown)}`}></span></div>

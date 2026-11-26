@@ -95,6 +95,14 @@ export default copy({
       subsidy: { 'zh-TW': '補助到 {subsidy}。', en: 'Subsidies end {subsidy}.' },
       'nothing-confirmed': { 'zh-TW': '{year} 年的補助還沒有確定。下面先用沒有補助的價格算。', en: 'Nothing is confirmed yet for {year} subsidies. The sums below use prices with no subsidy.' },
       'next-programme': { 'zh-TW': '補助到 {subsidy}。', en: 'Subsidies end {subsidy}.' },
+      'other-subsidy': {
+        'zh-TW': '最便宜的這一輛沒有算補助，它本來就便宜；別的車款不用報廢機車，也有新購補助，到 {subsidy}。',
+        en: 'No subsidy is counted for the cheapest model, which is cheap on its own; other models get a new-purchase subsidy even with nothing to scrap, until {subsidy}.',
+      },
+      'other-subsidy-and-promo': {
+        'zh-TW': '最便宜的這一輛沒有算補助，它本來就便宜；別的車款不用報廢機車，也有新購補助，到 {subsidy}。燃油機車的促銷到 {promo}。',
+        en: 'No subsidy is counted for the cheapest model, which is cheap on its own; other models get a new-purchase subsidy even with nothing to scrap, until {subsidy}. Petrol-scooter promotions end {promo}.',
+      },
       'no-subsidy': { 'zh-TW': '這個條件下，沒有可以算進去的補助。下面用沒有補助的價格算。', en: 'On these terms no subsidy can be counted. The sums below use prices with no subsidy.' },
     },
     plate: {

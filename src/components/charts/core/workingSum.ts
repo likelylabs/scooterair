@@ -121,8 +121,12 @@ export function workingPerRedCan(locale: Loc): WorkingSumProps {
  * How the kerb estimate is made, as a flow with arrows and no operator signs (brief 4.5): the
  * four boxes are `estimateText.flow`, the last one the result.
  */
-export function workingKerbFlow(locale: Loc): WorkingSumProps {
+export function workingKerbFlow(locale: Loc, scenario: 'few' | 'dozen' | 'full' = 'dozen'): WorkingSumProps {
   const boxes = estimateText.flow.map((b) => b[locale]);
+  // the count and the result belong to the scenario the reader picked (brief 4.2, 4.5)
+  const c = est.scn[scenario].count;
+  boxes[1] = locale === 'en' ? `${c.lo} to ${c.hi} scooters beside you` : `旁邊停 ${c.lo} 到 ${c.hi} 輛`;
+  boxes[boxes.length - 1] = fill(estimateText.flowResult, locale, { range: formatEstimate(`co.${scenario}.add`, locale).text });
   return {
     locale,
     mode: 'flow',
@@ -144,7 +148,7 @@ export function workingBusiest(locale: Loc): WorkingSumProps {
     locale,
     mode: 'sum',
     steps: [
-      { value: about(withUnit(n(b.perApproachHourShown, locale), veh, locale), locale), label: T.busiest.perHour[locale], chip: 'measured' },
+      { value: about(withUnit(n(b.perApproachHourShown, locale), veh, locale), locale), label: T.busiest.perHour[locale], chip: 'derived' },
       { op: '×', value: withUnit(n(b.redSeconds, locale), sec, locale), label: T.busiest.red[locale] },
       { op: '÷', value: withUnit(n(3600, locale), sec, locale), label: T.busiest.hour[locale] },
     ],

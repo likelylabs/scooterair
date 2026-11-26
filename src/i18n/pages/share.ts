@@ -83,7 +83,7 @@ export default copy({
     },
     'beside-me': {
       title: { 'zh-TW': '站遠一點|有用嗎？', en: 'Does standing back |help?' },
-      line: { 'zh-TW': '離排氣管遠一點，通常比較淡；差多少，本站不印數字。', en: 'Further from the tailpipe it is usually thinner. We print no figure for how much.' },
+      line: { 'zh-TW': '離排氣管遠一點，通常比較淡；差多少要看風，沒有準確的數字。', en: 'Further from the tailpipe it is usually thinner. How much depends on the wind; there is no exact figure.' },
     },
     mask: {
       title: { 'zh-TW': '口罩擋得住|廢氣嗎？', en: 'Does a mask |stop exhaust?' },
@@ -98,5 +98,5 @@ export default copy({
     },
   },
   /** Shared words on the cards. */
-  alt: { 'zh-TW': '{title}{line}（圖內附註：{caveat}）{note}', en: '{title} {line} (Note on the card: {caveat}) {note}' },
+  alt: { 'zh-TW': '{title}{line}（圖上小字：{caveat}）{note}', en: '{title} {line} (Note on the card: {caveat}) {note}' },
 });

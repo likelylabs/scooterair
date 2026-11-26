@@ -77,10 +77,11 @@ render.hover = {
   rows: years.map((y, i) => [String(y), actual[i] !== null ? `${names.actual}: ${format(actual[i] as number)}` : '', targetAt(y) !== null ? `${names.target}: ${format(targetAt(y) as number)}` : ''].filter(Boolean).join('\n')),
 };
 render.table = {
-  head: [names.year, `${names.actual} (%)`, `${names.target} (%)`],
+  head: [names.year, locale === 'en' ? `${names.actual} (%)` : `${names.actual}（%）`, locale === 'en' ? `${names.target} (%)` : `${names.target}（%）`],
   rows: years
     .map((y, i) => [String(y), actual[i] !== null ? format(actual[i] as number) : '–', targetAt(y) !== null ? format(targetAt(y) as number) : '–'])
-    .filter((r) => Number(r[0]) <= labels.last.x || r[2] !== '–'),
+    // a year with neither a verified figure nor a target is left out, never printed as a dash
+    .filter((r) => (r[1] !== '–' || r[2] !== '–') && (Number(r[0]) <= labels.last.x || r[2] !== '–')),
 };
 render.padRight = Math.max(render.padRight ?? 0, 18);
 ---

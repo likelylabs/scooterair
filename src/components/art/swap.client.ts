@@ -38,11 +38,18 @@ export function setSwap(scope: HTMLElement, n: number, announce = true): void {
     }
     const out = c.querySelector<HTMLElement>('[data-swap-text]');
     if (out && announce) out.textContent = (out.dataset.template ?? '').replace('{n}', String(n)).replace('{rest}', String(total - n));
-    c.querySelector<HTMLButtonElement>('[data-step="-1"]')?.toggleAttribute('disabled', n <= 0);
-    c.querySelector<HTMLButtonElement>('[data-step="1"]')?.toggleAttribute('disabled', n >= total);
+    // aria-disabled, never `disabled`: a button that disables itself while focused drops keyboard focus to <body>
+    c.querySelector<HTMLButtonElement>('[data-step="-1"]')?.setAttribute('aria-disabled', String(n <= 0));
+    c.querySelector<HTMLButtonElement>('[data-step="1"]')?.setAttribute('aria-disabled', String(n >= total));
   });
   scope.querySelectorAll<HTMLElement>('[data-swap-out]').forEach((o) => {
     o.textContent = String(o.dataset.swapOut === 'pct' ? Math.round((n / total) * 100) : o.dataset.swapOut === 'rest' ? total - n : n);
+  });
+  // a chip may carry its own words for "all of it" (機車排的廢氣：全部沒有了) instead of 少 100%
+  scope.querySelectorAll<HTMLElement>('[data-swap-all]').forEach((o) => {
+    const all = n >= total;
+    o.querySelectorAll<HTMLElement>('[data-swap-when="all"]').forEach((x) => (x.hidden = !all));
+    o.querySelectorAll<HTMLElement>('[data-swap-when="part"]').forEach((x) => (x.hidden = all));
   });
   scope.dispatchEvent(new CustomEvent('sa:swap', { bubbles: true, detail: { n, total } }));
 }
@@ -70,7 +77,7 @@ if (!window.__saSwap) {
   });
   document.addEventListener('click', (e) => {
     const btn = (e.target as Element).closest<HTMLButtonElement>('[data-swap-control] button[data-step]');
-    if (!btn) return;
+    if (!btn || btn.getAttribute('aria-disabled') === 'true') return;
     const scope = scopeOf(btn);
     stop(scope);
     setSwap(scope, Number(scope.getAttribute('data-swap-n') ?? btn.closest<HTMLElement>('[data-swap-control]')!.dataset.value ?? 0) + Number(btn.dataset.step));
@@ -81,6 +88,13 @@ if (!window.__saSwap) {
     if (!fig.classList.contains('scene--swap') || fig.dataset.swapPlay !== 'true') return;
     const scope = scopeOf(fig);
     const rest = Number(fig.dataset.swapRest ?? 10);
+    // a reader already on the controls (keyboard) is never overridden by the arrival play
+    if (scope.querySelector('[data-swap-control]')?.contains(document.activeElement)) return;
+    scope.addEventListener('focusin', (f) => {
+      if (!playing.has(scope) || !(f.target as Element).closest?.('[data-swap-control]')) return;
+      stop(scope);
+      setSwap(scope, rest);
+    });
     let n = 0;
     setSwap(scope, 0, false);
     const t = window.setInterval(() => {

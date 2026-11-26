@@ -413,6 +413,29 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
       animation: none;
     }
   }
+  /* on a narrow screen the bar stacks (label, answer, button at full width) and the button may
+     wrap, so the answer never squeezes into a few letters a line */
+  @media (max-width: 30em) {
+    .el-bar {
+      grid-template-columns: minmax(0, 1fr);
+      padding: var(--sp-2) var(--sp-3);
+      gap: var(--sp-1);
+    }
+    .el-bar__see {
+      justify-content: center;
+      white-space: normal;
+      text-align: center;
+    }
+  }
+  /* with large text a fixed bar would cover the questions: it stays in the flow instead */
+  :global(html[data-text='lg']) .el-bar,
+  :global(html[data-text='xl']) .el-bar {
+    position: static;
+  }
+  /* focused fields and anchors land above the bar, not under it */
+  :global(html:has(.el-bar)) {
+    scroll-padding-block-end: 8rem;
+  }
   /* on a phone the on-screen keyboard takes the bottom of the screen: step aside while typing */
   @media (max-width: 40em) {
     .el-calc:has(input[type='number']:focus) .el-bar {

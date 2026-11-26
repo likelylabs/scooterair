@@ -3434,17 +3434,6 @@ export const sources = {
     readLevel: 'abstract-only',
     readNote: 'From the estimate\'s source list (research/estimate/sources.json#abdillah-2024; verified false). Supplied: Taiwan roadside PN 25,000-38,000 /cm3 (abstract only; background upper end).',
   },
-  'ncku-thesis-hap-benzene': {
-    kind: 'report',
-    org: t('國立成功大學', 'National Cheng Kung University'),
-    title: 'National Cheng Kung University master\'s thesis on ten years of Taiwanese hazardous-air-pollutant monitoring (title and author not yet confirmed)',
-    titleTranslated: '成功大學碩士論文：台灣有害空氣污染物十年監測（題名與作者未確認）',
-    url: 'https://thesis.lib.ncku.edu.tw/thesis/detail/5e2db97f10546bf7fd23b16486abccfe',
-    accessed: '2026-11-26',
-    language: 'zh-TW',
-    readLevel: 'search-summary-only',
-    readNote: 'From the estimate\'s source list (research/estimate/sources.json#ncku-thesis-hap; verified false). Supplied: National annual mean benzene ~0.55 ppbv (2012) -> 0.51 ppbv (2016), urban > non-urban (search-result excerpt only; page returned HTTP 503). Lower end of benzene background. needsManualFetch. Used only for the deliberately wide, secondary benzene background (0.5–4 ppb).',
-  },
   'saksena-2007-hanoi': {
     kind: 'report',
     authors: ['Saksena S'],

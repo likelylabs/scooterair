@@ -58,6 +58,9 @@ delete (rest as Record<string, unknown>).arrow;
   }
   .next__text {
     text-wrap: balance;
+    /* Chinese breaks only at punctuation and spaces (戴口罩，|擋得住嗎？), never inside a word */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
   .next--primary {
     border-color: var(--accent);

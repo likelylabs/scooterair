@@ -1658,7 +1658,7 @@ const exposure = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '報告摘要（第1-6頁）也記錄，行人退縮的路口在退縮後PM2.5「略微上升」；另外，行人專用時相路口的實測資料在時相切換前後相當不穩定。',
+      '報告摘要（第 1–6 頁）也寫到：有一個等候區往後移的路口，移了以後 PM2.5 反而略高一點；另一個行人專用時相的路口，號誌切換前後的資料很不穩定。所以站遠一點有沒有用，量不出明顯的差別。',
       'The report\'s summary (p.1-6) also records PM2.5 "slightly higher" at the pedestrian-setback site after the setback; separately, field data at the scramble-crossing site were quite unstable around phase changes.',
     ),
     editorNote: 'research/02 §1a does not say whether the 0.46/0.94 came from a real before/after change at the same site or from comparing positions, nor which site had the "略微上升" result. The IOT PDF could not be re-opened (connection reset, 2026-11-26); re-check p.1-6 and 附1-4 before strengthening either point.',

@@ -69,7 +69,7 @@ export default copy({
   // 2 ─────────────────────────────────────────────────────────────────────────────────────────
   s2: {
     chapter: { 'zh-TW': '排出什麼', en: 'What comes out' },
-    headline: { 'zh-TW': '臭的是油氣。|一氧化碳和微粒，|聞不到', en: 'The smell is fuel vapour. |Carbon monoxide and particles |have no smell' },
+    headline: { 'zh-TW': '臭的是油氣和醛類。|一氧化碳和微粒，|聞不到', en: 'The smell is fuel vapour and sharp aldehydes. |Carbon monoxide and particles |have no smell' },
     body: {
       'zh-TW': '味道只告訴你一件事：你正站在廢氣裡。油氣裡有苯（ㄅㄣˇ），是確定會致癌的東西。',
       en: 'The smell tells you one thing: you are standing in exhaust. The vapour carries benzene, a proven cause of cancer.',
@@ -99,7 +99,7 @@ export default copy({
   // 3 ─────────────────────────────────────────────────────────────────────────────────────────
   s3: {
     chapter: { 'zh-TW': '排在哪裡', en: 'Where it goes' },
-    headline: { 'zh-TW': '待轉區的排氣管，|就在斑馬線前面', en: 'In the turn box, the tailpipes sit |right in front of the crossing' },
+    headline: { 'zh-TW': '待轉區的機車，|排氣管就對著斑馬線', en: 'In the turn box, the tailpipes sit |right in front of the crossing' },
     body: {
       'zh-TW': '排氣管離地大約 {h} 公分，廢氣就排在腳邊。待轉區和斑馬線之間，規定只要留 {gap} 公分以上。',
       en: 'A tailpipe is about {h} cm off the ground, so the exhaust comes out by your feet. The rules ask for at least {gap} cm between the turn box and the crossing.',
@@ -193,7 +193,7 @@ export default copy({
         en: 'The Health Effects Institute, in the United States, reviewed {n} long-term studies of people who lived for years with traffic exhaust.',
       },
       what: {
-        'zh-TW': '新得氣喘的比較多；因為缺血性心臟病、肺癌過世的也比較多。',
+        'zh-TW': '新得氣喘的比較多；因為心臟病（心臟血管塞住的那種）、肺癌過世的也比較多。',
         en: 'More people newly developed asthma; more died of ischaemic heart disease and of lung cancer.',
       },
       care: {
@@ -224,7 +224,7 @@ export default copy({
     },
     quiet: { 'zh-TW': '這些研究量的是各種來源的髒空氣，不只機車。', en: 'These studies measured dirty air from all sources, not scooters alone.' },
     stepper: { 'zh-TW': '一天等幾個紅燈？', en: 'How many red lights a day?' },
-    stepperOption: { 'zh-TW': '一天 {n} 個', en: '{n} a day' },
+    stepperOption: { 'zh-TW': '一天 {n}\u00a0個', en: '{n} a day' },
     posts: {
       minutes: {
         when: { 'zh-TW': '{min} 分鐘', en: '{min} minutes' },
@@ -246,8 +246,8 @@ export default copy({
         { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
       ],
       minutes: {
-        'zh-TW': '{min} 分鐘：高雄 {people} 人戴著感測器。髒空氣的高峰，多半來自工廠、蚊香、燒稻草和燒香；心跳節奏的變化很小，是暫時的訊號，不是生病。',
-        en: '{min} minutes: {people} people in Kaohsiung wore sensors. The peaks of dirty air came mostly from factories, mosquito coils, burning straw and incense; the change in heart rhythm was small and temporary, a signal, not an illness.',
+        'zh-TW': '{min} 分鐘：高雄 {people} 人戴著感測器。高雄找到的髒空氣高峰，主要來自工廠、蚊香、燒稻草和燒香；心跳的節奏小小變了一下，這是身體的訊號，不是生病。',
+        en: '{min} minutes: {people} people in Kaohsiung wore sensors. The peaks of dirty air found in Kaohsiung came mainly from factories, mosquito coils, burning straw and incense; the heart’s rhythm shifted a little: a signal, not an illness.',
       },
       hours: {
         'zh-TW': '{h} 小時：倫敦 {people} 位有氣喘的大人，沿著柴油車很多的街走。',
@@ -314,14 +314,14 @@ export default copy({
       },
       what: { 'zh-TW': '每個人身邊的 PM2.5，平均是：', en: 'Mean PM2.5 beside each person:' },
       modes: {
-        scooter: { 'zh-TW': '騎機車', en: 'On a scooter' },
+        scooter: { 'zh-TW': '騎燃油機車', en: 'On a petrol scooter' },
         walking: { 'zh-TW': '走路', en: 'On foot' },
         bus: { 'zh-TW': '搭公車', en: 'By bus' },
         car: { 'zh-TW': '坐汽車', en: 'By car' },
         metro: { 'zh-TW': '搭捷運', en: 'On the metro' },
       },
       care: {
-        'zh-TW': '量的是各種來源的 PM2.5，只有早上的一個小時。騎機車和走路的差別，在統計上不明顯。量的是騎士自己吸到的，不是站在機車旁邊的行人。',
+        'zh-TW': '量的是各種來源的 PM2.5，只有早上的一個小時。騎機車和走路的差別，統計上分不出來。量的是騎士自己吸到的，不是站在機車旁邊的行人。',
         en: 'It is PM2.5 from all sources, over one morning hour only. The difference between riding a scooter and walking was not statistically significant. It is what riders themselves breathed, not a pedestrian standing beside the scooters.',
       },
     },
@@ -355,13 +355,13 @@ export default copy({
         { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
       ],
       who: {
-        'zh-TW': '美國職業安全衛生研究所說明：一氧化碳這類氣體和汽油的蒸氣，連 N95 都擋不住，它只過濾微粒。醫用口罩和布口罩，一樣沒有吸附氣體的材料。',
-        en: 'The US occupational-safety institute, NIOSH, states that N95-type respirators filter particles only: they do not stop gases such as carbon monoxide, or petrol vapour. Surgical and cloth masks have no gas-absorbing layer either.',
+        'zh-TW': '美國職業安全衛生研究所說明：一氧化碳這類氣體和油氣（沒燒完的汽油），連 N95 都擋不住，它只過濾微粒。照同樣的道理，醫用口罩和布口罩也沒有吸附氣體的材料；這一句是我們的推論。',
+        en: 'The US occupational-safety institute, NIOSH, states that N95-type respirators filter particles only: they do not stop gases such as carbon monoxide, or petrol vapour. By the same reasoning, surgical and cloth masks have no gas-absorbing layer either; that part is our inference.',
       },
       cols: {
         mask: { 'zh-TW': '口罩', en: 'Mask' },
         gases: { 'zh-TW': '氣體', en: 'Gases' },
-        ultrafine: { 'zh-TW': '最細的微粒', en: 'The finest particles' },
+        ultrafine: { 'zh-TW': '很小的微粒（超細微粒）', en: 'The smallest particles (ultrafine)' },
         pm25: { 'zh-TW': 'PM2.5', en: 'PM2.5' },
       },
       /** The four rows of VERIFIED.json → tableRows, in the same order, cell for cell. */
@@ -369,26 +369,26 @@ export default copy({
         cloth: {
           mask: { 'zh-TW': '布口罩', en: 'Cloth mask' },
           gases: { 'zh-TW': '擋不住', en: 'None' },
-          ultrafine: { 'zh-TW': '很少（大多穿過布料，或從邊緣漏進去）', en: 'Very little (most passes through the cloth and round the edges)' },
-          pm25: { 'zh-TW': '一點點，漏很多', en: 'A little; it leaks a lot' },
+          ultrafine: { 'zh-TW': '幾乎擋不住（大多穿過布，或從邊緣進去）', en: 'Very little (most passes through the cloth and round the edges)' },
+          pm25: { 'zh-TW': '擋住一點，漏很多', en: 'A little; it leaks a lot' },
         },
         surgical: {
           mask: { 'zh-TW': '醫用口罩', en: 'Surgical mask' },
           gases: { 'zh-TW': '擋不住', en: 'None' },
-          ultrafine: { 'zh-TW': '擋下一些，會從邊緣漏', en: 'Some; it leaks at the edges' },
-          pm25: { 'zh-TW': '擋下一些，會從邊緣漏', en: 'Some; it leaks at the edges' },
+          ultrafine: { 'zh-TW': '擋住一些，邊緣會漏', en: 'Some; it leaks at the edges' },
+          pm25: { 'zh-TW': '擋住一些，邊緣會漏', en: 'Some; it leaks at the edges' },
         },
         carbon: {
           mask: { 'zh-TW': '活性碳口罩', en: 'Activated-carbon mask' },
-          gases: { 'zh-TW': '一氧化碳擋不住。苯和其他油氣只吸掉一點，而且撐不久，常常只有幾分鐘', en: 'Carbon monoxide: none. Benzene and other vapours: a little, briefly, often only minutes' },
-          ultrafine: { 'zh-TW': '和它用的那種口罩一樣（醫用型：擋下一些，會從邊緣漏）', en: 'The same as the mask it is built on (surgical type: some; it leaks at the edges)' },
-          pm25: { 'zh-TW': '和它用的那種口罩一樣（醫用型：擋下一些，會從邊緣漏）', en: 'The same as the mask it is built on (surgical type: some; it leaks at the edges)' },
+          gases: { 'zh-TW': '一氧化碳：擋不住。苯和其他油氣：吸住一點，撐不久（常常只有幾分鐘）', en: 'Carbon monoxide: none. Benzene and other vapours: a little, briefly, often only minutes' },
+          ultrafine: { 'zh-TW': '和它底下那層口罩一樣（醫用口罩那種：擋住一些，邊緣會漏）', en: 'The same as the mask it is built on (surgical type: some; it leaks at the edges)' },
+          pm25: { 'zh-TW': '和它底下那層口罩一樣（醫用口罩那種：擋住一些，邊緣會漏）', en: 'The same as the mask it is built on (surgical type: some; it leaks at the edges)' },
         },
         n95: {
           mask: { 'zh-TW': '貼合的 N95', en: 'Fitted N95' },
           gases: { 'zh-TW': '擋不住', en: 'None' },
-          ultrafine: { 'zh-TW': '戴得貼合，大多擋得住', en: 'Most, if it fits' },
-          pm25: { 'zh-TW': '戴得貼合，大多擋得住', en: 'Most, if it fits' },
+          ultrafine: { 'zh-TW': '戴得貼合的話，擋住大部分', en: 'Most, if it fits' },
+          pm25: { 'zh-TW': '戴得貼合的話，擋住大部分', en: 'Most, if it fits' },
         },
       },
       taiwan: { 'zh-TW': '台灣做過的兩個測試', en: 'Two tests done in Taiwan' },
@@ -401,7 +401,7 @@ export default copy({
       molSome: { 'zh-TW': '有 {passed} 款做到', en: '{passed} met it' },
       /** A comparison between masks, never a percentage. */
       ilosh: {
-        'zh-TW': '勞動部的研究所找 {people} 位大人實測，給每種口罩一個防護分數：頭帶式 N95 是 {n95}，一般醫用口罩是 {medical}。這是拿來互相比較的分數，不是百分比。',
+        'zh-TW': '勞動部勞動及職業安全衛生研究所（勞安所）找 {people} 位大人實測，給每種口罩一個防護分數：頭帶式 N95 是 {n95}，一般醫用口罩是 {medical}。這是拿來互相比較的分數，不是百分比。',
         en: 'The labour ministry’s institute tested {people} adults and gave each mask a protection score: {n95} for a headband N95, {medical} for an ordinary medical mask. The scores compare masks with each other; they are not percentages.',
       },
       care: {
@@ -425,6 +425,8 @@ export default copy({
     assume: { 'zh-TW': '假設每輛機車排得一樣多', en: 'assuming every scooter emits the same' },
     chipBefore: { 'zh-TW': '機車排的廢氣：少 ', en: 'Scooter exhaust: ' },
     chipAfter: { 'zh-TW': '%', en: '% less' },
+    /** The chip when every scooter is electric (the slider's resting value). */
+    chipAll: { 'zh-TW': '機車排的廢氣：全部沒有了', en: 'Scooter exhaust: none left' },
     sheet: {
       used: {
         'zh-TW': '圖上的 {total} 輛機車，先當成每一輛排的廢氣一樣多。',
@@ -449,6 +451,8 @@ export default copy({
 
   // 12 ────────────────────────────────────────────────────────────────────────────────────────
   s12: {
+    /** Beside the chip: what the percentage is. */
+    shareLabel: { 'zh-TW': '占一氧化碳{share}', en: '{share} of the carbon monoxide' },
     chapter: { 'zh-TW': '還沒要換車', en: 'Not switching yet' },
     headline: { 'zh-TW': '還沒要換車？|有一件事也很有用', en: 'Not switching yet? |One thing still helps a lot' },
     /** 「三分之一左右」 is checked against inspect.top10share at build time. */
@@ -490,9 +494,18 @@ export default copy({
     /** Without scripting the page shows the default case only. */
     fixed: { 'zh-TW': '{county}・{scrap}', en: '{county}, {scrap}' },
     bodyClass: {
-      'zh-TW': '這是最便宜的綠牌電動機車，和 125cc 不同級。',
-      en: 'This is the cheapest green-plate electric scooter, a lighter class than a 125 cc.',
+      'zh-TW': '最便宜的綠牌車，比 125cc 小一級，',
+      en: 'The cheapest green-plate scooter, a class below a 125 cc.',
     },
+    /** Added by rule when that scooter can only swap batteries. */
+    swapOnly: {
+      'zh-TW': '只能換電池、要付月費。',
+      en: 'It only swaps batteries, so it needs a battery plan.',
+    },
+    /** The least favourable case in the table, named as such (the screen's word budget is 45 characters). */
+    worst: { 'zh-TW': '最不划算：{county}、{scrap}、買{plate}，多付 {n}。', en: 'Worst case: {county}, {scrap}, a {plate} model: {n} more.' },
+    worstScrapYes: { 'zh-TW': '可報廢', en: 'one to scrap' },
+    worstScrapNo: { 'zh-TW': '沒車報廢', en: 'nothing to scrap' },
     sheet: {
       title: { 'zh-TW': '這個價錢，|是怎麼算的', en: 'How this price |was worked out' },
       used: {
@@ -523,8 +536,8 @@ export default copy({
     bodyKm: { 'zh-TW': '這是每月騎 {km} 公里的算法。', en: 'This is for {km} km a month.' },
     /** Chosen by rule: the cheapest way to swap against the petrol bill. */
     swapDearer: {
-      'zh-TW': '只能換電池的人，最便宜也要每月 {n}，比油錢貴，這一點照實講。',
-      en: 'If you can only swap batteries, the cheapest way is {n} a month, more than petrol. We say so plainly.',
+      'zh-TW': '只能換電池的人，最便宜也要每月 {n}，比油錢貴。',
+      en: 'If you can only swap batteries, the cheapest way is {n} a month, more than petrol.',
     },
     swapCheaper: {
       'zh-TW': '只能換電池的人，最便宜每月 {n}，比油錢便宜。',
@@ -550,13 +563,13 @@ export default copy({
     chapter: { 'zh-TW': '下一個紅燈', en: 'The next red light' },
     headline: { 'zh-TW': '下一個紅燈，|可以少掉這一團', en: 'The next red light |could come without this cloud' },
     body: {
-      'zh-TW': '差別只在，旁邊那一排有沒有排氣管。選你的縣市，半分鐘算出換一輛要多少錢。',
+      'zh-TW': '差別只在旁邊那一排有沒有排氣管。選你的縣市，半分鐘算出換一輛要多少錢。',
       en: 'The only difference is whether the row beside you has tailpipes. Pick your county and in half a minute you will know what a switch costs.',
     },
     start: { 'zh-TW': '開始算', en: 'Work it out' },
     /** '|' marks where a button's words may break. */
     line: { 'zh-TW': '傳給家人|（LINE）', en: 'Send to family |(LINE)' },
-    act: { 'zh-TW': '還不換車，|可以做什麼', en: 'Not switching? |What you can do' },
+    act: { 'zh-TW': '還沒要換車，|可以做什麼', en: 'Not switching? |What you can do' },
     more: { 'zh-TW': '看完以後', en: 'After the story' },
     sheet: {
       title: { 'zh-TW': '這張圖，|是怎麼畫的', en: 'How this picture |was drawn' },

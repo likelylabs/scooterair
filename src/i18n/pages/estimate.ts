@@ -58,7 +58,7 @@ export default copy({
     range: { 'zh-TW': '為什麼是一個範圍', en: 'Why a range' },
     drawing: { 'zh-TW': '圖是怎麼畫的', en: 'How the pictures are drawn' },
     limits: { 'zh-TW': '這個推估不能說什麼', en: 'What it cannot tell you' },
-    answers: { 'zh-TW': '十三個問題的答案', en: 'Answers to thirteen questions' },
+    answers: { 'zh-TW': '13 個問題的答案', en: 'Answers to 13 questions' },
     measure: { 'zh-TW': '把推估換成實測', en: 'Turn it into a measurement' },
   },
 
@@ -126,7 +126,7 @@ export default copy({
         },
       },
     },
-    resultTitle: { 'zh-TW': '算出來：|一輛機車停著、引擎沒熄火，|每小時排的一氧化碳', en: 'Result: the carbon monoxide one stopped scooter gives off in an hour, engine running' },
+    resultTitle: { 'zh-TW': '算出來：|平均一輛機車停著、引擎沒熄火，|每小時排的一氧化碳', en: 'Result: the carbon monoxide the average stopped scooter gives off in an hour, engine running' },
     perRedTitle: { 'zh-TW': '等一個紅燈呢？', en: 'And through one red light?' },
     perRedNote: {
       'zh-TW': '一小時有 {reds} 個 {red} 秒，所以除以 {reds}。換成氣體來看，大約可以裝滿一個 {ml} 毫升的鋁罐。',
@@ -275,8 +275,8 @@ export default copy({
     eyebrow: { 'zh-TW': '8　答案', en: '8 · The answers' },
     title: { 'zh-TW': '{n} 個問題，現在的答案', en: '{n} questions, and the answers we have now' },
     lead: {
-      'zh-TW': '這些問題，本站以前只寫「還不知道」。現在每一個都有答案：有的是量到的，有的是我們算的，有的是研究的結論。每一個都標明是哪一種，也寫出要小心的地方。',
-      en: 'This site used to leave these questions open. Each now has an answer: some measured, some worked out by us, some the finding of a study. Each says which, and what to be careful about.',
+      'zh-TW': '常被問的問題。每一題寫出是量到的、算的，還是研究的結論，也寫出要小心的地方。',
+      en: 'Questions people often ask. Each answer says whether it was measured, worked out or found by a study, and what to be careful about.',
     },
   },
 

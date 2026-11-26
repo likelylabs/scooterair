@@ -358,7 +358,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
         <p class="es-p es-draw__try">{t.drawing.tryIt}</p>
         <ScenarioSwitch locale={locale} />
         <div class="es-draw__nums">
-          {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} anchor="numbers" data-when-scenario={s} />)}
+          {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} anchor="numbers" data-when-scenario={s} data-say />)}
         </div>
         <p class="es-h4">{t.drawing.keyTitle}</p>
         <AirKey locale={locale} />

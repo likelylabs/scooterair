@@ -37,7 +37,7 @@ const { locale, chapter, total = 15, phase = 'red', class: cls } = Astro.props;
 const words = { red: screenText.red[locale], green: screenText.green[locale], position: screenText.position[locale] };
 ---
 
-<div class:list={['screen-rail', cls]} data-screen-rail data-js-only data-phase={phase} data-words={JSON.stringify(words)} role="group" aria-label={screenText.railLabel[locale]}>
+<div class:list={['screen-rail', cls]} data-screen-rail data-js-only data-phase={phase} data-words={JSON.stringify(words)} role="region" aria-label={screenText.railLabel[locale]}>
   <div class="container screen-rail__row">
     <span class="screen-rail__lamp" aria-hidden="true"></span>
     <span class="screen-rail__phase" data-rail-phase>{words[phase]}</span>
