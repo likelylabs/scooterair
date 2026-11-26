@@ -446,7 +446,8 @@ await check(4, () => {
       const under = zh ? /不到/.test(t) : /\bunder\b/i.test(t);
       if (!under && !(zh ? /約/.test(t) : /\babout\b/i.test(t))) lacks.push(zh ? '約' : '"about"');
       if (!under && !(zh ? /到|至/.test(t) : /\bto\b/i.test(t))) lacks.push('a range');
-      if (!(zh ? /推估/.test(t) : /\bestimate\b/i.test(t))) lacks.push(zh ? 'the 推估 chip' : 'the Estimate chip');
+      // inline parts run together in textOf ("ppmEstimateHow do we know?"), so no word boundary here
+      if (!(zh ? /推估/.test(t) : /estimate/i.test(t))) lacks.push(zh ? 'the 推估 chip' : 'the Estimate chip');
       // a way to /estimate/#…: a link inside, or a button / #how link whose sheet links there
       const inner = [el, ...elements(el)];
       const linksThere = (n) => [n, ...elements(n)].some((x) => x.name === 'a' && /estimate\/#/.test(attr(x, 'href') ?? ''));

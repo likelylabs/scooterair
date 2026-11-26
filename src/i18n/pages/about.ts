@@ -48,8 +48,8 @@ export default copy({
     eyebrow: { 'zh-TW': '推估', en: 'The estimate' },
     title: { 'zh-TW': '本站沒有自己去量；|我們推估，並把算法攤開', en: 'We did not measure it ourselves. |We estimate, and show all the working' },
     p1: {
-      'zh-TW': '我們用公開的資料來算：定檢讀數告訴我們一輛機車怠速時排多少，運研所的錄影告訴我們一個紅燈停幾輛，測站和現場量測告訴我們路邊的風。算出來的是一個範圍，標成「推估」。',
-      en: 'We work from published data: inspection readings tell us how much an idling scooter gives off, the Institute of Transportation’s video counts tell us how many stop at one red light, and weather stations and on-site readings tell us the wind at the kerb. The result is a range, labelled “estimate”.',
+      'zh-TW': '我們用公開的資料來算：定檢讀數告訴我們一輛機車停著、引擎沒熄火時排多少，運研所的錄影告訴我們一個紅燈停幾輛，測站和現場量測告訴我們路邊的風。算出來的是一個範圍，標成「推估」。',
+      en: 'We work from published data: inspection readings tell us how much a scooter gives off standing still with its engine running, the Institute of Transportation’s video counts tell us how many stop at one red light, and weather stations and on-site readings tell us the wind at the kerb. The result is a range, labelled “estimate”.',
     },
     link: { 'zh-TW': '看完整的算法', en: 'See the full working' },
   },
@@ -74,7 +74,7 @@ export default copy({
     list: [
       { 'zh-TW': '研究看到的是「有關」，不是「造成」。這兩個詞差很多，我們不會混著用。', en: 'Studies show that things are associated, not that one causes the other. The two words mean very different things, and we do not mix them up.' },
       { 'zh-TW': '推估一定給範圍，旁邊一定有「推估」標記，按下去看得到算法。', en: 'An estimate always comes as a range with its “estimate” label beside it, and one tap shows the working.' },
-      { 'zh-TW': '說清楚是什麼的量、在哪裡：機車「多出來」的和街上原本就有的分開寫；推估算的是大人鼻子的高度、90 秒的平均。', en: 'We say what the amount is and where it applies: what the scooters add is kept apart from what the street already holds, and the estimate is for an adult’s nose, averaged over 90 seconds.' },
+      { 'zh-TW': '說清楚是什麼的量、在哪裡：機車「多出來」的和街上原本就有的分開寫；推估指的是大人鼻子的高度、90 秒的平均。', en: 'We say what the amount is and where it applies: what the scooters add is kept apart from what the street already holds, and the estimate is for an adult’s nose, averaged over 90 seconds.' },
       { 'zh-TW': '不拿「幾倍」當標題，不說等一個紅燈就會生病，也不印比證據更大的數字。', en: 'No “so many times more” headlines, no claim that one red light makes you ill, and no figure bigger than the evidence.' },
       { 'zh-TW': '健康研究講的多半是所有車輛的廢氣，不只機車；我們每次都寫出來。', en: 'Health studies are mostly about exhaust from all traffic, not scooters alone, and we say so every time.' },
       { 'zh-TW': '對我們不利的數字，我們先講：電動機車在有些條件下比較貴，就和比較便宜的情況寫在同一個地方。', en: 'We put the numbers that cut against us first: where an electric scooter costs more, it is said in the same place as where it costs less.' },
@@ -160,7 +160,7 @@ export default copy({
         en: 'The Institute of Transportation has measured carbon monoxide and PM2.5 in the pedestrian waiting areas of junctions. The site now shows those readings beside its own estimate.',
       },
       'ufp-smell': {
-        'zh-TW': '我們只說一氧化碳沒有味道。苯要到百萬分之幾才聞得到，路邊的濃度不太可能聞得到。超細微粒聞不聞得到，我們找不到查證過的出處，所以不寫。',
+        'zh-TW': '我們只說一氧化碳沒有味道。苯要到百萬分之幾才聞得到，路邊的量不太可能聞得到。超細微粒聞不聞得到，我們找不到查證過的出處，所以不寫。',
         en: 'We say only that carbon monoxide has no smell. Benzene can be smelled only at parts per million, so it is unlikely to be smelled at roadside levels. We found no checked source on whether ultrafine particles can be smelled, so we do not say.',
       },
       'no-2027': {

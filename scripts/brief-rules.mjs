@@ -140,7 +140,7 @@ export const claimRules = [
   R('brief-vocab-chedui', 3, zh, /車隊/, 'Write 一排機車, not 車隊 (6.6).', { instead: '一排機車' }),
   R('brief-vocab-zuizang', 3, zh, /最髒/, 'Write 排最多的一成, not 最髒 (6.6).', { instead: '排最多的一成' }),
   R('brief-vocab-yu', 3, zh, /愈/, 'Write 越…越…, not 愈 (6.6).', { instead: '越' }),
-  R('brief-vocab-shuijian', 3, zh, /稅減/, 'Write 減稅, not 稅減 (6.6, 7.7).', { instead: '減稅' }),
+  R('brief-vocab-shuijian', 3, zh, /(?<!貨物)稅減/, 'Write 減稅, not 稅減 (6.6, 7.7). The official 貨物稅減徵 / 貨物稅減免 are names, not this mistake.', { instead: '減稅' }),
 
   // the other rows of 4.6 (check-copy; a match is a prompt to read the copy against the rule)
   R('brief-no-long-limits', 46, zh, /(8|八|24|二十四)\s*小時.{0,4}(平均|標準|限值|指引)|年平均.{0,4}(標準|限值|指引)|空氣品質指標.{0,6}(顏色|燈號)|AQI.{0,6}(顏色|燈號|紅|紫)/, 'No 8-hour, 24-hour or yearly limit against 90 seconds, and no AQI colours (4.6). The one comparable value is the WHO 15-minute carbon monoxide guideline.'),

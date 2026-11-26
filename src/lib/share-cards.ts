@@ -105,7 +105,7 @@ export function shareCardContent(id: ShareCardId, locale: Locale): ShareCardCont
     }
   }
   const q = share.questions[id];
-  const kicker = L(site.name, locale);
+  const kicker = L(share.questionKicker, locale);
   switch (id) {
     case 'smell':
       return { id, picture: 'smell', kicker, title: L(q.title, locale), line: L(q.line, locale), chip: 'estimate', caveat: L(illustration.tag, locale) };
@@ -125,10 +125,10 @@ export function shareCardContent(id: ShareCardId, locale: Locale): ShareCardCont
       return { id, picture: 'kerb', kicker, title: L(q.title, locale), line: L(q.line, locale), caveat: estimateCaveat(locale) };
     case 'mask':
       return { id, picture: 'mask', kicker, title: L(q.title, locale), line: L(q.line, locale), chip: 'official', caveat: L(illustration.tag, locale) };
-    case 'how-much':
+    default:
+      // 'how-much'
       return { id, picture: 'kerb', kicker, title: L(q.title, locale), line: L(q.line, locale), estimate: coAdd, caveat: estimateCaveat(locale) };
   }
-  throw new Error(`[share cards] unknown card ${id satisfies never}`);
 }
 
 /** The alt text of a card (brief 5.1): what it says, its caveat, and that the picture is an illustration. */

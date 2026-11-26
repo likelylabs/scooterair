@@ -61,6 +61,8 @@ const full = link('/estimate/#numbers', locale);
 const target = sheet ? `#${sheet}` : full;
 // the zoom-out strip: the block is the chart's whole axis on the 0–87 ppm bar, never thinner than 5px
 const block = Math.max(m.who.share, 0.1);
+// the guideline's name breaks after the organisation, never inside 「15 分鐘指引值」
+const whoLabel = m.who.label.split(' ');
 ---
 
 <div id={id} class:list={['chart', 'hc', 'hc-mve', 'hc--unit-end', cls]} data-chart="measured-vs-estimate" data-grow="" role="group" aria-label={m.title}>
@@ -86,15 +88,17 @@ const block = Math.max(m.who.share, 0.1);
               </span>
             </span>
             <span class="hc-row__sub">
-              <Fragment set:html={chipHtml(r.kind, locale)} />
+              <span class="hc-row__tail">
+                <Fragment set:html={chipHtml(r.kind, locale)} />
+                {r.id === 'estimate' && (
+                  <span class="hc-row__go" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 12h15M13 6l6 6-6 6" />
+                    </svg>
+                  </span>
+                )}
+              </span>
               <span>{r.sub}</span>
-              {r.id === 'estimate' && (
-                <span class="hc-row__go" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 12h15M13 6l6 6-6 6" />
-                  </svg>
-                </span>
-              )}
             </span>
           </Fragment>
         );
@@ -139,9 +143,7 @@ const block = Math.max(m.who.share, 0.1);
           </p>
           <p class="hc-zoom__limit">
             <span>
-              {m.who.label}
-              {locale === 'en' ? ': ' : '：'}
-              <b>{m.who.text}</b>
+              {whoLabel[0]} <span class="hc-nw">{whoLabel.slice(1).join(' ')}{locale === 'en' ? ':' : '：'}</span> <b>{m.who.text}</b>
             </span>
             <Fragment set:html={chipHtml('official', locale)} />
             <span aria-hidden="true">↑</span>

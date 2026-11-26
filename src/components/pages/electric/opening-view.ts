@@ -176,7 +176,9 @@ ${working}`;
 /** Screen 13's headline, assembled from the figures ('|' marks phrase boundaries; strip them for plain text). */
 export function monthHeadline(d: OpenData, T: OpenText, m: OpenMonth): string {
   const home = m.homeLo === m.homeHi ? fill(T.homeOne, { n: yuan(d.locale, m.homeLo) }) : fill(T.homeRange, { lo: d.locale === 'en' ? `NT$${num(d.locale, m.homeLo)}` : num(d.locale, m.homeLo), hi: yuan(d.locale, m.homeHi) });
-  return fill(T.monthHead, { home: glue(home), petrol: glue(yuan(d.locale, m.petrol)) });
+  // Chinese keeps 「約 22 到 28 元」 whole; English breaks at its own spaces
+  const g = d.locale === 'en' ? (x: string) => x : glue;
+  return fill(T.monthHead, { home: g(home), petrol: g(yuan(d.locale, m.petrol)) });
 }
 
 export function monthHtml(d: OpenData, T: OpenText, t: OpenTable, km: number): string {

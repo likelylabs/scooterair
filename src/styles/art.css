@@ -743,6 +743,8 @@ html:not(.js) .air-key--tap .air-key__item {
  * (lane B's Segmented name="mask") wins; without scripting the checked radio does.
  */
 .mk-v { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
+/* the mask lets the face show through a little, so what is inside it can be told from what is on it */
+.scene--mask .a-mask { fill-opacity: 0.78; }
 .mk-leak { fill: none; stroke: var(--air-dot); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .mk-leak--on-head { stroke: var(--here, var(--bg)); }
 [data-mask='cloth'] .mk-on-cloth,

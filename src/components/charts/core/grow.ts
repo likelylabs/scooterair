@@ -16,6 +16,13 @@ import { motionOk } from '../../ui/motion.client';
 
 const DONE_AFTER = 1400;
 
+/**
+ * Arrived: a good part of the chart is on screen. A chart taller than the screen can never show
+ * 30% of itself on a small phone held sideways, so half a screenful of it counts as well.
+ */
+const arrived = (e: IntersectionObserverEntry): boolean =>
+  e.isIntersecting && (e.intersectionRatio >= 0.3 || e.intersectionRect.height >= (e.rootBounds?.height ?? window.innerHeight) * 0.45);
+
 function arm(): void {
   const charts = [...document.querySelectorAll<HTMLElement>('[data-grow=""]')];
   if (!charts.length) return;
@@ -31,7 +38,8 @@ function arm(): void {
         const seenBefore = first.has(el);
         first.add(el);
         if (!seenBefore && e.isIntersecting) {
-          // on screen from the start: at rest
+          // on screen from the start, even a sliver of it: at rest (hiding marks the reader can
+          // already see would be a flicker)
           el.dataset.grow = 'done';
           io.unobserve(el);
         } else if (!seenBefore) {
@@ -40,14 +48,14 @@ function arm(): void {
             el.dataset.grow = 'done';
             io.unobserve(el);
           } else el.dataset.grow = 'wait';
-        } else if (e.isIntersecting) {
+        } else if (arrived(e)) {
           el.dataset.grow = motionOk() ? 'go' : 'done';
           io.unobserve(el);
           window.setTimeout(() => (el.dataset.grow = 'done'), DONE_AFTER);
         }
       }
     },
-    { threshold: 0.3 },
+    { threshold: [0, 0.15, 0.3, 0.5] },
   );
   charts.forEach((c) => io.observe(c));
   // the reader switches animation off while charts are still waiting: show them

@@ -53,8 +53,8 @@ export default copy({
     },
     keepWalking: { 'zh-TW': '繼續走路。我們沒有要你少走。', en: 'Keep walking. We are not asking you to walk less.' },
     keepWalkingWhy: {
-      'zh-TW': '一項台灣成人的研究裡，有規律運動的人，在每一種 PM2.5 程度下，死亡風險都比較低。',
-      en: 'In a study of Taiwanese adults, people who exercised regularly had a lower risk of death at every level of PM2.5.',
+      'zh-TW': '一項追蹤台灣大人的研究裡，有規律運動的人，在每一種 PM2.5 程度下（所有來源的 PM2.5），死亡風險都比較低。',
+      en: 'In a study of Taiwanese adults, people who exercised regularly had a lower risk of death at every level of PM2.5 (from all sources).',
     },
     smoky: {
       'zh-TW': '看到冒黑煙的機車，可以向縣市環保局檢舉；要附什麼，看當地環保局的說明。',

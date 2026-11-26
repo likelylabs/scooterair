@@ -57,7 +57,7 @@ const colon = locale === 'en' ? ': ' : '：';
 
 <div id={id} class:list={[panels.length > 1 && 'hc-bands-set', cls]}>
   {
-    panels.map(({ m, u }) => {
+    panels.map(({ m, u }, pi) => {
       const tickXs = m.axis.ticks.map(m.x);
       const g = m.axis.guide;
       const groups = (['compare', 'added'] as const).map((key) => ({ key, name: key === 'compare' ? T.compare[locale] : T.addedHead[locale], rows: m.rows.filter((r) => r.group === key) })).filter((x) => x.rows.length);
@@ -127,7 +127,7 @@ const colon = locale === 'en' ? ': ' : '：';
             {m.note && (locale === 'en' ? ' ' : '')}
             {m.confidence.why}
           </p>
-          <p class="hc-note">{m.logNote}</p>
+          {pi === 0 && <p class="hc-note">{m.logNote}</p>}
           {table && <Fragment set:html={tableHtml(m.table, { title: m.title, tableLabel: chartText.dataTable[locale] })} />}
         </section>
       );

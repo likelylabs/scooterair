@@ -43,12 +43,13 @@ export default copy({
   money: {
     kicker: { 'zh-TW': '換電動', en: 'Go electric' },
     title: { 'zh-TW': '換一輛電動機車，|要多少錢？', en: 'What does an electric |scooter cost?' },
-    cheaper: { 'zh-TW': '補助扣完，{county}報廢舊車換電動，比買新的燃油機車少付 {amount}。', en: 'After subsidies, in {county} with an old scooter to scrap, an electric one costs {amount} less than a new petrol one.' },
-    same: { 'zh-TW': '補助扣完，{county}報廢舊車換電動，和買新的燃油機車差不多錢。', en: 'After subsidies, in {county} with an old scooter to scrap, an electric one costs about the same as a new petrol one.' },
-    dearer: { 'zh-TW': '補助扣完，{county}報廢舊車換電動，還是比燃油機車多付 {amount}。', en: 'After subsidies, in {county} with an old scooter to scrap, an electric one still costs {amount} more than a petrol one.' },
+    cheaper: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，比買新的燃油機車少付 {amount}。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one costs {amount} less than a new petrol one.' },
+    same: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，和買新的燃油機車差不多錢。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one costs about the same as a new petrol one.' },
+    dearer: { 'zh-TW': '補助扣完，{county}報廢出廠滿 10 年的機車、換電動，還是比燃油機車多付 {amount}。', en: 'After subsidies, in {county} scrapping a scooter built 10 or more years ago, an electric one still costs {amount} more than a petrol one.' },
     worst: { 'zh-TW': '條件不同，也有人多付 {amount}。', en: 'On other terms, some pay {amount} more.' },
     caveat: { 'zh-TW': '價格和補助是 {date}查的。用網站上的計算機，算你自己的。', en: 'Prices and subsidies checked {date}. Work out your own on the site.' },
   },
+  questionKicker: { 'zh-TW': '問題', en: 'Questions' },
   /** The question pages (brief 7.5). Titles are the questions; the line is the one-sentence answer. */
   questions: {
     smell: {
@@ -97,6 +98,5 @@ export default copy({
     },
   },
   /** Shared words on the cards. */
-  estimateNote: { 'zh-TW': '這是算的，不是量的，所以給一個範圍。', en: 'This is worked out, not measured, so we give a range.' },
   alt: { 'zh-TW': '{title}{line}（圖內附註：{caveat}）{note}', en: '{title} {line} (Note on the card: {caveat}) {note}' },
 });
