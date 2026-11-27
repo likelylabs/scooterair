@@ -1,0 +1,1337 @@
+{
+ "key": "sources-yardsticks",
+ "researcher": "researcher 3 (yardsticks: hazard labels, reference values with averaging times, odour thresholds)",
+ "checkedOn": "2026-11-27",
+ "question": "For each candidate chemical, what is its cancer hazard label, which reference values exist and over what averaging time, and at what level can it (or petrol vapour, or diluted petrol exhaust) be smelled?",
+ "rulesForUse": [
+  "A cancer classification is a hazard label (strength of evidence that something CAN cause cancer), not a risk from one red light. Never say or imply one red light causes cancer; never compute a cancer risk for one red light; never rank chemicals by harm.",
+  "Unit risks (WHO, EPA, OEHHA) are lifetime figures recorded for completeness only; they must not be applied to seconds or minutes of exposure.",
+  "Compare a red-light level only with a reference value of matching averaging time, after converting the red-light series to that averaging time. Where none exists, say so: no above/below statement can be made.",
+  "AEGLs are emergency-planning values for rare accidental releases; workplace limits are for healthy adult workers. Neither is a yardstick for everyday public air; if quoted, label them as such.",
+  "Carbon monoxide has no smell; particles are too small to see. Benzo[a]pyrene is particle-bound and has no smell of its own."
+ ],
+ "iarcGroupMeanings": {
+  "Group 1": "Carcinogenic to humans: there is convincing evidence that it can cause cancer in people.",
+  "Group 2A": "Probably carcinogenic to humans: limited evidence in people plus sufficient evidence in animals or strong mechanistic evidence.",
+  "Group 2B": "Possibly carcinogenic to humans: only one line of evidence (limited in people, or sufficient in animals, or strong mechanistic).",
+  "Group 3": "Not classifiable: evidence inadequate or limited; not a finding of safety.",
+  "all": "Each group is a hazard label (strength of evidence that the agent CAN cause cancer), not the risk at any exposure level (IARC Q&A)."
+ },
+ "conversions": {
+  "basis": "ug/m3 = ppm x molecular weight / 24.45 x 1000 (25 C, 1 atm)",
+  "ugPerM3PerPpm": {
+   "benzene": 3195,
+   "toluene": 3769,
+   "ethylbenzene": 4342,
+   "xylenes": 4342,
+   "1,3-butadiene": 2212,
+   "n-hexane": 3525,
+   "styrene": 4260,
+   "naphthalene": 5242,
+   "formaldehyde": 1228,
+   "acetaldehyde": 1802,
+   "acrolein": 2293
+  }
+ },
+ "chemicals": [
+  {
+   "name": "benzene",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 1 (Vols 29, Sup 7, 100F [2012], 120 [listed 'In prep.' in 2019 list]). = carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC (list of classifications, Vols 1-123, 2019; Vol 100F 2012)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 3 (Vols 47, 71; 1999). = not classifiable (hazard label; not a finding of safety).",
+   "measuredOn": "IARC 1999 (Vol 71)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "ethylbenzene",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 2B (Vol 77; 2000). = possibly carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2000 (Vol 77)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "xylenes",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 3 (Vols 47, 71; 1999). = not classifiable (hazard label; not a finding of safety).",
+   "measuredOn": "IARC 1999 (Vol 71)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 1 (Vol 100F; 2012). = carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2012 (Vol 100F)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "n-hexane",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Not classified: n-hexane does not appear in the IARC list (2019 PDF); no IARC label exists.",
+   "measuredOn": "IARC list of classifications (Vols 1-123, 2019)",
+   "sourceIds": [
+    "iarc-list-2019"
+   ],
+   "confidence": "moderate (absence checked in 2019 PDF only; current web list did not render)"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 2A (Vols 60, 82, 121; listed 'In prep.' in 2019 list, i.e. upgraded from 2B by Vol 121). = probably carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC (Vol 121, 2018 meeting; list 2019)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "naphthalene",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 2B (Vol 82; 2002). = possibly carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2002 (Vol 82)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 1 (Sup 7, Vols 62, 88, 100F; 2012). = carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2012 (Vol 100F)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acetaldehyde",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 2B (Vols 36, Sup 7, 71; 1999). (Separately, acetaldehyde associated with drinking alcohol is Group 1, Vol 100E 2012 - that entry is about alcohol metabolism, not air.) = possibly carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 1999 (Vol 71)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acrolein",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 2A (Vol 128; evaluated 2020, published Nov 2021; was Group 3 in Vol 63, 1995). = probably carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2021 (Vol 128)",
+   "sourceIds": [
+    "iarc-v128-news",
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzo[a]pyrene",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 1 (Sup 7, Vols 92, 100F; 2012; upgraded on mechanistic evidence). = carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2012 (Vol 100F)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "petrol (gasoline) - the fuel and its vapour",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 1 (automotive gasoline, Vol 138; Lancet Oncology summary 21 March 2025, full volume released 2026; bladder cancer and acute myeloid leukaemia in adults). Was Group 2B (Vol 45, 1989). = carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2025/2026 (Vol 138)",
+   "sourceIds": [
+    "iarc-v138-news",
+    "iarc-list-2019",
+    "iarc-qa"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "petrol-engine exhaust (mixture)",
+   "shareBasis": "Cancer hazard label: IARC Monographs group",
+   "central": "Group 2B (engine exhaust, gasoline; Vols 46, 105; list year 2014, meeting 2012). Not re-evaluated in Vol 138. (Diesel engine exhaust is Group 1, same volumes.) = possibly carcinogenic to humans (hazard label, not risk).",
+   "measuredOn": "IARC 2014 (Vol 105)",
+   "sourceIds": [
+    "iarc-list-2019",
+    "iarc-qa",
+    "iarc-v138-news"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "Cancer hazard label: US EPA IRIS",
+   "central": "A (Human carcinogen), 1986 guidelines; 'Known/likely human carcinogen' (1996 proposed). Inhalation unit risk 2.2e-6 to 7.8e-6 per ug/m3 (lifetime; recorded for completeness, never for one red light).",
+   "measuredOn": "US EPA IRIS, cancer assessment 2000-01-09",
+   "sourceIds": [
+    "epa-iris-benzene"
+   ],
+   "low": "2.2e-6 per ug/m3",
+   "high": "7.8e-6 per ug/m3",
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "Cancer hazard label: US EPA IRIS",
+   "central": "Carcinogenic to humans (2002). Inhalation unit risk 3e-5 per ug/m3 (lifetime; not for one red light).",
+   "measuredOn": "US EPA IRIS 2002-11-05",
+   "sourceIds": [
+    "epa-iris-butadiene"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "Cancer hazard label: US EPA IRIS",
+   "central": "Carcinogenic to humans (inhalation route), 2005 guidelines. Inhalation unit risk 1.1e-5 per ug/m3 (lifetime; not for one red light).",
+   "measuredOn": "US EPA IRIS 2024-08-19",
+   "sourceIds": [
+    "epa-iris-formaldehyde"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzo[a]pyrene",
+   "shareBasis": "Cancer hazard label: US EPA IRIS",
+   "central": "Carcinogenic to humans (combined routes), 2005 guidelines. Inhalation unit risk 1e-3 per ug/m3 lifetime (6e-4 adult-based) (not for one red light).",
+   "measuredOn": "US EPA IRIS 2017-01-19",
+   "sourceIds": [
+    "epa-iris-bap"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "Taiwan hazard mark (workplace table)",
+   "central": "Marked 瘤 ('proven or suspected to cause tumours in humans') in Taiwan's workplace permissible exposure table. Taiwan has no separate national cancer classification list that we found.",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準 附表一 (amended 2025-04-11)",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "Taiwan hazard mark (workplace table)",
+   "central": "Marked 瘤 ('proven or suspected to cause tumours in humans') in Taiwan's workplace table.",
+   "measuredOn": "Taiwan Ministry of Labor 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "WHO guideline (2000 Europe; 2010 indoor): no safe level; unit risk, lifetime",
+   "central": "No safe level of exposure can be recommended. Unit risk of leukaemia 6e-6 per ug/m3 lifetime; 17 / 1.7 / 0.17 ug/m3 for lifetime excess risk 1/10,000 / 1/100,000 / 1/1,000,000. Recorded for completeness ONLY; it is a lifetime figure and must never be applied to one red light.",
+   "measuredOn": "WHO Regional Office for Europe 2000 (AQG 2nd ed., ch. 5.2) and WHO 2010 indoor guidelines (executive summary p. xxv)",
+   "sourceIds": [
+    "who-2000",
+    "who-2010-indoor"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "WHO guideline (2000 Europe), 1-week average",
+   "central": "260 ug/m3 (0.26 mg/m3), 1 week",
+   "measuredOn": "WHO Regional Office for Europe 2000, Table 2",
+   "sourceIds": [
+    "who-2000"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "WHO odour-based guideline (2000 Europe), 30-minute average",
+   "central": "1,000 ug/m3 (1 mg/m3), 30 min (odour annoyance; detection threshold 1 mg/m3, recognition 10 mg/m3)",
+   "measuredOn": "WHO Regional Office for Europe 2000, Table 3",
+   "sourceIds": [
+    "who-2000"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "WHO guideline (2000 Europe), 1-week average",
+   "central": "260 ug/m3 (0.26 mg/m3), 1 week",
+   "measuredOn": "WHO Regional Office for Europe 2000, Table 2",
+   "sourceIds": [
+    "who-2000"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "WHO odour-based guideline (2000 Europe), 30-minute average",
+   "central": "70 ug/m3, 30 min (odour; detection 70 ug/m3, recognition 210-280 ug/m3)",
+   "measuredOn": "WHO Regional Office for Europe 2000, Table 3",
+   "sourceIds": [
+    "who-2000"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "WHO guideline (2000 Europe; reaffirmed 2010 indoor), 30-minute average",
+   "central": "100 ug/m3 (0.1 mg/m3) for any 30-minute period (2010: also prevents lung-function effects, nasopharyngeal cancer and myeloid leukaemia)",
+   "measuredOn": "WHO Regional Office for Europe 2000 (Table 2, Table 3) and WHO 2010 indoor (exec. summary p. xxv)",
+   "sourceIds": [
+    "who-2000",
+    "who-2010-indoor"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "naphthalene",
+   "shareBasis": "WHO indoor guideline (2010), annual average",
+   "central": "10 ug/m3 (0.01 mg/m3), annual",
+   "measuredOn": "WHO 2010 indoor guidelines (exec. summary p. xxv)",
+   "sourceIds": [
+    "who-2010-indoor"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzo[a]pyrene",
+   "shareBasis": "WHO guideline (2000; 2010 indoor): no threshold; unit risk, lifetime",
+   "central": "No threshold can be determined. Unit risk for lung cancer from PAH mixtures 8.7e-5 per ng/m3 of BaP (2010); lifetime excess risk 1/10,000 / 1/100,000 / 1/1,000,000 at about 1.2 / 0.12 / 0.012 ng/m3. Lifetime figure: not for one red light.",
+   "measuredOn": "WHO 2010 indoor (exec. summary p. xxv); WHO 2000 ch. 5.9 (no guideline value for PAHs, BaP as indicator)",
+   "sourceIds": [
+    "who-2010-indoor",
+    "who-2000"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "WHO guideline (2000 Europe)",
+   "central": "None: WHO 2000 recommended no guideline value and no unit risk for butadiene (animal-based estimates differ 100-1000-fold).",
+   "measuredOn": "WHO Regional Office for Europe 2000, ch. 3",
+   "sourceIds": [
+    "who-2000"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "all candidate chemicals",
+   "shareBasis": "WHO global air quality guidelines 2021",
+   "central": "Not covered: the 2021 guidelines cover only PM2.5, PM10, ozone, NO2, SO2 and CO. None of the candidate chemicals has a 2021 WHO value.",
+   "measuredOn": "WHO 2021 (22 Sept 2021)",
+   "sourceIds": [
+    "who-2021"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 27 ug/m3 (1 h); 8-h 3 ug/m3; chronic 3 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); acute/8-h/chronic reviewed 6/14; inhalation unit risk 2.9e-5 per ug/m3 (lifetime, not for one red)",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 5,000 ug/m3 (1 h); 8-h 830 ug/m3; chronic 420 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); reviewed 8/20",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "ethylbenzene",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute: none (no OEHHA acute REL); 8-h: none; chronic 2,000 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); chronic 2/00; unit risk 2.5e-6 per ug/m3",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "xylenes",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 22,000 ug/m3 (1 h); 8-h: none; chronic 700 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); mixed isomers; acute 4/99, chronic 4/00",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 660 ug/m3 (1 h); 8-h 9 ug/m3; chronic 2 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); reviewed 7/13; unit risk 1.7e-4 per ug/m3",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "n-hexane",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute: none (no OEHHA acute REL); 8-h: none; chronic 7,000 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); chronic 4/00",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 21,000 ug/m3 (1 h); 8-h: none; chronic 900 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); acute 4/99, chronic 4/00",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "naphthalene",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute: none (no OEHHA acute REL); 8-h: none; chronic 9 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); chronic 4/00; unit risk 3.4e-5 per ug/m3",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 55 ug/m3 (1 h); 8-h 9 ug/m3; chronic 9 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); reviewed 12/08; unit risk 6.0e-6 per ug/m3",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acetaldehyde",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 470 ug/m3 (1 h); 8-h 300 ug/m3; chronic 140 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); reviewed 12/08; unit risk 2.7e-6 per ug/m3",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acrolein",
+   "shareBasis": "California OEHHA RELs: acute (1-hour average), 8-hour, chronic",
+   "central": "acute 2.5 ug/m3 (1 h); 8-h 0.7 ug/m3; chronic 0.35 ug/m3",
+   "measuredOn": "California OEHHA, via CARB consolidated table (updated 2025-09-25); reviewed 12/08",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzo[a]pyrene",
+   "shareBasis": "California OEHHA REL",
+   "central": "None (no acute, 8-h or chronic REL). Inhalation unit risk 1.1e-3 per ug/m3 (lifetime; not for one red light).",
+   "measuredOn": "California OEHHA via CARB table 2025-09-25",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "petrol vapour / petrol-engine exhaust",
+   "shareBasis": "California OEHHA REL",
+   "central": "None for petrol vapour or petrol-engine exhaust as mixtures (only diesel exhaust particulate has values: chronic REL 5 ug/m3, unit risk 3.0e-4 per ug/m3).",
+   "measuredOn": "California OEHHA via CARB table 2025-09-25",
+   "sourceIds": [
+    "carb-oehha-2025"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "0.009 ppm = 28.8 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, draft 10/2024",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "2 ppm = 7,537 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, final 06/2017",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "ethylbenzene",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "5 ppm = 21,712 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, final 11/2010",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "xylenes",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "2 ppm = 8,685 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, draft 05/2026",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "n-hexane",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "6 ppm = 21,148 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, final 04/2025",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "5 ppm = 21,299 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, final 11/2010",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "naphthalene",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "6e-05 ppm = 0.315 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, final 04/2025 (0.06 ppb)",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "0.04 ppm = 49.1 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, final 07/1999",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acrolein",
+   "shareBasis": "US ATSDR acute inhalation MRL, 1 to 14 days (NOT a 1-hour value)",
+   "central": "0.003 ppm = 6.88 ug/m3 (1-14 days)",
+   "measuredOn": "US ATSDR MRL list, final 04/2025",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene / acetaldehyde / benzo[a]pyrene / petrol",
+   "shareBasis": "US ATSDR acute inhalation MRL",
+   "central": "None listed",
+   "measuredOn": "US ATSDR MRL list (accessed 2026-11-27)",
+   "sourceIds": [
+    "atsdr-mrl"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "130 ppm (10 min); 52 ppm (60 min)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (interim 10/19/2007)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "67 ppm (10 min to 8 h)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (final)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "ethylbenzene",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "33 ppm (10 min to 8 h)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (interim 9/21/09)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "xylenes",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "130 ppm (10 min to 8 h)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (final)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "670 ppm (10 min to 8 h)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (interim 11/13/06)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "n-hexane",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "Not recommended (insufficient data)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (final)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "20 ppm (10 min to 8 h)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (interim 12/12/06)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "0.90 ppm (10 min to 8 h)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (interim 12/12/06)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acetaldehyde",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "45 ppm (10 min to 8 h); level of distinct odour awareness 0.56 ppm",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (interim 11/13/06)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acrolein",
+   "shareBasis": "US EPA AEGL-1, 10-minute (emergency planning value for rare accidental releases; not an everyday-air yardstick)",
+   "central": "0.030 ppm (10 min to 8 h)",
+   "measuredOn": "US EPA compiled AEGL values 2018-07-27 (final)",
+   "sourceIds": [
+    "epa-aegl-2018",
+    "epa-aegl-about"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "naphthalene / benzo[a]pyrene / petrol",
+   "shareBasis": "US EPA AEGL",
+   "central": "None in the compiled AEGL table",
+   "measuredOn": "US EPA 2018-07-27",
+   "sourceIds": [
+    "epa-aegl-2018"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "Taiwan indoor air quality standard, 1-hour value (public indoor places)",
+   "central": "0.08 ppm = 98 ug/m3 (1 h)",
+   "measuredOn": "Taiwan EPA (now Ministry of Environment), 室內空氣品質標準, 2012-11-23",
+   "sourceIds": [
+    "tw-iaq"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene + toluene + ethylbenzene + xylenes + styrene (in TVOC)",
+   "shareBasis": "Taiwan indoor air quality standard, TVOC 1-hour value",
+   "central": "0.56 ppm, 1 h, for the SUM of 12 named VOCs (includes benzene, toluene, ethylbenzene, xylenes, styrene) - indoor public places only; not a single-chemical value",
+   "measuredOn": "Taiwan EPA 2012-11-23",
+   "sourceIds": [
+    "tw-iaq"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "all candidate chemicals",
+   "shareBasis": "Taiwan ambient (outdoor) air quality standard",
+   "central": "None: the outdoor standard covers particles, ozone, SO2, NO2, CO and lead only (judged from the pollutants named in its articles; the article-3 table itself is an attachment we did not open).",
+   "measuredOn": "Taiwan Ministry of Environment, 空氣品質標準, amended 2024-09-30",
+   "sourceIds": [
+    "tw-aqs"
+   ],
+   "confidence": "moderate"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 1 ppm (3,195 ug/m3); 15 min: 2 ppm (6,389 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11; not marked 瘤; 特定化學物",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 50 ppm (188,425 ug/m3); 15 min: 75 ppm (282,638 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11; new value effective 2027-01-01 (amendment of 2025-04-11)",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "ethylbenzene",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 100 ppm (434,233 ug/m3); 15 min: 125 ppm (542,791 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11; listed as phenylethane",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "xylenes",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 100 ppm (434,233 ug/m3); 15 min: 125 ppm (542,791 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 5 ppm (11,061 ug/m3); 15 min: 10 ppm (22,123 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11; marked 瘤",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "n-hexane",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 50 ppm (176,237 ug/m3); 15 min: 75 ppm (264,356 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 50 ppm (212,986 ug/m3); 15 min: 75 ppm (319,479 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "naphthalene",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 10 ppm (52,421 ug/m3); 15 min: 15 ppm (78,632 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 0.75 ppm (921 ug/m3); 15 min: 2.25 ppm (2,763 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11; marked 瘤; new value effective 2027-01-01",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acetaldehyde",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 100 ppm (180,164 ug/m3); 15 min: 125 ppm (225,204 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acrolein",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA permissible concentration and 15-minute short-term limit (8-h value x multiplier); workers, not public",
+   "central": "8 h: 0.1 ppm (229 ug/m3); 15 min: 0.3 ppm (688 ug/m3)",
+   "measuredOn": "Taiwan Ministry of Labor, 勞工作業場所容許暴露標準, 附表一 and art. 3, amended 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "petrol (gasoline) vapour",
+   "shareBasis": "WORKPLACE: Taiwan 8-hour TWA and 15-minute limit",
+   "central": "8 h: 300 ppm (890 mg/m3); 15 min: 375 ppm",
+   "measuredOn": "Taiwan Ministry of Labor 2025-04-11",
+   "sourceIds": [
+    "tw-pel"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "WORKPLACE: NIOSH REL / OSHA PEL (US)",
+   "central": "NIOSH: potential carcinogen, TWA 0.1 ppm, 15-min ST 1 ppm. OSHA: TWA 1 ppm, STEL 5 ppm",
+   "measuredOn": "US NIOSH Pocket Guide",
+   "sourceIds": [
+    "niosh-benzene"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "WORKPLACE: NIOSH REL / OSHA PEL (US)",
+   "central": "NIOSH: potential carcinogen, TWA 0.016 ppm, ceiling 0.1 ppm (15 min). OSHA: TWA 0.75 ppm, STEL 2 ppm",
+   "measuredOn": "US NIOSH Pocket Guide",
+   "sourceIds": [
+    "niosh-formaldehyde"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acrolein",
+   "shareBasis": "WORKPLACE: NIOSH REL / OSHA PEL (US)",
+   "central": "NIOSH: TWA 0.1 ppm, ST 0.3 ppm. OSHA: TWA 0.1 ppm",
+   "measuredOn": "US NIOSH Pocket Guide",
+   "sourceIds": [
+    "niosh-acrolein"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "WORKPLACE: NIOSH REL / OSHA PEL (US)",
+   "central": "NIOSH: potential carcinogen (no number). OSHA: TWA 1 ppm, STEL 5 ppm",
+   "measuredOn": "US NIOSH Pocket Guide",
+   "sourceIds": [
+    "niosh-butadiene"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "acetaldehyde",
+   "shareBasis": "WORKPLACE: NIOSH REL / OSHA PEL (US)",
+   "central": "NIOSH: potential carcinogen (no number). OSHA: TWA 200 ppm",
+   "measuredOn": "US NIOSH Pocket Guide",
+   "sourceIds": [
+    "niosh-acetaldehyde"
+   ],
+   "confidence": "high"
+  },
+  {
+   "name": "benzene",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "2.7 ppm = 8,626 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold",
+   "sourceIds": [
+    "nagata-2003"
+   ],
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "toluene",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "0.33 ppm = 1,244 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold; WHO 2000 Table 3 for comparison",
+   "sourceIds": [
+    "nagata-2003",
+    "who-2000"
+   ],
+   "low": "0.27 ppm = 1 mg/m3 (WHO 2000 detection)",
+   "high": "0.33 ppm (Nagata)",
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "ethylbenzene",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "0.17 ppm = 738 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold",
+   "sourceIds": [
+    "nagata-2003"
+   ],
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "1,3-butadiene",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "0.23 ppm = 509 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold",
+   "sourceIds": [
+    "nagata-2003"
+   ],
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "n-hexane",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "1.5 ppm = 5,287 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold",
+   "sourceIds": [
+    "nagata-2003"
+   ],
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "styrene",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "0.035 ppm = 149 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold; WHO 2000 Table 3 for comparison",
+   "sourceIds": [
+    "nagata-2003",
+    "who-2000"
+   ],
+   "low": "0.016 ppm = 70 ug/m3 (WHO 2000 detection)",
+   "high": "0.035 ppm (Nagata)",
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "formaldehyde",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "0.5 ppm = 614 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold; WHO 2000 Table 3 for comparison",
+   "sourceIds": [
+    "nagata-2003",
+    "who-2000"
+   ],
+   "low": "0.024 ppm = 0.03 mg/m3 (WHO 2000 lower end)",
+   "high": "0.50 ppm (Nagata; WHO 2000 upper end 0.49 ppm = 0.6 mg/m3)",
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "acetaldehyde",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "0.0015 ppm = 2.7 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold",
+   "sourceIds": [
+    "nagata-2003"
+   ],
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "acrolein",
+   "shareBasis": "Odour detection threshold of the single chemical (50% of a panel detect; triangle odour bag)",
+   "central": "0.0036 ppm = 8.25 ug/m3",
+   "measuredOn": "Nagata 2003 (Japan Environmental Sanitation Center; measured 1976-1988), Table 2. Nagata: repeat tests vary up to about 5-fold",
+   "sourceIds": [
+    "nagata-2003"
+   ],
+   "confidence": "moderate (single-lab panel; repeat-test spread up to ~5x)"
+  },
+  {
+   "name": "xylenes",
+   "shareBasis": "Odour detection threshold of the single chemical",
+   "central": "o-xylene 0.38 ppm (1,650 ug/m3); m-xylene 0.041 ppm (178 ug/m3); p-xylene 0.058 ppm (252 ug/m3)",
+   "measuredOn": "Nagata 2003, Table 2",
+   "sourceIds": [
+    "nagata-2003"
+   ],
+   "low": "0.041 ppm (m-xylene)",
+   "high": "0.38 ppm (o-xylene)",
+   "confidence": "moderate"
+  },
+  {
+   "name": "naphthalene",
+   "shareBasis": "Odour detection threshold of the single chemical",
+   "central": "0.084 ppm = 440 ug/m3",
+   "measuredOn": "Amoore & Hautala 1983 compilation, as cited by US EPA naphthalene hazard summary (not in Nagata's table; original not opened)",
+   "sourceIds": [
+    "epa-naphthalene"
+   ],
+   "confidence": "low to moderate (secondary citation)"
+  },
+  {
+   "name": "acetaldehyde",
+   "shareBasis": "Odour: level of distinct odour awareness (US EPA AEGL program)",
+   "central": "0.56 ppm (distinct awareness, a higher level than bare detection)",
+   "measuredOn": "US EPA compiled AEGL values 2018",
+   "sourceIds": [
+    "epa-aegl-2018"
+   ],
+   "confidence": "moderate"
+  },
+  {
+   "name": "benzo[a]pyrene",
+   "shareBasis": "Odour detection threshold",
+   "central": "None: particle-bound, no odour threshold found; it cannot be smelled as such",
+   "measuredOn": "(no source)",
+   "sourceIds": [],
+   "confidence": "n/a"
+  },
+  {
+   "name": "petrol vapour",
+   "shareBasis": "Odour detection threshold of petrol (gasoline) vapour (50% of panel)",
+   "central": "0.474-0.576 ppm by volume (three blends: summer 0.576, winter 0.479, composite 0.474); recognition 0.765-1.121 ppm",
+   "measuredOn": "American Petroleum Institute 1995 (Publ. 4592; TRC odour laboratory, Connecticut; US gasoline blends)",
+   "sourceIds": [
+    "api-1995-odour"
+   ],
+   "low": "0.474 ppm",
+   "high": "0.576 ppm",
+   "confidence": "moderate (abstract only; US 1990s fuel)"
+  },
+  {
+   "name": "diluted petrol-engine exhaust",
+   "shareBasis": "Odour: dilution-to-threshold of raw exhaust (Fiala 1967)",
+   "central": "800 to 1,000-fold dilution",
+   "measuredOn": "Fiala & Zeschmann 1967, VDI-Z 109:1139-1141; water-cooled four-cylinder four-stroke Otto (car) engine, any operating state; at threshold CO was 1-100 ppm and HC 0.6-8 ppm; adding air lowered CO/HC but INCREASED odour",
+   "sourceIds": [
+    "eric-ap122"
+   ],
+   "low": "800",
+   "high": "1,000",
+   "confidence": "low (English abstract only; 1960s pre-catalyst car engine, not a scooter)"
+  },
+  {
+   "name": "diluted petrol-engine exhaust",
+   "shareBasis": "Odour: dilution-to-threshold of raw exhaust (Swedish BIL-32, 1970)",
+   "central": "log10 dilution 3.72-3.83 = about 5,200-6,800-fold (petrol engines with various pollution-control devices; idle and ECE cycle of the same order); diesel at idle without control 3.17 = about 1,500",
+   "measuredOn": "Lindvall T & Mortstedt S-E (Aktiebolaget Atomenergi, Rept BIL-32, Sweden, 1970), abstract",
+   "sourceIds": [
+    "eric-ap122"
+   ],
+   "low": "5,200",
+   "high": "6,800",
+   "confidence": "low (English abstract only; 1970 car engines; the simulation's 6,800 is the TOP of this study's range)"
+  }
+ ],
+ "noShortTermValue": {
+  "statement": "For a red light lasting seconds to about two minutes, no reference value of matching averaging time exists for ANY candidate chemical outside emergency (AEGL, 10-minute) and workplace (15-minute) limits. The shortest everyday-air values are 30 minutes (WHO: formaldehyde 100 ug/m3; odour guidelines for toluene 1 mg/m3 and styrene 70 ug/m3) and 1 hour (OEHHA acute RELs; Taiwan indoor formaldehyde 0.08 ppm and TVOC 0.56 ppm). A red-light peak can only be set beside these after converting to that averaging time (e.g. 1-hour mean = sum of concentration x seconds over the hour / 3600 s, with the rest of the hour at background), never as a raw 1-s or 10-s value.",
+  "noShortTermValueAtAll": [
+   {
+    "name": "ethylbenzene",
+    "why": "No WHO, OEHHA acute, or Taiwan public value of 1 hour or less; only ATSDR acute (1-14 days), EPA AEGL-1 (emergency, 10 min) and workplace limits."
+   },
+   {
+    "name": "n-hexane",
+    "why": "No value of 1 hour or less of any public kind; AEGL-1 'not recommended'; ATSDR acute is 1-14 days."
+   },
+   {
+    "name": "naphthalene",
+    "why": "Only WHO annual (10 ug/m3), OEHHA chronic and ATSDR acute (1-14 days); no 1-hour or shorter value, no AEGL."
+   },
+   {
+    "name": "benzo[a]pyrene",
+    "why": "Only lifetime unit risks (no threshold); no short-term value of any kind."
+   },
+   {
+    "name": "petrol vapour (mixture)",
+    "why": "Only a workplace limit (Taiwan 300 ppm 8 h / 375 ppm 15 min); no public value."
+   },
+   {
+    "name": "petrol-engine exhaust (mixture)",
+    "why": "No reference value of any averaging time anywhere (hazard label only)."
+   }
+  ],
+  "haveOneHourOrShorterPublicValue": [
+   "benzene (OEHHA 27 ug/m3, 1 h)",
+   "toluene (OEHHA 5,000 ug/m3, 1 h; WHO odour 1 mg/m3, 30 min)",
+   "xylenes (OEHHA 22,000 ug/m3, 1 h)",
+   "1,3-butadiene (OEHHA 660 ug/m3, 1 h)",
+   "styrene (OEHHA 21,000 ug/m3, 1 h; WHO odour 70 ug/m3, 30 min)",
+   "formaldehyde (WHO 100 ug/m3, 30 min; OEHHA 55 ug/m3, 1 h; Taiwan indoor 0.08 ppm, 1 h)",
+   "acetaldehyde (OEHHA 470 ug/m3, 1 h)",
+   "acrolein (OEHHA 2.5 ug/m3, 1 h)"
+  ]
+ },
+ "odourSolidity": {
+  "singleChemicals": "Nagata 2003 is a standard single-laboratory compilation (triangle odour bag, 50% detection); repeat tests varied up to about 5-fold, and published compilations for the same chemical often differ by 10-fold or more (e.g. formaldehyde: Nagata 0.50 ppm vs WHO 2000 range 0.024-0.49 ppm). Treat any 'above odour threshold' for one chemical as order-of-magnitude.",
+  "petrolVapour": "API 1995: 0.47-0.58 ppm detection, three US fuel blends, one laboratory; abstract only. This is evaporated fuel, not exhaust.",
+  "exhaust": "Both exhaust figures come from English abstracts of 1960s-1970 European car-engine studies (Fiala 1967: 800-1,000-fold, four-cylinder four-stroke petrol engine; BIL-32 1970: 10^3.72-10^3.83 = about 5,200-6,800-fold, petrol engines with control devices, idle and ECE cycle similar). The originals could not be opened. No measurement of odour concentration in scooter or motorcycle exhaust was found. The simulation's 6,800 is the top of the BIL-32 range (its low end is about 5,200), and 800 is the low end of Fiala's 800-1,000. Fiala found odour did not follow CO or HC (adding air lowered both but raised odour). Solidity: low. Supports 'smellable after roughly a thousand- to several-thousand-fold dilution', not an exact odour-unit number."
+ },
+ "sources": [
+  {
+   "id": "iarc-qa",
+   "citation": "IARC Monographs: Identification of Carcinogenic Hazards to Humans - Questions and Answers (IARC, Lyon).",
+   "url": "https://monographs.iarc.who.int/wp-content/uploads/2018/07/IARCMonographs-QA.pdf",
+   "read": "full text",
+   "keyFigure": "'The categories of the classification indicate the strength of the evidence as to whether an agent is capable of causing cancer (technically called \"hazard\"), but it does not measure the likelihood that cancer will occur (technically called \"risk\") at a particular level of exposure.' Group 1/2A/2B/3 definitions."
+  },
+  {
+   "id": "iarc-list-2019",
+   "citation": "IARC (2019). Agents Classified by the IARC Monographs, Volumes 1-123 (List of Classifications PDF).",
+   "url": "https://monographs.iarc.who.int/wp-content/uploads/2019/02/List_of_Classifications.pdf",
+   "read": "full text",
+   "keyFigure": "Rows: 71-43-2 Benzene 1; 108-88-3 Toluene 3 (47, 71, 1999); 100-41-4 Ethylbenzene 2B (77, 2000); 1330-20-7 Xylenes 3; 106-99-0 1,3-Butadiene 1 (2012); 100-42-5 Styrene 2A (60, 82, 121, In prep.); 91-20-3 Naphthalene 2B (82, 2002); 50-00-0 Formaldehyde 1 (100F, 2012); 75-07-0 Acetaldehyde 2B (1999); 107-02-8 Acrolein 3 (1995, superseded by Vol 128); 50-32-8 Benzo[a]pyrene 1 (2012); Engine exhaust, gasoline 2B (46, 105, 2014); Engine exhaust, diesel 1; Gasoline 2B (45, 1989, superseded by Vol 138). n-Hexane not listed."
+  },
+  {
+   "id": "iarc-agents-page",
+   "citation": "IARC Monographs: Agents classified by the IARC Monographs (web list), last updated 24 November 2026.",
+   "url": "https://monographs.iarc.who.int/agents-classified-by-the-iarc/",
+   "read": "page opened; the table loads by script and did not render for us, so the 2019 PDF plus the Vol 128 and Vol 138 announcements were used",
+   "keyFigure": "last updated 24 November 2026"
+  },
+  {
+   "id": "iarc-v128-news",
+   "citation": "IARC (18 Nov 2021). IARC Monographs Volume 128: Acrolein, Crotonaldehyde, and Arecoline.",
+   "url": "https://www.iarc.who.int/news-events/iarc-monographs-volume-128-acrolein-crotonaldehyde-and-arecoline",
+   "read": "web page",
+   "keyFigure": "'acrolein is probably carcinogenic to humans (Group 2A)'"
+  },
+  {
+   "id": "iarc-v138-news",
+   "citation": "IARC. IARC Monographs evaluation of the carcinogenicity of automotive gasoline and some oxygenated gasoline additives (Turner MC et al., Lancet Oncol, published online 21 March 2025, doi:10.1016/S1470-2045(25)00165-2); Volume 138.",
+   "url": "https://www.iarc.who.int/news-events/iarc-monographs-evaluation-of-the-carcinogenicity-of-automotive-gasoline-and-some-oxygenated-gasoline-additives",
+   "read": "web page",
+   "keyFigure": "'evaluated automotive gasoline as carcinogenic to humans (Group 1) on the basis of sufficient evidence for cancer in humans' (bladder cancer, acute myeloid leukaemia). Page does not mention engine exhaust."
+  },
+  {
+   "id": "who-2000",
+   "citation": "WHO Regional Office for Europe (2000). Air Quality Guidelines for Europe, 2nd ed. (WHO Regional Publications, European Series No. 91), ISBN 92 890 1358 3.",
+   "url": "https://geostat.ge/media/55662/9789289013581-eng.pdf",
+   "read": "full text (WHO's own IRIS repository would not serve the PDF to our client; this is a copy of the WHO publication hosted by Geostat; publisher page https://www.who.int/publications/i/item/9789289013581)",
+   "keyFigure": "Table 2: formaldehyde 0.1 mg/m3 30 min; styrene 0.26 mg/m3 1 week; toluene 0.26 mg/m3 1 week. Table 3 (30-min, odour): formaldehyde detection 0.03-0.6 mg/m3, guideline 0.1; styrene detection 70 ug/m3, recognition 210-280, guideline 70; toluene detection 1 mg/m3, recognition 10, guideline 1. Table 4: benzene unit risk 6e-6; butadiene no value. Benzene ch.: 'Benzene is carcinogenic to humans and no safe level of exposure can be recommended.' PAH ch.: 'No specific guideline value can be recommended for PAHs as such in air.'"
+  },
+  {
+   "id": "who-2010-indoor",
+   "citation": "WHO Regional Office for Europe (2010). WHO guidelines for indoor air quality: selected pollutants. ISBN 978 92 890 0213 4.",
+   "url": "https://www.afro.who.int/sites/default/files/2017-06/e94535.pdf",
+   "read": "full text (copy on WHO Africa regional site)",
+   "keyFigure": "Exec. summary p. xxv: benzene 'No safe level of exposure can be recommended'; 'Unit risk of leukaemia per 1 ug/m3 air concentration is 6 x 10-6'; 17/1.7/0.17 ug/m3. Formaldehyde 0.1 mg/m3 30-minute average. Naphthalene 0.01 mg/m3 annual average. PAH: unit risk 8.7 x 10-5 per ng/m3 of B[a]P; 1.2/0.12/0.012 ng/m3."
+  },
+  {
+   "id": "who-2021",
+   "citation": "WHO (22 Sept 2021). WHO global air quality guidelines: particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon monoxide.",
+   "url": "https://www.who.int/publications/i/item/9789240034228",
+   "read": "publisher page",
+   "keyFigure": "Scope (title): PM2.5, PM10, ozone, NO2, SO2, CO only."
+  },
+  {
+   "id": "carb-oehha-2025",
+   "citation": "California Air Resources Board. Consolidated Table of OEHHA/ARB Approved Risk Assessment Health Values (Table last updated September 25, 2025).",
+   "url": "https://ww2.arb.ca.gov/sites/default/files/classic/toxics/healthval/contable09252025.pdf",
+   "read": "full text (OEHHA's own REL page is behind bot protection and returned nothing; this is the state's official consolidated copy of OEHHA values)",
+   "keyFigure": "Acute/8-h/chronic REL (ug/m3): acetaldehyde 470/300/140; acrolein 2.5/0.7/0.35; benzene 27/3/3 (unit risk 2.9e-5); 1,3-butadiene 660/9/2; ethylbenzene -/-/2000; formaldehyde 55/9/9; n-hexane -/-/7000; naphthalene -/-/9; styrene 21000/-/900; toluene 5000/830/420; xylenes 22000/-/700; benzo(a)pyrene unit risk 1.1e-3 only. Note 2: 'All acute RELs use a 1-hour averaging period (OEHHA, 2008).'"
+  },
+  {
+   "id": "atsdr-mrl",
+   "citation": "US Agency for Toxic Substances and Disease Registry. Minimal Risk Levels (MRLs) list.",
+   "url": "https://wwwn.cdc.gov/TSP/MRLS/mrlslisting.aspx",
+   "read": "full list",
+   "keyFigure": "Inhalation acute: benzene 0.009 ppm (draft 10/2024); toluene 2 ppm; ethylbenzene 5 ppm; xylenes 2 ppm (draft 05/2026); n-hexane 6 ppm; styrene 5 ppm; naphthalene 0.06 ppb; formaldehyde 0.04 ppm; acrolein 0.003 ppm. 'Acute = 1 to 14 days'. No entries for 1,3-butadiene or acetaldehyde."
+  },
+  {
+   "id": "epa-aegl-2018",
+   "citation": "US EPA (27 July 2018). Compiled AEGL Values.",
+   "url": "https://www.epa.gov/sites/default/files/2018-08/documents/compiled_aegls_update_27jul2018.pdf",
+   "read": "full text",
+   "keyFigure": "AEGL-1 10 min: benzene 130 ppm; toluene 67; ethylbenzene 33; xylenes 130; 1,3-butadiene 670; n-hexane NR; styrene 20; formaldehyde 0.90; acetaldehyde 45 (LOA 0.56 ppm); acrolein 0.030."
+  },
+  {
+   "id": "epa-aegl-about",
+   "citation": "US EPA. About Acute Exposure Guideline Levels (AEGLs).",
+   "url": "https://www.epa.gov/aegl/about-acute-exposure-guideline-levels-aegls",
+   "read": "web page",
+   "keyFigure": "AEGL-1: 'Notable discomfort, irritation, or certain asymptomatic non-sensory effects'; for 'rare, usually accidental, releases of chemicals into the air'."
+  },
+  {
+   "id": "epa-iris-benzene",
+   "citation": "US EPA IRIS: Benzene (CASRN 71-43-2).",
+   "url": "https://iris.epa.gov/ChemicalLanding/&substance_nmbr=276",
+   "read": "web page",
+   "keyFigure": "A (Human carcinogen); IUR 2.2e-6 to 7.8e-6 per ug/m3; cancer WOE updated 01/09/2000."
+  },
+  {
+   "id": "epa-iris-butadiene",
+   "citation": "US EPA IRIS: 1,3-Butadiene (CASRN 106-99-0).",
+   "url": "https://iris.epa.gov/ChemicalLanding/&substance_nmbr=139",
+   "read": "web page",
+   "keyFigure": "Carcinogenic to humans; IUR 3e-5 per ug/m3; 11/05/2002."
+  },
+  {
+   "id": "epa-iris-formaldehyde",
+   "citation": "US EPA IRIS: Formaldehyde (CASRN 50-00-0).",
+   "url": "https://iris.epa.gov/ChemicalLanding/&substance_nmbr=419",
+   "read": "web page",
+   "keyFigure": "Carcinogenic to humans (inhalation); IUR 1.1e-5 per ug/m3; RfC 7e-3 mg/m3; 08/19/2024."
+  },
+  {
+   "id": "epa-iris-bap",
+   "citation": "US EPA IRIS: Benzo[a]pyrene (CASRN 50-32-8).",
+   "url": "https://iris.epa.gov/ChemicalLanding/&substance_nmbr=136",
+   "read": "web page",
+   "keyFigure": "Carcinogenic to humans; IUR 1e-3 per ug/m3; 01/19/2017."
+  },
+  {
+   "id": "niosh-benzene",
+   "citation": "US NIOSH Pocket Guide to Chemical Hazards: Benzene.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0049.html",
+   "read": "web page",
+   "keyFigure": "NIOSH REL Ca TWA 0.1 ppm ST 1 ppm; OSHA PEL TWA 1 ppm STEL 5 ppm."
+  },
+  {
+   "id": "niosh-formaldehyde",
+   "citation": "US NIOSH Pocket Guide: Formaldehyde.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0293.html",
+   "read": "web page",
+   "keyFigure": "Ca TWA 0.016 ppm C 0.1 ppm [15-minute]; OSHA TWA 0.75 ppm ST 2 ppm."
+  },
+  {
+   "id": "niosh-acrolein",
+   "citation": "US NIOSH Pocket Guide: Acrolein.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0011.html",
+   "read": "web page",
+   "keyFigure": "TWA 0.1 ppm ST 0.3 ppm; OSHA TWA 0.1 ppm."
+  },
+  {
+   "id": "niosh-butadiene",
+   "citation": "US NIOSH Pocket Guide: 1,3-Butadiene.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0067.html",
+   "read": "web page",
+   "keyFigure": "NIOSH Ca; OSHA TWA 1 ppm ST 5 ppm."
+  },
+  {
+   "id": "niosh-acetaldehyde",
+   "citation": "US NIOSH Pocket Guide: Acetaldehyde.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0001.html",
+   "read": "web page",
+   "keyFigure": "NIOSH Ca; OSHA TWA 200 ppm."
+  },
+  {
+   "id": "tw-pel",
+   "citation": "Taiwan Ministry of Labor. 勞工作業場所容許暴露標準 (Permissible exposure standards in workplaces), amended 2025-04-11; 附表一 空氣中有害物容許濃度; items 15, 211, 445 (incl. formaldehyde, toluene) take effect 2027-01-01.",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?PCODE=N0060004",
+   "read": "full text of articles and the 附表一 PDF (LawGetFile FileId=0000387835)",
+   "keyFigure": "Benzene 1 ppm; toluene 50 ppm (皮); phenylethane (ethylbenzene) 100; xylenes 100; 1,3-butadiene 5 (瘤); n-hexane 50 (皮); styrene 50; naphthalene 10; formaldehyde 0.75 (瘤); acetaldehyde 100; acrolein 0.1 (皮); gasoline 300 ppm. Art. 3: 15-min short-term = value x multiplier (3 below 1; 2 for 1-<10; 1.5 for 10-<100; 1.25 for 100-<1000)."
+  },
+  {
+   "id": "tw-iaq",
+   "citation": "Taiwan Environmental Protection Administration. 室內空氣品質標準 (Indoor air quality standards), 2012-11-23.",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?PCODE=O0130005",
+   "read": "full text",
+   "keyFigure": "甲醛 一小時值 0.08 ppm; TVOC 一小時值 0.56 ppm (sum of 12 VOCs incl. benzene, ethylbenzene, styrene, toluene, xylenes)."
+  },
+  {
+   "id": "tw-aqs",
+   "citation": "Taiwan Ministry of Environment. 空氣品質標準 (Ambient air quality standards), amended 2024-09-30.",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?PCODE=O0020007",
+   "read": "article text (the article-3 value table is in an attachment, not opened)",
+   "keyFigure": "Art. 4 compliance rules cover PM10, PM2.5, ozone, SO2, NO2, CO (and lead by 3-month mean); no VOC."
+  },
+  {
+   "id": "nagata-2003",
+   "citation": "Nagata Y. (2003). Measurement of Odor Threshold by Triangle Odor Bag Method. In: Odor Measurement Review, Ministry of the Environment, Japan, pp. 118-127.",
+   "url": "https://www.env.go.jp/en/air/odor/measure/02_3_2.pdf",
+   "read": "full text",
+   "keyFigure": "Table 2 (ppm, v/v): benzene 2.7; toluene 0.33; ethylbenzene 0.17; o-xylene 0.38; m-xylene 0.041; p-xylene 0.058; 1,3-butadiene 0.23; n-hexane 1.5; styrene 0.035; formaldehyde 0.50; acetaldehyde 0.0015; acrolein 0.0036. Naphthalene not listed. 223 substances, 1976-1988; repeat-test spread 'about 5 at the maximum'."
+  },
+  {
+   "id": "epa-naphthalene",
+   "citation": "US EPA. Naphthalene 91-20-3 hazard summary (Health Effects Notebook), citing Amoore JE & Hautala E (1983) J Appl Toxicol 3:272-290.",
+   "url": "https://www.epa.gov/sites/default/files/2016-09/documents/naphthalene.pdf",
+   "read": "full text",
+   "keyFigure": "'odor threshold of 0.44 mg/m3 (0.084 parts per million' (ref. 9, Amoore & Hautala)."
+  },
+  {
+   "id": "api-1995-odour",
+   "citation": "American Petroleum Institute (1995). Odor threshold studies performed with gasoline and gasoline combined with MTBE, ETBE and TAME. API Publ. 4592 (US EPA HERO 1248100).",
+   "url": "https://hero.epa.gov/hero/index.cfm/reference/details/reference_id/1248100",
+   "read": "abstract only",
+   "keyFigure": "Detection thresholds 0.576 (summer), 0.479 (winter), 0.474 ppm (composite); recognition 0.802, 1.121, 0.765 ppm; 50% of population."
+  },
+  {
+   "id": "eric-ap122",
+   "citation": "US EPA Air Pollution Technical Information Center (1973). Air Pollution Translations: A Bibliography with Abstracts, Vol. 4 (AP-122), ERIC ED099195; abstracts of Fiala E & Zeschmann E-G (1967) Laestigkeit von Abgasgeruch, VDI-Z 109:1139-1141, and Aktiebolaget Atomenergi Rept BIL-32 (1970), Investigation of the odor intensity of internal combustion engine exhausts.",
+   "url": "https://files.eric.ed.gov/fulltext/ED099195.pdf",
+   "read": "full PDF; only the two English abstracts exist in it (the original papers were not available to us)",
+   "keyFigure": "Fiala: 'Test personnel could smell the exhaust ... at 800- to 1000-fold dilution'; CO 1-100 ppm and HC 0.6-8 ppm at threshold; 'Addition of air ... reduced the concentrations, but increased the odor intensity.' BIL-32: 'odor thresholds, expressed as the logarithm of the dilution factor, were 3.17 for Diesel engines without exhaust control during idling, and 3.72-3.83 for gasoline engines equipped with different pollution control devices'; idle and ECE cycle 'largely of the same order of magnitude'."
+  }
+ ],
+ "blockedOrMissing": [
+  "oehha.ca.gov (REL summary and chemical pages): bot protection returned an empty page; used CARB's official consolidated table of OEHHA values instead.",
+  "www.ncbi.nlm.nih.gov Bookshelf (WHO 2010 indoor guidelines): browser check (reCAPTCHA); used the full PDF on afro.who.int.",
+  "iris.who.int (WHO 2000, 2010, 2021 PDFs): script-only repository, PDF not served; used other copies and the WHO publication page.",
+  "monographs.iarc.who.int list of classifications: table loads by script; used the 2019 PDF list plus IARC announcements for Vols 128 and 138. Vols 120/121 final publication years not separately opened.",
+  "swov.nl (a method for assessing vehicle exhaust odour): bot challenge; not read.",
+  "www.atsdr.cdc.gov naphthalene toxicological profile PDF: HTTP 403; naphthalene odour threshold taken from US EPA hazard summary citing Amoore & Hautala 1983 (original not opened).",
+  "Fiala 1967 and BIL-32 1970 originals: not available; only English abstracts read.",
+  "No odour-concentration measurement of scooter/motorcycle exhaust found.",
+  "Taiwan ambient standard value table (attachment) not opened; pollutant list judged from article 4."
+ ]
+}

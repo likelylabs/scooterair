@@ -44,7 +44,7 @@ const next = nextQuestion(slug, locale);
 const pages = { smell: QSmell, 'beside-me': QBesideMe, app: QApp, 'one-red-light': QOneRedLight, 'my-child': QMyChild, rider: QRider, mask: QMask } satisfies Record<Slug, unknown>;
 const Page = pages[slug];
 // the hard words each page uses, explained under its title (brief 6.6: gloss at first use)
-const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppm'], 'beside-me': ['pm25', 'ug'], app: ['ppm', 'pm25'], 'one-red-light': ['pm25', 'ufp', 'ec'], 'my-child': ['pm25'], rider: ['pm25'], mask: ['benzene', 'ufp'] };
+const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppb', 'ppm'], 'beside-me': ['pm25', 'ug'], app: ['ppm', 'pm25'], 'one-red-light': ['pm25', 'ufp', 'ec'], 'my-child': ['pm25'], rider: ['pm25'], mask: ['benzene', 'ufp'] };
 ---
 
 <Base locale={locale} title={typeset(plain(item.q[locale]), locale)} description={f(item.card[locale])} share={slug}>

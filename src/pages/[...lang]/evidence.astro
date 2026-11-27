@@ -58,7 +58,7 @@ import {
   sourceShort,
   sourceUses,
 } from '@/components/pages/evidence/ev';
-import { href, localeFromParam, localeStaticPaths, htmlLang } from '@/i18n';
+import { asset, href, localeFromParam, localeStaticPaths, htmlLang } from '@/i18n';
 import { chain, kSentences, readerText } from '@/i18n/ui';
 import { estimateText } from '@/data/estimate';
 import evidenceCopy from '@/i18n/pages/evidence';
@@ -84,6 +84,8 @@ import {
   type SeriesId,
   type SourceId,
 } from '@/data';
+import { smellEvidenceGroups } from '@/data/facts-smell';
+import { smellFiles } from '@/data/simulation';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -173,6 +175,8 @@ const v34 = [
 ];
 const iarc = [
   { id: 'iarc-benzene-group1' as FactId, label: T.v28.benzene },
+  { id: 'iarc-group1-three' as FactId, label: T.v28.butadiene, value: T.v28.group1 },
+  { id: 'iarc-group1-three' as FactId, label: T.v28.formaldehyde, value: T.v28.group1 },
   { id: 'iarc-outdoor-air-pollution-group1' as FactId, label: T.v28.outdoor },
   { id: 'iarc-diesel-exhaust-group1' as FactId, label: T.v28.diesel },
   { id: 'iarc-gasoline-exhaust-2b' as FactId, label: T.v28.gasoline },
@@ -203,11 +207,15 @@ const fullRead = sourceIds.filter((id) => getSource(id).readLevel === 'full-text
 const readCounts = readLevels.map((lvl) => ({ lvl, label: readerText(readLevelLabels[lvl][locale]), n: sourceIds.filter((id) => getSource(id).readLevel === lvl).length })).filter((r) => r.n > 0);
 
 // ---- context outside the chain ----------------------------------------------------------
-const ctx = contextItems();
+// the smell-chemicals facts have their own block (#smell-chemicals), not the context list
+const smellIds = new Set<string>(Object.values(smellEvidenceGroups).flat());
+const ctxAll = contextItems();
+const ctx = { ...ctxAll, facts: ctxAll.facts.filter((f) => !smellIds.has(f.id)) };
 
 const toc = [
   { href: '#chain', label: T.toc.chain },
   ...chainLinks.map((n) => ({ href: `#${chain.anchor(n)}`, label: `${fill(T.toc.linkN, { n })} · ${linkName(n)}` })),
+  { href: '#smell-chemicals', label: T.toc.smell },
   { href: '#map', label: T.toc.map },
   { href: '#answers', label: T.toc.answers },
   { href: '#not-claimed', label: T.toc.notClaimed },
@@ -428,9 +436,9 @@ const foldItems = (l: (typeof links)[number]) => l.answers.length + l.own.length
               {l.n === 4 && (
                 <Fragment>
                   <Figure locale={locale} title={T.v28.title} subtitle={T.v28.subtitle} level={4} badge="international">
-                    <CompareTable caption={plain(T.v28.title)} hideCaption rowHeader={T.v28.item} columns={[{ label: T.v28.group }]} rows={iarc.map((r) => ({ label: r.label, values: [lf(r.id, locale).display] }))} numeric={false} />
+                    <CompareTable caption={plain(T.v28.title)} hideCaption rowHeader={T.v28.item} columns={[{ label: T.v28.group }]} rows={iarc.map((r) => ({ label: r.label, values: ['value' in r && r.value ? r.value : lf(r.id, locale).display] }))} numeric={false} />
                     <Fragment slot="caption">{T.v28.foot}</Fragment>
-                    <Fragment slot="source">{cites(iarc.flatMap((r) => facts[r.id].sources)).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+                    <Fragment slot="source">{cites([...new Set(iarc.flatMap((r) => facts[r.id].sources))]).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
                   </Figure>
                 </Fragment>
               )}
@@ -479,6 +487,19 @@ const foldItems = (l: (typeof links)[number]) => l.answers.length + l.own.length
 
   <!-- The reference blocks: each a title and a 48 px button; a link to anything inside opens it -->
   <div class="ev-ref">
+  <Fold id="smell-chemicals" title={T.smellChem.title} lead={T.smellChem.lead} tone="sunken">
+    <h3 class="ev-sub ev-sub--first">{T.smellChem.what}</h3>
+    <FactList locale={locale} ids={[...smellEvidenceGroups.what] as FactId[]} visible={smellEvidenceGroups.what.length} />
+    <h3 class="ev-sub">{T.smellChem.seconds}</h3>
+    <FactList locale={locale} ids={[...smellEvidenceGroups.seconds] as FactId[]} visible={smellEvidenceGroups.seconds.length} />
+    <h3 class="ev-sub">{T.smellChem.averages}</h3>
+    <FactList locale={locale} ids={[...smellEvidenceGroups.averages] as FactId[]} visible={smellEvidenceGroups.averages.length} />
+    <p class="ev-note">
+      <a href={href('/estimate/#smell', locale)}>{T.smellChem.estimate} →</a>
+      {' '}<a href={asset(smellFiles.method)}>{T.smellChem.method} →</a>
+    </p>
+  </Fold>
+
   <Fold id="map" title={T.map.title} lead={T.map.short}>
     <p class="ev-note ev-fold-lead">{T.map.lead}</p>
     <EvidenceMap locale={locale} />

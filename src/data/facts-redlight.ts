@@ -603,8 +603,8 @@ export const intersection = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '量的是路口所有來源的空氣，不只機車，也沒有分紅燈和綠燈。每個路口只量兩天，而且是在夏天；用的是小型感測器，不是標準儀器。最高的一分鐘約 1.3 ppm，遠低於世界衛生組織的 15 分鐘指引值。',
-      'All-source air at the junction, not scooters alone, and not split by red and green. Each junction was measured for two days, in summer, with small sensors rather than reference instruments. The highest minute, about 1.3 ppm, is far below the WHO 15-minute guideline.',
+      '量的是路口所有來源的空氣，不只機車，也沒有分紅燈和綠燈。每個路口只量兩天，而且是在夏天；用的是小型感測器，不是標準儀器。最高的一分鐘約 1.3 ppm；還沒攤成 15 分鐘的平均，就已遠低於世界衛生組織的 15 分鐘指引值。',
+      'All-source air at the junction, not scooters alone, and not split by red and green. Each junction was measured for two days, in summer, with small sensors rather than reference instruments. The highest minute, about 1.3 ppm, is far below the WHO 15-minute guideline even before averaging over 15 minutes.',
     ),
     requiresCaveat: true,
     chainLink: 3,
@@ -688,8 +688,8 @@ export const smell = {
     evidence: 'international',
     readerKind: 'official',
     caveat: t(
-      '這是我們的推論。一氧化碳沒有味道，所以聞到廢氣味，不能告訴你一氧化碳有多少。這裡把一氧化碳當作廢氣的記號。沒有研究顯示，路口的一氧化碳多到會傷身體。運研所 2024 年夏天在路口行人等候區量過。最高值也遠低於世界衛生組織的短時間指引值。',
-      'This is our reasoning. Carbon monoxide has no smell, so smelling exhaust cannot tell you how much of it there is. We use carbon monoxide here as a marker for exhaust. No study shows carbon monoxide at the kerb reaching harmful levels. The highest readings the Institute of Transportation took in pedestrian waiting areas in summer 2024 were far below the WHO\'s short-term values.',
+      '這是我們的推論。一氧化碳沒有味道，所以聞到廢氣味，不能告訴你一氧化碳有多少。這裡把一氧化碳當作廢氣的記號。運研所 2024 年夏天在路口行人等候區量過，最高值也遠低於世界衛生組織的短時間指引值。本站的電腦推估只找到一個少見的例外：嬰兒車停在排氣管正後方半公尺、幾乎沒風，連續 15 分鐘每個紅燈都在（推估，信心低）。',
+      'This is our reasoning. Carbon monoxide has no smell, so smelling exhaust cannot tell you how much of it there is. We use carbon monoxide here as a marker for exhaust. The highest readings the Institute of Transportation took in pedestrian waiting areas in summer 2024 were far below the WHO\'s short-term values. Our simulation finds one rare exception: a pushchair half a metre behind a tailpipe, in almost no wind, through every red for 15 minutes (estimate, low confidence).',
     ),
     chainLink: 4,
     editorNote: 'R3: never rank carbon monoxide, benzene and ultrafine particles by harm.',

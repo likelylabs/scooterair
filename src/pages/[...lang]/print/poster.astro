@@ -57,7 +57,7 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
         <KindChip locale={locale} kind="measured" />
       </div>
       <div class="poster__row poster__row--est">
-        <span class="poster__label est--ring"><span class="est__label">{estimateText.addedByPack[locale]}</span></span>
+        <span class="poster__label"><span class="est__label">{estimateText.addedByPack[locale]}</span></span>
         <EstimateValue locale={locale} slotId="co.dozen.add" class="poster__est" />
       </div>
       <div class="poster__gloss"><span>{estimateText.ppmGloss[locale]}</span> <span>{est.meta.gloss[locale]}</span></div>

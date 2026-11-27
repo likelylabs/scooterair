@@ -3,7 +3,7 @@
  * these classes, so every drawing re-themes with the --art-* tokens.
  * `--here` is the surface behind the drawing (set by tones), used for cut-outs.
  *
- * The air (rings, dots, ribbons, the wash, the cores) is drawn by
+ * The air (the fume: its puffs at the tailpipes, the fume where people stand, its wisps) is drawn by
  * src/components/art/air.ts and styled in the section "The air rule" at the
  * end of this file. Its colours are the --air-* properties defined there.
  */
@@ -35,6 +35,7 @@
   stroke-linejoin: round;
 }
 .a-ink-s { stroke: var(--art-ink); }
+.a-far-s { fill: none; stroke: var(--art-far); stroke-linecap: round; }
 .a-deep-s { stroke: var(--art-deep); }
 .a-metal-s { stroke: var(--art-metal); }
 .a-clean-s { stroke: var(--clean); }
@@ -87,41 +88,8 @@
   stroke: var(--art-haze);
   stroke-linecap: round;
 }
-/* The gas you can't smell (CO): hollow rings */
-.a-co circle {
-  fill: none;
-  stroke: var(--art-co);
-  stroke-width: 1.4;
-}
-/* The particles you can't see (ultrafines): pin-point stipple */
-.a-ufp path {
-  fill: var(--art-ufp);
-  opacity: 0.5;
-}
 .a-wash-stop { stop-color: var(--art-haze); }
 .a-glow-stop { stop-color: var(--art-red); }
-
-.a-curl {
-  fill: none;
-  stroke: var(--art-haze);
-  stroke-width: 4.5;
-  stroke-linecap: round;
-  opacity: 0.55;
-}
-.a-puff {
-  fill: var(--art-haze);
-  opacity: 0;
-}
-
-/* Breathing point: a ring around each mouth, pulsing at breathing pace */
-.a-breath {
-  fill: none;
-  stroke: var(--signal-red);
-  stroke-width: 2.6;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-.is-clean .a-breath { stroke: var(--clean); }
 
 .a-label {
   font-family: var(--font-body);
@@ -143,36 +111,19 @@
 
 /* ---- Motion: slow, and only when welcome -------------------------------- */
 @media (prefers-reduced-motion: no-preference) {
-  .a-animated .a-puff {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: a-puff 3.6s linear infinite;
-  }
   .a-animated .a-drift-1 { animation: a-drift 17s ease-in-out infinite alternate; }
   .a-animated .a-drift-2 { animation: a-drift 23s ease-in-out infinite alternate-reverse; }
   .a-animated .a-drift-3 { animation: a-drift 31s ease-in-out infinite alternate; }
-  .a-animated .a-breath { animation: a-breathe 4.2s ease-in-out infinite; }
-}
-@keyframes a-puff {
-  0% { opacity: 0; transform: translate(0, 0) scale(0.35); }
-  14% { opacity: 0.42; }
-  100% { opacity: 0; transform: translate(-48px, -18px) scale(2.3); }
 }
 @keyframes a-drift {
   from { transform: translate(-16px, 1px); }
   to { transform: translate(16px, -3px); }
 }
-@keyframes a-breathe {
-  0%, 100% { transform: scale(0.85); opacity: 0.75; }
-  45% { transform: scale(1.18); opacity: 1; }
-}
 /* There is deliberately no animation that changes how much air pollution is drawn
-   (blueprint R11). The drift and puff keyframes above serve only the deprecated
-   Haze kinds and are not used by StreetScene, Scooter or any red-light frame. */
+   (blueprint R11). The drift keyframes above serve only the deprecated Haze kinds. */
 
 /* ==== Second air vocabulary (see parts.ts) =================================
- * Nothing here encodes an amount. The hatch has one pitch, the rings one
- * count, the stipple one density, the ribbons one length.
+ * Nothing here encodes an amount. The hatch has one pitch, the ribbons one length.
  */
 /* "exhaust present, amount not measured" */
 .a-hatch {
@@ -255,45 +206,30 @@
 
 /* ==== The air rule (src/components/art/air.ts; redesign brief 5.1) ==========
  *
- * One soft plume per row of scooters, and three kinds of mark inside it only:
- *   .air-ring  hollow blue ring   carbon monoxide
- *   .air-dot   small dark dot     particles
- *   .air-rib   wavy ochre ribbon  what you can smell (fuel vapour)
- *   .air-wash  layer B, the plume where people stand (soft ovals): three fixed steps
- *   .air-core  layer C, the soft core behind a tailpipe (a row's cores overlap into its plume)
- * The plume is smoke-coloured (a warm grey-brown), not orange: in the dark theme it is a
- * lighter haze, never a glow, so it does not read as fire or headlights.
- *
- * Contrast (measured on the test sheets, scratchpad build/C):
- *   - a ring is at least 3:1 against the page, the road, the walls and the
- *     wash at its strongest step;
- *   - over a core it is not, so every ring carries a 1 px halo in the colour
- *     of the paper (--air-halo): ring against halo, and halo against the
- *     core, are both well over 3:1. On plain paper the halo cannot be seen.
- * In the dark theme the paper is dark, so the plume is a pale smoky haze instead
- * of going dark, the rings turn pale blue and the halo is the dark paper.
+ * Exhaust is drawn only as fume coming out of the scooters, never as a symbol:
+ *   .air-core  layer C, the soft puff behind a tailpipe (a row's puffs overlap into its fume)
+ *   .air-wash  layer B, the fume where people stand (soft ovals): three steps, by the estimate
+ *   .air-rib   a wavy orange wisp through the fume: the part you can smell (the sharp-smelling gases)
+ *   .air-puff  a soft patch of the same fume in a diagram (inside the body, on a mask)
+ * The fume is smoke-coloured (a warm grey-brown) with orange wisps. In the dark theme it is a
+ * muted warm brown haze, never a pale glow, so it does not read as fire or headlights.
  */
 :root {
-  --air-ring: #1f5fa6;
-  --air-dot: #33230f;
   --air-rib: #8f4a08;
-  --air-wash: #7f644c;
-  --air-core: #3a2d22;
-  --air-core-mid: #6f5b48;
-  --air-core-far: #a08870;
-  --air-tyre: #5a666e;
-  /* --air-halo is the paper behind the drawing: var(--here), read where the mark is drawn */
+  --air-wash: #85603f;
+  --air-core: #3f2a1a;
+  --air-core-mid: #7a5536;
+  --air-core-far: #ad8460;
+  --air-soot: #2a211a;
 }
 @media screen and (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --air-ring: #93c5f4;
-    --air-dot: #e6d3b8;
-    --air-rib: #c9ad8a;
-    --air-wash: #9a8771;
-    --air-core: #c9b8a3;
-    --air-core-mid: #a39079;
-    --air-core-far: #7a6a59;
-    --air-tyre: #9aa5aa;
+    --air-rib: #d29a5c;
+    --air-wash: #6d5642;
+    --air-core: #a3876a;
+    --air-core-mid: #7f6650;
+    --air-core-far: #5a4636;
+    --air-soot: #5b4c3e;
     --art-mask: #27434c;
     --art-mask-cloth: #6d4320;
     --art-mask-carbon: #4b575d;
@@ -307,14 +243,12 @@
 @media screen {
   :root[data-theme='dark'],
   .tone-inverse {
-    --air-ring: #93c5f4;
-    --air-dot: #e6d3b8;
-    --air-rib: #c9ad8a;
-    --air-wash: #9a8771;
-    --air-core: #c9b8a3;
-    --air-core-mid: #a39079;
-    --air-core-far: #7a6a59;
-    --air-tyre: #9aa5aa;
+    --air-rib: #d29a5c;
+    --air-wash: #6d5642;
+    --air-core: #a3876a;
+    --air-core-mid: #7f6650;
+    --air-core-far: #5a4636;
+    --air-soot: #5b4c3e;
     --art-mask: #27434c;
     --art-mask-cloth: #6d4320;
     --art-mask-carbon: #4b575d;
@@ -326,47 +260,19 @@
   }
 }
 
-.air-ring {
-  /* inside a halo's <use> the same path is the halo: a whole paper disc (custom properties below) */
-  fill: var(--air-ring-fill, var(--air-ring));
-  fill-rule: var(--air-ring-rule, evenodd);
-}
-.air-dot {
-  fill: var(--air-dot);
-}
-/* The halo of a ring or dot: the same path drawn again underneath (air.ts), filled non-zero and
-   stroked in the colour of the paper. For a ring that is a paper disc, so EVERY ring has a clear
-   centre, over the plume as on a plain wall (the key's ring looks the same). The mark itself is
-   only its fill, so its paint is its own colour. */
-.air-halo {
-  --air-ring-fill: var(--air-halo, var(--here, var(--bg)));
-  --air-ring-rule: nonzero;
-  fill: var(--air-halo, var(--here, var(--bg)));
-  fill-rule: nonzero;
-  stroke: var(--air-halo, var(--here, var(--bg)));
-  stroke-linejoin: round;
-}
 .air-rib {
   fill: none;
   stroke: var(--air-rib);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.air-tyre { fill: var(--air-tyre); }
 .air-wash-stop { stop-color: var(--air-wash); }
 .air-wash--flat { fill: var(--air-wash); }
 .air-core-stop { stop-color: var(--air-core); }
 .air-core-stop--mid { stop-color: var(--air-core-mid); }
 .air-core-stop--far { stop-color: var(--air-core-far); }
-
-/* Glyphs of the three marks in a key or legend: <svg class="air-glyph" viewBox="0 0 24 24"> */
-.air-glyph {
-  inline-size: 1.5em;
-  block-size: 1.5em;
-  flex: none;
-  vertical-align: -0.35em;
-  overflow: visible;
-}
+.air-puff-stop { stop-color: var(--air-core-mid); }
+.air-puff-stop--soot { stop-color: var(--air-soot); }
 
 /* ---- Scenario steps -------------------------------------------------------
  * air({ scenario: 'all' }) draws the fullest set once (.air-steps). Which part
@@ -525,7 +431,7 @@ html[data-motion='on'] .air--drift .air-d3 { animation-name: air-drift-3; animat
   to { transform: none; }
 }
 @media screen {
-  .scene--hero.is-armed :is(.hero-sc, .air-core, .air-src, .air-kerb, .air-wash, .hero-waiting) { opacity: 0; }
+  .scene--hero.is-armed :is(.hero-sc, .air-core, .air-src, .air-kerb, .air-wash, .hero-waiting, .fume-lead) { opacity: 0; }
   .scene--hero.is-arrived .hero-sc {
     animation: hero-roll 0.95s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
     animation-delay: calc(var(--i) * var(--hero-step));
@@ -534,7 +440,7 @@ html[data-motion='on'] .air--drift .air-d3 { animation-name: air-drift-3; animat
     animation: sa-fade-in 0.7s ease-out backwards;
     animation-delay: calc(var(--i) * var(--hero-step) + 0.55s);
   }
-  .scene--hero.is-arrived :is(.air-kerb, .air-wash, .hero-waiting) {
+  .scene--hero.is-arrived :is(.air-kerb, .air-wash, .hero-waiting, .fume-lead) {
     animation: sa-fade-in 1.1s ease-out 1.6s backwards;
   }
 }
@@ -552,17 +458,21 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='few']:ch
 html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='dozen']:checked) .air-wash--steps { opacity: var(--air-w2); }
 html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:checked) .air-wash--steps { opacity: var(--air-w3); }
 
-/* ---- Marks that travel in once (G2, G6, G17) ---------------------------------
- * .sa-go    a ring or dot: starts part of the way back along its lane (--dx, --dy, in
- *           drawing units) and fades in, in turn (--i)
- * .sa-draw  a ribbon with pathLength="1": drawn from its start to its end
+/* ---- Fume that travels in once (G2, G6, G17) ---------------------------------
+ * .sa-go    starts part of the way back along its way (--dx, --dy, in drawing units) and
+ *           fades in, in turn (--i)
+ * .sa-fade  a soft patch of fume: fades in, in turn (--i)
+ * .sa-draw  a wisp with pathLength="1": drawn from its start to its end
  */
 @keyframes sa-go {
   from { opacity: 0; transform: translate(var(--dx, 0), var(--dy, 0)); }
 }
 @keyframes sa-draw {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
+  /* hidden until a short line of it is drawn: a zero-length dash with round caps would be a dot */
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  4% { opacity: 0; }
+  5% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
 }
 @media screen {
   .scene.is-armed :is(.sa-go, .sa-draw, .sa-fade) { opacity: 0; }
@@ -581,162 +491,27 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:c
   }
 }
 
-/* ---- Lighting one kind of mark (AirKey with `tap`; pins of the body) ---------
- * A picture groups its marks by kind: .tm-lane--ribbon | --ring | --dot.
+/* ---- Lighting one part of the fume (the pins of the body) ---------------------
+ * The body picture groups its fume by where it goes: .tm-lane--nose | --lungs | --blood.
  */
 .tm-lane { transition: opacity 0.3s ease; }
-[data-pick-mark='ribbon'] .tm-lane:not(.tm-lane--ribbon),
-[data-pick-mark='ring'] .tm-lane:not(.tm-lane--ring),
-[data-pick-mark='dot'] .tm-lane:not(.tm-lane--dot) {
+[data-pick-mark='nose'] .tm-lane:not(.tm-lane--nose),
+[data-pick-mark='lungs'] .tm-lane:not(.tm-lane--lungs),
+[data-pick-mark='blood'] .tm-lane:not(.tm-lane--blood) {
   opacity: 0.16;
 }
 
-/* ---- AirLegend: the small key of a picture ------------------------------------ */
-.air-legend {
-  padding: 0.375rem 0.5rem 0;
-  /* the key measures its own width (it also stands outside a scene: the film, the estimate page) */
-  container-type: inline-size;
-}
-.air-legend__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.125rem 0.625rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.air-legend__item {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0;
-  font-size: var(--fs-sm, 0.9375rem);
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--ink);
-  min-inline-size: 0;
-  overflow-wrap: break-word;
-}
-.air-legend__item .air-glyph {
-  inline-size: 1.25rem;
-  block-size: 1.25rem;
-}
-.air-legend__note {
-  margin: 0.125rem 0 0;
-  font-size: var(--fs-xs, 0.875rem);
-  line-height: 1.4;
-  color: var(--ink-2);
-}
-/* Never three and one: when a row does not hold every entry, two (or three) even columns.
-   Measured in rem, which follow the reader's text size, so 大 / 特大 switch earlier. */
-.air-legend--sense .air-legend__list,
-.air-legend--n2 .air-legend__list { display: grid; grid-template-columns: repeat(2, minmax(0, max-content)); }
-@container (max-width: 21rem) {
-  .air-legend--n4 .air-legend__list { display: grid; grid-template-columns: repeat(2, minmax(0, max-content)); }
-}
-@container (max-width: 27rem) {
-  .air-legend:is(.air-legend--n5, .air-legend--n6) .air-legend__list { display: grid; grid-template-columns: repeat(3, minmax(0, max-content)); }
-}
-@container (max-width: 33rem) {
-  :lang(en) .air-legend:not(.air-legend--sense):is(.air-legend--n4, .air-legend--n5, .air-legend--n6) .air-legend__list { display: grid; grid-template-columns: repeat(2, minmax(0, max-content)); }
-}
-/* the sense key in English is long: one entry a line on a phone */
-@container (max-width: 29rem) {
-  :lang(en) .air-legend--sense .air-legend__list { grid-template-columns: minmax(0, max-content); }
-}
-.air-glyph-plume { filter: blur(0.6px); }
-/* On the home page, at the standard text size and a phone's width or more, the key sits over the
-   empty road at the foot of the picture, on a solid paper plate, instead of adding a line under it
-   (each screen has a height budget: check-site 9). With 大 / 特大, or narrower, it goes back under
-   the picture. Only pictures whose bottom edge is empty road or plain body take it; the swap
-   picture (feet near its edge) keeps it underneath. The mask picture takes it at the top, in the
-   empty air above the head. English keeps it under the first picture. Where the key covers the
-   first picture's crossing, the crossing's stripes are left out, so no stripe is cut by the plate. */
-@container (min-width: 21.5rem) {
-  html:not([data-text]) .h-home :is(.scene--plan, .scene--kerb, .scene--heights, .scene--rider, .scene--ten, .scene--hero-green) > .air-legend,
-  html:not([data-text]) .h-home .scene--mask .air-legend--top,
-  html:not([data-text])[lang^='zh'] .h-home .scene--hero-red > .air-legend {
-    position: absolute;
-    inset-inline: 0;
-    inset-block-end: 0;
-    padding: 0.3125rem 0.5rem;
-    background: var(--bg);
-  }
-  html:not([data-text]) .h-home .scene--mask .air-legend--top {
-    inset-block: 0 auto;
-    background: transparent;
-  }
-  html:not([data-text])[lang^='zh'] .h-home .scene--hero-red .hero-zebra { display: none; }
-}
-/* the cropped closing street (home.css cuts its bottom on a phone): the key sits above the cut */
-@media (max-width: 56.24em) {
-  @container (min-width: 21.5rem) {
-    html:not([data-text]) .h-home .h-crop .scene--hero-green > .air-legend {
-      inset-block-end: calc(var(--crop, 0) * 1cqi);
-    }
-  }
-}
+/* ---- Words on a picture: what the fume is or holds ---------------------------
+ * A label names what the fume is or holds; a thin leader line (scene.ts leader()) runs from the
+ * label into the fume. The line is ink on a paper-coloured edge, so it reads over the darkest
+ * plume, in both themes, in greyscale and for every kind of colour vision.
+ */
+.fume-lead { pointer-events: none; }
+.fume-lead__edge { fill: none; stroke: var(--here, var(--bg)); stroke-linecap: round; opacity: 0.9; }
+.fume-lead__line { fill: none; stroke: var(--ink); stroke-linecap: round; }
+.fume-label { line-height: 1.2; }
 /* the one word inside the first picture never breaks */
 .hero-plume { white-space: nowrap; max-inline-size: none; }
-.air-glyph-plume__far { fill: var(--air-core-far); opacity: 0.7; }
-.air-glyph-plume__near { fill: var(--air-core); opacity: 0.8; }
-
-/* ---- AirKey ------------------------------------------------------------------ */
-.air-key {
-  display: grid;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.air-key--row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.25rem;
-}
-.air-key__item {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  inline-size: 100%;
-  margin: 0;
-  padding: 0.25rem 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: var(--fs-sm, 0.9375rem);
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--ink);
-  text-align: start;
-}
-.air-key__item .air-glyph {
-  inline-size: 1.75rem;
-  block-size: 1.75rem;
-}
-.air-key--tap .air-key__item {
-  min-block-size: var(--tap, 3rem);
-  padding: 0.375rem 0.75rem;
-  border: 2px solid var(--line-strong, var(--ink-3));
-  border-radius: var(--radius-3, 10px);
-  background: var(--surface);
-  cursor: pointer;
-}
-.air-key--tap .air-key__item[aria-pressed='true'] {
-  border-color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--ink);
-}
-.air-key--tap .air-key__item:focus-visible {
-  outline: 3px solid var(--focus, var(--accent));
-  outline-offset: 2px;
-}
-html:not(.js) .air-key--tap .air-key__item {
-  border-color: transparent;
-  background: none;
-  padding-inline: 0;
-  cursor: default;
-}
-
 .tm-head {
   display: flex;
   align-items: center;
@@ -750,6 +525,12 @@ html:not(.js) .air-key--tap .air-key__item {
 .tm-chip {
   flex: 1 1 auto;
   min-inline-size: 0;
+}
+/* the can's label names its gas in full ink, so the big number beside a benzene headline reads as
+   carbon monoxide at a glance, not as benzene */
+.tm-chip .est .est__label {
+  color: var(--ink);
+  font-weight: var(--fw-bold);
 }
 
 /* ---- G6 BodyFigure: the numbered pins, and the sentences under the picture ---- */
@@ -785,6 +566,14 @@ html:not(.js) .air-key--tap .air-key__item {
   background: var(--ink);
   color: var(--here, var(--bg));
 }
+/* the name beside each pin: placed at the pin's centre, pushed past the pin (1.875rem ring + border
+   + shadow, so about 1.1rem from the centre) by a gap in rem that scales with the pin */
+.body-word[data-anchor~='start'] {
+  margin-inline-start: 1.45rem;
+  /* the gap comes out of the width, so the plate still ends inside the picture (overrides the inline max) */
+  max-inline-size: calc(42% - 1.45rem) !important;
+}
+.body-word[data-anchor~='top'] { margin-block-start: 1.45rem; }
 .body-pin:focus-visible { outline: none; }
 .body-pin:focus-visible > span { outline: 3px solid var(--focus, var(--accent)); outline-offset: 3px; }
 .body-pins {
@@ -796,7 +585,7 @@ html:not(.js) .air-key--tap .air-key__item {
 }
 .body-pins__item {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
   gap: 0.5rem;
   padding: 0.5rem 0.625rem;
@@ -818,7 +607,6 @@ html:not(.js) .air-key--tap .air-key__item {
   font-weight: 900;
   line-height: 1;
 }
-.body-pins__item .air-glyph { inline-size: 1.5rem; block-size: 1.5rem; vertical-align: 0; }
 .body-pins__item:target,
 [data-pick-pin='nose'] .body-pins__item[data-pin-item='nose'],
 [data-pick-pin='lungs'] .body-pins__item[data-pin-item='lungs'],
@@ -835,7 +623,7 @@ html:not(.js) .air-key--tap .air-key__item {
 .mk-v { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
 /* the mask lets the face show through a little, so what is inside it can be told from what is on it */
 .scene--mask .a-mask { fill-opacity: 0.78; }
-.mk-leak { fill: none; stroke: var(--air-dot); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mk-leak { fill: none; stroke: var(--air-core); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .mk-leak--on-head { stroke: var(--here, var(--bg)); }
 [data-mask='cloth'] .mk-on-cloth,
 [data-mask='surgical'] .mk-on-surgical,
@@ -852,25 +640,13 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='surgical']:c
 html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='carbon']:checked) .mk-on-carbon,
 html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checked) .mk-on-n95 { visibility: visible; opacity: 1; }
 
-/* ---- G8 HeightsScene and the breathing rings ---------------------------------- */
+/* ---- G8 HeightsScene ---------------------------------------------------------- */
 .hs-band { fill: var(--art-yellow); opacity: 0.34; }
 .hs-band-edge { fill: none; stroke: var(--ink-2); stroke-width: 1.2; stroke-dasharray: 5 4; }
 .hs-metre { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-dasharray: 9 6; }
-.hs-pipe { fill: none; stroke: var(--air-rib); stroke-width: 2.6; }
 .scene--heights .hs-num { font-variant-numeric: tabular-nums; font-weight: 600; }
 .scene--heights .hs-pipe-label { color: var(--exhaust-ink); }
-/* one breath in and out: an adult about every four seconds, a child faster */
-@keyframes hs-breathe {
-  0%, 100% { transform: scale(0.82); opacity: 0.7; }
-  45% { transform: scale(1.2); opacity: 1; }
-}
-.hs-breath { transform-box: fill-box; transform-origin: center; }
-@media (prefers-reduced-motion: no-preference) {
-  html:not([data-motion='off']) .hs-breath { animation: hs-breathe 4.2s ease-in-out infinite; }
-  html:not([data-motion='off']) .hs-breath--fast { animation-duration: 2.6s; }
-}
-html[data-motion='on'] .hs-breath { animation: hs-breathe 4.2s ease-in-out infinite; }
-html[data-motion='on'] .hs-breath--fast { animation-duration: 2.6s; }
+
 
 /* ---- G10 SwapScene and SwapControl -------------------------------------------- */
 .swap-gas,
@@ -983,6 +759,12 @@ html:not(.js) [data-js-only] { display: none; }
   transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.3, 0.7, 0.2, 1);
 }
 .ten-fixed { opacity: 0; }
+.ten-label { transition: opacity 0.8s ease; }
+.scene--ten[data-fixed] .ten-label,
+[data-fixed] .scene--ten .ten-label,
+[data-pick-scope]:has(input[data-fix]:checked) .scene--ten .ten-label {
+  opacity: 0;
+}
 .scene--ten[data-fixed] .ten-big,
 [data-fixed] .scene--ten .ten-big,
 [data-pick-scope]:has(input[data-fix]:checked) .scene--ten .ten-big {
@@ -1150,7 +932,6 @@ html:not(.js) [data-js-only] { display: none; }
 }
 .road__strip { position: relative; padding-block-end: 1.375rem; }
 .road__strip svg { display: block; inline-size: 100%; block-size: auto; }
-.road-days circle { fill: var(--ink); }
 .road-bar-track { fill: var(--chart-track, var(--line)); }
 .road-bar { fill: var(--ink); }
 .road-bar--range { opacity: 0.45; }
@@ -1233,38 +1014,4 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checke
 .scene.is-offscreen,
 .scene.is-offscreen * {
   animation-play-state: paused !important;
-}
-
-/* ---- The blue ring beside the number it stands for ---------------------------------------
- * In the number box above the kerb picture (home screen 4, /estimate/, /questions/beside-me/)
- * and in the film's panel, 這排機車多出來 / "Added by these scooters" carries the same blue ring
- * the picture draws for it, so the number and the rings visibly match. 街上原本就有 has no ring:
- * the street's own air is not drawn (the tag under the picture says so).
- */
-.est--ring .est__label::before,
-.hud__row--est .hud__name::before {
-  content: '';
-  display: inline-block;
-  inline-size: 1.05em;
-  block-size: 1.05em;
-  margin-inline-end: 0.3em;
-  vertical-align: -0.15em;
-  border-radius: 50%;
-  background: radial-gradient(circle closest-side, transparent 0 52%, var(--air-ring) 56% 92%, transparent 96%);
-}
-
-/* the heights picture names its red rings in the picture (its key, over the road, holds one row) */
-.hs-nose-label { display: inline-flex; align-items: center; gap: 0.25rem; }
-.hs-nose-label .air-glyph { inline-size: 1.25rem; block-size: 1.25rem; }
-/* the sense key at 大 / 特大 on a phone: one entry a line, so the right column never runs off */
-@container (max-width: 18rem) {
-  .air-legend--sense .air-legend__list { grid-template-columns: minmax(0, max-content); }
-}
-/* a five- or six-entry key that no longer holds three columns: two */
-@container (max-width: 20rem) {
-  .air-legend:is(.air-legend--n5, .air-legend--n6) .air-legend__list { grid-template-columns: repeat(2, minmax(0, max-content)); }
-}
-/* and at the very narrowest, one entry a line, its words free to wrap */
-@container (max-width: 15rem) {
-  .air-legend .air-legend__list { display: grid; grid-template-columns: minmax(0, 1fr); }
 }

@@ -1,0 +1,1823 @@
+{
+ "numbers": [
+  {
+   "what": "CO added to a 15-min mean by one red, arcade street, kerb edge 0.5 m, 0.7 m",
+   "case": "S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "statistic": "CO_one_red_to_15min_ppm",
+   "unit": "ppm",
+   "low": 0.1,
+   "central": 0.75,
+   "high": 7.8,
+   "range_factors": [
+    "one red, coarse grid, see METHOD 4.4"
+   ],
+   "reference": {
+    "value": "87 ppm (100 mg/m3)",
+    "averaging": "15 min",
+    "body": "WHO"
+   },
+   "aboveReference": "no",
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe)",
+   "conditionProbability": "wind toward the facade within +-45 deg at <= 0.5 m/s in about 5 % of reds at arcade streets (upper bound; arcade share of streets unknown)",
+   "confidence": "low"
+  },
+  {
+   "what": "CO 90-s mean, arcade street, kerb edge 0.5 m, pushchair height",
+   "case": "S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "statistic": "CO/mean",
+   "unit": "ppm",
+   "low": 1.0,
+   "central": 7.5,
+   "high": 78.0,
+   "emission_P5_P50_P95": [
+    2.0,
+    7.5,
+    39.0
+   ],
+   "range_factors": [
+    "one red, coarse grid, see METHOD 4.4"
+   ],
+   "reference": {
+    "value": "none (90-s mean)",
+    "averaging": "90 s"
+   },
+   "aboveReference": "not-comparable",
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe)",
+   "conditionProbability": "wind toward the facade within +-45 deg at <= 0.5 m/s in about 5 % of reds at arcade streets (upper bound; arcade share of streets unknown)",
+   "confidence": "low"
+  },
+  {
+   "what": "CO 90-s mean, inside the arcade 1 m from its front, 0.7 m (most exposed arcade probe)",
+   "case": "S5-12b",
+   "probe": "AR x=-1.8 in=1.0 h=0.7",
+   "statistic": "CO/mean",
+   "unit": "ppm",
+   "low": 0.76,
+   "central": 3.6,
+   "high": 21.0,
+   "emission_P5_P50_P95": [
+    1.5,
+    3.6,
+    11.0
+   ],
+   "range_factors": [
+    "one red, coarse grid, see METHOD 4.4"
+   ],
+   "reference": {
+    "value": "none (90-s mean)",
+    "averaging": "90 s"
+   },
+   "aboveReference": "not-comparable",
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe)",
+   "conditionProbability": "wind toward the facade within +-45 deg at <= 0.5 m/s in about 5 % of reds at arcade streets (upper bound; arcade share of streets unknown)",
+   "confidence": "low"
+  },
+  {
+   "what": "CO highest 1 s, arcade street, kerb edge 0.5 m, 0.7 m",
+   "case": "S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "statistic": "CO/max1s",
+   "unit": "ppm",
+   "low": 3.0,
+   "central": 47.0,
+   "high": 1000.0,
+   "emission_P5_P50_P95": [
+    11.0,
+    47.0,
+    280.0
+   ],
+   "range_factors": [
+    "one red, coarse grid, see METHOD 4.4",
+    "1-s and 10-s values within 1 m: grid-limited, about x0.3-3 (METHOD 5.3)"
+   ],
+   "reference": {
+    "value": "200 ppm",
+    "averaging": "instantaneous ceiling (workplace)",
+    "body": "NIOSH"
+   },
+   "aboveReference": null,
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe)",
+   "conditionProbability": "wind toward the facade within +-45 deg at <= 0.5 m/s in about 5 % of reds at arcade streets (upper bound; arcade share of streets unknown)",
+   "confidence": "low (grid-limited)",
+   "note": "at least one second >= 200 ppm in 8 % of emission draws (fleet); about 0.4 % of reds at arcade streets at most"
+  },
+  {
+   "what": "CO highest 1 s, arcade street + high emitter 0.5 m away, 0.7 m",
+   "case": "S4-S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "statistic": "CO/max1s",
+   "unit": "ppm",
+   "low": 79.0,
+   "central": 500.0,
+   "high": 3500.0,
+   "emission_P5_P50_P95": [
+    290.0,
+    500.0,
+    940.0
+   ],
+   "range_factors": [
+    "as S5-12b",
+    "1-s and 10-s values within 1 m: grid-limited, about x0.3-3 (METHOD 5.3)"
+   ],
+   "reference": {
+    "value": "200 ppm",
+    "averaging": "instantaneous ceiling (workplace)",
+    "body": "NIOSH"
+   },
+   "aboveReference": null,
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe); nearest kerb-lane scooter a 6.5 % CO, HC-rich emitter",
+   "conditionProbability": "about 1 % x 5 % = 0.05 % of reds at arcade streets at most",
+   "confidence": "low (grid-limited)"
+  },
+  {
+   "what": "CO 15-min mean, standing through every red, arcade street, kerb edge 0.5 m, 0.7 m",
+   "case": "S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "statistic": "stay-through 15min, fresh pack every red",
+   "unit": "ppm",
+   "low": 1.1,
+   "central": 5.5,
+   "high": 28.0,
+   "red_45pct_P50": 4.3,
+   "red_65pct_P95": 14.0,
+   "range_factors": [
+    "one red, coarse grid, see METHOD 4.4",
+    "red 45-65 % of the cycle; nothing added in green; same simulated red every time; extrapolation (S8 not run)"
+   ],
+   "reference": {
+    "value": "87 ppm (100 mg/m3)",
+    "averaging": "15 min",
+    "body": "WHO"
+   },
+   "aboveReference": null,
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe) for 15 minutes",
+   "conditionProbability": "rarer than wind toward the facade within +-45 deg at <= 0.5 m/s in about 5 % of reds at arcade streets (upper bound; arcade share of streets unknown)",
+   "confidence": "low"
+  },
+  {
+   "what": "CO 15-min mean, same high emitter every red, arcade street, kerb edge 0.5 m, 0.3 m height",
+   "case": "S4-S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.3",
+   "statistic": "stay-through 15min, fresh pack every red",
+   "unit": "ppm",
+   "low": 60.0,
+   "central": 200.0,
+   "high": 600.0,
+   "red_45pct_P50": 160.0,
+   "red_65pct_P95": 300.0,
+   "range_factors": [
+    "as S5-12b",
+    "red 45-65 % of the cycle; nothing added in green; same simulated red every time; extrapolation (S8 not run)"
+   ],
+   "reference": {
+    "value": "87 ppm (100 mg/m3)",
+    "averaging": "15 min",
+    "body": "WHO"
+   },
+   "aboveReference": null,
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe); nearest kerb-lane scooter a 6.5 % CO, HC-rich emitter returning to the same spot every red for 15 minutes; 0.3 m above the pavement",
+   "conditionProbability": "not realistic (same scooter at the same spot every red, wind held 15 minutes)",
+   "confidence": "low",
+   "note": "the only simulated configuration above 87 ppm over 15 minutes; at 0.7 m the same case gives 32-59 ppm"
+  },
+  {
+   "what": "Benzene 1-h mean, standing through every red, arcade street, kerb edge 0.5 m, 0.7 m",
+   "case": "S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "statistic": "stay-through 1h, fresh pack every red",
+   "unit": "ppb",
+   "low": 3.9,
+   "central": 14.0,
+   "high": 47.0,
+   "red_45pct_P50": 12.0,
+   "red_65pct_P95": 24.0,
+   "range_factors": [
+    "one red, coarse grid, see METHOD 4.4",
+    "red 45-65 % of the cycle; nothing added in green; same simulated red every time; extrapolation (S8 not run)"
+   ],
+   "reference": {
+    "value": "8.5 ppb (27 ug/m3)",
+    "averaging": "1 h (derived on a 6-h basis)",
+    "body": "California OEHHA acute REL"
+   },
+   "aboveReference": null,
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe) for an hour",
+   "conditionProbability": "rarer than wind toward the facade within +-45 deg at <= 0.5 m/s in about 5 % of reds at arcade streets (upper bound; arcade share of streets unknown)",
+   "confidence": "low"
+  },
+  {
+   "what": "Share of seconds at or above the odour detection threshold (D/T 6800), arcade street, kerb edge 0.5 m, 0.7 m",
+   "case": "S5-12b",
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "statistic": "odour/OU_hc10_DT6800/share_of_seconds_at_or_above/1",
+   "unit": "fraction of seconds",
+   "low": 0.72,
+   "central": 0.8,
+   "high": 0.91,
+   "emission_P5_P50_P95": [
+    0.72,
+    0.8,
+    0.91
+   ],
+   "range_factors": [],
+   "reference": {
+    "value": "1 odour unit (detection by half a panel)",
+    "averaging": "a sniff (seconds)",
+    "body": "odour-panel convention"
+   },
+   "aboveReference": null,
+   "condition": "arcade street, 12 scooters, 0.5 m/s toward the building (as run: 0.25-0.33 m/s at the kerb from the pack toward the arcade; -161 deg at the upstream probe)",
+   "conditionProbability": "wind toward the facade within +-45 deg at <= 0.5 m/s in about 5 % of reds at arcade streets (upper bound; arcade share of streets unknown)",
+   "confidence": "low (odour threshold from 1967-70 car-exhaust abstracts)"
+  },
+  {
+   "what": "CO added to a 15-min mean by one red (30-s window as a 90-s red), pushchair 0.5 m downwind of one tailpipe, 0.6 m",
+   "case": "NF1-fine",
+   "probe": "K d=0.5 dx=0.0 h=0.6",
+   "statistic": "window mean / 10 (as one 90-s red)",
+   "unit": "ppm",
+   "low": 0.29,
+   "central": 5.4,
+   "high": 76.0,
+   "range_factors": [
+    "single scooter, near-calm held wind with sigma_w a third of the PLAN floor (upper-side); fine grid not shown converged; engine heat changes 0.5 m values up to x4"
+   ],
+   "reference": {
+    "value": "87 ppm (100 mg/m3)",
+    "averaging": "15 min",
+    "body": "WHO"
+   },
+   "aboveReference": null,
+   "condition": "one idling scooter, near-calm air (0.42 m/s as run) held from the scooter toward the person; 0.5 m directly downwind of the tailpipe; fine grid",
+   "conditionProbability": "light wind (<= 0.3-0.4 m/s) from that sector in about 1 % of reds; held for a whole red or 15 minutes: unknown, much rarer; exact position needed",
+   "confidence": "low"
+  },
+  {
+   "what": "CO 15-min mean, pushchair 0.5 m downwind of one tailpipe, 0.6 m, every red for 15 min, near-calm held wind",
+   "case": "NF1-fine",
+   "probe": "K d=0.5 dx=0.0 h=0.6",
+   "statistic": "stay-through 15min, fresh pack every red",
+   "unit": "ppm",
+   "low": 4.6,
+   "central": 45.0,
+   "high": 280.0,
+   "red_45pct_P50": 35.0,
+   "red_65pct_P95": 140.0,
+   "range_factors": [
+    "single scooter, near-calm held wind with sigma_w a third of the PLAN floor (upper-side); fine grid not shown converged; engine heat changes 0.5 m values up to x4",
+    "red 45-65 % of the cycle; nothing added in green; same simulated red every time; extrapolation (S8 not run)"
+   ],
+   "reference": {
+    "value": "87 ppm (100 mg/m3)",
+    "averaging": "15 min",
+    "body": "WHO"
+   },
+   "aboveReference": null,
+   "condition": "one idling scooter, near-calm air (0.42 m/s as run) held from the scooter toward the person; 0.5 m directly downwind of the tailpipe; fine grid; every red for 15 minutes",
+   "conditionProbability": "light wind (<= 0.3-0.4 m/s) from that sector in about 1 % of reds; held for a whole red or 15 minutes: unknown, much rarer; exact position needed",
+   "confidence": "low",
+   "note": "above 87 ppm in 10 % (red 45 % of cycle) to 22 % (65 %) of such 15-min periods; at 0.7 m 2-4 %; at 1.1 m or 1 m away 0 %"
+  },
+  {
+   "what": "CO 1-h mean, pushchair 0.5 m downwind of one tailpipe, 0.6 m, every red for 1 h, near-calm held wind",
+   "case": "NF1-fine",
+   "probe": "K d=0.5 dx=0.0 h=0.6",
+   "statistic": "stay-through 1h, fresh pack every red",
+   "unit": "ppm",
+   "low": 8.3,
+   "central": 53.0,
+   "high": 200.0,
+   "red_45pct_P50": 43.0,
+   "red_65pct_P95": 99.0,
+   "range_factors": [
+    "single scooter, near-calm held wind with sigma_w a third of the PLAN floor (upper-side); fine grid not shown converged; engine heat changes 0.5 m values up to x4",
+    "red 45-65 % of the cycle; nothing added in green; same simulated red every time; extrapolation (S8 not run)"
+   ],
+   "reference": {
+    "value": "31 ppm (35 mg/m3; Taiwan 1-h standard 31 ppm per 2024 amendment, older files 35)",
+    "averaging": "1 h",
+    "body": "WHO / Taiwan"
+   },
+   "aboveReference": null,
+   "condition": "one idling scooter, near-calm air (0.42 m/s as run) held from the scooter toward the person; 0.5 m directly downwind of the tailpipe; fine grid; every red for an hour",
+   "conditionProbability": "light wind (<= 0.3-0.4 m/s) from that sector in about 1 % of reds; held for a whole red or 15 minutes: unknown, much rarer; exact position needed",
+   "confidence": "low",
+   "note": "above 31 ppm in 83-99 % of such hours at 0.6 m, 24-70 % at 0.7 m"
+  },
+  {
+   "what": "CO highest 1 s, pushchair 0.5 m downwind of one tailpipe, 0.6 m, near-calm held wind",
+   "case": "NF1-fine",
+   "probe": "K d=0.5 dx=0.0 h=0.6",
+   "statistic": "CO/max1s",
+   "unit": "ppm",
+   "low": 7.7,
+   "central": 140.0,
+   "high": 2000.0,
+   "emission_P5_P50_P95": [
+    23.0,
+    140.0,
+    1000.0
+   ],
+   "range_factors": [
+    "single scooter, near-calm held wind with sigma_w a third of the PLAN floor (upper-side); fine grid not shown converged; engine heat changes 0.5 m values up to x4"
+   ],
+   "reference": {
+    "value": "200 ppm",
+    "averaging": "instantaneous ceiling (workplace)",
+    "body": "NIOSH"
+   },
+   "aboveReference": null,
+   "condition": "one idling scooter, near-calm air (0.42 m/s as run) held from the scooter toward the person; 0.5 m directly downwind of the tailpipe; fine grid",
+   "conditionProbability": "light wind (<= 0.3-0.4 m/s) from that sector in about 1 % of reds; held for a whole red or 15 minutes: unknown, much rarer; exact position needed",
+   "confidence": "low",
+   "note": "at least one second >= 200 ppm in 34 % of emission draws"
+  },
+  {
+   "what": "Grid factor: coarse / fine highest 1 s at 0.5-1 m, pushchair height 0.6-0.8 m (matrix values probably low by the inverse)",
+   "case": "NF1-fine vs NF1-coarse",
+   "unit": "ratio",
+   "low": 0.23,
+   "central": 0.3,
+   "high": 0.33,
+   "reference": null,
+   "aboveReference": "not-comparable",
+   "condition": "single scooter, near-calm held wind",
+   "conditionProbability": "n/a (numerical check)",
+   "confidence": "low (fine grid not shown converged)",
+   "note": "means at pushchair height 0.44-1.5; at 1.1-1.5 m, 0.5 m away the coarse grid reads 3-26 times high; at 2 m means agree within about 20 %"
+  }
+ ],
+ "admissibility": {
+  "NF1-fine": "kept: near-field check; A6 fails (sigma_w 0.031 m/s, a third of the floor), so upper-side",
+  "NF1-coarse": "kept: grid comparison",
+  "NF1-coarse-0kW": "kept: engine-heat sensitivity",
+  "S5-12b": "kept: arcade rerun with 60.8 m domain top; A6 fails on direction (-161 deg upstream, kerb flow toward the arcade 0.25-0.33 m/s); A8 tracer change 5-12 % over the last 20 s",
+  "S4-S5-12b": "kept: conditional (high emitter)"
+ },
+ "nearField": {
+  "ratio_coarse_over_fine": {
+   "K d=0.5 dx=0.0 h=0.3": {
+    "mean": 1.3196197141090056,
+    "max10s": 0.8705065412751993,
+    "max1s": 1.0220315554302881
+   },
+   "K d=0.5 dx=0.0 h=0.6": {
+    "mean": 0.439377768640176,
+    "max10s": 0.324803960664666,
+    "max1s": 0.22617516795410905
+   },
+   "K d=0.5 dx=0.0 h=0.7": {
+    "mean": 0.7689570397903914,
+    "max10s": 0.5266060534027541,
+    "max1s": 0.3088971158598439
+   },
+   "K d=0.5 dx=0.0 h=0.8": {
+    "mean": 1.4683890004460918,
+    "max10s": 0.7870401025587488,
+    "max1s": 0.33292274601787325
+   },
+   "K d=0.5 dx=0.0 h=1.1": {
+    "mean": 26.160065676558986,
+    "max10s": 12.303968633176494,
+    "max1s": 3.370895296761253
+   },
+   "K d=0.5 dx=0.0 h=1.5": {
+    "mean": 10.575876409044339,
+    "max10s": 8.293404427423663,
+    "max1s": 2.9360272984740385
+   },
+   "K d=0.5 dx=-1.0 h=0.3": {
+    "mean": null,
+    "max10s": null,
+    "max1s": 48629.113401381095
+   },
+   "K d=0.5 dx=-1.0 h=0.6": {
+    "mean": 751.3284063403665,
+    "max10s": 735.0568659826657,
+    "max1s": 738.5208784877672
+   },
+   "K d=0.5 dx=-1.0 h=0.7": {
+    "mean": 349.84186156980036,
+    "max10s": 342.3130326291813,
+    "max1s": 302.26554491672414
+   },
+   "K d=0.5 dx=-1.0 h=0.8": {
+    "mean": 138.06977401690344,
+    "max10s": 130.0853200380103,
+    "max1s": 103.55939339991856
+   },
+   "K d=0.5 dx=-1.0 h=1.1": {
+    "mean": 1.2533113118874426,
+    "max10s": 1.1828114630068174,
+    "max1s": 0.7657257249232706
+   },
+   "K d=0.5 dx=-1.0 h=1.5": {
+    "mean": 23.14180240492104,
+    "max10s": 37.07900931844662,
+    "max1s": 37.1298633542956
+   },
+   "K d=0.5 dx=1.0 h=0.3": {
+    "mean": 79.82299478667636,
+    "max10s": 74.4757171083392,
+    "max1s": 59.35737463514867
+   },
+   "K d=0.5 dx=1.0 h=0.6": {
+    "mean": 65.34603141239444,
+    "max10s": 52.732813472042366,
+    "max1s": 25.421373296203143
+   },
+   "K d=0.5 dx=1.0 h=0.7": {
+    "mean": 35.169118731000516,
+    "max10s": 32.85126684109243,
+    "max1s": 25.939180864759386
+   },
+   "K d=0.5 dx=1.0 h=0.8": {
+    "mean": 42.90088680175302,
+    "max10s": 45.67662765080468,
+    "max1s": 36.42292670054861
+   },
+   "K d=0.5 dx=1.0 h=1.1": {
+    "mean": 9.583897008755033,
+    "max10s": 8.064524005399957,
+    "max1s": 1.9436773531233429
+   },
+   "K d=0.5 dx=1.0 h=1.5": {
+    "mean": 4.0724784999427435,
+    "max10s": 3.4144386993985147,
+    "max1s": 1.3627261699709896
+   },
+   "K d=1.0 dx=0.0 h=0.3": {
+    "mean": 55.427476154315514,
+    "max10s": 44.3111674682026,
+    "max1s": 23.80365429023921
+   },
+   "K d=1.0 dx=0.0 h=0.6": {
+    "mean": 3.2943953651041995,
+    "max10s": 1.741738072750683,
+    "max1s": 0.48096872408093067
+   },
+   "K d=1.0 dx=0.0 h=0.7": {
+    "mean": 1.31657607364693,
+    "max10s": 1.1460724889064497,
+    "max1s": 0.26250158923804756
+   },
+   "K d=1.0 dx=0.0 h=0.8": {
+    "mean": 0.9231266522608128,
+    "max10s": 0.629631986026044,
+    "max1s": 0.2623375033958122
+   },
+   "K d=1.0 dx=0.0 h=1.1": {
+    "mean": 0.614064217897168,
+    "max10s": 0.6051152557492235,
+    "max1s": 0.3040635393777791
+   },
+   "K d=1.0 dx=0.0 h=1.5": {
+    "mean": 1.677340265770797,
+    "max10s": 0.9261748444970077,
+    "max1s": 0.37094831662992245
+   },
+   "K d=1.0 dx=-1.0 h=0.3": {
+    "mean": null,
+    "max10s": null,
+    "max1s": 7917.735643106314
+   },
+   "K d=1.0 dx=-1.0 h=0.6": {
+    "mean": 254.51634893977277,
+    "max10s": 145.3928220969162,
+    "max1s": 124.46427766079665
+   },
+   "K d=1.0 dx=-1.0 h=0.7": {
+    "mean": 776.0973345344092,
+    "max10s": 452.85123092391757,
+    "max1s": 391.18053417485464
+   },
+   "K d=1.0 dx=-1.0 h=0.8": {
+    "mean": 696.0633162601761,
+    "max10s": 374.8223391173381,
+    "max1s": 1152.651780308743
+   },
+   "K d=1.0 dx=-1.0 h=1.1": {
+    "mean": 0.4778080024711906,
+    "max10s": 0.31479903853980196,
+    "max1s": 0.3793893810331691
+   },
+   "K d=1.0 dx=-1.0 h=1.5": {
+    "mean": 0.5661487323776482,
+    "max10s": 0.40879482239464837,
+    "max1s": 0.3281693022880993
+   },
+   "K d=1.0 dx=1.0 h=0.3": {
+    "mean": 0.02825933538853279,
+    "max10s": 0.023452185356326753,
+    "max1s": 0.01178966049801501
+   },
+   "K d=1.0 dx=1.0 h=0.6": {
+    "mean": 352.2673828027529,
+    "max10s": 392.59463166472636,
+    "max1s": 121.65526931163652
+   },
+   "K d=1.0 dx=1.0 h=0.7": {
+    "mean": 36.73411649976238,
+    "max10s": 37.50544014947042,
+    "max1s": 35.62831316541694
+   },
+   "K d=1.0 dx=1.0 h=0.8": {
+    "mean": 37.69590672702216,
+    "max10s": 36.009562285325494,
+    "max1s": 27.5055098346385
+   },
+   "K d=1.0 dx=1.0 h=1.1": {
+    "mean": 20.771259563354306,
+    "max10s": 19.316479175101723,
+    "max1s": 5.799530128962365
+   },
+   "K d=1.0 dx=1.0 h=1.5": {
+    "mean": 33.553795893598696,
+    "max10s": 43.85367337395205,
+    "max1s": 17.52585674828103
+   },
+   "K d=2.0 dx=0.0 h=0.3": {
+    "mean": 116.65764199114054,
+    "max10s": 129.19756984419027,
+    "max1s": 76.15254032471844
+   },
+   "K d=2.0 dx=0.0 h=0.6": {
+    "mean": 18.206565629643524,
+    "max10s": 14.507759795288873,
+    "max1s": 5.896414481722023
+   },
+   "K d=2.0 dx=0.0 h=0.7": {
+    "mean": 7.873624126195233,
+    "max10s": 6.093393168589733,
+    "max1s": 2.9684978957156245
+   },
+   "K d=2.0 dx=0.0 h=0.8": {
+    "mean": 3.434270276790025,
+    "max10s": 2.487138715860883,
+    "max1s": 1.2681209278391365
+   },
+   "K d=2.0 dx=0.0 h=1.1": {
+    "mean": 0.8141900008621276,
+    "max10s": 0.9551945025170091,
+    "max1s": 0.5465796912299034
+   },
+   "K d=2.0 dx=0.0 h=1.5": {
+    "mean": 0.8790127025332848,
+    "max10s": 1.1211547901014982,
+    "max1s": 0.8311368254764281
+   },
+   "K d=2.0 dx=-1.0 h=0.3": {
+    "mean": 0.3566541069198085,
+    "max10s": 0.2496483462579297,
+    "max1s": 0.21967941073468505
+   },
+   "K d=2.0 dx=-1.0 h=0.6": {
+    "mean": 1.255965839465735,
+    "max10s": 0.9981962828665202,
+    "max1s": 0.5715706560163487
+   },
+   "K d=2.0 dx=-1.0 h=0.7": {
+    "mean": 0.700945984534583,
+    "max10s": 0.5313220672411444,
+    "max1s": 0.4580984381476074
+   },
+   "K d=2.0 dx=-1.0 h=0.8": {
+    "mean": 1.3741375759666326,
+    "max10s": 1.0207097000062895,
+    "max1s": 0.5466457299196069
+   },
+   "K d=2.0 dx=-1.0 h=1.1": {
+    "mean": 0.4367967840973961,
+    "max10s": 0.481528652656965,
+    "max1s": 0.5299591013703866
+   },
+   "K d=2.0 dx=-1.0 h=1.5": {
+    "mean": 1.0940914303270173,
+    "max10s": 1.458346124787615,
+    "max1s": 0.9292180496913347
+   },
+   "K d=2.0 dx=1.0 h=0.3": {
+    "mean": 0.04447134376317891,
+    "max10s": 0.0442232996570764,
+    "max1s": 0.03464721725485144
+   },
+   "K d=2.0 dx=1.0 h=0.6": {
+    "mean": 0.4831353649094861,
+    "max10s": 0.5058345377258964,
+    "max1s": 0.6359452295948879
+   },
+   "K d=2.0 dx=1.0 h=0.7": {
+    "mean": 0.5808938743234945,
+    "max10s": 0.688295422171009,
+    "max1s": 0.7556425905331574
+   },
+   "K d=2.0 dx=1.0 h=0.8": {
+    "mean": 1.0515093204774708,
+    "max10s": 1.3142814941452883,
+    "max1s": 1.4747556610566541
+   },
+   "K d=2.0 dx=1.0 h=1.1": {
+    "mean": 0.7154258195989459,
+    "max10s": 0.7400369407784891,
+    "max1s": 0.28773565379512867
+   },
+   "K d=2.0 dx=1.0 h=1.5": {
+    "mean": 0.07723809424578149,
+    "max10s": 0.06839734228011936,
+    "max1s": 0.04595325468930553
+   },
+   "SRC b0c0 d=0.25": {
+    "mean": 46.73307039081207,
+    "max10s": 21.42866748825524,
+    "max1s": 7.866502808865676
+   },
+   "SRC b0c0 d=0.5": {
+    "mean": 17.058415242063546,
+    "max10s": 16.748957471426067,
+    "max1s": 11.058371311308376
+   }
+  },
+  "heat_1kW_over_0kW_coarse": {
+   "K d=0.5 dx=0.0 h=0.3": {
+    "mean": 6.032828128760699,
+    "max1s": 2.8788201323268905
+   },
+   "K d=0.5 dx=0.0 h=0.6": {
+    "mean": 3.7067063367953845,
+    "max1s": 1.7880271964385432
+   },
+   "K d=0.5 dx=0.0 h=0.7": {
+    "mean": 3.7067063367953845,
+    "max1s": 1.7880271964385432
+   },
+   "K d=0.5 dx=0.0 h=0.8": {
+    "mean": 2.8982987640822153,
+    "max1s": 1.354719770297843
+   },
+   "K d=0.5 dx=0.0 h=1.1": {
+    "mean": 2.451724803052808,
+    "max1s": 1.6274220144030485
+   },
+   "K d=0.5 dx=0.0 h=1.5": {
+    "mean": 3.7821178013752683,
+    "max1s": 2.3447649226874936
+   },
+   "K d=0.5 dx=-1.0 h=0.3": {
+    "mean": 0.0012832107329998326,
+    "max1s": 0.001718379052678997
+   },
+   "K d=0.5 dx=-1.0 h=0.6": {
+    "mean": 0.018262098746112863,
+    "max1s": 0.026468484886820604
+   },
+   "K d=0.5 dx=-1.0 h=0.7": {
+    "mean": 0.018262098746112863,
+    "max1s": 0.026468484886820604
+   },
+   "K d=0.5 dx=-1.0 h=0.8": {
+    "mean": 0.042967535469759253,
+    "max1s": 0.06659242107701237
+   },
+   "K d=0.5 dx=-1.0 h=1.1": {
+    "mean": 0.04899557724299649,
+    "max1s": 0.09767828316321085
+   },
+   "K d=0.5 dx=-1.0 h=1.5": {
+    "mean": 0.035763448293431144,
+    "max1s": 0.06290407564923646
+   },
+   "K d=0.5 dx=1.0 h=0.3": {
+    "mean": 1.9027913963535008,
+    "max1s": 3.389473351594076
+   },
+   "K d=0.5 dx=1.0 h=0.6": {
+    "mean": 0.6941170840613321,
+    "max1s": 0.8846279502699774
+   },
+   "K d=0.5 dx=1.0 h=0.7": {
+    "mean": 0.6941170840613321,
+    "max1s": 0.8846279502699774
+   },
+   "K d=0.5 dx=1.0 h=0.8": {
+    "mean": 0.6125936531120438,
+    "max1s": 0.7705550314366045
+   },
+   "K d=0.5 dx=1.0 h=1.1": {
+    "mean": 0.4381283520958544,
+    "max1s": 0.6003147285422631
+   },
+   "K d=0.5 dx=1.0 h=1.5": {
+    "mean": 0.6545885161664652,
+    "max1s": 0.5308356707230214
+   },
+   "K d=1.0 dx=0.0 h=0.3": {
+    "mean": 4.02950832536902,
+    "max1s": 1.9971239485453307
+   },
+   "K d=1.0 dx=0.0 h=0.6": {
+    "mean": 2.8879392235908297,
+    "max1s": 0.9960697515608699
+   },
+   "K d=1.0 dx=0.0 h=0.7": {
+    "mean": 2.8879392235908297,
+    "max1s": 0.9960697515608699
+   },
+   "K d=1.0 dx=0.0 h=0.8": {
+    "mean": 1.4214371734450093,
+    "max1s": 0.8331707760964672
+   },
+   "K d=1.0 dx=0.0 h=1.1": {
+    "mean": 1.0031456852385077,
+    "max1s": 0.6604963579702378
+   },
+   "K d=1.0 dx=0.0 h=1.5": {
+    "mean": 1.8420703573675075,
+    "max1s": 1.1492273131824096
+   },
+   "K d=1.0 dx=-1.0 h=0.3": {
+    "mean": 0.001769872821841426,
+    "max1s": 0.01044241744604109
+   },
+   "K d=1.0 dx=-1.0 h=0.6": {
+    "mean": 0.020175400425186805,
+    "max1s": 0.03861272521865117
+   },
+   "K d=1.0 dx=-1.0 h=0.7": {
+    "mean": 0.023423234067642833,
+    "max1s": 0.0386773280318316
+   },
+   "K d=1.0 dx=-1.0 h=0.8": {
+    "mean": 0.07356368097194402,
+    "max1s": 0.112280976365407
+   },
+   "K d=1.0 dx=-1.0 h=1.1": {
+    "mean": 0.09848111533066801,
+    "max1s": 0.17401998005721647
+   },
+   "K d=1.0 dx=-1.0 h=1.5": {
+    "mean": 0.16013029457602468,
+    "max1s": 0.11427809793833266
+   },
+   "K d=1.0 dx=1.0 h=0.3": {
+    "mean": 0.05243690013667956,
+    "max1s": 0.04099954228351325
+   },
+   "K d=1.0 dx=1.0 h=0.6": {
+    "mean": 1.8607307893817608,
+    "max1s": 1.5346316348975808
+   },
+   "K d=1.0 dx=1.0 h=0.7": {
+    "mean": 1.8607307893817608,
+    "max1s": 1.5346316348975808
+   },
+   "K d=1.0 dx=1.0 h=0.8": {
+    "mean": 1.8657899620053333,
+    "max1s": 1.4558523039258582
+   },
+   "K d=1.0 dx=1.0 h=1.1": {
+    "mean": 2.436920698002862,
+    "max1s": 2.411742717754364
+   },
+   "K d=1.0 dx=1.0 h=1.5": {
+    "mean": 2.0415842192298768,
+    "max1s": 1.5781308218514036
+   },
+   "K d=2.0 dx=0.0 h=0.3": {
+    "mean": 1.7805140741548284,
+    "max1s": 1.4563065073420876
+   },
+   "K d=2.0 dx=0.0 h=0.6": {
+    "mean": 5.6365353877113575,
+    "max1s": 1.3783269024587788
+   },
+   "K d=2.0 dx=0.0 h=0.7": {
+    "mean": 5.6365353877113575,
+    "max1s": 1.3783269024587788
+   },
+   "K d=2.0 dx=0.0 h=0.8": {
+    "mean": 2.327990558068831,
+    "max1s": 0.9341080290463668
+   },
+   "K d=2.0 dx=0.0 h=1.1": {
+    "mean": 0.9276032632032535,
+    "max1s": 0.5241093143529829
+   },
+   "K d=2.0 dx=0.0 h=1.5": {
+    "mean": 0.6872634079153683,
+    "max1s": 0.7493414870681534
+   },
+   "K d=2.0 dx=-1.0 h=0.3": {
+    "mean": 0.04859468814418065,
+    "max1s": 0.08294522962927837
+   },
+   "K d=2.0 dx=-1.0 h=0.6": {
+    "mean": 0.31147569739129516,
+    "max1s": 0.2265505229299576
+   },
+   "K d=2.0 dx=-1.0 h=0.7": {
+    "mean": 0.31147569739129516,
+    "max1s": 0.2265505229299576
+   },
+   "K d=2.0 dx=-1.0 h=0.8": {
+    "mean": 0.2598093298563029,
+    "max1s": 0.2749674761106774
+   },
+   "K d=2.0 dx=-1.0 h=1.1": {
+    "mean": 0.22576334193394756,
+    "max1s": 0.29711323464343553
+   },
+   "K d=2.0 dx=-1.0 h=1.5": {
+    "mean": 0.6112884149687784,
+    "max1s": 0.6524035715658192
+   },
+   "K d=2.0 dx=1.0 h=0.3": {
+    "mean": 1.422906321517157,
+    "max1s": 2.263312680958422
+   },
+   "K d=2.0 dx=1.0 h=0.6": {
+    "mean": 5.388550741602232,
+    "max1s": 8.894229810167378
+   },
+   "K d=2.0 dx=1.0 h=0.7": {
+    "mean": 5.388550741602232,
+    "max1s": 8.894229810167378
+   },
+   "K d=2.0 dx=1.0 h=0.8": {
+    "mean": 2.463804967311194,
+    "max1s": 4.682369692734377
+   },
+   "K d=2.0 dx=1.0 h=1.1": {
+    "mean": 1.5198107030972468,
+    "max1s": 2.674109659962984
+   },
+   "K d=2.0 dx=1.0 h=1.5": {
+    "mean": 6.082666364537975,
+    "max1s": 8.030211952265534
+   },
+   "SRC b0c0 d=0.25": {
+    "mean": 0.0008264925854831661,
+    "max1s": 0.0005879406388245143
+   },
+   "SRC b0c0 d=0.5": {
+    "mean": 0.0006984302907491444,
+    "max1s": 0.000987962711222781
+   }
+  },
+  "fine_values": {
+   "K d=0.5 dx=0.0 h=0.3": {
+    "mean": {
+     "P5": 1.0553739891704883,
+     "P50": 6.528772656257462,
+     "P95": 45.895243414861355
+    },
+    "max10s": {
+     "P5": 1.9638089067864735,
+     "P50": 12.148548310177466,
+     "P95": 85.40052031041498
+    },
+    "max1s": {
+     "P5": 2.507327711891667,
+     "P50": 15.510873655832043,
+     "P95": 109.03662288336531
+    }
+   },
+   "K d=0.5 dx=0.0 h=0.6": {
+    "mean": {
+     "P5": 8.743891442465163,
+     "P50": 54.09161107307541,
+     "P95": 380.24722066580506
+    },
+    "max10s": {
+     "P5": 14.697364295368834,
+     "P50": 90.92108685194987,
+     "P95": 639.1469932123536
+    },
+    "max1s": {
+     "P5": 23.04761742126256,
+     "P50": 142.57756582582812,
+     "P95": 1002.275991767472
+    }
+   },
+   "K d=0.5 dx=0.0 h=0.7": {
+    "mean": {
+     "P5": 4.99621085759163,
+     "P50": 30.907645220230535,
+     "P95": 217.27114351318247
+    },
+    "max10s": {
+     "P5": 9.065148612745286,
+     "P50": 56.07897768479194,
+     "P95": 394.2177905112536
+    },
+    "max1s": {
+     "P5": 16.875517683892255,
+     "P50": 104.39561666796655,
+     "P95": 733.868751552978
+    }
+   },
+   "K d=0.5 dx=0.0 h=0.8": {
+    "mean": {
+     "P5": 2.3074068032753767,
+     "P50": 14.27411950518817,
+     "P95": 100.34262543903121
+    },
+    "max10s": {
+     "P5": 5.487421845333592,
+     "P50": 33.94638304978763,
+     "P95": 238.63252638011411
+    },
+    "max1s": {
+     "P5": 13.58952071380815,
+     "P50": 84.06772590415099,
+     "P95": 590.9699949510239
+    }
+   },
+   "K d=0.5 dx=0.0 h=1.1": {
+    "mean": {
+     "P5": 0.11116214689396726,
+     "P50": 0.6876731779439071,
+     "P95": 4.834128794691222
+    },
+    "max10s": {
+     "P5": 0.29789781490062706,
+     "P50": 1.8428605671916687,
+     "P95": 12.95473724756633
+    },
+    "max1s": {
+     "P5": 1.2527384451785175,
+     "P50": 7.749712035969797,
+     "P95": 54.47806793287865
+    }
+   },
+   "K d=0.5 dx=0.0 h=1.5": {
+    "mean": {
+     "P5": 0.1022985140854479,
+     "P50": 0.6328408207803091,
+     "P95": 4.448674359143986
+    },
+    "max10s": {
+     "P5": 0.259699014694077,
+     "P50": 1.6065544947951103,
+     "P95": 11.293578974172442
+    },
+    "max1s": {
+     "P5": 0.8888685070312256,
+     "P50": 5.498733589478666,
+     "P95": 38.65438878787108
+    }
+   },
+   "K d=0.5 dx=-1.0 h=0.3": {
+    "mean": {
+     "P5": 9.198031068961205e-12,
+     "P50": 5.690101741245352e-11,
+     "P95": 3.999964744054698e-10
+    },
+    "max10s": {
+     "P5": 2.7532535481429253e-11,
+     "P50": 1.7032224278132715e-10,
+     "P95": 1.1973124510503494e-09
+    },
+    "max1s": {
+     "P5": 1.909839450265157e-10,
+     "P50": 1.1814681533447072e-09,
+     "P95": 8.305354059570698e-09
+    }
+   },
+   "K d=0.5 dx=-1.0 h=0.6": {
+    "mean": {
+     "P5": 9.983857499760824e-07,
+     "P50": 6.176231034426194e-06,
+     "P95": 4.341698534099376e-05
+    },
+    "max10s": {
+     "P5": 2.9950967431697967e-06,
+     "P50": 1.8528318795332637e-05,
+     "P95": 0.0001302483247544113
+    },
+    "max1s": {
+     "P5": 2.577962226923745e-05,
+     "P50": 0.00015947834103087239,
+     "P95": 0.001121083190727284
+    }
+   },
+   "K d=0.5 dx=-1.0 h=0.7": {
+    "mean": {
+     "P5": 2.144156136937314e-06,
+     "P50": 1.3264215435691932e-05,
+     "P95": 9.324331358739779e-05
+    },
+    "max10s": {
+     "P5": 6.431442029652954e-06,
+     "P50": 3.9786296890362434e-05,
+     "P95": 0.00027968530633533476
+    },
+    "max1s": {
+     "P5": 6.29869649569399e-05,
+     "P50": 0.0003896510419351307,
+     "P95": 0.0027391257680457293
+    }
+   },
+   "K d=0.5 dx=-1.0 h=0.8": {
+    "mean": {
+     "P5": 4.356054156972641e-05,
+     "P50": 0.0002694749686940162,
+     "P95": 0.0018943253094546566
+    },
+    "max10s": {
+     "P5": 0.00013059148874286787,
+     "P50": 0.0008078673054227204,
+     "P95": 0.005679056168964227
+    },
+    "max1s": {
+     "P5": 0.0013043442950123928,
+     "P50": 0.008068957028508556,
+     "P95": 0.05672226104741437
+    }
+   },
+   "K d=0.5 dx=-1.0 h=1.1": {
+    "mean": {
+     "P5": 0.010126699044181854,
+     "P50": 0.06264595915403279,
+     "P95": 0.44038163001067676
+    },
+    "max10s": {
+     "P5": 0.029031639994732673,
+     "P50": 0.179596028809558,
+     "P95": 1.2625042856496227
+    },
+    "max1s": {
+     "P5": 0.2869037536896718,
+     "P50": 1.7748489173387842,
+     "P95": 12.476636478955133
+    }
+   },
+   "K d=0.5 dx=-1.0 h=1.5": {
+    "mean": {
+     "P5": 0.00012428586949659958,
+     "P50": 0.0007688593755909793,
+     "P95": 0.005404842541227977
+    },
+    "max10s": {
+     "P5": 0.00021873511518461875,
+     "P50": 0.0013531429177093073,
+     "P95": 0.009512174317150146
+    },
+    "max1s": {
+     "P5": 0.0015878976357298822,
+     "P50": 0.00982307956370754,
+     "P95": 0.06905319749919764
+    }
+   },
+   "K d=0.5 dx=1.0 h=0.3": {
+    "mean": {
+     "P5": 2.323738284211131e-06,
+     "P50": 1.4375149592402415e-05,
+     "P95": 0.00010105283556412701
+    },
+    "max10s": {
+     "P5": 6.937217563108545e-06,
+     "P50": 4.291513416218519e-05,
+     "P95": 0.00030168006028930575
+    },
+    "max1s": {
+     "P5": 3.6021712825991714e-05,
+     "P50": 0.00022283813713728172,
+     "P95": 0.001566482872738354
+    }
+   },
+   "K d=0.5 dx=1.0 h=0.6": {
+    "mean": {
+     "P5": 3.1880309038252074e-05,
+     "P50": 0.000197218514060189,
+     "P95": 0.0013863848820090834
+    },
+    "max10s": {
+     "P5": 9.430268906607776e-05,
+     "P50": 0.0005833769110323402,
+     "P95": 0.004100958441059757
+    },
+    "max1s": {
+     "P5": 0.000364729204646276,
+     "P50": 0.00225629405563118,
+     "P95": 0.015861046225809052
+    }
+   },
+   "K d=0.5 dx=1.0 h=0.7": {
+    "mean": {
+     "P5": 5.923525385394824e-05,
+     "P50": 0.0003664421424220383,
+     "P95": 0.0025759744150079533
+    },
+    "max10s": {
+     "P5": 0.00015137456148915204,
+     "P50": 0.0009364359061758989,
+     "P95": 0.006582853488575252
+    },
+    "max1s": {
+     "P5": 0.0003574483447138052,
+     "P50": 0.002211253075155133,
+     "P95": 0.01554442212639108
+    }
+   },
+   "K d=0.5 dx=1.0 h=0.8": {
+    "mean": {
+     "P5": 0.00015306050258148893,
+     "P50": 0.0009468655038509005,
+     "P95": 0.006656170319963845
+    },
+    "max10s": {
+     "P5": 0.0003502117227218645,
+     "P50": 0.002166485760184836,
+     "P95": 0.015229721810456153
+    },
+    "max1s": {
+     "P5": 0.0005866163807747302,
+     "P50": 0.003628936306763651,
+     "P95": 0.025510294798872502
+    }
+   },
+   "K d=0.5 dx=1.0 h=1.1": {
+    "mean": {
+     "P5": 0.0007059997449246777,
+     "P50": 0.004367467719771872,
+     "P95": 0.03070194118543297
+    },
+    "max10s": {
+     "P5": 0.0019540674196402356,
+     "P50": 0.012088285355467323,
+     "P95": 0.08497689046129321
+    },
+    "max1s": {
+     "P5": 0.012136824238489633,
+     "P50": 0.07508103007573125,
+     "P95": 0.5277963152632597
+    }
+   },
+   "K d=0.5 dx=1.0 h=1.5": {
+    "mean": {
+     "P5": 0.0002908011365146729,
+     "P50": 0.0017989589737547416,
+     "P95": 0.012646122685048682
+    },
+    "max10s": {
+     "P5": 0.0007758072120866659,
+     "P50": 0.004799311869321169,
+     "P95": 0.03373767139145458
+    },
+    "max1s": {
+     "P5": 0.005358853376883071,
+     "P50": 0.03315103058716305,
+     "P95": 0.23304144566791044
+    }
+   },
+   "K d=1.0 dx=0.0 h=0.3": {
+    "mean": {
+     "P5": 0.005366404234096143,
+     "P50": 0.033197741829442906,
+     "P95": 0.23336981118889244
+    },
+    "max10s": {
+     "P5": 0.008632973503458381,
+     "P50": 0.05340544861814786,
+     "P95": 0.37542371178456757
+    },
+    "max1s": {
+     "P5": 0.022458138867418292,
+     "P50": 0.13893092349497668,
+     "P95": 0.9766412291201686
+    }
+   },
+   "K d=1.0 dx=0.0 h=0.6": {
+    "mean": {
+     "P5": 0.27407290429863956,
+     "P50": 1.6954744969718667,
+     "P95": 11.918658963815023
+    },
+    "max10s": {
+     "P5": 0.6807121223349287,
+     "P50": 4.211032995588955,
+     "P95": 29.602253675556135
+    },
+    "max1s": {
+     "P5": 2.63772798758419,
+     "P50": 16.317558075806172,
+     "P95": 114.70736373512472
+    }
+   },
+   "K d=1.0 dx=0.0 h=0.7": {
+    "mean": {
+     "P5": 0.6857974436076679,
+     "P50": 4.242491897186328,
+     "P95": 29.823399980136344
+    },
+    "max10s": {
+     "P5": 1.034508926381222,
+     "P50": 6.399696847295437,
+     "P95": 44.987880579121544
+    },
+    "max1s": {
+     "P5": 4.832978986311774,
+     "P50": 29.897857421045437,
+     "P95": 210.1726490057135
+    }
+   },
+   "K d=1.0 dx=0.0 h=0.8": {
+    "mean": {
+     "P5": 0.9216144390089012,
+     "P50": 5.701307034999674,
+     "P95": 40.078417174379986
+    },
+    "max10s": {
+     "P5": 1.9945969488300126,
+     "P50": 12.339009823438325,
+     "P95": 86.73940557606932
+    },
+    "max1s": {
+     "P5": 5.7170721931034105,
+     "P50": 35.367049966354394,
+     "P95": 248.61937343088104
+    }
+   },
+   "K d=1.0 dx=0.0 h=1.1": {
+    "mean": {
+     "P5": 1.5093615269840006,
+     "P50": 9.337238142021576,
+     "P95": 65.63788324592393
+    },
+    "max10s": {
+     "P5": 2.2927082950619417,
+     "P50": 14.183191341810677,
+     "P95": 99.70342870004282
+    },
+    "max1s": {
+     "P5": 5.218781175738808,
+     "P50": 32.28451353622527,
+     "P95": 226.95010000927414
+    }
+   },
+   "K d=1.0 dx=0.0 h=1.5": {
+    "mean": {
+     "P5": 0.5456514292045526,
+     "P50": 3.375518221401797,
+     "P95": 23.728844390691563
+    },
+    "max10s": {
+     "P5": 1.3156136696432958,
+     "P50": 8.13867182695758,
+     "P95": 57.212334421522314
+    },
+    "max1s": {
+     "P5": 4.227561881226663,
+     "P50": 26.152615751391494,
+     "P95": 183.8447636394642
+    }
+   },
+   "K d=1.0 dx=-1.0 h=0.3": {
+    "mean": {
+     "P5": 2.984969143941061e-11,
+     "P50": 1.8465667267441494e-10,
+     "P95": 1.2980790397790878e-09
+    },
+    "max10s": {
+     "P5": 8.949814919640224e-11,
+     "P50": 5.536549841619508e-10,
+     "P95": 3.892022529167063e-09
+    },
+    "max1s": {
+     "P5": 8.817061369479736e-10,
+     "P50": 5.45442561293825e-09,
+     "P95": 3.834291747839098e-08
+    }
+   },
+   "K d=1.0 dx=-1.0 h=0.6": {
+    "mean": {
+     "P5": 7.3454095409558e-07,
+     "P50": 4.544029837015233e-06,
+     "P95": 3.194311801534765e-05
+    },
+    "max10s": {
+     "P5": 2.203511445219282e-06,
+     "P50": 1.3631400260873791e-05,
+     "P95": 9.582450883147065e-05
+    },
+    "max1s": {
+     "P5": 2.2030164617255453e-05,
+     "P50": 0.00013628338185503005,
+     "P95": 0.0009580298339293939
+    }
+   },
+   "K d=1.0 dx=-1.0 h=0.7": {
+    "mean": {
+     "P5": 3.8144879826388644e-07,
+     "P50": 2.3597250921684643e-06,
+     "P95": 1.6588134278719018e-05
+    },
+    "max10s": {
+     "P5": 1.1115238940587866e-06,
+     "P50": 6.876128160038934e-06,
+     "P95": 4.8337044690061684e-05
+    },
+    "max1s": {
+     "P5": 1.1002289440955394e-05,
+     "P50": 6.806255147030716e-05,
+     "P95": 0.00047845859116756663
+    }
+   },
+   "K d=1.0 dx=-1.0 h=0.8": {
+    "mean": {
+     "P5": 5.2460192392295005e-06,
+     "P50": 3.2453014111331545e-05,
+     "P95": 0.00022813460670252444
+    },
+    "max10s": {
+     "P5": 1.4787617150353509e-05,
+     "P50": 9.147941060999156e-05,
+     "P95": 0.0006430718357714011
+    },
+    "max1s": {
+     "P5": 4.145174706377992e-05,
+     "P50": 0.00025642950798590185,
+     "P95": 0.0018026197736394258
+    }
+   },
+   "K d=1.0 dx=-1.0 h=1.1": {
+    "mean": {
+     "P5": 0.06200503489500844,
+     "P50": 0.38357660936006394,
+     "P95": 2.696424394247294
+    },
+    "max10s": {
+     "P5": 0.1644475412126317,
+     "P50": 1.0173081973544478,
+     "P95": 7.151360570162725
+    },
+    "max1s": {
+     "P5": 0.6462762498849107,
+     "P50": 3.9980052113598243,
+     "P95": 28.10473453588234
+    }
+   },
+   "K d=1.0 dx=-1.0 h=1.5": {
+    "mean": {
+     "P5": 0.05110820604043524,
+     "P50": 0.3161664599763633,
+     "P95": 2.2225519870603363
+    },
+    "max10s": {
+     "P5": 0.10679745230079782,
+     "P50": 0.6606722294600462,
+     "P95": 4.64432051550245
+    },
+    "max1s": {
+     "P5": 0.6010770224835748,
+     "P50": 3.718392976294464,
+     "P95": 26.139147393282336
+    }
+   },
+   "K d=1.0 dx=1.0 h=0.3": {
+    "mean": {
+     "P5": 0.0001943215059831843,
+     "P50": 0.0012021150301259106,
+     "P95": 0.008450495188772332
+    },
+    "max10s": {
+     "P5": 0.0005468393711278523,
+     "P50": 0.003382867088083794,
+     "P95": 0.023780504640320624
+    },
+    "max1s": {
+     "P5": 0.002314423559525485,
+     "P50": 0.014317526682938817,
+     "P95": 0.10064776441287934
+    }
+   },
+   "K d=1.0 dx=1.0 h=0.6": {
+    "mean": {
+     "P5": 2.708191617852747e-06,
+     "P50": 1.6753461392809068e-05,
+     "P95": 0.00011777162862724323
+    },
+    "max10s": {
+     "P5": 6.797433318876138e-06,
+     "P50": 4.205039847522983e-05,
+     "P95": 0.0002956012370660317
+    },
+    "max1s": {
+     "P5": 3.442421791820286e-05,
+     "P50": 0.0002129556867647081,
+     "P95": 0.0014970123168981462
+    }
+   },
+   "K d=1.0 dx=1.0 h=0.7": {
+    "mean": {
+     "P5": 2.5970614356697853e-05,
+     "P50": 0.00016065985955508115,
+     "P95": 0.0011293888988783798
+    },
+    "max10s": {
+     "P5": 7.115329988008145e-05,
+     "P50": 0.0004401697629715974,
+     "P95": 0.0030942566817793995
+    },
+    "max1s": {
+     "P5": 0.00011754380518206671,
+     "P50": 0.0007271515017991981,
+     "P95": 0.005111649146271044
+    }
+   },
+   "K d=1.0 dx=1.0 h=0.8": {
+    "mean": {
+     "P5": 0.0001129429595877138,
+     "P50": 0.0006986896719452303,
+     "P95": 0.004911571324916944
+    },
+    "max10s": {
+     "P5": 0.00031871446620399836,
+     "P50": 0.0019716368921900884,
+     "P95": 0.013859994804085648
+    },
+    "max1s": {
+     "P5": 0.0007357579818395904,
+     "P50": 0.004551558634899712,
+     "P95": 0.03199604312542914
+    }
+   },
+   "K d=1.0 dx=1.0 h=1.1": {
+    "mean": {
+     "P5": 0.0005407465154625001,
+     "P50": 0.003345175359962145,
+     "P95": 0.023515543501688867
+    },
+    "max10s": {
+     "P5": 0.0015909320840249359,
+     "P50": 0.009841851319747446,
+     "P95": 0.06918515711215033
+    },
+    "max1s": {
+     "P5": 0.009989866527163455,
+     "P50": 0.06179948349254831,
+     "P95": 0.4344311690934397
+    }
+   },
+   "K d=1.0 dx=1.0 h=1.5": {
+    "mean": {
+     "P5": 0.00013113725453508385,
+     "P50": 0.0008112435311185434,
+     "P95": 0.0057027899866803
+    },
+    "max10s": {
+     "P5": 0.00023602042442114968,
+     "P50": 0.0014600735939022248,
+     "P95": 0.010263863749571417
+    },
+    "max1s": {
+     "P5": 0.0012878135012396423,
+     "P50": 0.007966693948806742,
+     "P95": 0.05600338336819699
+    }
+   },
+   "K d=2.0 dx=0.0 h=0.3": {
+    "mean": {
+     "P5": 0.0010751840417418206,
+     "P50": 0.006651321942931082,
+     "P95": 0.046756726826573156
+    },
+    "max10s": {
+     "P5": 0.0015822803717478507,
+     "P50": 0.009788329949006788,
+     "P95": 0.06880891850385919
+    },
+    "max1s": {
+     "P5": 0.0036806521051662763,
+     "P50": 0.022769313123107628,
+     "P95": 0.16006119728685064
+    }
+   },
+   "K d=2.0 dx=0.0 h=0.6": {
+    "mean": {
+     "P5": 0.013483666070331225,
+     "P50": 0.08341288609479275,
+     "P95": 0.5863666745368212
+    },
+    "max10s": {
+     "P5": 0.025187850112584384,
+     "P50": 0.15581750997502292,
+     "P95": 1.0953486857513965
+    },
+    "max1s": {
+     "P5": 0.07228378611524461,
+     "P50": 0.447163196291107,
+     "P95": 3.1434183452961815
+    }
+   },
+   "K d=2.0 dx=0.0 h=0.7": {
+    "mean": {
+     "P5": 0.031178939622091353,
+     "P50": 0.19287969055956017,
+     "P95": 1.3558843007850416
+    },
+    "max10s": {
+     "P5": 0.05996975233385232,
+     "P50": 0.3709859095044822,
+     "P95": 2.6079156859402963
+    },
+    "max1s": {
+     "P5": 0.14357940555011803,
+     "P50": 0.8882133789312874,
+     "P95": 6.243864103816999
+    }
+   },
+   "K d=2.0 dx=0.0 h=0.8": {
+    "mean": {
+     "P5": 0.058822685092932064,
+     "P50": 0.36388990248303277,
+     "P95": 2.5580329611664694
+    },
+    "max10s": {
+     "P5": 0.1303657027797319,
+     "P50": 0.806470544428594,
+     "P95": 5.669237373121125
+    },
+    "max1s": {
+     "P5": 0.3287332312380474,
+     "P50": 2.0336151481211244,
+     "P95": 14.295682687880646
+    }
+   },
+   "K d=2.0 dx=0.0 h=1.1": {
+    "mean": {
+     "P5": 0.2714476801623023,
+     "P50": 1.6792342904349051,
+     "P95": 11.804495357366408
+    },
+    "max10s": {
+     "P5": 0.38067121327780984,
+     "P50": 2.354914782603223,
+     "P95": 16.554319296942012
+    },
+    "max1s": {
+     "P5": 0.770323451792317,
+     "P50": 4.765388137420827,
+     "P95": 33.49919809561782
+    }
+   },
+   "K d=2.0 dx=0.0 h=1.5": {
+    "mean": {
+     "P5": 0.48160533455762733,
+     "P50": 2.979315173229672,
+     "P95": 20.9436600543766
+    },
+    "max10s": {
+     "P5": 0.7103965846635987,
+     "P50": 4.3946675251072085,
+     "P95": 30.89314736650678
+    },
+    "max1s": {
+     "P5": 1.2164284705444501,
+     "P50": 7.525090648695863,
+     "P95": 52.89904936569966
+    }
+   },
+   "K d=2.0 dx=-1.0 h=0.3": {
+    "mean": {
+     "P5": 0.0010964948816662918,
+     "P50": 0.006783155426045559,
+     "P95": 0.0476834752548507
+    },
+    "max10s": {
+     "P5": 0.0028640314004308325,
+     "P50": 0.017717520126199503,
+     "P95": 0.12454866200927871
+    },
+    "max1s": {
+     "P5": 0.007591757801418897,
+     "P50": 0.046964262200350756,
+     "P95": 0.3301441724147961
+    }
+   },
+   "K d=2.0 dx=-1.0 h=0.6": {
+    "mean": {
+     "P5": 0.005946850770016586,
+     "P50": 0.03678851013624508,
+     "P95": 0.25861179680606716
+    },
+    "max10s": {
+     "P5": 0.013122538751815228,
+     "P50": 0.08117887408886115,
+     "P95": 0.5706622641978146
+    },
+    "max1s": {
+     "P5": 0.04286449688532477,
+     "P50": 0.2651690851402376,
+     "P95": 1.8640562858231922
+    }
+   },
+   "K d=2.0 dx=-1.0 h=0.7": {
+    "mean": {
+     "P5": 0.010655659044114018,
+     "P50": 0.06591822056965232,
+     "P95": 0.4633846111365362
+    },
+    "max10s": {
+     "P5": 0.02465335097382434,
+     "P50": 0.15251098224387,
+     "P95": 1.0721048230731935
+    },
+    "max1s": {
+     "P5": 0.053482148299011344,
+     "P50": 0.3308521822552567,
+     "P95": 2.325788052121795
+    }
+   },
+   "K d=2.0 dx=-1.0 h=0.8": {
+    "mean": {
+     "P5": 0.017922649502227748,
+     "P50": 0.11087340146577014,
+     "P95": 0.7794055661638126
+    },
+    "max10s": {
+     "P5": 0.043827068874046055,
+     "P50": 0.27112376447109965,
+     "P95": 1.9059158315197968
+    },
+    "max1s": {
+     "P5": 0.17649209536178995,
+     "P50": 1.091818424622455,
+     "P95": 7.675144319024665
+    }
+   },
+   "K d=2.0 dx=-1.0 h=1.1": {
+    "mean": {
+     "P5": 0.14105248719641456,
+     "P50": 0.8725813133113818,
+     "P95": 6.133975539078108
+    },
+    "max10s": {
+     "P5": 0.26676160989168324,
+     "P50": 1.6502452422282448,
+     "P95": 11.600711354789041
+    },
+    "max1s": {
+     "P5": 0.4096848544215542,
+     "P50": 2.5343994666123764,
+     "P95": 17.816040863237383
+    }
+   },
+   "K d=2.0 dx=-1.0 h=1.5": {
+    "mean": {
+     "P5": 0.1994205107639721,
+     "P50": 1.2336585808752516,
+     "P95": 8.672236550592077
+    },
+    "max10s": {
+     "P5": 0.33087590288464375,
+     "P50": 2.0468701801772315,
+     "P95": 14.388861445162654
+    },
+    "max1s": {
+     "P5": 0.9132069349435055,
+     "P50": 5.649296389282819,
+     "P95": 39.71279849365424
+    }
+   },
+   "K d=2.0 dx=1.0 h=0.3": {
+    "mean": {
+     "P5": 0.0013072569527688323,
+     "P50": 0.008086975361831538,
+     "P95": 0.0568489243327404
+    },
+    "max10s": {
+     "P5": 0.0034590689226840273,
+     "P50": 0.021398551442678423,
+     "P95": 0.1504251685415756
+    },
+    "max1s": {
+     "P5": 0.011558592439114243,
+     "P50": 0.0715039626100949,
+     "P95": 0.5026506423029042
+    }
+   },
+   "K d=2.0 dx=1.0 h=0.6": {
+    "mean": {
+     "P5": 0.0008296744092948679,
+     "P50": 0.005132546047736502,
+     "P95": 0.03608020413654331
+    },
+    "max10s": {
+     "P5": 0.00204950495854026,
+     "P50": 0.012678682693988742,
+     "P95": 0.08912720032649524
+    },
+    "max1s": {
+     "P5": 0.005224336433958117,
+     "P50": 0.03231887956981416,
+     "P95": 0.22719168254856711
+    }
+   },
+   "K d=2.0 dx=1.0 h=0.7": {
+    "mean": {
+     "P5": 0.0006900486753411889,
+     "P50": 0.004268790939783581,
+     "P95": 0.030008274079010334
+    },
+    "max10s": {
+     "P5": 0.0015061997506828852,
+     "P50": 0.00931767870728873,
+     "P95": 0.06550038649647583
+    },
+    "max1s": {
+     "P5": 0.004396776828884484,
+     "P50": 0.02719941616018947,
+     "P95": 0.19120344529343677
+    }
+   },
+   "K d=2.0 dx=1.0 h=0.8": {
+    "mean": {
+     "P5": 0.0006523171079113389,
+     "P50": 0.004035375270796552,
+     "P95": 0.0283674344435951
+    },
+    "max10s": {
+     "P5": 0.001429632837867343,
+     "P50": 0.008844019159210358,
+     "P95": 0.0621707070299999
+    },
+    "max1s": {
+     "P5": 0.004859181227311988,
+     "P50": 0.030059950173311693,
+     "P95": 0.21131211069518047
+    }
+   },
+   "K d=2.0 dx=1.0 h=1.1": {
+    "mean": {
+     "P5": 0.0015606973809228588,
+     "P50": 0.009654812881328046,
+     "P95": 0.06787033499915081
+    },
+    "max10s": {
+     "P5": 0.004197368147857653,
+     "P50": 0.02596583076063684,
+     "P95": 0.18253172318480673
+    },
+    "max1s": {
+     "P5": 0.03968488101365364,
+     "P50": 0.2454992909503268,
+     "P95": 1.7257837436783916
+    }
+   },
+   "K d=2.0 dx=1.0 h=1.5": {
+    "mean": {
+     "P5": 0.029314657785488436,
+     "P50": 0.1813468383164068,
+     "P95": 1.2748119325413954
+    },
+    "max10s": {
+     "P5": 0.08368703241949568,
+     "P50": 0.5177061539797645,
+     "P95": 3.6393134215663205
+    },
+    "max1s": {
+     "P5": 0.4005942464580589,
+     "P50": 2.4781629918557138,
+     "P95": 17.420715917242056
+    }
+   },
+   "SRC b0c0 d=0.25": {
+    "mean": {
+     "P5": 1.6069036407763473e-06,
+     "P50": 9.940654837805003e-06,
+     "P95": 6.987971514782491e-05
+    },
+    "max10s": {
+     "P5": 4.814975940231954e-06,
+     "P50": 2.9786486668893724e-05,
+     "P95": 0.00020938974721874436
+    },
+    "max1s": {
+     "P5": 4.7430683945760885e-05,
+     "P50": 0.0002934165097777953,
+     "P95": 0.002062626905117328
+    }
+   },
+   "SRC b0c0 d=0.5": {
+    "mean": {
+     "P5": 8.997347911832047e-07,
+     "P50": 5.5659547826997765e-06,
+     "P95": 3.9126932891939924e-05
+    },
+    "max10s": {
+     "P5": 2.698846452660593e-06,
+     "P50": 1.669565017176249e-05,
+     "P95": 0.00011736523370407191
+    },
+    "max1s": {
+     "P5": 2.5738214650019533e-05,
+     "P50": 0.0001592221845073227,
+     "P95": 0.0011192824899494203
+    }
+   }
+  }
+ }
+}

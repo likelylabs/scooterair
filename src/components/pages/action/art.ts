@@ -23,9 +23,9 @@ let serial = 0;
 const uid = (p: string) => `j${p}${++serial}`;
 
 /**
- * The kerb, close (G4): a parent with a pushchair, a schoolchild covering her nose and an
+ * The kerb, close (G4): a parent with a pushchair, a schoolchild covering their nose and an
  * older woman on the left; the nearest scooter's tail on the right with its rider in view;
- * rows behind. `electric`: the same kerb after the swap (street air, tyre dots, one car core).
+ * rows behind. `electric`: the same kerb after the swap (no scooter fume; one car's small puff).
  */
 export function kerbDrawing(o: { scenario?: AirScenario; electric?: boolean; seed?: number } = {}): Drawing {
   const scenario = o.scenario ?? 'dozen';
@@ -39,12 +39,6 @@ export function kerbDrawing(o: { scenario?: AirScenario; electric?: boolean; see
   ];
   const nRows = scenario === 'few' ? 0 : scenario === 'dozen' ? 1 : 2;
   const shown = rows.slice(2 - nRows);
-  const avoid = [
-    ...P.figureBoxes('stroller', people.parent),
-    ...P.figureBoxes('schoolchild', people.child),
-    ...P.figureBoxes('elder-woman', people.elder),
-    ...P.figureBoxes('scooter', front),
-  ];
   const tailpipes = electric
     ? []
     : [...shown.map((r) => ({ x: r.x + P.TAILPIPE.x * r.s, y: -r.lift + P.TAILPIPE.y * r.s, scale: r.s, row: r.row })), { x: front + P.TAILPIPE.x, y: P.TAILPIPE.y, row: 1 as const }];
@@ -52,12 +46,10 @@ export function kerbDrawing(o: { scenario?: AirScenario; electric?: boolean; see
     frame: box,
     seed: o.seed ?? 4,
     id: uid('k'),
-    avoid,
     kerb: electric ? undefined : { x0: 8, x1: 286, sourceX: front + 4 },
     extra: AIR_EXTRA,
     scenario,
     tailpipes,
-    tyres: electric ? [{ x: front + P.REAR_TYRE.x, y: 0 }, ...shown.map((r) => ({ x: r.x + P.REAR_TYRE.x * r.s, y: -r.lift, scale: r.s }))] : [],
     cars: electric ? [{ x: 448, y: -64, dir: -1 }] : [],
   });
   const kind = electric ? 'electric' : 'gas';
@@ -86,24 +78,17 @@ export function kerbDrawing(o: { scenario?: AirScenario; electric?: boolean; see
 /**
  * Heights (G8): a ruler in centimetres and four whole figures on one ground line — a baby in a
  * pushchair (the 55–85 cm band shaded), a schoolchild, an adult and a rider seated on a
- * scooter, its tailpipe marked. Breathing rings at every nose. The air is drawn evenly from the
+ * scooter. The fume is drawn evenly from the
  * ground up: no bands by height (brief 5.1, K4).
  */
 export function heightsDrawing(o: { seed?: number; band?: boolean } = {}): Drawing {
   const box = { x: -70, y: -215, w: 680, h: 240 };
   const X = { pushchair: 4, child: 150, adult: 214, scooter: 280 };
   const tail = { x: X.scooter + P.TAILPIPE.x, y: P.TAILPIPE.y };
-  const avoid = [
-    ...P.figureBoxes('pushchair', X.pushchair),
-    ...P.figureBoxes('schoolchild', X.child),
-    ...P.figureBoxes('adult', X.adult),
-    ...P.figureBoxes('scooter', X.scooter),
-  ];
   const a = air({
     frame: box,
     seed: o.seed ?? 7,
     id: uid('h'),
-    avoid,
     kerb: { x0: -4, x1: X.scooter - 6, sourceX: tail.x, sourceY: tail.y },
     extra: AIR_EXTRA,
     scenario: 'dozen',
@@ -120,22 +105,15 @@ export function heightsDrawing(o: { seed?: number; band?: boolean } = {}): Drawi
     ticks.join(''),
     `<path class="a-rule a-rule--dot" d="M-14,-100H${box.x + box.w}"/>`,
   ].join('');
-  const breaths = [
-    P.breath(X.pushchair + P.MOUTH.pushchair.x, P.MOUTH.pushchair.y),
-    P.breath(X.child + P.MOUTH.schoolchild.x, P.MOUTH.schoolchild.y),
-    P.breath(X.adult + P.MOUTH.adult.x, P.MOUTH.adult.y),
-    P.breath(X.scooter + P.RIDER_MOUTH.x, P.RIDER_MOUTH.y),
-  ].join('');
   const fg = [
     `<g class="a-figure" transform="translate(${X.pushchair} 0)">${P.person('pushchair')}</g>`,
     `<g class="a-figure" transform="translate(${X.child} 0)">${P.person('schoolchild')}</g>`,
     `<g class="a-figure" transform="translate(${X.adult} 0)">${P.person('adult')}</g>`,
     `<g class="a-figure" transform="translate(${X.scooter} 0)">${P.scooter({ kind: 'gas', rider: true, face: true })}</g>`,
-    `<circle class="a-tailpipe-mark" cx="${tail.x}" cy="${tail.y}" r="6" fill="none" stroke="var(--exhaust-ink, currentColor)" stroke-width="2.4"/>`,
   ].join('');
   return {
     box,
-    svg: a.defs + ground + a.wash + a.cores + a.marks + fg + breaths,
+    svg: a.defs + ground + a.wash + a.cores + a.marks + fg,
     points: {
       cm0: { x: -32, y: 0 },
       cm50: { x: -32, y: -50 },

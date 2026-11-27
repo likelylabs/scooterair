@@ -32,6 +32,7 @@ export default copy({
     notClaimed: { 'zh-TW': '我們不會說的話', en: 'What we will not say' },
     changeMind: { 'zh-TW': '什麼會讓我們改口', en: 'What would change our mind' },
     notUsed: { 'zh-TW': '我們不這樣用的數字', en: 'Figures we do not use that way' },
+    smell: { 'zh-TW': '聞得到的時候，空氣裡還有什麼', en: 'When you can smell it, what else is in the air' },
     method: { 'zh-TW': '怎麼查證的', en: 'How we checked' },
     linkN: { 'zh-TW': '第 {n} 環', en: 'Link {n}' },
   },
@@ -116,7 +117,7 @@ export default copy({
     { title: { 'zh-TW': '排氣管離地不到一公尺。|待轉區只要求離斑馬線 {cm} 公分', en: 'The tailpipe is under a metre off the ground. |The turn box need only be {cm} cm from the crosswalk.' } },
     // Link 3 is whole (brief 7.3): the institute measured the waiting areas; beside the scooters, the site's estimate
     { title: { 'zh-TW': '等候區量過了，|機車旁邊是推估', en: 'The waiting areas were measured. |Beside the scooters, we estimate.' } },
-    { title: { 'zh-TW': '鼻子是警報器，|不是測量儀', en: 'Your nose is an alarm, |not a gauge.' } },
+    { title: { 'zh-TW': '聞不到，|不代表空氣乾淨', en: 'No smell |does not mean clean air.' } },
     { title: { 'zh-TW': '長年吸車子的廢氣，|和氣喘、心臟病、肺癌有關', en: 'Years of traffic exhaust are linked to |asthma, heart disease and lung cancer.' } },
     {
       title: { 'zh-TW': '同一個紅燈，|不一樣的位置', en: 'Same red light. |Different places in it.' },
@@ -284,15 +285,18 @@ export default copy({
     },
   },
   v28: {
-    title: { 'zh-TW': '致癌分級，|照實寫', en: 'Cancer classifications, |as they are' },
-    subtitle: { 'zh-TW': '國際癌症研究機構的分級', en: 'International Agency for Research on Cancer classifications' },
+    title: { 'zh-TW': '致癌分類，|照實寫', en: 'Cancer classifications, |as they are' },
+    subtitle: { 'zh-TW': '國際癌症研究機構的分類', en: 'International Agency for Research on Cancer classifications' },
     item: { 'zh-TW': '項目', en: 'Agent' },
-    group: { 'zh-TW': '分級', en: 'Group' },
+    group: { 'zh-TW': '分類', en: 'Group' },
     benzene: { 'zh-TW': '苯', en: 'Benzene' },
+    butadiene: { 'zh-TW': '1,3-丁二烯', en: '1,3-Butadiene' },
+    formaldehyde: { 'zh-TW': '甲醛', en: 'Formaldehyde' },
+    group1: { 'zh-TW': '第1類', en: 'Group 1' },
     outdoor: { 'zh-TW': '室外空氣污染與其中的懸浮微粒', en: 'Outdoor air pollution and its particulate matter' },
     diesel: { 'zh-TW': '柴油引擎廢氣', en: 'Diesel engine exhaust' },
     gasoline: { 'zh-TW': '汽油引擎廢氣', en: 'Petrol engine exhaust' },
-    foot: { 'zh-TW': '分級講的是「會致癌」的證據有多強，不是吸多少才會。', en: 'A classification says how strong the evidence is that something is carcinogenic, not how much it takes.' },
+    foot: { 'zh-TW': '分類講的是「會致癌」的證據有多強，不是吸多少才會，也不是一個紅燈的風險。', en: 'A classification says how strong the evidence is that something is carcinogenic, not how much it takes, and not the risk from one red light.' },
   },
   v13: {
     title: { 'zh-TW': '早上通勤，|三種方式', en: 'Morning commutes, |three ways to travel' },
@@ -446,8 +450,8 @@ export default copy({
         instead: { 'zh-TW': '長年吸車子的廢氣，和氣喘、心臟病、肺癌有關；講的是好幾年，不是一個紅燈。', en: 'Years of breathing traffic exhaust are linked to asthma, heart disease and lung cancer: years, not one red light.' },
       },
       {
-        no: { 'zh-TW': '機車廢氣是第 1 級致癌物。', en: 'That scooter exhaust is a Group 1 carcinogen.' },
-        instead: { 'zh-TW': '汽油引擎廢氣列在 2B 級；廢氣裡的苯，才是第 1 級。', en: 'Petrol engine exhaust is in Group 2B; the benzene in it is Group 1.' },
+        no: { 'zh-TW': '機車廢氣是第1類致癌物。', en: 'That scooter exhaust is a Group 1 carcinogen.' },
+        instead: { 'zh-TW': '汽油引擎廢氣整體是第2B類（「可能致癌」）；廢氣裡的苯是第1類（「確定會讓人致癌」）。分類說的是證據有多強，不是風險。', en: 'Petrol-engine exhaust as a whole is Group 2B, ‘possibly causes cancer’; the benzene in it is Group 1, ‘causes cancer in humans’. The groups describe the strength of the evidence, not a risk.' },
       },
       {
         no: { 'zh-TW': '機車是 PM2.5 的主要來源。', en: 'That scooters are a main source of PM2.5.' },
@@ -463,7 +467,7 @@ export default copy({
       },
       {
         no: { 'zh-TW': '拿比較長時間的空氣品質標準，或空氣品質指標的顏色，來比 90 秒。', en: 'Standards for longer averaging times, or air-quality-index colours, set against 90 seconds.' },
-        instead: { 'zh-TW': '只和世界衛生組織的 15 分鐘指引值比，而且說「低很多」。', en: 'Only the WHO 15-minute guideline, described as “far below”.' },
+        instead: { 'zh-TW': '只拿平均時間一樣的來比：90 秒的量要先換算成 15 分鐘的平均；「低很多」只用在等一個紅燈。', en: 'Only like with like: a 90-second level is first converted to a 15-minute average; “far below” is used only for one red light.' },
       },
       {
         no: { 'zh-TW': '拿吸菸、得到癌症的可能或毒性，來比等一個紅燈。', en: 'Comparing one red light with smoking, a chance of cancer or poisoning.' },
@@ -471,15 +475,15 @@ export default copy({
       },
       {
         no: { 'zh-TW': '紅燈等得越久，廢氣就一路往上加。', en: 'That exhaust keeps building up the longer the red lasts.' },
-        instead: { 'zh-TW': '本站只算 90 秒的平均，不畫紅燈裡怎麼變；綠燈起步那一陣也不印倍數。', en: 'This site gives a 90-second average only, draws no curve through the red, and prints no multiplier for the pull-away.' },
+        instead: { 'zh-TW': '本站的推估是 90 秒的平均；電腦算的一個紅燈，另外寫出一秒一秒的一陣一陣，但不畫成越來越多的曲線。綠燈起步那一陣也不印倍數。', en: 'Our estimate is a 90-second average; the simulated red light adds the second-by-second bursts but draws no rising curve. No multiplier for the pull-away.' },
       },
       {
         no: { 'zh-TW': '離機車遠幾步，就少吸一個固定的比例。', en: 'That stepping back a few paces cuts what you breathe by a fixed share.' },
         instead: { 'zh-TW': '離機車遠一點，通常比較淡；差多少要看風，所以不印數字。', en: 'Further from the scooters is usually thinner; how much depends on the wind, so we print no figure.' },
       },
       {
-        no: { 'zh-TW': '小孩高度的廢氣，是大人的幾倍。', en: 'A multiple for the air at a child’s height.' },
-        instead: { 'zh-TW': '矮的地方，廢氣一樣多或更多；照體重算，小孩吸進的空氣是大人的 1.5 到 2 倍。', en: 'Lower down the exhaust is the same or more; for their weight, children breathe 1.5 to 2 times the air an adult does.' },
+        no: { 'zh-TW': '國外量到的小孩高度倍數，或說每種風都一樣。', en: 'A child-height multiple measured abroad, or one said to hold in every wind.' },
+        instead: { 'zh-TW': '推估：風從機車吹來時，嬰兒車高度和大人鼻子差不多到兩倍；不是每種風都這樣。照體重算，小孩吸進的空氣是大人的 1.5 到 2 倍。', en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much; not in every wind. For their weight, children breathe 1.5 to 2 times the air an adult does.' },
       },
       {
         no: { 'zh-TW': '這排機車排出多少顆超細微粒。', en: 'A count of the ultrafine particles the pack gives off.' },
@@ -591,6 +595,16 @@ export default copy({
     questionsBody: { 'zh-TW': '用讀者自己的話問的問題，一題一頁。', en: 'Questions in readers’ own words, one page each.' },
   },
 
+  /** #smell-chemicals: the smell-chemicals step's facts, in three lists that never mix seconds-long and 30-minute / 1-hour values. */
+  smellChem: {
+    title: { 'zh-TW': '聞得到的時候，空氣裡還有什麼（推估）', en: 'When you can smell it, what else is in the air (estimate)' },
+    lead: { 'zh-TW': '本站用電腦算的推估，不是實測；數字都有範圍，是機車另外加進空氣裡的量。', en: 'Our own computer estimate, not a measurement; every number has a range and is what the scooters add to the air.' },
+    what: { 'zh-TW': '跟著味道來的，和那個味道是什麼', en: 'What comes with the smell, and what the smell is' },
+    seconds: { 'zh-TW': '幾秒鐘的量（不和平均值放在一起）', en: 'Seconds-long levels (never beside an average)' },
+    averages: { 'zh-TW': '30 分鐘或 1 小時的平均', en: '30-minute or 1-hour averages' },
+    estimate: { 'zh-TW': '數字、範圍和詳細表', en: 'The numbers, ranges and detail table' },
+    method: { 'zh-TW': '方法（研究檔案，英文）', en: 'The method (research file)' },
+  },
   context: {
     title: { 'zh-TW': '鏈外的背景資料', en: 'Background outside the chain' },
     lead: { 'zh-TW': '這幾項不屬於任何一環，是誰騎車、騎去哪裡這類背景。', en: 'These belong to no link of the chain; they are background, such as who rides and where to.' },

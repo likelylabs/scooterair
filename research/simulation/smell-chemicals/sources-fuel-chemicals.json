@@ -1,0 +1,404 @@
+{
+ "key": "sources-fuel-chemicals",
+ "checkedOn": "2026-11-27",
+ "role": "researcher 1: chemicals of unburnt fuel in petrol scooter and motorcycle exhaust",
+ "purpose": "Shares of harmful and odorous hydrocarbons in idle exhaust of four-stroke scooters/motorcycles, to multiply the simulation's unit exhaust (THC) tracer by. These are hazard-relevant compositions only: no cancer risk is computed, no chemical is ranked by harm, and nothing here is a concentration a person breathes until it is multiplied by the simulated dilution.",
+ "howToUse": "level_X(t) = THC level from the tracer (mass basis, as in stats.py / model.mjs where benzene = THC x benzeneFracTHC) x share_X / 100. Shares are mass fractions of THC. Where a source gives % of the SPECIATED NMHC (Kumar, Stockwell), the share of total THC is lower by the unspeciated fraction (unknown here; Tsai 2018's 67 species and the car literature suggest identified VOC are a large majority but not all of THC), so those values lean high. The existing model's benzeneFracTHC (1.2 / 2.7 / 5 %) is consistent with the range below (1.5 / 3 / 7 %).",
+ "cautions": [
+  "Idle data come from carburetted or unstated-technology bikes in Taiwan (one new engine, 2008), India (2017-18), Nepal (2015) and Bangkok (1999-2000). No modern catalysed Taiwanese scooter has a published idle speciation that I could open.",
+  "Bases differ (THC by a tail-gas analyser vs sum of 48-49 speciated NMHC). Yao 2008 does not state the THC detector; if it read hexane-equivalent rather than FID carbon, its shares would be overstated by the same factor. research/estimate/sources.json describes Yao's THC as FID; the paper text I read does not say so.",
+  "Toluene shares disagree five-fold between sources; styrene from Kumar is probably confounded with o-xylene.",
+  "Carry the simulation's own cautions: one simulated red per case, grid-limited seconds, held-wind condition, low to moderate confidence."
+ ],
+ "chemicals": [
+  {
+   "name": "benzene",
+   "casrn": "71-43-2",
+   "shareBasis": "weight % of exhaust THC/NMHC mass at idle (Yao: of THC as measured by the tail-gas analyser; Kumar and Stockwell: of the sum of 48-49 speciated C2-C10 NMHC, which overstates the share of total HC because unidentified and heavier HC are left out)",
+   "low": "1.5",
+   "central": "3",
+   "high": "7",
+   "unit": "% of THC mass",
+   "measuredOn": "Idle: Taiwan new 125 cc carburetted non-catalyst four-stroke engine (Yao 2008) 2.4-3.1 %; India 14 in-use two-wheelers incl. scooters (Kumar 2020) median 4.0 %, range 1.5-6.9 %; Nepal one carburetted rich four-stroke (Stockwell 2016) 3.5 %. Cycle-average Taiwan in-use four-strokes (Tsai 2018, not re-opened) about 2-3 % of VOC (chart reading). Taiwan national inventory 0.7-0.8 % of motorcycle HC (includes evaporative HC; biased low; not re-opened).",
+   "workings": "Yao: 764/31,900 = 2.39 %, 764/29,900 = 2.56 %, 918/31,900 = 2.88 %, 918/29,900 = 3.07 % (mg/L benzene over mg/L THC; the 20 vol% aromatics THC was only measured on fuel D). Low end = lowest single scooter in Kumar (1.47 %), above the inventory 0.77 % which is kept as context only. High end = highest single bike in Kumar (6.91 %). Central 3 % sits between the Taiwanese idle value (2.4-3.1 %) and the measured-NMHC-basis values (3.5-4.0 %), which overstate a THC share.",
+   "perFuel": "Yao idle 764-918 mg/L fuel = about 1.0-1.2 g/kg fuel (0.74 kg/L assumed); Stockwell single bike 2.10 g/kg.",
+   "rawExhaust": "Raw tailpipe benzene at idle: Bangkok four-strokes 11.7-32.9 ppm (Rungratanaubon 2007, Table 2); India two-wheelers 1.2-7.5 ppm, median 4.6 ppm (Kumar 2020 supplement).",
+   "confidence": "moderate (three independent idle data sets agree within a factor of about 2; none is a modern catalysed Taiwanese scooter)",
+   "sourceIds": [
+    "yao-2008",
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "tsai-2018",
+    "rungratanaubon-2007"
+   ]
+  },
+  {
+   "name": "toluene",
+   "casrn": "108-88-3",
+   "shareBasis": "weight % of exhaust THC/NMHC at idle (same bases as benzene)",
+   "low": "2",
+   "central": "10",
+   "high": "23",
+   "unit": "% of THC mass",
+   "measuredOn": "Idle: Yao 2008 1.7-3.4 % of THC (new non-catalyst engine); Kumar 2020 median 15.8 %, range 12.5-17.8 % of measured NMHC; Stockwell 2016 8.9 %. Cycle: Tsai 2003 abstract 100 mg/km of 344-433 mg/km four-stroke VOC (23-29 %, but the abstract's species values are not clearly matched to the totals).",
+   "workings": "Yao: 529/31,900 = 1.66 %; 1011/29,900 = 3.38 %. The sources disagree by a factor of about 5 (Yao vs Kumar); the range is kept wide rather than resolved. Central 10 % is about the geometric middle of Yao (2.5 %) and Kumar (16 %), close to Stockwell (8.9 %).",
+   "confidence": "low-moderate (large disagreement between sources)",
+   "sourceIds": [
+    "yao-2008",
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "tsai-2003-jawma",
+    "rungratanaubon-2007"
+   ]
+  },
+  {
+   "name": "ethylbenzene",
+   "casrn": "100-41-4",
+   "shareBasis": "weight % of speciated NMHC at idle",
+   "low": "1.4",
+   "central": "3",
+   "high": "5.6",
+   "unit": "% of THC mass",
+   "measuredOn": "Idle: Kumar 2020 median 4.7 %, range 3.2-5.6 %; Stockwell 2016 2.3 %. Cars only (flagged): MOVES 1.4-2.1 % of VOC. Named among main species by Tsai 2018 (no value).",
+   "confidence": "low-moderate (two motorcycle idle data sets, neither Taiwanese)",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "epa-moves-2016-toxics",
+    "tsai-2018"
+   ]
+  },
+  {
+   "name": "xylenes (m-, p-, o-)",
+   "casrn": "1330-20-7",
+   "shareBasis": "weight % of speciated NMHC at idle",
+   "low": "3.6",
+   "central": "10",
+   "high": "14.4",
+   "unit": "% of THC mass",
+   "measuredOn": "Idle: Kumar 2020 median 11.0 %, range 3.6-14.4 %; Stockwell 2016 10.7 %. Cars only (flagged): MOVES 5.6-7.8 % of VOC. Bangkok four-stroke idle xylene/benzene ppm ratio 0.26-0.65.",
+   "confidence": "low-moderate",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "epa-moves-2016-toxics",
+    "rungratanaubon-2007"
+   ]
+  },
+  {
+   "name": "1,3-butadiene",
+   "casrn": "106-99-0",
+   "shareBasis": "weight % of THC (Yao) or of speciated NMHC (Stockwell) at idle",
+   "low": "1",
+   "central": "1.5",
+   "high": "3.5",
+   "unit": "% of THC mass",
+   "measuredOn": "Idle: Yao 2008 353-358 mg/L vs THC 29.9-31.9 g/L = 1.1-1.2 % (Taiwan, new non-catalyst engine); Stockwell 2016 one rich carburetted bike 3.4 % of NMHC (2.04 g/kg); fleet FTIR 1.30 g/kg. NOT measured by Kumar 2020 or Tsai 2018. Yao's cruising value is only 7-8 mg/L, so idle is the condition that makes 1,3-butadiene.",
+   "workings": "353/31,900 = 1.11 %; 358/29,900 = 1.20 %. Only two sources, so the range is widened to 1-3.5 % with the central near the Taiwanese value.",
+   "confidence": "low (two sources, one of them a single very rich bike)",
+   "sourceIds": [
+    "yao-2008",
+    "stockwell-2016"
+   ]
+  },
+  {
+   "name": "n-hexane",
+   "casrn": "110-54-3",
+   "shareBasis": "weight % of speciated NMHC at idle",
+   "low": "0.1",
+   "central": "1.2",
+   "high": "3.1",
+   "unit": "% of THC mass",
+   "measuredOn": "Idle: Kumar 2020 median 1.6 %, range 0.13-3.1 %; Stockwell 2016 0.82 %. Cars only (flagged): MOVES 0.86-1.6 % of VOC.",
+   "confidence": "low-moderate",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "epa-moves-2016-toxics"
+   ]
+  },
+  {
+   "name": "styrene",
+   "casrn": "100-42-5",
+   "shareBasis": "weight % of speciated NMHC at idle",
+   "low": "0.1",
+   "central": "0.3",
+   "high": "3.8",
+   "unit": "% of THC mass",
+   "measuredOn": "Idle: Stockwell 2016 0.22 %; Kumar 2020 median 3.1 %, range 2.1-3.8 %. Cars only (flagged): MOVES 0.1-0.34 % of VOC.",
+   "workings": "Kumar's styrene is probably inflated: in the same samples o-xylene is only 0.09-0.94 ppm (median 0.22) against styrene 0.75-7.6 ppm (median 1.94), the reverse of normal petrol exhaust, which suggests o-xylene and styrene were not separated on the DB-1 column (my inference, not stated by the authors). Central therefore taken from Stockwell and the car values; Kumar kept only as the high end.",
+   "confidence": "low",
+   "sourceIds": [
+    "stockwell-2016",
+    "kumar-2020-acp",
+    "epa-moves-2016-toxics"
+   ]
+  },
+  {
+   "name": "naphthalene (gas phase)",
+   "casrn": "91-20-3",
+   "shareBasis": "fraction of VOC, US gasoline CARS only (no scooter or motorcycle gas-phase naphthalene measurement found)",
+   "low": "0.05",
+   "central": "0.2",
+   "high": "0.6",
+   "unit": "% of THC mass",
+   "measuredOn": "CARS ONLY, flagged: MOVES2014 Table 48 naphthalene gas-phase PAH/VOC = 2.07x10^-3 (0.21 %), from US light-duty gasoline vehicles (Kansas City study); MOVES applies it to motorcycles by assumption. The low/high are this value divided and multiplied by about 3 - an ASSUMED widening, not data.",
+   "confidence": "very low (car data, modelled; may be better reported as not estimated for scooters)",
+   "sourceIds": [
+    "epa-moves-2016-toxics"
+   ]
+  },
+  {
+   "name": "formaldehyde (carbonyl, not a hydrocarbon; included because it is in the same exhaust)",
+   "casrn": "50-00-0",
+   "shareBasis": "mass ratio to THC at idle",
+   "low": "0.5",
+   "central": "0.7",
+   "high": "1.5",
+   "unit": "% of THC mass (ratio, since formaldehyde is not part of THC)",
+   "measuredOn": "Idle: Yao 2008 219-228 mg/L vs THC 29.9-31.9 g/L = 0.69-0.76 %. Stockwell 2016 fleet FTIR 0.548 g/kg (most bikes below detection; only the scooter detectable per earlier record), Pulsar WAS 'bdl'. Cycle: Tsai 2018 carbonyls (15 species) 1.8-3.0 % of VOC.",
+   "confidence": "low",
+   "sourceIds": [
+    "yao-2008",
+    "stockwell-2016",
+    "tsai-2018"
+   ]
+  },
+  {
+   "name": "acetaldehyde (carbonyl; strong odour)",
+   "casrn": "75-07-0",
+   "shareBasis": "mass ratio to THC (Yao) or to speciated NMHC (Stockwell) at idle",
+   "low": "0.2",
+   "central": "0.4",
+   "high": "1.4",
+   "unit": "% of THC mass (ratio)",
+   "measuredOn": "Idle: Yao 2008 64-88 mg/L = 0.20-0.29 % of THC; Stockwell 2016 Pulsar 0.817 g/kg = 1.4 % of its NMHC sum.",
+   "confidence": "low",
+   "sourceIds": [
+    "yao-2008",
+    "stockwell-2016"
+   ]
+  },
+  {
+   "name": "aromatics (sum; the BTEX and C9 alkylbenzenes that dominate the 'petrol' smell of exhaust)",
+   "shareBasis": "weight % of speciated NMHC",
+   "low": "31",
+   "central": "42",
+   "high": "50",
+   "unit": "% of measured NMHC mass",
+   "measuredOn": "Idle: Kumar 2020 median 46.3 %, range 36.2-49.9 % (16 aromatics); Stockwell 2016 31.5 %. Cycle: Tsai 2018 38-48 % of 67 VOC (Taiwan, in-use four-strokes; not re-opened). BTEX alone: Kumar median 36.7 %, range 27.7-39.6 %; Stockwell 25.4 %.",
+   "confidence": "moderate",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "tsai-2018"
+   ]
+  },
+  {
+   "name": "alkanes / paraffins (sum; pentanes, methylpentanes, hexanes - the unburnt-fuel fraction)",
+   "shareBasis": "weight % of speciated NMHC",
+   "low": "15",
+   "central": "38",
+   "high": "54",
+   "unit": "% of measured NMHC mass",
+   "measuredOn": "Idle: Kumar 2020 median 36.5 %, range 24.8-53.8 % (22 alkanes); isopentane alone median 9.5 % (5.7-16.4 %). Cycle: Tsai 2018 paraffins 38-45 %. Hanoi idle motorcycles (Dominutti 2023): 'Light alkanes, mainly pentanes, dominate' (no number available). Stockwell Pulsar: 18 alkanes sum 14.7 %, i-pentane 3.3 % (very rich, ethylene-dominated sample; sets the low end).",
+   "confidence": "moderate",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "tsai-2018",
+    "dominutti-2023-vietnam",
+    "stockwell-2016"
+   ]
+  },
+  {
+   "name": "alkenes / olefins (sum, excluding acetylene)",
+   "shareBasis": "weight % of speciated NMHC",
+   "low": "4",
+   "central": "12",
+   "high": "45",
+   "unit": "% of measured NMHC mass",
+   "measuredOn": "Idle: Kumar 2020 median 10.0 %, range 4.0-23.1 % (10 alkenes; 1,3-butadiene not measured); Stockwell Pulsar ethylene 26.4 % + propylene 7.1 % + butenes, pentenes, 1,3-butadiene and propadiene: sum of 12 alkenes/dienes 41.2 % by my addition (very rich bike, MCE 0.60). Cycle: Tsai 2018 olefins 9.7-15 %. Acetylene additionally: Kumar median 3.9 % (0.25-23 %), Stockwell 11.9 %; Hanoi motorcycles 'emit a large amount of acetylene'.",
+   "confidence": "low-moderate (depends strongly on how rich the engine runs)",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "tsai-2018",
+    "dominutti-2023-vietnam"
+   ]
+  },
+  {
+   "name": "petrol VAPOUR (unburnt fuel evaporating, not exhaust) - for contrast",
+   "shareBasis": "weight % of 49 speciated NMHC in fuel-tank headspace",
+   "low": "n/a",
+   "central": "isopentane 51 %, n-pentane 12 %, 2-methylpentane 5 %, toluene 2.4 %, benzene 0.6 %, alkanes 93 %, aromatics 3.9 %",
+   "high": "n/a",
+   "unit": "% of measured NMHC mass (medians of 10 Indian petrol samples)",
+   "measuredOn": "Kumar 2020, headspace of petrol vehicle fuel tanks, Mohali, Aug 2020. Indian petrol, not Taiwanese. Shows that raw petrol vapour is mostly light alkanes with little benzene, whereas idle EXHAUST is aromatic-rich (aromatics about 45 % vs 4 %).",
+   "confidence": "moderate for India; Taiwanese petrol vapour not measured",
+   "sourceIds": [
+    "kumar-2020-acp"
+   ]
+  }
+ ],
+ "fuel": {
+  "taiwanGasolineLimits": {
+   "benzene_vol_pct_max": {
+    "from_2012": 1.0,
+    "from_2020_07_01_refinery_and_imports": 0.9,
+    "from_2024_01_01_refinery_and_imports_storage_by_2024_07_01": 0.8
+   },
+   "aromatics_vol_pct_max": 35,
+   "olefins_vol_pct_max": 18,
+   "sulfur_mg_per_kg_max": 10,
+   "oxygen_mass_pct_max": 2.7,
+   "vapour_pressure_kPa_max": 60,
+   "definition_aromatics": "Art. 2: benzene, toluene, ethylbenzene, xylenes and C9+ aromatics",
+   "sourceIds": [
+    "tw-fuel-standard-2020"
+   ],
+   "note": "Legal maxima for all grades (92/95/98 are not distinguished in the standard). CPC's own per-grade safety data sheets (data.gov.tw dataset 30130, host www3.cpc.com.tw) could not be read: the CPC host reset the connection."
+  },
+  "measuredTaiwanFuelExamples": [
+   {
+    "what": "Commercial 95-octane test fuel, Tsai et al. 2018",
+    "benzene": "0.52 % (unit basis not stated)",
+    "aromatics": "30.0 vol%",
+    "olefins": "10.8 %",
+    "MTBE": "10.2 %",
+    "sourceIds": [
+     "tsai-2018"
+    ],
+    "read": "repo full-text extraction, not re-opened (aaqr.org 403)"
+   },
+   {
+    "what": "Four refinery-blended test fuels, Yao et al. 2008",
+    "aromatics": "28.6, 22.0, 29.0, 21.0 vol% (fuels A-D)",
+    "sulfur": "149, 146, 48.5, 40.5 ppmw",
+    "octane": "95-97",
+    "sourceIds": [
+     "yao-2008"
+    ],
+    "read": "full text"
+   }
+  ],
+  "relevance": "Unburnt-fuel benzene scales with fuel benzene and exhaust benzene also forms from other aromatics (Yao 2008: lowering aromatics 30 -> 20 vol% cut idle benzene 17 % and toluene 48 %). Fuel benzene fell from 1.0 to 0.8 % v/v between 2012 and 2024, after most of the speciation studies above were done, so shares from older fuels may overstate today's benzene slightly; the size of that effect has not been measured for scooters."
+ },
+ "notEstimated": [
+  {
+   "name": "benzene, toluene etc. for a modern fuel-injected, catalysed Taiwanese scooter (Phase 6/7) at idle",
+   "why": "No speciated idle measurement of such a scooter was found. All idle data are carburetted (Yao, Stockwell, Bangkok) or of unstated technology (Kumar). Dhital et al. 2019 (Taiwan, carburettor vs fuel-injection with three-way catalyst) report only percentage reductions in the abstract (TWC cut BTEX 88 %); the full text was behind ScienceDirect (403). Whether a catalyst changes the SHARE of benzene in what remains is therefore unknown."
+  },
+  {
+   "name": "naphthalene for scooters/motorcycles",
+   "why": "Only US car data (MOVES) were found; the row above is car-based and assumption-widened. A downstream user may prefer to list naphthalene as not estimated."
+  },
+  {
+   "name": "heavier unburnt-fuel hydrocarbons (C10+), trimethylbenzene isomers as separate toxics, other PAH in the gas phase",
+   "why": "Not covered by the open idle data sets (Kumar and Stockwell stop at C10; Yao measured five toxics only)."
+  },
+  {
+   "name": "exact idle-mode VOC speciation of Taiwanese motorcycles (Tsai et al. 2003, Atmos. Environ. 37:2485, stage-resolved incl. idle)",
+   "why": "Full text and abstract were not available (ScienceDirect 403; abstract elided by the publisher in Semantic Scholar and absent in OpenAlex)."
+  }
+ ],
+ "blockedOrMissing": [
+  "aaqr.org (Aerosol and Air Quality Research) - HTTP 403 for PDFs and landing pages: Tsai 2018, Tsai/Yao 2017 full texts not re-opened",
+  "www.sciencedirect.com - HTTP 403: Tsai 2003 Atmos. Environ. (idle speciation), Dhital 2019 Atmos. Pollut. Res., Chiang 2008 J. Hazard. Mater., Dominutti 2023 supplement",
+  "www.tandfonline.com - HTTP 403: Tsai 2003 JAWMA full text (abstract obtained via NCBI E-utilities instead)",
+  "www.mdpi.com - HTTP 403: Tsai 2023 Atmosphere (inventory benzene share) not re-opened",
+  "www3.cpc.com.tw - connection reset: CPC 92/95/98 gasoline safety data sheets not read",
+  "data.zhenzhi.com - HTTP 403 (index page for Tsai 2003 AE)",
+  "www.koreascience.or.kr - empty reply: Korean Euro III motorcycle VOC/1,3-butadiene papers (Yoo et al. 2015) not read"
+ ],
+ "sources": [
+  {
+   "id": "yao-2008",
+   "citation": "Yao Y-C, Tsai J-H, Chang A-L, Jeng F-T (2008). Effects of sulfur and aromatic contents in gasoline on motorcycle emissions. Atmospheric Environment 42:6560-6564. doi:10.1016/j.atmosenv.2008.04.031",
+   "url": "https://scholars.lib.ntu.edu.tw/bitstreams/b3c5056c-1d88-476f-b5d3-3241ec7cdc55/download (NTU repository copy of the publisher PDF; DOI https://doi.org/10.1016/j.atmosenv.2008.04.031)",
+   "read": "full text (PDF from the NTU institutional repository, text extracted and Table 1 read)",
+   "whatWasMeasured": "One NEW 125 cm3 four-stroke carburetted motorcycle ENGINE without catalytic converter, engine dynamometer, cold-start, steady IDLE at 1718 +/- 105 rpm and cruising (4828 and 5763 rpm); four fuels blended by Taiwan's largest refinery: sulfur 40-150 ppmw, aromatics 21.0-29.0 vol%, octane 95-97. Criteria gases by an in-situ 'MEGA 300 Tail Gas Analyzer' over 5 min (detector principle for THC NOT stated in the paper); air toxics by GC/MS, carbonyls by DNPH/HPLC. Taiwan, published 2008 (grants 2005-2006).",
+   "keyFigure": "Section 3.1: 'The THC emission factors ranged from 29.9 to 31.9 g L-1-fuel' (idle); 'The CO emission factors ranged from 533 to 581 g L-1-fuel' (idle). Section 3.2 cruising: THC 8.5 to 14.7 g/L. Table 1 (mg per L fuel, Idle / Cruising): Benzene 30 vol% aromatics 918 / 303, 20 vol% 764 / 211; 1,3-Butadiene 353 / 8 and 358 / 7; Toluene 1011 / 648 and 529 / 379; Formaldehyde 219 / 126 and 228 / 129; Acetaldehyde 64 / 84 and 88 / 108. Text: 'In all test fuels, toluene and benzene represent the highest emissions among the target air toxics (Table 1).' Note: 'Because the data of THC was unstable during the idle test of Fuel B ... the test results for that low aromatic content fuels were not analyzed.'"
+  },
+  {
+   "id": "kumar-2020-acp",
+   "citation": "Kumar A, Sinha V, Shabin M, Hakkim H, Bonsang B, Gros V (2020). Non-methane hydrocarbon (NMHC) fingerprints of major urban and agricultural emission sources for use in source apportionment studies. Atmospheric Chemistry and Physics 20:12133-12152. doi:10.5194/acp-20-12133-2020",
+   "url": "https://acp.copernicus.org/articles/20/12133/2020/acp-20-12133-2020.pdf ; supplement https://acp.copernicus.org/articles/20/12133/2020/acp-20-12133-2020-supplement.zip (Supplementaryfile3mixingratiossamples.xlsx)",
+   "read": "full text (open access, CC BY) plus the supplement spreadsheet of per-vehicle tailpipe mixing ratios; per-vehicle mass shares recomputed by me from the 'Actual sample mixing ratios (ppb)' columns times molar mass",
+   "whatWasMeasured": "Tailpipe whole-air canister samples, IDLE after a 5 min warm-up (engine 70-90 C), sampled 'directly from the mouth of the exhaust tailpipe'; 14 petrol two-wheelers (Hero/Honda Splendor, Passion, Shine, CD Deluxe, CB Twister, Bajaj Platina, Royal Enfield Bullet, Honda Activa scooter, Bajaj scooter; i.e. Indian four-stroke motorcycles and scooters, catalyst fitment and model years not stated) and 9 petrol cars; Chandigarh and Mohali, India, March 2017 - October 2018; TD-GC-FID, 49 NMHC (22 alkanes, 16 aromatics, 10 alkenes, acetylene). 1,3-butadiene, carbonyls and C>10 compounds NOT measured. Also 10 headspace samples of petrol vapour from vehicle fuel tanks (August 2020).",
+   "keyFigure": "Sect. 3: 'The emissions from the tailpipes of two wheelers majorly comprised of toluene (16 %), i-pentane (11 %), m/p-xylene (10 %), acetylene (6 %), ethylbenzene (5 %), benzene (4 %) and 2,2-dimethylbutane (4 %).' 'Aromatics (44 %) and alkanes (42 %) were the major constituents of emissions from petrol vehicles' 'A high content of BTEX (34 %) in petrol exhaust'. My recomputation from the supplement (weight % of the 49 measured NMHC, 14 two-wheelers): benzene median 4.04, mean 4.15, range 1.47-6.91 (n=14); toluene median 15.81, mean 15.92, range 12.52-17.81 (n=14); ethylbenzene median 4.69, mean 4.57, range 3.22-5.59 (n=14); xylenes median 11.04, mean 10.45, range 3.61-14.41 (n=14); styrene median 3.07, mean 2.89, range 2.13-3.77 (n=14); n-hexane median 1.61, mean 1.67, range 0.13-3.08 (n=14); isopentane median 9.5, mean 10.65, range 5.68-16.36 (n=14); aromatics median 46.31, mean 44.39, range 36.21-49.86 (n=14); alkanes median 36.48, mean 38.52, range 24.79-53.84 (n=14); alkenes median 10.0, mean 10.81, range 3.95-23.11 (n=14); acetylene median 3.85, mean 6.28, range 0.25-23.19 (n=14). Raw tailpipe benzene 1.20-7.46 ppm (median 4.60), toluene 5.6-40.5 ppm (median 11.4). Petrol tank-headspace vapour: isopentane median 51.37, mean 49.38, range 35.25-54.35 (n=10); n-pentane median 12.37, mean 11.98, range 8.65-13.11 (n=10); benzene median 0.59, mean 0.6, range 0.45-0.86 (n=10); toluene median 2.35, mean 2.27, range 1.11-4.82 (n=10); alkanes median 92.74, mean 91.4, range 78.22-94.51 (n=10); aromatics median 3.85, mean 4.14, range 2.01-11.79 (n=10)."
+  },
+  {
+   "id": "stockwell-2016",
+   "citation": "Stockwell CE et al. (2016). Nepal Ambient Monitoring and Source Testing Experiment (NAMaSTE): emissions of trace gases and light-absorbing carbon from wood and dung cooking fires, garbage and crop residue burning, brick kilns, and other sources. Atmos. Chem. Phys. 16:11043-11081. doi:10.5194/acp-16-11043-2016",
+   "url": "https://acp.copernicus.org/articles/16/11043/2016/ ; supplement https://acp.copernicus.org/articles/16/11043/2016/acp-16-11043-2016-supplement.zip (acp-2016-154-sp.xlsx, Table S4)",
+   "read": "supplement Table S4 opened and read by me (per-bike emission factors, g per kg fuel); main-text figures taken from the earlier full-text read recorded in research/estimate/inputs-speciation-particles.json (finding nepal-idle-speciation), not re-read by me",
+   "whatWasMeasured": "Start-up and IDLE exhaust at the tailpipe of carburetted four-stroke motorcycles in a Kathmandu workshop, 2015, before and after servicing; FTIR for all bikes; whole-air canister GC (WAS) speciation for ONE bike only (Bajaj Pulsar, pre-service, MCE 0.598, i.e. very rich). Shares below are my division of each WAS species by the sum of the 48 non-methane hydrocarbons in that column.",
+   "keyFigure": "Table S4, column 'EF Pre-Service Bajaj Pulsar' (method FTIR+WAS), g/kg: CO 740.6; ethylene 15.70; acetylene 7.06; propylene 4.24; 1,3-butadiene 2.039; benzene 2.096; toluene 5.293; ethylbenzene 1.359; m/p-xylene 4.760; o-xylene 1.627; styrene 0.131; n-hexane 0.490; i-pentane 1.956; acetaldehyde 0.817; formaldehyde 'bdl'. My sums: 48 NMHC = 59.55 g/kg; benzene 3.52 %, toluene 8.89 %, ethylbenzene 2.28 %, xylenes 10.73 %, styrene 0.22 %, n-hexane 0.82 %, 1,3-butadiene 3.42 %, i-pentane 3.28 %, ethylene 26.4 %, acetylene 11.9 %, propylene 7.1 %, aromatics 31.5 % of NMHC mass; benzene = 13.8 % of BTEX. Main text (from repo record): fleet FTIR 1,3-butadiene 1.30 (SD 0.51) g/kg pre-service; 'aromatics account for ~31% of the NMHC'."
+  },
+  {
+   "id": "rungratanaubon-2007",
+   "citation": "Rungratanaubon T, Panich N (2007). Benzene Toluene and Xylene in Exhaust from Motorcycles. Research and Development Journal (Engineering Institute of Thailand) 18(3):74-78. Based on the 2000 Chulalongkorn MSc thesis, doi:10.58837/CHULA.THE.2000.1691",
+   "url": "https://ph02.tci-thaijo.org/index.php/eit-researchjournal/article/download/142669/105631",
+   "read": "full text (PDF, Tables 2-4 read)",
+   "whatWasMeasured": "44 in-use 100-150 cc motorcycles in Bangkok (two- and four-stroke; 17 four-stroke), IDLE only after at least 10 min warm-up, Tedlar bag at the tailpipe, GC-FID, Oct 1999 - Mar 2000; benzene, toluene and total xylenes only (no total hydrocarbon), so only ratios and raw concentrations are usable. Fuel 91 or 95 unleaded from the bikes' own tanks.",
+   "keyFigure": "Table 2 (ppm, four-stroke): benzene old 32.9, moderate 30.6, new 11.7; toluene 93.2, 45.6, 29.0; xylene 21.5, 7.9, 7.6. Two-stroke: benzene 116.2, 108.6, 83.2; toluene 261.7, 219.8, 192.8. Table 4 fuel-tank petrol (four-stroke bikes): benzene 11,335-12,053 ppm, toluene 76,670-82,310 ppm, xylene 35,256-41,981 ppm (unit basis of the fuel ppm not stated). Derived by me (mass ratio benzene/toluene = ppm ratio x 78.11/92.14): four-stroke 0.30 (old), 0.57 (moderate), 0.34 (new)."
+  },
+  {
+   "id": "chula-2001-2stroke-btex",
+   "citation": "ภราดา มีเงิน (2001). ปริมาณการปล่อยและชนิดของสารประกอบอินทรีย์ระเหยได้จากรถจักรยานยนต์ (Emission estimates and species of volatile organic compounds from motorcycles). M.Eng. thesis, Chulalongkorn University. doi:10.58837/CHULA.THE.2001.1372",
+   "url": "https://digital.car.chula.ac.th/chulaetd/64301",
+   "read": "abstract only (repository record page)",
+   "whatWasMeasured": "10 TWO-stroke motorcycles in Thailand, idle, on-road and chassis dynamometer, charcoal tubes, GC-FID; BTEX only.",
+   "keyFigure": "Abstract: BTEX/THC ratios in exhaust 8.46 %, 16.54 %, 0.83 % and 2.72 % (listed in the order benzene, toluene, ethylbenzene, xylene); average before-maintenance EFs 790.458, 1550.108, 74.946, 244.856 mg/km. Two-stroke only: context for the minority of two-strokes, not for four-stroke shares."
+  },
+  {
+   "id": "tsai-2003-jawma",
+   "citation": "Tsai J-H, Liu Y-Y, Yang C-Y, Chiang H-L, Chang L-P (2003). Volatile organic profiles and photochemical potentials from motorcycle engine exhaust. J. Air & Waste Manage. Assoc. 53(5):516-522. doi:10.1080/10473289.2003.10466199",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/12774984/ (abstract retrieved through the NCBI E-utilities efetch interface for PMID 12774984)",
+   "read": "abstract only (Taylor & Francis full text returned HTTP 403)",
+   "whatWasMeasured": "Chassis dynamometer, ECE cycle with stage samples (idle, acceleration, 30 and 50 km/h cruise, deceleration); 10 new and 15 in-use Taiwanese Phase III two- and four-stroke motorcycles.",
+   "keyFigure": "'The dominant volatile organic carbon (VOC) species were isopentane (53 and 295 mg/km, 2- and 4-stroke, respectively), 2-methylpentane (75 and 83 mg/km), 3-methylpentane (34 and 66 mg/km), and toluene (30 and 100 mg/km). The VOC emission factors for the 2-/4-stroke motorcycles were 311/344 (new) and 1479/433 (in-use) mg/km'. 'formaldehyde (0.4 and 0.7 mg/km ...), acetaldehyde (0.6 and 1.2 mg/km)'. The abstract does not say whether the species values are for new or in-use bikes; isopentane 295 of 344-433 mg/km (68-86 %) looks inconsistent with the other studies, so these are NOT used as shares."
+  },
+  {
+   "id": "tsai-2018",
+   "citation": "Tsai J-H, Yao Y-C, Huang P-H, Chiang H-L (2018). Fuel Economy and Volatile Organic Compound Exhaust Emission for Motorcycles with Various Running Mileages. Aerosol and Air Quality Research 18:3056-3067. doi:10.4209/aaqr.2018.07.0264",
+   "url": "https://doi.org/10.4209/aaqr.2018.07.0264",
+   "read": "NOT re-opened by me (aaqr.org returned HTTP 403 to both the PDF and the landing page). Figures are from the earlier full-text extraction in the main repository (research/papers/tsai-2018-aaqr.json, readLevel 'full text', checker verdicts CONFIRMED/CORRECTED) and the abstract quoted there.",
+   "whatWasMeasured": "43 in-use Taiwanese four-stroke motorcycles (Phase III-V), chassis dynamometer, whole ECE cycle (780 s incl. 240 s idle, not separated), CVS bag, 52 VOC by GC/MS plus 15 carbonyls; 95-octane commercial fuel with 0.52 % benzene, 30.0 vol% aromatics, 10.8 % olefins, 10.2 % MTBE.",
+   "keyFigure": "Abstract: 'paraffins (38-45%), olefins (9.7-15%), aromatics (38-48%), and carbonyls (1.8-3.0%)' of the 67 measured VOC; 'Toluene, isopentane, m,p-xylene, o-xylene, 1-butene, 1,2,4-trimethylbenzene, ethylbenzene, n-pentane, and benzene were the main VOCs'. Total VOC 25.2 (abstract) or 19.1 (text) to 47.1 g/L fuel. Benzene has NO printed value; the repo extraction reads it from Fig. 5(c) as about 0.7-1 g/L (visual), i.e. roughly 2-3 % of total VOC (chart reading). Fuel: 'benzene content was 0.52%'."
+  },
+  {
+   "id": "tsai-2017",
+   "citation": "Yao Y-C (or Tsai J-H) et al. (2017). Criteria Pollutants and Volatile Organic Compounds Emitted from Motorcycle Exhaust under Various Regulation Phases. Aerosol and Air Quality Research 17. doi:10.4209/aaqr.2016.04.0155",
+   "url": "https://doi.org/10.4209/aaqr.2016.04.0155 (abstract read via the OpenAlex API record for this DOI)",
+   "read": "abstract only (aaqr.org returned HTTP 403)",
+   "whatWasMeasured": "40 in-use Taiwanese four-stroke motorcycles, Phases III-V, chassis dynamometer, ECE cycle, 52 VOC.",
+   "keyFigure": "'The total VOC emissions of Phase V motorcycles were the lowest (0.59 g km-1) ... the fraction of VOC groups was similar among all test motorcycles regardless of different regulation phases. ... the emissions of benzene, toluene, ethylbenzene, and xylene (BTEX) decreased by 37-58% and 44-62%, respectively, for Phases IV and V motorcycles compared to those of Phase III'."
+  },
+  {
+   "id": "dominutti-2023-vietnam",
+   "citation": "Dominutti PA, Hopkins JR, Shaw M, Mills GP, Le HA, Huy DH, Forster GL, Keita S, Hien TT, Oram DE (2023). Evaluating major anthropogenic VOC emission sources in densely populated Vietnamese cities. Environmental Pollution 318:120927. doi:10.1016/j.envpol.2022.120927",
+   "url": "https://hal.science/hal-03912788/document (author accepted manuscript, CC BY 4.0)",
+   "read": "full text of the accepted manuscript; supplement (Table S3 with the per-source emission factors) NOT available to me (ScienceDirect returned HTTP 403)",
+   "whatWasMeasured": "Near-source plume samples about 1 m from the source, Hanoi, including five four-stroke motorcycles, all at IDLE; Vietnamese fleet (only about 6 % of motorcycles with catalysts, per the paper citing Ly et al. 2020).",
+   "keyFigure": "Sect. 3.4: 'Light alkanes, mainly pentanes, dominate the VOC profiles from motorcycles emissions and reveal a more significant contribution of heavy alkanes from older motorcycles. Motorcycles were found to emit a large amount of acetylene'; 'pentanes representing the largest fraction of total VOC mass, responsible for up to 34% of emissions' (across sources). Sect. 3.5: 'As for motorcycles, higher isopentane and 224-TMP and lower toluene ethylbenzene, propane, and butane emissions are depicted'. No numeric benzene share in the main text: qualitative support only."
+  },
+  {
+   "id": "epa-moves-2016-toxics",
+   "citation": "US EPA (2016). Air Toxic Emissions from On-road Vehicles in MOVES2014. EPA-420-R-16-016.",
+   "url": "https://19january2017snapshot.epa.gov/sites/production/files/2016-11/documents/420r16016.pdf",
+   "read": "full text (PDF; Section 1.2, Tables 14, 15, 48 read)",
+   "whatWasMeasured": "US light-duty GASOLINE CAR data (model years 2000 and earlier for Tables 14-15; Kansas City Light-duty Vehicle Emissions Study for PAH), modelled as fractions of VOC; the report says these light-duty rates 'are applied to all gasoline vehicles, including motorcycles' - an assumption, not a motorcycle measurement.",
+   "keyFigure": "Table 14 (MY<=2000, E0 / E10, fraction of VOC): ethylbenzene 0.02147 / 0.01932; hexane 0.01570 / 0.01593; styrene 0.00108 / 0.00097; toluene 0.09619 / 0.08657; xylene 0.07814 / 0.07032. Table 15 (MTBE gasoline, winter / RFG): ethylbenzene 0.01398 / 0.01484; n-hexane 0.00861 / 0.00888; styrene 0.00328 / 0.00340; toluene 0.09873 / 0.10494; xylene 0.05557 / 0.05910. Table 48 (ethanol < 20 %): naphthalene gaseous phase PAH/VOC 2.07x10^-3."
+  },
+  {
+   "id": "tw-fuel-standard-2020",
+   "citation": "Environmental Protection Administration, Executive Yuan (Taiwan). 移動污染源燃料成分管制標準 (Mobile Source Fuel Composition Control Standard), amended and issued 20 March 2020 (環署空字第1090019185號), Article 3 gasoline tables.",
+   "url": "https://6laws.net/6law/law3/移動污染源燃料成分管制標準.htm ; table images .../law3images/移動污染源燃料成分管制標準/image003.png, image005.png, image007.png",
+   "read": "full text of the regulation on an unofficial mirror; the three gasoline tables are images, which I opened and read (image005 and image007 this session; image003 per the earlier record). Not checked against the official gazette or law.moj.gov.tw.",
+   "whatWasMeasured": "Legal maximum composition of commercial gasoline in Taiwan (not a measurement).",
+   "keyFigure": "image007: 苯含量 0.8% (v/v) 最大值; 硫含量 10 mg/kg; 蒸氣壓 60 kPa; 氧含量 2.7% (m/m); 芳香烴含量 35% (v/v); 烯烴含量 18% (v/v); 備註(二) 煉油廠製造之汽油應於中華民國一百十三年一月一日起符合本標準值 ... 油料儲銷設備應於一百十三年七月一日前完成換儲作業; (三) 進口之汽油應於中華民國一百十三年一月一日起符合本標準值. image005: 苯含量 0.9% (v/v), aromatics 35%, olefins 18%; refinery from 民國109年7月1日 (1 Jul 2020). image003 (earlier record): 苯含量 1.0% (v/v) (from 2012). Art. 2: 芳香烴含量 means benzene, toluene, ethylbenzene, xylenes and C9+ aromatics."
+  }
+ ],
+ "workingFiles": "Per-vehicle recomputation of Kumar 2020 and Stockwell 2016 supplements: scripts kumar.py and stock.py in the session scratchpad (fcscripts/); not committed."
+}

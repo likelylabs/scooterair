@@ -279,10 +279,10 @@ export default copy({
 
   /** Words drawn in lane J's pictures (Picture.astro). */
   pictures: {
-    waitingToo: { 'zh-TW': '他也在等', en: 'He is waiting too' },
+    waitingToo: { 'zh-TW': '他也在等', en: 'They’re waiting too' },
     kerbAlt: {
       'zh-TW': '路邊的近景。推嬰兒車的大人、用手摀住鼻子的小學生和阿嬤，站在左邊。最近一輛機車的車尾在右邊，騎士也在等。',
-      en: 'The kerb, close. A parent with a pushchair, a schoolchild covering her nose and an older woman stand on the left. The tail of the nearest scooter is on the right, its rider waiting too.',
+      en: 'The kerb, close. A parent with a pushchair, a schoolchild covering their nose and an older woman stand on the left. The tail of the nearest scooter is on the right, its rider waiting too.',
     },
     kerbElectricAlt: {
       'zh-TW': '同一個路邊，機車換成電動的。沒有排氣管，只剩街上原本就有的空氣，和一輛汽車自己的一小團廢氣。',
@@ -332,7 +332,7 @@ export default copy({
     kicker: { 'zh-TW': '給里長和議員的一頁說明', en: 'A one-page brief for borough chiefs and councillors' },
     title: { 'zh-TW': '紅燈時，機車旁邊的空氣：|量到的，和算的', en: 'The air beside scooters at a red light: |measured, and worked out' },
     kerbHead: { 'zh-TW': '一排機車停在旁邊，路邊多一層廢氣', en: 'A row of scooters adds a layer of exhaust at the kerb' },
-    /** Then checkSentence(), estimateText.whoCoOnly (while farBelowWho()), estimateText.coMarksBenzene and estimateText.benzeneWho. */
+    /** Then checkSentence(), estimateText.checkIsEstimate, estimateText.whoCoOnly, and estimateText.coMarksBenzene. The WHO's 'no safe level of benzene' is not printed here: this paragraph carries per-red values (statements-smell must-not 2). */
     checkLead: {
       'zh-TW': '運研所在 {sites} 個路口的行人等候區放了儀器。',
       en: 'The Institute of Transportation put sensors where pedestrians wait at {sites} junctions.',
@@ -343,7 +343,11 @@ export default copy({
     rowIotSub: { 'zh-TW': '運研所，{n} 個路口，最高的一分鐘', en: 'Institute of Transportation, {n} junctions, highest minute' },
     rowEst: { 'zh-TW': '紅燈時，十來輛機車旁邊', en: 'Beside a dozen scooters at a red light' },
     rowEstSub: { 'zh-TW': '90 秒平均，含街上原本就有的', en: '90-second average, including what the street already holds' },
-    who: { 'zh-TW': '上面整張圖，只占這條長條最左邊的一小段。長條的右端是世界衛生組織 15 分鐘指引值：約 {ppm} ppm，只看一氧化碳。', en: 'The whole chart above fits in the small piece at the left of this bar. Its right end is the WHO 15-minute guideline: about {ppm} ppm, for carbon monoxide only.' },
+    /** Statement 1 and the exception, around the EstimateValue of sim.co.oneRed15 ({range}); the 推估 chip「推估・電腦算的一個紅燈」opens the line. */
+    simLine: {
+      'zh-TW': '電腦算的一個紅燈，在一般的街上，一氧化碳的 15 分鐘平均多{range}。例外：嬰兒車停在排氣管正後方半公尺、幾乎沒風，連續 15 分鐘每個紅燈都在，可能超過指引值（這樣的 15 分鐘，約十次有一到兩次；很少見，信心低）。',
+      en: 'In the simulated red light on an ordinary street, carbon monoxide adds {range} to a 15-minute average. Exception: a pushchair half a metre behind a tailpipe, in almost no wind, through every red for 15 minutes, can pass it (1 or 2 in 10 such periods; rare; low confidence).',
+    },
     axis: { 'zh-TW': '一氧化碳（ppm）', en: 'Carbon monoxide (ppm)' },
     tableHead: { 'zh-TW': '這排機車多出來多少', en: 'What the scooters add' },
     tableScenario: { 'zh-TW': '旁邊停了幾輛', en: 'Scooters beside you' },

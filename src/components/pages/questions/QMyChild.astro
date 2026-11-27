@@ -2,12 +2,13 @@
 /**
  * /questions/my-child/ — 我的小孩呢？ (brief 7.5; home screen 8)
  *   1  G8, the heights. The number is a breathing-rate fact (air per kilogram), never a number
- *      for child height; K4 is the quiet line.
+ *      for child height. The quiet line is statement 5 of the simulation (pushchair height, with
+ *      the wind from the scooters, not in every wind), which replaces K4.
+ *   +  The pushchair exception (statement 3), one idea per line, #pushchair.
  *   +  The back-seat answer, marked as measured abroad and as our inference for Taiwan.
  */
 import type { Locale } from '@/i18n';
 import { href } from '@/i18n';
-import { kSentences } from '@/i18n/ui';
 import Screen from '@/components/ui/Screen.astro';
 import HowSheet from '@/components/ui/HowSheet.astro';
 import HowButton from '@/components/ui/HowButton.astro';
@@ -16,6 +17,8 @@ import NextButton from '@/components/ui/NextButton.astro';
 import Phrased from '@/components/ui/Phrased.astro';
 import HeightsScene from '@/components/art/HeightsScene.astro';
 import { fact } from '@/data/facts';
+import { simStamp } from '@/data/simulation';
+import SimText from '@/components/pages/estimate/SimText.astro';
 import questions from '@/i18n/pages/questions';
 import { factText, filler, questionNumbers } from './q';
 
@@ -29,18 +32,36 @@ const nums = questionNumbers(locale);
 const child = { lo: nums.childLo, hi: nums.childHi };
 const s1 = questions.myChild.s1;
 const back = questions.myChild.backSeat;
+const pc = questions.myChild.pushchair;
 const air = factText('child-air-per-kg', locale);
 ---
 
-<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale], child)} quiet={kSentences.K4[locale]} illustration>
+<Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale], child)} quiet={s1.quiet[locale]} illustration>
   <HeightsScene slot="picture" locale={locale} />
   <KindChip slot="chips" locale={locale} of={fact('child-air-per-kg')} />
-  <HowSheet slot="sheet" id="how-1" locale={locale} kind="study" facts="child-air-per-kg" primary={{ href: href('/evidence/#link-6', locale) }}>
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="study" facts={['child-air-per-kg', 'sim-pushchair-height']} primary={{ href: href('/evidence/#link-6', locale) }} secondary={{ href: href('/estimate/#simulation', locale), label: pc.moreLink[locale] }}>
     <p slot="block1">{f(s1.sheet.b1[locale])}</p>
     <p slot="block2">{air.statement}</p>
     <p slot="block3">{air.caveat}</p>
   </HowSheet>
 </Screen>
+
+<section class="q-also" id="pushchair" aria-labelledby="pushchair-h">
+  <h2 class="q-also__q" id="pushchair-h"><Phrased text={pc.q[locale]} locale={locale} /></h2>
+  <div class="q-also__lines">
+    <p class="q-also__a q-also__gloss">{pc.gloss[locale]}</p>
+    {pc.lines.map((l) => <p class="q-also__a">{l[locale]}</p>)}
+  </div>
+  <div class="q-also__foot">
+    <KindChip locale={locale} kind="estimate" />
+    <HowButton locale={locale} sheet="how-3" />
+  </div>
+  <HowSheet id="how-3" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} facts="sim-co-pushchair-exception">
+    <p slot="block1">{pc.sheet.b1[locale]}</p>
+    <SimText slot="block2" locale={locale} text={pc.sheet.b2[locale]} slots={{ middle: 'sim.co.pushchairMiddle' }} />
+    <p slot="block3">{pc.sheet.b3[locale]}</p>
+  </HowSheet>
+</section>
 
 <section class="q-also" id="back-seat" aria-labelledby="back-seat-h">
   <h2 class="q-also__q" id="back-seat-h"><Phrased text={back.q[locale]} locale={locale} /></h2>
@@ -76,6 +97,14 @@ const air = factText('child-air-per-kg', locale);
     line-height: var(--lh-headline);
     letter-spacing: 0;
     text-wrap: balance;
+  }
+  .q-also__lines {
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 40rem;
+  }
+  .q-also__gloss {
+    color: var(--ink-2);
   }
   .q-also__a {
     margin: 0;

@@ -1,6 +1,6 @@
 # What a pedestrian breathes beside idling scooters at a red light: the published estimate
 
-**Status: ESTIMATE (推估), not a measurement.** Signed 2026-11-26. Nobody has measured what a person standing at a Taiwanese kerb beside a pack of idling scooters breathes during one red light. This document explains how we estimated it, how far it can be trusted, and what it cannot say.
+**Status: ESTIMATE (推估), not a measurement.** Signed 2026-11-26. **Amended 2026-11-27** after the signed 3-D simulation (`research/simulation/METHOD.md` §8): the 90-second figures are unchanged; the statements in §1 (heights, the upper tail), §8 (heights, second-by-second peaks) and §9 (fair comparisons) are amended as marked. Nobody has measured what a person standing at a Taiwanese kerb beside a pack of idling scooters breathes during one red light. This document explains how we estimated it, how far it can be trusted, and what it cannot say.
 
 - Model: `research/estimate/model.mjs`. It is dependency-free. Run it with `node model.mjs`, which takes about 10 s; `node model.mjs --write` does the full run and writes `results.json`.
 - Complete record: `research/estimate/results.json` holds every scenario, the exact `estimate()` call that reproduces it, the validation runs, the sensitivity runs and the test cases. A text copy of the full run is in `results.txt`.
@@ -12,11 +12,13 @@ All values below are **increments above the air the street already holds**. Each
 
 | Scooters queued beside you | CO (ppm) | Benzene (ppb) | PM2.5 (µg/m³) | Ultrafine particle number | Child/pushchair height |
 |---|---|---|---|---|---|
-| A few (2–5), nearest 2–4 m | 0.007 / **0.06** / 0.3 | 0.01 / **0.1** / 0.8 | 0.02 / **0.2** / 2 | not estimated | not estimated |
-| A dozen or so (8–20), nearest 0.7–3 m | 0.05 / **0.3** / 1 | 0.09 / **0.6** / 3 | 0.09 / **0.9** / 7 | not estimated | not estimated |
-| A full stop box (25–45), nearest 0.3–1.5 m | 0.1 / **0.5** / 2 | 0.2 / **1** / 5 | 0.2 / **2** / 10 | not estimated | not estimated |
+| A few (2–5), nearest 2–4 m | 0.007 / **0.06** / 0.3 | 0.01 / **0.1** / 0.8 | 0.02 / **0.2** / 2 | not estimated | see §8 (amended) |
+| A dozen or so (8–20), nearest 0.7–3 m | 0.05 / **0.3** / 1 | 0.09 / **0.6** / 3 | 0.09 / **0.9** / 7 | not estimated | see §8 (amended) |
+| A full stop box (25–45), nearest 0.3–1.5 m | 0.1 / **0.5** / 2 | 0.2 / **1** / 5 | 0.2 / **2** / 10 | not estimated | see §8 (amended) |
 
 Values are rounded to one significant figure, which is how they may be published. Unrounded values are in `results.json`.
+
+*Amended 2026-11-27 (simulation, `research/simulation/METHOD.md` §8).* The P95 is **the upper end of typical reds, not the worst red**. With the wind held from the pack for a whole red, kerb 90-second means at 0.5–4 m are 3–12 ppm (simulation case S1-from), 3–11 times the median here and above its P95; at 0.5 m directly downwind of one tailpipe in near-calm air the window mean is 30–54 ppm at pushchair height (NF1-fine). Child/pushchair height column: about the same or higher; up to about twice when the wind blows from the scooters to you, and many times higher right behind a tailpipe in near-calm air; not in every wind (see §8).
 
 What the street already holds:
 
@@ -213,12 +215,12 @@ Dozen scenario, median CO increment at 1.5 m, with one input pinned at its P5 an
   - The model's number (a few hundred per cm³ for a dozen scooters) is a lower bound of unknown size.
   - The models disagree by about 200 times depending on route.
   - The chart shows ultrafine particles as **unmeasured and unestimated**.
-- **Child or pushchair height: not estimated as a number.**
+- **Child or pushchair height: not estimated as a number here; simulated since (amended 2026-11-27).**
   - The model gives 0.6 m / 1.5 m ratios of 1.3–1.6 (P5–P95 1.1–3.3), but these rest on an assumed initial plume depth.
   - Borrowed measurements say the same or higher: +5–15% for NO2 at 0.8 m (Kenagy 2016) and about 1.6 times for a diesel tailpipe (Buzzard 2009).
-  - The publishable statement is: "probably the same or higher at a child's or pushchair's height; by how much is unknown."
-- **The time course within the red: not published.** The modelled build-up is set by an assumed arrival law. The one measured red-phase series (Shanghai particles) falls through the red, because of the pull-away from the previous green. The pull-away burst at green is not modelled at all.
-- **Second-by-second peaks.** These are not modelled: there are 90-s means only. Brief plume hits of a few ppm CO within a red are expected but not quantified.
+  - ~~The publishable statement is: "probably the same or higher at a child's or pushchair's height; by how much is unknown."~~ Replaced by the simulation (`research/simulation/METHOD.md` §4.9, §8): "about the same or higher at a child's or pushchair's height; up to about twice when the wind blows from the scooters to you, and many times higher right behind a tailpipe in near-calm air". Not in every wind (the street-canyon cases, which are not settled, gave 0.6–0.7). Published only as statement 5 of `research/simulation/statements.json`, marked Estimate.
+- **The time course within the red: not published.** The modelled build-up is set by an assumed arrival law. The one measured red-phase series (Shanghai particles) falls through the red, because of the pull-away from the previous green. The pull-away burst at green is not modelled at all. *(2026-11-27: the simulation's one-second series show bursts, not a build-up; the pull-away is still not simulated.)*
+- **Second-by-second peaks.** ~~These are not modelled: there are 90-s means only. Brief plume hits of a few ppm CO within a red are expected but not quantified.~~ *Amended 2026-11-27:* this model gives 90-s means only, but the simulation (`research/simulation/METHOD.md` §8) gives the highest 1 s as about 5–30 ppm at 0.5 m in ordinary cases and 100–300 ppm in held or near-calm wind, probably higher at pushchair height (grid). Always marked Estimate and never compared with a 15-minute or 1-hour guideline.
 - **Other traffic.** Cars, buses and lorries in the same queue, and moving cross traffic, are excluded. These are scooter-only increments.
 - **A particular junction.** The results are distributions over generic Taiwanese approaches.
 - **Emissions of scooters under 5 years old.** These are assumed; no reading exists.
@@ -228,8 +230,8 @@ Dozen scenario, median CO increment at 1.5 m, with one input pinned at its P5 an
 
 **Fair:**
 
-- **CO against the WHO 15-minute guideline** (100 mg/m³, about 87 ppm). Even the full-box P95 (2 ppm) is about 1/40 of it, and the dozen median is about 1/300. Fair as "far below".
-- **CO against Taiwan's 1-hour standard** (31 ppm) and the WHO 1-hour value (35 mg/m³, about 30 ppm), as "far below".
+- **CO against the WHO 15-minute guideline** (100 mg/m³, about 87 ppm). Even the full-box P95 (2 ppm) is about 1/40 of it, and the dozen median is about 1/300. Fair as "far below". *Amended 2026-11-27:* for the published 90-second figures and for a pedestrian waiting one red, after conversion (one 90-s red counts one tenth of a 15-minute mean). Not for brief peaks, not for people who stay at the kerb through every red, and not for a pushchair parked directly behind a tailpipe in near-calm air (`research/simulation/METHOD.md` §8).
+- **CO against Taiwan's 1-hour standard** (31 ppm) and the WHO 1-hour value (35 mg/m³, about 30 ppm), as "far below". *Amended 2026-11-27:* for one red after conversion (one 90-s red counts 1/40 of an hour). For people who stay through every red with the wind held from the pack see `research/simulation/METHOD.md` §4.8; the exception is a pushchair 0.5 m behind one tailpipe in held near-calm air, which passes 31 ppm in most such hours (low confidence; not printed on the site, per `statements.json`).
 - **CO and benzene against the city's own background.** Same order as the urban background.
 - **The total against the annual mean at Taiwanese traffic stations** (0.54 ppm), as an order-of-magnitude analogy: "like a busy roadside".
 - **Benzene against Taipei on-road commuter exposure**, as an analogy of scale: about 2.6 ppb for cyclists and about 4.2 ppb for electric-scooter riders (Wu 2021, chart reading).
@@ -239,7 +241,7 @@ Dozen scenario, median CO increment at 1.5 m, with one input pinned at its P5 an
 
 - 8-hour, 24-hour or annual standards (for example the WHO 24-h CO 4 mg/m³, or annual PM2.5).
 - Cancer unit risks or lifetime risk from 90 seconds.
-- The benzene OEHHA "1-hour REL", which is unverified and has an uncertain averaging time.
+- The benzene OEHHA "1-hour REL", which is unverified and has an uncertain averaging time. *Amended 2026-11-27:* now verified (8.5 ppb, 1 h, derived on a 6-h basis; ARB table of 2025-07-18, opened for the simulation). Still not fair for one red. Fair for people who stay an hour, with its 6-hour flag, and reached in the simulation (`research/simulation/METHOD.md` §4.8).
 - The ATSDR 14-day MRL.
 - The WHO particle-number "high" marker.
 - "× background" multipliers as a headline.
@@ -264,7 +266,7 @@ Dozen scenario, median CO increment at 1.5 m, with one input pinned at its P5 an
 | Box model: IOT queue wrong by ~12 times; mass check tautological; inconsistent with its own plume check (all) | Accepted. The box model is not used for values. It is an upper bound only, and its "agrees with IOT" and "mass balance closes" claims are withdrawn. |
 | Empirical model: leave-one-out has no skill; a 50/50 mixture is not a probability interval; route B is assumption-driven (all) | Accepted. Only route A is used, as a cross-check. The mixture median is not used. |
 | "Typical" means different things in different models (communication) | Scenarios are now named by queue size. |
-| OEHHA REL comparison; WHO particle-number marker comparison (communication) | Removed. |
+| OEHHA REL comparison; WHO particle-number marker comparison (communication) | Removed. (OEHHA REL restored 2026-11-27 for people who stay an hour, see §9.) |
 
 ## 11. Confidence by pollutant
 

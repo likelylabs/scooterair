@@ -4,10 +4,11 @@
  * screen 11, 5.2). Replaces SceneCompare.
  *
  * Ten scooters at the kerb, in two rows. Each can be a petrol scooter (with
- * its dark core and its cluster of marks) or an electric one (a motor in the
- * wheel, a green light strip, nothing behind it but three grey dots at the
- * tyre). The people at the kerb and one car with its own small plume stay
- * whatever the slider says. The street's own air is not drawn (air.ts).
+ * its puff of fume and a wisp) or an electric one (a plain hub, a light strip,
+ * no tailpipe and no fume behind it; the first one is named 電動機車 in words). The people at the kerb and one car
+ * with its own small puff of exhaust stay whatever the slider says; the car's
+ * puff is named on the picture (汽車排的氣, a thin line into it). Tyre and brake
+ * dust is left to the words. The street's own air is not drawn (air.ts).
  *
  * The slider is <SwapControl> (put it in the Screen's `controls` slot); the
  * two talk through the Screen (data-swap-n) and swap.client.ts. On arrival the
@@ -28,10 +29,11 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { art, fill } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
-import { air, airTyreDust, unitsPerPx, type Box, AIR_KEY } from './air';
-import { CAR_TAILPIPE, artId, car, figureBoxes, person, rider, scooter } from './parts';
-import { ROW_CLASS, pickSources, put, tailOf, tyreOf, withoutSources, type Placed } from './kit';
-import { sceneAlt } from './scene';
+import SceneLabel from './SceneLabel.astro';
+import { air, unitsPerPx, type Box } from './air';
+import { CAR_TAILPIPE, artId, car, person, rider, scooter } from './parts';
+import { ROW_CLASS, pickSources, put, tailOf, withoutSources, type Placed } from './kit';
+import { leader, sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
@@ -40,7 +42,7 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  /** the label on the car's exhaust (default true; false for a thumbnail or a share card) */
   legend?: boolean;
 }
 const { locale, legend = true, play = true, tag = false, id, class: cls } = Astro.props;
@@ -64,11 +66,14 @@ const a = air({
   id: artId('air'),
   tailpipes: pack.map(tailOf),
   cars: [{ x: carAt.x + CAR_TAILPIPE.x * carAt.s, y: carAt.y + CAR_TAILPIPE.y * carAt.s, dir: 1, scale: 1.25 }],
-  avoid: [...figureBoxes('stroller', people.parent, people.ground), ...figureBoxes('schoolchild', people.child, people.ground)],
 });
 
 /** The parts of scooter i: what only the petrol one has, what only the electric one has, and the rider both share. */
 const gasOnly = (i: number, inner: string) => `<g class="swap-gas${i < value ? ' is-off' : ''}" data-swap-i="${i}">${inner}</g>`;
+// A petrol scooter's wisps blow back onto the scooter behind it in its row (index i - 2). When that
+// one is electric they are hidden, so no electric scooter seems to give off fume.
+const wisps = (i: number, inner: string) =>
+  i < 2 ? gasOnly(i, inner) : `<g class="swap-gas${i - 2 < value ? ' is-off' : ''}" data-swap-i="${i}" data-swap-left="${i - 2}">${inner}</g>`;
 const evOnly = (i: number, inner: string) => `<g class="swap-ev${i < value ? ' is-on' : ''}" data-swap-i="${i}">${inner}</g>`;
 const rowArt = (row: 1 | 2) =>
   // every core of the row first, so no scooter is buried by its neighbour's
@@ -83,8 +88,7 @@ const rowArt = (row: 1 | 2) =>
         evOnly(i, at(scooter({ kind: 'electric' }))) +
         at(rider({ face: i === 0 })) +
         '</g>' +
-        gasOnly(i, pickSources(a.marks, (k) => k === i)) +
-        evOnly(i, airTyreDust(tyreOf(q), upp, i + 1))
+        wisps(i, pickSources(a.marks, (k) => k === i))
       );
     })
     .join('');
@@ -100,12 +104,23 @@ const street = [
 const folk = put(people.parent, people.ground, person('stroller'), { cls: 'a-figure' }) + put(people.child, people.ground, person('schoolchild'), { cls: 'a-figure' });
 // the car keeps its own small core and cluster, whatever the slider says
 const carCore = a.cores.match(/<g class="air-core air-core--car".*?<\/g>/)?.[0] ?? '';
-const scene = a.defs + street + put(carAt.x, carAt.y, car(), { s: carAt.s, cls: 'a-row-2' }) + carCore + withoutSources(a.marks) + rowArt(2) + rowArt(1) + folk;
+// the car's puff, named in the empty sky above the far pavement, with a thin line down into it
+const carPipe = { x: carAt.x + CAR_TAILPIPE.x * carAt.s, y: carAt.y + CAR_TAILPIPE.y * carAt.s };
+// (anchored at the right edge, so at 大 / 特大 it grows leftward and never off the picture)
+const LBL = { x: VB.x + VB.w - 8, y: VB.y + 10 };
+const lead = legend ? leader(VB.x + VB.w - 110, LBL.y + 36, carPipe.x + 30, carPipe.y - 6, upp) : '';
+// the first scooter to go electric (front row, left) is named on the pavement under it, in words,
+// with a thin line up to its wheel; label and line show only while it is electric
+const EV = { x: front[0].x + 4, y: VB.y + VB.h - 6 };
+const evLead = legend ? evOnly(0, leader(EV.x + 40, EV.y - 34, front[0].x + 60, -14, upp)) : '';
+const scene = a.defs + street + put(carAt.x, carAt.y, car(), { s: carAt.s, cls: 'a-row-2' }) + carCore + withoutSources(a.marks) + rowArt(2) + rowArt(1) + folk + lead + evLead;
 const alt = sceneAlt(locale, fill(art.swap.alt, locale, { total: TOTAL }), { kind: 'electric' });
 ---
 
-<SceneFrame locale={locale} legend={legend && ([...AIR_KEY, 'car', 'tyre'] as const)} box={VB} alt={alt} tag={tag} drift arrive={play} id={id} class={['scene--swap', cls].filter(Boolean).join(' ')} data-swap-total={TOTAL} data-swap-rest={value} data-swap-n={value} data-swap-play={play ? 'true' : undefined}>
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} drift arrive={play} id={id} class={['scene--swap', cls].filter(Boolean).join(' ')} data-swap-total={TOTAL} data-swap-rest={value} data-swap-n={value} data-swap-play={play ? 'true' : undefined}>
   <Fragment set:html={scene} />
+  {legend && <SceneLabel slot="labels" box={VB} x={LBL.x} y={LBL.y} anchor="end top" max={40} plate class="fume-label">{art.fume.carLabel[locale]}</SceneLabel>}
+  {legend && <SceneLabel slot="labels" box={VB} x={EV.x} y={EV.y} anchor="start bottom" max={44} plate class={`swap-ev${0 < value ? ' is-on' : ''}`} data-swap-i="0">{art.words.electric[locale]}</SceneLabel>}
 </SceneFrame>
 
 <script>

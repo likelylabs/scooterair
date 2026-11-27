@@ -1,0 +1,95 @@
+== S1  window 30.0-120.0  domain top 24.0
+  IN up=1.5 h=1.5          u +0.44 v +0.15 w -0.03  speed 0.46
+  K d=0.5 dx=0.0 h=1.1     u +0.88 v +0.12 w -0.02  speed 0.88
+  K d=1.0 dx=0.0 h=1.1     u +0.50 v -0.21 w -0.23  speed 0.54
+  K d=2.0 dx=0.0 h=1.1     u +1.04 v +0.05 w -0.01  speed 1.04
+  K d=4.0 dx=0.0 h=1.1     u +1.32 v +0.01 w -0.09  speed 1.32
+  KL y=-0.2 x=-10 h=1.1    u +0.73 v -0.01 w -0.01  speed 0.73
+  KL y=-0.2 x=-4 h=1.1     u +0.87 v +0.14 w +0.00  speed 0.88
+  KL y=-0.2 x=2 h=1.1      u +0.89 v +0.22 w -0.12  speed 0.92
+  nearest-scooter share of K d=0.5 h=1.1 mean: 0.0002880075332672762
+  nearest-scooter share of K d=1.0 h=1.1 mean: 1.3279389215107366e-05
+  nearest-scooter share of K d=2.0 h=1.1 mean: 8.740388757839366e-09
+  nearest-scooter share of K d=4.0 h=1.1 mean: 6.981666305605042e-14
+  K0.5 h0.7: CO mean P50 0.694  max1 P50 4.5  peak/mean 6.49  THC max1 P50 2.04 ppmC  OU6800 share>=1/5/30 P50 0.23/0.00/0.00  OU800 >=5 0.00
+  K0.5 h1.1: CO mean P50 1.39  max1 P50 15  peak/mean 10.79  THC max1 P50 6.79 ppmC  OU6800 share>=1/5/30 P50 0.29/0.10/0.00  OU800 >=5 0.00
+  K0.5 h1.5: CO mean P50 1.17  max1 P50 15.4  peak/mean 13.14  THC max1 P50 6.95 ppmC  OU6800 share>=1/5/30 P50 0.24/0.09/0.00  OU800 >=5 0.00
+  A1 worst 0.61 %  max exhaust fraction at any probe 0.0135
+  A6 IN: dir 19  U 0.46  sw/U 0.38099873655633465  sw 0.17551644849873477
+  A8 tracer change last 20 s: {'s_box1': 0.02113012734303379, 's_box2': 0.03360124342956139, 's_head': 0.019489564904289863, 's_kerbcol': 0.04073509389438262}
+== S2  window 20.0-110.0  domain top 24.0
+  IN up=1.5 h=1.5          u +0.27 v +0.18 w -0.04  speed 0.33
+  K d=0.5 dx=0.0 h=1.1     u +0.64 v +0.07 w +0.01  speed 0.64
+  K d=1.0 dx=0.0 h=1.1     u +0.31 v -0.15 w -0.16  speed 0.34
+  K d=2.0 dx=0.0 h=1.1     u +0.72 v +0.04 w -0.04  speed 0.72
+  K d=4.0 dx=0.0 h=1.1     u +0.79 v +0.01 w -0.03  speed 0.79
+  KL y=-0.2 x=-10 h=1.1    u +0.57 v +0.10 w +0.03  speed 0.58
+  KL y=-0.2 x=-4 h=1.1     u +0.63 v +0.09 w +0.03  speed 0.63
+  KL y=-0.2 x=2 h=1.1      u +0.65 v +0.15 w -0.12  speed 0.66
+  nearest-scooter share of K d=0.5 h=1.1 mean: 0.025978584724976283
+  nearest-scooter share of K d=1.0 h=1.1 mean: 3.227168245827962e-05
+  nearest-scooter share of K d=2.0 h=1.1 mean: 1.581645011594679e-09
+  nearest-scooter share of K d=4.0 h=1.1 mean: 1.4600831452651206e-19
+  K0.5 h0.7: CO mean P50 0.367  max1 P50 3.76  peak/mean 10.27  THC max1 P50 1.66 ppmC  OU6800 share>=1/5/30 P50 0.11/0.00/0.00  OU800 >=5 0.00
+  K0.5 h1.1: CO mean P50 0.371  max1 P50 5.35  peak/mean 14.44  THC max1 P50 2.31 ppmC  OU6800 share>=1/5/30 P50 0.11/0.01/0.00  OU800 >=5 0.00
+  K0.5 h1.5: CO mean P50 0.496  max1 P50 4.7  peak/mean 9.47  THC max1 P50 2.01 ppmC  OU6800 share>=1/5/30 P50 0.20/0.00/0.00  OU800 >=5 0.00
+  A1 worst 0.61 %  max exhaust fraction at any probe 0.0150
+  A6 IN: dir 33  U 0.33  sw/U 0.1646169355249209  sw 0.054085841300149706
+  A8 tracer change last 20 s: {'s_box1': -0.06971875575610537, 's_box2': -0.08833584280608114, 's_head': 0.12084565738462436, 's_kerbcol': -0.00790809494745633, 's_queue': -0.06295821376426455}
+== S1-from  window 20.0-110.0  domain top 15.200000000000001
+  IN up=1.5 h=1.5          u -0.28 v -0.89 w -0.05  speed 0.93
+  K d=0.5 dx=0.0 h=1.1     u +0.13 v -0.54 w +0.05  speed 0.55
+  K d=1.0 dx=0.0 h=1.1     u +0.09 v -0.72 w +0.11  speed 0.73
+  K d=2.0 dx=0.0 h=1.1     u +0.02 v -0.66 w +0.05  speed 0.66
+  K d=4.0 dx=0.0 h=1.1     u -0.12 v -0.62 w +0.02  speed 0.63
+  KL y=-0.2 x=-10 h=1.1    u +0.15 v +0.12 w +0.21  speed 0.19
+  KL y=-0.2 x=-4 h=1.1     u +0.12 v -0.75 w +0.19  speed 0.76
+  KL y=-0.2 x=2 h=1.1      u -0.14 v -0.98 w +0.04  speed 1.00
+  nearest-scooter share of K d=0.5 h=1.1 mean: 0.31886051156679
+  nearest-scooter share of K d=1.0 h=1.1 mean: 0.37479921788516174
+  nearest-scooter share of K d=2.0 h=1.1 mean: 0.3712765574432977
+  nearest-scooter share of K d=4.0 h=1.1 mean: 0.26342178282603934
+  K0.5 h0.7: CO mean P50 11.5  max1 P50 27.2  peak/mean 2.36  THC max1 P50 12.8 ppmC  OU6800 share>=1/5/30 P50 0.97/0.88/0.00  OU800 >=5 0.00
+  K0.5 h1.1: CO mean P50 8.79  max1 P50 28.5  peak/mean 3.24  THC max1 P50 13.3 ppmC  OU6800 share>=1/5/30 P50 0.84/0.66/0.01  OU800 >=5 0.00
+  K0.5 h1.5: CO mean P50 6.34  max1 P50 22.9  peak/mean 3.61  THC max1 P50 10.4 ppmC  OU6800 share>=1/5/30 P50 0.76/0.50/0.00  OU800 >=5 0.00
+  A1 worst 0.64 %  max exhaust fraction at any probe 0.0097
+  A6 IN: dir -107  U 0.93  sw/U 0.1666793405965721  sw 0.15476041207550315
+  A8 tracer change last 20 s: {'s_box1': 0.12396253086098814, 's_box2': 0.06713604614441626, 's_head': -0.049283169812556864, 's_kerbcol': 0.05959542284298119}
+== S5-12  window 20.0-80.0  domain top 15.200000000000001
+  IN up=1.5 h=1.5          u -0.31 v -0.40 w +0.02  speed 0.50
+  K d=0.5 dx=0.0 h=1.1     u +0.07 v +0.07 w +0.13  speed 0.09
+  K d=1.0 dx=0.0 h=1.1     u -0.02 v +0.06 w +0.05  speed 0.07
+  K d=2.0 dx=0.0 h=1.1     u -0.05 v +0.06 w -0.00  speed 0.07
+  K d=4.0 dx=0.0 h=1.1     u -0.02 v +0.04 w -0.04  speed 0.04
+  KL y=-0.2 x=-10 h=1.1    u -0.24 v -0.07 w -0.08  speed 0.25
+  KL y=-0.2 x=-4 h=1.1     u +0.02 v -0.02 w +0.15  speed 0.02
+  KL y=-0.2 x=2 h=1.1      u +0.12 v -0.18 w -0.06  speed 0.22
+  nearest-scooter share of K d=0.5 h=1.1 mean: 0.9272768205043315
+  nearest-scooter share of K d=1.0 h=1.1 mean: 0.9380520753481174
+  nearest-scooter share of K d=2.0 h=1.1 mean: 0.9354747120327092
+  nearest-scooter share of K d=4.0 h=1.1 mean: 0.9616906458285358
+  K0.5 h0.7: CO mean P50 10.2  max1 P50 35.9  peak/mean 3.51  THC max1 P50 17.4 ppmC  OU6800 share>=1/5/30 P50 0.68/0.58/0.18  OU800 >=5 0.07
+  K0.5 h1.1: CO mean P50 8.5  max1 P50 30.4  peak/mean 3.58  THC max1 P50 14.6 ppmC  OU6800 share>=1/5/30 P50 0.77/0.50/0.12  OU800 >=5 0.00
+  K0.5 h1.5: CO mean P50 7.23  max1 P50 20.8  peak/mean 2.87  THC max1 P50 9.9 ppmC  OU6800 share>=1/5/30 P50 0.63/0.52/0.00  OU800 >=5 0.00
+  A1 worst 0.59 %  max exhaust fraction at any probe 0.0187
+  A6 IN: dir -128  U 0.50  sw/U 0.06944905234526384  sw 0.034850674310645285
+  A8 tracer change last 20 s: {'s_box1': 0.14461313040070686, 's_box2': 0.15443450868099856, 's_head': 0.1862951424981605, 's_kerbcol': 0.17710307342503837}
+== A  window 30.0-60.0  domain top 15.200000000000001
+  IN up=1.5 h=1.5          u +1.65 v -1.17 w +0.07  speed 2.02
+  K d=0.5 dx=0.0 h=1.1     u +0.80 v -0.24 w +0.16  speed 0.83
+  K d=1.0 dx=0.0 h=1.1     u +0.90 v -0.80 w +0.36  speed 1.20
+  K d=2.0 dx=0.0 h=1.1     u +0.85 v -0.57 w -0.03  speed 1.03
+  K d=4.0 dx=0.0 h=1.1     u +1.19 v -0.65 w -0.10  speed 1.35
+  KL y=-0.2 x=-10 h=1.1    u +0.94 v -0.51 w -0.05  speed 1.07
+  KL y=-0.2 x=-4 h=1.1     u +0.71 v -0.25 w +0.25  speed 0.75
+  KL y=-0.2 x=2 h=1.1      u +0.87 v -0.43 w +0.08  speed 0.97
+  nearest-scooter share of K d=0.5 h=1.1 mean: 0.03966860712702394
+  nearest-scooter share of K d=1.0 h=1.1 mean: 0.11702210888979198
+  nearest-scooter share of K d=2.0 h=1.1 mean: 0.032580632789383196
+  nearest-scooter share of K d=4.0 h=1.1 mean: 2.205705377402719e-06
+  K0.5 h0.7: CO mean P50 5.51  max1 P50 10.5  peak/mean 1.91  THC max1 P50 4.6 ppmC  OU6800 share>=1/5/30 P50 1.00/0.60/0.00  OU800 >=5 0.00
+  K0.5 h1.1: CO mean P50 3.18  max1 P50 8.76  peak/mean 2.75  THC max1 P50 3.67 ppmC  OU6800 share>=1/5/30 P50 0.87/0.20/0.00  OU800 >=5 0.00
+  K0.5 h1.5: CO mean P50 1.29  max1 P50 4.41  peak/mean 3.43  THC max1 P50 1.9 ppmC  OU6800 share>=1/5/30 P50 0.53/0.00/0.00  OU800 >=5 0.00
+  A1 worst 0.65 %  max exhaust fraction at any probe 0.0047
+  A6 IN: dir -35  U 2.02  sw/U 0.13811151130738433  sw 0.2787117456230063
+  A8 tracer change last 20 s: {'s_box1': 0.2798183796819006, 's_box2': 0.335047496054586, 's_head': 0.4076178053140595, 's_kerbcol': 0.45043440723143346, 's_queue': 0.5166775968288451}

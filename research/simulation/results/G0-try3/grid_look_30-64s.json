@@ -1,0 +1,252 @@
+{
+ "window_fast_s": [
+  30.0,
+  64.0
+ ],
+ "window_coarse_s": [
+  30.0,
+  64.0
+ ],
+ "what": "P50 over emission draws of CO increment; fast = 5 cm kerb-lane tailpipes, 10 cm near the headline scooter; coarse = one level coarser",
+ "A3_limits_for_reference": {
+  "mean": 0.2,
+  "max10s": 0.3,
+  "max1s": 0.5
+ },
+ "rows": [
+  {
+   "probe": "K d=0.5 dx=0.0 h=0.7",
+   "mean": {
+    "fast_ppm": 0.5582393155499484,
+    "coarse_ppm": 0.8914856991655694,
+    "coarse_over_fast": 1.5969597166178164
+   },
+   "max10s": {
+    "fast_ppm": 1.619554598159962,
+    "coarse_ppm": 2.124091443939994,
+    "coarse_over_fast": 1.3115281487596995
+   },
+   "max1s": {
+    "fast_ppm": 5.306821375348379,
+    "coarse_ppm": 7.772819554592224,
+    "coarse_over_fast": 1.4646846021045805
+   }
+  },
+  {
+   "probe": "K d=0.5 dx=0.0 h=1.1",
+   "mean": {
+    "fast_ppm": 0.7286178598267308,
+    "coarse_ppm": 0.8195254437017796,
+    "coarse_over_fast": 1.1247671638143308
+   },
+   "max10s": {
+    "fast_ppm": 2.0474272152375987,
+    "coarse_ppm": 2.279532947608466,
+    "coarse_over_fast": 1.1133645829475467
+   },
+   "max1s": {
+    "fast_ppm": 6.3196901776012915,
+    "coarse_ppm": 5.3781337812787235,
+    "coarse_over_fast": 0.8510122537874244
+   }
+  },
+  {
+   "probe": "K d=0.5 dx=0.0 h=1.5",
+   "mean": {
+    "fast_ppm": 0.979188217436666,
+    "coarse_ppm": 0.9410747905907171,
+    "coarse_over_fast": 0.961076505857349
+   },
+   "max10s": {
+    "fast_ppm": 2.1651107113104224,
+    "coarse_ppm": 2.3421875697984316,
+    "coarse_over_fast": 1.0817865144553436
+   },
+   "max1s": {
+    "fast_ppm": 5.741932360287055,
+    "coarse_ppm": 8.173398369767181,
+    "coarse_over_fast": 1.423457793807688
+   }
+  },
+  {
+   "probe": "K d=1.0 dx=0.0 h=0.7",
+   "mean": {
+    "fast_ppm": 0.13899020511307006,
+    "coarse_ppm": 0.34004353703883317,
+    "coarse_over_fast": 2.4465287806590688
+   },
+   "max10s": {
+    "fast_ppm": 0.32892818914588834,
+    "coarse_ppm": 0.8857353704969131,
+    "coarse_over_fast": 2.6927925295696262
+   },
+   "max1s": {
+    "fast_ppm": 0.5935013462133923,
+    "coarse_ppm": 1.904164869614637,
+    "coarse_over_fast": 3.2083581305475217
+   }
+  },
+  {
+   "probe": "K d=1.0 dx=0.0 h=1.1",
+   "mean": {
+    "fast_ppm": 0.295497917839633,
+    "coarse_ppm": 0.38747222914201196,
+    "coarse_over_fast": 1.3112519775936071
+   },
+   "max10s": {
+    "fast_ppm": 0.7956371510115654,
+    "coarse_ppm": 1.1425444306848997,
+    "coarse_over_fast": 1.4360119172819918
+   },
+   "max1s": {
+    "fast_ppm": 4.065717770885269,
+    "coarse_ppm": 2.999887468927569,
+    "coarse_over_fast": 0.7378494125710978
+   }
+  },
+  {
+   "probe": "K d=1.0 dx=0.0 h=1.5",
+   "mean": {
+    "fast_ppm": 0.4955979004216443,
+    "coarse_ppm": 0.41682183046819044,
+    "coarse_over_fast": 0.8410484187151865
+   },
+   "max10s": {
+    "fast_ppm": 1.3178623980575495,
+    "coarse_ppm": 1.0335479806366616,
+    "coarse_over_fast": 0.7842609229613423
+   },
+   "max1s": {
+    "fast_ppm": 4.2405481960688975,
+    "coarse_ppm": 2.767672394494463,
+    "coarse_over_fast": 0.6526685387186897
+   }
+  },
+  {
+   "probe": "K d=2.0 dx=0.0 h=0.7",
+   "mean": {
+    "fast_ppm": 0.08118133380194709,
+    "coarse_ppm": 0.026804184637140044,
+    "coarse_over_fast": 0.3301766968073289
+   },
+   "max10s": {
+    "fast_ppm": 0.2707082464749824,
+    "coarse_ppm": 0.08668226108307461,
+    "coarse_over_fast": 0.32020546921567605
+   },
+   "max1s": {
+    "fast_ppm": 1.0915534638328854,
+    "coarse_ppm": 0.5111564271479336,
+    "coarse_over_fast": 0.46828345480491335
+   }
+  },
+  {
+   "probe": "K d=2.0 dx=0.0 h=1.1",
+   "mean": {
+    "fast_ppm": 0.13055529023563764,
+    "coarse_ppm": 0.052116322432092924,
+    "coarse_over_fast": 0.3991896639196222
+   },
+   "max10s": {
+    "fast_ppm": 0.4359425490818767,
+    "coarse_ppm": 0.1573211668837286,
+    "coarse_over_fast": 0.3608759163680104
+   },
+   "max1s": {
+    "fast_ppm": 2.135628051345849,
+    "coarse_ppm": 0.6290117710557579,
+    "coarse_over_fast": 0.2945324541225059
+   }
+  },
+  {
+   "probe": "K d=2.0 dx=0.0 h=1.5",
+   "mean": {
+    "fast_ppm": 0.09041563185623487,
+    "coarse_ppm": 0.09247478529515847,
+    "coarse_over_fast": 1.0227743079006266
+   },
+   "max10s": {
+    "fast_ppm": 0.20085874865131298,
+    "coarse_ppm": 0.21974784229687416,
+    "coarse_over_fast": 1.0940416774095925
+   },
+   "max1s": {
+    "fast_ppm": 0.9916111641259697,
+    "coarse_ppm": 1.1159214782975315,
+    "coarse_over_fast": 1.1253619550372165
+   }
+  },
+  {
+   "probe": "KL y=-0.2 x=-10 h=0.7",
+   "mean": {
+    "fast_ppm": 2.419515958089179,
+    "coarse_ppm": 2.4697459910773096,
+    "coarse_over_fast": 1.0207603644109873
+   },
+   "max10s": {
+    "fast_ppm": 4.2708817746131436,
+    "coarse_ppm": 3.844326968240584,
+    "coarse_over_fast": 0.9001248854725797
+   },
+   "max1s": {
+    "fast_ppm": 14.666539361276554,
+    "coarse_ppm": 12.982729136988244,
+    "coarse_over_fast": 0.8851937609267253
+   }
+  },
+  {
+   "probe": "KL y=-0.2 x=-4 h=0.7",
+   "mean": {
+    "fast_ppm": 0.5925350269688292,
+    "coarse_ppm": 0.8960915886670326,
+    "coarse_over_fast": 1.512301463849448
+   },
+   "max10s": {
+    "fast_ppm": 1.6998958938510227,
+    "coarse_ppm": 2.127217656445011,
+    "coarse_over_fast": 1.2513811370094636
+   },
+   "max1s": {
+    "fast_ppm": 6.043196638893011,
+    "coarse_ppm": 7.231289751784232,
+    "coarse_over_fast": 1.1966001081687214
+   }
+  },
+  {
+   "probe": "SRC b1c0 d=0.25",
+   "mean": {
+    "fast_ppm": 20.424247317442415,
+    "coarse_ppm": 13.644137908463605,
+    "coarse_over_fast": 0.6680362657384902
+   },
+   "max10s": {
+    "fast_ppm": 33.3877027621175,
+    "coarse_ppm": 18.98555395371227,
+    "coarse_over_fast": 0.5686391210854357
+   },
+   "max1s": {
+    "fast_ppm": 65.56918113211728,
+    "coarse_ppm": 33.41293647990989,
+    "coarse_over_fast": 0.5095829458749099
+   }
+  },
+  {
+   "probe": "SRC b1c0 d=0.5",
+   "mean": {
+    "fast_ppm": 27.64082799449872,
+    "coarse_ppm": 18.355208181933442,
+    "coarse_over_fast": 0.6640614451052852
+   },
+   "max10s": {
+    "fast_ppm": 40.195481882395526,
+    "coarse_ppm": 24.424344311467266,
+    "coarse_over_fast": 0.6076390471677473
+   },
+   "max1s": {
+    "fast_ppm": 78.70616774062647,
+    "coarse_ppm": 37.22597725650061,
+    "coarse_over_fast": 0.47297407973384714
+   }
+  }
+ ]
+}

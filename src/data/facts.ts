@@ -36,6 +36,8 @@ import { formatCitation, shortCitation, sourceUrl } from './sources.ts';
 import { economics } from './facts-economics.ts';
 import { inspection, intersection, smell, acute, longterm, vulnerable, levers } from './facts-redlight.ts';
 import { kerb, masks } from './facts-air.ts';
+import { simulation } from './facts-simulation.ts';
+import { smellChemicals } from './facts-smell.ts';
 
 export interface FactInput {
   /** Raw values for charts and calculations. May be empty for qualitative facts (e.g. an IARC group). */
@@ -2391,9 +2393,9 @@ const standards = {
 const hazard = {
   'iarc-gasoline-exhaust-2b': {
     data: {},
-    display: t('第 2B 級', 'Group 2B'),
+    display: t('第2B類', 'Group 2B'),
     statement: t(
-      '國際癌症研究機構（IARC）把汽油引擎的廢氣，列為「可能對人類致癌」（第 2B 級）。從 1989 年評估到現在，都沒變。',
+      '國際癌症研究機構（IARC）把汽油引擎的廢氣，列為「可能對人類致癌」的第2B類。從 1989 年評估到現在，都沒變。',
       'The International Agency for Research on Cancer (IARC) lists petrol-engine exhaust as "possibly carcinogenic to humans" (Group 2B), unchanged since it was assessed in 1989.',
     ),
     period: t('2012 年重新評估（專論第 105 卷）', 'Re-evaluated 2012 (Monographs Vol. 105)'),
@@ -2404,7 +2406,7 @@ const hazard = {
     evidence: 'international',
     readerKind: 'official',
     caveat: t(
-      '第 2B 級比柴油廢氣的第 1 級弱；柴油廢氣的分級，不能套在燃油機車（汽油引擎）的廢氣上。IARC 分的是「會不會致癌」，不是平常吸到的量有多危險。',
+      '第2B類比柴油廢氣的第1類弱；柴油廢氣的分類，不能套在燃油機車（汽油引擎）的廢氣上。IARC 分的是「會不會致癌」的證據有多強，不是平常吸到的量有多危險。',
       'Group 2B is weaker than diesel exhaust\'s Group 1, and the diesel grade does not apply to exhaust from petrol scooters. IARC rates whether something can cause cancer, not how risky everyday amounts are.',
     ),
     requiresCaveat: true,
@@ -2414,9 +2416,9 @@ const hazard = {
   },
   'iarc-diesel-exhaust-group1': {
     data: {},
-    display: t('第 1 級', 'Group 1'),
+    display: t('第1類', 'Group 1'),
     statement: t(
-      'IARC 把柴油引擎的廢氣，列為「對人類致癌」（第 1 級）。因為有足夠的證據顯示，吸柴油廢氣和得肺癌的風險變高有關。',
+      'IARC 把柴油引擎的廢氣，列為「對人類致癌」的第1類。因為有足夠的證據顯示，吸柴油廢氣和得肺癌的風險變高有關。',
       'IARC lists diesel-engine exhaust as "carcinogenic to humans" (Group 1), because there is enough evidence that breathing it is linked to a higher risk of lung cancer.',
     ),
     period: t('2012 年（專論第 105 卷）', '2012 (Monographs Vol. 105)'),
@@ -2435,9 +2437,9 @@ const hazard = {
   },
   'iarc-outdoor-air-pollution-group1': {
     data: {},
-    display: t('第 1 級', 'Group 1'),
+    display: t('第1類', 'Group 1'),
     statement: t(
-      'IARC 把室外的空氣污染和裡面的懸浮微粒，列為「對人類致癌」（第 1 級）。因為有足夠的證據顯示，它會讓人得肺癌。',
+      'IARC 把室外的空氣污染和裡面的懸浮微粒，列為「對人類致癌」的第1類。因為有足夠的證據顯示，它會讓人得肺癌。',
       'IARC lists outdoor air pollution, and the particles in it, as "carcinogenic to humans" (Group 1), because there is enough evidence that it causes lung cancer.',
     ),
     period: t('2013 年（專論第 109 卷）', '2013 (Monographs Vol. 109)'),
@@ -2456,14 +2458,14 @@ const hazard = {
   },
   'iarc-benzene-group1': {
     data: {},
-    display: t('第 1 級', 'Group 1'),
+    display: t('第1類', 'Group 1'),
     statement: t(
-      '國際癌症研究機構（IARC）把苯列為「對人類致癌」（第 1 級）。苯會讓大人得急性骨髓性白血病。汽油和汽油引擎的廢氣裡都有苯。',
-      'The International Agency for Research on Cancer (IARC) lists benzene as "carcinogenic to humans" (Group 1); it causes acute myeloid leukaemia in adults. Benzene is in petrol and in petrol-engine exhaust.',
+      '國際癌症研究機構（IARC）把苯列為「確定會讓人致癌」的第1類，苯會讓大人得急性骨髓性白血病。這是說「證據有多強」，不是說平常吸到的量有多少風險。汽油引擎廢氣整體被列為第2B類（「可能致癌」）。',
+      'The International Agency for Research on Cancer (IARC) puts benzene in Group 1, ‘causes cancer in humans’; it causes acute myeloid leukaemia in adults. That describes how strong the evidence is, not the risk from everyday amounts. Petrol-engine exhaust as a whole is Group 2B, ‘possibly causes cancer’.',
     ),
     period: t('2017 年評估，2018 年出版（專論第 120 卷）', 'Evaluated 2017, published 2018 (Monographs Vol. 120)'),
     place: NOT_PLACE,
-    sources: ['iarc-vol120-benzene', 'lancet-onc-2017-benzene'],
+    sources: ['iarc-vol120-benzene', 'lancet-onc-2017-benzene', 'iarc-pr213-2012'],
     locator: 'Vol. 120 §6: "Benzene is carcinogenic to humans (Group 1)." "Benzene causes acute myeloid leukaemia in adults."',
     confidence: 'verified',
     evidence: 'international',
@@ -3084,6 +3086,8 @@ export const factGroups = {
   levers,
   kerb,
   masks,
+  simulation,
+  smellChemicals,
 };
 export type Topic = keyof typeof factGroups;
 
@@ -3112,6 +3116,8 @@ export const topicLabels: Record<Topic, L10n> = {
   levers: t('政策工具', 'Policy levers'),
   kerb: t('路邊的空氣與參考值', 'Kerbside air and reference values'),
   masks: t('口罩擋得住什麼', 'What masks do and do not stop'),
+  simulation: t('電腦算的一個紅燈', 'One red light, simulated'),
+  smellChemicals: t('聞得到的時候，空氣裡還有什麼（推估）', 'What else is in the air when you can smell it (estimate)'),
 };
 
 const merged = {
@@ -3134,6 +3140,8 @@ const merged = {
   ...levers,
   ...kerb,
   ...masks,
+  ...simulation,
+  ...smellChemicals,
 };
 export type FactId = keyof typeof merged;
 export type Fact = Omit<FactInput, 'chainLink'> & { id: FactId; topic: Topic; chainLink: ChainLink | null };

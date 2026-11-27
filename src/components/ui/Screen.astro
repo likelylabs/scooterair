@@ -128,7 +128,7 @@ const phaseWord = phase === 'green' ? screenText.green[locale] : screenText.red[
 const position = fill(screenText.position, locale, { n, total });
 ---
 
-<article class:list={['screen', `screen--${phase}`, cls]} id={id} data-screen data-n={n} data-chapter={chapter} data-phase={phase} data-pick-scope aria-labelledby={`${id}-h`} style={picAr ? `--pic-ar:${picAr}` : undefined}>
+<article class:list={['screen', `screen--${phase}`, cls]} id={id} data-screen data-n={n} data-chapter={chapter} data-phase={phase} data-solo={total === 1 ? '' : undefined} data-pick-scope aria-labelledby={`${id}-h`} style={picAr ? `--pic-ar:${picAr}` : undefined}>
   <div class="screen__stage">
     {hasAbove && <div class="screen__above"><slot name="above" /></div>}
     <div class="screen__pic">
@@ -373,6 +373,16 @@ const position = fill(screenText.position, locale, { n, total });
       margin-inline: auto;
       padding-block: var(--screen-pad);
       scroll-margin-block-start: -1rem;
+    }
+    /* a question page's screen is as tall as its words: the picture starts level with the headline
+       and does not float in the middle of a long column */
+    .screen[data-solo] {
+      align-items: start;
+    }
+    /* and while a long column of words scrolls by, the picture stays in view beside it */
+    .screen[data-solo] > .screen__stage {
+      position: sticky;
+      inset-block-start: calc(var(--header-h) + var(--sp-3));
     }
     /* the drawing is rounded, not the box: the tag's line sits under it */
     .screen__pic > :global(:first-child) {

@@ -6,7 +6,8 @@
  * tailpipe of the scooter in front points straight at him: his front wheel
  * and feet stand in its dark core, and the same layer B that surrounds the
  * people at the kerb surrounds him. His own tailpipe leaves a core behind
- * him. A breathing ring sits at his nose. No chart.
+ * him. No rings, no dots, no ring at the nose: one label on the fume, with a thin
+ * line into it. No chart.
  *
  * Props
  *   locale  Locale
@@ -21,18 +22,18 @@ import { art } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, type Box, AIR_KEY } from './air';
+import { air, unitsPerPx, type Box } from './air';
 import { AIR_EXTRA } from './air-slots';
-import { artId, breath, figureBoxes } from './parts';
-import { placed, riderNoseOf, shopfronts, tailOf, type Placed } from './kit';
-import { sceneAlt } from './scene';
+import { artId } from './parts';
+import { placed, shopfronts, tailOf, type Placed } from './kit';
+import { leader, sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
   tag?: false | 'street';
   id?: string;
   class?: string;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  /** the label on the fume (default true; false for a thumbnail or a share card) */
   legend?: boolean;
 }
 const { locale, legend = true, tag = false, id, class: cls } = Astro.props;
@@ -46,7 +47,6 @@ const others: Placed[] = [
   { x: -92, lift: 64, s: 0.86, row: 3 },
   { x: 250, lift: 34, s: 0.93, row: 2 },
 ];
-const nose = riderNoseOf(me);
 
 const a = air({
   frame: VB,
@@ -56,7 +56,6 @@ const a = air({
   extra: AIR_EXTRA,
   kerb: { x0: -40, x1: ahead.x - 8, sourceX: tailOf(ahead).x },
   tailpipes: [...others.map(tailOf), tailOf(me), tailOf(ahead)],
-  avoid: [...figureBoxes('scooter', me.x), ...figureBoxes('scooter', ahead.x), { x: 20, y: -236, w: 150, h: 50 }],
 });
 const street = [
   shopfronts({ x0: VB.x - 4, x1: VB.x + VB.w + 4, base: FAR, top: VB.y, bay: 210, shift: 60 }),
@@ -64,14 +63,19 @@ const street = [
   `<path class="a-line" d="M${VB.x},${FAR}H${VB.x + VB.w}"/>`,
   `<path class="a-paint" opacity="0.8" d="M${VB.x},34H${VB.x + VB.w}V42H${VB.x}Z"/>`,
 ].join('');
+// the one label on the fume: on the road under his rear wheel, a thin line up into his own scooter's fume
+const LBL = { x: -60, y: 46 };
+// the label stands on the bottom edge and grows upward with 字大; its line starts under its plate
+const LBL_BASE = VB.y + VB.h - 4;
 const scene =
   a.defs + street + a.wash + others.map((q) => placed(q, 'gas')).join('') + a.cores + a.marks +
   placed(ahead, 'gas', { cls: 'a-figure' }) + placed(me, 'gas', { face: true, cls: 'a-figure' }) +
-  `<g class="hs-breath">${breath(nose.x + 4, nose.y - 3, 10)}</g>`;
+  (legend ? leader(LBL.x + 34, LBL.y, -36, -22, unitsPerPx(VB.w)) : '');
 const alt = sceneAlt(locale, art.riderScene.alt[locale], { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<SceneFrame locale={locale} legend={legend && ([...AIR_KEY, 'nose'] as const)} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--rider', cls].filter(Boolean).join(' ')}>
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--rider', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={scene} />
   <SceneLabel slot="labels" box={VB} x={me.x + 84} y={-186} anchor="center bottom" plate>{art.words.waiting[locale]}</SceneLabel>
+  {legend && <SceneLabel slot="labels" box={VB} x={LBL.x} y={LBL_BASE} anchor="start bottom" max={60} plate class="fume-label">{art.fume.label[locale]}</SceneLabel>}
 </SceneFrame>

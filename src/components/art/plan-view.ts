@@ -28,24 +28,52 @@ export const PLAN3 = {
 
 const SC = { len: 184, wid: 54 };
 
-/** A scooter from above, facing right; (x, y) is the middle of its tail. */
+/**
+ * A scooter from above, facing right; (x, y) is the middle of its tail. Drawn so it reads as a
+ * scooter with its rider seen from overhead, not as a mark: two wheels sticking out front and
+ * back, a long deck, handlebars with grips, and a rider whose arms reach the grips, with a helmet
+ * and its visor toward the front.
+ */
 function scooterTop(x: number, y: number): string {
+  const L = SC.len;
   return (
-    `<g class="a-figure"><rect class="a-ink" x="${x}" y="${y - SC.wid / 2}" width="${SC.len}" height="${SC.wid}" rx="${SC.wid / 2}"/>` +
-    `<path class="a-ink-s" stroke-width="9" d="M${x + 142},${y - 38}v76"/>` +
-    `<circle class="a-far" cx="${x + 84}" cy="${y}" r="19"/><circle class="a-bg" cx="${x + 88}" cy="${y}" r="9"/>` +
+    '<g class="a-figure">' +
+    // wheels, front and back, peeking out past the body
+    `<rect class="a-deep" x="${x - 6}" y="${y - 7}" width="34" height="14" rx="6"/><rect class="a-deep" x="${x + L - 26}" y="${y - 7}" width="34" height="14" rx="6"/>` +
+    // the body: a long deck, wider under the seat, narrow at the front
+    `<path class="a-ink" d="M${x + 4},${y - 22}Q${x},${y} ${x + 4},${y + 22}L${x + 112},${y + 22}Q${x + 132},${y + 12} ${x + L - 10},${y + 10}Q${x + L},${y} ${x + L - 10},${y - 10}Q${x + 132},${y - 12} ${x + 112},${y - 22}Z"/>` +
+    // handlebars with their grips
+    `<path class="a-ink-s" stroke-width="8" d="M${x + 146},${y - 40}V${y + 40}"/>` +
+    `<rect class="a-deep" x="${x + 140}" y="${y - 48}" width="12" height="14" rx="4"/><rect class="a-deep" x="${x + 140}" y="${y + 34}" width="12" height="14" rx="4"/>` +
+    // the rider: arms to the grips, shoulders, and a helmet with its visor to the front
+    `<path class="a-far-s" stroke-width="11" d="M${x + 92},${y - 22}L${x + 142},${y - 38}M${x + 92},${y + 22}L${x + 142},${y + 38}"/>` +
+    `<ellipse class="a-far" cx="${x + 84}" cy="${y}" rx="20" ry="32"/>` +
+    `<circle class="a-deep" cx="${x + 92}" cy="${y}" r="17"/><path class="a-far" d="M${x + 99},${y - 13}A17,17 0 0 1 ${x + 99},${y + 13}L${x + 104},${y + 9}A12,12 0 0 0 ${x + 104},${y - 9}Z"/>` +
+    // tail light and tailpipe
     `<rect class="a-red" x="${x - 2}" y="${y - 9}" width="7" height="18" rx="3"/>` +
-    `<circle class="a-exh" cx="${x + 3}" cy="${y + 21}" r="7"/></g>`
+    `<rect class="a-exh" x="${x - 6}" y="${y + 16}" width="22" height="10" rx="5"/></g>`
   );
 }
-/** A person from above: shoulders and head. */
+/** A person from above: shoulders, arms at their sides, and the head (hair, or a yellow school cap with its brim). */
 function personTop(x: number, y: number, o: { cap?: boolean; small?: boolean } = {}): string {
   const k = (o.small ? 0.8 : 1) * 1.35;
-  return `<g class="a-figure"><ellipse class="a-ink" cx="${x}" cy="${y}" rx="${30 * k}" ry="${15 * k}"/><circle class="${o.cap ? 'a-yellow' : 'a-deep'}" cx="${x}" cy="${y - 2}" r="${13 * k}"/>${o.cap ? `<path class="a-yellow" d="M${x - 9 * k},${y - 12 * k}h${18 * k}v${-9 * k}h${-18 * k}z"/>` : ''}</g>`;
+  return (
+    '<g class="a-figure">' +
+    `<ellipse class="a-ink" cx="${x - 30 * k}" cy="${y + 2 * k}" rx="${7 * k}" ry="${10 * k}"/><ellipse class="a-ink" cx="${x + 30 * k}" cy="${y + 2 * k}" rx="${7 * k}" ry="${10 * k}"/>` +
+    `<ellipse class="a-ink" cx="${x}" cy="${y}" rx="${27 * k}" ry="${14 * k}"/>` +
+    `<circle class="${o.cap ? 'a-yellow' : 'a-deep'}" cx="${x}" cy="${y - 1 * k}" r="${12 * k}"/>` +
+    (o.cap ? `<path class="a-yellow" d="M${x - 9 * k},${y - 10 * k}Q${x},${y - 22 * k} ${x + 9 * k},${y - 10 * k}Z"/>` : `<ellipse class="a-far" cx="${x}" cy="${y - 9 * k}" rx="${4 * k}" ry="${2.4 * k}"/>`) +
+    '</g>'
+  );
 }
-/** A pushchair from above, pushed up the picture (toward the road). */
+/** A pushchair from above, pushed up the picture (toward the road): four wheels, the seat, the hood, the handle. */
 function pushchairTop(x: number, y: number): string {
-  return `<g class="a-figure"><rect class="a-ink" x="${x - 26}" y="${y - 40}" width="52" height="66" rx="15"/><path class="a-far" d="M${x - 20},${y - 8}a20,20 0 0 1 40,0z"/><circle class="a-bg" cx="${x}" cy="${y + 8}" r="9"/></g>`;
+  return (
+    '<g class="a-figure">' +
+    [[-28, -34], [22, -34], [-28, 14], [22, 14]].map(([dx, dy]) => `<rect class="a-deep" x="${x + dx}" y="${y + dy}" width="6" height="16" rx="3"/>`).join('') +
+    `<rect class="a-ink" x="${x - 24}" y="${y - 40}" width="48" height="62" rx="14"/><path class="a-far" d="M${x - 20},${y - 6}a20,20 0 0 1 40,0z"/>` +
+    `<path class="a-ink-s" stroke-width="6" d="M${x - 22},${y + 22}V${y + 34}H${x + 22}V${y + 22}"/></g>`
+  );
 }
 
 export interface PlanParts {
@@ -59,8 +87,6 @@ export interface PlanParts {
   tailpipes: AirSource[];
   /** where the people stand, for air({ kerb }) and for labels */
   people: Box;
-  /** keep-clear boxes for the air marks */
-  avoid: Box[];
 }
 
 export function planView(): PlanParts {
@@ -99,10 +125,5 @@ export function planView(): PlanParts {
 
   const tailpipes: AirSource[] = [...rank, ...turn].map((s) => ({ x: s.x + 3, y: s.y + 21 }));
   const people: Box = { x: 244, y: P.kerb + 4, w: 300, h: 150 };
-  const avoid: Box[] = [
-    ...Object.values(folk).map((p) => ({ x: p.x - 44, y: p.y - 44, w: 88, h: 76 })),
-    ...turn.map((s) => ({ x: s.x, y: s.y - 28, w: SC.len, h: 56 })),
-    ...rank.map((s) => ({ x: s.x, y: s.y - 28, w: SC.len, h: 56 })),
-  ];
-  return { ground: g.join(''), figures, dimension, tailpipes, people, avoid };
+  return { ground: g.join(''), figures, dimension, tailpipes, people };
 }

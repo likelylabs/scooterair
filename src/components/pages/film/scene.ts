@@ -13,21 +13,21 @@
  * is exact, jumping to a second gives the same picture as playing to it, and a still at 0:48
  * is the film at 0:48.
  *
- * THE AIR IS DRAWN BY ONE RULE: ../../art/air.ts, the same function the home page uses.
- *   A  the street's own air   NOT drawn (air.ts: pictures show only the scooters' plume; the
- *                             number panel carries the street's own level). streetAir() below
- *                             asks air() for it and gets an empty layer.
- *   B  what the pack adds     the kerb zone where the people stand: extra rings by the
- *      where people stand     signed estimate (`extra`, from air-slots.ts), three ribbons
- *                             and the soft wash. It FORMS AS THE SCOOTERS ARRIVE AND THEN
- *                             HOLDS. Nothing changes with the countdown. At green it thins.
- *   C  the cores              one dark core per tailpipe, appearing with its scooter and
- *                             leaving with it. Drawn for the eye, not scaled by the estimate.
- * The only things the film adds to that grammar are motion: puffs that leave a tailpipe and
- * gather into its core, a drift of a few pixels, and marks travelling on the cards.
+ * THE AIR IS DRAWN BY ONE RULE: ../../art/air.ts, the same function the home page uses. Exhaust is
+ * fume coming out of the scooters and nothing else: no symbol in the film needs a key.
+ *   B  what the pack adds     the kerb zone where the people stand: the soft fume whose
+ *      where people stand     thickness follows the signed estimate (`extra`, from
+ *                             air-slots.ts), and three wisps. It FORMS AS THE SCOOTERS ARRIVE
+ *                             AND THEN HOLDS. Nothing changes with the countdown. At green it thins.
+ *   C  the puffs              one soft puff of fume per tailpipe, appearing with its scooter
+ *                             and leaving with it. Drawn for the eye, not scaled by the estimate.
+ * The street's own air is not drawn (the number panel carries it). What the film adds to that
+ * grammar is motion: small puffs that leave each tailpipe and gather into its puff, puffs that
+ * drift from the nearest tailpipe to the people, a drift of a few pixels, and the fume moving on
+ * the cards. What the fume holds is said in the captions, in words.
  *
- * The air under the camera is built at two sizes of mark (a wide shot and a close shot) and
- * cross-faded as the camera moves, so a ring is the rule's size on screen in both.
+ * The air under the camera is built at two sizes (a wide shot and a close shot) and cross-faded
+ * as the camera moves, so a wisp keeps the rule's width on screen in both.
  *
  * Drawing: scooters, riders, people, car, LED digits, nose, masked face and body figure are
  * ../../art/parts.ts. Colours are the --art-* and --air-* tokens through the .a-* and .air-*
@@ -43,26 +43,36 @@
  * with the .ts extension, nothing from '@/'.
  */
 import * as P from '../../art/parts.ts';
-import { AIR, air as airAll, airDot as airDot1, airRibbon, airRing as airRing1, airWisp, type AirScenario, type Box } from '../../art/air.ts';
+import { AIR, air, airPuff, airPuffDefs, airRibbon, airWisp, type AirScenario, type Box } from '../../art/air.ts';
 import { T, signalAt, type Signal } from './timeline.ts';
+import { pedSignal } from '../../art/kit.ts';
 
-/* ---- a mark and its halo ------------------------------------------------------------
- * air.ts draws the light halo of a ring or a dot as a second drawing of the same path
- * underneath it: `<use class="air-halo …" href="#id"/><path id="id" class="air-ring …"/>` (or two
- * <path>s from airRing/airDot). The mark keeps its own paint, which is what the contrast check
- * reads. The film moves marks one element at a time, so wherever it animates a mark it moves the
- * PAIR: it wraps the pair in a <g> or gives both elements the same motion. These patterns find
- * the pairs; air() below stops the build if air.ts ever draws a mark the film cannot find.
+/**
+ * The day numbers printed on the calendar card's pages, drawn as strokes (the film holds no
+ * <text>): each digit on a 10 × 16 box, top-left at 0,0, for a round-capped stroke.
  */
-const PAIR = /<use class="air-halo([^"]*)" href="#([^"]+)"([^>]*)\/><path id="\2" class="(air-(?:ring|dot))([^"]*)"([^>]*)\/>/g;
-function air(o: Parameters<typeof airAll>[0]): ReturnType<typeof airAll> {
-  const a = airAll(o);
-  const loose = (a.marks.match(/class="air-(?:ring|dot)[ "]/g) ?? []).length - (a.marks.match(PAIR) ?? []).length;
-  if (loose !== 0) throw new Error(`film: air.ts drew ${loose} ring(s) or dot(s) without the halo pair the film expects (its markup changed)`);
-  return a;
-}
-const airRing = airRing1;
-const airDot = airDot1;
+const DATE_DIGITS: Record<string, string> = {
+  '0': 'M5,0C1.6,0 0,3.4 0,8C0,12.6 1.6,16 5,16C8.4,16 10,12.6 10,8C10,3.4 8.4,0 5,0Z',
+  '1': 'M2,3.4L6,0V16',
+  '2': 'M0.6,4C0.8,1.5 2.6,0 5,0C7.6,0 9.4,1.6 9.4,4.2C9.4,7.2 6.8,9 0.4,16H10',
+  '3': 'M0.8,2C2,0.7 3.4,0 5,0C7.8,0 9.4,1.6 9.4,4C9.4,6.4 7.6,7.6 4.4,7.6C7.9,7.6 10,9.2 10,11.8C10,14.6 7.8,16 5,16C3.2,16 1.6,15.3 0.4,14',
+  '4': 'M7.6,16V0L0,11H10',
+  '5': 'M9.2,0H1.4L0.8,7.2C2,6.4 3.4,6 5,6C8,6 10,8 10,11C10,14 8,16 5,16C3,16 1.4,15.2 0.4,14',
+  '6': 'M8.6,1C7.6,0.3 6.4,0 5.2,0C1.8,0 0,3.4 0,9C0,13.6 2,16 5,16C8,16 10,14 10,11C10,8 8,6.2 5.2,6.2C3,6.2 1,7.4 0.2,9.6',
+  '7': 'M0,0H10L3.6,16',
+  '8': 'M5,7.4C2.4,7.4 0.8,6 0.8,3.8C0.8,1.5 2.6,0 5,0C7.4,0 9.2,1.5 9.2,3.8C9.2,6 7.6,7.4 5,7.4C2,7.4 0,9 0,11.8C0,14.4 2.2,16 5,16C7.8,16 10,14.4 10,11.8C10,9 8,7.4 5,7.4Z',
+  '9': 'M9.8,6.4C9,8.6 7,9.8 4.8,9.8C2,9.8 0,8 0,5C0,2 2,0 5,0C8,0 10,2.4 10,7C10,12.6 8.2,16 4.8,16C3.6,16 2.4,15.7 1.4,15',
+};
+/** A day number centred at cx with its top at y, `h` units tall. */
+const dateNumber = (n: number, cx: number, y: number, h: number): string => {
+  const ds = String(n).split('');
+  const k = h / 16;
+  const w = (ds.length * 10 + (ds.length - 1) * 4) * k;
+  return `<g class="f-date" transform="translate(${r1(cx - w / 2)} ${r1(y)}) scale(${r3(k)})" stroke-width="${r2(2.4)}">${ds.map((d, i) => `<path transform="translate(${i * 14} 0)" d="${DATE_DIGITS[d]}"/>`).join('')}</g>`;
+};
+
+/** The calendar card's red pedestrian signal (no countdown), its head's top-left at (x, y) of the card, the pole to the card's foot. */
+const P_SIGNAL = (x: number, y: number): string => pedSignal({ x, y, scale: 2.4, state: 'red', poleTo: 300 });
 
 /* ---- small maths ------------------------------------------------------------------ */
 const clamp = (v: number, a = 0, b = 1): number => (v < a ? a : v > b ? b : v);
@@ -76,6 +86,10 @@ const r1 = (v: number): number => Math.round(v * 10) / 10;
 const r2 = (v: number): number => Math.round(v * 100) / 100;
 const r3 = (v: number): number => Math.round(v * 1000) / 1000;
 const mod = (v: number, m: number): number => ((v % m) + m) % m;
+/** How much of a wisp must be drawn before it shows: a zero-length dash with round caps is a dot. */
+const DRAWN = 0.02;
+/** A wisp drawn on from its start (pathLength 1, dasharray 1): hidden until a short line of it is drawn. */
+const drawOn = (p: number, opacity: number): { 'stroke-dashoffset': number; opacity: number } => ({ 'stroke-dashoffset': r3(1 - p), opacity: p < DRAWN ? 0 : opacity });
 
 /* ---- the street, left to right (cm) ----------------------------------------------- */
 const X0 = -1500; // drawn extent
@@ -146,7 +160,7 @@ const PACK: Scooter[] = [...SCENE.stopBox, ...SCENE.turnBox].map((q, i) => {
     px: q.front - LEN * R.s + P.TAILPIPE.x * R.s, py: -R.lift + P.TAILPIPE.y * R.s,
   };
 });
-/** The scooter whose tailpipe is nearest the people: the front of the turn box. Its rider gets a face and a breathing ring. */
+/** The scooter whose tailpipe is nearest the people: the front of the turn box. Its rider gets a face. */
 const NEAREST = PACK.find((q) => q.turn && q.row === 1)!;
 const FIRST_STOP = Math.min(...PACK.map((q) => q.ta));
 
@@ -169,7 +183,7 @@ const SHOTS: Record<string, Shot> = {
   arrB: { p: [560, 740], l: [470, 1240], h: 380, fy: 0.84 },
   tail: { p: [248, 410], l: [290, 600], h: 240, fy: 0.8 },
   build0: { p: [704, 908], l: [640, 1300], h: 430, fy: 0.85 },
-  // the child with a hand over her nose, the pushchair, and the nearest core coming in from the right
+  // the child with a hand over their nose, the pushchair, and the nearest core coming in from the right
   kid: { p: [752, 300], l: [770, 470], h: 196, fy: 0.88 },
   build1: { p: [730, 850], l: [660, 1240], h: 430, fy: 0.85 },
   in: { p: [896, 60], l: [896, 60], h: 38, cy: -44, fy: 0.5 },
@@ -258,7 +272,7 @@ export interface FilmOptions {
   /** { char: { d, adv } } in a 1000-unit em: outlines of the shop-sign characters */
   glyphs?: Record<string, { d: string; adv: number }>;
   text: FilmText;
-  /** layer B: extra rings per patch (AIR_EXTRA from ../../art/air-slots.ts) */
+  /** layer B: steps of fume where people stand (AIR_EXTRA from ../../art/air-slots.ts) */
   extra: Record<AirScenario, number>;
   /** est.scn.dozen.drawn: the film must draw exactly this many scooters */
   drawn: number;
@@ -382,14 +396,13 @@ export function createFilm(opt: FilmOptions) {
   };
   const FULL = '<rect x="-4000" y="-4000" width="9000" height="9000"';
   /**
-   * How big a mark is. The rule sizes marks for a picture 360 px wide and lets them grow with
-   * the picture; the home page's pictures stop growing at about 600 px, so the film's marks do
-   * too. On a laptop's wide stage that means more marks of the same size, not giant ones.
+   * How wide a wisp is. The rule sizes wisps for a picture 360 px wide and lets them grow with
+   * the picture; the home page's pictures stop growing at about 600 px, so the film's do too.
    */
   const MARK = Math.min(1, 600 / PX);
-  /** Drawing units per reference pixel, for marks drawn under the camera at a shot. */
+  /** Drawing units per reference pixel, for wisps drawn under the camera at a shot. */
   const uppAt = (shot: string): number => ((VW / AIR.refWidth) * MARK) / Math.exp(shots[shot].ls);
-  /** The same for marks drawn on a card (a 400 × 300 design box). */
+  /** The same for wisps drawn on a card (a 400 × 300 design box). */
   const CARD_UPP = 400 / AIR.refWidth;
 
   /* the signal: where its own LED is, so the corner clock can stand in when it is out of frame */
@@ -544,12 +557,12 @@ export function createFilm(opt: FilmOptions) {
     return o.join('');
   }
 
-  /* ---- other traffic: a car in the far lane, heading away, with its own small core ----- */
+  /* ---- other traffic: a car in the far lane, heading away, with its own small puff of exhaust ----- */
   const CAR_PASS: [number, number][] = [[T.waiting - 0.2, T.waiting + 4.4], [T.panel + 1.4, T.panel + 5.8], [T.electric + 1.3, T.electric + 3.6], [T.compare + 1.5, T.compare + 3.9], [T.end + 0.4, T.total + 0.2]];
   function car(): string {
     const cs = 0.6;
     const pipe = { x: P.CAR_TAILPIPE.x * cs, y: P.CAR_TAILPIPE.y * cs };
-    const a = air({ frame: { x: 0, y: -200, w: 600, h: 200 }, upp: uppAt(LOD_WIDE), id: `${ID}-car`, seed: 3, noStreetAir: true, cars: [{ ...pipe, dir: 1, scale: 1.2 }] });
+    const a = air({ frame: { x: 0, y: -200, w: 600, h: 200 }, upp: uppAt(LOD_WIDE), id: `${ID}-car`, seed: 3, cars: [{ ...pipe, dir: 1, scale: 1.2 }] });
     return (
       a.defs +
       `<g${dyn((c) => {
@@ -645,23 +658,18 @@ export function createFilm(opt: FilmOptions) {
     return o.join('');
   }
 
-  /* ---- the air under the camera: layers B and C, by air.ts, at two sizes of mark -------- */
+  /* ---- the air under the camera: layers B and C, by air.ts, at two sizes -------------- */
   const AIR_T: [number, number] = [FIRST_STOP - 0.2, REMEMBER[1] + 0.3];
-  /** How much of a tailpipe's core is there: it gathers after the scooter stops and leaves with it. */
+  /** How much of a tailpipe's puff is there: it gathers after the scooter stops and leaves with it. */
   function coreK(q: Scooter, c: Context): number {
     const t = c.t;
     if (t >= T.swap) return t >= REMEMBER[0] && t <= REMEMBER[1] ? 1 : 0;
     const k = eo(seg(t, q.ta + 0.1, q.ta + 2.6)) * (1 - seg(t, q.tl + 0.3, q.tl + 2.8));
     return k * (0.95 + 0.05 * Math.sin(c.wt * 2.3 + q.i * 1.9));
   }
-  /** After green the core is dragged a little way along behind its scooter. */
+  /** After green the puff is dragged a little way along behind its scooter. */
   const drag = (q: Scooter, t: number): number => (t >= q.tl && t < T.swap ? 150 * eo(seg(t, q.tl, q.tl + 2.8)) : 0);
   const order = [...PACK].sort((a, b) => b.row - a.row); // back row first, as air.ts asks
-  const avoid: Box[] = [
-    ...P.figureBoxes('elder-woman', PEOPLE.elder),
-    ...P.figureBoxes('schoolchild-cover', PEOPLE.child),
-    ...P.figureBoxes('stroller', PEOPLE.parent),
-  ];
   interface PackAir {
     defs: string;
     wash: string;
@@ -676,18 +684,16 @@ export function createFilm(opt: FilmOptions) {
       upp,
       seed: 12,
       id: `${ID}-${tag}`,
-      noStreetAir: true,
       scenario: 'dozen',
       extra: opt.extra,
       kerb: { x0: PL0 - 12, x1: TB0 - 4, sourceX: NEAREST.px, sourceY: NEAREST.py },
-      // in the wide shot the far rows keep only their plume, as on the home page: sixteen clusters would bury the pack
-      tailpipes: order.map((q) => ({ x: q.px, y: q.py, scale: q.s, row: q.row, ...(sparse && q.row !== 1 ? { rings: 0, dots: 0, ribbons: 0 } : {}) })),
-      avoid,
+      // in the wide shot the far rows keep only their puffs, as on the home page: sixteen fans of wisps would bury the pack
+      tailpipes: order.map((q) => ({ x: q.px, y: q.py, scale: q.s, row: q.row, ...(sparse && q.row !== 1 ? { ribbons: 0 } : {}) })),
     });
     const out: PackAir = { defs: a.defs, wash: '', cores: { 1: '', 2: '', 3: '' }, clusters: { 1: '', 2: '', 3: '' }, kerb: '' };
-    // the wash: its step of opacity (air() sets it so its average over the kerb zone is AIR.washOpacity.dozen), times how much of the layer has formed
+    // the fume where people stand: its step of opacity (air() sets it so its average over the kerb zone follows the estimate), times how much of the layer has formed
     out.wash = a.wash.replace(/ opacity="[^"]*"/, dyn((c) => ({ opacity: r3((a.counts.kerb?.dozen.wash ?? 0) * c.form), display: c.form > 0 ? null : 'none' }), ...AIR_T));
-    // each core and its cluster of marks belong to one scooter: they come and go with it
+    // each puff and its wisps belong to one scooter: they come and go with it
     for (const m of a.cores.matchAll(/<g class="air-core" data-src="(\d+)" transform="[^"]*" opacity="([^"]*)">(.*?)<\/g>/g)) {
       const q = order[+m[1]];
       const rowOp = +m[2];
@@ -712,11 +718,9 @@ export function createFilm(opt: FilmOptions) {
         m[2],
       );
     }
-    // the kerb's extra rings and its ribbons arrive one after another as the layer forms
+    // the kerb's wisps arrive one after another as the layer forms
     const kerb = /<g class="air-kerb">(.*?)<\/g>/.exec(a.marks)?.[1] ?? '';
     const ribs = [...kerb.matchAll(/<path class="air-rib air-b[^"]*" data-k="(\d+)"[^>]*\/>/g)];
-    // a ring is a halo pair (<use> + <path>), both marked with its data-k
-    const rings = [...kerb.matchAll(/<use class="air-halo air-b[^"]*" href="#([^"]+)"[^>]*data-k="(\d+)"\/><path id="\1" class="air-ring air-b[^"]*"[^>]*\/>/g)];
     const reveal = (k: number, n: number, wave: number) => (c: Context): Attrs => {
       const th = (k + 0.6) / (n + 0.4);
       const on = seg(c.form, th - 0.1, th);
@@ -724,10 +728,9 @@ export function createFilm(opt: FilmOptions) {
       return on <= 0 ? HIDE : { opacity: r2(on), transform: `translate(${r1(d * Math.sin(c.wt * 0.6 + k * 1.7 + wave))} ${r1(d * 0.7 * Math.sin(c.wt * 0.8 + k * 2.3))})`, display: null };
     };
     for (const m of ribs) out.kerb += m[0].replace(/ data-k="\d+"/, dyn(reveal(+m[1], ribs.length, 1), ...AIR_T));
-    for (const m of rings) out.kerb += `<g${dyn(reveal(+m[2], rings.length, 0), ...AIR_T)}>${m[0].replace(/ data-k="\d+"/g, '')}</g>`;
     return out;
   }
-  /** One of the two sizes of mark: the wide-shot set shows when the camera is wide, the close-shot set when it is close. */
+  /** One of the two sizes: the wide-shot set shows when the camera is wide, the close-shot set when it is close. */
   const lod = (near: boolean, inner: string): string =>
     inner
       ? grp(dyn((c) => {
@@ -736,16 +739,20 @@ export function createFilm(opt: FilmOptions) {
         }, ...AIR_T), inner)
       : '';
 
-  /* ---- puffs: they leave each tailpipe at knee height and gather into its core ---------- */
+  /* ---- puffs: they leave each tailpipe at knee height and gather into its puff; from the
+   * nearest tailpipe they drift on to the people at the kerb ---------------------------- */
+  /** Every small puff is a soft round of fume, its edge fading to nothing (never a hard disc). */
+  const PUFF = `${ID}-fp`;
+  const puffEl = (attrs: string) => `<circle class="f-puff" r="10" fill="url(#${PUFF}-p)"${attrs}/>`;
   function puffs(): string {
-    const o: string[] = [];
+    const o: string[] = [airPuffDefs(PUFF)];
     const LIFE = 2.1;
     for (const q of PACK) {
       for (let k = 0; k < 3; k++) {
         const off = (k / 3 + ((q.i * 0.377) % 1)) * LIFE;
         const jy = ((q.i * 7 + k * 3) % 5) - 2;
         o.push(
-          `<circle class="f-puff" r="10"${dyn((c) => {
+          puffEl(dyn((c) => {
             const t = c.t;
             const live = t < T.swap ? t >= q.ta - 0.2 && t < q.tl : t >= REMEMBER[0] && t <= REMEMBER[1];
             if (!live) return HIDE;
@@ -754,19 +761,43 @@ export function createFilm(opt: FilmOptions) {
             const p = age / LIFE;
             const x = q.px - 6 - 78 * q.s * eo(p);
             const y = q.py - 2 - (14 + jy * 3) * p * q.s + 8 * p * p;
-            const op = (p < 0.1 ? p / 0.1 : 1 - (p - 0.1) / 0.9) * 0.55;
-            return { transform: `translate(${r1(x)} ${r1(y)}) scale(${r2((0.45 + 1.9 * p) * q.s)})`, opacity: r2(op), display: null };
-          }, ...AIR_T)}/>`,
+            const op = (p < 0.1 ? p / 0.1 : 1 - (p - 0.1) / 0.9) * 0.8;
+            return { transform: `translate(${r1(x)} ${r1(y)}) scale(${r2((0.55 + 2.1 * p) * q.s)})`, opacity: r2(op), display: null };
+          }, ...AIR_T)),
         );
       }
       // pulling away: one short puff. Its direction is documented; how big it is has not been measured, so nothing here says.
       o.push(
-        `<circle class="f-puff" r="10"${dyn((c) => {
+        puffEl(dyn((c) => {
           const u = c.t - q.tl;
           if (u < 0 || u > 2.2 || c.t >= T.swap) return HIDE;
           const p = u / 2.2;
-          return { transform: `translate(${r1(q.px + 30 * eo(p))} ${r1(q.py - 4 - 26 * eo(p))}) scale(${r2((0.8 + 3 * eo(p)) * q.s)})`, opacity: r2(0.6 * (1 - p) * (1 - p)), display: null };
-        }, T.green, T.green + 8)}/>`,
+          return { transform: `translate(${r1(q.px + 30 * eo(p))} ${r1(q.py - 4 - 26 * eo(p))}) scale(${r2((0.9 + 3.2 * eo(p)) * q.s)})`, opacity: r2(0.8 * (1 - p) * (1 - p)), display: null };
+        }, T.green, T.green + 8)),
+      );
+    }
+    // from the nearest tailpipe the fume drifts on to the people: soft puffs that leave it low, rise
+    // as they spread, and thin out over the three at the kerb. Only while that scooter is there.
+    const DRIFT = 4.2;
+    const toX = PEOPLE.elder - 30;
+    for (let k = 0; k < 6; k++) {
+      const off = (k / 6) * DRIFT;
+      const lane = [0.25, 0.7, 0.45, 0.9, 0.15, 0.6][k];
+      o.push(
+        puffEl(dyn((c) => {
+          const t = c.t;
+          const q = NEAREST;
+          const live = t < T.swap ? t >= q.ta + 0.6 && t < q.tl + 1.2 : t >= REMEMBER[0] && t <= REMEMBER[1];
+          if (!live) return HIDE;
+          const age = mod(c.wt + off, DRIFT);
+          if (t < T.swap && c.wt - age < q.ta + 0.6) return HIDE; // it would have left before the scooter stopped
+          const p = age / DRIFT;
+          const x = lerp(q.px - 10, toX, sine(p));
+          const y = lerp(q.py, -40 - 110 * lane, eo(p)) + 6 * Math.sin(c.wt * 1.1 + k);
+          const fade = t >= q.tl ? 1 - seg(t, q.tl, q.tl + 1.2) : 1;
+          const op = (p < 0.15 ? p / 0.15 : 1 - Math.pow((p - 0.15) / 0.85, 1.6)) * 0.62 * fade;
+          return { transform: `translate(${r1(x)} ${r1(y)}) scale(${r2(1.2 + 3.4 * p)})`, opacity: r2(op), display: null };
+        }, ...AIR_T)),
       );
     }
     return o.join('');
@@ -789,7 +820,7 @@ export function createFilm(opt: FilmOptions) {
     parent: { home: PEOPLE.parent, out0: T.green + 1.9, speed: 88 },
     elder: { home: PEOPLE.elder, out0: T.green + 2.4, speed: 50 },
   };
-  /** The child's hand goes to her nose when the first exhaust reaches the corner, and stays there until the pack has gone. */
+  /** The child’s hand goes to their nose when the first exhaust reaches the corner, and stays there until the pack has gone. */
   const covering = (t: number): boolean => t >= FIRST_STOP + 0.5 && t < T.green + 0.5;
   function people(): string {
     const o: string[] = [];
@@ -827,9 +858,6 @@ export function createFilm(opt: FilmOptions) {
   function worldLayer(): string {
     const wide = packAir('w', LOD_WIDE, true);
     const near = packAir('c', LOD_CLOSE, false);
-    // electric scooters: tyre and brake dust stays (three grey dots behind each rear tyre)
-    const tyres = (shot: string) =>
-      air({ frame: { x: X0, y: -400, w: X1 - X0, h: 460 }, upp: uppAt(shot), seed: 5, id: `${ID}-t${shot}`, noStreetAir: true, tyres: PACK.map((q) => ({ x: q.rear + P.REAR_TYRE.x * q.s, y: -q.lift, scale: q.s })) }).marks;
     const o: string[] = [];
     o.push(
       '<defs>' +
@@ -840,62 +868,27 @@ export function createFilm(opt: FilmOptions) {
         near.defs,
     );
     const both = (pick: (a: PackAir) => string) => lod(false, pick(wide)) + lod(true, pick(near));
-    // petrol side, back to front: the wash behind everything; each far row with its cores low in front of it;
-    // the front row's cores behind its scooters, so the nearest silhouettes stay whole; marks over all
+    // petrol side, back to front: the kerb fume behind everything; each far row with its puffs low in front of it;
+    // the front row's puffs behind its scooters, so the nearest silhouettes stay whole; wisps over all
     o.push(`<g clip-path="url(#${ID}-l)">${CAMG()}`);
     o.push(both((a) => a.wash));
     o.push(scooterRow('gas', 3), both((a) => a.cores[3]), scooterRow('gas', 2), both((a) => a.cores[2]), both((a) => a.cores[1]), scooterRow('gas', 1));
     o.push(puffs());
     o.push(both((a) => a.clusters[3] + a.clusters[2] + a.clusters[1] + a.kerb));
     o.push('</g></g>');
-    // electric side
+    // electric side: no fume behind them (tyre and brake dust is left to the captions)
     o.push(`<g clip-path="url(#${ID}-r)">${CAMG()}${scooterRow('electric', 3)}${scooterRow('electric', 2)}${scooterRow('electric', 1)}`);
-    const dust = (isNear: boolean, shot: string) =>
-      grp(dyn((c) => {
-        const k = (isNear ? c.near : 1 - c.near) * seg(c.t, T.electric + 1.6, T.electric + 3.4);
-        return k <= 0 ? HIDE : { opacity: r2(k), display: null };
-      }, T.swap - 0.2, T.total), tyres(shot));
-    o.push(dust(false, LOD_WIDE), dust(true, LOD_CLOSE));
     o.push('</g></g>');
     o.push(CAMG(), people(), '</g>');
     return o.join('');
   }
 
   /* ================================================================================
-   * ATMOS: the street's own air (layer A). AIR: what the ruler shot adds over everything
+   * AIR: what the ruler shot adds over everything. (ATMOS, the street's own air, is not drawn:
+   * the layer stays, empty, so the layer slots keep their order.)
    * ================================================================================ */
-  /**
-   * Layer A, the street's own air. air.ts no longer draws it in a picture (only the counting patch
-   * does), so this layer is empty; it stays so the film's layer slots keep their order. It lies behind the scooters and the people, and keeps clear of
-   * the signal. Like the pack's air it is drawn at two sizes of mark and cross-faded.
-   */
-  function streetAir(): string {
-    const keep: Box[] = [...avoid, { x: BX - 8, y: SY - 8, w: 58 + 136 + 16, h: 68 }, { x: POLE + 2, y: -268, w: 56, h: 64 }];
-    const one = (tag: string, shot: string, frame: Box, near: boolean): string => {
-      const upp = uppAt(shot);
-      const a = air({ frame, upp, id: `${ID}-s${tag}`, seed: 21, avoid: keep });
-      // three drift groups of each kind, each a few pixels, each at its own pace
-      let k = 0;
-      // each drift group is a halo pair: the halo and the mark get the same motion (one function, two elements)
-      const marks = a.marks.replace(PAIR, (_m, hcls: string, hid: string, hattrs: string, kind: string, cls: string, attrs: string) => {
-        const d = /air-d(\d)/.exec(cls)?.[1] ?? '0';
-        const g = +d + (kind === 'air-dot' ? 0 : 3);
-        const ph = k++;
-        const fn = (c: Context): Attrs => {
-          const amp = AIR.driftPx * upp * 0.5;
-          return { transform: `translate(${r1(amp * Math.sin(c.wt * (0.5 + g * 0.06) + ph * 1.3))} ${r1(amp * 0.8 * Math.sin(c.wt * (0.62 + g * 0.05) + ph * 2.1))})` };
-        };
-        return `<use class="air-halo${hcls}" href="#${hid}"${hattrs}${dyn(fn)}/><path id="${hid}" class="${kind}${cls}"${attrs}${dyn(fn)}/>`;
-      });
-      return grp(dyn((c) => {
-        const w = near ? c.near : 1 - c.near;
-        return w <= 0 ? HIDE : { opacity: w < 1 ? w : null, display: null };
-      }), marks);
-    };
-    return CAMG() + one('w', LOD_WIDE, { x: -800, y: -1000, w: 2600, h: 1170 }, false) + one('c', LOD_CLOSE, { x: -100, y: -600, w: 1400, h: 700 }, true) + '</g>';
-  }
 
-  /** The ruler shot: the pushchair band, the tailpipe's height, the ruler, and a breathing ring at every nose. No bands in the air. */
+  /** The ruler shot: the pushchair band, the tailpipe's height, the ruler, and the fume's wisps breathed in at every nose. No bands in the air. */
   const RULER_X = PL0 - 10;
   const CT: [number, number] = [T.closest, T.health + 0.1];
   // the ruler leaves as the camera nudges toward the rider (it would be cut by the frame's edge)
@@ -913,7 +906,8 @@ export function createFilm(opt: FilmOptions) {
     let ticks = `M${RULER_X},0 V-180`;
     for (let h = 0; h <= 180; h += 10) ticks += ` M${RULER_X},${-h} h${h % 50 === 0 ? -12 : -6}`;
     o.push(`<g${dyn((c) => ({ opacity: r2(rulerOn(c)), transform: `translate(${r1(-30 * (1 - eo(seg(c.t, T.closest + 0.9, T.closest + 1.7))))} 0)` }), ...CT)}><path class="f-ruler" d="${ticks}"/></g>`);
-    // breathing: a ring at each nose; a child's is quicker than an adult's. The rider's comes last (beat 12).
+    // breathing: at each nose, a short wisp of the fume is drawn in with every breath; a child's
+    // breaths come quicker than an adult's. The rider's comes last (beat 12).
     const m = P.MOUTH;
     const noses = [
       { x: PEOPLE.parent + m.pushchair.x, y: m.pushchair.y, period: 1.9, big: true, at: T.closest + 1.6 },
@@ -922,16 +916,25 @@ export function createFilm(opt: FilmOptions) {
       { x: PEOPLE.parent + m.parent.x, y: m.parent.y, period: 4.2, big: false, at: T.closest + 2.35 },
       { x: NEAREST.rear + P.RIDER_MOUTH.x, y: P.RIDER_MOUTH.y, period: 4.2, big: true, at: T.rider + 0.5 },
     ];
+    const U = uppAt(LOD_CLOSE);
     for (const n of noses) {
+      // the wisp comes from the pack's side (larger x) and ends at the nose
+      const d = airWisp(n.x + 46, n.y + 10, n.x + 3, n.y, U);
       o.push(
-        `<circle class="${n.big ? 'f-breath' : 'f-breath f-breath--quiet'}" r="${n.big ? 11 : 9}"${dyn((c) => {
-          const show = seg(c.t, n.at, n.at + 0.5) * (1 - seg(c.t, T.health - 0.4, T.health));
-          // off screen it rests in one fixed state, so its value does not depend on how the clock got here
-          if (show <= 0) return { transform: `translate(${r1(n.x)} ${n.y}) scale(0)`, opacity: 0 };
-          const k = 0.5 - 0.5 * Math.cos((6.2832 * c.t) / n.period);
-          const pop = back(seg(c.t, n.at, n.at + 0.5));
-          return { transform: `translate(${r1(n.x)} ${n.y}) scale(${r2((0.82 + 0.42 * k) * pop)})`, opacity: r2(show * (0.75 + 0.25 * k)) };
-        }, ...CT)}/>`,
+        airRibbon(d, U, {
+          weight: n.big ? 1.15 : 0.9,
+          attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => {
+            const show = seg(c.t, n.at, n.at + 0.5) * (1 - seg(c.t, T.health - 0.4, T.health));
+            // off screen it rests in one fixed state, so its value does not depend on how the clock got here
+            if (show <= 0) return { opacity: 0, 'stroke-dashoffset': 1 };
+            // breathing in draws the wisp into the nose; breathing out lets it fade
+            const ph = mod(c.t / n.period, 1);
+            const draw = ph < 0.45 ? eio(ph / 0.45) : 1;
+            const fade = ph < 0.45 ? 1 : 1 - eio((ph - 0.45) / 0.55);
+            // a wisp not yet drawn is hidden: a zero-length dash with round caps would show as a dot
+            return { 'stroke-dashoffset': r3(1 - draw), opacity: draw < DRAWN ? 0 : r2(show * (0.35 + 0.65 * fade)) };
+          }, ...CT)}`,
+        }),
       );
     }
     o.push('</g>');
@@ -941,67 +944,50 @@ export function createFilm(opt: FilmOptions) {
   /* ================================================================================
    * CARDS: drawn in stage coordinates, over the street
    * ================================================================================ */
-  function wavy(x: number, y: number, len: number, wl: number, amp: number): string {
-    const half = Math.max(2, Math.round(len / (wl / 2)));
-    let d = `M${r1(x)},${r1(y)} q${r1(wl / 4)},${r1(-amp)} ${r1(wl / 2)},0`;
-    for (let k = 1; k < half; k++) d += ` t${r1(wl / 2)},0`;
-    return d;
-  }
 
   /** Inside the layer: what is in it (beats 7 to 9), and what an ordinary mask does about it (the mask beat). */
   function insideCard(): string {
     const A = T.inside + 1.0; // card in
     const M = T.mask; // the mask takes over
     const Z = T.closest; // card out
-    const U = CARD_UPP * 2.5; // we are close: marks are drawn two and a half times the rule's size
+    const U = CARD_UPP * 2.5; // we are close: wisps are drawn two and a half times the rule's width
     const o: string[] = [];
     o.push(`${FULL} class="f-wash"/>`);
-    let inner = '';
-    // drifting bands of the air we are inside
-    for (let k = 0; k < 5; k++) {
-      inner += `<path class="f-inwave" d="${wavy(-260, 26 + k * 62, 900, 190 + k * 22, 16)}" stroke-width="${30 - k * 3}"${dyn((c) => ({ transform: `translate(${r1(mod(c.t * (16 + k * 5), 190 + k * 22) - 100)} 0)` }), A - 0.2, Z + 0.9)}/>`;
-    }
-
-    /* --- beats 7 to 9: the nose ---------------------------------------------------- */
+    const FP = `${ID}-in`;
+    let inner = airPuffDefs(FP);
+    /* --- beats 7 to 9: one scooter, one fume, one person (home screen 2, TailpipeMarks) ----
+     * The fume is drawn coming out of the tailpipe and nothing else: no floating blobs, no drop,
+     * no sooty patch (the owner, 2026-11-27: only what a reader recognises at once). What it
+     * holds is said in the captions. Local units as on screen 2: the ground under the scooter's
+     * tail at (0, 0), placed at (205, 262) of the 400 × 300 card. */
     let first = '';
-    const noseX = 268;
-    const noseY = 86;
-    // A. carbon monoxide: rings drift into a nose that notices nothing
-    const rc = P.rng(5);
-    const co: { x: number; y: number; size: number; v: number; d: number }[] = [];
-    for (let k = 0; k < 13; k++) co.push({ x: -40 + rc() * 250, y: 44 + rc() * 212, size: rc(), v: 15 + rc() * 12, d: k * 0.13 });
-    const coT = T.inside + 1.5;
-    co.forEach((q, k) => {
-      first += `<g${dyn((c) => {
-        const u = c.t - coT - q.d;
-        const x = q.x + q.v * Math.max(0, u);
-        const y = q.y + 5 * Math.sin(c.t * 1.2 + k);
-        const into = seg(x, noseX - 6, noseX + 30); // at the nose it goes in, unnoticed
-        const dim = c.t > T.fuel ? 0.5 : 1;
-        return { transform: `translate(${r1(x)} ${r1(y)}) scale(${r2(back(seg(u, 0, 0.45)) * (1 - 0.5 * into))})`, opacity: r2((u < 0 ? 0 : 1) * (1 - into) * dim) };
-      }, A - 0.2, M + 0.6)}>${airRing(0, 0, U * (0.8 + q.size * 0.5), { size: 0.5 })}</g>`;
-    });
-    // B. the smell: unburnt fuel. A drop of petrol, ribbons from it, and the nose that smells them
+    const G = { x: 205, y: 262 };
+    const MO = { x: 4 + P.TAILPIPE.x, y: P.TAILPIPE.y }; // the tailpipe mouth
+    const HEAD = { x: -112, y: -118, s: 0.46 }; // a small head in profile, looking back at the scooter
+    const NOSE = { x: HEAD.x - P.MASK_FACE.nose.x * HEAD.s + 3, y: HEAD.y + P.MASK_FACE.nose.y * HEAD.s };
+    const ta = air({ frame: { x: -200, y: -226, w: 390, h: 300 }, upp: CARD_UPP, id: `${ID}-tp`, tailpipes: [{ ...MO, boost: 1.4, ribbons: 0 }] });
+    let local = '';
+    // the street: a plain wall and the road, wide enough for any stage
+    local += '<rect class="a-plane" x="-4000" y="-4000" width="8000" height="4000"/><rect class="a-road" x="-4000" y="0" width="8000" height="4000"/><path class="a-line" d="M-4000,0H4000"/>';
+    // A. the fume leaves the tailpipe and spreads back along the ground to the person
+    const coT = T.inside + 1.3;
+    local += ta.defs + `<g${dyn((c) => {
+      const e = eo(seg(c.t, coT, coT + 2.4));
+      const k = 0.15 + 0.85 * e;
+      return { opacity: r2(seg(c.t, coT, coT + 0.5)), transform: `translate(${MO.x} ${MO.y}) scale(${r3(k)} ${r3(0.5 + 0.5 * e)}) translate(${-MO.x} ${-MO.y}) translate(${r1(3 * Math.sin(c.t * 0.9))} 0)` };
+    }, A - 0.2, M + 0.6)}>${ta.cores}</g>`;
+    local += `<g class="a-figure" transform="translate(${HEAD.x} ${HEAD.y}) scale(${HEAD.s}) scale(-1 1)">${P.maskHead()}</g>`;
+    // B. the smell: wisps of the sharp-smelling gases rise out of the same tailpipe to the nose
     const B0 = T.fuel;
-    first += `<g${dyn((c) => ({ opacity: r2(seg(c.t, B0, B0 + 0.4)), transform: `translate(46 150) scale(${r2(back(seg(c.t, B0, B0 + 0.6)))})` }), B0 - 0.1, M + 0.6)}><path class="f-drop" d="M0,-34 C14,-12 22,-2 22,10 A22 22 0 0 1 -22,10 C-22,-2 -14,-12 0,-34 Z"/><path class="f-drop-hi" d="M-11,8 a11 11 0 0 0 8,12"/></g>`;
-    const ribs = ['M70,138 C110,118 140,160 178,140 S240,150 286,170', 'M70,152 C116,170 150,132 190,158 S250,168 288,176', 'M70,166 C112,190 160,168 196,182 S250,186 286,182'];
-    ribs.forEach((d, k) => {
-      first += `<path class="air-rib" pathLength="1" stroke-dasharray="1" d="${d}" stroke-width="${8 - k}"${dyn((c) => ({ 'stroke-dashoffset': r3(1 - eio(seg(c.t, B0 + 0.3 + k * 0.18, B0 + 1.5 + k * 0.18))), opacity: c.t < B0 + 0.3 ? 0 : r2(0.95 - k * 0.14), transform: `translate(0 ${r1(2.4 * Math.sin(c.t * 3 + k * 1.4))})` }), B0 - 0.1, M + 0.6)}/>`;
+    [-7, 0, 7].forEach((dy, i) => {
+      local += airRibbon(airWisp(MO.x - 4, MO.y - 3 - i * 1.5, NOSE.x + 2 + (i % 2) * 4, NOSE.y + dy, CARD_UPP), CARD_UPP, {
+        weight: i === 1 ? 1.15 : 0.95,
+        attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ ...drawOn(eio(seg(c.t, B0 + 0.3 + i * 0.2, B0 + 1.8 + i * 0.2)), 1), transform: `translate(0 ${r1(1.6 * Math.sin(c.t * 2.4 + i * 1.3))})` }), B0 - 0.1, M + 0.6)}`,
+      });
     });
-    // the nose: dashed while only carbon monoxide arrives, filled when the ribbons reach it
-    const smell = (c: Context) => seg(c.t, B0 + 1.3, B0 + 1.7);
-    first += `<g transform="translate(${noseX} ${noseY}) scale(2.7)">`;
-    first += `<g${dyn((c) => ({ opacity: r2(1 - smell(c)) }), B0, B0 + 2)}>${P.nose(false)}</g>`;
-    first += `<g${dyn((c) => ({ opacity: r2(smell(c)), transform: `translate(24 24) scale(${r2(1 + 0.12 * Math.sin(Math.PI * seg(c.t, B0 + 1.3, B0 + 2.1)))}) translate(-24 -24)` }), B0, B0 + 2.2)}>${P.nose(true)}</g>`;
-    first += '</g>';
-    // C. particles too small to see: they only show under the glass
-    const C0 = T.specks;
-    const lx = (c: Context) => lerp(70, 226, eio(seg(c.t, C0 + 0.2, M - 0.2)));
-    const ly = (c: Context) => 150 + 46 * Math.sin(seg(c.t, C0 + 0.2, M - 0.2) * 5.2);
-    first += `<clipPath id="${ID}-lens"><circle r="46"${dyn((c) => ({ cx: r1(lx(c)), cy: r1(ly(c)) }), C0 - 0.1, M + 0.6)}/></clipPath>`;
-    first += `<g${dyn((c) => ({ opacity: r2(seg(c.t, C0, C0 + 0.4)), transform: `translate(${r1(lx(c))} ${r1(ly(c))}) scale(${r2(back(seg(c.t, C0, C0 + 0.5)))})` }), C0 - 0.1, M + 0.6)}><path class="f-lens-h" d="M33,33 L66,66"/><circle class="f-lens-g" r="46"/></g>`;
-    first += `<g clip-path="url(#${ID}-lens)"${dyn((c) => ({ opacity: r2(seg(c.t, C0 + 0.3, C0 + 0.7)) }), C0 - 0.1, C0 + 0.8)}><use class="f-dots" href="#f-dots"/></g>`;
-    first += `<circle class="f-lens-r" r="46"${dyn((c) => ({ opacity: r2(seg(c.t, C0, C0 + 0.4)), transform: `translate(${r1(lx(c))} ${r1(ly(c))}) scale(${r2(back(seg(c.t, C0, C0 + 0.5)))})` }), C0 - 0.1, M + 0.6)}/>`;
+    local += `<g class="a-figure" transform="translate(4 0)">${P.scooter({ kind: 'gas', rider: true })}</g>`;
+    // C. particles too small to see: nothing new is drawn (the caption says it); the fume stays as it is
+    first += `<g transform="translate(${G.x} ${G.y})">${local}</g>`;
     inner += grp(dyn((c) => ({ opacity: r2(1 - seg(c.t, M - 0.1, M + 0.35)), display: c.t < M + 0.4 ? null : 'none' }), M - 0.2, M + 0.5), first);
 
     /* --- the mask beat: the same air meets an ordinary surgical mask -------------------- */
@@ -1013,9 +999,9 @@ export function createFilm(opt: FilmOptions) {
     const front = FX + P.MASK_FACE.front.x * K;
     const AIRWAY = 'M24,-86 C40,-91 58,-85 62,-66 C64,-52 66,-38 67,-5';
     mask += `<g transform="translate(${FX} ${FY}) scale(${K})">${P.maskHead()}<path class="a-bg-s" stroke-width="7" d="${AIRWAY}"/>${P.maskOn('surgical')}</g>`;
-    // rings come in from the left and go straight through the mask, in at the nose and down the airway
-    const way = [{ x: 37, y: -88.5 }, { x: 53, y: -84 }, { x: 62.5, y: -68 }, { x: 64.5, y: -48 }, { x: 66, y: -26 }, { x: 67, y: -8 }].map(F);
-    const lane = (y0: number) => [{ x: -24, y: y0 }, { x: 96, y: y0 + (150 - y0) * 0.35 }, { x: front - 4, y: F(P.MASK_FACE.inside).y }, F(P.MASK_FACE.inside), ...way];
+    // the fume comes in from the left as soft puffs, reaches the mask and goes on through it: a haze of
+    // it fills the airway (the gases: an ordinary mask does not stop them)
+    const lane = (y0: number) => [{ x: -40, y: y0 }, { x: 96, y: y0 + (150 - y0) * 0.35 }, { x: front - 2, y: F(P.MASK_FACE.inside).y }];
     const along = (pts: { x: number; y: number }[], u: number) => {
       // constant speed along a polyline
       let total = 0;
@@ -1031,33 +1017,38 @@ export function createFilm(opt: FilmOptions) {
       }
       return pts[pts.length - 1];
     };
-    const lanes = [lane(92), lane(196)];
-    for (let k = 0; k < 10; k++) {
-      const pts = lanes[k % 2];
-      const off = k / 10;
+    const lanes = [lane(92), lane(196), lane(140)];
+    for (let k = 0; k < 15; k++) {
+      const pts = lanes[k % 3];
+      const off = k / 15;
       mask += `<g${dyn((c) => {
-        const u = mod((c.t - M) * 0.26 + off, 1);
+        const u = mod((c.t - M) * 0.3 + off, 1);
         const p = along(pts, u);
-        // the stream is already flowing when the card arrives; a ring fades in at the edge and out at the end of the airway
-        return { transform: `translate(${r1(p.x)} ${r1(p.y)})`, opacity: r2(seg(u, 0, 0.06) * (1 - seg(u, 0.93, 1))) };
-      }, M - 0.4, Z + 0.9)}>${airRing(0, 0, U * 0.85, { size: 0.5 })}</g>`;
+        // the stream is already flowing when the card arrives; a puff fades in at the edge and thins into the mask
+        return { transform: `translate(${r1(p.x)} ${r1(p.y)}) scale(${r2(1 - 0.45 * seg(u, 0.6, 1))})`, opacity: r2(seg(u, 0, 0.08) * (1 - seg(u, 0.82, 1))) };
+      }, M - 0.4, Z + 0.9)}>${airPuff(FP, [{ cx: 0, cy: 0, rx: 50, ry: 34 }, { cx: -20, cy: 10, rx: 32, ry: 22 }], { strength: 0.45 })}</g>`;
     }
-    // ribbons (fuel vapour, benzene) pass through too
+    // past the mask: the haze in the airway, kept inside it by a mask the shape of the cut-out
+    const AW = `${ID}-maw`;
+    mask += `<defs><mask id="${AW}" maskUnits="userSpaceOnUse" x="0" y="0" width="400" height="320"><path transform="translate(${FX} ${FY}) scale(${K})" d="${AIRWAY}" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/></mask></defs>`;
+    mask += airPuff(FP, [{ x: 38, y: -89 }, { x: 54, y: -84 }, { x: 62, y: -66 }, { x: 65, y: -44 }, { x: 66, y: -22 }, { x: 67, y: -6 }].map(F).map((p) => ({ cx: p.x, cy: p.y, rx: 22, ry: 26 })), {
+      strength: null,
+      attrs: ` mask="url(#${AW})"${dyn((c) => ({ opacity: r2(0.7 * eo(seg(c.t, M + 0.6, M + 1.8))) }), M - 0.1, Z + 0.9)}`,
+    });
+    // ribbons (the sharp-smelling gases, and the benzene that comes with them) pass through too
     const inP = F(P.MASK_FACE.inside);
     [[-20, 132, -3], [-20, 168, 4]].forEach(([x0, y0, dy], k) => {
       mask += airRibbon(airWisp(x0, y0, inP.x - 2, inP.y + dy, U * 0.8, k ? -1 : 1), U * 0.8, {
-        attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ 'stroke-dashoffset': r3(1 - eio(seg(c.t, M + 0.5 + k * 0.3, M + 1.9 + k * 0.3))), opacity: c.t < M + 0.5 ? 0 : 0.95, transform: `translate(0 ${r1(1.8 * Math.sin(c.t * 2.6 + k * 1.4))})` }), M - 0.1, Z + 0.9)}`,
+        attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ ...drawOn(eio(seg(c.t, M + 0.5 + k * 0.3, M + 1.9 + k * 0.3)), 0.95), transform: `translate(0 ${r1(1.8 * Math.sin(c.t * 2.6 + k * 1.4))})` }), M - 0.1, Z + 0.9)}`,
       });
     });
     const airwayRib = `M${F({ x: 24, y: -86 }).x},${F({ x: 24, y: -86 }).y} C${F({ x: 40, y: -91 }).x},${F({ x: 40, y: -91 }).y} ${F({ x: 56, y: -86 }).x},${F({ x: 56, y: -86 }).y} ${F({ x: 61, y: -70 }).x},${F({ x: 61, y: -70 }).y}`;
-    mask += airRibbon(airwayRib, U * 0.8, { attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ 'stroke-dashoffset': r3(1 - eio(seg(c.t, M + 1.9, M + 2.7))), opacity: c.t < M + 1.9 ? 0 : 0.95 }), M - 0.1, M + 2.8)}` });
-    // some particles do stop on the mask: it is a particle filter, loose at the edges
-    [[-4, 110], [-12, 150], [-6, 186], [-16, 128], [-10, 170]].forEach(([x0, y0], k) => {
-      const stop = { x: front - 5 - (k % 2) * 6, y: F({ x: 0, y: -95 + k * 8 }).y };
-      mask += `<g${dyn((c) => {
-        const u = eo(seg(c.t, M + 0.3 + k * 0.32, M + 1.7 + k * 0.32));
-        return { transform: `translate(${r1(lerp(x0, stop.x, u))} ${r1(lerp(y0, stop.y, u))})`, opacity: r2(seg(c.t, M + 0.3 + k * 0.32, M + 0.6 + k * 0.32)) };
-      }, M - 0.1, M + 3.6)}>${airDot(0, 0, U, { size: 0.8 })}</g>`;
+    mask += airRibbon(airwayRib, U * 0.8, { attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => drawOn(eio(seg(c.t, M + 1.9, M + 2.7)), 0.95), M - 0.1, M + 2.8)}` });
+    // some particles do stop on the mask: it is a particle filter, loose at the edges. Soot gathers on its front
+    mask += airPuff(FP, [F({ x: 14, y: -88 }), F({ x: 16, y: -74 }), F({ x: 20, y: -62 })].map((p) => ({ cx: p.x - 3, cy: p.y, rx: 20, ry: 24 })), {
+      tone: 'soot',
+      strength: null,
+      attrs: dyn((c) => ({ opacity: r2(0.62 * eo(seg(c.t, M + 0.4, M + 3.2))) }), M - 0.1, Z + 0.9),
     });
     inner += grp(dyn((c) => ({ opacity: r2(seg(c.t, M + 0.05, M + 0.5)), display: c.t > M ? null : 'none' }), M - 0.1, M + 0.6), mask);
 
@@ -1065,81 +1056,91 @@ export function createFilm(opt: FilmOptions) {
     return grp(dyn((c) => ({ opacity: r2(seg(c.t, A, A + 0.7) * (1 - seg(c.t, Z - 0.1, Z + 0.6))), display: c.t > A - 0.1 && c.t < Z + 0.7 ? null : 'none' }), A - 0.2, Z + 0.8), o.join(''));
   }
 
-  /** Health, card A: one red light is short, but it is every day. A month fills, one dot a day; more months fan out behind it. */
+  /**
+   * Health, card A: one red light is short, but it is every day. A red pedestrian signal beside a
+   * tear-off day calendar: each page carries its day's number in large print (1, 2, 3 …), and the
+   * pages keep flipping, faster and faster, so the numbers count the days going by. No circles or
+   * dots to decode (the owner, 2026-11-27); the caption says the hours.
+   */
   function calendarCard(): string {
     const A = T.health;
     const Z = T.body;
+    const PAD = { x: 178, y: 62, w: 170, h: 178 };
+    const page = (day: number, cls = '') =>
+      `<rect class="f-sheet${cls}" x="${PAD.x}" y="${PAD.y}" width="${PAD.w}" height="${PAD.h}" rx="7"/>` +
+      `<rect class="f-sheet-top" x="${PAD.x}" y="${PAD.y}" width="${PAD.w}" height="30" rx="7"/>` +
+      `<rect class="f-sheet-top" x="${PAD.x}" y="${PAD.y + 16}" width="${PAD.w}" height="14"/>` +
+      // the day's number, large, under the red-and-dark binding strip
+      dateNumber(day, PAD.x + PAD.w / 2, PAD.y + 58, 92);
+    const N = 26;
     let inner = '';
-    const sheet = (k: number) =>
-      `<g${dyn((c) => {
-        const e = eo(seg(c.t, A + 3.0 + k * 0.3, A + 3.8 + k * 0.3));
-        return { opacity: r2(e), transform: `translate(${r1(k * 13 * e)} ${r1(-k * 12 * e)})` };
-      }, A, A + 5)}><rect class="f-sheet" width="184" height="170" rx="7"/></g>`;
-    inner += sheet(3) + sheet(2) + sheet(1);
-    inner += '<rect class="f-sheet" width="184" height="170" rx="7"/><rect class="f-sheet-top" width="184" height="24" rx="7"/>';
-    for (let d = 0; d < 30; d++) {
-      const col = d % 7;
-      const row = Math.floor(d / 7);
-      const x = 20 + col * 24;
-      const y = 46 + row * 25.5;
-      const at = A + 0.6 + 2.2 * Math.pow(d / 29, 0.62);
-      inner += `<circle class="f-day" cx="${x}" cy="${y}" r="8.2"/>`;
-      inner += `<circle class="a-led-red" cx="${x}" cy="${y}" r="7"${dyn((c) => ({ transform: `translate(${x} ${y}) scale(${r2(back(seg(c.t, at, at + 0.28)))}) translate(${-x} ${-y})`, opacity: c.t < at ? 0 : 1 }), A, A + 3.4)}/>`;
+    // the signal at red, its pole down to the bottom of the card
+    inner += P_SIGNAL(70, 72);
+    // the pad: the page underneath (the day after the last flip), then the pages that flip away
+    // one after another, day 1 on top
+    inner += `<g transform="translate(6 6)">${page(N + 1)}</g>${page(N + 1)}`;
+    for (let d = N - 1; d >= 0; d--) {
+      const at = A + 0.7 + 5.0 * Math.pow(d / (N - 1), 0.7);
+      inner += `<g${dyn((c) => {
+        const e = eio(seg(c.t, at, at + 0.32));
+        return { opacity: c.t > at + 0.32 ? 0 : 1, transform: `translate(0 ${PAD.y}) scale(1 ${r3(1 - e)}) translate(0 ${-PAD.y})` };
+      }, A, A + 6.2)}>${page(d + 1)}</g>`;
     }
-    const body = `${FULL} class="f-freeze"/><g${dyn(fit(400, 300, 0.98))}><g transform="translate(74 40) scale(1.3)">${inner}</g></g>`;
+    const body = `${FULL} class="f-freeze"/><g${dyn(fit(400, 300, 0.98))}>${inner}</g>`;
     return grp(dyn((c) => ({ opacity: r2(seg(c.t, A + 0.1, A + 0.7) * (1 - seg(c.t, Z - 0.2, Z + 0.3))), display: c.t > A && c.t < Z + 0.35 ? null : 'none' }), A - 0.1, Z + 0.4), body);
   }
 
   /**
-   * Health, card B: the body figure of the home page (G6). The three marks travel in once and
-   * stop where they stop; then the three pins light in turn. Nothing joins it to the calendar,
-   * no organ fills or changes colour. The mark positions are those of BodyFigure.astro.
+   * Health, card B: the body figure of the home page (G6). The fume goes in once and stays where
+   * it stops, as on the home page: its wisps in at the nose and down the throat, a sooty haze in
+   * the lungs, a faint haze of it on into the heart and the blood. Then the three pins light in
+   * turn. Nothing joins it to the calendar. The shapes are those of BodyFigure.astro.
    */
   const BODY_AT = { x: 172, y: 286, k: 0.882 }; // the figure's own units into the 400 × 300 card
   const PIN_AT = (i: number): number => T.pins + 0.7 + i * 1.9;
   function bodyCard(): string {
     const A = T.body;
     const Z = T.last;
-    const U = 1.26; // the rule's mark size at this scale
-    const r = P.rng(61);
-    const split = { x: 0, y: -134 };
-    const outside = { x: 230, y: -246 };
+    const U = 1.26; // the rule's wisp width at this scale
     const start = A + 0.7;
     const step = 0.28;
-    /** A mark that travels in: it starts part of the way back along its route. Its pin's turn dims the other two kinds a little. */
-    const go = (i: number, x: number, y: number, kind: 0 | 1 | 2) => {
-      const from = x > 80 ? outside : y > -130 ? split : P.BODY.nose;
-      const at = start + i * step;
-      return dyn((c) => {
-        const k = eo(seg(c.t, at, at + 0.75));
-        let lit = 1;
-        for (let p = 0; p < 3; p++) if (p !== kind) lit -= 0.6 * seg(c.t, PIN_AT(p), PIN_AT(p) + 0.3) * (1 - seg(c.t, PIN_AT(p) + 1.5, PIN_AT(p) + 1.8));
-        return { transform: `translate(${r1((from.x - x) * 0.6 * (1 - k))} ${r1((from.y - y) * 0.6 * (1 - k))})`, opacity: r2(seg(c.t, at, at + 0.25) * lit) };
-      }, A, Z + 0.5);
+    const BID = `${ID}-bd`;
+    /** How lit one part is: while another pin has its turn, the other two parts dim a little. */
+    const lit = (c: Context, kind: 0 | 1 | 2): number => {
+      let l = 1;
+      for (let p = 0; p < 3; p++) if (p !== kind) l -= 0.6 * seg(c.t, PIN_AT(p), PIN_AT(p) + 0.3) * (1 - seg(c.t, PIN_AT(p) + 1.5, PIN_AT(p) + 1.8));
+      return l;
     };
-    // 1 · ribbons: in at the nose, and no further than the throat
+    /** A patch of fume that arrives at its turn `i` and stays. */
+    const arrive = (i: number, kind: 0 | 1 | 2, peak: number, extra = '') =>
+      `${extra}${dyn((c) => ({ opacity: r2(peak * eo(seg(c.t, start + i * step, start + i * step + 1.1)) * lit(c, kind)) }), A, Z + 0.5)}`;
+    // 1 · wisps: in at the nose, and no further than the throat
     const ribAttr = (i: number) =>
-      ` pathLength="1" stroke-dasharray="1"${dyn((c) => {
-        let lit = 1;
-        for (let p = 1; p < 3; p++) lit -= 0.6 * seg(c.t, PIN_AT(p), PIN_AT(p) + 0.3) * (1 - seg(c.t, PIN_AT(p) + 1.5, PIN_AT(p) + 1.8));
-        return { 'stroke-dashoffset': r3(1 - eio(seg(c.t, start + i * step, start + i * step + 1.1))), opacity: c.t < start + i * step ? 0 : r2(lit) };
-      }, A, Z + 0.5)}`;
+      ` pathLength="1" stroke-dasharray="1"${dyn((c) => drawOn(eio(seg(c.t, start + i * step, start + i * step + 1.1)), r2(lit(c, 0))), A, Z + 0.5)}`;
     const ribbons =
       [-262, -246, -230].map((y0, i) => airRibbon(airWisp(206, y0, 66, -238 + i * 2, U), U, { weight: i === 1 ? 1.15 : 0.95, attrs: ribAttr(i) })).join('') +
       airRibbon('M57,-237 C50,-241 44,-232 37,-235 C29,-238 24,-229 17,-230 C10,-231 8,-221 5,-213', U, { weight: 1.15, attrs: ribAttr(5) });
-    // 2 · dots: down the windpipe, deep into both lungs
-    const dotAt: [number, number, number][] = [
-      [196, -214, 0], [170, -276, 0], [150, -216, 1], [128, -270, 1], [108, -220, 2], [88, -262, 2], [2, -200, 5], [0, -178, 6], [1, -156, 6],
-      [-26, -110, 8], [-48, -100, 9], [-62, -80, 10], [-70, -56, 10], [-44, -62, 10], [-58, -38, 11], [-36, -36, 12], [-22, -52, 11], [-24, -84, 9], [-46, -80, 10], [-66, -30, 12], [-30, -66, 11],
-      [28, -112, 8], [48, -106, 9], [64, -88, 10], [72, -62, 10], [56, -70, 11], [66, -42, 11], [52, -30, 12], [60, -26, 12], [70, -30, 12], [50, -50, 11], [34, -96, 9],
-    ];
-    const dots = dotAt.map(([x, y, i]) => `<g${go(i, x, y, 1)}>${airDot(x, y, U, { size: 0.8 + r() * 0.2 })}</g>`).join('');
-    // 3 · rings: through a lung, into the blood, and on with it
-    const ringAt: [number, number, number][] = [[200, -238, 0], [174, -256, 0], [146, -234, 1], [120, -252, 1], [96, -236, 2], [1, -188, 6], [0, -146, 7], [-34, -96, 9], [26, -100, 9], [46, -84, 10], [17, -50, 13], [17, -13, 15]];
-    const rings = ringAt.map(([x, y, i]) => `<g${go(i, x, y, 2)}>${airRing(x, y, U, { size: 0.8 })}</g>`).join('');
+    const LUNGS =
+      'M-13,-128 C-38,-138 -68,-114 -78,-78 C-85,-50 -82,-24 -66,-19 C-44,-14 -19,-24 -13,-42 Z' +
+      'M13,-128 C38,-138 68,-114 78,-78 C85,-50 82,-24 66,-19 C54,-16 44,-20 40,-30 C46,-48 38,-66 22,-72 C16,-74 13,-78 13,-84 Z';
+    const HEART = 'M17,-27 C-5,-42 -7,-66 8,-69 C13,-70 16,-66 17,-63 C18,-66 22,-71 29,-69 C42,-65 38,-42 17,-27 Z';
+    const cut = (name: string, inner: string) => `<mask id="${BID}-${name}" maskUnits="userSpaceOnUse" x="-150" y="-310" width="380" height="400">${inner}</mask>`;
+    const masks =
+      '<defs>' +
+      cut('aw', '<path d="M50,-238 C30,-236 6,-229 2,-204 L0,-136 M0,-138 L-22,-116 M0,-138 L22,-116" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>') +
+      cut('lu', `<path d="${LUNGS}" fill="#fff"/>`) +
+      cut('bl', `<path d="${HEART}" fill="#fff"/><path d="M17,-28V60" stroke="#fff" stroke-width="6"/>`) +
+      '</defs>';
+    const cloud = airPuff(BID, [{ cx: 178, cy: -246, rx: 40, ry: 30 }, { cx: 140, cy: -236, rx: 32, ry: 24 }], { strength: null, attrs: arrive(0, 0, 0.55) });
+    const windpipe = airPuff(BID, [{ cx: 26, cy: -232, rx: 30, ry: 12 }, { cx: 2, cy: -190, rx: 10, ry: 40 }, { cx: 0, cy: -140, rx: 26, ry: 16 }], { strength: null, attrs: arrive(5, 0, 0.5, ` mask="url(#${BID}-aw)"`) });
+    // 2 · particles: a sooty haze settled in both lungs
+    const lungs = airPuff(BID, [{ cx: -50, cy: -66, rx: 40, ry: 58 }, { cx: 52, cy: -82, rx: 40, ry: 56 }, { cx: -42, cy: -34, rx: 34, ry: 26 }, { cx: 60, cy: -36, rx: 26, ry: 22 }], { tone: 'soot', strength: null, attrs: arrive(8, 1, 0.62, ` mask="url(#${BID}-lu)"`) });
+    // 3 · carbon monoxide: a faint haze of the fume carried on into the heart and the blood
+    const blood = airPuff(BID, [{ cx: 17, cy: -50, rx: 26, ry: 26 }, { cx: 17, cy: -12, rx: 8, ry: 30 }, { cx: 17, cy: 30, rx: 8, ry: 40 }], { strength: null, attrs: arrive(12, 2, 0.55, ` mask="url(#${BID}-bl)"`) });
     const body =
       `${FULL} class="f-freeze f-freeze--solid"/><g${dyn(fit(400, 300, 0.98))}><g transform="translate(${BODY_AT.x} ${BODY_AT.y}) scale(${BODY_AT.k})">` +
-      `<g class="f-halo">${P.bodyFigure()}</g>${dots}${rings}${ribbons}</g></g>`;
+      airPuffDefs(BID) + masks +
+      `<g class="f-halo">${P.bodyFigure()}</g>${cloud}${windpipe}${lungs}${blood}${ribbons}</g></g>`;
     return grp(dyn((c) => ({ opacity: r2(seg(c.t, A + 0.05, A + 0.6) * (1 - seg(c.t, Z - 0.1, Z + 0.4))), display: c.t > A && c.t < Z + 0.45 ? null : 'none' }), A - 0.1, Z + 0.5), body);
   }
 
@@ -1323,28 +1324,19 @@ export function createFilm(opt: FilmOptions) {
    * in a zero-size <svg> at the top of the page. Everything else refers to it with <use>.
    */
   function defs(): string {
-    const rd = P.rng(77);
-    let dots = '';
-    for (let k = 0; k < 170; k++) {
-      const rad = 1.3 + rd() * 2;
-      const x = 6 + rd() * 300;
-      const y = 34 + rd() * 236;
-      dots += `M${r1(x - rad)},${r1(y)}a${r1(rad)},${r1(rad)} 0 1,0 ${r1(rad * 2)},0a${r1(rad)},${r1(rad)} 0 1,0 ${r1(-rad * 2)},0`;
-    }
     const sc = (kind: 'gas' | 'electric', rider: boolean, face = false) => `<g id="f-sc-${kind}${rider ? (face ? '-face' : '') : '-bare'}">${P.scooter({ kind, rider, face })}</g>`;
     return (
       '<radialGradient id="f-glow-r"><stop class="f-stop-r" offset="0" stop-opacity="0.5"/><stop class="f-stop-r" offset="0.35" stop-opacity="0.14"/><stop class="f-stop-r" offset="1" stop-opacity="0"/></radialGradient>' +
       '<radialGradient id="f-glow-g"><stop class="f-stop-g" offset="0" stop-opacity="0.55"/><stop class="f-stop-g" offset="0.35" stop-opacity="0.16"/><stop class="f-stop-g" offset="1" stop-opacity="0"/></radialGradient>' +
       `<g id="f-street">${buildings()}${road()}</g>` +
-      sc('gas', true) + sc('gas', true, true) + sc('electric', true) + sc('electric', true, true) + sc('gas', false) + sc('electric', false) +
-      `<path id="f-dots" d="${dots}"/>`
+      sc('gas', true) + sc('gas', true, true) + sc('electric', true) + sc('electric', true, true) + sc('gas', false) + sc('electric', false)
     );
   }
 
   /** Each part with the span of film time in which it can be on screen (for the stills). */
   const parts: { layer: LayerName; a: number; b: number; s: string }[] = [
     { layer: 'back', a: 0, b: 1e9, s: backLayer() },
-    { layer: 'atmos', a: 0, b: 1e9, s: streetAir() },
+    { layer: 'atmos', a: 0, b: 1e9, s: '' },
     { layer: 'world', a: 0, b: 1e9, s: worldLayer() },
     { layer: 'air', a: T.closest, b: T.health + 0.1, s: closest() },
     { layer: 'cards', a: 0, b: 1e9, s: flashes() },
@@ -1372,29 +1364,6 @@ export function createFilm(opt: FilmOptions) {
     for (const k in a) if (a[k] !== null && a[k] !== undefined) s += `${k}:${a[k]};`;
     return s ? ` style="${s}"` : '';
   }
-  /**
-   * Keep only the marks of the street's own air that fall inside the frame: a still shows a
-   * few dozen of the hundreds the whole street holds. Each mark is one closed sub-path (a dot)
-   * or two (a ring: its outer and inner edge), starting with its own M.
-   */
-  function cullMarks(html: string, c: Context): string {
-    const pad = 30;
-    const x0 = -c.cam.tx / c.cam.s - pad;
-    const x1 = (VW - c.cam.tx) / c.cam.s + pad;
-    const y0 = -c.cam.ty / c.cam.s - pad;
-    const y1 = (VH - c.cam.ty) / c.cam.s + pad;
-    return html.replace(/(<path class="air-(dot|ring)"[^>]*? d=")([^"]*)"/g, (_m, head: string, kind: string, d: string) => {
-      const subs = d.split('M').filter(Boolean);
-      const per = kind === 'ring' ? 2 : 1;
-      let out = '';
-      for (let i = 0; i < subs.length; i += per) {
-        const [x, y] = subs[i].split(/[a,]/, 2).map(Number);
-        if (x >= x0 && x <= x1 && y >= y0 && y <= y1) for (let j = 0; j < per; j++) out += 'M' + subs[i + j];
-      }
-      return `${head}${out}"`;
-    });
-  }
-
   /** The layers at film time t, as finished markup: only what is on screen at t. */
   function renderStatic(t: number): Record<LayerName, string> {
     const c = context(t);
@@ -1411,7 +1380,6 @@ export function createFilm(opt: FilmOptions) {
         // an HTML element carries two style attributes after its slot is filled (its place, then its state): merge them
         .replace(/ style="([^"]*)"( data-[a-z-]+="[^"]*")* style="([^"]*)"/g, (_m, s1: string, _d: string, s2: string) => ` style="${s1}${s1.endsWith(';') ? '' : ';'}${s2}"`);
     }
-    out.atmos = cullMarks(out.atmos, c);
     // a card that covers the whole picture: the street under it is not drawn into a still
     if (covered(t) && !(t >= T.health && t < T.body + 0.4)) out.back = out.atmos = out.world = out.air = '';
     return out;

@@ -2,13 +2,13 @@
 /**
  * TenScooters — G11: ten scooters, one to fix (brief 3.2 screen 12, 5.2).
  *
- * Ten small scooters in two rows of five. Nine leave a wisp. One, with no
- * rider on it (nobody is blamed), leaves a cloud that holds the share of all
- * the rings that the highest tenth of inspection readings hold of all the
- * carbon monoxide: est.inspect.top10share, about a third. The count is worked
- * out here, never typed. This picture leaves the street's own air out, so
- * that "a third of all the rings" is literally what is drawn.
- *
+ * Ten small scooters in two rows of five. Nine leave a small puff of fume. One, with no
+ * rider on it (nobody is blamed), leaves a big cloud, drawn darker than the small puffs, and is
+ * named in words right above it (該修的那一輛), so the cloud is not read as its neighbour's. The cloud is drawn so its area is the
+ * share of all the fume in the picture that the highest tenth of inspection readings hold of
+ * all the carbon monoxide: est.inspect.top10share (middle of the range), about a third. The
+ * size is worked out here, never typed. This picture leaves the street's own air out, so that
+ * "about a third of all the fume" is literally what is drawn.
  * The button is <FixButton> (the Screen's `controls` slot). Pressed, the
  * cloud shrinks to a wisp like the others, once, in 0.8 s. It is a checkbox
  * underneath: it works with the keyboard and without scripting.
@@ -27,7 +27,8 @@ import type { Locale } from '@/i18n';
 import { art, fill } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
-import { air, type Box, AIR_KEY } from './air';
+import SceneLabel from './SceneLabel.astro';
+import { air, type Box } from './air';
 import { artId, scooter } from './parts';
 import { pickSources, put, tailOf, type Placed } from './kit';
 
@@ -37,10 +38,8 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
-  legend?: boolean;
 }
-const { locale, legend = true, fixed = false, tag = false, id, class: cls } = Astro.props;
+const { locale, fixed = false, tag = false, id, class: cls } = Astro.props;
 
 const TOTAL = 10;
 const VB: Box = { x: 0, y: -700, w: 1310, h: 870 };
@@ -48,50 +47,50 @@ const rows = [-400, 0]; // ground line of the back and the front row
 const pack: Placed[] = rows.flatMap((ground) => Array.from({ length: 5 }, (_, i) => ({ x: 118 + i * 243, lift: -ground, s: 1, row: 1 as const })));
 const BIG = 8; // the one that needs repair: front row, fourth along, so its cloud lies over the row
 
-// How many rings: each of the nine keeps WISP rings; the one holds the share of the total that
-// the highest tenth of readings hold (the middle of the published range).
-const WISP = 2;
+// How big the cloud is: the nine small puffs are each drawn at scale SMALL. The one's cloud is the
+// same puff scaled up by `boost`, so its area is boost² times one small puff. It holds the share of
+// all the fume that the highest tenth of readings hold (the middle of the published range):
+//   boost² ÷ (9 + boost²) = share   →   boost = √(9 × share ÷ (1 − share))
+const SMALL = 0.8;
 const share = (est.inspect.top10share.lo + est.inspect.top10share.hi) / 2 / 100;
-const bigRings = Math.round(((TOTAL - 1) * WISP * share) / (1 - share));
-const allRings = (TOTAL - 1) * WISP + bigRings;
+const boost = Math.sqrt(((TOTAL - 1) * share) / (1 - share));
+const sharePct = Math.round(share * 100);
 
-const small = { rings: WISP, dots: 2, ribbons: 1, scale: 0.62 };
+const small = { ribbons: 1, scale: SMALL };
 const tail = (q: Placed) => tailOf(q);
 const big = tail(pack[BIG]);
-// the cloud: three lobes that billow back and up from the one tailpipe, holding `bigRings` rings between them
-const lobes = [Math.ceil(bigRings * 0.45), Math.round(bigRings * 0.3)];
 const a = air({
   frame: VB,
   id: artId('air'),
   seed: 23,
-  noStreetAir: true,
   tailpipes: [
-    ...pack.map((q, i) => ({ ...tail(q), ...small, ...(i === BIG ? { rings: 0, dots: 0, ribbons: 0, scale: 0.001 } : {}) })),
-    // the same tailpipe again: as it is (three lobes), and repaired
-    { ...big, boost: 2.5, rings: lobes[0], dots: 12, ribbons: 3 },
-    { x: big.x - 190, y: big.y - 96, boost: 2.3, rings: lobes[1], dots: 8, ribbons: 0 },
-    { x: big.x - 400, y: big.y - 150, boost: 2.0, rings: bigRings - lobes[0] - lobes[1], dots: 6, ribbons: 0 },
+    ...pack.map((q, i) => ({ ...tail(q), ...small, ...(i === BIG ? { ribbons: 0, scale: 0.001 } : {}) })),
+    // the same tailpipe again: as it is (one big cloud), and repaired
+    { ...big, ...small, boost, ribbons: 3 },
     { ...big, ...small },
   ],
 });
 const mouth = tail(pack[BIG]);
-const isBig = (k: number) => k >= TOTAL && k < TOTAL + 3;
+const isBig = (k: number) => k === TOTAL;
 const one = (i: number) => pickSources(a.cores, (k) => k === i) + pickSources(a.marks, (k) => k === i);
 const ground = rows.map((y) => `<path class="a-line" stroke-width="3" d="M40,${y}H${VB.w - 40}"/>`).join('');
 const scene = [
   `<rect class="a-plane" x="0" y="${VB.y}" width="${VB.w}" height="${VB.h}"/>`,
   a.defs + ground,
-  `<g class="ten-big" style="transform-origin:${mouth.x}px ${mouth.y + 20}px">${pickSources(a.cores, isBig)}</g>`,
+  // drawn three times over, so the one cloud is clearly darker as well as bigger than the small puffs
+  `<g class="ten-big" style="transform-origin:${mouth.x}px ${mouth.y + 20}px">${pickSources(a.cores, isBig).repeat(3)}</g>`,
   pack.map((_, i) => (i === BIG ? '' : one(i))).join(''),
-  `<g class="ten-fixed">${one(TOTAL + 3)}</g>`,
+  `<g class="ten-fixed">${one(TOTAL + 1)}</g>`,
   pack.map((q, i) => put(q.x, -q.lift, scooter({ kind: 'gas', rider: i !== BIG }), { cls: 'a-figure' })).join(''),
-  // the big cloud's rings and dots lie over the scooters it reaches
+  // the big cloud's wisps lie over the scooters it reaches
   `<g class="ten-big ten-big--marks" style="transform-origin:${mouth.x}px ${mouth.y + 20}px">${pickSources(a.marks, isBig)}</g>`,
 ].join('');
 const alt =
-  fill(art.ten.alt, locale, { total: TOTAL, rest: TOTAL - 1, rings: allRings, big: bigRings, fix: art.ten.fix[locale] }) + (locale === 'en' ? ' ' : '') + art.alt2.plain[locale];
+  fill(art.ten.alt, locale, { total: TOTAL, rest: TOTAL - 1, share: sharePct, fix: art.ten.fix[locale] }) + (locale === 'en' ? ' ' : '') + art.alt2.plain[locale];
 ---
 
-<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} id={id} class={['scene--ten', cls].filter(Boolean).join(' ')} data-fixed={fixed ? '' : undefined} data-rings={allRings} data-big-rings={bigRings}>
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} id={id} class={['scene--ten', cls].filter(Boolean).join(' ')} data-fixed={fixed ? '' : undefined} data-share={sharePct}>
   <Fragment set:html={scene} />
+  {/* the one to fix is named in words right above it, so its cloud is not taken for its neighbour's; gone once fixed */}
+  <SceneLabel slot="labels" box={VB} x={pack[BIG].x + 92} y={-176} anchor="center bottom" max={46} plate class="ten-label">{art.ten.label[locale]}</SceneLabel>
 </SceneFrame>

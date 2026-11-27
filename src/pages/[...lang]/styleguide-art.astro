@@ -12,10 +12,8 @@ import { localeFromParam, localeStaticPaths } from '@/i18n';
 import { chipWhere } from '@/i18n/ui';
 import HeroStreet from '@/components/art/HeroStreet.astro';
 import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
-import AirKey from '@/components/art/AirKey.astro';
 import ApproachPlan from '@/components/art/ApproachPlan.astro';
 import KerbScene from '@/components/art/KerbScene.astro';
-import AirRange from '@/components/art/AirRange.astro';
 import BodyFigure from '@/components/art/BodyFigure.astro';
 import RoadOfTime from '@/components/art/RoadOfTime.astro';
 import HeightsScene from '@/components/art/HeightsScene.astro';
@@ -39,9 +37,9 @@ const posts = [
 const scenes = [
   { id: 'g1', name: 'G1 · HeroStreet (red)' },
   { id: 'g14', name: 'G14 · HeroStreet (green)' },
-  { id: 'g2', name: 'G2 · TailpipeMarks + AirKey' },
+  { id: 'g2', name: 'G2 · TailpipeMarks' },
   { id: 'g3', name: 'G3 · ApproachPlan' },
-  { id: 'g4', name: 'G4 · KerbScene (all scenarios) + AirRange' },
+  { id: 'g4', name: 'G4 · KerbScene (all scenarios)' },
   { id: 'g6', name: 'G6 · BodyFigure' },
   { id: 'g7', name: 'G7 · RoadOfTime' },
   { id: 'g8', name: 'G8 · HeightsScene' },
@@ -60,12 +58,11 @@ const scenes = [
 
     <section id="g1"><h2>G1</h2><HeroStreet locale={locale} tag="street" /></section>
     <section id="g14"><h2>G14</h2><HeroStreet locale={locale} phase="green" tag="street" /></section>
-    <section id="g2"><h2>G2</h2><TailpipeMarks locale={locale} tag="street" /><AirKey locale={locale} layout="row" /></section>
+    <section id="g2"><h2>G2</h2><TailpipeMarks locale={locale} tag="street" /></section>
     <section id="g3"><h2>G3</h2><ApproachPlan locale={locale} tag="street" /></section>
     <section id="g4">
       <h2>G4</h2>
       <KerbScene locale={locale} scenario="dozen" tag="street" />
-      <div class="sg__row"><AirRange locale={locale} scenario="dozen" /></div>
     </section>
     <section id="g6"><h2>G6</h2><BodyFigure locale={locale} tag="body" /></section>
     <section id="g7"><h2>G7</h2><RoadOfTime locale={locale} posts={posts as any} /></section>

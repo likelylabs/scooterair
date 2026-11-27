@@ -141,7 +141,7 @@ For each screen: the chain link it serves (numbering as in `src/data/types.ts` �
 
 **Screen 4 · 吸進多少** — link 3. The centre of the page.
 
-- **Picture G4.** The kerb, close. Pushchair, child and adult at the left; the nearest scooter's tail at the right with its rider in view; rows behind. Sparse rings and dots cover the whole frame (the air the street already holds). Where the people stand there are more, by the estimate. The tailpipes have dark cores.
+- **Picture G4.** The kerb, close. Pushchair, child and adult at the left; the nearest scooter's tail at the right with its rider in view; rows behind. The fume from the tailpipes reaches the people; where they stand it is as thick as the estimate says (5.1). The tailpipes have dark puffs. The street's own air is not drawn. One label: 機車排的氣.
 - **Number box above the picture (HTML):**
 
   | | | |
@@ -155,7 +155,7 @@ For each screen: the chain link it serves (numbering as in `src/data/types.ts` �
 - **Headline.** 一排機車停在旁邊，路邊多一層廢氣 / A row of scooters beside you adds a layer of exhaust at the kerb
 - **Body.** 這是算的，不是量的，所以給一個範圍。多出來的量，和街上原本就有的差不多。 / This is worked out, not measured, so we give a range. What the scooters add is about as much as the street already holds.
   The second sentence is chosen by rule from `co.<scenario>.add.mid ÷ bg.co.traffic`: under 0.3 → 比街上原本就有的少 / is less than the street already holds; 0.3 to 3 → 和街上原本就有的差不多; over 3 → 比街上原本就有的多 / is more than the street already holds. With the signed values: 幾輛 → 少; 十來輛 and 停滿 → 差不多.
-- **Q.** 圈圈越密＝一氧化碳越多。到處都有的稀疏圈圈，是街上原本就有的。 / More rings mean more carbon monoxide. The sparse rings everywhere are what the street already holds.
+- **Q.** 機車越多，路邊的廢氣越濃。街上原本就有的空氣，圖上沒有畫。 / More scooters, thicker exhaust at the kerb. The air the street already holds is not drawn.
 - **Next.** 實際量到的，算多嗎？↓ / And the real readings: is that a lot? ↓
 
 **Screen 5 · 量到的，和算的** — link 3
@@ -184,7 +184,7 @@ For each screen: the chain link it serves (numbering as in `src/data/types.ts` �
 
 **Screen 6 · 吸進去以後** — links 4 and 5
 
-- **Picture G6.** A neutral adult figure, head and chest, in the signal-figure style. Airway, lungs and heart are cut out. The three marks from screen 2 travel in once and stop where they stop: ribbons at the nose and throat ①, dots in the lungs ②, rings pass into the blood ③. Tag: 示意圖・不是醫學圖. **Not a child. No street behind it. No disease names on the body.** Organs do not fill up or change colour.
+- **Picture G6.** A neutral adult figure, head and chest, in the signal-figure style. Airway, lungs and heart are cut out. The fume of screen 2 goes in once and stays where it stops: orange wisps at the nose and throat ①, a sooty haze in the lungs ②, a faint haze on into the blood ③. Each number has its short name printed beside it (鼻子、喉嚨 / 肺 / 血液), so the picture reads without a tap. Tag: 示意圖・不是醫學圖. **Not a child. No street behind it. No disease names on the body.** Nothing changes after it has arrived.
 - **Headline.** 長年吸車子的廢氣，和氣喘、心臟病、肺癌有關 / Years of breathing traffic exhaust are linked to asthma, heart disease and lung cancer
 - **Body.** 這是 353 篇長期研究的結論，講的是所有車輛的廢氣，不只機車。圖上是廢氣進到身體以後去的地方。 / That is the finding of a review of 353 long-term studies of exhaust from all traffic, not scooters alone. The picture shows where exhaust goes once it is inside the body.
 - **Q.** 等一個紅燈就會生病嗎？沒有人證明過。 / Does one red light make you ill? Nobody has shown that.
@@ -211,7 +211,7 @@ For each screen: the chain link it serves (numbering as in `src/data/types.ts` �
 - **Headline.** 一個紅燈很短，可是天天都要等 / One red light is short. But you wait at one every day
 - **Body, by stepper** (`time.hoursPerYear`):
   - 2 → 一天等兩個紅燈，一年就在路邊站了半天到快一天。 / Two red lights a day add up to half a day to nearly a day a year at the kerb. (12–18 hours)
-  - 4 → 一天等四個紅燈，一年就在路邊站了一天到一天半。 / Four a day add up to a day to a day and a half. (24–36 hours)
+  - 4 → 一天等四個紅燈，一年就在路邊站了一整天到一天半。 / Four red lights a day: one to one and a half whole days at the kerb each year. (24–36 hours)
   - 6 → 一天等六個紅燈，一年就在路邊站了一天半到兩天多。 / Six a day add up to a day and a half to more than two days. (36–55 hours)
 - **Q.** 這些研究量的是各種來源的髒空氣，不是只有機車。 / These studies measured dirty air from all sources, not scooters alone.
 - **Number.** 約 24 到 36 小時 — 本站計算 (60 to 90 seconds a red × reds a day × 365).
@@ -221,7 +221,7 @@ For each screen: the chain link it serves (numbering as in `src/data/types.ts` �
 
 **Screen 8 · 誰最近** — link 6
 
-- **Picture G8.** A ruler in centimetres. Four figures to scale on one ground line: a baby in a pushchair (band 55–85 cm shaded), a schoolchild, an adult, and a rider seated on a scooter, **drawn whole**. The tailpipe is marked. A breathing ring pulses at each nose, the child's faster. The haze is drawn evenly from the ground to above the adult's head. No bands by height.
+- **Picture G8.** A ruler in centimetres. Four figures to scale on one ground line: a baby in a pushchair (band 55–85 cm shaded), a schoolchild, an adult, and a rider seated on a scooter, **drawn whole**. The tailpipe is labelled. The fume from it is drawn evenly from the ground to above the adult's head, with one label 機車排的氣. No bands by height.
 - **Headline.** 同一個路口，小孩離排氣管最近 / Same junction: the child is closest to the tailpipe
 - **Body.** 排氣管和嬰兒車裡的寶寶，都不到一公尺高。照體重算，小孩吸進的空氣是大人的 1.5 到 2 倍。 / The tailpipe and a baby in a pushchair are both less than a metre off the ground. For their body weight, children breathe 1.5 to 2 times as much air as adults.
 - **Q.** 矮的地方，廢氣一樣多或更多；多多少，還算不出來。 / Lower down, the exhaust is the same or more. How much more cannot yet be worked out.
@@ -239,7 +239,7 @@ For each screen: the chain link it serves (numbering as in `src/data/types.ts` �
 
 **Screen 10 · 換掉** — link 7
 
-- **Picture G10.** The kerb with ten scooters in view. A slider: 10 輛裡，換幾輛電動機車？ / Out of 10, how many go electric? It has ten stops and plus and minus buttons. On arrival it plays once from 0 to 10 and **rests on all-electric**. Each swapped scooter gets a hub motor and a green light strip and loses its marks. The street's own sparse air, a few grey dots at the tyres and one car with its own small plume stay.
+- **Picture G10.** The kerb with ten scooters in view. A slider: 10 輛裡，換幾輛電動機車？ / Out of 10, how many go electric? It has ten stops and plus and minus buttons. On arrival it plays once from 0 to 10 and **rests on all-electric**. Each swapped scooter loses its tailpipe and its fume; its wheels stay plain (no coloured hub ring). The first one is named in words, 電動機車, with a thin line. A petrol scooter's wisps are hidden while the scooter behind it is electric, so no electric scooter seems to give off fume. One car with its own small puff stays.
 - **Chip under the slider.** 機車排的廢氣：少 {n × 10}% 本站計算｜假設每輛排得一樣多 / Scooter exhaust: {n × 10}% less. Our arithmetic, assuming every scooter emits the same.
 - **Headline.** 換一輛電動的，就少一根排氣管 / Every electric scooter is one tailpipe fewer
 - **Body.** 電動機車沒有排氣管。輪胎和煞車的粉塵還在，旁邊的汽車也還在。 / An electric scooter has no tailpipe. Tyre and brake dust stay, and so do the cars beside it.
@@ -248,7 +248,7 @@ For each screen: the chain link it serves (numbering as in `src/data/types.ts` �
 
 **Screen 11 · 還沒要換車** — link 7
 
-- **Picture G11.** Ten small scooters in a row. Nine have a wisp. One has a cloud holding about a third of all the rings. No rider on that one. A button 修好它 / Fix it shrinks the cloud.
+- **Picture G11.** Ten small scooters in a row. Nine have a small puff of fume. One has a cloud whose area is about a third of all the fume drawn. No rider on that one. A button 修好它 / Fix it shrinks the cloud.
 - **Headline.** 還沒要換車？有一件事也很有用 / Not switching yet? One thing still helps a lot
 - **Body.** 定檢讀數裡，排最多的一成，占了全部一氧化碳的三分之一左右。準時定檢、該修就修，路口就少一大團。 / In Taiwan's inspection readings, the highest tenth account for about a third of all the carbon monoxide. Get inspected on time and fix what fails, and a big cloud leaves the junction.
 - **Number.** 約 30% 到 45% — 本站計算 on 官方 data (`inspect.top10share`).
@@ -378,7 +378,7 @@ One word for the site's own air numbers: **推估**. Not 估計, 估算, 試算 
 - Solid dots or solid bars for measurements. A hatched band with a dashed edge for an estimate. An estimate is never a dot and never a line. Nothing joins a measured mark to an estimated band. They are never averaged, subtracted or turned into a ratio.
 - A two-item legend stays under every such chart: ● 量到的　▨ 算出來的 / ● measured　▨ worked out.
 - One sentence states the relation, chosen by the written rule (screen 5).
-- A guideline is drawn only where its averaging time is comparable: the WHO 15-minute carbon monoxide value, as the zoom-out strip. The sheet says a 90-second level counts for one tenth of a 15-minute average.
+- A guideline is drawn only where its averaging time is comparable: the WHO 15-minute carbon monoxide value, as the zoom-out strip. The sheet says a 90-second level counts for one tenth of a 15-minute average. *As built 2026-11-27 (§13, "The 3-D simulation on the site"): the zoom-out strip is gone. A 90-second band set beside 87 ppm without conversion is must-not 3 of `research/simulation/statements.json`. The WHO 15-minute value is drawn only on the simulation's chart of 15-minute averages (SimCompare), home screen 5 and `/estimate/#simulation`.*
 - No row is ever empty and no cell says 無資料. A pollutant with no publishable estimate gets a sentence, not an empty chart (section 7.2).
 
 ### 4.5 The sheet behind 怎麼知道的？
@@ -421,43 +421,48 @@ The copy check (`scripts/check-copy.mjs` with `src/data/claims-policy.ts`) gets 
 
 One function draws air everywhere: `src/components/art/air.ts`. Home scenes, question pages, share cards, the poster and the film all use its rule and its constants. It replaces the hatched "unmeasured" band.
 
-**As built (air rework, 2026-11-27; supersedes the table below where they differ).** The owner read layer A's rings and dots on walls, windows and the crossing as decoration or a fault, so pictures now draw **only the scooters' exhaust**: one soft plume per row, low at the tailpipes, wrapping the people from the ground up, with the rings, dots and ribbons inside it. Layer A (6 + 6 per patch) is no longer drawn in pictures; it stays the yardstick and is drawn only in the two counting patches on `/estimate/` and in the screen-4 sheet (7 and 17 rings). The tag under every street picture says so: **示意圖｜廢氣大多看不見，街上本來的空氣沒有畫** / *Illustration: real exhaust is mostly invisible, and the street's own air is not drawn*. Layer B keeps +1 / +3 / +6 rings per patch (counted over the plume's area) and 1 / 3 / 5 ribbons; the plume's strength is set so its **average tint over the kerb zone is 10 / 18 / 26 %**, the old flat wash's amount (`washStrength`, tested). Layer C cores are unchanged and drawn for the eye. Every ring has a paper centre (no "filled" rings), marks are larger (ring r 4–5 px, dot r 1.7–2.3 px at 360 px), and rings never touch. Every picture has a key (`AirLegend`) naming only what it draws; the first picture, the kerb picture, `/estimate/`, the poster and the film name the marks by sense (聞得到：油氣 / 聞不到：一氧化碳 / 看不到：微粒). The heights and rider pictures name the red ring (鼻子的高度). 這排機車多出來 carries the blue ring in the number boxes and the film panel. Dark mode: a pale haze, muted ribbons, no orange glow.
+**As built (fume only, 2026-11-27; this replaces the earlier rings-and-dots design).** The owner did not read blue rings and dark dots as anything, even with a key under every picture, but recognised the orange-brown fume coming out of the scooters at once. So **exhaust is drawn only as fume coming out of the scooters**, and nothing in a picture is an abstract mark that needs a key to decode. There is no key (`AirKey`, `AirLegend` and `AirRange` are gone). What the fume holds is said in plain words: on the picture, as short labels with a thin leader line into the fume (`scene.ts leader()`), or in the text beside it.
 
-**Three kinds of mark.** Wavy ribbons are what you can smell (fuel vapour; benzene travels in it). Hollow blue rings are carbon monoxide. Small dark dots are particles. Ring strokes must reach 3:1 against both the page and the darkest haze (give them a 1 px light halo over the haze).
+**The fume.** A warm, soft, smoky grey-brown with wavy orange wisps through it (the wisps are the part you can smell). Every edge fades to nothing, it is drawn behind the people so it never covers a face, and in dark mode it is a muted warm brown haze, never a pale glow that could read as headlights.
 
-**Three layers.**
+**Two parts.**
 
-| Layer | Where | Rule |
+| Part | Where | Rule |
 |---|---|---|
-| **A. The street's own air** | The whole frame, in every scene, including electric and green-light scenes | Sparse rings and dots at one fixed density: 6 rings and 6 dots per reference patch (120 × 120 px at 360 px width). No ribbons. Seeded, so it never flickers between renders. |
-| **B. What the pack adds where people stand** | The kerb zone: from the ground to 180 cm, around the waiting people | Extra rings per patch = `6 × co.<scenario>.add.mid ÷ bg.co.traffic`, rounded, at least 1. With today's values that is **+1, +3, +6** for 幾輛, 十來輛, 停滿; the code computes it, nobody types it. Ribbons reaching the people: 1, 3, 5. A soft ochre wash in three fixed steps (10%, 18%, 26% opacity), drawn behind the figures and never opaque. No bands by height. |
-| **C. The cores at the tailpipes** | Behind each drawn petrol scooter | One fixed dark core per tailpipe, the darkest step in the palette, low to the ground, thinning toward the kerb over about two metres. Not scaled by the estimate. This is what makes the picture bold where it is true: beside a tailpipe. |
+| **B. What the pack adds where people stand** | The kerb zone: from the ground to 150 cm, on the people's side of the nearest tailpipe | The fume carried on from the nearest tailpipe to the people: three overlapping soft ovals, low at the tailpipe, wrapping the people from the ground up. Its **average tint over the zone is 6 % per step**, and the steps are `6 × co.<scenario>.add.mid ÷ bg.co.traffic`, rounded, at least 1: **1, 3, 6** steps (6 / 18 / 36 %) for 幾輛, 十來輛, 停滿, in proportion to the carbon monoxide the pack adds. The code computes it (`fumeSteps`, `AIR_EXTRA`); nobody types it. Its darkest point never passes 62 % (`AIR.washMax`), so the full box is drawn a little lighter than proportional, never darker. Wisps reaching the people: 1, 3, 5. No bands by height. |
+| **C. A puff at each tailpipe** | Behind each drawn petrol scooter | One fixed soft puff per tailpipe, low on the ground, billowing a little and thinning over about two metres, with one or two short wisps. Not scaled by the estimate; drawn for the eye. This is what makes the picture bold where it is true: beside a tailpipe. |
 
-**What changes the drawing.** Only the scenario switch (screens 1, 4), the swap slider (screen 10) and the repair button (screen 11). **Nothing changes with time through the red.** Marks drift a few pixels; that is all. Dots do not scale with the scenario beyond the number of tailpipes drawn, because PM2.5 barely changes and ultrafine particles are not estimated.
+The street's own air is **not drawn**. The tag under every street picture says so: **示意圖｜廢氣大多看不見，街上本來的空氣沒有畫** / *Illustration: real exhaust is mostly invisible, and the street's own air is not drawn*, and the number boxes carry it (0.5 ppm, 實測).
 
-**Electric scooters** have no layer B or C. A car at the frame's edge keeps one small core. Three grey dots sit at the tyres.
+**Words on the pictures.** Screen 2 and `/questions/smell/`: one scooter, one fume, a few wisps rising to a person's nose, and three labels into that fume: **油氣：聞得到** (at the wisps), **一氧化碳：聞不到** (into the thinner fume near the head), **微粒：小到看不到** (into the fume low behind the pipe; no darker patch, so nothing visible sits beside "too small to see"). Labels never break inside a phrase (SceneLabel glues each short piece) and the ones on the bottom edge grow upward with 字大. Never ranked. Every other street picture carries at most one label, **機車排的氣**, or **汽車排的氣** where the only exhaust is a car's (the green street, the swap picture).
 
-**Seeing the range.** The estimate sheet's third block shows two small patches side by side, 範圍低的一頭 and 範圍高的一頭, drawn with the same rule from `add.lo` and `add.hi` (for the dozen today: 7 rings and 17 rings).
+**What changes the drawing.** Only the scenario switch (screens 1, 4), the swap slider and the repair button. **Nothing changes with time through the red.** Wisps drift a few pixels; that is all.
 
-**The tag, on every scene, as HTML at 14 px or more:** 示意圖｜廢氣大多看不見，街上本來的空氣沒有畫 / Illustration: real exhaust is mostly invisible, and the street's own air is not drawn. Screen 4 adds the key (its quiet line). Every alt text says it is an illustration, names the scenario, and says that the amount where the people stand follows the site's estimate while the dark patches at the tailpipes are drawn for the eye.
+**Electric scooters** have no fume at all. A car at the frame's edge keeps one small puff of its own exhaust, labelled. Tyre and brake dust is left to the words.
 
-**The rule is published** on `/estimate/#drawing` in four sentences with the two patches, so a reporter can check it.
+**Diagrams draw the same fume** (`airPuff`, `airRibbon`): the body (G6) shows the cloud breathed in, its wisps to the nose and throat (1), a sooty haze in both lungs (2: particles), a faint haze on into the heart and blood (3: carbon monoxide), each part lit by its numbered pin. The mask (G17) shows the cloud coming out of the tailpipe of a scooter whose back and rear wheel are in the picture (a bare pipe read as a cigarette), reaching the mask, the gases going on through it as a faint haze in the airway, the wisps to the nose, a sooty patch on the mask's front (darker on a mask that stops more), and on a loose mask the fume curling in at the gaps beside the nose and the cheek (two small arrows). The ten scooters (G11) draw the one that needs repair as one cloud whose area is about a third of all the fume in the picture (`est.inspect.top10share`, middle of the range), drawn darker than the small puffs and named right above it, 該修的那一輛 / This one needs repair. The heights scene (G8) draws the fume from the ground to above the adult's head, with no shaded band. The green street names one electric scooter in words and turns the car so its puff lies clear of the scooters; the electric share card has no exhaust at all. The film animates the same fume: puffs leave each tailpipe, drift from the nearest one to the people, and a wisp is breathed in at each nose in the ruler shot.
+
+**The range** is not drawn: a picture draws the middle value, and the range section of `/estimate/` shows how wide it is.
+
+**Every alt text** says it is an illustration, names the scenario, and says that the amount where the people stand follows the site's estimate while the dark patches at the tailpipes are drawn for the eye.
+
+**The rule is published** on `/estimate/#drawing` in five sentences (numbers from `AIR_RULE`), so a reporter can check it. The site check (`check:site`, check 14) fails if any page carries a ring, dot, halo, key or breathing ring.
 
 ### 5.2 The graphics
 
 | # | Graphic | Used on | Spec |
 |---|---|---|---|
-| G1 | Street, red | Screen 1, share card, poster | A 4:5 crop. Pale shopfronts. Sixteen scooters three rows deep, fading with distance; one front-row rider with a face. Three pedestrians at the kerb in front of the wash. Signal with LED 90. Scooters roll in and settle, the counter runs to 16, the cores appear with them, then everything rests. Must look unpleasant at the tailpipes. |
-| G2 | One scooter, three marks | Screen 2, `/questions/smell/` | Full-width side view. Ribbons, rings and dots leave in separate lanes before mixing. The three-item key under it doubles as three tap targets that light their marks. A nose icon beside the ribbons only. A drawn drinks can by the chip. |
-| G3 | From above | Screen 3, `/questions/beside-me/` | Rebuild of `ApproachPlan.astro`: stop line, turn box, zebra, kerb in road-paint colours; scooters as capsules with a head dot; a dimension line with a large HTML number; a side inset with the one-metre line. The cores slide across the gap once. |
-| G4 | Kerb close-up with the switch | Screen 4, share card, poster, brief | The page's central picture. People left, tail right, the three layers of 5.1. Switching changes layer B, the number of rows behind, and the 推估 row. Fade 0.6 s. |
+| G1 | Street, red | Screen 1, share card, poster | A 4:5 crop. Pale shopfronts. Sixteen scooters three rows deep, fading with distance; one front-row rider with a face. Three pedestrians at the kerb in front of the fume. Signal with LED 90. A zebra crossing in front. Scooters roll in and settle, the counter runs to 16, the puffs appear with them, then everything rests. One label, 機車排的氣, with a thin line into the fume. Must look unpleasant at the tailpipes. |
+| G2 | One scooter, one fume | Screen 2, `/questions/smell/` | Full-width side view. One soft fume leaves the tailpipe, with wisps rising to a person's nose; Three labels with leader lines into the fume: 油氣：聞得到 / 一氧化碳：聞不到 / 微粒：小到看不到. No key. A drawn drinks can by the chip. |
+| G3 | From above | Screen 3, `/questions/beside-me/` | Rebuild of `ApproachPlan.astro`: stop line, turn box, zebra, kerb in road-paint colours; scooters from above with wheels, handlebars and a rider (arms to the grips, helmet with visor); a dimension line with a large HTML number; a side inset with the one-metre line. The puffs slide across the gap once; one label, 機車排的氣. |
+| G4 | Kerb close-up with the switch | Screen 4, share card, poster, brief | The page's central picture. People left, tail right, the fume of 5.1. Switching changes how thick the fume is where the people stand, the number of rows behind, and the 推估 row. Fade 0.6 s. One label, 機車排的氣. |
 | G5 | Measured beside estimated, with the zoom-out strip | Screen 5, `/estimate/`, brief | Section 3.2, screen 5. Direct labels, no legend lookup, a data-table view in the sheet. Bars grow once. |
-| G6 | The body | Screen 6, `/questions/one-red-light/`, film | Base it on the one-walk drawing (large, dark, high contrast) with an adult, not a child, and no cap. Three numbered pins. Marks travel in once. |
-| G7 | Road of time and the year strip | Screen 7, `/questions/one-red-light/` | Replaces `TimeLadder.astro`. Three signposts, each with a drawing (a heartbeat trace with one shallow dip; lungs; a calendar). The year strip refills when the stepper changes. Never an empty rung. |
-| G8 | Heights | Screen 8, `/questions/my-child/`, film | Ruler in centimetres with HTML numbers. Four whole figures on one ground line. Breathing rings. Even haze, no height bands. |
-| G9 | The rider | Screen 9, `/questions/rider/` | Second-row rider, visor up, the tailpipe ahead pointing at him. No chart. |
+| G6 | The body | Screen 6, `/questions/one-red-light/`, film | Base it on the one-walk drawing (large, dark, high contrast) with an adult, not a child, and no cap. Three numbered pins. The fume goes in once: wisps to the nose and throat, soot in the lungs, a faint haze into the blood. |
+| G7 | Road of time and the year strip | Screen 7, `/questions/one-red-light/` | Replaces `TimeLadder.astro`. Three signposts, each with a drawing (a heartbeat trace with one shallow dip; lungs; a calendar). Under them one bar in hours, 一年加起來 / Added up over a year (no dot per day: the owner rejected dots, 2026-11-27); it refills when the stepper changes. Never an empty rung. |
+| G8 | Heights | Screen 8, `/questions/my-child/`, film | Ruler in centimetres with HTML numbers. Four whole figures on one ground line. Even fume from the rider's tailpipe, no height bands, one label 機車排的氣. |
+| G9 | The rider | Screen 9, `/questions/rider/` | Second-row rider, visor up, the tailpipe ahead pointing at them. No chart. One label 機車排的氣. |
 | G10 | Swap slider | Screen 10, share card | Ten scooters, ten stops, plus and minus buttons. Plays 0 → 10 once and rests on electric. Replaces `SceneCompare.astro`. |
-| G11 | Ten scooters, one to fix | Screen 11 | The 修好它 button shrinks one cloud, once, 0.8 s. No rider on the dirty one. |
+| G11 | Ten scooters, one to fix | Screen 11 | The 修好它 button shrinks one cloud, once, 0.8 s. No rider on the dirty one. The cloud's area is about a third of all the fume drawn. |
 | G12 | Price bars | Screen 12, `/electric/` | Two bars to one scale, the subsidy as a dashed extension, one bracket. Green when electric is cheaper, ochre when dearer. |
 | G13 | Monthly bars | Screen 13, `/electric/` | Two thick bars, a divider, two thin outlined bars, direct labels in 元. |
 | G14 | Street, green | Screen 14 | G1 after the switch. |
@@ -466,9 +471,9 @@ One function draws air everywhere: `src/components/art/air.ts`. Home scenes, que
 
 ### 5.3 What moves
 
-- **Once, on arrival, then rest (under 4 s):** scooters arriving and the counter (1); marks leaving the tailpipe (2); the cores crossing the gap (3); bars growing (5, 12, 13); marks travelling in (6); the slider's first run (10).
+- **Once, on arrival, then rest (under 4 s):** scooters arriving and the counter (1); wisps leaving the tailpipe (2); the puffs crossing the gap (3); bars growing (5, 12, 13); the fume going in (6); the slider's first run (10).
 - **On a tap:** the scenario switch (4), pins (6), the stepper (7), the slider (10), 修好它 (11), county and scrapping (12), distance (13).
-- **Gently, all the time:** breathing rings; a drift of a few pixels in the marks. A 動畫 開／關 switch in the menu stops both.
+- **Gently, all the time:** a drift of a few pixels in the wisps. A 動畫 開／關 switch in the menu stops it.
 - **Never:** text, axes, numbers once drawn, the page itself.
 - With `prefers-reduced-motion` every picture shows its final state and every control still works.
 
@@ -486,7 +491,7 @@ One function draws air everywhere: `src/components/art/air.ts`. Home scenes, que
 | `NextButton` | `src/components/ui/NextButton.astro` | The full-width question button. |
 | `ScenarioSwitch` | `src/components/ui/ScenarioSwitch.astro` | Three whole-width segments, 48 px tall, each with its count range underneath. Emits one event that the picture and the number listen to. |
 | `TextSize` | `src/components/shell/TextSize.astro` | The 字大 button (section 6.4), with a pre-paint script in `Base.astro`. |
-| `air.ts` and `Air.astro` | `src/components/art/` | Section 5.1. A pure function from scenario, zone, tailpipe positions and seed to SVG. |
+| `air.ts` | `src/components/art/` | Section 5.1. A pure function from scenario, zone, tailpipe positions and seed to SVG: fume only. |
 | Scenes | `src/components/art/HeroStreet.astro`, `TailpipeMarks.astro`, `KerbScene.astro`, `BodyFigure.astro`, `HeightsScene.astro`, `RiderScene.astro`, `SwapScene.astro`, `TenScooters.astro` | G1, G2, G4, G6, G8, G9, G10, G11. One SVG each, built from `parts.ts`. |
 | `MeasuredVsEstimate` | `src/components/charts/MeasuredVsEstimate.astro` | G5 with the zoom-out strip. Takes rows with a kind; draws by the rules of 4.4. |
 | `RoadOfTime` | `src/components/charts/RoadOfTime.astro` | G7. |
@@ -681,7 +686,7 @@ The index is a grid of seven picture cards, each with its picture, its question 
 | `one-red-light` 等一個紅燈有差嗎 | G7, G6 | Screen 7's copy, the dose arithmetic and the kerb workers. K5. | Delete "the evidence starts at an hour". Rewrite the figure caption that printed raw research notes. The year counter is always filled in. |
 | `rider` 騎車的人呢 | G9, then the five commute bars | Screen 9's copy. Bars labelled 平均・各種來源・早上一小時; a line that scooter and walking did not differ significantly. | Never "the most". |
 | `beside-me` 站遠一點有用嗎 | G3 | 離排氣管遠一點，通常比較淡；差多少，本站不印數字。運研所把等候區往後退，量到 PM2.5 少了 0.46 和 0.94 微克。 實測 | No distance control. No "step back N metres". The idle-limit chart names its pollutants or is removed. |
-| `mask` 口罩擋得住廢氣嗎 (new) | A face with a mask: dots partly stopped, rings and ribbons passing through | 口罩擋的是微粒，而且會從邊緣漏；一氧化碳和油氣是氣體，連 N95 都擋不住。 研究 | Use only the facts and the `mustNotSay` list in `research/masks/VERIFIED.json`. Do not print the old "70–80%" figure. |
+| `mask` 口罩擋得住廢氣嗎 (new) | A face with a mask: fume reaching it, the gases going on through as a haze, soot on the mask's front, fume curling in at the gaps | 口罩擋的是微粒，而且會從邊緣漏；一氧化碳和油氣是氣體，連 N95 都擋不住。 研究 | Use only the facts and the `mustNotSay` list in `research/masks/VERIFIED.json`. Do not print the old "70–80%" figure. |
 
 `how-much` and `electric` are redirect pages. Their share cards are kept as files so old shares still show a picture.
 
@@ -746,13 +751,13 @@ Keep the prototype. It is a real animation: one continuous scene driven by one c
 | 4 | 12.4–16.4 | 82→74 ▸▸ with the word 快轉 | Push in low behind the front row. Puffs leave each tailpipe at knee height and gather into the dark cores. | 廢氣就排在膝蓋的高度。 / The exhaust comes out at knee height. | — | — |
 | 5 | 16.4–20.8 | 74→62 | Pull back. The layer has formed as the pack arrived and now **holds**. Close shot of the child covering her nose, held 2.5 s. | 車停著，廢氣一直補上來。 / They stay put. The exhaust keeps coming. | — | — |
 | 6 | 20.8–27.8 | 62→50 | The number panel slides in and stays still. Line 1, 20 px or more: 這排機車多出來的一氧化碳　約 0.05 到 1 ppm　推估. Line 2: 街上原本就有　約 0.5 ppm　實測. | 路邊多了多少？這是推估。 / How much more at the kerb? An estimate. | — | `co.dozen.add`, `bg.co.traffic` |
-| 7 | 27.8–31.8 | 50→44 | The camera dives into the layer. Blue rings float to a dashed nose that does not react. | 一氧化碳：沒有味道。 / Carbon monoxide: no smell at all. | — | — |
-| 8 | 31.8–37.0 | 44→36 | A drop of petrol; ribbons draw from it to the nose; the nose fills in. | 臭味，是沒燒完的汽油。 / The smell is unburnt fuel. | 油氣裡有苯，會致癌 / The vapour carries benzene, which causes cancer | — |
-| 9 | 37.0–40.2 | 36→30 | A magnifying glass wanders; specks show only inside the lens. | 還有微粒，小到看不見。 / And particles too small to see. | — | — |
-| 10 | 40.2–45.2 | 30→18 | Out to a close shot. A ruler slides in. A dashed line at tailpipe height; the pushchair band 55–85 cm shaded. Breathing rings at every nose. **No bands in the haze.** | 排氣管和嬰兒車，都不到一公尺高。 / Tailpipe and pushchair: both under a metre high. | — | — |
-| 11 | 45.2–48.8 | 18→10 | The rings pulse; the child's faster. | 小孩個子矮，呼吸又快。 / Children are shorter and breathe faster. | — | — |
-| 12 | 48.8–52.0 | 10→4 | A ring appears at the front-row rider's nose; the camera nudges toward him. | 騎士也在這一層裡。 / The rider is in it too. | — | — |
-| 13 | 52.0–58.4 | 4 ❚❚ | Freeze. Full-frame card A: a month sheet fills with one dot a day; three more sheets fan out. | 一個紅燈很短，可是天天等。 / One red light is short. But it is every day. | 一年約 12 到 55 小時 (chip 本站計算) / About 12 to 55 hours a year | `time.hoursPerYear` |
+| 7 | 27.8–31.8 | 50→44 | A card: one scooter from the side and a small head (home screen 2). One fume leaves the tailpipe and spreads back along the ground to the person; the face does not react. | 一氧化碳：沒有味道。 / Carbon monoxide: no smell at all. | — | — |
+| 8 | 31.8–37.0 | 44→36 | The same scooter: wisps of fuel rise out of its tailpipe to the person's nose. | 臭味，是沒燒完的汽油。 / The smell is unburnt fuel. | 油氣裡有苯，會致癌 / The vapour carries benzene, which causes cancer | — |
+| 9 | 37.0–40.2 | 36→30 | Nothing new is drawn: the caption says it. | 還有微粒，小到看不見。 / And particles too small to see. | — | — |
+| 10 | 40.2–45.2 | 30→18 | Out to a close shot. A ruler slides in. A dashed line at tailpipe height; the pushchair band 55–85 cm shaded. A wisp of the fume is breathed in at every nose. **No bands in the haze.** | 排氣管和嬰兒車，都不到一公尺高。 / Tailpipe and pushchair: both under a metre high. | — | — |
+| 11 | 45.2–48.8 | 18→10 | The wisps are breathed in again and again; the child's faster. | 小孩個子矮，呼吸又快。 / Children are shorter and breathe faster. | — | — |
+| 12 | 48.8–52.0 | 10→4 | A wisp is breathed in at the front-row rider's nose; the camera nudges toward them. | 騎士也在這一層裡。 / The rider is in it too. | — | — |
+| 13 | 52.0–58.4 | 4 ❚❚ | Freeze. Full-frame card A: a red pedestrian signal beside a tear-off day calendar whose pages flip away faster and faster (no dots). | 一個紅燈很短，可是天天等。 / One red light is short. But it is every day. | 一年約 12 到 55 小時 (chip 本站計算) / About 12 to 55 hours a year | `time.hoursPerYear` |
 | 14 | 58.4–64.4 | 4 ❚❚ | Card A leaves. Card B, full frame: the body figure G6. The three marks travel their routes. **Nothing joins the calendar to the body.** | 長年吸車子的廢氣， / Years of breathing traffic exhaust | 長期研究，所有車輛，不只機車 / Long-term studies of all traffic, not scooters alone | — |
 | 15 | 64.4–71.6 | 4 ❚❚ | Same card. The three pins light in turn. No organ fills or changes colour. | 和氣喘、心臟病、肺癌有關。 / are linked to asthma, heart disease, lung cancer. | 等一個紅燈就生病？沒有人證明過 / One red light making you ill? Nobody has shown that | — |
 | 16 | 71.6–74.6 | 3→0, real time | Card off; the street resumes where it froze. | 快綠燈了。 / Nearly green. | — | — |
@@ -780,10 +785,10 @@ Numbers and claims:
 4. Rename the panel from 這群機車造成的 to 這排機車多出來的, and add the 街上原本就有 row.
 5. Draw the street's own air (layer A of 5.1) in every scene, including before the red and in the electric replay. The layer never becomes an opaque band, never rises as a wall over heads and never tints the whole frame.
 6. Make the haze dark and dense at the tailpipes and the first metres of kerb, thinning away from them (layer C), instead of a pale band across the whole width.
-7. Remove the 50 / 100 / 150 cm banding and `ESTIMATE.profile`. Keep the ruler and the nose rings. No height-ratio chip.
+7. Remove the 50 / 100 / 150 cm banding and `ESTIMATE.profile`. Keep the ruler and the breathing at the noses (as built: wisps breathed in, no rings). No height-ratio chip.
 8. "The tailpipe is level with the pushchair" becomes "both under a metre high" (beat 10).
 9. Health beat: two separate full-frame cards (calendar, then body), about 19 seconds in all. No ribbon from the calendar into the lungs. Organs do not fill. Add the K5 quiet line. Label 12 to 55 hours 本站計算, not 推估.
-10. Add a breathing ring and a caption for the rider (beat 12).
+10. Add the breathing and a caption for the rider (beat 12).
 11. Money: replace the block stacks and the bouncing question mark with the two real price tags (beat 23) and add the running-cost beat (beat 24). No 示意圖 label on money.
 12. The persistent tag 示意圖｜廢氣其實大多看不見 stays on screen in every street shot, not only at one moment.
 13. The note under the player is rewritten to match what the film now does: the countdown is time-lapsed where 快轉 shows; how much is drawn where the people stand follows the site's estimate; the dark patches at the tailpipes are drawn for the eye.
@@ -922,13 +927,13 @@ After deploy: canonical links, `og:url`, `og:image`, the sitemap and QR codes st
 | Route lines need checked facts | Screen 6 pins ship only with facts. |
 | Kaohsiung study out of the headline path; add dose arithmetic | Screen 7. |
 | Long-term signpost wording; cohort studies not 實測 | The 研究 chip (4.1); screen 6 and 7 wording. |
-| Background in every drawing, a key, low and high ends visible, a persistent tag | 5.1. |
+| Background in every drawing, a key, low and high ends visible, a persistent tag | 5.1 (superseded 2026-11-27: fume only, no key; the tag stays). |
 | One WHO value (100 mg/m³, about 87 ppm), checked | Slot `who.co15min_*`; section 11. |
 | Can comparison recomputed from the fleet mean, as a range | Screen 2 chip; slot `emit.co.perRed_can`. |
 | Swap percentage labelled as arithmetic assuming equal scooters | Screen 10 chip. |
 | Story label wherever named characters appear | No named characters. |
 | Health picture must not label disease on a child's chest under a countdown | Screen 6: adult, routes not diseases, no street, K5 on the same screen; the rail has no seconds. |
-| Hero cloud must not hide people; ring contrast | G1; 5.1. |
+| Hero cloud must not hide people; mark contrast | G1; 5.1 (as built: wisps and leader lines at 3:1, check 14). |
 | Screen 6 of the base: one pollutant, zoom-out strip, a worded button | Screen 5; the foot button is always 怎麼知道的？ in words. |
 | Headline line breaks; mock-ups at 特大 | `Phrased`; check 13. Phase 2 screenshots at 特大 replace the missing mock-ups. |
 | One set of scooter counts | `scn.*` everywhere; 16 drawn on the page and in the film. |
@@ -968,20 +973,20 @@ None of these blocks the build; each has a stated fallback.
 
 **12.2 Masks: one more home screen, one film beat, one question page.** The owner asked: "a lot of people in Taiwan wear surgical masks or other basic masks — we need to warn about the ineffectiveness of those". Verified research is in `research/masks/VERIFIED.json` (nine facts, the warning text in both languages, the four-row table, the must-not-say list). Lane A enters the nine facts and their sources in the registry.
 - **The home page has 15 screens, not 14.** A new screen goes between "騎士也在裡面" and "換掉": **Screen 10 · 口罩擋得住嗎** (the later screens move down one; the rail counts `n / 15`; the red part of the rail runs to screen 12 and green from 13). Wherever this brief says 14 screens, read 15; acceptance check 9 becomes exactly 15 `Screen` articles and at most 12,300 px at 360 × 740.
-  - **Picture G17.** A face in profile, in the signal-figure style, wearing an ordinary surgical mask. The three marks of screen 2 arrive from a tailpipe at the left: the blue rings (carbon monoxide) pass straight through the mask; the ribbons (fuel vapour, benzene) pass through; some dots (particles) stop on the mask and some slip in round the edges at the nose and cheeks. A four-way switch under the picture changes the mask: 布口罩 · **醫用口罩** · 活性碳口罩 · 貼合的 N95. Rings pass through all four. With the activated-carbon mask a few ribbons stop and the rest pass. With the fitted N95 most dots stop and nothing leaks at the edges. Default 醫用口罩.
+  - **Picture G17.** A face in profile, in the signal-figure style, wearing an ordinary surgical mask. A cloud of fume arrives from a tailpipe at the left: the gases (carbon monoxide) go on through the mask, drawn as a faint haze in the airway; the orange wisps (fuel vapour, benzene) pass through to the nose; a sooty patch builds up on the mask's front (the particles it stops), and on a loose mask the fume curls in round the edges at the nose and cheek (two small arrows). A four-way switch under the picture changes the mask: 布口罩 · **醫用口罩** · 活性碳口罩 · 貼合的 N95. The gases pass through all four. With the activated-carbon mask a few wisps stop at the mask and the rest pass. With the fitted N95 the soot is darkest and nothing leaks at the edges. Default 醫用口罩.
   - **Headline.** 醫用口罩擋不住機車廢氣 / A surgical mask won't stop scooter exhaust
   - **Body.** 廢氣裡的一氧化碳和苯是氣體，一般口罩擋不住氣體。細小的微粒，也會從口罩邊緣漏進去。 / The carbon monoxide and benzene in exhaust are gases, and ordinary masks do not stop gases. Fine particles also leak in round the edges.
   - **Q.** 口罩防感冒、流感還是有用。 / A mask still helps against colds and flu.
   - **Chips.** 官方 (NIOSH statement, `mask-niosh-no-gas`) and 研究 (`mask-asworn-vandersande`). The sheet carries the four-row table from VERIFIED.json, each cell backed by its fact, and the two Taiwanese tests (`mask-carbon-mol-2005` with its date, `mask-ilosh-taiwan` as a comparison between masks, not percentages).
   - **Next.** 那這一團，可以變小嗎？↓ / So can the cloud be made smaller? ↓
   - Obey the must-not-say list in VERIFIED.json: never "masks are useless"; never a filter-material percentage as protection as worn; never that activated-carbon masks block exhaust or carbon monoxide; no advice to put N95s on children.
-- **Film.** Add one beat of about four seconds after the "what is in it" beats and before the heights beat: the same profile face with a surgical mask, rings and ribbons passing through. Caption 一般口罩，擋不住這些氣體。 / An ordinary mask does not stop these gases.
+- **Film.** Add one beat of about four seconds after the "what is in it" beats and before the heights beat: the same profile face with a surgical mask, the fume flowing to it and on through it, soot gathering on its front. Caption 一般口罩，擋不住這些氣體。 / An ordinary mask does not stop these gases.
 - **`/questions/mask/`** as in section 2, built from the same facts and G17.
 - **`/act/`:** the pedestrians' card includes one line: 口罩擋不住廢氣裡的氣體；能做的是別站在車陣正後方。 / A mask does not stop the gases in exhaust; what you can do is not stand right behind the pack.
 
 **12.3 Distance.** Advice about standing back is qualitative only ("離機車遠一點", "別站在車陣正後方"). No metres, no "halves your exposure": the signed method rules out a distance rule.
 
-**12.4 The health case, stated once so every lane tells it the same way.** The signed estimate says one red light beside a dozen scooters adds about as much carbon monoxide as the street already holds, far below short-term limits. The site does not claim one red light is dangerous. The case it makes is: (1) the smell is real and it is unburnt fuel carrying benzene; (2) it is at child height, a step or two away; (3) it repeats every day, and people who work at the kerb stand in it for hours; (4) years of breathing traffic exhaust are linked to asthma, heart disease and lung cancer; (5) scooters are a large share of the country's fuel-vapour and carbon-monoxide emissions (about 10% and 15.6%); (6) a tenth of scooters account for about a third of the carbon monoxide; (7) an ordinary mask does not stop the gases; (8) an electric scooter is one tailpipe fewer. Push these as hard as the facts allow and no harder.
+**12.4 The health case, stated once so every lane tells it the same way.** The signed estimate says one red light beside a dozen scooters adds about as much carbon monoxide as the street already holds, far below short-term limits. The site does not claim one red light is dangerous. The case it makes is: (1) the smell is real and it is unburnt fuel carrying benzene; (2) it is at child height, a step or two away; (3) it repeats every day, and people who work at the kerb stand in it for hours; (4) years of breathing traffic exhaust are linked to asthma, heart disease and lung cancer; (5) scooters are a large share of the country's fuel-vapour and carbon-monoxide emissions (about 10% and 15.6%); (6) a tenth of scooters account for about a third of the carbon monoxide; (7) an ordinary mask does not stop the gases; (8) an electric scooter is one tailpipe fewer. Push these as hard as the facts allow and no harder. *As built 2026-11-27 (§13): the signed 3-D simulation adds that (1) the smell is above what people can smell for most of the red when the wind blows from the scooters, (2) carbon monoxide comes in second-long bursts near a tailpipe, (3) for people who stay an hour with the wind from the scooters benzene is about 1 to 4 times California's 1-hour reference, and (4) one case passes the WHO 15-minute value: a pushchair half a metre behind one tailpipe in near-still held air, every red for 15 minutes (low confidence, rare). "Far below" stays only for one red light, after conversion to a 15-minute average.*
 
 **12.5 Notes left for lane owners by earlier fixers** (things in your files that must change because the registry, the calculator or shared components were corrected today) are in the `forOtherOwners` lists of `registry-evidence-results.json`, `calc-electric-results.json` and `shared-build-results.json` under the session scratchpad folder `fixes/`. The review's raw findings for the old pages are under `findings/` in the same scratchpad. Read the ones for your lane; most concern copy that this redesign replaces, but any factual correction in them still applies.
 
@@ -1092,3 +1097,21 @@ This section records the first release as it was built. Where it differs from th
 - *Share cards:* no site name (it was a speck in every preview); the 示意圖 / Illustration plate is 38 px type with a border, at the bottom right of the central square (X lays the link title over the bottom-left). Each headline phrase stays on one line and the headline is set as large as its box allows; the signal and the station stand further left so one-red-light and app headlines set near home's size. English headlines were re-phrased to shorter lines: "One red light. |Does it matter?", "Going electric: |what does it cost?", "Does stepping |back help?", and brief "A step or two |from children" (no closer than the Chinese 一兩步). The act card's cloud is smaller and paler. The /questions/smell/ link preview text now gives the page's own answer (油氣和醛類 / fuel vapour and aldehydes).
 - *Smaller things:* the English smell strip title is "Can't smell it, |can't see it" ("nothing to see" read as "nothing there"); the English header shows the menu icon without its word from 62em to 70em (it was cut to "Mer" at 1,024 px); the share block's two buttons share one row at 360 px and its lead keeps 家長群組 together.
 - *Heights after the review fixes* (360 × 740, 標準, folds closed): `/` 12,192 / 14,200; screen 13 at most 838 px (Chinese, limit 850) and 1,016 px (English, limit 1,020) over all 22 counties and both answers.
+
+**The 3-D simulation on the site (2026-11-27).** The owner asked whether the air at a red light is over the guideline, because it smells horrible. A signed 3-D large-eddy simulation (`research/simulation/`, OpenFOAM, adversarial verification) answered it; the site prints only the statements `research/simulation/statements.json` allows, each with what it must carry, and none of its must-not statements. Numbers reach pages only through `scripts/build-simulation-data.mjs` → `src/data/simulation-data.ts` (generated; check-data re-runs it) → `src/data/simulation.ts` (slots) → `EstimateValue`, the charts and the registry facts (`src/data/facts-simulation.ts`, read level 本站自己用電腦算的推估).
+- *Screen 5* ("超過指引值嗎"). Screen 4's next button asks the owner's question: 「那麼臭，超過指引值了嗎？」. The headline is chosen by `simBelowWho()`: 「臭是真的。一氧化碳沒味道；等一個紅燈，仍低於指引值」 / "The smell is real. Carbon monoxide has no smell. After one red light, it is still below the WHO guideline". It names one red light and never says "far below". Body, one idea per line: the smell (推估, statement 6) and the exception (推估, statement 3, linked to `/questions/my-child/#pushchair`). The picture is SimCompare compact: three rows of 15-minute averages (one red 0.1–4; every red for 15 minutes with the wind held 3–16; the pushchair's middle case 35–56 with an arrow past 87 and "of such 15-minute periods, about 1 or 2 in 10 pass 87"), the WHO 15-minute line with 「只看一氧化碳；低於它，不代表廢氣安全。」, and the caption 推估 · one simulated red per case. MeasuredVsEstimate and its zoom-out strip left home (must-not 3); the quiet line is empty (no placeholder).
+- *Screen 2* body is one line per sentence. *Screen 6* sheet: the carbon monoxide sentence is one red light after conversion, labelled 推估. *Screen 7* sheet: statement 8 (people who stay an hour, benzene). *Screen 8* quiet line: statement 5 (pushchair height, wind from the scooters, not in every wind) replaces K4, whose 「多多少，還算不出來」 is answered; K4 stays defined in `ui.ts` and `brief-rules.mjs`.
+- *`/estimate/#simulation`* (section 2; later sections renumbered 3–10): the owner's question answered, SimCompare (b), SimSeconds (a: one-second series sorted from most to least, no guideline, no number on a second; sorted because brief-no-buildup draws no curve through the red), heights, SimAbove (c: share of the red you can smell it; benzene for people who stay against California's 1-hour reference), and folds 可以信多少 / 沒有算的 (enclosed places) / 還算了什麼 (arcade) / 方法和檔案 (JSON download). The hero's MeasuredVsEstimate has no zoom strip; EstimateBands no WHO row; under the table: 「範圍最高的數字，是一般紅燈裡偏高的那種，不是最糟的紅燈。」
+- *Question pages.* `/questions/smell/#smell-co` 「聞起來那麼臭，一氧化碳超過指引值了嗎？」, `/questions/my-child/#pushchair` (statement 3, one idea per line), `/questions/one-red-light/` sheet (statements 2, 8, 9). `/about/#corrections`: new entry 2026-11-27 (sim-guideline), and child-44's "now" text. The one-page brief uses the new headline, no zoom strip, and statement 1 with the exception.
+- *Guards.* Eleven `sim-*` claim rules (qualifiers for the exception, heights and benzene; do-not-claim rules for the must-not statements) and the brief rule `brief-no-seconds-beside-guideline` (check 3 on the built pages: a 1-, 10- or 90-second value in the same sentence as 87 or 31 ppm). Every hit has a reviewed allow-list entry naming what it carries. Nothing was loosened.
+- *Not changed (other jobs' files):* the film, share cards and art. `src/i18n/pages/film.ts` 239–240 (heights sheet: "not about how much exhaust there is at any height") is contradicted by statement 5 and should change at the combine step.
+- *Heights at 360 × 740* (check-site 9, 標準, phone font): `/` 12,153 / 14,203 (before: 12,192 / 14,200); screen 5 736 / 905 px (before 775 / 950); screen 8 610 / 704.
+
+**The smell chemicals on the site (2026-11-27).** The owner asked to simulate the harmful chemicals present when people smell the fumes, and to associate them with benzene and other cancer-causing chemicals where honest. The signed answer (`research/simulation/smell-chemicals/`, statements-smell.json: eleven allowed statements, fourteen must-nots) is on the site only in its own words. Plan, three sceptics' objections and the decisions on them: the job's scratch folder (PLAN.md, OBJECTIONS-*.md, DECISIONS.md).
+- *Home screen 2* headline 「聞到的不是苯，|但苯跟著一起來」 / "What you smell is not benzene, |but benzene comes with it"; body 「推估：如果你聞到的是身旁機車的廢氣，那口空氣裡也有苯（ㄅㄣˇ）、甲醛等十幾種廢氣成分。」 and 「聞不到，不代表空氣乾淨。」; quiet line: the shares come from older scooters. The picture label 「油氣：聞得到」 became 「刺鼻的氣體：聞得到」 / "Sharp-smelling gases: you notice them": the smell more likely comes from burning, not unburnt petrol (statement not-unburnt-petrol), so 油氣 / fuel vapour is never the name of what you smell (it still names hydrocarbons in inventories, inspections and masks). The WHO "no safe level of benzene" line left screen 2 and /questions/smell/ (it would sit beside seconds-long values: must-not 2); it stays in the registry and on /evidence/ link 4. The IARC labels (benzene, 1,3-butadiene, formaldehyde Group 1, with what the groups mean and exhaust's own 2B) are in the screen 2 sheet, in a different block from every smell sentence.
+- *Home screen 5* quiet line 「推估：味道比較可能是燒過才有的。」 / "Estimate: the smell more likely comes from burning."; its order-of-magnitude hedge is the first sentence of the sheet paragraph. A hazard line on screen 6 was measured and left out: 913 / 1,111 px against the 850 / 1,020 px caps.
+- */questions/smell/* three screens (#answer the strongest line, the names in share order and the hazard labels as a visible paragraph; #what not-unburnt-petrol with the SmellBenzene chart; #more no-smell-not-clean), the card #how-much (seconds-long benzene with the share of seconds, the runs and the condition) and the existing #smell-co.
+- */estimate/#smell* (section 3; later sections renumbered 4–11): the statements in full, SmellBenzene (seconds-long benzene on a log axis; one line, benzene's lowest published odour threshold, labelled as not a health limit), and under #smell-hour the one-red and stay-an-hour statements with the detail table (each chemical against its own 1-hour or 30-minute reference; IARC group as a column, never as an ordered list). The near-calm single-tailpipe rows stay in the served `results-smell.json` only. The share of the red you can smell is printed as the two central values (76 % and 97 %, the same as chart c1) with a sentence on why the smell step's ranges (0-97 %, 83-99 %) are wider than c1's.
+- */evidence/#smell-chemicals*: the smell facts in three lists (what comes with the smell; seconds-long levels; 30-minute and 1-hour averages), never in the link-4 group that holds the WHO line. The IARC rows now say 第1類 / 第2B類 site-wide (was 級), with the meaning of the groups.
+- *Guards.* Fourteen `smell-chem-*` claim rules (must-nots 1–14), `src/lib/__tests__/smell.test.ts` (numbers against results-smell.json; no-smell-not-clean in every view with the strongest line; Group 1 always with the meaning and 2B; no sentence with both a smell word and a cancer word; the chart; the /evidence/ lists), and the generator checks the published words against the results.
+- *Film.* Cue `fuel` now reads 「聞到的不是苯，但苯跟著來。」 / 「推估。聞不到也不代表乾淨」 ("The smell isn't benzene. Benzene comes with it." / "Estimate. No smell does not mean clean air."); 1.4 s moved from cue `co` to `fuel` to meet the reading floor (the film's length is unchanged). The MP4s must be rendered again. Share cards are unchanged (their words and art do not name what the smell is).

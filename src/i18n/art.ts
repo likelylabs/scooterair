@@ -4,16 +4,18 @@
 // upper-primary reading level; English follows it sentence for sentence.
 //
 // Copy rules that bind these strings (docs/redesign-brief.md):
-//  - the pictures draw ONLY the scooters' exhaust, as one soft plume per row
-//    that leaves the tailpipes and reaches the people; the street's own air is
-//    not drawn (the key under every picture says so: key.note). Where people
-//    stand, the rings inside the plume follow the site's estimate (推估); the
+//  - the pictures draw ONLY the scooters' exhaust, as fume coming out of the
+//    tailpipes and drifting to the people, never as symbols; the street's own
+//    air is not drawn (the tag under every picture says so). Where people
+//    stand, how thick the fume is follows the site's estimate (推估); the
 //    dark patches at the tailpipes are drawn for the eye (5.1). Every alt text
-//    says so (scene.ts → sceneAlt);
+//    says so (scene.ts → sceneAlt). What the fume holds is said in words;
 //  - one word for the site's own air numbers: 推估. A scene never prints a
 //    number itself: numbers come from src/data/estimate.ts (3.3);
-//  - the three marks are named the same way everywhere: 油氣（沒燒完的汽油）
-//    / fuel vapour, 一氧化碳 / carbon monoxide, 微粒 / particles (6.6);
+//  - what the fume holds is named the same way everywhere: 刺鼻的氣體（聞得到）
+//    / sharp-smelling gases, 一氧化碳 / carbon monoxide, 微粒 / particles (6.6).
+//    The smellable part is never called 油氣 / fuel vapour: the smell more likely comes from
+//    burning, not unburnt petrol (statements-smell not-unburnt-petrol);
 //  - carbon monoxide, benzene and particles are never ranked by harm;
 //  - "zero" is only ever a scooter's own exhaust: tyre and brake dust and the
 //    other traffic stay in the electric pictures;
@@ -22,10 +24,7 @@
 // The tag on every scene (示意圖｜廢氣其實大多看不見) and the sentence every
 // alt text ends with live in ui.ts (`illustration`), shared with the film.
 //
-// The groups from `illustration` down to `cycle` serve the old scenes
-// (StreetScene, PollutantKey, SceneCompare, SignalCycle). They go
-// when those components are deleted (brief 5.4, phase 3). New strings are in
-// `alt2`, `marks` and `range`, then one group per scene (`words` to
+// Strings are in `alt2` and `fume`, then one group per scene (`words` to
 // `measure2`), directly below.
 
 import type { L10n, Locale } from './index';
@@ -56,48 +55,17 @@ export const art = {
   },
 
   /**
-   * The small key under every picture (AirLegend): the plume and the marks
-   * inside it, one or two words each so it fits one line on a phone (what
-   * you can and cannot smell is screen 2's key, art.marks), and on the first
-   * picture one line that says the street's own air is not drawn (so an empty
-   * part of a picture is not read as clean).
+   * Words ON a picture, each at the end of a thin leader line that points into the fume. No key:
+   * the picture names what it shows where it shows it. The screen that explains what is in the
+   * fume carries the three `in*` labels on one fume; every other picture carries at most `label`
+   * (or `carLabel`, on a picture whose only exhaust is a car's).
    */
-  key: {
-    title: { 'zh-TW': '圖例', en: 'Key' } as L10n,
-    plume: { 'zh-TW': '機車排的氣', en: 'Scooter exhaust' } as L10n,
-    car: { 'zh-TW': '汽車排的氣', en: 'Car exhaust' } as L10n,
-    ribbon: { 'zh-TW': '油氣', en: 'Fuel vapour' } as L10n,
-    ring: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' } as L10n,
-    dot: { 'zh-TW': '微粒', en: 'Particles' } as L10n,
-    tyre: { 'zh-TW': '輪胎粉塵', en: 'Tyre dust' } as L10n,
-    note: { 'zh-TW': '街上原本就有的空氣，圖上沒有畫。', en: 'The air the street already holds is not drawn.' } as L10n,
-    nose: { 'zh-TW': '鼻子的高度', en: 'Nose height' } as L10n,
-    /** The same three marks named by the sense that finds them (the first picture, the kerb, the film). */
-    sense: {
-      ribbon: { 'zh-TW': '聞得到：油氣', en: 'Can smell: fuel vapour' } as L10n,
-      ring: { 'zh-TW': '聞不到：一氧化碳', en: 'No smell: carbon monoxide' } as L10n,
-      dot: { 'zh-TW': '看不到：微粒', en: 'Can’t see: particles' } as L10n,
-    },
-    /** The one word inside the first picture, with an arrow up at the plume around the people. */
-    label: { 'zh-TW': '↑ 機車排的氣', en: '↑ Scooter exhaust' } as L10n,
-  },
-
-  /** The three kinds of mark, named once (screen 2's key, any legend). */
-  marks: {
-    ribbon: { 'zh-TW': '聞得到：油氣和醛（ㄑㄩㄢˊ）類', en: 'Smell: fuel vapour and aldehydes' } as L10n,
-    ring: { 'zh-TW': '聞不到：一氧化碳', en: 'No smell: carbon monoxide' } as L10n,
-    dot: { 'zh-TW': '看不到：微粒', en: 'Too small to see: particles' } as L10n,
-  },
-
-  /** AirRange: the two patches that show the two ends of an estimate. */
-  range: {
-    lo: { 'zh-TW': '範圍低的一頭', en: 'Low end of the range' } as L10n,
-    hi: { 'zh-TW': '範圍高的一頭', en: 'High end of the range' } as L10n,
-    rings: { 'zh-TW': '一格 {n} 個圈', en: '{n} rings in a patch' } as L10n,
-    alt: {
-      'zh-TW': '示意圖：同一個推估的兩頭。{which}，一格畫 {n} 個圈；圈圈越密，一氧化碳越多。',
-      en: 'Illustration: the two ends of one estimate. {which}: {n} rings in a patch. More rings mean more carbon monoxide.',
-    } as L10n,
+  fume: {
+    label: { 'zh-TW': '機車排的氣', en: 'Scooter exhaust' } as L10n,
+    carLabel: { 'zh-TW': '汽車排的氣', en: 'Car exhaust' } as L10n,
+    inSmell: { 'zh-TW': '刺鼻的氣體：聞得到', en: 'Sharp-smelling gases: you notice them' } as L10n,
+    inCo: { 'zh-TW': '一氧化碳：聞不到', en: 'Carbon monoxide: no smell' } as L10n,
+    inPm: { 'zh-TW': '微粒：小到看不到', en: 'Particles: too small to see' } as L10n,
   },
 
   /* ---------------------------------------------------------------------- */
@@ -108,9 +76,9 @@ export const art = {
 
   /** Words used in more than one scene. */
   words: {
-    waiting: { 'zh-TW': '他也在等', en: 'He is waiting too' } as L10n,
-    /** The street scene's label, placed under the rider it names, pointing up at him. */
-    waitingUp: { 'zh-TW': '↑ 他也在等', en: '↑ He is waiting too' } as L10n,
+    waiting: { 'zh-TW': '他也在等', en: 'They’re waiting too' } as L10n,
+    /** The street scene's label, placed under the rider it names, pointing up at them. */
+    waitingUp: { 'zh-TW': '↑ 他也在等', en: '↑ They’re waiting too' } as L10n,
     tailpipe: { 'zh-TW': '排氣管', en: 'Tailpipe' } as L10n,
     cm: { 'zh-TW': '公分', en: 'cm' } as L10n,
     oneMetre: { 'zh-TW': '1 公尺', en: '1 m' } as L10n,
@@ -125,12 +93,12 @@ export const art = {
   /** G1 and G14: the street at a red light, and the same street with the pedestrian signal green. */
   hero: {
     altRed: {
-      'zh-TW': '路口的街景：紅燈，行人號誌倒數 {count}。阿嬤、推嬰兒車的大人和戴黃帽的小學生站在路邊，小學生用手摀著口鼻。旁邊停了 {n} 輛機車，排成三排，引擎沒熄火；每一根排氣管後面都有一團深色的廢氣。前排一位騎士掀起鏡片，看得到臉，旁邊寫著「他也在等」。',
-      en: 'A junction at a red light; the pedestrian signal counts down from {count}. An older woman, an adult with a pushchair and a schoolchild in a yellow cap wait at the kerb; the child covers nose and mouth with a hand. Beside them {n} scooters stand three rows deep with their engines running, and behind every tailpipe there is a dark patch of exhaust. One front-row rider has the visor up and a face, labelled “He is waiting too”.',
+      'zh-TW': '路口的街景：紅燈，行人號誌倒數 {count}。阿嬤、推嬰兒車的大人和戴黃帽的小學生站在路邊，小學生用手摀著口鼻。旁邊停了 {n} 輛機車，排成三排，引擎沒熄火；每一根排氣管後面都有一團深色的廢氣。廢氣飄到等紅燈的人身上，圖上寫著「機車排的氣」。前排一位騎士掀起鏡片，看得到臉，旁邊寫著「他也在等」。',
+      en: 'A junction at a red light; the pedestrian signal counts down from {count}. An older woman, an adult with a pushchair and a schoolchild in a yellow cap wait at the kerb; the child covers nose and mouth with a hand. Beside them {n} scooters stand three rows deep with their engines running, and behind every tailpipe there is a dark patch of exhaust. The exhaust drifts onto the people waiting, labelled “Scooter exhaust”. One front-row rider has the visor up and a face, labelled “They’re waiting too”.',
     } as L10n,
     altGreen: {
-      'zh-TW': '同一個路口，行人號誌轉綠。旁邊的 {n} 輛都是電動機車，沒有排氣管。後面沒有那一團廢氣，輪胎旁有幾顆灰色小點。畫面邊緣有一輛汽車，後面還有它自己的一小團。戴黃帽的小學生一腳踏上斑馬線。',
-      en: 'The same junction with the pedestrian signal green. All {n} scooters beside the kerb are electric: no tailpipes, no cloud behind them, a few grey dots at the tyres. A car at the edge of the picture still has its own small cloud. The schoolchild in the yellow cap steps onto the crossing.',
+      'zh-TW': '同一個路口，行人號誌轉綠。旁邊的 {n} 輛都是電動機車，沒有排氣管，後面沒有那一團廢氣；最後一排的一輛，上面寫著「電動機車」。遠處有一輛汽車，車尾還有它自己的一小團廢氣，圖上寫著「汽車排的氣」。戴黃帽的小學生一腳踏上斑馬線。',
+      en: 'The same junction with the pedestrian signal green. All {n} scooters beside the kerb are electric: no tailpipes and no cloud behind them, and one in the back row is labelled “Electric scooter”. A car further back still has its own small cloud, labelled “Car exhaust”. The schoolchild in the yellow cap steps onto the crossing.',
     } as L10n,
     counter: { 'zh-TW': '機車 {n} 輛', en: '{n} scooters' } as L10n,
   },
@@ -138,25 +106,26 @@ export const art = {
   /** G4: the kerb, close. */
   kerb: {
     alt: {
-      'zh-TW': '路邊的近景。推嬰兒車的大人和用手摀著口鼻的小學生，站在左邊。最近一輛機車的車尾，就在右邊一兩步的地方。騎士也在畫面裡，後面還有別排的機車。每排機車後面有一團廢氣，飄到人站的地方。人站的地方，圈圈和小點多一些；排氣管後面顏色最深。',
-      en: 'The kerb, close. An adult with a pushchair and a schoolchild covering nose and mouth stand on the left. The tail of the nearest scooter is a step or two to their right, with its rider in view and more rows behind. Each row of scooters leaves a soft plume of exhaust that reaches the people. Where they stand there are more rings and dots, and the patches behind the tailpipes are darkest.',
+      'zh-TW': '路邊的近景。推嬰兒車的大人和用手摀著口鼻的小學生，站在左邊。最近一輛機車的車尾，就在右邊一兩步的地方。騎士也在畫面裡，後面還有別排的機車。每排機車後面有一團廢氣，飄到人站的地方。停的機車越多，人站的地方廢氣越濃；排氣管後面顏色最深。圖上寫著「機車排的氣」。',
+      en: 'The kerb, close. An adult with a pushchair and a schoolchild covering nose and mouth stand on the left. The tail of the nearest scooter is a step or two to their right, with its rider in view and more rows behind. Each row of scooters leaves a soft plume of exhaust that reaches the people. The more scooters wait, the thicker the exhaust where the people stand, and it is darkest just behind the tailpipes. It is labelled “Scooter exhaust”.',
     } as L10n,
   },
 
-  /** G2: one scooter, three kinds of mark. */
+  /** G2: one scooter, one fume, and what is in it. */
   tailpipe: {
     alt: {
-      'zh-TW': '一輛燃油機車的側面，引擎沒熄火。排氣管排出三種東西，各走各的路。波浪線是聞得到的油氣，往上飄到一個鼻子前面；空心圈是聞不到的一氧化碳；小黑點是看不到的微粒。旁邊畫了一個鋁罐。',
-      en: 'One petrol scooter from the side, engine running. Three kinds of mark leave the tailpipe, each in its own lane. Wavy ribbons are the fuel vapour you can smell, drifting up to a nose. Hollow rings are carbon monoxide, which has no smell. Small dark dots are particles too small to see. A drinks can is drawn beside them.',
+      'zh-TW': '一輛燃油機車的側面，引擎沒熄火。排氣管後面有一團廢氣，貼著地面往後飄，有幾縷往上飄到一個人的鼻子前面。圖上寫著這團廢氣裡有什麼：刺鼻的氣體，聞得到；一氧化碳，聞不到；微粒，小到看不到。',
+      en: 'One petrol scooter from the side, engine running. A cloud of exhaust leaves the tailpipe and drifts back along the ground, and a few wisps rise to a person’s nose. Words on the picture say what is in the cloud: sharp-smelling gases, which you notice; carbon monoxide, which has no smell; particles, too small to see.',
     } as L10n,
-    keyLegend: { 'zh-TW': '點一種，只看它', en: 'Tap one to see it alone' } as L10n,
+    /** added to the alt text when the drinks can is drawn above the picture */
+    canAlt: { 'zh-TW': '上面畫了一個飲料罐，用來比一比有多少。', en: 'A drinks can is drawn above it, to give a sense of the amount.' } as L10n,
   },
 
   /** G3: the junction from above. */
   plan3: {
     alt: {
-      'zh-TW': '從上面看的路口。左邊是停止線，後面停著機車；中間是斑馬線；右邊是待轉區。待轉區裡的機車，車尾朝著斑馬線。每個車尾後面有一團深色的廢氣，伸過那一小段空隙。空隙上標著「{gap}」。阿嬤、推嬰兒車的大人和戴黃帽的小學生，就站在斑馬線旁邊的路邊等。角落的小圖是一輛機車的側面：排氣管在一公尺的虛線下面，標著「{height}」。',
-      en: 'The junction from above. On the left is the stop line with scooters behind it. In the middle is the crossing. On the right is the turn box. Its scooters have their tails toward the crossing, each with a dark patch of exhaust reaching across the small gap. The gap is marked “{gap}”. An older woman, an adult with a pushchair and a schoolchild in a yellow cap wait at the kerb beside the crossing. A small inset shows a scooter from the side: its tailpipe is under a dashed one-metre line, marked “{height}”.',
+      'zh-TW': '從上面看的路口。左邊是停止線，後面停著機車；中間是斑馬線；右邊是待轉區。待轉區裡的機車，從上面看得到騎士的安全帽和握著把手的手，車尾朝著斑馬線。每個車尾後面有一團深色的廢氣，伸過那一小段空隙，飄到等過馬路的人那裡。空隙上標著「{gap}」。阿嬤、推嬰兒車的大人和戴黃帽的小學生，就站在斑馬線旁邊的路邊等。角落的小圖是一輛機車的側面：排氣管在一公尺的虛線下面，標著「{height}」。',
+      en: 'The junction from above. On the left is the stop line with scooters behind it. In the middle is the crossing. On the right is the turn box. Its scooters, seen from above with each rider’s helmet and hands on the handlebars, have their tails toward the crossing, each with a dark patch of exhaust reaching across the small gap to the people waiting. The gap is marked “{gap}”. An older woman, an adult with a pushchair and a schoolchild in a yellow cap wait at the kerb beside the crossing. A small inset shows a scooter from the side: its tailpipe is under a dashed one-metre line, marked “{height}”.',
     } as L10n,
     turnBox: { 'zh-TW': '待轉區', en: 'Turn box' } as L10n,
     crossing: { 'zh-TW': '斑馬線', en: 'Crossing' } as L10n,
@@ -169,8 +138,8 @@ export const art = {
   /** G6: where exhaust goes in the body. */
   body: {
     alt: {
-      'zh-TW': '一個大人的頭和胸口，畫成號誌小人的樣子，看得到氣管、兩片肺和心臟。三種記號從鼻子進去：波浪線（油氣）停在鼻子和喉嚨；小黑點（微粒）進到肺裡；空心圈（一氧化碳）穿過肺，進到血液。圖上只畫它們去的地方，沒有畫任何疾病。',
-      en: 'The head and chest of an adult, drawn like a signal figure, with the windpipe, both lungs and the heart showing. Three kinds of mark go in through the nose. Wavy ribbons (fuel vapour) stop at the nose and throat. Small dots (particles) reach the lungs. Hollow rings (carbon monoxide) pass through the lungs into the blood. The picture shows only where they go; it draws no disease.',
+      'zh-TW': '一個大人的頭和胸口，畫成號誌小人的樣子，看得到氣管、兩片肺和心臟。臉的前面有一團廢氣，從鼻子吸進去：橘色的幾縷刺鼻的氣體到鼻子和喉嚨；兩片肺裡有一層深色的煙灰（微粒）；淡淡的一層廢氣再進到心臟和血液（一氧化碳）。三個號碼標出這三個地方，旁邊寫著鼻子、喉嚨，肺，血液。圖上只畫它們去的地方，沒有畫任何疾病。',
+      en: 'The head and chest of an adult, drawn like a signal figure, with the windpipe, both lungs and the heart showing. A cloud of exhaust in front of the face is breathed in through the nose. Orange wisps (the sharp-smelling gases) reach the nose and throat. A dark, sooty haze (particles) settles in both lungs. A faint haze of the exhaust goes on into the heart and the blood (carbon monoxide). Three numbers mark the three places, each with its name beside it: nose and throat, lungs, blood. The picture shows only where it goes; it draws no disease.',
     } as L10n,
     pins: {
       nose: { 'zh-TW': '鼻子、喉嚨', en: 'Nose and throat' } as L10n,
@@ -182,14 +151,14 @@ export const art = {
   /** G7: the road of time and the year strip. */
   road: {
     alt: {
-      'zh-TW': '一條往遠處走的路，路邊有三個路牌，越遠時間越長：{a}、{b}、{c}。每個路牌有一個小圖：一條心跳的線，中間淺淺凹了一下；兩片肺；一本日曆。路的下面是一年的小點，一天一顆，流進一條用小時量的長條。',
-      en: 'A road running into the distance with three signposts, each for a longer time than the last: {a}, {b}, {c}. Each has a small drawing: a heartbeat trace with one shallow dip; a pair of lungs; a calendar. Under the road, a year of small dots, one for each day, flows into a bar measured in hours.',
+      'zh-TW': '一條往遠處走的路，路邊有三個路牌，越遠時間越長：{a}、{b}、{c}。每個路牌有一個小圖：一條心跳的線，中間淺淺凹了一下；兩片肺；一本日曆。路的下面是一條用小時量的長條：一年加起來，在路邊站多久。',
+      en: 'A road running into the distance with three signposts, each for a longer time than the last: {a}, {b}, {c}. Each has a small drawing: a heartbeat trace with one shallow dip; a pair of lungs; a calendar. Under the road, a bar measured in hours: how long a year of waiting adds up to at the kerb.',
     } as L10n,
     stripAlt: {
       'zh-TW': '一天等 {n} 個紅燈：一年約 {lo} 到 {hi} 小時。',
       en: '{n} red lights a day: about {lo} to {hi} hours a year.',
     } as L10n,
-    days: { 'zh-TW': '一年 {days} 天，一天一顆', en: '{days} days a year, one dot a day' } as L10n,
+    days: { 'zh-TW': '一年加起來', en: 'Added up over a year' } as L10n,
     hours: { 'zh-TW': '約 {lo} 到 {hi} 小時', en: 'About {lo} to {hi} hours' } as L10n,
     hourUnit: { 'zh-TW': '小時', en: 'hours' } as L10n,
   },
@@ -197,8 +166,8 @@ export const art = {
   /** G8: heights on one ruler. */
   heights: {
     alt: {
-      'zh-TW': '一把從地面量到 {top} 公分的尺。同一條地面上有四個人。他們是嬰兒車裡的寶寶、戴黃帽的小學生、大人，還有坐在機車上的騎士。嬰兒車的高度（{lo} 到 {hi} 公分）塗了一條顏色；機車的排氣管做了記號，它和寶寶都不到一公尺高。每個人的鼻子前面有一個呼吸的圈，小孩的動得比較快。廢氣從地面到大人頭頂以上畫得一樣多，沒有分層。',
-      en: 'A ruler from the ground to {top} cm. Four people stand on one ground line: a baby in a pushchair, a schoolchild in a yellow cap, an adult, and a rider seated on a scooter. The pushchair height ({lo} to {hi} cm) is shaded; the scooter’s tailpipe is marked, and both it and the baby are less than a metre off the ground. A breathing ring sits at each nose; the child’s moves faster. The exhaust is drawn evenly from the ground to above the adult’s head, with no bands by height.',
+      'zh-TW': '一把從地面量到 {top} 公分的尺。同一條地面上有四個人。他們是嬰兒車裡的寶寶、戴黃帽的小學生、大人，還有坐在機車上的騎士。機車的排氣管標了出來，它和寶寶都不到一公尺高。廢氣從排氣管飄過每一個人，從地面一直到大人的頭頂上面，沒有分層；排氣管旁邊最濃。圖上寫著「機車排的氣」。',
+      en: 'A ruler from the ground to {top} cm. Four people stand on one ground line: a baby in a pushchair, a schoolchild in a yellow cap, an adult, and a rider seated on a scooter. The scooter’s tailpipe is labelled, and both it and the baby are less than a metre off the ground. The exhaust drifts from the tailpipe across all of them, from the ground to above the adult’s head, with no bands by height; it is thickest beside the tailpipe. It is labelled “Scooter exhaust”.',
     } as L10n,
     /** Short names under the four figures: they must fit side by side on a 320 px phone. */
     names: {
@@ -212,16 +181,16 @@ export const art = {
   /** G9: the rider. */
   riderScene: {
     alt: {
-      'zh-TW': '排在第二排的一位騎士，鏡片掀起來，看得到臉。旁邊寫著「他也在等」。前面那輛機車的排氣管正對著他，他的前輪和腳都在那一團深色的廢氣裡；他自己的機車後面也有一團。他的鼻子前面有一個呼吸的圈。',
-      en: 'A rider in the second row, visor up, face showing, labelled “He is waiting too”. The tailpipe of the scooter in front points straight at him. His front wheel and feet are in its dark patch of exhaust; his own scooter leaves a patch behind it too. A breathing ring sits at his nose.',
+      'zh-TW': '排在第二排的一位騎士，鏡片掀起來，看得到臉。旁邊寫著「他也在等」。前面那輛機車的排氣管正對著這位騎士，前輪和腳都在那一團深色的廢氣裡；騎士自己的機車後面也有一團，圖上寫著「機車排的氣」。',
+      en: 'A rider in the second row, visor up, face showing, labelled “They’re waiting too”. The tailpipe of the scooter in front points straight at them. Their front wheel and feet are in its dark patch of exhaust; their own scooter leaves a patch behind it too, labelled “Scooter exhaust”.',
     } as L10n,
   },
 
   /** G10: the swap slider. */
   swap: {
     alt: {
-      'zh-TW': '路邊停了 {total} 輛機車，分成兩排，全部是電動機車。它們有輪子裡的馬達和一條綠色的燈條。後面沒有廢氣，輪胎旁有幾顆灰色小點。畫面邊緣有一輛汽車，後面有它自己的一小團。用圖下面的滑桿，可以一輛一輛換回燃油機車。每換回一輛，排氣管後面就多一團深色的廢氣。',
-      en: '{total} scooters at the kerb in two rows, all electric. Each has a motor in the wheel and a green light strip, nothing behind it, and a few grey dots at the tyres. A car at the edge of the picture has its own small cloud. With the slider under the picture you can turn them back into petrol scooters one at a time. Each one brings back a dark patch of exhaust behind its tailpipe.',
+      'zh-TW': '路邊停了 {total} 輛機車，分成兩排，全部是電動機車。它們沒有排氣管，後面沒有廢氣；第一輛下面寫著「電動機車」。畫面邊緣有一輛汽車，後面有它自己的一小團廢氣，圖上寫著「汽車排的氣」。用圖下面的滑桿，可以一輛一輛換回燃油機車。每換回一輛，排氣管後面就多一團深色的廢氣。',
+      en: '{total} scooters at the kerb in two rows, all electric. They have no tailpipe and nothing behind them; the first is labelled “Electric scooter”. A car at the edge of the picture has its own small cloud, labelled “Car exhaust”. With the slider under the picture you can turn them back into petrol scooters one at a time. Each one brings back a dark patch of exhaust behind its tailpipe.',
     } as L10n,
     question: { 'zh-TW': '{total} 輛裡，換幾輛電動機車？', en: 'Out of {total}, how many go electric?' } as L10n,
     value: { 'zh-TW': '{n} 輛電動、{rest} 輛燃油', en: '{n} electric, {rest} petrol' } as L10n,
@@ -232,18 +201,20 @@ export const art = {
   /** G11: ten scooters, one to fix. */
   ten: {
     alt: {
-      'zh-TW': '{total} 輛機車排成兩排。{rest} 輛的排氣管後面只有一小縷廢氣；有一輛沒有騎士的機車，後面是一大團。圖上一共畫了 {rings} 個圈，有 {big} 個在這一團裡。按「{fix}」，這一團會縮成和別輛一樣的一小縷。',
-      en: '{total} scooters in two rows. {rest} of them leave only a wisp of exhaust; one, with no rider on it, leaves a big cloud. The picture draws {rings} rings in all, and {big} of them are in that cloud. Press “{fix}” and the cloud shrinks to a wisp like the others.',
+      'zh-TW': '{total} 輛機車排成兩排。{rest} 輛的排氣管後面只有一小團廢氣；有一輛沒有騎士的機車，後面是一大團，上面寫著「該修的那一輛」。圖上所有的廢氣裡，大約 {share}% 是這一大團。按「{fix}」，這一團會縮成和別輛一樣的一小團。',
+      en: '{total} scooters in two rows. {rest} of them leave only a small puff of exhaust; one, with no rider on it and labelled “This one needs repair”, leaves a big cloud. Of all the exhaust in the picture, about {share}% is that one cloud. Press “{fix}” and the cloud shrinks to a small puff like the others.',
     } as L10n,
     fix: { 'zh-TW': '修好它', en: 'Fix it' } as L10n,
+    /** the words right above the scooter that needs repair (hidden once it is fixed) */
+    label: { 'zh-TW': '該修的那一輛', en: 'This one needs repair' } as L10n,
     undo: { 'zh-TW': '再看一次修之前', en: 'Show it before the repair' } as L10n,
   },
 
   /** G17: what a mask stops. */
   mask: {
     alt: {
-      'zh-TW': '一張戴著口罩的側臉，畫成號誌小人的樣子；左邊一根排氣管排出三種記號。空心圈（一氧化碳）直接穿過口罩；波浪線（油氣和苯）也穿過去；小黑點（微粒）有些停在口罩上，有些從鼻子旁邊和臉頰的縫漏進去。圖下面可以換四種口罩：布口罩、醫用口罩、活性碳口罩、貼合的 N95。不管哪一種，空心圈都穿過去。',
-      en: 'A face in profile wearing a mask, drawn like a signal figure. A tailpipe on the left gives off three kinds of mark. Hollow rings (carbon monoxide) pass straight through the mask. Wavy ribbons (fuel vapour and benzene) pass through too. Of the small dots (particles), some stop on the mask and some slip in at the gaps beside the nose and at the cheek. A switch under the picture changes the mask: cloth, surgical, activated carbon, fitted N95. With every one of them the rings pass through.',
+      'zh-TW': '一張戴著口罩的側臉，畫成號誌小人的樣子；左邊是一輛機車的車尾，看得到後輪和排氣管；排氣管排出一團廢氣，飄到臉前面。廢氣裡的氣體（一氧化碳）穿過口罩，進到鼻子後面的通道，畫成淡淡的一層；橘色的幾縷刺鼻的氣體也穿過去，到鼻子。口罩前面積了一層深色的煙灰，是擋下來的微粒；廢氣也從鼻子旁邊和臉頰的縫鑽進去（兩個小箭頭）。圖下面可以換四種口罩：布口罩、醫用口罩、活性碳口罩、貼合的 N95。擋得越多，口罩上的煙灰越深；不管哪一種，一氧化碳都穿過去。',
+      en: 'A face in profile wearing a mask, drawn like a signal figure. On the left is the back of a scooter, its rear wheel and tailpipe; the tailpipe gives off a cloud of exhaust that drifts up to the face. The gases in it (carbon monoxide) go on through the mask into the airway behind the nose, drawn as a faint haze. Orange wisps of the sharp-smelling gases pass through to the nose too. A dark, sooty patch builds up on the front of the mask: the particles it stops. The exhaust also slips in at the gaps beside the nose and at the cheek (two small arrows). A switch under the picture changes the mask: cloth, surgical, activated carbon, fitted N95. The more a mask stops, the darker its soot; with every one of them the carbon monoxide passes through.',
     } as L10n,
     names: {
       cloth: { 'zh-TW': '布口罩', en: 'Cloth mask' } as L10n,
@@ -265,8 +236,8 @@ export const art = {
   /** The station picture for /questions/app/: why an air-quality app does not show a red light. */
   station: {
     alt: {
-      'zh-TW': '路邊的一個空氣品質測站：一個箱子，進氣口在一根高高的管子頂端，標著「{inlet}」。旁邊的路邊，小學生和推嬰兒車的大人站在一輛機車的車尾後面；那一團深色的廢氣貼著地面，遠遠低於進氣口。',
-      en: 'An air-quality station beside the road: a cabinet whose inlet is at the top of a tall pipe, marked “{inlet}”. At the kerb beside it, a schoolchild and an adult with a pushchair stand behind the tail of a scooter. Its dark patch of exhaust stays near the ground, far below the inlet.',
+      'zh-TW': '路邊的一個空氣品質測站：一個箱子，進氣口在一根高高的管子頂端，標著「{inlet}」。旁邊的路邊，小學生和推嬰兒車的大人站在一輛機車的車尾後面；那一團深色的廢氣貼著地面，遠遠低於進氣口，圖上寫著「機車排的氣」。',
+      en: 'An air-quality station beside the road: a cabinet whose inlet is at the top of a tall pipe, marked “{inlet}”. At the kerb beside it, a schoolchild and an adult with a pushchair stand behind the tail of a scooter. Its dark patch of exhaust stays near the ground, far below the inlet, labelled “Scooter exhaust”.',
     } as L10n,
     inletRange: { 'zh-TW': '進氣口：{lo} 到 {hi} 公尺高', en: 'Inlet: {lo} to {hi} m up' } as L10n,
     cabinet: { 'zh-TW': '測站', en: 'Station' } as L10n,
@@ -284,15 +255,14 @@ export const art = {
   smell: {
     canTitle: { 'zh-TW': '聞得到', en: 'You can smell' } as L10n,
     canBody: {
-      'zh-TW': '你站在廢氣裡。臭的是沒燒完的汽油，和刺鼻的醛類。',
-      en: 'You are standing in exhaust. The smell is unburnt petrol and sharp aldehydes.',
+      'zh-TW': '你站在廢氣裡。如果味道來自身旁的機車，苯也在同一口空氣裡（推估）。',
+      en: 'You are standing in exhaust. If the smell is from the scooters beside you, benzene is in the same breath of air (estimate).',
     } as L10n,
     cannotTitle: { 'zh-TW': '聞不到、|看不到', en: 'Can’t smell it, |can’t see it' } as L10n,
     cannotBody: {
-      'zh-TW': '一氧化碳沒有味道。微粒太小，看不到。',
-      en: 'Carbon monoxide has no smell. Particles are too small to see.',
+      'zh-TW': '一氧化碳沒有味道。微粒小到看不到。沒有味道的時候，也可能有苯。',
+      en: 'Carbon monoxide has no smell. Particles are too small to see. Benzene can be there when nothing can be smelled.',
     } as L10n,
-    footer: { 'zh-TW': '味道是警報，不是量表。', en: 'Smell is an alarm, not a gauge.' } as L10n,
   },
 
   /** MeasurementDiagram (V35) */

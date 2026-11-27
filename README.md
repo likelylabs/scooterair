@@ -94,11 +94,11 @@ Three of its rules are this project's reading of the brief, stated so nobody is 
 | `src/lib/calc/` | the calculation engine; pure functions with tests |
 | `src/lib/site-state.ts` | which subsidy "phase" applies on a given date (see "Dates") |
 | `src/components/ui/` | the shared frame: `Screen`, `ScreenRail`, `KindChip` (the five chips), `EstimateValue`, `HowSheet` (the 怎麼知道的？ sheet), `NextButton`, `Segmented`, `ScenarioSwitch`, `IllustrationTag` |
-| `src/components/art/` | the drawings: `air.ts` (the one rule for drawing exhaust as an amount, brief 5.1) and one scene per picture (`HeroStreet`, `TailpipeMarks`, `KerbScene`, `BodyFigure`, `RoadOfTime`, `HeightsScene`, `RiderScene`, `MaskScene`, `SwapScene`, `TenScooters`, …) |
-| `src/components/charts/` | the chart library: `core/*.ts` draws each chart as an SVG string, the same code at build time and in the browser; `MeasuredVsEstimate`, `PriceBars`, `MonthlyBars`, `WorkingSum` are the redesign's charts |
+| `src/components/art/` | the drawings: `air.ts` (the one rule for drawing exhaust, as fume coming out of the scooters and nothing else, brief 5.1) and one scene per picture (`HeroStreet`, `TailpipeMarks`, `KerbScene`, `BodyFigure`, `RoadOfTime`, `HeightsScene`, `RiderScene`, `MaskScene`, `SwapScene`, `TenScooters`, …) |
+| `src/components/charts/` | the chart library: `core/*.ts` draws each chart as an SVG string, the same code at build time and in the browser; `MeasuredVsEstimate`, `PriceBars`, `MonthlyBars`, `WorkingSum` are the redesign's charts; `SimCompare`, `SimSeconds`, `SimAbove` draw the 3-D simulation |
 | `src/lib/home-money.ts` | every money figure on the home page, the film and `/electric/`, from the calculator engine, for today and for each coming date on which the sums change |
 | `docs/redesign-brief.md` | **the build brief**: the home page's 15 screens, the rules for showing estimates and measurements, wording, pictures, the film, every other page, and the acceptance checks. Its section 12 overrides the rest; section 13 says what was built differently and why. `docs/editorial-blueprint.md` is the earlier blueprint, kept for history and superseded where they differ |
-| `research/` | the research notes and per-paper checks the registry was built from; `research/estimate/` is the signed kerbside estimate (below); `research/masks/VERIFIED.json` the checked facts on masks |
+| `research/` | the research notes and per-paper checks the registry was built from; `research/estimate/` is the signed kerbside estimate (below); `research/simulation/` the signed 3-D simulation of one red light (and, in `smell-chemicals/`, what is in the air when the fumes can be smelled); `research/masks/VERIFIED.json` the checked facts on masks |
 | `scripts/` | the checks, the share-card renderer and the headline-font builder |
 | `public/` | files served as they are: icons, manifest, share images |
 
@@ -124,11 +124,34 @@ site works it out and says so. The estimate is signed and versioned (推估 v1�
 one significant figure for what the pack adds, one decimal for totals) → components that take the
 slot object, never a typed number: `EstimateValue` prints 約 A 到 B, the unit and the 推估 chip
 and opens the sheet; `formatEstimate()` gives the same text for share cards and the film; the
-illustrations' density comes from the same slots through `src/components/art/air.ts`. Headlines
+illustrations’ fume thickness comes from the same slots through `src/components/art/air.ts`. Headlines
 that depend on an estimate are chosen by written rules (`kerbRule`, `checkRule` in
 `estimate.ts`), so they change by themselves if the numbers change. `scripts/check-data.mjs`
 re-reads `results.json` and fails if any slot differs; `scripts/check-site.mjs` fails if a page
 prints an air number that is in neither `estimate.ts` nor the registry.
+
+**The 3-D simulation (推估, signed 2026-11-27).** `research/simulation/` holds a 3-D large-eddy
+simulation of one red light (OpenFOAM) that answers what the 90-second estimate cannot: the
+seconds-long bursts near a tailpipe, pushchair height, the smell, and people who stay at the kerb.
+Its `ANSWER.md` is the answer in plain words; `statements.json` lists the only statements the site
+may make (each with what it must carry) and the ones it must not. Numbers reach the site through
+`node scripts/build-simulation-data.mjs`, which reads `results-simulation.json`, `statements.json`
+and two `results/*/series_1s.csv` files and writes `src/data/simulation-data.ts` and
+`research/simulation/site-extract.json`; `src/data/simulation.ts` turns them into slots
+(`simRange('sim.co.oneRed15')`) for `EstimateValue` and the charts `SimCompare`, `SimSeconds` and
+`SimAbove`. check-data re-runs the generator and fails on any difference; the facts are in
+`src/data/facts-simulation.ts`; the `sim-*` rules in `claims-policy.ts` and
+`brief-no-seconds-beside-guideline` in `scripts/brief-rules.mjs` guard the must-not statements.
+After the signed files change: `node scripts/build-simulation-data.mjs && npm run check`.
+
+**The smell chemicals (推估, signed 2026-11-27).** `research/simulation/smell-chemicals/` answers
+what else is in the air in the seconds the fumes can be smelled: `ANSWER-SMELL.md` in plain words,
+`METHOD-SMELL.md` the method, `results-smell.json` every number, `statements-smell.json` the eleven
+statements the site may make and the fourteen it must not, `corrections.md` the sceptics' fixes.
+The same generator reads `results-smell.json` and `statements-smell.json` into
+`simData.smellChemicals` (slots `sim.smell.*`, chart `SmellBenzene`, facts in
+`src/data/facts-smell.ts`, the `smell-chem-*` rules in `claims-policy.ts`). The site serves
+`METHOD-SMELL.md` and `results-smell.json` as published (`src/pages/research/smell-chemicals/`).
 
 **Re-running it.**
 

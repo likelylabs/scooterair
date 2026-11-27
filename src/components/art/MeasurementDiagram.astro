@@ -20,7 +20,7 @@ import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, AIR_KEY } from './air';
+import { air } from './air';
 import { artId } from './parts';
 import { PLAN3, planView } from './plan-view';
 
@@ -28,10 +28,8 @@ interface Props {
   locale: Locale;
   level?: 2 | 3 | 4 | 5 | 6;
   class?: string;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
-  legend?: boolean;
 }
-const { locale, legend = true, level = 4, class: cls } = Astro.props;
+const { locale, level = 4, class: cls } = Astro.props;
 const H = `h${level}` as 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 const m = { ...art.measure, measure2Alt: art.measure2.alt[locale] + (locale === 'en' ? ' ' : '') + art.alt2.plain[locale] };
 // the same junction from above as G3 (plan-view.ts), with the instrument positions numbered in HTML
@@ -43,7 +41,7 @@ const spots: [number, number][] = [
   [VB.x + 96, PLAN3.kerb + 60],
   [VB.x + VB.w - 110, VB.y + VB.h - 70],
 ];
-const a = air({ frame: VB, seed: 14, id: artId('air'), tailpipes: plan.tailpipes, avoid: [...plan.avoid, ...spots.map(([x, y]) => ({ x: x - 50, y: y - 50, w: 100, h: 100 }))] });
+const a = air({ frame: VB, seed: 14, id: artId('air'), tailpipes: plan.tailpipes });
 const sep = locale === 'en' ? '; ' : '；';
 const alt = m.measure2Alt
   .replace('{n}', String(m.points.length))
@@ -52,7 +50,7 @@ const alt = m.measure2Alt
 
 <figure class:list={['measure', cls]}>
   <p class="measure__stamp">{m.stamp[locale]}</p>
-  <SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag="street" class="measure__plan">
+  <SceneFrame locale={locale} box={VB} alt={alt} tag="street" class="measure__plan">
     <Fragment set:html={a.defs + plan.ground + a.cores + a.marks + plan.figures + `<path class="plan3-dim" d="M${spots[3][0] + 34},${spots[3][1]}h40m0,0l-12,-9m12,9l-12,9"/>`} />
     <Fragment slot="labels">
       {spots.map(([x, y], i) => <SceneLabel box={VB} x={x} y={y} anchor="center middle" class="measure-n" as="span">{i + 1}</SceneLabel>)}

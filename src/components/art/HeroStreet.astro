@@ -13,10 +13,12 @@
  * phase="red"    petrol scooters; the plume of air.ts for the dozen scenario
  *                (one per row, the front row's reaching the people), and one
  *                label on the crossing pointing up at it. On arrival the scooters roll in and settle one
- *                after another, each with its dark core, and the chip counts
+ *                after another, each with its puff of fume, and the chip counts
  *                to the number drawn (under 4 s). Then it rests.
- * phase="green"  electric scooters: no plume; grey dots at the tyres and one
- *                car's small core stay. The child steps onto the crossing. Nothing to play.
+ * phase="green"  electric scooters: no fume behind them. One car's small puff of
+ *                exhaust stays, with the label 汽車排的氣 on a thin line into it (tyre
+ *                and brake dust is left to the words). The child steps onto the crossing.
+ *                Nothing to play.
  *
  * Props
  *   locale   Locale
@@ -35,11 +37,11 @@ import { art, fill } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, type Box, AIR_KEY } from './air';
+import { air, unitsPerPx, type Box } from './air';
 import { AIR_EXTRA } from './air-slots';
-import { CAR_TAILPIPE, artId, car, figureBoxes, person } from './parts';
-import { SIGNAL_HEAD, indexSources, pedSignal, pickSources, placed, put, shopfronts, tailOf, tyreOf, withoutSources, type Placed } from './kit';
-import { sceneAlt } from './scene';
+import { CAR_TAILPIPE, artId, car, person } from './parts';
+import { indexSources, pedSignal, pickSources, placed, put, shopfronts, tailOf, withoutSources, type Placed } from './kit';
+import { leader, sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
@@ -49,7 +51,7 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  /** the words on the picture (default true; false for a thumbnail or a share card) */
   legend?: boolean;
 }
 const { locale, legend = true, phase = 'red', tag = false, id, class: cls } = Astro.props;
@@ -59,8 +61,8 @@ const counter = red && (Astro.props.counter ?? true);
 const kind = red ? 'gas' : 'electric';
 const drawn = est.scn.dozen.drawn;
 
-// the bottom of the crossing is cut short: on the home page the key sits over it (art.css, AirLegend)
-const VB: Box = { x: 0, y: -690, w: 720, h: 860 };
+// the crossing ends just under its third stripe (no key under the picture any more)
+const VB: Box = { x: 0, y: -690, w: 720, h: 880 };
 const FAR = -296; // where the far pavement meets the shopfronts
 const KERB = 250; // right edge of the pavement the people stand on
 
@@ -81,12 +83,27 @@ const faceIdx = pack.findIndex((q) => q.row === 1); // the nearest front-row rid
 const people = { elder: 40, parent: 100, child: 222 };
 const childKind = red ? 'schoolchild-cover' : 'schoolchild-step';
 const SIG = { x: 28, y: -656, scale: 2.9 };
-const sigBox: Box = { x: SIG.x - 8, y: SIG.y - 8, w: SIGNAL_HEAD.w * SIG.scale + 16, h: SIGNAL_HEAD.h * SIG.scale + 16 };
-const carAt = { x: 372, y: FAR + 4, s: 0.6 };
+const carAt = { x: 420, y: FAR + 4, s: 0.6 };
 // under a front-row rider, pointing up at him (not under the empty road between scooters); the plume's label has the space nearer the people
 const labelAt = { x: pack[faceIdx + 1].x + 18, y: 8 };
-// the one word for the plume: on the crossing under the people's feet, pointing up at the plume around their legs
-const plumeAt = { x: 72, y: 8 };
+// the one word for the plume: on the pavement above the people, with a thin line down into the
+// fume coming out of the second row (the fume a reader recognises at once)
+const plumeAt = { x: 92, y: -268 };
+const plumeTo = { x: 252, y: -186 };
+const plumeLead = red && legend ? leader(plumeAt.x + 70, plumeAt.y + 36, plumeTo.x, plumeTo.y, unitsPerPx(VB.w)) : '';
+// green: the car's own small puff of exhaust, named on the far pavement with a line down into it.
+// The car faces right (drawn mirrored), so its tailpipe and puff are at its left end, over the empty
+// road left of the pack: the puff never lies on an electric scooter.
+const carPipe = { x: carAt.x - CAR_TAILPIPE.x * carAt.s, y: carAt.y + CAR_TAILPIPE.y * carAt.s };
+const carLabelAt = { x: carPipe.x - 70, y: -500 };
+const carLead = !red && legend ? leader(carPipe.x - 40, carLabelAt.y + 46, carPipe.x - 30, carPipe.y - 8, unitsPerPx(VB.w)) : '';
+// green: one scooter of the back row named in words, from the empty air above the pack at the right,
+// with a thin line down to the front of its body, in front of the rider (never on the rider's head;
+// the bottom of the picture is cropped on the home page)
+const evAt = pack.findIndex((q) => q.row === 3) + 5;
+const EV = { x: VB.x + VB.w - 8, y: -500 };
+const evTo = { x: pack[evAt].x + 116, y: -216 - 76 };
+const evLead = !red && legend ? leader(evTo.x - 4, EV.y + 46, evTo.x, evTo.y, unitsPerPx(VB.w)) : '';
 
 const a = air({
   frame: VB,
@@ -95,20 +112,9 @@ const a = air({
   scenario: 'dozen',
   extra: AIR_EXTRA,
   kerb: red ? { x0: 14, x1: KERB + 12, sourceX: pack[faceIdx].x + 4 } : undefined,
-  // the far rows keep only their plume (no marks): sixteen clusters would bury the pack, and the marks belong where people stand
-  tailpipes: red ? pack.map((q) => ({ ...tailOf(q), ...(q.row === 1 ? {} : { rings: 0, dots: 0, ribbons: 0 }) })) : [],
-  tyres: red ? [] : pack.filter((q) => q.row === 1).map(tyreOf),
-  cars: red ? [] : [{ x: carAt.x + CAR_TAILPIPE.x * carAt.s, y: carAt.y + CAR_TAILPIPE.y * carAt.s, dir: 1, scale: 1.2, rings: 0 }], // no ring: it would sit on the frame edge
-  avoid: [
-    sigBox,
-    ...figureBoxes('elder-woman', people.elder),
-    ...figureBoxes('stroller', people.parent),
-    ...figureBoxes(childKind, people.child),
-    // faces in the front row, the label and the chip
-    ...pack.filter((q) => q.row === 1).flatMap((q) => figureBoxes('scooter', q.x, 0, 1, 'head')),
-    { x: labelAt.x - 10, y: labelAt.y - 6, w: 200, h: 50 },
-    { x: 500, y: -690, w: 220, h: 80 },
-  ],
+  // the far rows keep only their puffs (no wisps): sixteen fans of wisps would bury the pack
+  tailpipes: red ? pack.map((q) => ({ ...tailOf(q), ...(q.row === 1 ? {} : { ribbons: 0 }) })) : [],
+  cars: red ? [] : [{ ...carPipe, dir: -1, scale: 1.2 }],
 });
 
 const street = [
@@ -123,7 +129,7 @@ const street = [
   `<path class="a-paint" opacity="0.7" d="M${KERB + 30},-66H730V-59H${KERB + 30}ZM${KERB + 30},-176H730V-170H${KERB + 30}Z"/>`,
 ].join('');
 const signal = pedSignal({ ...SIG, state: red ? 'red' : 'green', count: red ? led : undefined, poleTo: FAR + 62 });
-const carArt = red ? '' : put(carAt.x, carAt.y, car(), { s: carAt.s, cls: 'a-row-2' });
+const carArt = red ? '' : put(carAt.x, carAt.y, car(), { s: carAt.s, cls: 'a-row-2', flip: true });
 
 /** One scooter, wrapped so CSS can roll it in without touching the transform that places it. */
 const sc = (i: number) => `<g class="hero-sc" style="--i:${turn.get(i)}">${placed(pack[i], kind, { face: i === faceIdx, cls: 'a-figure' })}</g>`;
@@ -133,7 +139,7 @@ const cores = withTurn(a.cores);
 const clusters = withTurn(a.marks);
 // A row and its exhaust. The front row's dark patches lie behind its scooters, so the nearest
 // silhouettes stay whole; the far rows' patches lie low in front of them, at the wheels. Each
-// tailpipe's ribbons, rings and dots are drawn over its row, where they blow onto the scooter behind.
+// tailpipe's wisps are drawn over its row, where they blow onto the scooter behind.
 const rowArt = (row: 1 | 2 | 3) => {
   const mine = (i: number) => pack[i].row === row;
   const scooters = pack.map((q, i) => (q.row === row ? sc(i) : '')).join('');
@@ -156,9 +162,11 @@ const alt = red
   : sceneAlt(locale, fill(art.hero.altGreen, locale, { n: drawn }), { kind: 'electric' });
 ---
 
-<SceneFrame locale={locale} legend={legend && (red ? AIR_KEY : (['car', 'tyre'] as const))} legendSense={red} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive={red} id={id} class={['scene--hero', `scene--hero-${phase}`, cls].filter(Boolean).join(' ')} data-hero-count={red ? drawn : undefined}>
-  <Fragment set:html={a.defs + street + signal + carArt + a.wash + pickSources(a.cores, () => false) + noCar(withoutSources(a.marks)) + (red ? '' : noCar(a.cores)) + rowArt(3) + carAir + rowArt(2) + rowArt(1) + folk} />
-  {red && <SceneLabel slot="labels" box={VB} x={plumeAt.x} y={plumeAt.y} anchor="start top" max={30} plate class="hero-waiting hero-plume">{art.key.label[locale]}</SceneLabel>}
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive={red} id={id} class={['scene--hero', `scene--hero-${phase}`, cls].filter(Boolean).join(' ')} data-hero-count={red ? drawn : undefined}>
+  <Fragment set:html={a.defs + street + signal + carArt + a.wash + pickSources(a.cores, () => false) + noCar(withoutSources(a.marks)) + (red ? '' : noCar(a.cores)) + rowArt(3) + carAir + rowArt(2) + rowArt(1) + folk + plumeLead + carLead + evLead} />
+  {!red && legend && <SceneLabel slot="labels" box={VB} x={carLabelAt.x} y={carLabelAt.y} anchor="start top" max={36} plate class="fume-label">{art.fume.carLabel[locale]}</SceneLabel>}
+  {!red && legend && <SceneLabel slot="labels" box={VB} x={EV.x} y={EV.y} anchor="end top" max={44} plate>{art.words.electric[locale]}</SceneLabel>}
+  {red && legend && <SceneLabel slot="labels" box={VB} x={plumeAt.x} y={plumeAt.y} anchor="start top" max={52} plate class="hero-waiting hero-plume fume-label">{art.fume.label[locale]}</SceneLabel>}
   {red && <SceneLabel slot="labels" box={VB} x={labelAt.x} y={labelAt.y} anchor="start top" max={42} plate class="hero-waiting">{art.words.waitingUp[locale]}</SceneLabel>}
   {counter && (
     <SceneLabel slot="labels" box={VB} x={704} y={-672} anchor="end top" plate class="hero-count">

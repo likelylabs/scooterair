@@ -1,0 +1,1 @@
+solver stopped by the 2-h background limit at t=64.1718 s; ExecutionTime = 7052.26 s  ClockTime = 7172 s

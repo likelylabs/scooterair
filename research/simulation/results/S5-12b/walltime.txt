@@ -1,0 +1,1 @@
+mesh_s 34 solve_s 3584 nProcs 2

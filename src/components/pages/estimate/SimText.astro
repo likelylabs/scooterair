@@ -1,0 +1,51 @@
+---
+/**
+ * SimText — one sentence of copy with the simulation's ranges in it. Each `{name}` token is
+ * replaced by an <EstimateValue> of the slot it names (src/data/simulation.ts), so the range is
+ * printed with 約, its two ends, the 推估 chip and a link to /estimate/#simulation (check-site
+ * check 4), and no number is ever typed into the copy.
+ *
+ *   <SimText locale={locale} text={t.simulation.oneRed} slots={{ range: 'sim.co.oneRed15' }} />
+ *
+ * Props
+ *   locale   Locale
+ *   text     the localized string, with {tokens}
+ *   slots    token → simulation slot
+ *   sheet    optional HowSheet id the values open
+ *   as       'p' | 'div' | 'li' | 'span'. Default: 'div' when the text holds a range (an EstimateValue
+ *            is a 48 px control, not running body text), else 'p'
+ *   class
+ */
+import type { Locale } from '@/i18n';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import { simRange, type SimSlot } from '@/data/simulation';
+
+interface Props {
+  locale: Locale;
+  text: string;
+  slots?: Record<string, SimSlot>;
+  sheet?: string;
+  as?: 'p' | 'div' | 'li' | 'span';
+  class?: string;
+}
+const { locale, text, slots = {}, sheet, class: cls } = Astro.props;
+const parts = text.split(/\{(\w+)\}/);
+const Tag = Astro.props.as ?? (parts.length > 1 ? 'div' : 'p');
+for (let i = 1; i < parts.length; i += 2) if (!slots[parts[i]]) throw new Error(`SimText: no slot for {${parts[i]}} in 「${text}」`);
+/** The punctuation that opens the text after a figure: kept with the figure so it never starts a line. */
+const glue = (s: string) => /^[，。、；：,.;:)）」’”]+/.exec(s)?.[0] ?? '';
+---
+
+<Tag class={cls}>{parts.map((p, i) => {
+  if (i % 2 === 0) return i > 0 ? p.slice(glue(p).length) : p;
+  const after = glue(parts[i + 1] ?? '');
+  const value = <EstimateValue locale={locale} slotId={slots[p]} value={simRange(slots[p])} anchor={simRange(slots[p]).anchor ?? 'simulation'} sheet={sheet} />;
+  return after ? <span class="sim-text__glue">{value}{after}</span> : value;
+})}</Tag>
+
+<style>
+  /* a comma or full stop right after a figure stays on the figure's line */
+  .sim-text__glue {
+    white-space: nowrap;
+  }
+</style>

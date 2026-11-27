@@ -38,9 +38,12 @@ const SHEET = [
   { id: 'waiting', beat: 'arrive', dur: 3.8 },
   { id: 'knee', beat: 'idle', dur: 4.0 },
   { id: 'keeps', beat: 'idle', dur: 4.4 },
-  { id: 'howMuch', beat: 'kerb', dur: 7.0 },
-  { id: 'co', beat: 'inside', dur: 4.0 },
-  { id: 'fuel', beat: 'inside', dur: 5.2 },
+  { id: 'howMuch', beat: 'kerb', dur: 6.4 },
+  { id: 'co', beat: 'inside', dur: 2.6 },
+  // the smell cue holds the strongest allowed line, with its condition, and its no-smell-not-clean note
+  // in one frame (statements-smell); 1.4 s taken from 'co' and 0.6 s from 'howMuch' (both still above
+  // their reading floors) keep the film's length
+  { id: 'fuel', beat: 'inside', dur: 7.2 },
   { id: 'specks', beat: 'inside', dur: 3.2 },
   { id: 'mask', beat: 'mask', dur: 4.2 },
   { id: 'under', beat: 'closest', dur: 5.0 },
@@ -84,11 +87,11 @@ export const T = {
   waiting: at('waiting'),
   /** push in low behind the front row */
   tail: at('knee'),
-  /** pull back; then the close shot of the child covering her nose */
+  /** pull back; then the close shot of the child covering their nose */
   keeps: at('keeps'),
   /** the number panel */
   panel: at('howMuch'),
-  /** the dive into the layer: rings, then the drop of fuel, then the magnifying glass */
+  /** the dive into the fume: a cloud that has no smell, then the smell, then the soot */
   inside: at('co'),
   fuel: at('fuel'),
   specks: at('specks'),
@@ -142,7 +145,7 @@ export const BEATS: readonly Beat[] = [
 
 /**
  * The frame behind the Play button, and the film's share image (brief 8.2, change 21): the
- * ruler shot of beat 10, with the breathing rings on.
+ * ruler shot of beat 10, with the wisps breathed in at every nose.
  */
 export const POSTER_T: number = r1(T.closest + 4.2);
 

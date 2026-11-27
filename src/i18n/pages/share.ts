@@ -32,11 +32,11 @@ export default copy({
   picture: {
     kerb: {
       'zh-TW': '示意圖：紅燈亮著，家長推著嬰兒車，小學生摀著口鼻，站在路邊。機車的排氣管離他們一兩步，排出的廢氣飄到他們身邊。',
-      en: 'Illustration: the light is red. A parent with a pushchair and a schoolchild covering her nose wait at the kerb. A scooter’s tailpipe is a step or two away, and its exhaust drifts around them.',
+      en: 'Illustration: the light is red. A parent with a pushchair and a schoolchild covering their nose wait at the kerb. A scooter’s tailpipe is a step or two away, and its exhaust drifts around them.',
     },
     smell: {
       'zh-TW': '示意圖：小學生摀著口鼻，站在路邊，旁邊機車排出的廢氣飄過來。',
-      en: 'Illustration: a schoolchild at the kerb covers her nose as exhaust drifts over from the scooter beside her.',
+      en: 'Illustration: a schoolchild at the kerb covers their nose as exhaust drifts over from the scooter beside them.',
     },
     child: {
       'zh-TW': '示意圖：家長推著嬰兒車，停在機車排氣管旁邊。寶寶的臉和廢氣差不多高。',
@@ -67,8 +67,8 @@ export default copy({
       en: 'Illustration: three rows of scooters fill the box, and their exhaust drifts around an older woman, a parent with a pushchair and a schoolchild waiting at the kerb.',
     },
     electric: {
-      'zh-TW': '示意圖：同一個路口，機車都換成電動的。行人號誌是綠燈，沒有排氣管的廢氣，只剩輪胎的粉塵，和遠處一台汽車的一點廢氣。',
-      en: 'Illustration: the same crossing with every scooter electric. The pedestrian light is green; there is no scooter exhaust, only a little tyre dust and a car’s exhaust at the far edge.',
+      'zh-TW': '示意圖：同一個路口，機車都換成電動的。行人號誌是綠燈，畫面裡沒有廢氣。',
+      en: 'Illustration: the same crossing with every scooter electric. The pedestrian light is green, and there is no exhaust in the picture.',
     },
     fix: {
       'zh-TW': '示意圖：一排機車等紅燈，其中一台沒保養好，排出的廢氣比旁邊的多很多。',

@@ -1,0 +1,3 @@
+results/*/stats.json
+results/*/stats_window*.json
+__pycache__/

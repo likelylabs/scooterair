@@ -1,0 +1,617 @@
+{
+ "note": "Scenario registry for run-scenario.sh. Ids follow research/simulation/PLAN.md section 3. 'pack' holds the arguments passed to cfd/make_pack.py. 'status' says what has actually been run. 'deviations' lists every place where the registered case differs from PLAN.md; each one is also logged in PLAN.md section 9. Common to all: kerb 0.2 m (castellated grid; PLAN 0.15 m); grade 'fast' (5 cm kerb-lane tailpipe cells, 10 cm near the headline scooter and its probes, 20 cm over the pack) because PLAN's 2.5 cm/5 cm resolution costs about 47 h per 90 s on 3 cores; spin-up 30 s from the mean wind (PLAN 60 s); one red per run (PLAN asks 5 reds; more reds = rerun with --reds, see run-scenario.sh). UPDATE 2026-11-27 (matrix run, PLAN 9.17-9.19): all cases now use the 'coarse' grade with lean refinement extents (10 cm tailpipe cells on 0.2 m muffler faces, 10 cm bodies of kerb-lane scooters, 20 cm over the pack and round the probes) and the 'rfm' structured inflow (large-scale wander + convected random Fourier modes, precomputed boundary data). Results of the earlier try-3 build proof are kept in results/S1-try3, G0-try3, S4-try3.",
+ "common": [
+  "--spinup",
+  "30",
+  "--duration",
+  "90",
+  "--writeEvery",
+  "10",
+  "--grade",
+  "coarse"
+ ],
+ "scenarios": {
+  "S1": {
+   "title": "Baseline dozen: 8 in the box (2x4) + 4 in the kerb lane, 20 m street with 12 m buildings both sides, 0.8 m/s at 1.5 m blowing 45 deg oblique from the pack toward the kerb",
+   "pack": [
+    "--box",
+    "2",
+    "4",
+    "--queue",
+    "1",
+    "4",
+    "--wind",
+    "0.8",
+    "--dirDeg",
+    "-45",
+    "--canyon",
+    "20",
+    "12",
+    "--inflowFactor",
+    "0.9"
+   ],
+   "status": "matrix run 2026-11-27: complete red; results/S1 | verification (PLAN 9.24): end-fed canyon inlet forces the kerb flow; values relabelled, probably low x2-5",
+   "deviations": [
+    "grade coarse (lean extents)",
+    "rfm inflow: sigma_h 0.45U, sigma_wL 0.10U, sigma_s 0.30U, L 2 m, wavelengths 1.6-12 m",
+    "inflow factor 0.9 (try 3: 1.33 gave 1.18 m/s at the IN probe)",
+    "task text asked for 1 m/s; PLAN's pre-registered 0.8 m/s kept"
+   ]
+  },
+  "G0": {
+   "title": "Grid look: S1 with every near-source and probe zone one level coarser (10 cm tailpipe cells on 0.2 m mufflers, 20 cm probe zones)",
+   "pack": [
+    "--box",
+    "2",
+    "4",
+    "--queue",
+    "1",
+    "4",
+    "--wind",
+    "0.8",
+    "--dirDeg",
+    "-45",
+    "--canyon",
+    "20",
+    "12",
+    "--grade",
+    "coarse",
+    "--inflowFactor",
+    "1.33"
+   ],
+   "status": "archived: see results/G0-try3",
+   "deviations": [
+    "PLAN's G halves the grid (fine grade, ~47 h); G0 doubles it instead, giving the direction and size of grid dependence from the other side"
+   ]
+  },
+  "G": {
+   "title": "PLAN grid repeat: S1 at the fine grade (2.5 cm exits, 5 cm within 2 m)",
+   "pack": [
+    "--box",
+    "2",
+    "4",
+    "--queue",
+    "1",
+    "4",
+    "--wind",
+    "0.8",
+    "--dirDeg",
+    "-45",
+    "--canyon",
+    "20",
+    "12",
+    "--grade",
+    "fine",
+    "--inflowFactor",
+    "1.33"
+   ],
+   "status": "registered, not run: about 3.7 M cells, ~47 h per 90 s on 3 cores",
+   "deviations": []
+  },
+  "NF1-calm": {
+   "title": "Single scooter with rider, still air (exhaust and engine heat only), kerb 0.3 m to the right of the tailpipe",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0",
+    "--duration",
+    "30",
+    "--spinup",
+    "10"
+   ],
+   "status": "registered, not run (budget, PLAN 9.22)",
+   "deviations": [
+    "fast grade (5 cm exit); PLAN wants 2.5 cm: use cfd-template smoke scenes for 2.5 cm",
+    "always with the kerb (no no-kerb variant)"
+   ]
+  },
+  "NF1-u03-behind": {
+   "title": "Single scooter, 0.3 m/s along the street toward -x, i.e. carrying the exhaust rearward toward someone behind the scooter",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "180",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "NF1-u03-side": {
+   "title": "Single scooter, 0.3 m/s from the road side toward the kerb",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "NF1-u10-behind": {
+   "title": "Single scooter, 1.0 m/s along the street toward -x",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "1.0",
+    "--dirDeg",
+    "180",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "NF1-u10-side": {
+   "title": "Single scooter, 1.0 m/s from the road side toward the kerb",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "1.0",
+    "--dirDeg",
+    "-90",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "NF1-T100": {
+   "title": "NF1 0.3 m/s side, exit 100 C",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--Texh",
+    "373.15",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "NF1-T350": {
+   "title": "NF1 0.3 m/s side, exit 350 C",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--Texh",
+    "623.15",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "NF1-ang0": {
+   "title": "NF1 0.3 m/s side, exit horizontal",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--pipeAngle",
+    "0",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "NF1-ang20": {
+   "title": "NF1 0.3 m/s side, exit 20 deg up",
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--pipeAngle",
+    "20",
+    "--duration",
+    "30",
+    "--spinup",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "S2": {
+   "title": "Calm full box: 16 in the box (2x8) + 14 in the kerb lane (2x7), 0.3 m/s from the pack",
+   "pack": [
+    "--box",
+    "2",
+    "8",
+    "--queue",
+    "2",
+    "7",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-45",
+    "--canyon",
+    "20",
+    "12",
+    "--inflowFactor",
+    "1.45",
+    "--spinup",
+    "20"
+   ],
+   "status": "matrix run 2026-11-27: complete red; results/S2 | verification (PLAN 9.24): end-fed canyon inlet forces the kerb flow; values relabelled, probably low x2-5",
+   "deviations": [
+    "direction fixed at 45 deg from the pack; PLAN's +-60 deg wandering is not implemented",
+    "inflow factor 1.45: retuned from the S1 matrix run's A6 inflow check (0.72 m/s inflow gave 0.48-0.54 m/s at the IN 1.5 m probe, i.e. x0.67-0.75), before S2 was run (PLAN 9.20)"
+   ]
+  },
+  "S3": {
+   "title": "Behind the last row of a 12-scooter kerb-lane queue (2 columns x 6), 0.5 m/s along the queue toward the person",
+   "pack": null,
+   "status": "not implemented: make_pack needs a queue-only layout and a pushchair block (box 0 x 0 is not supported yet)",
+   "deviations": []
+  },
+  "S4": {
+   "title": "High-emitter neighbour: post-processing of S1/S2/S3 with the nearest scooter at 6.5 % CO / 5,800 ppm HC, or a two-stroke",
+   "post": [
+    "--emitters",
+    "nearestHigh"
+   ],
+   "of": "S1",
+   "status": "post-processing of S1 (results/S4, S4-S1), S2 (S4-S2), S5-12 (S4-S5-12), S1-from (S4-S1-from)",
+   "deviations": []
+  },
+  "S5-12": {
+   "title": "Arcade, 12 scooters (S1 pack), 0.5 m/s toward the building, pedestrians inside the arcade",
+   "pack": [
+    "--box",
+    "2",
+    "4",
+    "--queue",
+    "1",
+    "4",
+    "--wind",
+    "0.5",
+    "--dirDeg",
+    "-90",
+    "--arcade",
+    "--spinup",
+    "20",
+    "--duration",
+    "60"
+   ],
+   "status": "matrix run 2026-11-27: 60-s red; results/S5-12. WITHDRAWN after verification (PLAN 9.24): 15.2 m domain top over a 12 m building (79 % blockage), not admissible; replaced by S5-12b",
+   "deviations": [
+    "one red, not 3 cycles",
+    "no buildings across the street",
+    "the 0.5 m/s wind blows straight from the pack toward the arcade, so it is also a 'wind from the pack toward the kerb' case"
+   ]
+  },
+  "S5-30": {
+   "title": "Arcade, 30 scooters (S2 pack), 0.5 m/s toward the building",
+   "pack": [
+    "--box",
+    "2",
+    "8",
+    "--queue",
+    "2",
+    "7",
+    "--wind",
+    "0.5",
+    "--dirDeg",
+    "-90",
+    "--arcade"
+   ],
+   "status": "registered, not run",
+   "deviations": [
+    "one red, not 3 cycles"
+   ]
+  },
+  "S6": {
+   "title": "Deep canyon, leeward pavement: 14 m street, 20 m buildings, 30 scooters, 2 m/s perpendicular from the pavement-side roof",
+   "pack": [
+    "--box",
+    "2",
+    "8",
+    "--queue",
+    "2",
+    "7",
+    "--wind",
+    "2.0",
+    "--dirDeg",
+    "90",
+    "--canyon",
+    "14",
+    "20"
+   ],
+   "status": "registered, not run",
+   "deviations": [
+    "inflow speed is uniform with height (2 m/s everywhere at the inflow faces), not a roof-level reference"
+   ]
+  },
+  "S7": {
+   "title": "Pull-away at green",
+   "pack": null,
+   "status": "not implemented: needs moving sources",
+   "deviations": []
+  },
+  "S8": {
+   "title": "Stay-through 15 min (6 cycles)",
+   "pack": null,
+   "status": "not implemented: needs the pack to leave and re-form",
+   "deviations": []
+  },
+  "S9-from": {
+   "title": "Few typical: 4 scooters in one box row, 1.2 m/s from the pack",
+   "pack": [
+    "--box",
+    "1",
+    "4",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "1.2",
+    "--dirDeg",
+    "-45",
+    "--canyon",
+    "20",
+    "12"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "S9-along": {
+   "title": "Few typical: 4 scooters, 1.2 m/s along the street",
+   "pack": [
+    "--box",
+    "1",
+    "4",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "1.2",
+    "--dirDeg",
+    "0",
+    "--canyon",
+    "20",
+    "12"
+   ],
+   "status": "registered, not run",
+   "deviations": [
+    "'across' read as along the street (perpendicular to the pack-to-kerb line)"
+   ]
+  },
+  "S10": {
+   "title": "S1 with the wind from the kerb toward the pack",
+   "pack": [
+    "--box",
+    "2",
+    "4",
+    "--queue",
+    "1",
+    "4",
+    "--wind",
+    "0.8",
+    "--dirDeg",
+    "135",
+    "--canyon",
+    "20",
+    "12",
+    "--inflowFactor",
+    "1.33"
+   ],
+   "status": "registered, not run",
+   "deviations": []
+  },
+  "S11": {
+   "title": "Enclosed scooter underpass, 50 scooters",
+   "pack": null,
+   "status": "not implemented: needs an enclosed geometry and a 15-min run",
+   "deviations": []
+  },
+  "A": {
+   "title": "Kaohsiung anchor (Mingcheng 1st / Minzu 1st): 34 scooters (box 2x8 = 16, overflow 2 lanes x 9 = 18), open road, 1.6 m/s (site median) blowing from the pack toward the sensor area (-25 deg), I probes 2-8 m ahead x 2.5-5 m to the pavement side at 1.2/1.5 m",
+   "pack": [
+    "--box",
+    "2",
+    "8",
+    "--queue",
+    "2",
+    "9",
+    "--wind",
+    "1.6",
+    "--dirDeg",
+    "-25",
+    "--iot"
+   ],
+   "status": "matrix run 2026-11-27: 30 s of red; results/A, a2_iot.json | verification: A2 untested",
+   "deviations": [
+    "one red with the wind from the pack toward the sensor (the sector that gives the highest 1-min), not 8 reds with uniform directions: tests A2(b) for the highest red only; A2(a) (median red) not testable",
+    "no buildings (site 'fairly open')",
+    "sensor modelled as a first-order response tau 30 s then 1-min means (PLAN A2)",
+    "ended at t = 60 s (30 s spin-up + 30 s of the red), PLAN 9.22"
+   ]
+  },
+  "S1-from": {
+   "title": "Wind from the pack straight toward the kerb: S1 pack, open street (no buildings), 0.8 m/s blowing toward the pavement (-90 deg)",
+   "pack": [
+    "--box",
+    "2",
+    "4",
+    "--queue",
+    "1",
+    "4",
+    "--wind",
+    "0.8",
+    "--dirDeg",
+    "-90",
+    "--spinup",
+    "20"
+   ],
+   "status": "matrix run 2026-11-27: complete red; results/S1-from",
+   "deviations": [
+    "added for the task's 'wind from the pack toward the kerb' (in S1 the canyon turns the near-ground wind along the street); open ground like the published estimate's frame"
+   ]
+  },
+  "S5-12b": {
+   "pack": [
+    "--box",
+    "2",
+    "4",
+    "--queue",
+    "1",
+    "4",
+    "--wind",
+    "0.5",
+    "--dirDeg",
+    "-90",
+    "--arcade",
+    "--spinup",
+    "30",
+    "--duration",
+    "90",
+    "--ztop",
+    "60.8"
+   ],
+   "status": "run 2026-11-27 (signed-report step, PLAN 9.24-9.25): full 90-s red, 2 cores, mesh 34 s + solve 3,584 s; results/S5-12b, S4-S5-12b",
+   "deviations": [
+    "building still continuous along x (a row of arcade houses); blockage now only by the building itself, not by the domain top"
+   ]
+  },
+  "NF1-fine": {
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--duration",
+    "30",
+    "--spinup",
+    "20",
+    "--grade",
+    "fine"
+   ],
+   "status": "run 2026-11-27 (PLAN 9.24-9.25): 30-s window; 3,700 s on 1 core to t=20.9 s, then 2,704 s on 2 cores from t=20; results/NF1-fine"
+  },
+  "NF1-coarse": {
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--duration",
+    "30",
+    "--spinup",
+    "20",
+    "--grade",
+    "coarse"
+   ],
+   "status": "run 2026-11-27 (PLAN 9.24): mesh 6 s + solve 902 s, 1 core; results/NF1-coarse"
+  },
+  "NF1-coarse-0kW": {
+   "pack": [
+    "--box",
+    "1",
+    "1",
+    "--queue",
+    "0",
+    "0",
+    "--wind",
+    "0.3",
+    "--dirDeg",
+    "-90",
+    "--duration",
+    "30",
+    "--spinup",
+    "20",
+    "--grade",
+    "coarse",
+    "--engineW",
+    "0"
+   ],
+   "status": "run 2026-11-27 (PLAN 9.24): mesh 6 s + solve 870 s, 1 core; results/NF1-coarse-0kW"
+  }
+ }
+}

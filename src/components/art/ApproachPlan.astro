@@ -6,7 +6,7 @@
  * Stop line, crossing, turn box and kerb in road-paint colours; scooters as
  * capsules with a helmet; the people who wait at the end of the crossing. The
  * turn-box scooters have their tails toward the crossing, and each tail has
- * its dark core, reaching across the gap. A dimension line names the gap with
+ * its puff of fume, reaching across the gap; one label, 機車排的氣, points into it. A dimension line names the gap with
  * a large number (HTML). A side inset shows a tailpipe under a dashed
  * one-metre line. On arrival the cores slide across the gap once.
  *
@@ -32,11 +32,11 @@ import { est } from '@/data/estimate';
 import { fact } from '@/data/facts';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, AIR_KEY } from './air';
+import { air, unitsPerPx } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { TAILPIPE, artId, scooter } from './parts';
 import { PLAN3, planView } from './plan-view';
-import { sceneAlt } from './scene';
+import { leader, sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
@@ -51,7 +51,7 @@ interface Props {
   kind?: 'gas' | 'electric';
   /** @deprecated ignored (see `kind`). */
   caption?: string | false;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  /** the label on the fume (default true; false for a thumbnail or a share card) */
   legend?: boolean;
 }
 const { locale, legend = true, inset = true, labels = true, tag = false, id, class: cls } = Astro.props;
@@ -74,7 +74,6 @@ const a = air({
   extra: AIR_EXTRA,
   kerb: { x0: plan.people.x, x1: plan.people.x + plan.people.w, ground: plan.people.y + plan.people.h, top: plan.people.h, sourceX: T.x0 + 18, sourceY: T.y1 - 20 },
   tailpipes: plan.tailpipes,
-  avoid: [...plan.avoid, ...(inset ? [{ x: VB.x, y: 0, w: VB.w, h: PLAN3.centre - 40 }] : [])],
 });
 
 // the inset: the tail of a scooter from the side, 1.5 times the plan's scale, under a dashed one-metre line
@@ -88,19 +87,25 @@ const insetArt = inset
     `<path class="a-line" stroke-width="2.5" d="M${IN.x + 12},${ground}H${IN.x + IN.w - 12}"/>` +
     `<g transform="translate(${scX} ${ground}) scale(${IN.k})">${scooter({ kind: 'gas', rider: true })}</g>` +
     `<path class="hs-metre" stroke-width="2.6" d="M${IN.x + 14},${ground - 100 * IN.k}H${IN.x + IN.w - 14}"/>` +
-    `<circle class="hs-pipe" stroke-width="4" cx="${pipe.x + 3}" cy="${pipe.y - 3}" r="15"/><path class="a-leader" stroke-width="2.5" d="M${pipe.x - 16},${pipe.y - 3}h-26"/></g>`
+    `<path class="a-leader" stroke-width="2.5" d="M${pipe.x - 16},${pipe.y - 3}h-26"/></g>`
   : '';
-const scene = a.defs + plan.ground + a.wash + `<g class="plan3-slide">${a.cores}</g>` + a.marks + plan.figures + plan.dimension + insetArt;
+// the one label on the fume: on the pavement right of the people, a thin line up into the fume that
+// reaches across the gap from the turn box's tails. It stands in the picture's bottom-right corner,
+// so a bigger text size grows it up and to the left, never out of the picture.
+const FL = { x: T.x0 - 10, y: VB.y + VB.h - 8 };
+const fumeLead = legend ? leader(FL.x + 60, FL.y - 96, T.x0 - 70, PLAN3.kerb + 30, unitsPerPx(VB.w)) : '';
+const scene = a.defs + plan.ground + a.wash + `<g class="plan3-slide">${a.cores}</g>` + a.marks + plan.figures + plan.dimension + fumeLead + insetArt;
 const alt = sceneAlt(locale, fill(art.plan3.alt, locale, { gap: gapLabel, height: heightLabel }), { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive id={id} class={['scene--plan', cls].filter(Boolean).join(' ')}>
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive id={id} class={['scene--plan', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={scene} />
   <Fragment slot="labels">
     <SceneLabel box={VB} x={VB.x + VB.w - 16} y={T.y0 - 46} anchor="end bottom" max={96} plate class="plan3-gap">{gapLabel}</SceneLabel>
     {labels && <SceneLabel box={VB} x={PLAN3.crossing[0] + 76} y={PLAN3.centre + 118} anchor="center middle" plate>{art.plan3.crossing[locale]}</SceneLabel>}
     {labels && <SceneLabel box={VB} x={(T.x0 + T.x1) / 2} y={PLAN3.kerb + 14} anchor="center top" plate>{art.plan3.turnBox[locale]}</SceneLabel>}
     {labels && <SceneLabel box={VB} x={plan.people.x - 10} y={plan.people.y + 62} anchor="end middle" plate max={30}>{art.plan3.waiting[locale]}</SceneLabel>}
+    {legend && <SceneLabel box={VB} x={VB.x + VB.w - 8} y={FL.y} anchor="end bottom" plate max={40} class="fume-label">{art.fume.label[locale]}</SceneLabel>}
     {inset && <SceneLabel box={VB} x={IN.x + 16} y={ground - 100 * IN.k - 6} anchor="start bottom">{art.words.oneMetre[locale]}</SceneLabel>}
     {inset && <SceneLabel box={VB} x={pipe.x - 48} y={pipe.y + 12} anchor="end bottom" max={56} class="hs-pipe-label">{heightLabel}</SceneLabel>}
   </Fragment>

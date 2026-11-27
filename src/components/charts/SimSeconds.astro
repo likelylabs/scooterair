@@ -1,0 +1,68 @@
+---
+/**
+ * SimSeconds — chart (a) of the simulation: carbon monoxide comes in bursts. Two panels on ONE
+ * shared ppm axis; each shows every second of one simulated red, sorted from the most to the
+ * least, as thin bars, and a dashed line at that panel's own average over the red.
+ *
+ * Sorted, not in time order, on purpose: the redesign brief's rule brief-no-buildup draws no curve
+ * through the red. What the reader sees is the shape: most seconds hold little, a few hold several
+ * times the average.
+ *
+ * Rules it keeps (research/simulation/statements.json): no guideline line (no 87, no 31, no
+ * workplace value), no number on any single second (each series is ONE emission draw, not a range
+ * or a middle value), no smoothed or running line, no build-up wording. The text alternative
+ * describes the shape in words and prints no single number. Data: src/data/simulation.ts
+ * (generated from the series_1s.csv files of research/simulation/results).
+ *
+ * Props: locale, id, class
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { simSecondsModel } from './core/simCharts';
+import { chipHtml, pc } from './core/html';
+import { tableHtml } from './core/shared';
+import { chartText } from './strings';
+
+interface Props {
+  locale: Locale;
+  id?: string;
+  class?: string;
+}
+const { locale, id, class: cls } = Astro.props;
+const m = simSecondsModel(locale);
+const PH = 120; // plot height, px
+const y = (v: number) => PH - (v / m.axis.max) * PH;
+---
+
+<div id={id} class:list={['chart', 'hc', 'hc-sec', cls]} data-chart="sim-seconds" role="group" aria-label={m.title}>
+  <p class="vh" data-chart-summary>{m.summary}</p>
+  <div class="hc-sec__head" aria-hidden="true">
+    <p class="hc-sim__label">{m.title}</p>
+    <p class="hc-sec__sublabel">{m.sub}<Fragment set:html={' ' + chipHtml('estimate', locale)} /></p>
+  </div>
+  {
+    m.panels.map((p) => (
+      <figure class="hc-sec__panel" data-panel={p.id}>
+        <figcaption class="hc-row__label">{p.label}</figcaption>
+        <div class="hc-sec__plot">
+          <div class="hc-sec__ticks" aria-hidden="true">
+            {m.axis.ticks.map((t) => <span style={`inset-block-start:${y(t)}px`}>{t}</span>)}
+          </div>
+          <svg class="hc-sec__svg" width="100%" height={PH} aria-hidden="true" focusable="false">
+            {m.axis.ticks.map((t) => <line class="hc-grid" x1="0" x2="100%" y1={y(t)} y2={y(t)} />)}
+            {p.sorted.map((v, i) => {
+              const w = 100 / p.sorted.length;
+              const h = Math.max(PH - y(v), v > 0 ? 1 : 0);
+              return <rect class="hc-sec__bar" data-mark="estimate" x={pc(i * w)} y={PH - h} width={pc(w * 0.78)} height={h} />;
+            })}
+            <line class="hc-sec__mean" data-mark="mean" x1="0" x2="100%" y1={y(p.mean)} y2={y(p.mean)} />
+          </svg>
+          <p class="hc-sec__meanlabel" style={`inset-block-start:${Math.max(0, y(p.mean) - 26)}px`} aria-hidden="true">{m.meanLabel}</p>
+        </div>
+      </figure>
+    ))
+  }
+  <p class="hc-sec__axislabel" aria-hidden="true"><span>{m.axis.label}</span><span>{m.xLabel} →</span></p>
+  <p class="hc-sim__caption">{m.caption}</p>
+  <Fragment set:html={tableHtml(m.table, { title: m.title, tableLabel: chartText.dataTable[locale] })} />
+</div>

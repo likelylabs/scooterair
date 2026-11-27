@@ -1,0 +1,1 @@
+mesh_s 23 solve_s 7172 nProcs 2 STOPPED by the 2-h background limit at t=64.17 s (red window 30-64 s = 34 s of 90 s)

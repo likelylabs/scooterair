@@ -54,8 +54,8 @@ export default copy({
     },
     /** The note under the player: what is time-lapse, what follows the estimate, what is drawn for the eye. */
     notes: {
-      'zh-TW': '片裡的紅燈是 {red} 秒。畫面右上角出現「快轉」記號的時候，倒數走得比實際快。人站的地方畫了多少廢氣，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
-      en: 'The red light in the film lasts {red} seconds. While the time-lapse mark shows at the top right, the countdown runs faster than real time. How much exhaust is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
+      'zh-TW': '片裡的紅燈是 {red} 秒。畫面右上角出現「快轉」記號的時候，倒數走得比實際快；出現「‖」的時候，紅燈先停在那裡，等字幕講完再繼續。人站的地方畫了多少廢氣，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
+      en: 'The red light in the film lasts {red} seconds. While the time-lapse mark shows at the top right, the countdown runs faster than real time; while the ‖ mark shows, the light waits there until the captions finish. How much exhaust is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
     },
     how: { 'zh-TW': '怎麼算的', en: 'How we worked it out' },
     line: { 'zh-TW': '傳給家人（LINE）', en: 'Send to family (LINE)' },
@@ -81,7 +81,7 @@ export default copy({
       noScrap: { 'zh-TW': '沒有機車可報廢', en: 'nothing to scrap' },
       where: { 'zh-TW': '{county}・{scrap}', en: '{county} · {scrap}' },
       /** In front of the second tag: it is the least favourable case in the table, not the reader's county. */
-      worst: { 'zh-TW': '挑最便宜的車，最不划算：', en: 'Cheapest models, worst case: ' },
+      worst: { 'zh-TW': '最不划算的例子：', en: 'Least favourable case: ' },
       less: { 'zh-TW': '少付 {amount}', en: '{amount} less' },
       more: { 'zh-TW': '多付 {amount}', en: '{amount} more' },
       same: { 'zh-TW': '差不多，只差 {amount}', en: 'about the same: {amount} apart' },
@@ -112,10 +112,14 @@ export default copy({
     howMuch: { main: { 'zh-TW': '路邊多了多少？這是推估。', en: 'How much more at the kerb? An estimate.' } },
     co: { main: { 'zh-TW': '一氧化碳：沒有味道。', en: 'Carbon monoxide: no smell at all.' } },
     fuel: {
-      main: { 'zh-TW': '臭味，是沒燒完的汽油。', en: 'The smell is unburnt fuel.' },
-      note: { 'zh-TW': '油氣裡有苯（ㄅㄣˇ），會致癌', en: 'The fuel vapour holds benzene, known to give cancer' },
+      /** statements-smell smell-comes-with-benzene (short form). Its condition (the smell is the scooters' exhaust)
+       *  is the caption's subject, 機車的味道 / Scooter smell; 推估 and no-smell-not-clean are the quiet line, in the
+       *  same frame; the condition in full and the older-engines caveat are the transcript's line under it
+       *  (transcript.drawn.fuelShares). No cancer word in the film. */
+      main: { 'zh-TW': '機車的味道不是苯，但苯跟著來。', en: 'Scooter smell isn’t benzene. Benzene comes with it.' },
+      note: { 'zh-TW': '推估。聞不到也不代表乾淨', en: 'Estimate. No smell does not mean clean air.' },
     },
-    specks: { main: { 'zh-TW': '還有微粒，小到看不見。', en: 'And particles too small to see.' } },
+    specks: { main: { 'zh-TW': '還有微粒，小到看不到。', en: 'And particles too small to see.' } },
     mask: { main: { 'zh-TW': '一般口罩，擋不住這些氣體。', en: 'An ordinary mask does not stop these gases.' } },
     under: { main: { 'zh-TW': '排氣管和嬰兒車，都不到一公尺高。', en: 'Tailpipe and pushchair: both under a metre high.' } },
     child: { main: { 'zh-TW': '小孩個子矮，呼吸又快。', en: 'Children are shorter and breathe faster.' } },
@@ -209,6 +213,11 @@ export default copy({
       burst: { 'zh-TW': '起步的時候，每輛機車噴出一小團。', en: 'As they pull away each scooter throws one small puff.' },
       tag: { 'zh-TW': '{where}（{plate}）：{sum}。', en: '{where} ({plate}): {sum}.' },
       bar: { 'zh-TW': '{label}：{value}。', en: '{label}: {value}.' },
+      /** Under the benzene cue (alwaysCarry: any view that names a chemical says where the shares come from). */
+      fuelShares: {
+        'zh-TW': '推估：只要聞得到身旁機車的廢氣，同一口空氣裡就有苯。廢氣裡各種成分占多少，是量舊型機車得來的；新型機車可能不一樣。',
+        en: 'Estimate: whenever you can smell the exhaust of the scooters beside you, the same breath of air holds benzene. The shares of the exhaust come from tests of older scooters; newer ones may differ.',
+      },
     },
   },
 

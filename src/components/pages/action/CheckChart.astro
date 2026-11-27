@@ -3,7 +3,9 @@
  * CheckChart — "measured beside estimated" (G5) for the one-page brief, drawn by the rules of
  * brief 4.4: one linear axis in ppm (0 to 2), three rows named for where and when they apply,
  * measured rows above (solid dots), the estimate below (a hatched band with a dashed edge, never
- * a dot or a line), the two-item legend, and the zoom-out strip with the WHO 15-minute value.
+ * a dot or a line) and the two-item legend. No WHO 15-minute strip: these are 90-second values,
+ * never set beside the 15-minute guideline without conversion (research/simulation/statements.json
+ * must-not 3); the brief says the converted comparison in words (act.ts brief.simLine).
  * Every value comes from src/data/estimate.ts. Lane D's MeasuredVsEstimate is the site's own
  * version; this one is sized for paper and has no interaction.
  *
@@ -30,9 +32,6 @@ const n1 = (v: number) => formatEstNumber(v, 'dp1', locale);
 // the measured peaks keep the precision the report prints (0.5 · 0.62 · 1.3), as on home and /estimate/
 const nPeak = (v: number) => new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 2 }).format(v);
 const ticks = [0, 0.5, 1, 1.5, 2];
-const who = est.who.co15min_ppm.value;
-// the zoom-out strip: the whole chart (0–MAX) as a share of the WHO value
-const stripShare = `${((MAX / who) * 100).toFixed(2)}%`;
 ---
 
 <figure class="cc">
@@ -58,10 +57,6 @@ const stripShare = `${((MAX / who) * 100).toFixed(2)}%`;
     <p class="cc__unit">{b.axis}</p>
   </div>
   <p class="cc__legend"><span class="cc__k cc__k--m"></span>{estimateText.legendMeasured[locale]}<span class="cc__k cc__k--e"></span>{estimateText.legendEstimated[locale]}</p>
-  <div class="cc__strip" aria-hidden="true">
-    <span class="cc__strip-bar"><span class="cc__strip-in" style={`width:max(4px, ${stripShare})`}></span></span>
-  </div>
-  <p class="cc__who">{fill(b.who, { ppm: who })} <KindChip locale={locale} kind="official" size="sm" /></p>
 </figure>
 
 <style>

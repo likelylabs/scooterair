@@ -147,22 +147,6 @@
   inline-size: auto;
 }
 
-/* ---- screen 2: the three marks, as tap targets, in two rows ---- */
-.h-key.air-key--row {
-  gap: var(--tap-gap);
-}
-.h-key.air-key--row > li {
-  flex: 1 1 auto;
-}
-.h-key.air-key--tap .air-key__item {
-  gap: 0.4rem;
-  padding-inline: 0.55rem;
-}
-.h-key .air-key__item .air-glyph {
-  inline-size: 1.5rem;
-  block-size: 1.5rem;
-}
-
 /* ---- screen 4: the number box. In flow above the drawing; on a phone of 360 px or more at
    標準 text size it lies over the top of the drawing, where the scene is only shopfronts. In two
    columns (from 43em) the picture column is narrow, so the box always sits above the drawing:
@@ -596,7 +580,7 @@ html.js .h-pick__fixed {
   border-block-end: 0;
 }
 
-/* ---- screen 5: one idea per line in the body ---- */
+/* ---- screens 2 and 5: one idea per line in the body ---- */
 .h-lines {
   display: grid;
   /* one idea per line: each short sentence starts its own line; the reading line height spaces them
@@ -605,6 +589,14 @@ html.js .h-pick__fixed {
 }
 
 /* ---- screen 5: the chart sits on the page's gutters, with air above it ---- */
-.h-pic--mve {
+.h-pic--mve,
+.h-pic--sim {
   padding-block-start: var(--sp-3);
+}
+/* screen 5's exception line links to its full answer; it reads as a sentence, underlined */
+.h-inlink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
 }

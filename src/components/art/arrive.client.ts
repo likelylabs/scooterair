@@ -49,7 +49,7 @@ if (!window.__saArt) {
     );
     scenes.forEach((s) => io.observe(s));
   } else scenes.forEach((s) => s.classList.remove('is-armed'));
-  // the gentle permanent motion (drifting air, breathing rings) pauses while its picture is off
+  // the gentle permanent motion (drifting fume) pauses while its picture is off
   // screen, so a long page does not keep hundreds of animations running on a small phone
   if ('IntersectionObserver' in window) {
     const idle = new IntersectionObserver((entries) => {
