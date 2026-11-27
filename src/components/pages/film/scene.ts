@@ -948,7 +948,7 @@ export function createFilm(opt: FilmOptions) {
       return { opacity: r2(seg(c.t, coT, coT + 0.5)), transform: `translate(${MO.x} ${MO.y}) scale(${r3(k)} ${r3(0.5 + 0.5 * e)}) translate(${-MO.x} ${-MO.y}) translate(${r1(3 * Math.sin(c.t * 0.9))} 0)` };
     }, A - 0.2, M + 0.6)}>${ta.cores}</g>`;
     local += `<g class="a-figure" transform="translate(${HEAD.x} ${HEAD.y}) scale(${HEAD.s}) scale(-1 1)">${P.maskHead()}</g>`;
-    // B. the smell: wisps of unburnt fuel rise out of the same tailpipe to the nose
+    // B. the smell: wisps of the sharp-smelling gases rise out of the same tailpipe to the nose
     const B0 = T.fuel;
     [-7, 0, 7].forEach((dy, i) => {
       local += airRibbon(airWisp(MO.x - 4, MO.y - 3 - i * 1.5, NOSE.x + 2 + (i % 2) * 4, NOSE.y + dy, CARD_UPP), CARD_UPP, {
@@ -1006,7 +1006,7 @@ export function createFilm(opt: FilmOptions) {
       strength: null,
       attrs: ` mask="url(#${AW})"${dyn((c) => ({ opacity: r2(0.7 * eo(seg(c.t, M + 0.6, M + 1.8))) }), M - 0.1, Z + 0.9)}`,
     });
-    // ribbons (fuel vapour, benzene) pass through too
+    // ribbons (the sharp-smelling gases, and the benzene that comes with them) pass through too
     const inP = F(P.MASK_FACE.inside);
     [[-20, 132, -3], [-20, 168, 4]].forEach(([x0, y0, dy], k) => {
       mask += airRibbon(airWisp(x0, y0, inP.x - 2, inP.y + dy, U * 0.8, k ? -1 : 1), U * 0.8, {

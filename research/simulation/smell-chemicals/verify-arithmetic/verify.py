@@ -5,14 +5,15 @@ Inputs: raw per-group tracer probe series of the finished flow cases (read-only)
 (only for the tracer normalisation factors and as a comparison target), draws_<case>.json produced here by
 running the unchanged draws.mjs (fleet, N 1000, seed 20261127, as stats.json), speciation.json (toluene share).
 
-Usage: python3 -I verify.py   (writes verify-out.json next to this file)
+Usage: python3 -I verify.py RUN_DIR   (RUN_DIR holds the raw flow cases, RUN_DIR/<case>/case, read-only,
+       as for smell_chemicals.py; the SIM_RUN environment variable may give it instead; writes verify-out.json next to this file)
 """
 import json, os, sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SIM = os.path.abspath(os.path.join(HERE, "..", ".."))
-RUN = "/tmp/claude-0/-home-user-scooterair/3096f22d-9964-5310-9b6f-44efda6d48e8/scratchpad/sim/run"
+RUN = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("SIM_RUN", os.path.join(SIM, "run")))
 sys.path.insert(0, os.path.join(SIM, "cfd"))
 from analyse import series  # noqa: E402  (file reader only)
 

@@ -25,7 +25,8 @@ import { simData } from './simulation-data.ts';
 
 const S = simData.statements;
 
-const range = (lo: number, hi: number, unit: EstRange['unit']): EstRange => ({ lo, hi, unit, kind: 'estimate', rounding: 'as-given', anchor: 'simulation' });
+const range = (lo: number, hi: number, unit: EstRange['unit'], anchor: EstRange['anchor'] = 'simulation'): EstRange => ({ lo, hi, unit, kind: 'estimate', rounding: 'as-given', anchor });
+const SC = simData.smellChemicals;
 
 export const simMeta = {
   signed: simData.signed,
@@ -80,6 +81,25 @@ export const sim = {
     /** Statement 10: 1–3 m inside an arcade, one light-wind red (1–4 ppm). */
     inside: range(S.arcade.lo, S.arcade.hi, 'ppm'),
   },
+  /**
+   * The smell-chemicals step (research/simulation/smell-chemicals, statements-smell.json). Seconds-long
+   * levels only: never printed beside a 30-minute, 1-hour or yearly value (must-not 3), always with
+   * the share of seconds, the number of runs and the condition (must-not 7).
+   */
+  smell: {
+    /** how-much-just-smellable: the two smell tests' typical values, 「約 2 到 15 ppb」 (full range 0.4–60 in words). */
+    benzeneJust: range(SC.just.wordsLo, SC.just.wordsHi, 'ppb', 'smell'),
+    /** level-in-smellable-seconds: the full range, 「約 2 到 360 ppb」, printed after 「大約 30」. */
+    benzeneSeconds: range(SC.seconds.wordsRangeLo, SC.seconds.wordsRangeHi, 'ppb', 'smell'),
+  },
+} as const;
+
+/** The smell-chemicals numbers as generated (shares, draws, the detail table). Read-only. */
+export const simSmell = SC;
+/** The signed smell files the site serves as published (src/pages/research/smell-chemicals/); link them with asset(). */
+export const smellFiles = {
+  method: '/research/smell-chemicals/METHOD-SMELL.md',
+  results: '/research/smell-chemicals/results-smell.json',
 } as const;
 
 export type SimSlot =
@@ -90,9 +110,11 @@ export type SimSlot =
   | 'sim.co.burst1sHeld'
   | 'sim.benzene.stay1hTimes'
   | 'sim.height.ratio'
-  | 'sim.arcade.inside';
+  | 'sim.arcade.inside'
+  | 'sim.smell.benzeneJust'
+  | 'sim.smell.benzeneSeconds';
 
-export const simSlots: SimSlot[] = ['sim.co.oneRed15', 'sim.co.stay15', 'sim.co.pushchairMiddle', 'sim.co.burst1s', 'sim.co.burst1sHeld', 'sim.benzene.stay1hTimes', 'sim.height.ratio', 'sim.arcade.inside'];
+export const simSlots: SimSlot[] = ['sim.co.oneRed15', 'sim.co.stay15', 'sim.co.pushchairMiddle', 'sim.co.burst1s', 'sim.co.burst1sHeld', 'sim.benzene.stay1hTimes', 'sim.height.ratio', 'sim.arcade.inside', 'sim.smell.benzeneJust', 'sim.smell.benzeneSeconds'];
 
 /** The range behind a simulation slot. Throws on an unknown slot, so a typo fails the build. */
 export function simRange(slot: SimSlot): EstRange {

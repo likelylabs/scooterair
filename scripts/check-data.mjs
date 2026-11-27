@@ -153,11 +153,17 @@ const { readFileSync: readFs, existsSync: existsFs } = await import('node:fs');
 const jsonCache = new Map();
 let masksVerified;
 let simStatements;
+let smellStatements;
 function checkResearchRefs(where, research) {
   if (typeof research !== 'string') return;
   for (const m of research.matchAll(/\bmasks\/VERIFIED#([a-z0-9-]+)/g)) {
     masksVerified ??= JSON.parse(readFs(resolve(root, 'research/masks/VERIFIED.json'), 'utf8'));
     if (!masksVerified.facts.some((f) => f.id === m[1])) err(where, `research/masks/VERIFIED.json has no fact "${m[1]}"`);
+  }
+  // 'simulation/smell-chemicals/statements-smell#<id>': a `may` id of the smell step's statements
+  for (const m of research.matchAll(/\bsimulation\/smell-chemicals\/statements-smell#([a-z-]+)/g)) {
+    smellStatements ??= JSON.parse(readFs(resolve(root, 'research/simulation/smell-chemicals/statements-smell.json'), 'utf8'));
+    if (!smellStatements.may.some((x) => x.id === m[1])) err(where, `research/simulation/smell-chemicals/statements-smell.json has no allowed statement "${m[1]}"`);
   }
   // 'simulation/statements#may-<n>': statement n (from 1) of research/simulation/statements.json `may`
   for (const m of research.matchAll(/\bsimulation\/statements#may-(\d+)\b/g)) {
@@ -824,7 +830,8 @@ const deferredVoice = [];
         continue;
       }
       if (!(r.lo < r.hi)) err(w(slot), `bad range ${r.lo}–${r.hi}`);
-      if (r.kind !== 'estimate' || r.anchor !== 'simulation') err(w(slot), 'must be an estimate anchored at /estimate/#simulation');
+      const wantAnchor = slot.startsWith('sim.smell.') ? 'smell' : 'simulation';
+      if (r.kind !== 'estimate' || r.anchor !== wantAnchor) err(w(slot), `must be an estimate anchored at /estimate/#${wantAnchor}`);
       const zh = estimateMod.formatEstimate(r, 'zh-TW').text;
       const en = estimateMod.formatEstimate(r, 'en').text;
       if (!/約/.test(zh) || !/到/.test(zh)) err(w(slot), `zh text "${zh}" lacks 約 or 到`);

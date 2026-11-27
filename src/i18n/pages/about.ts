@@ -138,6 +138,10 @@ export default copy({
     common: { 'zh-TW': '常見的說法', en: 'A common claim' },
     /** What was said. Struck through on the page. */
     claims: {
+      'smell-not-petrol': {
+        'zh-TW': '本站以前寫，那個味道來自汽油沒燒完的部分。同一段也寫了苯的致癌分類，卻沒寫分類的意思。',
+        en: 'This site used to say the smell came from petrol that had not burnt. The same passage gave benzene’s cancer label without saying what the label means.',
+      },
       'sim-guideline': {
         'zh-TW': '本站以前寫：一氧化碳比指引值低很多，是好消息。一秒一秒的高點和嬰兒車的高度，我們沒有給數字。',
         en: 'This site used to say carbon monoxide was far below the guideline, which was good news, and gave no figure for second-by-second highs or for pushchair height.',
@@ -163,6 +167,10 @@ export default copy({
      * {tokens} are filled from the registry on the page.
      */
     wrongText: {
+      'smell-not-petrol': {
+        'zh-TW': '我們用電腦把味道和每一種成分一起算過（推估）。在一群機車的情況裡，苯從來沒有濃到它自己聞得出來；那個味道比較可能來自燃燒產生的醛類，只能粗略估計，可能差到十倍左右。沒燒完的汽油蒸氣，我們沒有另外算。這兩件事寫在同一段，讀起來就把兩件不同的事混在一起了。',
+        en: 'We worked out the smell and each chemical together (an estimate). In the cases with a group of scooters, benzene never gets strong enough to be smelled itself; the smell more likely comes from aldehydes formed by burning, though only the order of magnitude can be estimated. Unburnt petrol vapour was not worked out separately. Putting the two in one passage ran two different things together.',
+      },
       'sim-guideline': {
         'zh-TW': '對等一個紅燈的人，用 15 分鐘平均來看，這句話還是對的，但說得太廣。我們用電腦把一個紅燈算了一遍。靠近排氣管時，一氧化碳是一陣一陣的。風從機車吹來時，嬰兒車高度可能比較多（不是每種風都這樣）。在路口待上一小時、風一直從機車吹來的人，苯可能是加州 1 小時參考值的 1 到 4 倍（推估；這個參考值是用 6 小時的資料訂的，機車廢氣裡有多少苯可能差到 5 到 10 倍；這不是在說等一個紅燈的人）。舊範圍最高的數字，也不是最糟的紅燈。',
         en: 'For someone waiting one red, averaged over 15 minutes, it still holds, but it said too much. We simulated one red light on a computer. Near a tailpipe, carbon monoxide comes in bursts. With the wind from the scooters, pushchair height can get more (not in every wind). For people who stay an hour at a junction with the wind always from the scooters, benzene can be about 1 to 4 times California’s 1-hour reference level (estimate; that reference was set from 6-hour data, scooter exhaust’s benzene share could be off five- to ten-fold, and this is not about someone waiting one red). The top of the old range is not the worst red either.',
@@ -214,6 +222,10 @@ export default copy({
     },
     /** What we say now, in plain words. */
     nowText: {
+      'smell-not-petrol': {
+        'zh-TW': '聞到的不是苯，但苯跟著一起來（推估）：只要那個味道來自身旁機車的廢氣，同一口空氣裡就有苯。聞不到，不代表空氣乾淨。苯、1,3-丁二烯、甲醛的致癌分類另外寫，寫出分類的意思，也寫出汽油引擎廢氣整體是第2B類。',
+        en: 'What you smell is not benzene, but benzene comes with it (estimate): whenever the smell is the exhaust of the scooters beside you, benzene is in the same breath of air. No smell does not mean clean air. The cancer labels of benzene, 1,3-butadiene and formaldehyde are given separately, with what the groups mean and with petrol-engine exhaust’s own Group 2B.',
+      },
       'sim-guideline': {
         'zh-TW': '推估：等一個紅燈，一氧化碳攤成 15 分鐘的平均，多{range}，比世界衛生組織的指引值低很多。例外是嬰兒車停在排氣管正後方約半公尺，幾乎沒風、風向不變，連續 15 分鐘每個紅燈都在：這時 15 分鐘的平均，可能超過世界衛生組織 15 分鐘的指引值（這樣的 15 分鐘，約十次有一到兩次；這種風很少見，信心低）；往旁邊移開半公尺，就沒有了。其他的數字，都在「怎麼算的」那一頁。',
         en: 'Estimate: the carbon monoxide one red light adds, spread over 15 minutes, is {range}, far below the WHO guideline. The exception is a pushchair half a metre directly behind a tailpipe, in almost no wind that keeps its direction, through every red for 15 minutes: then the 15-minute average can pass the WHO 15-minute guideline (in about 1 or 2 of 10 such periods; such a wind is rare, and confidence is low); half a metre to the side, and it is gone. The other figures are on the ‘How we worked it out’ page.',

@@ -112,6 +112,7 @@ const extra: Partial<Record<CueId, string[]>> = {
   under: [fill(dr.ruler, { lo: d.slots.band.lo, hi: d.slots.band.hi })],
   // the assumption behind the yearly hours, in the same words as home screen 7
   daily: [redHoursSentence(locale, waitPerRed_s.lo, waitPerRed_s.hi)],
+  fuel: [dr.fuelShares],
   thins: [dr.burst, kSentences.K6[locale]],
   electric: [fill(dr.zero, { label: text.panel.addedElectric, value: text.panel.zero })],
   tags: [...m.tags.map(tagLine), m.chip],
@@ -123,7 +124,8 @@ const refs: Partial<Record<CueId, Ref>> = {
   knee: { chip: { fact: 'iot-exhaust-height-assumption' }, href: '/evidence/#link-2' },
   howMuch: { estimate: true, chip: { fact: 'moenv-co-stations-2025' }, sheet: 'how-film-estimate' },
   co: { chip: { fact: 'co-odourless' }, href: '/evidence/#link-4' },
-  fuel: { chip: { fact: 'iarc-benzene-group1' }, href: '/evidence/#link-4' },
+  // the smell-chemicals estimate: its condition, ranges and method are on /questions/smell/
+  fuel: { chip: { kind: 'estimate' }, href: '/questions/smell/' },
   specks: { chip: { fact: 'route-particles-deep-lung' }, href: '/evidence/#link-4' },
   mask: { chip: { fact: 'mask-niosh-no-gas' }, href: '/questions/mask/' },
   under: { chip: { fact: 'iot-exhaust-height-assumption' }, sheet: 'how-film-heights' },

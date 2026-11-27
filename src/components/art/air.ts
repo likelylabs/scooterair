@@ -13,7 +13,7 @@
  * the tailpipe), spreads and thins toward the kerb, and wraps the waiting people from the ground
  * up, with a few wavy orange wisps through it (the part you can smell). Every edge fades to
  * nothing; it is drawn BEHIND the people, so it never covers a face. There is no symbol in it
- * that needs a key. What the fume holds (fuel vapour you can smell, carbon monoxide that has no
+ * that needs a key. What the fume holds (sharp-smelling gases you notice, carbon monoxide that has no
  * smell, particles too small to see) is said in words: on the picture, as labels with thin leader
  * lines into the fume (scene.ts leader()), or in the text beside it.
  *

@@ -332,7 +332,7 @@ export default copy({
     kicker: { 'zh-TW': '給里長和議員的一頁說明', en: 'A one-page brief for borough chiefs and councillors' },
     title: { 'zh-TW': '紅燈時，機車旁邊的空氣：|量到的，和算的', en: 'The air beside scooters at a red light: |measured, and worked out' },
     kerbHead: { 'zh-TW': '一排機車停在旁邊，路邊多一層廢氣', en: 'A row of scooters adds a layer of exhaust at the kerb' },
-    /** Then checkSentence(), estimateText.checkIsEstimate, estimateText.whoCoOnly, estimateText.coMarksBenzene and estimateText.benzeneWho. */
+    /** Then checkSentence(), estimateText.checkIsEstimate, estimateText.whoCoOnly, and estimateText.coMarksBenzene. The WHO's 'no safe level of benzene' is not printed here: this paragraph carries per-red values (statements-smell must-not 2). */
     checkLead: {
       'zh-TW': '運研所在 {sites} 個路口的行人等候區放了儀器。',
       en: 'The Institute of Transportation put sensors where pedestrians wait at {sites} junctions.',

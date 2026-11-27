@@ -184,12 +184,12 @@ export const simulation = {
     data: {},
     display: t('很臭，不代表一氧化碳超過指引值', 'A strong smell does not mean carbon monoxide is over the guideline'),
     statement: t(
-      '一氧化碳沒有味道。你聞到的，是沒燒完、沒燒乾淨的汽油；它只要一點點（十億份空氣裡幾份），鼻子就聞得到。所以很臭，不代表一氧化碳超過指引值。',
-      'Carbon monoxide has no smell. What you smell is petrol that did not burn, or did not burn cleanly; the nose picks it up at a tiny amount, a few parts in a billion. So a strong smell does not mean carbon monoxide is over the guideline.',
+      '一氧化碳沒有味道。你聞到的味道，比較可能是燒過才有的（推估，只能粗略估計）；鼻子在十億份空氣裡只有幾份時，就聞得到。所以很臭，不代表一氧化碳超過指引值。',
+      'Carbon monoxide has no smell. The smell you notice more likely comes from burning (an estimate, order of magnitude only); the nose picks it up at a few parts in a billion. So a strong smell does not mean carbon monoxide is over the guideline.',
     ),
     period: t('嗅覺門檻：日本 1976–1988 年、美國 1995 年；電腦算的一個紅燈：2026 年', 'Smell thresholds: Japan 1976–1988, US 1995; the simulated red light: 2026'),
     place: t('不限地區', 'Not place-specific'),
-    sources: ['nagata-odour-thresholds', 'api-1995-gasoline-odour', 'who-2010-indoor-air-guidelines', 'scooterair-simulation-2026'],
+    sources: ['nagata-odour-thresholds', 'api-1995-gasoline-odour', 'who-2010-indoor-air-guidelines', 'scooterair-simulation-2026', 'scooterair-smell-chemicals-2026'],
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
@@ -198,7 +198,7 @@ export const simulation = {
     ),
     requiresCaveat: true,
     chainLink: 4,
-    editorNote: 'Statement 7: no number, general fact. Do not use it to say exhaust is harmless.',
+    editorNote: 'Statement 7: no number, general fact. Its "unburnt fuel" half is superseded by statements-smell not-unburnt-petrol (the smell more likely comes from burning); the carbon monoxide and parts-per-billion halves stand. Do not use it to say exhaust is harmless.',
     research: R(7),
   },
   'sim-benzene-stayers-1h': {

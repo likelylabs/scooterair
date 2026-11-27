@@ -8,7 +8,7 @@
  * the picture is a symbol that needs a key. What the fume holds is said in words ON the picture,
  * three labels with thin leader lines pointing into the same fume:
  *
- *   油氣：聞得到        at the wisps that reach the nose (top left, above the head)
+ *   刺鼻的氣體：聞得到  at the wisps that reach the nose (top left, above the head)
  *   一氧化碳：聞不到    into the thinner fume near the head
  *   微粒：小到看不到    into the fume low behind the pipe (no darker patch: a reader must not
  *                       see a visible smudge beside the words "too small to see")
@@ -98,7 +98,7 @@ const alt = sceneAlt(locale, art.tailpipe.alt[locale] + (can ? (locale === 'en' 
   )}
   <Fragment set:html={scene} />
   <Fragment slot="labels">
-    <SceneLabel box={VB} x={L.vapour.x} y={L.vapour.y} anchor="start top" max={52} plate class="fume-label">{art.fume.inVapour[locale]}</SceneLabel>
+    <SceneLabel box={VB} x={L.vapour.x} y={L.vapour.y} anchor="start top" max={52} plate class="fume-label">{art.fume.inSmell[locale]}</SceneLabel>
     <SceneLabel box={VB} x={L.co.x} y={L.co.y} anchor="start bottom" max={47} plate class="fume-label">{art.fume.inCo[locale]}</SceneLabel>
     <SceneLabel box={VB} x={L.pm.x} y={L.pm.y} anchor="end bottom" max={47} plate class="fume-label">{art.fume.inPm[locale]}</SceneLabel>
   </Fragment>

@@ -62,9 +62,9 @@ import { tableOn, type OpenText } from '@/components/pages/electric/opening-view
 import { filmLength, homeFigures, verified } from '@/components/pages/home/home-figures';
 import * as V from '@/components/pages/home/money-view';
 import { checkHeadlinePhrased, checkSentence, defaultRedsPerDay, est, waitPerRed_s, estimateText, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
-import { simBelowWho, simChipWhere, simRange, simStamp } from '@/data/simulation';
+import { simBelowWho, simChipWhere, simRange, simStamp, smellFiles } from '@/data/simulation';
 import { fact } from '@/data/facts';
-import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { homeMoney } from '@/lib/home-money';
 import { formatDate } from '@/lib/site-state';
 import electric from '@/i18n/pages/electric';
@@ -173,8 +173,8 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 2 · 排出什麼 ====================================================================== -->
-    <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={hl(t.s2.headline)} quiet={verified('who-benzene-no-safe-level') ? t.s2.quiet : undefined} next={{ label: t.s2.next }}>
-      <div slot="body" class="h-lines">{t.s2.body.map((line) => <p>{line}</p>)}</div>
+    <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={hl(t.s2.headline)} quiet={t.s2.quiet} next={{ label: t.s2.next }}>
+      <div slot="body" class="h-lines">{t.s2.body.map((line, i) => <p>{i === 0 ? <a class="h-inlink" href={href('/questions/smell/', locale)}>{line}</a> : line}</p>)}</div>
       <div slot="picture" class="h-pic">
         <div class="h-crop" style="--crop:0">
           <TailpipeMarks locale={locale}>
@@ -183,15 +183,19 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         </div>
         <IllustrationTag locale={locale} />
       </div>
-      <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="recipe" title={t.s2.sheet.title} facts={['iarc-benzene-group1', 'who-benzene-no-safe-level', 'co-odourless']}>
+      <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="recipe" title={t.s2.sheet.title} facts={['smell-comes-with-benzene', 'smell-not-unburnt-petrol', 'smell-older-engines', 'iarc-group1-three', 'iarc-gasoline-exhaust-2b', 'co-odourless']}>
         <p slot="block1">{fill(t.s2.sheet.measured, { readings: F.readings })}</p>
         <Fragment slot="block2">
           <WorkingSum locale={locale} {...workingPerRed(locale)} />
           <WorkingSum locale={locale} {...workingPerRedCan(locale)} />
           <p>{fill(t.s2.sheet.can, { litres: formatEstimate('emit.co.perRed_L', locale).text, ml: F.canMl, cans: est.emit.co.canWords[locale] })}</p>
+          <p>{t.s2.sheet.smell}</p>
         </Fragment>
         <Fragment slot="block3">
           <p>{t.s2.sheet.care}</p>
+          <p>{t.s2.sheet.hazard}</p>
+          <p><a href={href('/questions/smell/', locale)}>{t.s2.sheet.smellLink}</a></p>
+          <p><a href={asset(smellFiles.method)}>{t.s2.sheet.method}</a></p>
           <p><a href={evidence(1)}>{how.fullEvidence[locale]}</a></p>
         </Fragment>
       </HowSheet>
@@ -237,14 +241,14 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 5 · 量到的，和算的 ================================================================= -->
-    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} next={{ label: t.s5.next }}>
+    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} quiet={t.s5.quiet} next={{ label: t.s5.next }}>
       <div slot="picture" class="h-pic h-pic--chart h-pic--sim"><SimCompare locale={locale} sheet="how-5" table={false} compact /></div>
       <div slot="body" class="h-lines">
         <p>{t.s5.smell}</p>
         <p><a class="h-inlink" href={href('/questions/my-child/#pushchair', locale)}>{t.s5.exception}</a></p>
       </div>
       <KindChip size={chipSize} slot="chips" locale={locale} of={fact('sim-co-one-red-15min')} where={simChipWhere[locale]} />
-      <HowSheet slot="sheet" id="how-5" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} title={t.s5.sheet.title} facts={['sim-co-one-red-15min', 'sim-co-stay-15min', 'sim-co-pushchair-exception', 'sim-smell-seconds', 'iot-waiting-area-co-2024']}>
+      <HowSheet slot="sheet" id="how-5" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} title={t.s5.sheet.title} facts={['sim-co-one-red-15min', 'sim-co-stay-15min', 'sim-co-pushchair-exception', 'sim-smell-seconds', 'smell-not-unburnt-petrol', 'iot-waiting-area-co-2024']}>
         <Fragment slot="block1">
           <p>{t.s5.sheet.who}{sp}{checkSentence(locale)}</p>
           <p>{estimateText.checkIsEstimate[locale]}</p>
@@ -253,6 +257,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
           <p>{t.s5.sheet.sim}</p>
           <p>{t.s5.sheet.higher}</p>
           <p>{t.s5.sheet.smell}</p>
+          <p>{t.s5.sheet.whatSmell} <a href={href('/questions/smell/#what', locale)}>{t.s5.sheet.whatSmellLink}</a></p>
           <p>{t.s5.sheet.pushchair}</p>
           <p>{t.s5.sheet.bursts}</p>
         </Fragment>

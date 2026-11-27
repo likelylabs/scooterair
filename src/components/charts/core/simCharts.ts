@@ -17,7 +17,8 @@
  *   - nothing ranks carbon monoxide, benzene and particles
  */
 import { formatEstNumber, formatEstimate } from '../../../data/estimate.ts';
-import { sim, simAbove, simRange, simSeries, type SimSlot } from '../../../data/simulation.ts';
+import { sim, simAbove, simRange, simSeries, simSmell, type SimSlot } from '../../../data/simulation.ts';
+import { facts } from '../../../data/facts.ts';
 import { chartText, fill } from '../strings.ts';
 import type { ChartTable } from './shared.ts';
 import type { Loc } from './html.ts';
@@ -237,6 +238,59 @@ export function simAboveModel(locale: Loc): SimAboveModel {
         ...benzeneRows.map((r) => [paren(r.label, r.sub, locale), paren(r.value, est, locale)]),
         [refLabel, locale === 'en' ? 'Official' : '官方'],
       ],
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
+// SmellBenzene: benzene in the seconds you can smell it (statements-smell how-much-just-smellable,
+// level-in-smellable-seconds). Seconds-long values ONLY: no 15-minute, 30-minute, 1-hour or yearly
+// value, no health or reference line, no other chemical, no near-calm single-tailpipe case.
+// The one line is benzene's own LOWEST published odour threshold (registry odour-thresholds).
+// ---------------------------------------------------------------------------------------------
+
+export interface SmellBenzeneModel {
+  title: string;
+  /** ticks: a guide line each decade; labelled: the ticks that print a number (every other decade, so a 320 px 特大 axis never overlaps) */
+  axis: { min: number; max: number; ticks: number[]; labelled: number[]; label: string };
+  rows: SimBandRow[];
+  odour: { value: number; label: string };
+  caption: string;
+  summary: string;
+  table: ChartTable;
+}
+
+/** value → percent along a log axis from min to max */
+export const logX = (min: number, max: number) => (v: number) => ((Math.log10(v) - Math.log10(min)) / (Math.log10(max) - Math.log10(min))) * 100;
+
+export function smellBenzeneModel(locale: Loc): SmellBenzeneModel {
+  const T = chartText.sim.smellBenzene;
+  const J = simSmell.just;
+  const S = simSmell.seconds;
+  const pct = (x: number) => Math.round(x * 100);
+  const justText = formatEstimate(simRange('sim.smell.benzeneJust'), locale).text;
+  const secText = formatEstimate(simRange('sim.smell.benzeneSeconds'), locale).text;
+  const lowest = fill(T.lowest, locale, { lo: num(J.wordsRangeLo, locale), hi: num(J.wordsRangeHi, locale) });
+  const rows: SimBandRow[] = [
+    { label: T.just[locale], sub: T.justSub[locale], lo: J.lo, hi: J.hi, value: paren(justText, lowest, locale) },
+    { label: T.seconds[locale], sub: T.secondsSub[locale], lo: S.lo, hi: S.hi, value: fill(T.aboutRange, locale, { about: num(S.wordsAbout, locale), range: secText }) },
+  ];
+  // benzene's own odour threshold: the lowest published value (registry odour-thresholds, ppm → ppb)
+  const od = (facts['odour-thresholds'].data as Record<string, { value: number; unit: string }>).benzeneEpaLow;
+  if (od.unit !== 'ppm') throw new Error('[smellBenzeneModel] odour-thresholds benzeneEpaLow is no longer in ppm');
+  const odour = od.value * 1000;
+  const est = locale === 'en' ? 'Estimate' : '推估';
+  return {
+    title: T.title[locale],
+    axis: { min: 0.1, max: 10000, ticks: [0.1, 1, 10, 100, 1000, 10000], labelled: [0.1, 10, 1000], label: T.axis[locale] },
+    rows,
+    odour: { value: odour, label: T.odour[locale] },
+    caption: fill(T.caption, locale, { a: pct(simSmell.share800.c), b: pct(simSmell.share6800.c), nj: num(J.n, locale), ns: num(S.n, locale) }),
+    summary: fill(T.summary, locale, { just: justText, about: num(S.wordsAbout, locale), seconds: secText }),
+    table: {
+      caption: T.tableStat[locale],
+      head: T.tableHead.map((h) => h[locale]),
+      rows: rows.map((r) => [paren(r.label, r.sub, locale), paren(r.value, est, locale)]),
     },
   };
 }

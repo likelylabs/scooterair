@@ -2,7 +2,8 @@
 /**
  * SmellStrip — 聞得到／聞不到 (blueprint V10). Two columns with nose glyphs:
  * a filled nose for what a smell tells you, a hollow dashed one for what it
- * never reports. Used once, in Link 4. It ranks nothing by harm.
+ * never reports. Used once, in Link 4. It ranks nothing by harm. No footer line: the
+ * screen it sits on carries 聞不到，不代表空氣乾淨 as its headline.
  *
  * Props
  *   locale  Locale
@@ -38,7 +39,6 @@ const s = art.smell;
       <p class="smell__body"><slot name="cannot">{s.cannotBody[locale]}</slot></p>
     </div>
   </div>
-  <p class="smell__foot">{s.footer[locale]}</p>
 </figure>
 
 <style>
@@ -78,10 +78,5 @@ const s = art.smell;
     font-size: var(--fs-sm);
     line-height: var(--lh-snug);
     color: var(--ink-2);
-  }
-  .smell__foot {
-    padding-block-start: var(--sp-3);
-    border-block-start: 1px solid var(--line-strong);
-    font-weight: var(--fw-bold);
   }
 </style>

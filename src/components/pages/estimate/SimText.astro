@@ -34,4 +34,4 @@ const Tag = Astro.props.as ?? (parts.length > 1 ? 'div' : 'p');
 for (let i = 1; i < parts.length; i += 2) if (!slots[parts[i]]) throw new Error(`SimText: no slot for {${parts[i]}} in 「${text}」`);
 ---
 
-<Tag class={cls}>{parts.map((p, i) => (i % 2 === 0 ? p : <EstimateValue locale={locale} slotId={slots[p]} value={simRange(slots[p])} anchor="simulation" sheet={sheet} />))}</Tag>
+<Tag class={cls}>{parts.map((p, i) => (i % 2 === 0 ? p : <EstimateValue locale={locale} slotId={slots[p]} value={simRange(slots[p])} anchor={simRange(slots[p]).anchor ?? 'simulation'} sheet={sheet} />))}</Tag>

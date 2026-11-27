@@ -1,0 +1,86 @@
+---
+/**
+ * SmellBenzene — benzene in the seconds you can smell the exhaust (the smell-chemicals step,
+ * research/simulation/smell-chemicals). Two hatched bands on one log axis (ppb), and one line:
+ * the lowest published level at which a nose can smell benzene itself. It shows at a glance
+ * 「聞到的不是苯，但苯跟著一起來」: the benzene is there, far below its own smell.
+ *
+ *   row 1  when the exhaust is just noticeable (one scooter; the two old smell tests' typical values)
+ *   row 2  the seconds you can smell it, wind held from a group of scooters, 0.5 m, 0.7 m
+ *
+ * Rules it keeps (statements-smell.json): seconds-long values only, never beside a 30-minute,
+ * 1-hour or yearly value (must-not 3); no health, reference or guideline line; no other chemical;
+ * no near-calm single-tailpipe case (must-not 8); no cancer or risk word; hatched bands with a
+ * dashed edge and no middle mark (as SimAbove). Data: smellBenzeneModel() (core/simCharts.ts).
+ *
+ * Props: locale, compact (tighter layout; the caption still prints), table (default true), id, class
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { uid as makeId } from '@/components/uid';
+import { logX, smellBenzeneModel } from './core/simCharts';
+import { chipHtml, guides, hatchDef, pc } from './core/html';
+import { tableHtml } from './core/shared';
+import { chartText } from './strings';
+
+interface Props {
+  locale: Locale;
+  compact?: boolean;
+  table?: boolean;
+  id?: string;
+  class?: string;
+}
+const { locale, compact = false, table = true, id, class: cls } = Astro.props;
+const m = smellBenzeneModel(locale);
+const u = makeId('smb');
+const H = 26;
+const x = logX(m.axis.min, m.axis.max);
+const tickXs = m.axis.ticks.map(x);
+const nf = (v: number) => new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 1 }).format(v);
+---
+
+<div id={id} class:list={['chart', 'hc', 'hc-above', 'hc-smellbz', 'hc--unit-end', compact && 'hc--compact', cls]} data-chart="smell-benzene" data-grow="" role="group" aria-label={m.title}>
+  <p class="vh" data-chart-summary>{m.summary}</p>
+  <section class="hc-above__panel">
+    <p class="hc-sim__label">{m.title}</p>
+    <ol class="hc-rows" role="list">
+      {m.rows.map((r, i) => (
+        <li class="hc-row">
+          <div class="hc-row__text">
+            <span class="hc-row__head">
+              <span class="hc-row__label">{r.label}</span>{' '}
+              <span class="hc-row__value hc-row__value--sm"><span class="hc-row__n">{r.value}</span></span>
+            </span>
+            <span class="hc-row__sub">
+              <span class="hc-row__tail"><Fragment set:html={chipHtml('estimate', locale)} /></span> <span>{r.sub}</span>
+            </span>
+          </div>
+          <svg class="hc-plot" width="100%" height={H} aria-hidden="true" focusable="false">
+            <Fragment set:html={hatchDef(`${u}-${i}`)} />
+            <rect class="hc-track" x="0" y={H / 2 - 9} width="100%" height="18" rx="2" />
+            <Fragment set:html={guides(tickXs, H)} />
+            <rect class="hc-band hc-g" data-mark="estimate" x={pc(x(r.lo))} y={H / 2 - 10} width={pc(Math.max(x(r.hi) - x(r.lo), 0.8))} height="20" rx="2" fill={`url(#${u}-${i})`} />
+            <line class="hc-who" data-mark="odour-threshold" x1={pc(x(m.odour.value))} x2={pc(x(m.odour.value))} y1="0" y2={H} />
+          </svg>
+        </li>
+      ))}
+    </ol>
+    <div class="hc-axis" data-chart-axis aria-hidden="true">
+      {m.axis.labelled.map((t) => <span style={`inset-inline-start:${pc(x(t))}`}>{nf(t)}</span>)}
+      <b class="hc-axis__unit">ppb</b>
+    </div>
+    <p class="hc-sim__axislabel" aria-hidden="true">{m.axis.label}</p>
+    <div class="hc-sim__who">
+      <svg width="14" height="22" aria-hidden="true" focusable="false"><line class="hc-who" x1="7" x2="7" y1="1" y2="21" /></svg>
+      <p class="hc-sim__wholabel"><span class="hc-sim__wholine">{m.odour.label}</span> <Fragment set:html={chipHtml('study', locale)} /></p>
+    </div>
+    {/* the caption prints in every mode: it carries the share of seconds, the number of draws, the
+        condition and 'typical, not a minimum' that the two bands may never be shown without (must-not 7) */}
+    <p class="hc-sim__caption">{m.caption}</p>
+  </section>
+  {table && <Fragment set:html={tableHtml(m.table, { title: m.title, tableLabel: chartText.dataTable[locale] })} />}
+</div>
+
+<script>
+  import './core/grow';
+</script>

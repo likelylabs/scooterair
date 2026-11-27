@@ -264,14 +264,6 @@
       "reviewedOn": "2026-11-26"
     },
     {
-      "id": "home.s2.body.1",
-      "rule": "associations-not-causes-tw",
-      "locale": "en",
-      "reason": "Brief screen 2 wording: benzene is an IARC Group 1 carcinogen, a causal classification of the substance; the rule is about Taiwanese association studies of traffic, which this sentence does not cite. (Re-keyed 2026-11-27: screen 2 body is now one line per sentence; this is the same sentence.)",
-      "reviewedBy": "lane K (integrator)",
-      "reviewedOn": "2026-11-26"
-    },
-    {
       "id": "home.s3.sheet.care",
       "rule": "no-arcade-or-idling-measurements",
       "reason": "Brief screen 3 requires this line about the three-minute idling rule. It cites the rule, not a measured idle emission rate or an arcade comparison.",
@@ -473,6 +465,143 @@
       "rule": "sim-stayers-benzene-qualified",
       "reason": "The /sources/ line that says what the source is used for: it compares nothing and states the rule itself (only against people who stay an hour at a junction).",
       "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s2.headline",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, or that benzene comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene (statements-smell.json), shown with its 推估, its condition and no-smell-not-clean in the same view.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s2.sheet.smell",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, or that benzene comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene (statements-smell.json), shown with its 推估, its condition and no-smell-not-clean in the same view.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smell.s1.headline",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, or that benzene comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene (statements-smell.json), shown with its 推估, its condition and no-smell-not-clean in the same view.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.items.smell.card",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, or that benzene comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene (statements-smell.json), shown with its 推估, its condition and no-smell-not-clean in the same view.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.smell.withTitle",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, or that benzene comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene (statements-smell.json), shown with its 推估, its condition and no-smell-not-clean in the same view.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.smell.with.0",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, or that benzene comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene (statements-smell.json), shown with its 推估, its condition and no-smell-not-clean in the same view.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "about.corrections.nowText.smell-not-petrol",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, or that benzene comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene (statements-smell.json), shown with its 推估, its condition and no-smell-not-clean in the same view.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smell.s1.body",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "'Idling' / 怠速 describes the scooters, in the signed statements-smell wording ('the idling scooters beside you'). No Taiwanese red-light idle emission rate is cited and no arcade comparison is made; what was measured at idle is the share of each chemical in the exhaust (older scooters in Taiwan 2008, India and Nepal), named as such.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smell.s1.sheet.b1",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "'Idling' / 怠速 describes the scooters, in the signed statements-smell wording ('the idling scooters beside you'). No Taiwanese red-light idle emission rate is cited and no arcade comparison is made; what was measured at idle is the share of each chemical in the exhaust (older scooters in Taiwan 2008, India and Nepal), named as such.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smell.s1.sheet.flow.0.label",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "'Idling' / 怠速 describes the scooters, in the signed statements-smell wording ('the idling scooters beside you'). No Taiwanese red-light idle emission rate is cited and no arcade comparison is made; what was measured at idle is the share of each chemical in the exhaust (older scooters in Taiwan 2008, India and Nepal), named as such.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.smell.with.0",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "'Idling' / 怠速 describes the scooters, in the signed statements-smell wording ('the idling scooters beside you'). No Taiwanese red-light idle emission rate is cited and no arcade comparison is made; what was measured at idle is the share of each chemical in the exhaust (older scooters in Taiwan 2008, India and Nepal), named as such.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.smell.stay.0",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "The signed statement stay-through-benzene (statements-smell.json), verbatim, for someone who stays through every red for an hour with the wind held. Its mustCarry is the next line, estimate.smell.stay.1 (range from below to several times above, the wind held for the whole hour, the same simulated red, a reference derived from 6-hour data, not proof of harm); no cancer word. The '1 to 4 times' form of the same finding is printed in #simulation just above.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.smell.table.refs.california",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "A reference-column label of the detail table (statements-smell detail-table), whose caption says every row is for someone who stays through every red for an hour (or 30 minutes) with the wind held; the benzene label says the value was set from 6-hour data, and the table's foot says being above a reference is not proof of harm.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.smell.table.refs.californiaBenzene",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "A reference-column label of the detail table (statements-smell detail-table), whose caption says every row is for someone who stays through every red for an hour (or 30 minutes) with the wind held; the benzene label says the value was set from 6-hour data, and the table's foot says being above a reference is not proof of harm.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s2.sheet.hazard",
+      "rule": "associations-not-causes-tw",
+      "locale": "en",
+      "reason": "IARC's own name for Group 1 ('causes cancer in humans'), quoted with what the groups mean (strength of evidence, not risk) and with petrol-engine exhaust's own Group 2B, as the signed hazard-labels statement requires. It is not a claim about Taiwanese studies.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smell.s1.hazard",
+      "rule": "associations-not-causes-tw",
+      "locale": "en",
+      "reason": "IARC's own name for Group 1 ('causes cancer in humans'), quoted with what the groups mean (strength of evidence, not risk) and with petrol-engine exhaust's own Group 2B, as the signed hazard-labels statement requires. It is not a claim about Taiwanese studies.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.smell.hazard",
+      "rule": "associations-not-causes-tw",
+      "locale": "en",
+      "reason": "IARC's own name for Group 1 ('causes cancer in humans'), quoted with what the groups mean (strength of evidence, not risk) and with petrol-engine exhaust's own Group 2B, as the signed hazard-labels statement requires. It is not a claim about Taiwanese studies.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "evidence.notClaimed.items.1.instead",
+      "rule": "associations-not-causes-tw",
+      "locale": "en",
+      "reason": "IARC's own name for Group 1 ('causes cancer in humans'), quoted with what the groups mean (strength of evidence, not risk) and with petrol-engine exhaust's own Group 2B, as the signed hazard-labels statement requires. It is not a claim about Taiwanese studies.",
+      "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
       "reviewedOn": "2026-11-27"
     }
   ],

@@ -141,6 +141,28 @@ export const chartText = {
       tableHead: [t('情況', 'Case'), t('數值', 'Value')],
       tableStat: t('一種算法：從中間的情形，到偏高但平常的情形', 'One statistic: from the middle case to a high-but-ordinary case'),
     },
+    /** SmellBenzene (/estimate/#smell, /questions/smell/ screen 2): seconds-long benzene only. */
+    smellBenzene: {
+      title: t('味道來的時候，苯也在，只是淡到聞不出苯自己', 'When the smell comes, benzene is there too, just too faint to be smelled itself'),
+      axis: t('苯（ppb＝十億份空氣裡有幾份），每往右一格，就是多十倍', 'Benzene (ppb = parts in a billion of air); each step right is ten times more'),
+      just: t('剛好聞得到廢氣味的時候', 'When the exhaust is just noticeable'),
+      justSub: t('一輛機車・和風怎麼吹無關', 'One scooter · does not depend on the wind'),
+      seconds: t('風從機車吹來，聞得到的那幾秒', 'Wind from the scooters, the seconds you can smell it'),
+      secondsSub: t('離最近的機車半公尺、小孩鼻子的高度（約 0.7 公尺）・這種風最多約八個紅燈有一個', 'Half a metre from the nearest scooter, child’s nose height (about 0.7 m) · such a wind comes in at most about 1 red in 8'),
+      odour: t('鼻子聞得出「苯」自己的濃度：公開數值裡最低的（不是健康標準）', 'Where benzene itself can be smelled: the lowest published value (not a health limit)'),
+      caption: t(
+        '推估。每條是從低到高的範圍，沒有標中間。上面一條是常見的量，不是最少的量；兩個「聞得到」的標準來自 1967 和 1970 年的汽車廢氣研究，算了 {nj} 輛單獨一輛的機車。下面一條是電腦算的一個紅燈，換了 {ns} 次排放量；聞得到的時間，依中間推估約占紅燈的 {a}%（1967 年的標準）到 {b}%（1970 年的標準）。這是機車另外加進空氣裡的量；成分比例來自舊型機車。幾秒鐘的量沒有官方的數值可以比，所以沒辦法說它高或低。',
+        'Estimate. Each band runs from low to high; its middle is not marked. The top band is a typical value, not a minimum; its two "can smell it" levels come from car-exhaust studies of 1967 and 1970, worked out for {nj} single scooters. The lower band is one simulated red with {ns} draws of the emissions; at the central estimate the smell is there for about {a} % (1967 level) to {b} % (1970 level) of the red. These are amounts the scooters add; the shares come from older scooters. No official value exists for a few seconds, so they cannot be called high or low.',
+      ),
+      summary: t(
+        '推估：剛好聞得到時，苯{just}；風從機車吹來、聞得到的那幾秒，苯平均大約 {about}（範圍{seconds}）。兩者都遠低於鼻子聞得出苯自己的濃度。',
+        'Estimate: when the smell is just noticeable, benzene is {just}; in the seconds you can smell it with the wind from the scooters, it averages about {about} (range {seconds}). Both are far below the level at which benzene itself can be smelled.',
+      ),
+      tableHead: [t('情況', 'Case'), t('苯', 'Benzene')],
+      tableStat: t('剛好聞得到：兩個標準的中間值，到最低和最高；那幾秒：從低到高', 'Just noticeable: the two levels\' central values, with the lowest and highest; the seconds: low to high'),
+      lowest: t('最低約\u00a0{lo}，最高約\u00a0{hi}', 'lowest about\u00a0{lo}, highest about\u00a0{hi}'),
+      aboutRange: t('大約 {about}（範圍{range}）', 'about {about} (range {range})'),
+    },
   },
 
   // ---- the estimate's range bands and table (/estimate/) --------------------------------------

@@ -40,6 +40,7 @@ import ChartTable from '@/components/charts/ChartTable.astro';
 import SimCompare from '@/components/charts/SimCompare.astro';
 import SimSeconds from '@/components/charts/SimSeconds.astro';
 import SimAbove from '@/components/charts/SimAbove.astro';
+import SmellBenzene from '@/components/charts/SmellBenzene.astro';
 import SimText from '@/components/pages/estimate/SimText.astro';
 import { mveModel } from '@/components/charts/core/estimateCharts';
 import { workingBusiest, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
@@ -52,12 +53,12 @@ import { lf, sourceShort } from '@/components/pages/evidence/ev';
 import NumberBox from '@/components/pages/estimate/NumberBox.astro';
 import SpreadBars from '@/components/pages/estimate/SpreadBars.astro';
 import Downloads from '@/components/pages/estimate/Downloads.astro';
-import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { estText, kSentences } from '@/i18n/ui';
 import { answerList, facts, type SourceId } from '@/data';
 import { est, estimateText, formatEstimate, scenarioKeys } from '@/data/estimate';
 import { simData } from '@/data/simulation-data';
-import { sim } from '@/data/simulation';
+import { sim, simAbove, simSmell, smellFiles } from '@/data/simulation';
 import estimateCopy from '@/i18n/pages/estimate';
 import { chipWhere } from '@/i18n/ui';
 import { fill, localize } from '@/i18n/pages/_copy';
@@ -81,7 +82,7 @@ const sheetMeasured = fill(t.sheet.measured, {
 });
 const sheetTitle = fill(t.fmt.sheetTitle, { v: formatEstimate('co.dozen.total', locale).text });
 const mve = mveModel(locale);
-const toc = (['numbers', 'simulation', 'recipe', 'count', 'check', 'range', 'drawing', 'limits', 'answers', 'measure'] as const).map((id) => ({
+const toc = (['numbers', 'simulation', 'smell', 'recipe', 'count', 'check', 'range', 'drawing', 'limits', 'answers', 'measure'] as const).map((id) => ({
   id,
   label: id === 'answers' ? fill(t.toc.answers, { n: answerList.length }) : t.toc[id],
 }));
@@ -179,6 +180,49 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: 'date' in l && l.date
 const S = t.simulation;
 // the full generated extract (research/simulation/site-extract.json), described as such on the page
 const simJson = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(simData, null, 2))}`;
+
+// ---- #smell -----------------------------------------------------------------------------------
+// statements-smell.json `may` only. Seconds-long values (#smell up to the chart and 「那個味道是什麼」)
+// and the 30-minute / 1-hour averages (#smell-hour) are kept under separate headings (must-not 3).
+const SM = t.smell;
+const C = simSmell;
+const pct = (x: number) => Math.round(x * 100);
+const smVars = {
+  lo: nf(C.just.wordsRangeLo, 1),
+  hi: nf(C.just.wordsRangeHi, 1),
+  about: nf(C.seconds.wordsAbout, 0),
+  a: pct(C.share800.c),
+  b: pct(C.share6800.c),
+  aLo: pct(C.share800.lo),
+  aHi: pct(C.share800.hi),
+  bLo: pct(C.share6800.lo),
+  bHi: pct(C.share6800.hi),
+  eLoA: pct(simAbove.smell[0].low),
+  eHiA: pct(simAbove.smell[0].high),
+  eLoB: pct(simAbove.smell[1].low),
+  eHiB: pct(simAbove.smell[1].high),
+  lowDraws: nf(C.share800.drawsAnyLowHigh[0], 0),
+};
+const smSlots = { just: 'sim.smell.benzeneJust', seconds: 'sim.smell.benzeneSeconds' } as const;
+const refName = (chem: string, body: string) =>
+  body.startsWith('California') ? (chem === 'benzene' ? SM.table.refs.californiaBenzene : SM.table.refs.california) : body.startsWith('Taiwan indoor') ? SM.table.refs.taiwanIndoor : /odour/.test(body) ? SM.table.refs.whoOdour : SM.table.refs.who30;
+const verdictText = (chem: string, v: string) => (v === 'yes' ? SM.table.verdict.yes : v === 'in-worst-case-only' ? SM.table.verdict.worst : chem === 'hcn' ? SM.table.verdict.farBelow : SM.table.verdict.no);
+const sep = en ? '; ' : '；';
+const stayTable = {
+  head: SM.table.head as string[],
+  rows: C.stay.map((s) => {
+    const name = (SM.table.names as Record<string, string>)[s.chem];
+    const conf = (SM.table.confidence as Record<string, string>)[s.confidence ?? 'low'] + (['acrolein', 'naphthalene'].includes(s.chem) ? `${colon}${SM.table.carOnly}` : '');
+    // the name alone: no IARC group beside a stay-through value (stay-through-benzene carries nothing about cancer)
+    const nameCell = name;
+    if (!s.rows.length) return [nameCell, SM.table.notAveraged, SM.table.refs.none, conf];
+    const avg = (a: string) => (a === '60min' ? SM.table.avg60 : SM.table.avg30);
+    const values = s.rows.map((r) => fill(SM.table.cell, { avg: avg(r.avg), c: nf(r.central), lo: nf(r.low), hi: nf(r.high) }));
+    if (s.chem === 'benzene') values.push(fill(SM.table.ppb, { c: nf(C.benzeneStayPpb.central, 0), lo: nf(C.benzeneStayPpb.low, 0), hi: nf(C.benzeneStayPpb.high, 0) }));
+    const refs = s.rows.flatMap((r) => r.refs.map((ref) => fill(SM.table.refCell, { ref: refName(s.chem, ref.body), v: nf(ref.ugm3), verdict: verdictText(s.chem, ref.stay) })));
+    return [nameCell, values.join(sep), refs.join(sep), conf];
+  }),
+};
 ---
 
 <Base locale={locale} title={t.meta.title} description={t.meta.description} share="how-much">
@@ -309,6 +353,56 @@ const simJson = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.s
         <p class="es-p">{S.files}</p>
         <p><a class="es-inlink" href={simJson} download={`scooterair-simulation-${simData.signed}.json`}>{S.json}<Icon name="arrow-right" size="1em" /></a></p>
       </div>
+    </details>
+  </Section>
+
+  <!-- ===================================================== 3 SMELL -->
+  <Section id="smell" eyebrow={SM.eyebrow} title={SM.title} width="wide" tone="sunken" rule>
+    <div class="es-sim__lead">
+      {SM.lead.map((l) => <p class="es-p">{l}</p>)}
+      <p class="es-p">{SM.files}</p>
+      <p><a class="es-inlink es-inlink--ink" href={asset(smellFiles.method)}>{SM.methodLink}<Icon name="arrow-right" size="1em" /></a></p>
+      <p><a class="es-inlink es-inlink--ink" href={asset(smellFiles.results)}>{SM.resultsLink}<Icon name="arrow-right" size="1em" /></a></p>
+    </div>
+
+    <h3 class="es-h3"><Phrased text={SM.withTitle} locale={locale} /></h3>
+    <div class="es-sim__lines">
+      {SM.with.map((l) => <p class="es-p">{l}</p>)}
+      <p class="es-p">{SM.hazard}</p>
+    </div>
+
+    <h3 class="es-h3"><Phrased text={SM.justTitle} locale={locale} /></h3>
+    <div class="es-sim__lines">
+      {SM.just.map((l) => <SimText locale={locale} text={fill(l, smVars)} slots={smSlots} class="es-p" />)}
+    </div>
+
+    <h3 class="es-h3"><Phrased text={SM.secondsTitle} locale={locale} /></h3>
+    <SmellBenzene locale={locale} />
+    <div class="es-sim__lines">
+      {SM.seconds.map((l) => <SimText locale={locale} text={fill(l, smVars)} slots={smSlots} class="es-p" />)}
+    </div>
+
+    <h3 class="es-h3"><Phrased text={SM.whatTitle} locale={locale} /></h3>
+    <div class="es-sim__lines">
+      {SM.what.map((l) => <p class="es-p">{l}</p>)}
+    </div>
+
+    <h3 class="es-h3" id="smell-hour"><Phrased text={SM.hourTitle} locale={locale} /></h3>
+    <div class="es-sim__lines">
+      <p class="es-p">{SM.hourLead}</p>
+      <p class="es-p">{SM.oneRed}</p>
+      {SM.stay.map((l) => <p class="es-p">{l}</p>)}
+    </div>
+    <div class="es-smell-table"><ChartTable table={stayTable} caption={SM.table.caption} /></div>
+    <p class="es-p es-gloss">{SM.table.foot}</p>
+
+    <details class="es-more">
+      <summary><span>{SM.sureTitle}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <div class="es-more__body"><ul class="es-limits">{SM.sure.map((l) => <li>{l}</li>)}</ul></div>
+    </details>
+    <details class="es-more">
+      <summary><span>{SM.notTitle}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <div class="es-more__body"><ul class="es-limits">{SM.not.map((l) => <li>{l}</li>)}</ul></div>
     </details>
   </Section>
 
@@ -963,6 +1057,15 @@ const simJson = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.s
     gap: 0.3em;
     min-block-size: var(--tap);
     font-weight: var(--fw-bold);
+  }
+  /* on the sunken #smell section the accent link colour falls under 7:1 in the light theme */
+  .es-smell-table {
+    margin-block: var(--sp-4) var(--sp-3);
+  }
+  .es-inlink--ink {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
   }
 
   .es-answers {

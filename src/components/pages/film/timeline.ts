@@ -38,9 +38,12 @@ const SHEET = [
   { id: 'waiting', beat: 'arrive', dur: 3.8 },
   { id: 'knee', beat: 'idle', dur: 4.0 },
   { id: 'keeps', beat: 'idle', dur: 4.4 },
-  { id: 'howMuch', beat: 'kerb', dur: 7.0 },
-  { id: 'co', beat: 'inside', dur: 4.0 },
-  { id: 'fuel', beat: 'inside', dur: 5.2 },
+  { id: 'howMuch', beat: 'kerb', dur: 6.4 },
+  { id: 'co', beat: 'inside', dur: 2.6 },
+  // the smell cue holds the strongest allowed line, with its condition, and its no-smell-not-clean note
+  // in one frame (statements-smell); 1.4 s taken from 'co' and 0.6 s from 'howMuch' (both still above
+  // their reading floors) keep the film's length
+  { id: 'fuel', beat: 'inside', dur: 7.2 },
   { id: 'specks', beat: 'inside', dur: 3.2 },
   { id: 'mask', beat: 'mask', dur: 4.2 },
   { id: 'under', beat: 'closest', dur: 5.0 },
@@ -88,7 +91,7 @@ export const T = {
   keeps: at('keeps'),
   /** the number panel */
   panel: at('howMuch'),
-  /** the dive into the fume: a cloud that has no smell, then the drop of fuel, then the soot */
+  /** the dive into the fume: a cloud that has no smell, then the smell, then the soot */
   inside: at('co'),
   fuel: at('fuel'),
   specks: at('specks'),

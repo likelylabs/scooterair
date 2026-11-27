@@ -90,10 +90,12 @@ const scene = [
 ].join('');
 const alt = sceneAlt(locale, art.body.alt[locale], { kind: 'plain' });
 // where each pin's word sits, from its pin: beside it, or under it at the left edge
+// Each name starts at its pin's centre; the gap past the pin is set in rem in art.css (.body-word),
+// so it grows with the reader's text size exactly as the pin does and the two never touch.
 const WORD: Record<BodyPin, { dx: number; dy: number; anchor: string }> = {
-  nose: { dx: 30, dy: 0, anchor: 'start middle' },
-  lungs: { dx: 0, dy: 30, anchor: 'center top' },
-  blood: { dx: 30, dy: 0, anchor: 'start middle' },
+  nose: { dx: 0, dy: 0, anchor: 'start middle' },
+  lungs: { dx: 0, dy: 0, anchor: 'center top' },
+  blood: { dx: 0, dy: 0, anchor: 'start middle' },
 };
 ---
 

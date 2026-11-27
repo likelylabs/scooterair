@@ -1,27 +1,32 @@
 ---
 /**
- * /questions/smell/ — 那個味道是什麼？ (brief 7.5)
- *   1  G2, one fume and three labels on it (what is in it). The answer is a ranking from odour
- *      thresholds: the site's own working, so it carries 推估 and never says more than
- *      "likeliest".
- *   2  The 聞得到／聞不到 strip: no smell does not mean none is there; benzene.
- *   +  「聞起來那麼臭，一氧化碳超過指引值了嗎？」: the simulation's answer (statements 6, 7, 1 and
- *      the pushchair exception), one <p> per line, so one more line can follow later.
+ * /questions/smell/ — 那個味道是什麼？ (brief 7.5), from the signed smell-chemicals step
+ * (research/simulation/smell-chemicals/statements-smell.json):
+ *   1  #answer  smell-comes-with-benzene, what-is-in-it, no-smell-not-clean (same view), and the
+ *               hazard labels as their own paragraph (no smell word, no number)
+ *   2  #what    not-unburnt-petrol; picture: the SmellBenzene chart (seconds-long benzene only)
+ *   3  #more    no-smell-not-clean with how-often-wind; one-red in its sheet, away from the labels
+ *   +  #how-much  seconds-long benzene (how-much-just-smellable, level-in-smellable-seconds) with
+ *               the share of seconds, the runs and the condition. No 30-minute or 1-hour value here.
+ *   +  #smell-co  the simulation's answer on carbon monoxide (statements 6, 7, 1 and the pushchair)
  */
 import type { Locale } from '@/i18n';
-import { href } from '@/i18n';
+import { asset, href } from '@/i18n';
 import { chipWhere, how } from '@/i18n/ui';
 import Screen from '@/components/ui/Screen.astro';
 import HowSheet from '@/components/ui/HowSheet.astro';
 import KindChip from '@/components/ui/KindChip.astro';
 import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
 import SmellStrip from '@/components/art/SmellStrip.astro';
+import SmellBenzene from '@/components/charts/SmellBenzene.astro';
+import ChartTable from '@/components/charts/ChartTable.astro';
+import { smellBenzeneModel } from '@/components/charts/core/simCharts';
 import WorkingSum from '@/components/charts/WorkingSum.astro';
 import HowButton from '@/components/ui/HowButton.astro';
 import NextButton from '@/components/ui/NextButton.astro';
 import Phrased from '@/components/ui/Phrased.astro';
 import SimText from '@/components/pages/estimate/SimText.astro';
-import { simStamp } from '@/data/simulation';
+import { simSmell, simStamp, smellFiles } from '@/data/simulation';
 import questions from '@/i18n/pages/questions';
 import { filler } from './q';
 
@@ -34,42 +39,116 @@ const f = filler(locale);
 const t = questions.smell;
 const s1 = t.s1;
 const s2 = t.s2;
+const s3 = t.s3;
+const hm = t.howMuch;
 const sim = questions.smellSim;
+const pct = (x: number) => Math.round(x * 100);
+const nf = (v: number) => new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 1 }).format(v);
+const C = simSmell;
+const fillVars = (s: string, vars: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
+const hmVars = {
+  lo: nf(C.just.wordsRangeLo),
+  hi: nf(C.just.wordsRangeHi),
+  about: nf(C.seconds.wordsAbout),
+  a: pct(C.share800.c),
+  b: pct(C.share6800.c),
+  aLo: pct(C.share800.lo),
+  aHi: pct(C.share800.hi),
+  bLo: pct(C.share6800.lo),
+  bHi: pct(C.share6800.hi),
+  lowDraws: nf(C.share800.drawsAnyLowHigh[0]),
+  canyon: nf(C.canyon.a.drawsAny),
+  canyonLo: nf(C.canyon.a.drawsAnyLowHigh[0]),
+  canyonHi: nf(C.canyon.a.drawsAnyLowHigh[1]),
+};
+const chart = smellBenzeneModel(locale);
+const method = asset(smellFiles.method);
 ---
 
 <Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
   <TailpipeMarks slot="picture" locale={locale} can={false} />
-  <KindChip slot="chips" locale={locale} kind="derived" />
-  <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['scooter-exhaust-carbonyls', 'odour-thresholds']} primary={{ href: href('/evidence/#link-4', locale) }} secondary={{ href: href('/estimate/#answers', locale), label: how.fullMethod[locale] }}>
-    <p slot="block1">{f(s1.sheet.b1[locale])}</p>
+  <div class="q-smell__more">
+    <p class="q-smell__names">{s1.names[locale]}</p>
+    <p class="q-smell__hazard">{s1.hazard[locale]}</p>
+  </div>
+  <Fragment slot="chips">
+    <KindChip locale={locale} kind="estimate" fact="smell-comes-with-benzene" />
+    <KindChip locale={locale} kind="official" where={chipWhere.international[locale]} fact="iarc-group1-three" />
+  </Fragment>
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="estimate" anchor="smell" stamp={simStamp[locale]} title={s1.sheet.title[locale]} facts={['smell-comes-with-benzene', 'smell-no-smell-not-clean', 'smell-what-is-in-it', 'smell-older-engines', 'iarc-group1-three']} primary={{ href: href('/evidence/#smell-chemicals', locale) }} secondary={{ href: href('/estimate/#smell', locale), label: s1.sheet.estimateLink[locale] }}>
+    <p slot="block1">{s1.sheet.b1[locale]}</p>
     <Fragment slot="block2">
       <WorkingSum
         locale={locale}
         mode="flow"
-        steps={s1.sheet.flow.map((x) => ({ value: x.value[locale], label: x.label[locale], chip: 'measured' as const }))}
-        result={{ value: s1.sheet.result.value[locale], label: s1.sheet.result.label[locale], kind: 'derived' }}
+        steps={s1.sheet.flow.map((x, i) => ({ value: x.value[locale], label: x.label[locale], chip: (i === 0 ? 'measured' : 'estimate') as 'measured' | 'estimate' }))}
+        result={{ value: s1.sheet.result.value[locale], label: s1.sheet.result.label[locale], kind: 'estimate' }}
       />
-      <p>{f(s1.sheet.b2[locale])}</p>
+      <p>{s1.sheet.b2[locale]}</p>
     </Fragment>
-    <p slot="block3">{f(s1.sheet.b3[locale])}</p>
+    <Fragment slot="block3">
+      <p>{s1.sheet.b3[locale]}</p>
+      <p><a href={method}>{s1.sheet.method[locale]}</a></p>
+    </Fragment>
   </HowSheet>
 </Screen>
 
-<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={f(s2.quiet[locale])}>
-  <SmellStrip slot="picture" locale={locale} class="q-plate" />
-  <KindChip slot="chips" locale={locale} kind="official" where={chipWhere.international[locale]} fact={['co-odourless', 'iarc-benzene-group1', 'who-benzene-no-safe-level']} />
-  <HowSheet slot="sheet" id="how-2" locale={locale} kind="official" where={chipWhere.international[locale]} facts={['co-odourless', 'iarc-benzene-group1', 'who-benzene-no-safe-level']} primary={{ href: href('/evidence/#link-4', locale) }}>
-    <p slot="block1">{f(s2.sheet.b1[locale])}</p>
+<Screen locale={locale} n={2} total={1} id="what" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={f(s2.quiet[locale])}>
+  <div slot="picture" class="q-plate q-smell__chart"><SmellBenzene locale={locale} compact table={false} /></div>
+  <KindChip slot="chips" locale={locale} kind="estimate" fact="smell-not-unburnt-petrol" />
+  <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="smell" stamp={simStamp[locale]} title={s2.sheet.title[locale]} facts={['smell-not-unburnt-petrol', 'odour-thresholds', 'scooter-exhaust-carbonyls']} primary={{ href: href('/evidence/#smell-chemicals', locale) }} secondary={{ href: href('/estimate/#smell', locale), label: s1.sheet.estimateLink[locale] }}>
+    <p slot="block1">{s2.sheet.b1[locale]}</p>
     <p slot="block2">{f(s2.sheet.b2[locale])}</p>
-    <p slot="block3">{f(s2.sheet.b3[locale])}</p>
+    <Fragment slot="block3">
+      <p>{s2.sheet.b3[locale]}</p>
+      <p><a href={method}>{s1.sheet.method[locale]}</a></p>
+    </Fragment>
+    <ChartTable table={chart.table} caption={chart.title} />
   </HowSheet>
 </Screen>
+
+<Screen locale={locale} n={3} total={1} id="more" how="how-3" chapter={s3.chapter[locale]} headline={s3.headline[locale]} body={f(s3.body[locale])} quiet={f(s3.quiet[locale])}>
+  <SmellStrip slot="picture" locale={locale} class="q-plate" />
+  <Fragment slot="chips">
+    <KindChip locale={locale} kind="estimate" fact="smell-no-smell-not-clean" />
+    <KindChip locale={locale} kind="official" where={chipWhere.international[locale]} fact="co-odourless" />
+  </Fragment>
+  <HowSheet slot="sheet" id="how-3" locale={locale} kind="estimate" anchor="smell" stamp={simStamp[locale]} facts={['smell-no-smell-not-clean', 'co-odourless', 'smell-one-red']} primary={{ href: href('/evidence/#smell-chemicals', locale) }} secondary={{ href: href('/estimate/#smell-hour', locale), label: hm.hourLink[locale] }}>
+    <p slot="block1">{fillVars(s3.sheet.b1[locale], hmVars)}</p>
+    <p slot="block2">{s3.sheet.b2[locale]}</p>
+    <p slot="block3">{s3.sheet.b3[locale]}</p>
+  </HowSheet>
+</Screen>
+
+<section class="q-also" id="how-much" aria-labelledby="how-much-h">
+  <h2 class="q-also__q" id="how-much-h"><Phrased text={hm.q[locale]} locale={locale} /></h2>
+  <div class="q-also__lines">
+    <p class="q-also__a q-also__gloss">{hm.gloss[locale]}</p>
+    {hm.lines.map((l) => <SimText locale={locale} text={fillVars(l[locale], hmVars)} slots={{ just: 'sim.smell.benzeneJust', seconds: 'sim.smell.benzeneSeconds' }} sheet="how-4" class="q-also__a" />)}
+  </div>
+  <p class="q-also__links">
+    <a href={href('/estimate/#smell', locale)}>{hm.numbersLink[locale]}</a>
+    <a href={href('/estimate/#smell-hour', locale)}>{hm.hourLink[locale]}</a>
+  </p>
+  <div class="q-also__foot">
+    <KindChip locale={locale} kind="estimate" />
+    <HowButton locale={locale} sheet="how-4" />
+  </div>
+  <HowSheet id="how-4" locale={locale} kind="estimate" anchor="smell" stamp={simStamp[locale]} facts={['smell-benzene-just-smellable', 'smell-benzene-seconds', 'sim-smell-seconds']}>
+    <p slot="block1">{hm.sheet.b1[locale]}</p>
+    <p slot="block2">{fillVars(hm.sheet.b2[locale], hmVars)}</p>
+    <Fragment slot="block3">
+      <p>{hm.sheet.b3[locale]}</p>
+      <p><a href={method}>{s1.sheet.method[locale]}</a></p>
+    </Fragment>
+  </HowSheet>
+</section>
 
 <section class="q-also" id="smell-co" aria-labelledby="smell-co-h">
   <h2 class="q-also__q" id="smell-co-h"><Phrased text={sim.q[locale]} locale={locale} /></h2>
   <div class="q-also__lines">
     <p class="q-also__a q-also__gloss">{questions.myChild.pushchair.gloss[locale]}</p>
-    {sim.lines.map((l) => <SimText locale={locale} text={l[locale]} slots={{ range: 'sim.co.oneRed15' }} sheet="how-3" class="q-also__a" />)}
+    {sim.lines.map((l) => <SimText locale={locale} text={l[locale]} slots={{ range: 'sim.co.oneRed15' }} sheet="how-5" class="q-also__a" />)}
   </div>
   <p class="q-also__links">
     <a href={href('/questions/my-child/#pushchair', locale)}>{sim.pushchairLink[locale]}</a>
@@ -77,9 +156,9 @@ const sim = questions.smellSim;
   </p>
   <div class="q-also__foot">
     <KindChip locale={locale} kind="estimate" />
-    <HowButton locale={locale} sheet="how-3" />
+    <HowButton locale={locale} sheet="how-5" />
   </div>
-  <HowSheet id="how-3" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} facts={['sim-smell-seconds', 'smell-not-co-guideline', 'sim-co-one-red-15min']}>
+  <HowSheet id="how-5" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} facts={['sim-smell-seconds', 'smell-not-co-guideline', 'sim-co-one-red-15min']}>
     <p slot="block1">{sim.sheet.b1[locale]}</p>
     <p slot="block2">{sim.sheet.b2[locale]}</p>
     <p slot="block3">{sim.sheet.b3[locale]}</p>
@@ -90,6 +169,22 @@ const sim = questions.smellSim;
 </section>
 
 <style>
+  /* screen 1: the names and the hazard labels, after the quiet line, in body type (visible, not folded) */
+  .q-smell__more {
+    display: grid;
+    gap: var(--sp-2);
+    margin-block-start: var(--sp-3);
+  }
+  .q-smell__more p {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+    max-inline-size: 40rem;
+  }
+  .q-smell__chart {
+    padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  }
   /* the second question on this page: a card in the same column as the screens above it (as on /questions/my-child/) */
   .q-also {
     display: grid;

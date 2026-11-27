@@ -23,7 +23,6 @@ import { checkHeadline, checkSentence, est, estimateText, formatEstimate, format
 import { simBelowWho, simChipWhere, simRange } from '@/data/simulation';
 import act from '@/i18n/pages/act';
 import { fill, localize } from '@/i18n/pages/_copy';
-import { verified } from '@/components/pages/home/home-figures';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -71,7 +70,7 @@ const pollutants = [
         <section class="blk">
           <h2 class="blk__h">{checkHeadline(locale, simBelowWho())}</h2>
           <div class="blk__p"><KindChip locale={locale} kind="estimate" where={simChipWhere[locale]} size="sm" />{sp}{simA}<EstimateValue locale={locale} slotId="sim.co.oneRed15" value={simRange('sim.co.oneRed15')} anchor="simulation" />{simB}</div>
-          <p class="blk__p">{fill(b.checkLead, { sites: est.meas.iot.sites.value })}{sp}{checkSentence(locale)}{sp}{estimateText.checkIsEstimate[locale]}{sp}{estimateText.whoCoOnly[locale]}{sp}{estimateText.coMarksBenzene[locale]}{verified('who-benzene-no-safe-level') && <Fragment>{sp}{estimateText.benzeneWho[locale]}</Fragment>}</p>
+          <p class="blk__p">{fill(b.checkLead, { sites: est.meas.iot.sites.value })}{sp}{checkSentence(locale)}{sp}{estimateText.checkIsEstimate[locale]}{sp}{estimateText.whoCoOnly[locale]}{sp}{estimateText.coMarksBenzene[locale]}</p>
           <CheckChart locale={locale} />
         </section>
       </div>

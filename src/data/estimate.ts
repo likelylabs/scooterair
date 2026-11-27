@@ -99,7 +99,7 @@ export interface EstRange {
   anchor?: EstimateAnchor;
 }
 
-export type EstimateAnchor = 'numbers' | 'simulation' | 'recipe' | 'count' | 'check' | 'range' | 'drawing' | 'limits' | 'answers' | 'measure';
+export type EstimateAnchor = 'numbers' | 'simulation' | 'smell' | 'recipe' | 'count' | 'check' | 'range' | 'drawing' | 'limits' | 'answers' | 'measure';
 
 const est1 = (lo: number, mid: number, hi: number, unit: EstUnit, anchor: EstimateAnchor = 'numbers'): EstRange => ({ lo, mid, hi, unit, kind: 'estimate', rounding: 'sf1', anchor });
 const tot1 = (lo: number, mid: number, hi: number): EstRange => ({ lo, mid, hi, unit: 'ppm', kind: 'estimate', rounding: 'dp1', anchor: 'numbers' });
@@ -677,12 +677,6 @@ export const estimateText = {
   belowIsNotSafe: t('低於指引值，不代表廢氣就安全。', 'Below the guideline does not mean safe.'),
   /** Screen 5's link from the chart to benzene: the short form of coTracksVapour (claims policy brief-no-everything-rises). */
   coMarksBenzene: t('一氧化碳多的地方，苯也多。', 'Benzene goes up with carbon monoxide.'),
-  /**
-   * Benzene, said on its own and in the registry's strength (fact who-benzene-no-safe-level: the
-   * WHO names no safe level; nothing more is attributed to the WHO). Print only while that fact is verified. It is a callback to screen
-   * 2's quiet line and says nothing about the amount at the kerb or the risk of one red light.
-   */
-  benzeneWho: t('世界衛生組織說，苯找不到安全的量。', 'The WHO names no safe level of benzene.'),
   /** The label under the WHO bar of every measured-beside-estimated chart. */
   whoIsCoLimit: t('只看一氧化碳', 'Carbon monoxide only'),
   /** Screen 5 quiet line: limited to fresh fuel vapour and benzene. */

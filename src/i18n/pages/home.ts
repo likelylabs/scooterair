@@ -69,29 +69,44 @@ export default copy({
   // 2 ─────────────────────────────────────────────────────────────────────────────────────────
   s2: {
     chapter: { 'zh-TW': '排出什麼', en: 'What comes out' },
-    headline: { 'zh-TW': '臭的是油氣和醛類。|一氧化碳聞不到，|微粒看不到', en: 'The smell is fuel vapour and aldehydes. |Carbon monoxide has no smell. |Particles are too small to see' },
+    /** statements-smell smell-comes-with-benzene: the strongest allowed line. Its 推估 and its condition are body line 1; no-smell-not-clean is body line 2 (same view). */
+    headline: { 'zh-TW': '聞到的不是苯，|但苯跟著一起來', en: 'What you smell is not benzene, |but benzene comes with it' },
     /** One idea per line (printed as separate lines, so one more line can follow without a rewrite). */
     body: [
-      { 'zh-TW': '味道只告訴你一件事：你正站在廢氣裡。', en: 'The smell tells you one thing: you are standing in exhaust.' },
-      { 'zh-TW': '油氣（沒燒完的汽油）裡有苯（ㄅㄣˇ），是確定會致癌的東西。', en: 'The fuel vapour carries benzene, a proven cause of cancer.' },
+      /** what-is-in-it, short form: the "if", 推估, the first names in the signed statement's own order, benzene glossed once in plain words. The line links to /questions/smell/ (the full answer, with what the IARC groups mean). */
+      { 'zh-TW': '推估：如果你聞到的是身旁機車的廢氣，裡面也有苯（ㄅㄣˇ，汽油裡的成分）、甲醛等十幾種成分。', en: 'Estimate: if what you smell is the exhaust of the scooters beside you, that air also holds benzene (a substance found in petrol), formaldehyde and about ten other exhaust chemicals.' },
+      /** no-smell-not-clean (its carbon monoxide and particle halves are the picture's labels). */
+      { 'zh-TW': '聞不到，不代表空氣乾淨。', en: 'No smell does not mean clean air.' },
     ],
-    /** Printed only while the registry fact who-benzene-no-safe-level is verified. */
-    quiet: { 'zh-TW': '世界衛生組織說，苯找不到安全的量。', en: 'The WHO names no safe level of benzene.' },
+    /** alwaysCarry plus[2]: the shares come from older engines. */
+    quiet: { 'zh-TW': '這些成分各占多少，是量舊型機車得來的；新型機車可能不一樣。', en: 'The shares come from tests of older scooters; newer ones may differ.' },
     /** Beside the drawn can; the range and the 推估 chip follow it. */
     canLabel: { 'zh-TW': '一輛機車等一個紅燈，排出的一氧化碳', en: 'Carbon monoxide from one scooter through one red light' },
     sheet: {
-      title: { 'zh-TW': '一個鋁罐的一氧化碳，|怎麼來的', en: 'A drinks can of carbon monoxide: |where it comes from' },
+      title: { 'zh-TW': '一個鋁罐的一氧化碳，|和那個味道', en: 'A drinks can of carbon monoxide, |and that smell' },
       measured: {
-        'zh-TW': '環境部的機車定檢，一年大約 {readings} 萬筆一氧化碳讀數。苯是國際癌症研究機構認定會致癌的東西。',
-        en: 'Taiwan’s scooter inspections: about {readings} million carbon monoxide readings a year. The International Agency for Research on Cancer classes benzene as carcinogenic to humans.',
+        'zh-TW': '環境部的機車定檢，一年大約 {readings} 萬筆一氧化碳讀數。廢氣裡有哪些成分、各占多少，用的是台灣、印度、尼泊爾量的舊型機車（化油器或沒有觸媒）；新型機車可能不一樣。',
+        en: 'Taiwan’s scooter inspections: about {readings} million carbon monoxide readings a year. Which chemicals the exhaust holds, and how much of each, comes from older scooters measured in Taiwan, India and Nepal (carburetted or without a catalyst); newer scooters may differ.',
       },
+      /** statements-smell not-unburnt-petrol and the basis of smell-comes-with-benzene. No cancer word here (must-not 1). */
+      smell: {
+        'zh-TW': '推估：聞到的不是苯。苯要百萬分之幾才聞得到，路邊的苯遠遠不到那麼濃。那個刺鼻的味道，有一部分比較可能來自燃燒時產生的醛（ㄑㄩㄢˊ）類，不是沒燒完的汽油；這只能粗略估計，可能差到十倍左右。味道和苯是從同一團廢氣出來的，所以只要那個味道來自身旁的機車，苯就在同一口空氣裡。',
+        en: 'Estimate: what you smell is not benzene. Benzene can only be smelled at parts per million, and at the kerb it is nowhere near that. Part of the sharp smell more likely comes from aldehydes formed by burning, not from unburnt petrol; this is only a rough estimate, within about ten times. The smell and the benzene come out of the same exhaust, so whenever the smell comes from the scooters beside you, benzene is in the same breath of air.',
+      },
+      /** statements-smell hazard-labels, verbatim: its own paragraph, in a different block from every smell sentence, no number. */
+      hazard: {
+        'zh-TW': '世界衛生組織的癌症研究機構（IARC）把苯、1,3-丁二烯、甲醛列為「確定會讓人致癌」的第1類。這是說「證據有多強」，不是說等一個紅燈會有多少風險。汽油引擎廢氣整體被列為第2B類（「可能致癌」）。',
+        en: 'The World Health Organization’s cancer agency (IARC) puts benzene, 1,3-butadiene and formaldehyde in Group 1, ‘causes cancer in humans’. That describes how strong the evidence is, not the risk from waiting at one red light. Petrol-engine exhaust as a whole is Group 2B, ‘possibly causes cancer’.',
+      },
+      smellLink: { 'zh-TW': '完整的說明：那個味道是什麼？', en: 'The full answer: what is that smell?' },
+      method: { 'zh-TW': '味道推估的方法（研究檔案，英文）', en: 'How the smell was estimated (research file)' },
       can: {
         'zh-TW': '常溫下這些一氧化碳{litres}，一個鋁罐是 {ml} 毫升，所以是{cans}。',
         en: 'At room temperature that carbon monoxide takes up {litres}. A drinks can holds {ml} mL, so it is {cans}.',
       },
       care: {
-        'zh-TW': '這是全台灣機車的平均：新車排得少，騎了很多年的車排得多。苯會致癌，講的是長年吸進去，不是等一個紅燈。',
-        en: 'This is an average over Taiwan’s scooters: new ones give off less, ones ridden for many years more. When we say benzene gives people cancer, we mean years of breathing it, not one red light.',
+        'zh-TW': '這是全台灣機車的平均：新車排得少，騎了很多年的車排得多。',
+        en: 'This is an average over Taiwan’s scooters: new ones give off less, ones ridden for many years more.',
       },
     },
     next: { 'zh-TW': '排出來以後，去哪裡？', en: 'Where does it go?' },
@@ -160,8 +175,17 @@ export default copy({
     smell: { 'zh-TW': '風從機車吹來，大半時間聞得到。', en: 'With the wind from the scooters, you can smell it for most of the red.' },
     /** Statement 3, short form, with its key condition (every red for 15 minutes); links to /questions/my-child/#pushchair. */
     exception: { 'zh-TW': '例外：嬰兒車在排氣管正後方、幾乎沒風，15 分鐘每個紅燈都在，可能超過指引值。', en: 'The exception: a pushchair right behind a tailpipe, in almost no wind, through every red for 15 minutes, can pass the guideline.' },
-    // quiet: none for now (statements.json allows nothing more here today)
+    /** statements-smell no-smell-not-clean, its benzene half (one line at 360 px; the screen is at its height cap), under the 「仍低於指引值」 headline, so a glance
+     *  does not leave with "below the limit, so fine". not-unburnt-petrol, in full with its order-of-magnitude hedge,
+     *  is sheet.whatSmell on this screen and the answer on /questions/smell/#what. */
+    quiet: { 'zh-TW': '推估：聞不到，也可能有苯。', en: 'Estimate: benzene can be there with no smell.' },
     sheet: {
+      /** not-unburnt-petrol in full, with its mustCarry. No smell-chemical number here: this sheet carries 15-minute values (must-not 3). */
+      whatSmell: {
+        'zh-TW': '推估：那個味道比較可能來自燃燒時產生的醛（ㄑㄩㄢˊ）類，不是沒燒完的汽油；這只能粗略估計，可能差到十倍左右。在一群機車的情況裡，苯從來沒有濃到聞得出來。',
+        en: 'Estimate: the smell more likely comes from aldehydes formed by burning, not from unburnt petrol; this is only a rough estimate, within about ten times. In the cases with a group of scooters, benzene never gets strong enough to be smelled.',
+      },
+      whatSmellLink: { 'zh-TW': '完整的說明：那個味道是什麼？', en: 'The full answer: what is that smell?' },
       /** Statement 6 in full (the screen's smell line is its short form). */
       smell: {
         'zh-TW': '推估：風整個紅燈從一群機車吹來時，紅燈大約一半到幾乎全部的時間，廢氣都多過一般人聞得到的量。「聞得到」的標準，來自 1967 和 1970 年汽車廢氣研究的摘要，只能說「風吹來時，很多秒聞得到」。',
@@ -211,7 +235,7 @@ export default copy({
     hint: { 'zh-TW': '點圖上的數字，看廢氣去了哪裡。', en: 'Tap a number to see where the exhaust goes.' },
     /** Each prints only while its registry fact (route-…) is verified. */
     pins: {
-      nose: { 'zh-TW': '鼻子、喉嚨：聞得到的刺鼻味道，會刺激鼻子和喉嚨。', en: 'Nose and throat: the sharp smell you notice irritates them.' },
+      nose: { 'zh-TW': '鼻子、喉嚨：刺鼻的氣體會到這裡，吸得夠多會刺激鼻子和喉嚨。', en: 'Nose and throat: the sharp-smelling gases reach here; enough of them irritates the nose and throat.' },
       lungs: { 'zh-TW': '肺：很小的微粒，可以進到肺的深處。', en: 'Lungs: very small particles reach deep into the lungs.' },
       blood: { 'zh-TW': '血液：一氧化碳從肺進到血液，占掉載氧氣的位子。', en: 'Blood: carbon monoxide passes from the lungs into the blood and takes up room meant for oxygen.' },
     },

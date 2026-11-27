@@ -98,7 +98,7 @@ Three of its rules are this project's reading of the brief, stated so nobody is 
 | `src/components/charts/` | the chart library: `core/*.ts` draws each chart as an SVG string, the same code at build time and in the browser; `MeasuredVsEstimate`, `PriceBars`, `MonthlyBars`, `WorkingSum` are the redesign's charts; `SimCompare`, `SimSeconds`, `SimAbove` draw the 3-D simulation |
 | `src/lib/home-money.ts` | every money figure on the home page, the film and `/electric/`, from the calculator engine, for today and for each coming date on which the sums change |
 | `docs/redesign-brief.md` | **the build brief**: the home page's 15 screens, the rules for showing estimates and measurements, wording, pictures, the film, every other page, and the acceptance checks. Its section 12 overrides the rest; section 13 says what was built differently and why. `docs/editorial-blueprint.md` is the earlier blueprint, kept for history and superseded where they differ |
-| `research/` | the research notes and per-paper checks the registry was built from; `research/estimate/` is the signed kerbside estimate (below); `research/simulation/` the signed 3-D simulation of one red light; `research/masks/VERIFIED.json` the checked facts on masks |
+| `research/` | the research notes and per-paper checks the registry was built from; `research/estimate/` is the signed kerbside estimate (below); `research/simulation/` the signed 3-D simulation of one red light (and, in `smell-chemicals/`, what is in the air when the fumes can be smelled); `research/masks/VERIFIED.json` the checked facts on masks |
 | `scripts/` | the checks, the share-card renderer and the headline-font builder |
 | `public/` | files served as they are: icons, manifest, share images |
 
@@ -143,6 +143,15 @@ and two `results/*/series_1s.csv` files and writes `src/data/simulation-data.ts`
 `src/data/facts-simulation.ts`; the `sim-*` rules in `claims-policy.ts` and
 `brief-no-seconds-beside-guideline` in `scripts/brief-rules.mjs` guard the must-not statements.
 After the signed files change: `node scripts/build-simulation-data.mjs && npm run check`.
+
+**The smell chemicals (推估, signed 2026-11-27).** `research/simulation/smell-chemicals/` answers
+what else is in the air in the seconds the fumes can be smelled: `ANSWER-SMELL.md` in plain words,
+`METHOD-SMELL.md` the method, `results-smell.json` every number, `statements-smell.json` the eleven
+statements the site may make and the fourteen it must not, `corrections.md` the sceptics' fixes.
+The same generator reads `results-smell.json` and `statements-smell.json` into
+`simData.smellChemicals` (slots `sim.smell.*`, chart `SmellBenzene`, facts in
+`src/data/facts-smell.ts`, the `smell-chem-*` rules in `claims-policy.ts`). The site serves
+`METHOD-SMELL.md` and `results-smell.json` as published (`src/pages/research/smell-chemicals/`).
 
 **Re-running it.**
 

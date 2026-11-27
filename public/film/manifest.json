@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "hash": "07d58494e0547abc",
+  "hash": "8800e6034adf9309",
   "width": 1080,
   "height": 1920,
   "fps": 25,
@@ -9,14 +9,14 @@
   "files": {
     "zh-TW": {
       "file": "scooterair-film-zh.mp4",
-      "bytes": 10154893,
-      "sha256": "5e65b0c08e03aa887031f83b97fb024e108f509a3c2defe958f7fb13c26e3ca4",
+      "bytes": 10160957,
+      "sha256": "2edbf7feb1495a437da1dfb00f3773f76a7b0e553fe8742433883f1a46c3d8d4",
       "frames": 3046
     },
     "en": {
       "file": "scooterair-film-en.mp4",
-      "bytes": 10371927,
-      "sha256": "8b5cdc99caf7e8fd022260390d17d031ac0a83823de3156112961319a412df6c",
+      "bytes": 10398103,
+      "sha256": "616a110d1a17055fc72641e509c558c858b77c7903a1a6b5e7474259268998e1",
       "frames": 3046
     }
   }

@@ -57,11 +57,11 @@ test('numbers behind the charts equal results-simulation.json', () => {
   assert.equal(`${sim.who15min_ppm} ppm (100 mg/m3)`, N[0].reference.value);
 });
 
-test('every slot prints as 約 A 到 B / about A to B, as an estimate anchored at #simulation', () => {
+test('every slot prints as 約 A 到 B / about A to B, as an estimate anchored at #simulation (the smell step at #smell)', () => {
   for (const slot of simSlots) {
     const r = simRange(slot);
     assert.equal(r.kind, 'estimate');
-    assert.equal(r.anchor, 'simulation');
+    assert.equal(r.anchor, slot.startsWith('sim.smell.') ? 'smell' : 'simulation');
     assert.match(formatEstimate(r, 'zh-TW').text, /^約 [\d.]+ 到 [\d.]+/);
     assert.match(formatEstimate(r, 'en').text, /^about [\d.]+ to [\d.]+/);
   }

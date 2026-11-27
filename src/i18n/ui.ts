@@ -635,8 +635,9 @@ export const words = {
   pm25: { 'zh-TW': 'PM2.5：細懸浮微粒，很小的灰，小到可以吸進肺的深處', en: 'PM2.5: fine particles, dust small enough to reach deep into the lungs' } as L10n,
   ufp: { 'zh-TW': '超細微粒：比 PM2.5 還小很多的微粒', en: 'Ultrafine particles: far smaller again than PM2.5' } as L10n,
   ec: { 'zh-TW': '元素碳：黑色的碳粒，就是煙灰', en: 'Elemental carbon: black specks of carbon, that is, soot' } as L10n,
-  benzene: { 'zh-TW': '苯（ㄅㄣˇ）：汽油和廢氣裡的一種氣體', en: 'Benzene: a gas found in petrol and in exhaust' } as L10n,
+  benzene: { 'zh-TW': '苯（ㄅㄣˇ）：廢氣裡的一種氣體', en: 'Benzene: a gas in exhaust' } as L10n,
   ppm: { 'zh-TW': 'ppm：一百萬份空氣裡有幾份', en: 'ppm: parts in a million parts of air' } as L10n,
+  ppb: { 'zh-TW': 'ppb：十億份空氣裡有幾份', en: 'ppb: parts in a billion parts of air' } as L10n,
   ug: { 'zh-TW': '微克：一百萬分之一公克', en: 'Microgram (µg): a millionth of a gram' } as L10n,
 } as const;
 export type WordId = Exclude<keyof typeof words, 'label'>;

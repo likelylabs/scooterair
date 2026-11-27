@@ -209,7 +209,7 @@
  * Exhaust is drawn only as fume coming out of the scooters, never as a symbol:
  *   .air-core  layer C, the soft puff behind a tailpipe (a row's puffs overlap into its fume)
  *   .air-wash  layer B, the fume where people stand (soft ovals): three steps, by the estimate
- *   .air-rib   a wavy orange wisp through the fume: the part you can smell (fuel vapour)
+ *   .air-rib   a wavy orange wisp through the fume: the part you can smell (the sharp-smelling gases)
  *   .air-puff  a soft patch of the same fume in a diagram (inside the body, on a mask)
  * The fume is smoke-coloured (a warm grey-brown) with orange wisps. In the dark theme it is a
  * muted warm brown haze, never a pale glow, so it does not read as fire or headlights.
@@ -523,6 +523,12 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:c
   flex: 1 1 auto;
   min-inline-size: 0;
 }
+/* the can's label names its gas in full ink, so the big number beside a benzene headline reads as
+   carbon monoxide at a glance, not as benzene */
+.tm-chip .est .est__label {
+  color: var(--ink);
+  font-weight: var(--fw-bold);
+}
 
 /* ---- G6 BodyFigure: the numbered pins, and the sentences under the picture ---- */
 .body-pin {
@@ -557,6 +563,14 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:c
   background: var(--ink);
   color: var(--here, var(--bg));
 }
+/* the name beside each pin: placed at the pin's centre, pushed past the pin (1.875rem ring + border
+   + shadow, so about 1.1rem from the centre) by a gap in rem that scales with the pin */
+.body-word[data-anchor~='start'] {
+  margin-inline-start: 1.45rem;
+  /* the gap comes out of the width, so the plate still ends inside the picture (overrides the inline max) */
+  max-inline-size: calc(42% - 1.45rem) !important;
+}
+.body-word[data-anchor~='top'] { margin-block-start: 1.45rem; }
 .body-pin:focus-visible { outline: none; }
 .body-pin:focus-visible > span { outline: 3px solid var(--focus, var(--accent)); outline-offset: 3px; }
 .body-pins {

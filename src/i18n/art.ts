@@ -12,8 +12,10 @@
 //    says so (scene.ts → sceneAlt). What the fume holds is said in words;
 //  - one word for the site's own air numbers: 推估. A scene never prints a
 //    number itself: numbers come from src/data/estimate.ts (3.3);
-//  - what the fume holds is named the same way everywhere: 油氣（沒燒完的汽油）
-//    / fuel vapour, 一氧化碳 / carbon monoxide, 微粒 / particles (6.6);
+//  - what the fume holds is named the same way everywhere: 刺鼻的氣體（聞得到）
+//    / sharp-smelling gases, 一氧化碳 / carbon monoxide, 微粒 / particles (6.6).
+//    The smellable part is never called 油氣 / fuel vapour: the smell more likely comes from
+//    burning, not unburnt petrol (statements-smell not-unburnt-petrol);
 //  - carbon monoxide, benzene and particles are never ranked by harm;
 //  - "zero" is only ever a scooter's own exhaust: tyre and brake dust and the
 //    other traffic stay in the electric pictures;
@@ -61,7 +63,7 @@ export const art = {
   fume: {
     label: { 'zh-TW': '機車排的氣', en: 'Scooter exhaust' } as L10n,
     carLabel: { 'zh-TW': '汽車排的氣', en: 'Car exhaust' } as L10n,
-    inVapour: { 'zh-TW': '油氣：聞得到', en: 'Fuel vapour: you can smell it' } as L10n,
+    inSmell: { 'zh-TW': '刺鼻的氣體：聞得到', en: 'Sharp-smelling gases: you notice them' } as L10n,
     inCo: { 'zh-TW': '一氧化碳：聞不到', en: 'Carbon monoxide: no smell' } as L10n,
     inPm: { 'zh-TW': '微粒：小到看不到', en: 'Particles: too small to see' } as L10n,
   },
@@ -112,8 +114,8 @@ export const art = {
   /** G2: one scooter, one fume, and what is in it. */
   tailpipe: {
     alt: {
-      'zh-TW': '一輛燃油機車的側面，引擎沒熄火。排氣管後面有一團廢氣，貼著地面往後飄，有幾縷往上飄到一個人的鼻子前面。圖上寫著這團廢氣裡有什麼：油氣，聞得到；一氧化碳，聞不到；微粒，小到看不到。',
-      en: 'One petrol scooter from the side, engine running. A cloud of exhaust leaves the tailpipe and drifts back along the ground, and a few wisps rise to a person’s nose. Words on the picture say what is in the cloud: fuel vapour, which you can smell; carbon monoxide, which has no smell; particles, too small to see.',
+      'zh-TW': '一輛燃油機車的側面，引擎沒熄火。排氣管後面有一團廢氣，貼著地面往後飄，有幾縷往上飄到一個人的鼻子前面。圖上寫著這團廢氣裡有什麼：刺鼻的氣體，聞得到；一氧化碳，聞不到；微粒，小到看不到。',
+      en: 'One petrol scooter from the side, engine running. A cloud of exhaust leaves the tailpipe and drifts back along the ground, and a few wisps rise to a person’s nose. Words on the picture say what is in the cloud: sharp-smelling gases, which you notice; carbon monoxide, which has no smell; particles, too small to see.',
     } as L10n,
     /** added to the alt text when the drinks can is drawn above the picture */
     canAlt: { 'zh-TW': '上面畫了一個飲料罐，用來比一比有多少。', en: 'A drinks can is drawn above it, to give a sense of the amount.' } as L10n,
@@ -136,8 +138,8 @@ export const art = {
   /** G6: where exhaust goes in the body. */
   body: {
     alt: {
-      'zh-TW': '一個大人的頭和胸口，畫成號誌小人的樣子，看得到氣管、兩片肺和心臟。臉的前面有一團廢氣，從鼻子吸進去：橘色的幾縷油氣到鼻子和喉嚨；兩片肺裡有一層深色的煙灰（微粒）；淡淡的一層廢氣再進到心臟和血液（一氧化碳）。三個號碼標出這三個地方，旁邊寫著鼻子、喉嚨，肺，血液。圖上只畫它們去的地方，沒有畫任何疾病。',
-      en: 'The head and chest of an adult, drawn like a signal figure, with the windpipe, both lungs and the heart showing. A cloud of exhaust in front of the face is breathed in through the nose. Orange wisps (fuel vapour) reach the nose and throat. A dark, sooty haze (particles) settles in both lungs. A faint haze of the exhaust goes on into the heart and the blood (carbon monoxide). Three numbers mark the three places, each with its name beside it: nose and throat, lungs, blood. The picture shows only where it goes; it draws no disease.',
+      'zh-TW': '一個大人的頭和胸口，畫成號誌小人的樣子，看得到氣管、兩片肺和心臟。臉的前面有一團廢氣，從鼻子吸進去：橘色的幾縷刺鼻的氣體到鼻子和喉嚨；兩片肺裡有一層深色的煙灰（微粒）；淡淡的一層廢氣再進到心臟和血液（一氧化碳）。三個號碼標出這三個地方，旁邊寫著鼻子、喉嚨，肺，血液。圖上只畫它們去的地方，沒有畫任何疾病。',
+      en: 'The head and chest of an adult, drawn like a signal figure, with the windpipe, both lungs and the heart showing. A cloud of exhaust in front of the face is breathed in through the nose. Orange wisps (the sharp-smelling gases) reach the nose and throat. A dark, sooty haze (particles) settles in both lungs. A faint haze of the exhaust goes on into the heart and the blood (carbon monoxide). Three numbers mark the three places, each with its name beside it: nose and throat, lungs, blood. The picture shows only where it goes; it draws no disease.',
     } as L10n,
     pins: {
       nose: { 'zh-TW': '鼻子、喉嚨', en: 'Nose and throat' } as L10n,
@@ -211,8 +213,8 @@ export const art = {
   /** G17: what a mask stops. */
   mask: {
     alt: {
-      'zh-TW': '一張戴著口罩的側臉，畫成號誌小人的樣子；左邊是一輛機車的車尾，看得到後輪和排氣管；排氣管排出一團廢氣，飄到臉前面。廢氣裡的氣體（一氧化碳）穿過口罩，進到鼻子後面的通道，畫成淡淡的一層；橘色的幾縷油氣也穿過去，到鼻子。口罩前面積了一層深色的煙灰，是擋下來的微粒；廢氣也從鼻子旁邊和臉頰的縫鑽進去（兩個小箭頭）。圖下面可以換四種口罩：布口罩、醫用口罩、活性碳口罩、貼合的 N95。擋得越多，口罩上的煙灰越深；不管哪一種，一氧化碳都穿過去。',
-      en: 'A face in profile wearing a mask, drawn like a signal figure. On the left is the back of a scooter, its rear wheel and tailpipe; the tailpipe gives off a cloud of exhaust that drifts up to the face. The gases in it (carbon monoxide) go on through the mask into the airway behind the nose, drawn as a faint haze. Orange wisps of fuel vapour pass through to the nose too. A dark, sooty patch builds up on the front of the mask: the particles it stops. The exhaust also slips in at the gaps beside the nose and at the cheek (two small arrows). A switch under the picture changes the mask: cloth, surgical, activated carbon, fitted N95. The more a mask stops, the darker its soot; with every one of them the carbon monoxide passes through.',
+      'zh-TW': '一張戴著口罩的側臉，畫成號誌小人的樣子；左邊是一輛機車的車尾，看得到後輪和排氣管；排氣管排出一團廢氣，飄到臉前面。廢氣裡的氣體（一氧化碳）穿過口罩，進到鼻子後面的通道，畫成淡淡的一層；橘色的幾縷刺鼻的氣體也穿過去，到鼻子。口罩前面積了一層深色的煙灰，是擋下來的微粒；廢氣也從鼻子旁邊和臉頰的縫鑽進去（兩個小箭頭）。圖下面可以換四種口罩：布口罩、醫用口罩、活性碳口罩、貼合的 N95。擋得越多，口罩上的煙灰越深；不管哪一種，一氧化碳都穿過去。',
+      en: 'A face in profile wearing a mask, drawn like a signal figure. On the left is the back of a scooter, its rear wheel and tailpipe; the tailpipe gives off a cloud of exhaust that drifts up to the face. The gases in it (carbon monoxide) go on through the mask into the airway behind the nose, drawn as a faint haze. Orange wisps of the sharp-smelling gases pass through to the nose too. A dark, sooty patch builds up on the front of the mask: the particles it stops. The exhaust also slips in at the gaps beside the nose and at the cheek (two small arrows). A switch under the picture changes the mask: cloth, surgical, activated carbon, fitted N95. The more a mask stops, the darker its soot; with every one of them the carbon monoxide passes through.',
     } as L10n,
     names: {
       cloth: { 'zh-TW': '布口罩', en: 'Cloth mask' } as L10n,
@@ -253,15 +255,14 @@ export const art = {
   smell: {
     canTitle: { 'zh-TW': '聞得到', en: 'You can smell' } as L10n,
     canBody: {
-      'zh-TW': '你站在廢氣裡。臭的是沒燒完的汽油，和刺鼻的醛類。',
-      en: 'You are standing in exhaust. The smell is unburnt petrol and sharp aldehydes.',
+      'zh-TW': '你站在廢氣裡。如果味道來自身旁的機車，苯也在同一口空氣裡（推估）。',
+      en: 'You are standing in exhaust. If the smell is from the scooters beside you, benzene is in the same breath of air (estimate).',
     } as L10n,
     cannotTitle: { 'zh-TW': '聞不到、|看不到', en: 'Can’t smell it, |can’t see it' } as L10n,
     cannotBody: {
-      'zh-TW': '一氧化碳沒有味道。微粒太小，看不到。',
-      en: 'Carbon monoxide has no smell. Particles are too small to see.',
+      'zh-TW': '一氧化碳沒有味道。微粒小到看不到。沒有味道的時候，也可能有苯。',
+      en: 'Carbon monoxide has no smell. Particles are too small to see. Benzene can be there when nothing can be smelled.',
     } as L10n,
-    footer: { 'zh-TW': '味道是警報，不是量表。', en: 'Smell is an alarm, not a gauge.' } as L10n,
   },
 
   /** MeasurementDiagram (V35) */
