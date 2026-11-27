@@ -1,0 +1,699 @@
+{
+ "key": "inputs-simulation",
+ "checkedOn": "2026-11-27",
+ "purpose": "Inputs and reference values for a 3-D near-field simulation of what a pedestrian breathes beside idling petrol scooters at a red light, and for its fair comparisons. Source ids refer to research/estimate/sources.json (existing) or research/simulation/sources.json (new). status: V = opened and figure found in the source by this job or a prior verified project file; S = secondary (figure read in another document, or an abstract only); D = derived here by stated arithmetic; A = assumption with basis.",
+ "integrityNote": "No value in this file was chosen to reach or avoid any guideline. Where a source gives a range, the whole range is given. The owner expects the result to exceed a guideline; this file records what the sources say, including the facts that point both ways (odour thresholds are reached at dilutions where CO is far below WHO values, AND strong exhaust odour can coincide with momentary CO of tens of ppm; enclosed car parks DO exceed the WHO 15-min CO value).",
+ "unitConversions": {
+  "CO_mg_per_m3_per_ppm_25C": 1.146,
+  "CO_mg_per_m3_per_ppm_20C_WHO": 1.165,
+  "benzene_ug_per_m3_per_ppb_25C": 3.195,
+  "formaldehyde_ug_per_m3_per_ppb_25C": 1.228,
+  "acetaldehyde_ug_per_m3_per_ppb_25C": 1.801,
+  "WHO_15min_CO_100mg_m3_in_ppm": "87 ppm at 25 C (86 at 20 C)",
+  "averaging_rule": "A level C held for t seconds and zero (above background) otherwise contributes C*t/T to a T-second mean: a 90 s red at C adds C/10 to a 15-min mean and C/40 to a 1-h mean; 10 consecutive 90-s reds within 15 min (impossible with 120-200 s cycles) would be needed for a 90-s level to equal the 15-min mean. With a cycle of 120-180 s and the person waiting only one red, the 15-min mean is about (90/900)*C_red + background."
+ },
+ "tailpipe": {
+  "summary": "Warm idle of an in-use 100-150 cc four-stroke scooter: exhaust about 0.3-0.8 L/s (STP, central 0.47) leaving a 18-32 mm pipe at 0.3-0.5 m height, about 150-350 C (assumed; no idle measurement found), so 0.5-6 m/s exit velocity and a weak buoyancy flux of order 1e-3 to 8e-3 m4/s3. Raw idle CO: inspection distribution with 75 % of tests in the 0-1 % bin, 25 % >= 1 %, 6.7 % >= 3 %, 1.5 % >= 5 %. Raw HC 370-530 ppm (hexane, NDIR) for ordinary phases, about 5,800 ppm for the failing tail and about 5,400 ppm for two-strokes. Raw benzene 12-33 ppm for four-strokes and 83-116 ppm for two-strokes (Bangkok, 100-150 cc).",
+  "items": [
+   {
+    "id": "exhaustFlow",
+    "value": "0.47 L/s at 25 C (range 0.31-0.78), i.e. 28 L/min (19-47)",
+    "status": "V/D",
+    "sources": [
+     "vojtisek-lom-2020",
+     "nguyen-2025",
+     "nguyen-2021",
+     "yao-2008"
+    ],
+    "basis": "Measured: four-stroke CVT motorcycle idle exhaust 'very low flow rate ~30 L/min' (Vojtisek-Lom 2020, V; ~20 L/min for a 50 cc moped). Carbon balance: fuel F = 80/120/200 g/h (estimate input), 0.86 gC/g, carbon species 12.5 % of exhaust moles -> 0.31/0.47/0.78 L/s at 25 C. Engine physics: 125 cc x 1700 rpm / 2 = 1.77 L/s swept, idle volumetric efficiency 0.2-0.35 -> 0.35-0.62 L/s (A)."
+   },
+   {
+    "id": "idleRpm",
+    "value": "1700 +/- 100 (ADV150); 1718 +/- 105 (Yao 2008 125 cc bench); 1850 +/- 100 (Kymco Dinkstreet 125 manual, search snippet only, not opened)",
+    "status": "V",
+    "sources": [
+     "inputs-emission-rates:idle-rpm-adv150",
+     "yao-2008"
+    ]
+   },
+   {
+    "id": "exitTemperature",
+    "value": "150-350 C at the tailpipe exit after warm-up (ASSUMPTION; central 250 C)",
+    "status": "A",
+    "sources": [
+     "vojtisek-lom-2020",
+     "rungratanaubon-2007",
+     "ghafori-2016"
+    ],
+    "basis": "No measured warm-idle exit temperature for a scooter was found. Bounds: exhaust rose from 25 to 200-300 C within 3 min of cold start on a motorcycle PEMS test (Vojtisek-Lom 2020, V, not idle-specific); idle sampling protocol required >= 50 C at the pipe end after 10 min warm-up (Rungratanaubon 2007, V, a lower bound); CG125 tailpipe gas maximum 306 C over 1000-5000 rpm (Ghafori 2016, V, idle not tested). Buoyancy is a minor term for receptors > 0.5 m away (estimate sensitivity: no buoyant rise changed median < 5 %), but it decides whether the plume core passes pushchair height within 1 m; the simulation should test 100-350 C."
+   },
+   {
+    "id": "tailpipeDiameter",
+    "value": "18-32 mm inner diameter at exit (ASSUMPTION; central 25 mm)",
+    "status": "A",
+    "sources": [],
+    "basis": "No source with a measured scooter muffler outlet diameter was found (one marketing page quoting 38 mm for a 50 cc Monkey was not used). Typical OEM scooter muffler outlets are visually about 2-3 cm; treat as assumption."
+   },
+   {
+    "id": "exitVelocity",
+    "value": "about 1.7 m/s central (range 0.5-6.4 m/s)",
+    "status": "D",
+    "basis": "actual volume flow = STP flow x (T+273)/298; v = Q/(pi d^2/4). 0.47 L/s, 250 C, 25 mm -> 1.7 m/s; 0.31 L/s, 150 C, 32 mm -> 0.55 m/s; 0.78 L/s, 350 C, 18 mm -> 6.4 m/s."
+   },
+   {
+    "id": "buoyancyFlux",
+    "value": "F_b = g Q_actual (T_exit - T_air)/T_exit = 1.2e-3 to 8.2e-3 m4/s3 (central 3.4e-3)",
+    "status": "D"
+   },
+   {
+    "id": "tailpipeHeightAndDirection",
+    "value": "outlet 0.3-0.5 m above road, rear-right of scooter, pointing rearward and slightly upward (0-30 deg) (height V/S; direction A)",
+    "status": "V/A",
+    "sources": [
+     "iot-113-tb006",
+     "ning-2005"
+    ],
+    "basis": "IOT GRAL used 0.5 m (V); scene file 0.3-0.5 m. Ning 2005 (abstract, V): exit angle mattered more than exit velocity or initial concentration; at 15 deg the pollutants spread along the ground."
+   },
+   {
+    "id": "rawCO_distribution",
+    "value": "MOENV 2025 national idle-CO test counts by 1 % bin (n = 9,067,160, scooters >= 5 y): 0-1 % 6,769,973; 1-2 % 1,042,630; 2-3 % 650,643; 3-4 % 342,331; 4-5 % 121,532; 5-6 % 57,596; 6-7 % 35,469; 7-8 % 21,826; 8-9 % 12,560; >= 9 % 12,597. Share >= 1 % 25.3 %; >= 2 % 13.8 %; >= 3 % 6.7 %; >= 4 % 2.9 %; >= 5 % 1.5 %; >= 7 % 0.5 %.",
+    "status": "V",
+    "sources": [
+     "moenv-co-2025"
+    ],
+    "basis": "Bins as encoded in research/estimate/model.mjs (moenvCObins). Counts include retests. Group means by phase (Yilan 2014-15): 1.45 % (phase 5) to 3.04 % (phase 1); new <5 y scooters uninspected (assumed 0.05-0.6 %)."
+   },
+   {
+    "id": "rawCO_limits",
+    "value": "In-use idle limits: pre-2004 4.5 % CO / 9000 ppm HC; 2004 3.5 % / 2000; July 2007 3.5 % / 1600; 2017+ 2.0 % / 1000",
+    "status": "V",
+    "sources": [
+     "redlight/idle-emissions:moenv-idle-limits-inuse"
+    ]
+   },
+   {
+    "id": "rawCO_highEmitters",
+    "value": "deteriorated Phase IV high emitters 6.36-6.94 % CO (Taichung case study); Indonesian 2009 125 cc 3.55 % (S)",
+    "status": "V/S",
+    "sources": [
+     "redlight/smell-chemistry:tsai2026-phaseIV-highemitters",
+     "inputs-emission-rates:gantina-2024-idle-supra"
+    ]
+   },
+   {
+    "id": "rawHC",
+    "value": "Yilan inspection means 367 ppm (phase 5), 401 (phase 4), 526 (phase 3), 545-748 (older), hexane-equivalent NDIR; 2025 failing tail mean 5,823 ppm (n = 12,280 = 0.15 % of tests), after repair 1,951; two-stroke mean 5,431 ppm (Taipei Times citing EPA 2017, S); 49 cc ~700 ppm above 90-150 cc",
+    "status": "V/S",
+    "sources": [
+     "cheng-2017-niu",
+     "moenv-hc-2025",
+     "inputs-emission-rates:platt-lin-two-stroke-secondary"
+    ],
+    "basis": "NDIR hexane ppm x ~6 = ppmC; NDIR under-reads FID total HC by roughly 1.5-2x for exhaust (A, from the estimate's THC basis note)."
+   },
+   {
+    "id": "rawBenzene",
+    "value": "Bangkok 44 in-use 100-150 cc motorcycles at idle (Tedlar bag, GC-FID): four-stroke benzene 11.7 (new) / 30.6 (5-10 y) / 32.9 ppm (>10 y); toluene 29.0 / 45.6 / 93.2; xylene 7.6 / 7.9 / 21.5 ppm. Two-stroke benzene 83.2 / 108.6 / 116.2; toluene 192.8 / 219.8 / 261.7; xylene 29.9 / 30.6 / 39.2 ppm. Fuel benzene 1.1-1.5 % (11,335-15,183 ppm in fuel sample).",
+    "status": "V",
+    "sources": [
+     "rungratanaubon-2007"
+    ],
+    "crossCheck": "D: 400 ppm hexane NDIR x 6 x 1.7 (FID/NDIR) ~ 4,000 ppmC; benzene 2.7 % of THC mass -> 4,000 x 0.027 x 13.85/78.1 ~ 19 ppm benzene: consistent with 12-33 ppm. Taiwanese bench (Yao 2008) idle benzene 764-918 mg per L fuel."
+   },
+   {
+    "id": "rawAldehydesAndOdorants",
+    "value": "Speciation per km (Taiwan Phase III dynamometer, cycle not idle): formaldehyde 0.4-0.7 mg/km, acetaldehyde 0.6-1.2, acetone 0.5-0.7, total carbonyls 3.1-5.3 mg/km against total VOC 311-1479 mg/km; isopentane 53-295, toluene 30-100 mg/km. VOC paraffins 38-45 %, olefins 10-15 %, aromatics 38-48 %, carbonyls 1.8-3.0 % (Tsai 2018).",
+    "status": "V (abstracts)",
+    "sources": [
+     "redlight/smell-chemistry:tsai2003-speciation",
+     "redlight/smell-chemistry:tsai2018-mileage"
+    ],
+    "note": "No idle-specific aldehyde or sulphur-compound measurement for scooters was found; aldehyde share of VOC 0.5-3 % is the usable range."
+   },
+   {
+    "id": "idleFuelFlow",
+    "value": "80 / 120 / 200 g/h (estimate input; the dominant uncertainty)",
+    "status": "S",
+    "sources": [
+     "nguyen-2025",
+     "nguyen-2021",
+     "inputs-emission-rates:delta-2008-idle-fuel"
+    ]
+   },
+   {
+    "id": "twoStrokeShare",
+    "value": "1-3 % of idling scooters; old two-strokes: 243,725 notified in 2025, 44 % attended inspection, 8.4 % of those failed",
+    "status": "S/V",
+    "sources": [
+     "redlight/idle-emissions:moenv-inspection-2025"
+    ]
+   },
+   {
+    "id": "coldStart",
+    "value": "cold/hot ratio CO 1.1-1.5, HC 1.2-2.8",
+    "status": "V",
+    "sources": [
+     "redlight/smell-chemistry:yao2009-coldstart"
+    ]
+   },
+   {
+    "id": "pullAway",
+    "value": "Not quantified for scooters; qualitative: sharp CO and HC spikes on acceleration from a stop (Vojtisek-Lom 2020); idle-stop restarts raised CO 57 % in one 125 cc test (Lijewski 2021). Pull-away burst must be an explicit assumption in the simulation.",
+    "status": "V/A",
+    "sources": [
+     "vojtisek-lom-2020",
+     "redlight/idle-emissions:lijewski-2021-start-stop"
+    ]
+   }
+  ]
+ },
+ "nearField": {
+  "summary": "No measurement of concentration versus distance 0.3-3 m behind an idling scooter exists in anything opened. Usable anchors: moving-car plumes diluted ~6,000x by 3 m (Toronto); a diesel pickup's PM at stroller height (0.85 m) ~1.6x (mean) to 1.8x (1.5-s peak) adult mouth height (1.65 m) at 0.75 m lateral; kerb NO2 +5-15 % at 0.8 m vs 2.0 m within 2.5 m of the kerb and no difference beyond; in-pram particles up to +44 %; Ning 2005: idle plumes decay exponentially in all directions, and a 15-deg exit angle keeps the plume near the ground. A UC Riverside 2024 field test measured CO2 at 1-6 m behind an idling truck at 1-4 m heights (values in figures only).",
+  "items": [
+   {
+    "id": "wang2015",
+    "value": "dilution tailpipe->3 m ~6,000; ->15 m ~10,000-15,500 (range 424-49,970); moving traffic",
+    "status": "V",
+    "sources": [
+     "wang-2015"
+    ]
+   },
+   {
+    "id": "buzzard2009",
+    "value": "0.75 m lateral from a passing diesel pickup: mean plume PM 125 ug/m3 at adult mouth 1.65 m, 199 at stroller 0.85 m; 1.5-s peaks 613 vs 1114; durations 5.1 vs 12.7 s",
+    "status": "V",
+    "sources": [
+     "buzzard-2009"
+    ]
+   },
+   {
+    "id": "kenagy2016",
+    "value": "NO2 at 0.8 m 8.7 % higher than at 2.0 m within 5 m of kerb (+14-15 % at 0.4-0.5 m from kerb; +11.6 % at 1.2 m); no significant difference beyond 2.5 m",
+    "status": "V",
+    "sources": [
+     "kenagy-2016"
+    ]
+   },
+   {
+    "id": "sharmaKumar",
+    "value": "in-pram fine particles up to +44 % vs adult height; review: up to ~60 %; baby breathing height 0.55-0.85 m",
+    "status": "V (abstract)",
+    "sources": [
+     "redlight/intersection-peaks:sharma-kumar-2020-pram-height",
+     "redlight/intersection-peaks:sharma-kumar-2018-pram-review"
+    ]
+   },
+   {
+    "id": "ning2005",
+    "value": "three idling vehicles, calm isolated site: concentrations decayed exponentially in all directions; exit angle > exit velocity > initial concentration in effect; crosswind bends the plume and limits downstream reach; CFD (k-epsilon) matched near source, decayed too slowly far away",
+    "status": "V (abstract)",
+    "sources": [
+     "ning-2005"
+    ]
+   },
+   {
+    "id": "tti2024",
+    "value": "CO2 tracer at 1, 2, 3, 4, 5, 6 m behind an idling Class-8 truck, angles 60/90/120 deg, heights 1-4 m, 4-5 min averages, sonic anemometer at 2 m; Gaussian C/Q matched measured distribution (figure only; vertical stack, so geometry differs from a scooter)",
+    "status": "V (no numbers in text)",
+    "sources": [
+     "tti-2024"
+    ]
+   },
+   {
+    "id": "fiala1967_dilutionAtOdourThreshold",
+    "value": "car exhaust smelled at 800-1,000-fold dilution, independent of engine operating state; at the odour threshold CO was 1-100 ppm and HC 0.6-8 ppm",
+    "status": "S (abstract in an EPA translated-bibliography)",
+    "sources": [
+     "epa-ap122-1973"
+    ],
+    "use": "an independent cross-check of near-field dilution: wherever the simulation predicts dilution < ~1,000-7,000, exhaust should be smellable."
+   },
+   {
+    "id": "derivedRequiredDilution",
+    "value": "raw CO 0.5 % (fleet bulk) / 1.5 % / 5 % (high emitter): dilution to reach 87 ppm = 57 / 170 / 575; to reach 26 ppm (WHO 1-h, 30 mg/m3 at 25 C) = 190 / 570 / 1,900; to reach 1 ppm = 5,000 / 15,000 / 50,000",
+    "status": "D"
+   },
+   {
+    "id": "derivedJetScale",
+    "value": "a 25 mm jet at 1.7 m/s has momentum length scale ~ d*sqrt(rho_j/rho_a) ~ 2 cm and becomes wind- or wake-dominated within ~0.1-0.3 m; near-field mixing at 0.3-3 m is set by ambient turbulence (sigma_v 0.2-0.5 m/s floor in the estimate), the scooter/rider wake (none when stationary, CAL3QHC) and weak buoyancy",
+    "status": "D/A"
+   },
+   {
+    "id": "ptsClaim",
+    "value": "PTS news (undated, unnamed scholar): a rider breathes 400 ppm CO within 30 s at rush hour and 750 ppm within 10 s directly facing a tailpipe",
+    "status": "V that the article says it; method unknown, NOT a usable anchor",
+    "sources": [
+     "inputs-validation-measurements:pts-news-400-750-ppm-claim"
+    ]
+   }
+  ]
+ },
+ "kerbMeasurements": {
+  "summary": "Taiwan today: 1-min kerb CO maxima 0.5-1.3 ppm (Kaohsiung 2024), traffic-station annual 0.54 ppm (2025). Taiwan 1989-91 (two-stroke era, mixed traffic): Taipei roadside and arcade (corridor) CO 7.8-8.3 ppm mean of 30-60 min samples, maxima 40 ppm (arcade, 60 min) and 101 ppm (roadside, 30-50 min); bus stops 13 ppm mean, 42 max; on motorcycles 17.5 mean, 126 max. Motorcycle-commuter benzene 384 ug/m3 (~120 ppb) in 1994 Taipei. Elsewhere: Hanoi walking 8.5 ppm (2006); HCMC intersections daily 1.7-8.7 ppm, max hourly ~20 (S); Bangkok motorcycle commuters 12.8 ppm (S).",
+  "items": [
+   {
+    "id": "liu1994",
+    "place": "Taipei, Dec 1989 - Feb 1991 (1/3 of vehicles cars, 2/3 motorcycles, many two-strokes)",
+    "values": {
+     "on_motorcycle": "mean 17.5, min 2.9, max 126 ppm (n=295)",
+     "bus": "11.6 (3.5-37)",
+     "car": "11.0 (4.5-20)",
+     "bus_stop": "13.0 (1.3-42)",
+     "roadside_or_corridor_all": "8.1 (0.5-101) n=854",
+     "moving_along_roadside": "7.8 (0.5-101)",
+     "fixed_at_corridors_arcades": "8.3 (0.7-40) n=473",
+     "residential_outdoor": "2.5 (0.5-7)",
+     "school_outdoor": "1.6 (0.7-6)"
+    },
+    "averaging": "30-50 min Tedlar bag samples; 60 min at corridor stations; 07:00-19:00",
+    "status": "V (full text)",
+    "sources": [
+     "liu-chan-jeng-1994"
+    ],
+    "note": "'Corridor' = sheltered walkway set back from the road (Taiwanese arcade 騎樓). Taipei motorcycles contributed 44 % of CO emissions (ICF 1991 as cited). Whole traffic, not scooters alone."
+   },
+   {
+    "id": "chan1994benzene",
+    "value": "Taipei motorcycle commuters 384 ug/m3 benzene vs 166.5 ug/m3 for bus commuters",
+    "status": "S (cited in Kuo 2000 full text)",
+    "sources": [
+     "kuo-2000"
+    ]
+   },
+   {
+    "id": "kuo2000",
+    "value": "Taichung 1998-99, six roads: total VOC 2149 (car) and 1343 ug/m3 (motorcycle) on Ta-Ya Road; T:B:X:E 5.7:2.0:2.6:1.0 for motorcycle commuters",
+    "status": "V (abstract, full text opened)",
+    "sources": [
+     "kuo-2000"
+    ]
+   },
+   {
+    "id": "iot2024",
+    "value": "Kaohsiung waiting-zone 1-min CO maxima 0.5, 0.5, 0.62 and ~1.3 ppm (Mingcheng 1st/Minzu 1st, ~34 scooters per red); station hourly 0.03-0.90 ppm",
+    "averaging": "1 min, 48 h per site, inlet 1.2-1.5 m, 1.0-1.5 m from crosswalk line",
+    "status": "V",
+    "sources": [
+     "iot-113-tb006"
+    ]
+   },
+   {
+    "id": "moenvTrafficStations",
+    "value": "annual mean CO at 6 traffic stations 0.98 ppm (2016) -> 0.54 (2025); Taipei City traffic stations 1.07 (2019), 0.83 (2023)",
+    "status": "V / S",
+    "sources": [
+     "moenv-annual-2025",
+     "inputs-validation-measurements:taipei-city-traffic-station-co"
+    ]
+   },
+   {
+    "id": "ntuThesisTaipeiSanchong",
+    "value": "CO in the traffic lane 1.1-30 x the sidewalk value (motorcycle commute, Taipei-Sanchong)",
+    "status": "V (thesis abstract)",
+    "sources": [
+     "inputs-validation-measurements:ntu-thesis-motorcycle-commuters-stop-vs-move"
+    ]
+   },
+   {
+    "id": "hanoi2006",
+    "value": "walking 8.5 ppm mean (GM 5.1, n=16), motorbike 18.6, roadside cafes 3.2 and 11.3 ppm, rooftop station 1.5 ppm",
+    "averaging": "trip / session means",
+    "status": "V",
+    "sources": [
+     "saksena-2007"
+    ]
+   },
+   {
+    "id": "hcmc",
+    "value": "major intersections daily mean CO 2-10 mg/m3 (1.7-8.7 ppm), max hourly 23.3 mg/m3 (~20 ppm)",
+    "status": "S",
+    "sources": [
+     "inputs-validation-measurements:hcmc-intersection-co-old-report"
+    ]
+   },
+   {
+    "id": "bangkok",
+    "value": "motorcycle commuters 12.8 ppm CO (17-min trips); closed-window cars 27.2 ppm",
+    "status": "S",
+    "sources": [
+     "inputs-validation-measurements:bangkok-co-commuters-and-police"
+    ]
+   },
+   {
+    "id": "indiaItaly",
+    "value": "Mumbai signal CO '>25 ppm' and Milan traffic police CO 3.5 mg/m3 (~3 ppm) are second-hand only; Delhi 1990 (Singh et al.) and 1997-99 intersection data (Nagendra & Khare 2003) located but no numbers read; no Italian scooter-era pedestrian CO number was found",
+    "status": "S / gap",
+    "sources": [
+     "inputs-validation-measurements:other-asia-police-btex-co"
+    ]
+   }
+  ]
+ },
+ "enclosedCases": {
+  "summary": "Enclosed car parks are the one documented everyday setting where CO above the WHO 15-min value occurs: in 52 Hong Kong underground car parks (1990s, cars) the 15-min TWA averaged 39 ppm and reached 362 ppm, 1-min maxima averaged 98 ppm (9-667), and > 34 % failed WHO-type criteria; Beirut underground parking peaks 26-140 mg/m3 (30-min). Taipei's 60 underground car parks name CO as the main parking-area pollutant (no values in abstract). No measurement of CO under a Taiwanese arcade beside a scooter queue, in a covered scooter waiting zone, or in a tunnel carrying scooters was found; Taiwanese tunnel studies opened exclude motorcycles.",
+  "items": [
+   {
+    "id": "chan1997hk",
+    "value": "52 underground car parks, peak hours, sensor at 1.5 m: 1-min max 9-667 ppm (mean 98); 5-min TWA 6.4-506.6 (mean 59); 15-min TWA 3-361.6 (mean 39); 30-min TWA 2.7-255.1 (mean 32); 1-h TWA 2-153.8 (mean 25); highest at ramps (low gear, queuing)",
+    "status": "V (full text)",
+    "sources": [
+     "chan-burnett-chow-1997"
+    ]
+   },
+   {
+    "id": "who2010table",
+    "value": "Beirut underground parking 26-140 mg/m3 peak (30-min); ice rink > 140 mg/m3 (petrol resurfacer); highest non-accidental CO levels in public or residential garages",
+    "status": "V",
+    "sources": [
+     "who-2010-iaq"
+    ]
+   },
+   {
+    "id": "hung2011taipei",
+    "value": "60 Taipei underground parking lots: CO the main pollutant in parking areas; advice to avoid idling (no values in abstract)",
+    "status": "V (abstract)",
+    "sources": [
+     "hung-2011"
+    ]
+   },
+   {
+    "id": "taiwanIAQstandard",
+    "value": "Taiwan indoor air quality standard CO 9 ppm 8-h (applies to designated public premises)",
+    "status": "V",
+    "sources": [
+     "tw-iaq-standard-2012"
+    ]
+   },
+   {
+    "id": "derivedWhatItTakes",
+    "value": "Well-mixed enclosure: C = N q / Q_air. With q = 15 g/h per idling scooter (fleet mean, 4.2 mg/s) and 100 mg/m3: Q_air <= N x 0.042 m3/s. 30 idling scooters need less than 1.3 m3/s of fresh air through the space they share, e.g. a 3 m x 3.5 m arcade cross-section ventilated at < 0.12 m/s, or an enclosed 300 m3 waiting room at < 15 air changes per hour, held for 15 min. Outdoors the street's air exchange is tens to hundreds of m3/s, so a 15-min mean of 87 ppm would need a sealed or near-sealed volume, emitters far above the fleet mean, or both.",
+    "status": "D",
+    "note": "arithmetic for the simulation team to test; not a finding"
+   }
+  ]
+ },
+ "odour": {
+  "summary": "Odour is the comparison that matches 'it smelled horrible'. Whole petrol-engine exhaust is detectable at roughly 800 to 6,800-fold dilution of raw exhaust (two independent 1967-70 panel studies, abstracts). Gasoline vapour headspace: detection 0.47-0.58 ppm, recognition 0.77-1.12 ppm (API 1995). Key odorants by Nagata triangle-bag detection threshold (ppm): acetaldehyde 0.0015, propionaldehyde 0.0010, n-butyraldehyde 0.00067, isovaleraldehyde 0.00010, acrolein 0.0036, crotonaldehyde 0.023, formaldehyde 0.50, H2S 0.00041, methyl mercaptan 0.000070, dimethyl sulfide 0.0030, carbonyl sulfide 0.055, SO2 0.87, NO2 0.12, styrene 0.035, m-xylene 0.041, p-xylene 0.058, ethylbenzene 0.17, toluene 0.33, o-xylene 0.38, 1-butene 0.36, 1,3-butadiene 0.23, 1-pentene 0.10, n-heptane 0.67, isooctane 0.67, isopentane 1.3, n-pentane 1.4, n-hexane 1.5, benzene 2.7, 2-methylpentane 7.0, 3-methylpentane 8.9, isobutene 10, propylene 13, acetone 42. CO is odourless. Individual thresholds vary ~5x between repeated panels (Nagata), more across people.",
+  "howQuantified": "Odour concentration = the dilution factor at which 50 % of a panel (6-10 assessors) detect the sample (dilution-to-threshold, D/T; European odour unit ouE/m3 = number of dilutions to threshold). A sample diluted 100 times to threshold is 100 OU/m3 (Danish EPA). For a mixture, a first estimate is the sum of odour activity values OAV_i = C_i / OT_i (an approximation; mixtures are often sub-additive). For whole exhaust: OU at the nose ~ (D/T of raw exhaust) / (dilution from tailpipe to nose).",
+  "items": [
+   {
+    "id": "exhaustDT_swedish1970",
+    "value": "odour threshold expressed as log10(dilution factor): 3.72-3.83 for gasoline engines with different emission controls (D/T 5,200-6,800), 3.17 for uncontrolled diesel at idle (D/T 1,500); idle and ECE cycle intensities of the same order",
+    "status": "S (abstract of Aktiebolaget Atomenergi Rept BIL-32, 1970, in EPA AP-122 bibliography)",
+    "sources": [
+     "epa-ap122-1973"
+    ]
+   },
+   {
+    "id": "exhaustDT_fiala1967",
+    "value": "four-cylinder four-stroke Otto engine exhaust smelled at 800-1,000-fold dilution independent of operating state; CO 1-100 ppm and HC 0.6-8 ppm at threshold; adding air to the exhaust lowered CO/HC but increased odour intensity",
+    "status": "S (abstract, Fiala & Zeschmann, VDI-Z 109:1139-1141, 1967, in EPA AP-122)",
+    "sources": [
+     "epa-ap122-1973"
+    ]
+   },
+   {
+    "id": "derivedOdourVsCO",
+    "value": "If raw scooter exhaust has D/T ~800-6,800 and raw CO 0.5-5 %, then at exactly the odour threshold the CO increment is 0.7-60 ppm (central ~2-20 ppm). A 'horrible' smell (say 5-30x threshold) implies dilution of ~30-1,400, i.e. momentary CO of ~4 to >1,000 ppm in that puff (wide). Because odour depends on HC/aldehydes, a rich, HC-heavy scooter (or two-stroke) smells at much higher dilution than its CO alone would suggest. This links smell to momentary plume hits, not to 15-min means.",
+    "status": "D (order of magnitude only; car-engine D/T applied to scooters is an assumption)"
+   },
+   {
+    "id": "gasolineVapour",
+    "value": "API 1995 headspace vapour: detection 0.576 (summer), 0.479 (winter), 0.474 ppm (composite); recognition 0.802, 1.121, 0.765 ppm",
+    "status": "V (HERO record)",
+    "sources": [
+     "api-1995-odour"
+    ]
+   },
+   {
+    "id": "nagataThresholds",
+    "value": "see summary list; 223 substances, triangle odour bag, 1976-1988; max/min ratio of repeated determinations about 5 (H2S 6.0, m-xylene 5.5)",
+    "status": "V (full text)",
+    "sources": [
+     "nagata-2003"
+    ]
+   },
+   {
+    "id": "otherBenzeneAldehydeThresholds",
+    "value": "benzene 1.5 ppm (EPA/ATSDR) to 61 ppm detection / 97 recognition (AIHA); formaldehyde 0.83 ppm (EPA), WHO review 0.05-0.5 mg/m3; acetaldehyde 0.05 ppm (EPA); acetaldehyde AEGL 'level of distinct odour awareness' 0.56 ppm (as reported on the EPA interim AEGL page)",
+    "status": "V",
+    "sources": [
+     "redlight/smell-chemistry:epa-odour-thresholds-benzene-hcho-acetaldehyde",
+     "who-2010-iaq",
+     "epa-aegl-acetaldehyde"
+    ]
+   }
+  ]
+ },
+ "references": [
+  {
+   "pollutant": "CO",
+   "value": "100 mg/m3 (87 ppm at 25 C)",
+   "averagingTime": "15 min (not more than once a day, light exercise)",
+   "body": "WHO 2010 indoor guidelines; retained unchanged in WHO 2021 global AQG",
+   "source": "who-2010-iaq; who-2021-aqg",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "35 mg/m3 (31 ppm at 25 C; 30 ppm at 20 C)",
+   "averagingTime": "1 h",
+   "body": "WHO 2010 / 2021",
+   "source": "who-2010-iaq; who-2021-aqg",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "10 mg/m3 (8.7 ppm)",
+   "averagingTime": "8 h",
+   "body": "WHO 2010 / 2021",
+   "source": "who-2010-iaq; who-2021-aqg",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "7 mg/m3 (2010 indoor) / 4 mg/m3 (2021, 99th percentile)",
+   "averagingTime": "24 h",
+   "body": "WHO",
+   "source": "who-2010-iaq; who-2021-aqg",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "31 ppm (1 h); 9 ppm (8 h) per the 2024-09-30 amendment as printed in the MOENV 2025 annual report (earlier documents quote 35 ppm 1 h; the law text itself was not re-opened in this job)",
+   "averagingTime": "1 h / 8 h",
+   "body": "Taiwan MOENV ambient air quality standard",
+   "source": "moenv-annual-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "9 ppm",
+   "averagingTime": "8 h",
+   "body": "Taiwan Indoor Air Quality Standard (2012)",
+   "source": "tw-iaq-standard-2012",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "AEGL-1 not recommended (insufficient data); AEGL-2 420 / 150 / 83 / 33 / 27 ppm; AEGL-3 1,700 / 600 / 330 / 150 / 130 ppm (final)",
+   "averagingTime": "10 min / 30 min / 60 min / 4 h / 8 h; single emergency exposure",
+   "body": "US EPA AEGL programme (NAC/NRC)",
+   "source": "epa-aegl-co",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "23,000 ug/m3 (20 ppm)",
+   "averagingTime": "1 h (acute REL)",
+   "body": "California OEHHA (ARB table, updated 2025-07-18)",
+   "source": "arb-oehha-rel-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "ceiling 200 ppm; TWA 35 ppm",
+   "averagingTime": "ceiling = never exceeded (instantaneous); TWA 10 h",
+   "body": "NIOSH REL (occupational; healthy workers)",
+   "source": "niosh-npg-co",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "50 ppm",
+   "averagingTime": "8 h TWA",
+   "body": "OSHA PEL (occupational)",
+   "source": "niosh-npg-co",
+   "opened": true
+  },
+  {
+   "pollutant": "CO",
+   "value": "87 ppm 15-min (WHO, as used); HK AQO 1 h 27 ppm (as quoted)",
+   "averagingTime": "15 min / 1 h",
+   "body": "used as car-park criteria by Chan et al. 1997",
+   "source": "chan-burnett-chow-1997",
+   "opened": true
+  },
+  {
+   "pollutant": "benzene",
+   "value": "27 ug/m3 (8.5 ppb)",
+   "averagingTime": "1 h (OEHHA states all acute RELs now refer to 1 h; the benzene value was derived under older guidelines with a different averaging time, 6 h, and was kept unchanged)",
+   "body": "California OEHHA acute REL",
+   "source": "arb-oehha-rel-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "benzene",
+   "value": "3 ug/m3",
+   "averagingTime": "8 h REL (repeated daily)",
+   "body": "California OEHHA",
+   "source": "arb-oehha-rel-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "benzene",
+   "value": "AEGL-1 130 / 73 / 52 / 18 / 9.0 ppm; AEGL-2 2,000 / 1,100 / 800 / 400 / 200 ppm (interim)",
+   "averagingTime": "10 min / 30 min / 60 min / 4 h / 8 h",
+   "body": "US EPA AEGL",
+   "source": "epa-aegl-benzene",
+   "opened": true
+  },
+  {
+   "pollutant": "benzene",
+   "value": "NIOSH ST 1 ppm, TWA 0.1 ppm; OSHA STEL 5 ppm, TWA 1 ppm",
+   "averagingTime": "15 min / 8-10 h",
+   "body": "NIOSH REL / OSHA PEL (occupational)",
+   "source": "niosh-npg-benzene",
+   "opened": true
+  },
+  {
+   "pollutant": "benzene",
+   "value": "1-h ReV 580 ug/m3; 1-h ESL 170 ug/m3; ATSDR acute MRL 9 ppb (1-14 days, not fair for seconds-minutes)",
+   "averagingTime": "1 h / 1-14 d",
+   "body": "Texas TCEQ; ATSDR",
+   "source": "inputs-scene-and-references:B11-benzene-short-term-values",
+   "opened": true
+  },
+  {
+   "pollutant": "benzene",
+   "value": "no safe level; unit risk 6e-6 per ug/m3; 1.7 ug/m3 = 1/100,000 lifetime risk; EU annual limit 5 ug/m3 (3.4 from 2030)",
+   "averagingTime": "lifetime / annual (NOT fair for a 90-s exposure)",
+   "body": "WHO 2010; EU",
+   "source": "who-2010-iaq; inputs-scene-and-references:B09-benzene-eu-limit",
+   "opened": true
+  },
+  {
+   "pollutant": "formaldehyde",
+   "value": "0.1 mg/m3 (81 ppb)",
+   "averagingTime": "30 min (any 30-min period)",
+   "body": "WHO 2010 indoor guideline",
+   "source": "who-2010-iaq",
+   "opened": true
+  },
+  {
+   "pollutant": "formaldehyde",
+   "value": "55 ug/m3 (45 ppb)",
+   "averagingTime": "1 h acute REL; 8-h REL 9 ug/m3",
+   "body": "California OEHHA",
+   "source": "arb-oehha-rel-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "formaldehyde",
+   "value": "0.08 ppm",
+   "averagingTime": "1 h",
+   "body": "Taiwan Indoor Air Quality Standard",
+   "source": "tw-iaq-standard-2012",
+   "opened": true
+  },
+  {
+   "pollutant": "formaldehyde",
+   "value": "AEGL-1 0.90 ppm (all durations 10 min-8 h, interim); NIOSH ceiling 0.1 ppm (15 min); OSHA STEL 2 ppm",
+   "averagingTime": "10 min-8 h / 15 min / 15 min",
+   "body": "US EPA AEGL; NIOSH; OSHA",
+   "source": "epa-aegl-formaldehyde; niosh-npg-formaldehyde",
+   "opened": true
+  },
+  {
+   "pollutant": "acetaldehyde",
+   "value": "470 ug/m3 (260 ppb)",
+   "averagingTime": "1 h acute REL; 8-h REL 300 ug/m3",
+   "body": "California OEHHA",
+   "source": "arb-oehha-rel-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "acetaldehyde",
+   "value": "AEGL-1 45 ppm (10 min-8 h, interim)",
+   "averagingTime": "10 min-8 h",
+   "body": "US EPA AEGL",
+   "source": "epa-aegl-acetaldehyde",
+   "opened": true
+  },
+  {
+   "pollutant": "acrolein",
+   "value": "2.5 ug/m3 (1.1 ppb); 8-h 0.7 ug/m3",
+   "averagingTime": "1 h acute REL",
+   "body": "California OEHHA",
+   "source": "arb-oehha-rel-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "toluene / xylenes / 1,3-butadiene / styrene / NO2",
+   "value": "5,000 / 22,000 / 660 / 21,000 / 470 ug/m3",
+   "averagingTime": "1 h acute REL",
+   "body": "California OEHHA",
+   "source": "arb-oehha-rel-2025",
+   "opened": true
+  },
+  {
+   "pollutant": "TVOC (sum of 12 VOCs)",
+   "value": "0.56 ppm",
+   "averagingTime": "1 h",
+   "body": "Taiwan Indoor Air Quality Standard",
+   "source": "tw-iaq-standard-2012",
+   "opened": true
+  },
+  {
+   "pollutant": "gasoline vapour",
+   "value": "ACGIH TLV 300 ppm TWA, 500 ppm STEL (Cal/OSHA PEL same); no OSHA PEL; NIOSH: carcinogen, lowest feasible",
+   "averagingTime": "8 h / 15 min (occupational)",
+   "body": "ACGIH / Cal-OSHA / NIOSH",
+   "source": "osha-gasoline",
+   "opened": true
+  },
+  {
+   "pollutant": "gasoline vapour (odour)",
+   "value": "detection 0.47-0.58 ppm; recognition 0.77-1.12 ppm",
+   "averagingTime": "sniff (seconds)",
+   "body": "API 1995 panel",
+   "source": "api-1995-odour",
+   "opened": true
+  },
+  {
+   "pollutant": "petrol-engine exhaust (odour)",
+   "value": "D/T 800-1,000 (Fiala 1967) to 5,200-6,800 (Swedish 1970)",
+   "averagingTime": "sniff (seconds)",
+   "body": "odour panels",
+   "source": "epa-ap122-1973",
+   "opened": true
+  }
+ ],
+ "fairComparisonNotes": [
+  "Seconds-to-minutes peaks: the only CO values with averaging times of 10-15 min are the WHO 15-min guideline (87 ppm) and AEGL-2 10-min (420 ppm, a disabling-effects emergency level, not a public-health guideline). NIOSH's 200 ppm ceiling is occupational and instantaneous. There is no AEGL-1 for CO. A 1-s or 10-s peak must not be compared with these without averaging over their window.",
+  "A 90-s red contributes C_red/10 to a 15-min mean if the rest of the 15 min is at background; a 15-min mean of 87 ppm from one red would need C_red ~ 870 ppm sustained for 90 s at the nose.",
+  "For benzene and aldehydes, the 1-h OEHHA acute RELs are the shortest health-based values; a 90-s level contributes C/40 to a 1-h mean. Annual and lifetime values are not fair comparisons.",
+  "Odour comparisons have a seconds averaging time and are fair against second-by-second simulated concentrations; they speak to perception, not to toxicity."
+ ],
+ "gaps": [
+  "No measured warm-idle exit temperature or outlet diameter for a Taiwanese scooter (assumed 150-350 C, 18-32 mm).",
+  "No measurement of concentration versus distance 0.3-3 m behind an idling scooter; Ding et al. 2023 (APR) still blocked; Ning 2005 and TTI 2024 give no usable numbers in text.",
+  "No idle aldehyde or sulphur-compound emission measurement for scooters; odour estimate must use cycle speciation and whole-exhaust D/T from 1967-70 car engines.",
+  "Whole-exhaust D/T values are from abstracts in an EPA translation bibliography, not the original papers.",
+  "No CO measurement under a Taiwanese arcade beside a scooter queue (the 1989-91 Liu corridor data are whole-traffic), in a covered scooter waiting zone, or in a tunnel/underground car park with scooters (Taipei 60-lot study gives no values in abstract).",
+  "No 1990s pedestrian CO number for Italy or India was opened; Delhi data located but not read.",
+  "Taiwan ambient CO 1-h standard: 31 ppm (2024 amendment as printed in the MOENV annual report) vs 35 ppm in older sources; law text not re-opened.",
+  "Pull-away burst at green unquantified for scooters."
+ ]
+}

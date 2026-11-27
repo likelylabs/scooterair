@@ -1,0 +1,150 @@
+{
+ "name": "smoke: one scooter body + muffler, hot exhaust jet 0.4 m high, 250 C, 0.47 L/s(25 C), 10 deg up, rearward; 0.5 m/s cross-flow toward -y (pavement side), DFSEM inflow I=20%; finest cell 2.5 cm",
+ "domain": {
+  "min": [
+   -2.0,
+   -2.0,
+   0.0
+  ],
+  "max": [
+   3.6,
+   1.2,
+   3.2
+  ],
+  "dx0": 0.2
+ },
+ "ambient": {
+  "T": 303.15
+ },
+ "wind": {
+  "speed": 0.5,
+  "toward": "-y",
+  "turbulence": {
+   "type": "dfsem",
+   "I": 0.2,
+   "L": 0.4,
+   "delta": 2.0
+  }
+ },
+ "defaults": {
+  "pipeHeight": 0.4,
+  "pipeSize": 0.025,
+  "mufflerSize": 0.1,
+  "mdot": 0.00055,
+  "Texh": 523.15,
+  "pipeAngleDeg": 10.0,
+  "engineHeatW": 0.0,
+  "pipeRefineRadius": 0.15,
+  "bodyLevel": 2,
+  "mufflerLevel": 3,
+  "rider": false
+ },
+ "scooters": [
+  {
+   "name": "a",
+   "rear": [
+    0.0,
+    0.0
+   ],
+   "tracer": "s0"
+  }
+ ],
+ "refinementBoxes": [
+  {
+   "min": [
+    -2.0,
+    -2.0,
+    0.0
+   ],
+   "max": [
+    3.6,
+    1.2,
+    1.2
+   ],
+   "level": 1
+  },
+  {
+   "min": [
+    -1.2,
+    -2.0,
+    0.0
+   ],
+   "max": [
+    0.6,
+    0.4,
+    1.0
+   ],
+   "level": 2
+  }
+ ],
+ "probes": [
+  [
+   -0.3,
+   -0.85,
+   0.4
+  ],
+  [
+   -0.3,
+   -0.85,
+   0.7
+  ],
+  [
+   -0.3,
+   -0.85,
+   1.1
+  ],
+  [
+   -0.3,
+   -0.85,
+   1.5
+  ],
+  [
+   -0.3,
+   -1.35,
+   0.4
+  ],
+  [
+   -0.3,
+   -1.35,
+   0.7
+  ],
+  [
+   -0.3,
+   -1.35,
+   1.1
+  ],
+  [
+   -0.3,
+   -1.35,
+   1.5
+  ],
+  [
+   -0.6,
+   -0.4,
+   0.4
+  ],
+  [
+   -0.6,
+   -0.4,
+   0.7
+  ],
+  [
+   -0.25,
+   -0.4,
+   0.42
+  ],
+  [
+   -0.3,
+   -1.9,
+   0.7
+  ]
+ ],
+ "time": {
+  "duration": 20.0,
+  "spinup": 0.0,
+  "maxCo": 0.7,
+  "maxDeltaT": 0.05,
+  "writeInterval": 5
+ },
+ "nProcs": 1
+}

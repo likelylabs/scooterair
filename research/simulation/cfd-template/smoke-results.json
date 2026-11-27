@@ -1,0 +1,458 @@
+{
+ "what": "Smoke test: one scooter body + muffler, hot exhaust jet (250 C, 5.5e-4 kg/s = 0.47 L/s at 25 C, 10 deg up, rearward) at 0.4 m, 0.5 m/s cross-flow toward the pavement side (-y) with DFSEM turbulence sigma_h 0.1 m/s, 20 s simulated, serial (1 core) while the machine carried other jobs (load average 4-15 on 4 cores). Tracer s = exhaust mass fraction. CO-equivalent ppm uses 0.81 % raw CO (PLAN.md fleet flux-weighted mix); dilution = 1/s. Probe statistics over t = 8-20 s (12 s window, so 'max10s' is close to the mean). Probes are x = -0.3 m (0.3 m behind the exit plane), y = -0.85 / -1.35 / -1.9 m (0.45 / 0.95 / 1.5 m sideways from the pipe at y = -0.40), heights above the road; [-0.25,-0.4,0.42] is on the exit axis 0.25 m behind; [-0.6,-0.4,*] is 0.6 m behind on the axis line.",
+ "cases": {
+  "smoke": {
+   "grid": "2.5 cm finest (tailpipe patch 1 face 2.5x2.5 cm, exit 1.32 m/s), 5 cm near field",
+   "cells": 64968,
+   "wall_s_mesh": 11,
+   "wall_s_solve_serial": 945,
+   "mass_balance": {
+    "t0": 0.0012,
+    "t1": 20.0,
+    "emitted_kg": 0.011,
+    "out_kg": 0.00472,
+    "stored_kg": 0.00628,
+    "balance_error_pct": -0.02477,
+    "mean_emission_vs_specified_pct": -0.00442,
+    "last_third_outflow_over_emission": 0.64117,
+    "last_third_storage_rate_over_emission": 0.36316
+   },
+   "probes": [
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      0.4
+     ],
+     "dilution_mean": 915,
+     "CO_ppm_mean": 8.86,
+     "CO_ppm_max1s": 71.38,
+     "CO_ppm_inst_max": 114.9
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      0.7
+     ],
+     "dilution_mean": 460,
+     "CO_ppm_mean": 17.62,
+     "CO_ppm_max1s": 61.76,
+     "CO_ppm_inst_max": 156.91
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      1.1
+     ],
+     "dilution_mean": 4553,
+     "CO_ppm_mean": 1.78,
+     "CO_ppm_max1s": 5.47,
+     "CO_ppm_inst_max": 16.36
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      1.5
+     ],
+     "dilution_mean": 5122,
+     "CO_ppm_mean": 1.58,
+     "CO_ppm_max1s": 7.15,
+     "CO_ppm_inst_max": 9.71
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      0.4
+     ],
+     "dilution_mean": 1520,
+     "CO_ppm_mean": 5.33,
+     "CO_ppm_max1s": 19.95,
+     "CO_ppm_inst_max": 23.21
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      0.7
+     ],
+     "dilution_mean": 752,
+     "CO_ppm_mean": 10.77,
+     "CO_ppm_max1s": 42.22,
+     "CO_ppm_inst_max": 63.68
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      1.1
+     ],
+     "dilution_mean": 2739,
+     "CO_ppm_mean": 2.96,
+     "CO_ppm_max1s": 8.01,
+     "CO_ppm_inst_max": 20.78
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      1.5
+     ],
+     "dilution_mean": 6799,
+     "CO_ppm_mean": 1.19,
+     "CO_ppm_max1s": 6.16,
+     "CO_ppm_inst_max": 6.47
+    },
+    {
+     "xyz": [
+      -0.6,
+      -0.4,
+      0.4
+     ],
+     "dilution_mean": 6925850,
+     "CO_ppm_mean": 0.0,
+     "CO_ppm_max1s": 0.01,
+     "CO_ppm_inst_max": 0.03
+    },
+    {
+     "xyz": [
+      -0.6,
+      -0.4,
+      0.7
+     ],
+     "dilution_mean": 17260610,
+     "CO_ppm_mean": 0.0,
+     "CO_ppm_max1s": 0.0,
+     "CO_ppm_inst_max": 0.0
+    },
+    {
+     "xyz": [
+      -0.25,
+      -0.4,
+      0.42
+     ],
+     "dilution_mean": 233,
+     "CO_ppm_mean": 34.78,
+     "CO_ppm_max1s": 243.34,
+     "CO_ppm_inst_max": 572.86
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.9,
+      0.7
+     ],
+     "dilution_mean": 2966,
+     "CO_ppm_mean": 2.73,
+     "CO_ppm_max1s": 8.91,
+     "CO_ppm_inst_max": 11.83
+    }
+   ]
+  },
+  "smoke_5cm": {
+   "grid": "5 cm finest (patch 5x5 cm, exit 0.33 m/s), 5 cm near field",
+   "cells": 61727,
+   "wall_s_mesh": 10,
+   "wall_s_solve_serial": 624,
+   "mass_balance": {
+    "t0": 0.0012,
+    "t1": 20.0,
+    "emitted_kg": 0.011,
+    "out_kg": 0.00504,
+    "stored_kg": 0.00598,
+    "balance_error_pct": -0.17947,
+    "mean_emission_vs_specified_pct": -0.00472,
+    "last_third_outflow_over_emission": 0.76994,
+    "last_third_storage_rate_over_emission": 0.17836
+   },
+   "probes": [
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      0.4
+     ],
+     "dilution_mean": 1588,
+     "CO_ppm_mean": 5.1,
+     "CO_ppm_max1s": 21.99,
+     "CO_ppm_inst_max": 30.32
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      0.7
+     ],
+     "dilution_mean": 546,
+     "CO_ppm_mean": 14.84,
+     "CO_ppm_max1s": 68.06,
+     "CO_ppm_inst_max": 204.96
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      1.1
+     ],
+     "dilution_mean": 2140,
+     "CO_ppm_mean": 3.79,
+     "CO_ppm_max1s": 20.91,
+     "CO_ppm_inst_max": 33.43
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      1.5
+     ],
+     "dilution_mean": 12198,
+     "CO_ppm_mean": 0.66,
+     "CO_ppm_max1s": 3.8,
+     "CO_ppm_inst_max": 4.19
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      0.4
+     ],
+     "dilution_mean": 2253,
+     "CO_ppm_mean": 3.6,
+     "CO_ppm_max1s": 13.68,
+     "CO_ppm_inst_max": 19.03
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      0.7
+     ],
+     "dilution_mean": 1598,
+     "CO_ppm_mean": 5.07,
+     "CO_ppm_max1s": 21.62,
+     "CO_ppm_inst_max": 24.81
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      1.1
+     ],
+     "dilution_mean": 1741,
+     "CO_ppm_mean": 4.65,
+     "CO_ppm_max1s": 23.2,
+     "CO_ppm_inst_max": 35.01
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      1.5
+     ],
+     "dilution_mean": 6682,
+     "CO_ppm_mean": 1.21,
+     "CO_ppm_max1s": 7.93,
+     "CO_ppm_inst_max": 9.32
+    },
+    {
+     "xyz": [
+      -0.6,
+      -0.4,
+      0.4
+     ],
+     "dilution_mean": 7567396,
+     "CO_ppm_mean": 0.0,
+     "CO_ppm_max1s": 0.01,
+     "CO_ppm_inst_max": 0.02
+    },
+    {
+     "xyz": [
+      -0.6,
+      -0.4,
+      0.7
+     ],
+     "dilution_mean": 2758048,
+     "CO_ppm_mean": 0.0,
+     "CO_ppm_max1s": 0.02,
+     "CO_ppm_inst_max": 0.06
+    },
+    {
+     "xyz": [
+      -0.25,
+      -0.4,
+      0.42
+     ],
+     "dilution_mean": 317,
+     "CO_ppm_mean": 25.58,
+     "CO_ppm_max1s": 223.04,
+     "CO_ppm_inst_max": 573.16
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.9,
+      0.7
+     ],
+     "dilution_mean": 4509,
+     "CO_ppm_mean": 1.8,
+     "CO_ppm_max1s": 7.94,
+     "CO_ppm_inst_max": 9.79
+    }
+   ]
+  },
+  "smoke_10cm": {
+   "grid": "10 cm finest (patch 10x10 cm on a 0.2 m muffler, exit 0.08 m/s), 10 cm near field",
+   "cells": 25470,
+   "wall_s_mesh": 3,
+   "wall_s_solve_serial": 76,
+   "mass_balance": {
+    "t0": 0.0012,
+    "t1": 20.0,
+    "emitted_kg": 0.011,
+    "out_kg": 0.00542,
+    "stored_kg": 0.00564,
+    "balance_error_pct": -0.57883,
+    "mean_emission_vs_specified_pct": -0.00492,
+    "last_third_outflow_over_emission": 0.87906,
+    "last_third_storage_rate_over_emission": 0.1873
+   },
+   "probes": [
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      0.4
+     ],
+     "dilution_mean": 2687,
+     "CO_ppm_mean": 3.01,
+     "CO_ppm_max1s": 11.12,
+     "CO_ppm_inst_max": 12.16
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      0.7
+     ],
+     "dilution_mean": 1075,
+     "CO_ppm_mean": 7.53,
+     "CO_ppm_max1s": 18.69,
+     "CO_ppm_inst_max": 29.0
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      1.1
+     ],
+     "dilution_mean": 2291,
+     "CO_ppm_mean": 3.53,
+     "CO_ppm_max1s": 15.13,
+     "CO_ppm_inst_max": 17.26
+    },
+    {
+     "xyz": [
+      -0.3,
+      -0.85,
+      1.5
+     ],
+     "dilution_mean": 3503,
+     "CO_ppm_mean": 2.31,
+     "CO_ppm_max1s": 11.55,
+     "CO_ppm_inst_max": 12.08
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      0.4
+     ],
+     "dilution_mean": 2236,
+     "CO_ppm_mean": 3.62,
+     "CO_ppm_max1s": 8.73,
+     "CO_ppm_inst_max": 10.47
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      0.7
+     ],
+     "dilution_mean": 1792,
+     "CO_ppm_mean": 4.52,
+     "CO_ppm_max1s": 8.0,
+     "CO_ppm_inst_max": 8.96
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      1.1
+     ],
+     "dilution_mean": 1666,
+     "CO_ppm_mean": 4.86,
+     "CO_ppm_max1s": 20.11,
+     "CO_ppm_inst_max": 21.51
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.35,
+      1.5
+     ],
+     "dilution_mean": 4327,
+     "CO_ppm_mean": 1.87,
+     "CO_ppm_max1s": 8.14,
+     "CO_ppm_inst_max": 8.62
+    },
+    {
+     "xyz": [
+      -0.6,
+      -0.4,
+      0.4
+     ],
+     "dilution_mean": 19408,
+     "CO_ppm_mean": 0.42,
+     "CO_ppm_max1s": 2.15,
+     "CO_ppm_inst_max": 2.54
+    },
+    {
+     "xyz": [
+      -0.6,
+      -0.4,
+      0.7
+     ],
+     "dilution_mean": 47185,
+     "CO_ppm_mean": 0.17,
+     "CO_ppm_max1s": 0.85,
+     "CO_ppm_inst_max": 1.1
+    },
+    {
+     "xyz": [
+      -0.25,
+      -0.4,
+      0.42
+     ],
+     "dilution_mean": 228,
+     "CO_ppm_mean": 35.58,
+     "CO_ppm_max1s": 85.35,
+     "CO_ppm_inst_max": 106.61
+    },
+    {
+     "xyz": [
+      -0.3,
+      -1.9,
+      0.7
+     ],
+     "dilution_mean": 5849,
+     "CO_ppm_mean": 1.38,
+     "CO_ppm_max1s": 3.98,
+     "CO_ppm_inst_max": 4.08
+    }
+   ]
+  }
+ }
+}

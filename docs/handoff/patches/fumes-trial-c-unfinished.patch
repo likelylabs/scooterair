@@ -1,0 +1,615 @@
+diff --git a/src/components/art/MaskScene.astro b/src/components/art/MaskScene.astro
+index 5661035..2603db0 100644
+--- a/src/components/art/MaskScene.astro
++++ b/src/components/art/MaskScene.astro
+@@ -132,7 +132,7 @@ const scene = [
+ const alt = [art.mask.alt[locale], art.alt2.plain[locale]].join(locale === 'en' ? ' ' : '');
+ ---
+ 
+-<SceneFrame locale={locale} legend={legend && AIR_KEY} legendTop box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--mask', cls].filter(Boolean).join(' ')} data-mask={mask}>
++<SceneFrame locale={locale} legend={legend && AIR_KEY} legendMarks legendTop box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--mask', cls].filter(Boolean).join(' ')} data-mask={mask}>
+   {says && (
+     <div slot="before" class="mk-says" aria-live="polite">
+       {MASKS.map((m) => (
+diff --git a/src/components/art/MeasurementDiagram.astro b/src/components/art/MeasurementDiagram.astro
+index a2fa9fb..4bd1ad4 100644
+--- a/src/components/art/MeasurementDiagram.astro
++++ b/src/components/art/MeasurementDiagram.astro
+@@ -43,7 +43,7 @@ const spots: [number, number][] = [
+   [VB.x + 96, PLAN3.kerb + 60],
+   [VB.x + VB.w - 110, VB.y + VB.h - 70],
+ ];
+-const a = air({ frame: VB, seed: 14, id: artId('air'), tailpipes: plan.tailpipes, avoid: [...plan.avoid, ...spots.map(([x, y]) => ({ x: x - 50, y: y - 50, w: 100, h: 100 }))] });
++const a = air({ frame: VB, seed: 14, id: artId('air'), symbols: true, tailpipes: plan.tailpipes, avoid: [...plan.avoid, ...spots.map(([x, y]) => ({ x: x - 50, y: y - 50, w: 100, h: 100 }))] });
+ const sep = locale === 'en' ? '; ' : '；';
+ const alt = m.measure2Alt
+   .replace('{n}', String(m.points.length))
+@@ -52,7 +52,7 @@ const alt = m.measure2Alt
+ 
+ <figure class:list={['measure', cls]}>
+   <p class="measure__stamp">{m.stamp[locale]}</p>
+-  <SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag="street" class="measure__plan">
++  <SceneFrame locale={locale} legend={legend && AIR_KEY} legendMarks box={VB} alt={alt} tag="street" class="measure__plan">
+     <Fragment set:html={a.defs + plan.ground + a.cores + a.marks + plan.figures + `<path class="plan3-dim" d="M${spots[3][0] + 34},${spots[3][1]}h40m0,0l-12,-9m12,9l-12,9"/>`} />
+     <Fragment slot="labels">
+       {spots.map(([x, y], i) => <SceneLabel box={VB} x={x} y={y} anchor="center middle" class="measure-n" as="span">{i + 1}</SceneLabel>)}
+diff --git a/src/components/art/RiderScene.astro b/src/components/art/RiderScene.astro
+index 97a4e96..5e76b48 100644
+--- a/src/components/art/RiderScene.astro
++++ b/src/components/art/RiderScene.astro
+@@ -6,7 +6,7 @@
+  * tailpipe of the scooter in front points straight at him: his front wheel
+  * and feet stand in its dark core, and the same layer B that surrounds the
+  * people at the kerb surrounds him. His own tailpipe leaves a core behind
+- * him. A breathing ring sits at his nose. No chart.
++ * him. No chart, and no mark at his nose (trial C: fumes only).
+  *
+  * Props
+  *   locale  Locale
+@@ -23,8 +23,8 @@ import SceneFrame from './SceneFrame.astro';
+ import SceneLabel from './SceneLabel.astro';
+ import { air, type Box, AIR_KEY } from './air';
+ import { AIR_EXTRA } from './air-slots';
+-import { artId, breath, figureBoxes } from './parts';
+-import { placed, riderNoseOf, shopfronts, tailOf, type Placed } from './kit';
++import { artId, figureBoxes } from './parts';
++import { placed, shopfronts, tailOf, type Placed } from './kit';
+ import { sceneAlt } from './scene';
+ 
+ interface Props {
+@@ -46,7 +46,6 @@ const others: Placed[] = [
+   { x: -92, lift: 64, s: 0.86, row: 3 },
+   { x: 250, lift: 34, s: 0.93, row: 2 },
+ ];
+-const nose = riderNoseOf(me);
+ 
+ const a = air({
+   frame: VB,
+@@ -66,12 +65,12 @@ const street = [
+ ].join('');
+ const scene =
+   a.defs + street + a.wash + others.map((q) => placed(q, 'gas')).join('') + a.cores + a.marks +
+-  placed(ahead, 'gas', { cls: 'a-figure' }) + placed(me, 'gas', { face: true, cls: 'a-figure' }) +
+-  `<g class="hs-breath">${breath(nose.x + 4, nose.y - 3, 10)}</g>`;
++  placed(ahead, 'gas', { cls: 'a-figure' }) + placed(me, 'gas', { face: true, cls: 'a-figure' });
++// trial C: no breathing ring at the nose (an abstract mark); the rider sits in the fumes, which says it
+ const alt = sceneAlt(locale, art.riderScene.alt[locale], { scenario: 'dozen', count: est.scn.dozen.count });
+ ---
+ 
+-<SceneFrame locale={locale} legend={legend && ([...AIR_KEY, 'nose'] as const)} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--rider', cls].filter(Boolean).join(' ')}>
++<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--rider', cls].filter(Boolean).join(' ')}>
+   <Fragment set:html={scene} />
+   <SceneLabel slot="labels" box={VB} x={me.x + 84} y={-186} anchor="center bottom" plate>{art.words.waiting[locale]}</SceneLabel>
+ </SceneFrame>
+diff --git a/src/components/art/SceneFrame.astro b/src/components/art/SceneFrame.astro
+index 8019ed2..509dbcf 100644
+--- a/src/components/art/SceneFrame.astro
++++ b/src/components/art/SceneFrame.astro
+@@ -35,6 +35,10 @@
+  *   legendTop  the key belongs to the top of the drawing (the mask: empty air above the head).
+  *             It is printed inside the canvas; on the home page art.css lays it over the top
+  *             edge, elsewhere it still reads under the drawing.
++ *   legendMarks keep the key's plume / ribbon / ring / dot entries. Trial C (2026-11-27): street
++ *             pictures draw fumes only, which need no key, so those entries are dropped unless a
++ *             picture that still draws rings and dots on purpose (the mask, the repair picture,
++ *             the measurement plan: not reworked yet) asks to keep them.
+  *   legendNote add the key's line "the street's own air is not drawn" (only where
+  *             no tag says it: the tag under every street picture already does)
+  *   id, class passed to the <figure>; other data-* attributes too
+@@ -72,11 +76,14 @@ interface Props {
+   legendNote?: boolean;
+   legendSense?: boolean;
+   legendTop?: boolean;
++  legendMarks?: boolean;
+   id?: string;
+   class?: string;
+   [key: `data-${string}`]: string | number | boolean | undefined;
+ }
+-const { locale, box, alt, tag = false, scenario, drift = false, arrive = false, legend = false, legendNote = false, legendSense = false, legendTop = false, id, class: cls, ...rest } = Astro.props;
++const { locale, box, alt, tag = false, scenario, drift = false, arrive = false, legend: legendIn = false, legendNote = false, legendSense = false, legendTop = false, legendMarks = false, id, class: cls, ...rest } = Astro.props;
++const FUME_KEY: readonly AirKeyItem[] = ['plume', 'ribbon', 'ring', 'dot'];
++const legend = legendIn && (legendMarks ? legendIn : legendIn.filter((k) => !FUME_KEY.includes(k)));
+ assertSceneAlt(alt, locale);
+ // the long closing sentence (estimate / street's own air) is read once per page: later scenes end
+ // with the short 「這是示意圖。」 (still says 示意圖: check 17) — see ./alt-once.client.ts. The tag stays visible.
+diff --git a/src/components/art/TailpipeMarks.astro b/src/components/art/TailpipeMarks.astro
+index b7529cb..163c203 100644
+--- a/src/components/art/TailpipeMarks.astro
++++ b/src/components/art/TailpipeMarks.astro
+@@ -1,16 +1,21 @@
+ ---
+ /**
+- * TailpipeMarks — G2: one scooter, three kinds of mark (brief 3.2 screen 2, 5.2).
++ * TailpipeMarks — G2: a close-up of the fume (brief 3.2 screen 2; trial C, 2026-11-27).
+  *
+- * One petrol scooter from the side, engine running. Three kinds of mark leave
+- * the tailpipe, each in its own lane: ribbons (what you can smell) drift up to
+- * the nose of a small head in profile; rings (carbon monoxide) go straight back; dots (particles) stay low.
+- * This is where the reader learns the three marks every other picture uses, so
+- * the street's own sparse air is left out here: nothing competes with the lanes.
++ * One petrol scooter from the side, engine running, and the fumes it leaves on the
++ * ground behind it: the same orange-brown plume and wavy ribbons every street picture
++ * draws. A magnifying glass rests on the fume, and what it sees is opened up in a panel
++ * above, cut into three bands of the same fume, each NAMED IN WORDS inside it:
+  *
+- * The names of the three marks are not printed in the picture: put <AirKey tap>
+- * under it (the Screen's `controls` slot). Tapping a key item sets
+- * data-pick-mark on the Screen and this picture lights that lane.
++ *   聞得到：油氣和醛類   the band with the wavy orange ribbons (what you can smell)
++ *   聞不到：一氧化碳     a clear, pale band: plain fume, nothing to see or smell
++ *   看不到：微粒         a darker, sooty band
++ *
++ * The panel's own line above it says the three are MIXED in the fume: the bands only pull
++ * them apart so they can be named. There are no rings and no dots anywhere: this is the one
++ * place on the site that says what the fumes hold, and every other picture draws the fumes
++ * alone (air.ts). The bands differ in lightness and texture, not only in hue, so they part
++ * in greyscale print and for colour-blind readers.
+  *
+  * Props
+  *   locale  Locale
+@@ -23,15 +28,14 @@
+  *           it can grow with 字大 without covering the picture
+  *
+  *   <TailpipeMarks slot="picture" locale={locale}><EstimateValue slot="chip" … /></TailpipeMarks>
+- *   <AirKey slot="controls" locale={locale} tap />
+  */
+ import '@/styles/art.css';
+ import type { Locale } from '@/i18n';
+ import { art } from '@/i18n/art';
+ import SceneFrame from './SceneFrame.astro';
+ import SceneLabel from './SceneLabel.astro';
+-import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
+-import { CAN, MASK_FACE, TAILPIPE, artId, drinksCan, maskHead, rng, scooter } from './parts';
++import { air, airRibbon, airWave, unitsPerPx, type Box } from './air';
++import { CAN, TAILPIPE, artId, drinksCan, scooter } from './parts';
+ import { put } from './kit';
+ import { sceneAlt } from './scene';
+ 
+@@ -46,53 +50,78 @@ const { locale, tag = false, id, class: cls } = Astro.props;
+ const hasChip = Astro.slots.has('chip');
+ const can = Astro.props.can ?? hasChip;
+ 
+-const VB: Box = { x: -200, y: -226, w: 390, h: 311 };
++const VB: Box = { x: -200, y: -262, w: 390, h: 352 };
+ const upp = unitsPerPx(VB.w);
+-const at = { x: 4, y: 0 };
+-const M = { x: at.x + TAILPIPE.x, y: TAILPIPE.y }; // the tailpipe mouth
+-const HEAD = { x: -112, y: -118, s: 0.46 }; // a small head in profile, looking back at the scooter: the one who smells it
+-const NOSE = { x: HEAD.x - MASK_FACE.nose.x * HEAD.s + 3, y: HEAD.y + MASK_FACE.nose.y * HEAD.s };
+-const r = rng(20);
++const S = 0.86; // the scooter, a little smaller than life so the panel fits above it
++const at = { x: 24, y: 0 };
++const M = { x: at.x + TAILPIPE.x * S, y: TAILPIPE.y * S }; // the tailpipe mouth
++const gid = artId('tm');
+ 
+-// only the dark core here: the lanes below are placed one mark at a time
+-const a = air({ frame: VB, id: artId('air'), noStreetAir: true, tailpipes: [{ ...M, rings: 0, dots: 0, ribbons: 0 }] });
++// the fumes: one big soft core with its ribbons, exactly as the street pictures draw them
++const a = air({ frame: VB, id: artId('air'), noStreetAir: true, tailpipes: [{ ...M, scale: S, boost: 1.4, ribbons: 3 }] });
+ 
+-/** A mark that travels out from the mouth on arrival: it starts part of the way back toward it. */
+-const go = (i: number, x: number, y: number) => ` style="--i:${i};--dx:${((M.x - x) * 0.55).toFixed(1)}px;--dy:${((M.y - y) * 0.55).toFixed(1)}px"`;
++// the panel: the fume opened up, three bands
++const P = { x0: -190, x1: 180, top: -232, band: 38, r: 10 };
++const bandTop = (i: number) => P.top + i * P.band;
++const bottom = bandTop(3);
++const W = P.x1 - P.x0;
++// the magnifying glass, resting on the fume
++const L = { x: -66, y: -36, r: 28 };
+ 
+-// ribbons: up and back to the nose
+-const ribbons = [-7, 0, 7, 14]
+-  .map((dy, i) => airRibbon(airWisp(M.x - 4, M.y - 3 - i * 1.5, NOSE.x + 2 + (i % 2) * 4, NOSE.y + dy, upp), upp, { weight: i === 1 ? 1.15 : 0.95, cls: 'sa-draw', attrs: ` pathLength="1" style="--i:${i * 2}"` }))
++// band 1: wavy ribbons right across it (the part you can smell)
++const ribbons = [0.36, 0.7]
++  .map((k, i) => airRibbon(airWave(P.x0 - 6 + i * 9, bandTop(0) + P.band * k, W + 12, 1, upp, i % 2 ? -1 : 1), upp, { weight: i === 0 ? 1.15 : 0.95 }))
++  .join('');
++// soft puffs, so the panel reads as smoke and not as a table (fixed places: the same picture every time)
++const puffs = [
++  [-150, 0.25, 70, 30], [-60, 0.6, 80, 34], [40, 0.3, 70, 28], [130, 0.7, 80, 32],
++  [-120, 1.6, 75, 30], [-10, 1.3, 70, 26], [100, 1.6, 85, 30],
++  [-160, 2.5, 70, 30], [-60, 2.7, 80, 30], [50, 2.4, 75, 32], [150, 2.6, 70, 30],
++]
++  .map(([x, b, rx, ry]) => `<ellipse class="tm-puff" cx="${x}" cy="${(P.top + b * P.band).toFixed(1)}" rx="${rx}" ry="${ry}"/>`)
+   .join('');
+-// rings: straight back, spreading as they go
+-const rings = Array.from({ length: 13 }, (_, i) => {
+-  const u = (i + 0.5) / 13;
+-  const x = M.x - 14 - u * 180;
+-  const y = M.y - 4 - u * 30 + (((i * 7) % 5) / 4 - 0.5) * (8 + u * 46);
+-  return airRing(x, y, upp, { size: r(), cls: 'sa-go', attrs: go(i, x, y) });
+-}).join('');
+-// dots: low, along the ground
+-const dots = Array.from({ length: 26 }, (_, i) => {
+-  const u = (i + 0.5) / 26;
+-  const x = M.x - 8 - u * 190 + (r() - 0.5) * 6;
+-  const y = -4 - (((i * 5) % 7) / 6) * (7 + u * 16);
+-  return airDot(x, y, upp, { size: 0.5 + r() * 0.5, cls: 'sa-go', attrs: go(Math.round(i * 0.5), x, y) });
+-}).join('');
++
++const panel = [
++  `<defs><clipPath id="${gid}-p"><rect x="${P.x0}" y="${P.top}" width="${W}" height="${bottom - P.top}" rx="${P.r}"/></clipPath>` +
++    // a fume's soft edge along the top and bottom of each band
++    `<filter id="${gid}-b" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="9"/></filter></defs>`,
++  // the callout: two lines from the glass up to the panel's lower corners
++  `<path class="tm-call" d="M${L.x - L.r * 0.9},${L.y - L.r * 0.45}L${P.x0 + 14},${bottom}M${L.x + L.r * 0.9},${L.y - L.r * 0.45}L${P.x1 - 14},${bottom}"/>`,
++  `<g clip-path="url(#${gid}-p)">`,
++  `<rect class="tm-paper" x="${P.x0}" y="${P.top}" width="${W}" height="${bottom - P.top}"/>`,
++  // the whole panel is the fume: an even tint and soft puffs
++  `<rect class="tm-fume" x="${P.x0}" y="${P.top}" width="${W}" height="${bottom - P.top}"/>`,
++  `<g filter="url(#${gid}-b)">${puffs}</g>`,
++  // band 1: with its ribbons (the part you can smell)
++  `<g class="tm-ribs">${ribbons}</g>`,
++  // band 2: clearer and paler: nothing to see, nothing to smell
++  `<rect class="tm-band tm-band--clear" x="${P.x0}" y="${bandTop(1)}" width="${W}" height="${P.band}"/>`,
++  // band 3: darker and sooty
++  `<rect class="tm-band tm-band--soot" x="${P.x0}" y="${bandTop(2)}" width="${W}" height="${P.band}"/>`,
++  `<path class="tm-cut" d="M${P.x0},${bandTop(1)}H${P.x1}M${P.x0},${bandTop(2)}H${P.x1}"/>`,
++  '</g>',
++  `<rect class="tm-frame" x="${P.x0}" y="${P.top}" width="${W}" height="${bottom - P.top}" rx="${P.r}"/>`,
++].join('');
++
++// the glass: a rim, a faint lens and a handle
++const glass =
++  `<path class="tm-handle" d="M${L.x - L.r * 0.72},${L.y + L.r * 0.72}l-20,20"/>` +
++  `<circle class="tm-lens" cx="${L.x}" cy="${L.y}" r="${L.r}"/>`;
+ 
+ const scene = [
+   `<rect class="a-plane" x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${-VB.y}"/>`,
+   `<rect class="a-road" x="${VB.x}" y="0" width="${VB.w}" height="${VB.y + VB.h}"/>`,
+   `<path class="a-line" d="M${VB.x},0H${VB.x + VB.w}"/>`,
+-  a.defs + a.cores,
+-  `<g class="tm-lane tm-lane--dot">${dots}</g>`,
+-  `<g class="tm-lane tm-lane--ring">${rings}</g>`,
+-  `<g class="tm-lane tm-lane--ribbon">${put(HEAD.x, HEAD.y, maskHead(), { s: HEAD.s, flip: true, cls: 'a-figure' })}${ribbons}</g>`,
+-  put(at.x, at.y, scooter({ kind: 'gas', rider: true }), { cls: 'a-figure' }),
++  a.defs + a.cores + a.marks,
++  put(at.x, at.y, scooter({ kind: 'gas', rider: false }), { s: S, cls: 'a-figure' }),
++  panel,
++  glass,
+ ].join('');
+ const alt = sceneAlt(locale, art.tailpipe.alt[locale], { kind: 'plain' });
++const mid = (i: number) => bandTop(i) + P.band / 2;
+ ---
+ 
+-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--tailpipe', cls].filter(Boolean).join(' ')}>
++<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} id={id} class={['scene--tailpipe', cls].filter(Boolean).join(' ')}>
+   {(hasChip || can) && (
+     <div slot="before" class="tm-head">
+       {can && <svg class="tm-can" viewBox={`0 ${-CAN.h - 4} ${CAN.w} ${CAN.h + 6}`} aria-hidden="true" focusable="false" set:html={drinksCan()} />}
+@@ -100,6 +129,10 @@ const alt = sceneAlt(locale, art.tailpipe.alt[locale], { kind: 'plain' });
+     </div>
+   )}
+   <Fragment set:html={scene} />
+-  {/* the one word for the soft cloud, on the road under it: what screen 2's key does not name */}
+-  <SceneLabel slot="labels" box={VB} x={-150} y={8} anchor="start top" max={60} plate class="tm-plume">{art.key.label[locale]}</SceneLabel>
++  <SceneLabel slot="labels" box={VB} x={P.x0 + 2} y={P.top - 6} anchor="start bottom" max={96} class="tm-title">{art.tailpipe.title[locale]}</SceneLabel>
++  <SceneLabel slot="labels" box={VB} x={P.x0 + 10} y={mid(0)} anchor="start middle" max={90} plate class="tm-name">{art.marks.ribbon[locale]}</SceneLabel>
++  <SceneLabel slot="labels" box={VB} x={P.x0 + 10} y={mid(1)} anchor="start middle" max={90} plate class="tm-name">{art.marks.ring[locale]}</SceneLabel>
++  <SceneLabel slot="labels" box={VB} x={P.x0 + 10} y={mid(2)} anchor="start middle" max={90} plate class="tm-name">{art.marks.dot[locale]}</SceneLabel>
++  {/* the one word for the fume itself, on the road under it */}
++  <SceneLabel slot="labels" box={VB} x={-188} y={8} anchor="start top" max={60} plate class="tm-plume">{art.key.label[locale]}</SceneLabel>
+ </SceneFrame>
+diff --git a/src/components/art/TenScooters.astro b/src/components/art/TenScooters.astro
+index 2b460ce..bca1179 100644
+--- a/src/components/art/TenScooters.astro
++++ b/src/components/art/TenScooters.astro
+@@ -65,6 +65,8 @@ const a = air({
+   id: artId('air'),
+   seed: 23,
+   noStreetAir: true,
++  // trial C: this picture still counts rings on purpose (not reworked yet)
++  symbols: true,
+   tailpipes: [
+     ...pack.map((q, i) => ({ ...tail(q), ...small, ...(i === BIG ? { rings: 0, dots: 0, ribbons: 0, scale: 0.001 } : {}) })),
+     // the same tailpipe again: as it is (three lobes), and repaired
+@@ -92,6 +94,6 @@ const alt =
+   fill(art.ten.alt, locale, { total: TOTAL, rest: TOTAL - 1, rings: allRings, big: bigRings, fix: art.ten.fix[locale] }) + (locale === 'en' ? ' ' : '') + art.alt2.plain[locale];
+ ---
+ 
+-<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} id={id} class={['scene--ten', cls].filter(Boolean).join(' ')} data-fixed={fixed ? '' : undefined} data-rings={allRings} data-big-rings={bigRings}>
++<SceneFrame locale={locale} legend={legend && AIR_KEY} legendMarks box={VB} alt={alt} tag={tag} id={id} class={['scene--ten', cls].filter(Boolean).join(' ')} data-fixed={fixed ? '' : undefined} data-rings={allRings} data-big-rings={bigRings}>
+   <Fragment set:html={scene} />
+ </SceneFrame>
+diff --git a/src/components/art/air.ts b/src/components/art/air.ts
+index 41f11d1..f5c6715 100644
+--- a/src/components/art/air.ts
++++ b/src/components/art/air.ts
+@@ -6,7 +6,19 @@
+  * It is pure: the same options always give the same SVG, so nothing flickers
+  * between renders, and nothing in it depends on time through the red light.
+  *
+- * WHAT A PICTURE SHOWS: ONE READABLE PLUME, AND NOTHING ELSE
++ * WHAT A PICTURE SHOWS: FUMES COMING OUT OF THE SCOOTERS, AND NOTHING ELSE
++ * (2026-11-27, owner's decision.) A picture draws only the plume and its wavy
++ * orange ribbons, because a reader of any age knows fumes at a glance. It
++ * draws NO rings and NO dots: abstract marks that need a key to decode. What
++ * the fumes hold (fuel vapour you can smell, carbon monoxide that has no
++ * smell, particles too small to see) is said in words: once, inside the
++ * close-up of the fume on screen 2 and /questions/smell/ (TailpipeMarks), and
++ * in the text beside the other pictures. Rings and dots below are still worked
++ * out (their counts keep the rule testable), but they are drawn only by the
++ * counting patch (airPatch, /estimate/: `streetAir`) and by the film, which
++ * places its own. The rest of this header describes the rule as first built.
++ *
++ * THE PLUME AS FIRST BUILT
+  * A picture draws only what the scooters give off. Their exhaust is one soft
+  * plume per row: it leaves the tailpipes, stays low (under about 90 cm at the
+  * tailpipe), spreads and thins toward the kerb, and wraps the waiting people
+@@ -306,6 +318,11 @@ export interface AirOptions {
+   streetAir?: boolean;
+   /** @deprecated pictures no longer draw the street's own air; kept so old callers still compile */
+   noStreetAir?: boolean;
++  /**
++   * Draw rings and dots (default: only with `streetAir`, i.e. the counting patch). Pictures draw
++   * fumes only: the plume and its ribbons. Counts are worked out either way.
++   */
++  symbols?: boolean;
+ }
+ 
+ export interface AirCounts {
+@@ -486,6 +503,7 @@ export function air(o: AirOptions): AirLayers {
+   const { frame, seed = 1, id, avoid = [], kerb, tailpipes = [], cars = [], tyres = [] } = o;
+   const upp = o.upp ?? unitsPerPx(frame.w);
+   const scenario = o.scenario ?? 'dozen';
++  const symbols = o.symbols ?? !!o.streetAir;
+   const px = (v: number) => v * upp;
+   const side = px(AIR.patch);
+   const ringSw = px(AIR.ring.stroke);
+@@ -621,8 +639,8 @@ export function air(o: AirOptions): AirLayers {
+         // where it lands in the picture, so the kerb's rings keep clear of it
+         allRings.push({ x: s.x + p.x * (dir === 1 ? -1 : 1), y: s.y + p.y });
+       }
+-      if (dd) g += dotEl(`air-d${(i % 3) + 1}`, dd);
+-      if (rd2) g += ringEl(`air-d${((i + 1) % 3) + 1}`, rd2);
++      if (dd && symbols) g += dotEl(`air-d${(i % 3) + 1}`, dd);
++      if (rd2 && symbols) g += ringEl(`air-d${((i + 1) % 3) + 1}`, rd2);
+       srcMarks.push(g + '</g>');
+     });
+     cores.push('</g>');
+@@ -726,7 +744,7 @@ export function air(o: AirOptions): AirLayers {
+     // the extra rings: one sequence, so a smaller scenario is a prefix of a larger one
+     const rk = rng(seed * 7919 + 41);
+     const extraRings = scatter(want[last], inPlume, allRings, rk, kerbAvoid, ringPad, px(AIR.ring.rMin), px(AIR.ring.rMax));
+-    extraRings.forEach((m, k) => {
++    if (symbols) extraRings.forEach((m, k) => {
+       marks.push(ringEl(`air-b air-b${stepOf(k, want)} air-d${(k % 3) + 1}`, ringPath(m.x, m.y, m.r, ringSw), ` data-k="${k}"`));
+     });
+     marks.push('</g>');
+diff --git a/src/components/art/card-art.ts b/src/components/art/card-art.ts
+index 5afa648..3690ba7 100644
+--- a/src/components/art/card-art.ts
++++ b/src/components/art/card-art.ts
+@@ -118,6 +118,8 @@ function kerbStreet(o: KerbOptions): { box: Box; svg: string } {
+     upp: cardUpp(b),
+     seed: o.seed,
+     id: artId('card'),
++    // trial C: the share cards are not reworked yet and keep their rings and dots
++    symbols: true,
+     scenario: o.scenario ?? 'dozen',
+     extra: AIR_EXTRA,
+     kerb: gas ? { x0: zone[0], x1: zone[1], sourceX: o.front + TAILPIPE.x } : undefined,
+diff --git a/src/components/pages/film/scene.ts b/src/components/pages/film/scene.ts
+index 81e1d1e..54e1e58 100644
+--- a/src/components/pages/film/scene.ts
++++ b/src/components/pages/film/scene.ts
+@@ -56,7 +56,8 @@ import { T, signalAt, type Signal } from './timeline.ts';
+  */
+ const PAIR = /<use class="air-halo([^"]*)" href="#([^"]+)"([^>]*)\/><path id="\2" class="(air-(?:ring|dot))([^"]*)"([^>]*)\/>/g;
+ function air(o: Parameters<typeof airAll>[0]): ReturnType<typeof airAll> {
+-  const a = airAll(o);
++  // trial C: the film is not reworked yet, so it keeps drawing the rings and dots it narrates
++  const a = airAll({ symbols: true, ...o });
+   const loose = (a.marks.match(/class="air-(?:ring|dot)[ "]/g) ?? []).length - (a.marks.match(PAIR) ?? []).length;
+   if (loose !== 0) throw new Error(`film: air.ts drew ${loose} ring(s) or dot(s) without the halo pair the film expects (its markup changed)`);
+   return a;
+diff --git a/src/components/pages/questions/QSmell.astro b/src/components/pages/questions/QSmell.astro
+index 9b63afa..7e39baf 100644
+--- a/src/components/pages/questions/QSmell.astro
++++ b/src/components/pages/questions/QSmell.astro
+@@ -1,7 +1,7 @@
+ ---
+ /**
+  * /questions/smell/ — 那個味道是什麼？ (brief 7.5)
+- *   1  G2, the three kinds of mark, with the key under it. The answer is a ranking from odour
++ *   1  G2, the close-up of the fume that names its three parts in words. The answer is a ranking from odour
+  *      thresholds: the site's own working, so it carries 推估 and never says more than
+  *      "likeliest".
+  *   2  The 聞得到／聞不到 strip: no smell does not mean none is there; benzene.
+@@ -13,7 +13,6 @@ import Screen from '@/components/ui/Screen.astro';
+ import HowSheet from '@/components/ui/HowSheet.astro';
+ import KindChip from '@/components/ui/KindChip.astro';
+ import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
+-import AirKey from '@/components/art/AirKey.astro';
+ import SmellStrip from '@/components/art/SmellStrip.astro';
+ import WorkingSum from '@/components/charts/WorkingSum.astro';
+ import questions from '@/i18n/pages/questions';
+@@ -32,7 +31,6 @@ const s2 = t.s2;
+ 
+ <Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
+   <TailpipeMarks slot="picture" locale={locale} can={false} />
+-  <AirKey slot="controls" locale={locale} tap />
+   <KindChip slot="chips" locale={locale} kind="derived" />
+   <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['scooter-exhaust-carbonyls', 'odour-thresholds']} primary={{ href: href('/evidence/#link-4', locale) }} secondary={{ href: href('/estimate/#answers', locale), label: how.fullMethod[locale] }}>
+     <p slot="block1">{f(s1.sheet.b1[locale])}</p>
+diff --git a/src/i18n/art.ts b/src/i18n/art.ts
+index bee2837..c6cdb82 100644
+--- a/src/i18n/art.ts
++++ b/src/i18n/art.ts
+@@ -138,17 +138,18 @@ export const art = {
+   /** G4: the kerb, close. */
+   kerb: {
+     alt: {
+-      'zh-TW': '路邊的近景。推嬰兒車的大人和用手摀著口鼻的小學生，站在左邊。最近一輛機車的車尾，就在右邊一兩步的地方。騎士也在畫面裡，後面還有別排的機車。每排機車後面有一團廢氣，飄到人站的地方。人站的地方，圈圈和小點多一些；排氣管後面顏色最深。',
+-      en: 'The kerb, close. An adult with a pushchair and a schoolchild covering nose and mouth stand on the left. The tail of the nearest scooter is a step or two to their right, with its rider in view and more rows behind. Each row of scooters leaves a soft plume of exhaust that reaches the people. Where they stand there are more rings and dots, and the patches behind the tailpipes are darkest.',
++      'zh-TW': '路邊的近景。推嬰兒車的大人和用手摀著口鼻的小學生，站在左邊。最近一輛機車的車尾，就在右邊一兩步的地方。騎士也在畫面裡，後面還有別排的機車。每排機車後面有一團廢氣，飄到人站的地方。人站的地方，廢氣比較淡，但把人整個包住；排氣管後面顏色最深。',
++      en: 'The kerb, close. An adult with a pushchair and a schoolchild covering nose and mouth stand on the left. The tail of the nearest scooter is a step or two to their right, with its rider in view and more rows behind. Each row of scooters leaves a soft plume of exhaust that reaches the people. Where they stand the fumes are thinner but wrap the people from the ground up, and the patches behind the tailpipes are darkest.',
+     } as L10n,
+   },
+ 
+-  /** G2: one scooter, three kinds of mark. */
++  /** G2: a close-up of the fume (trial C: no rings, no dots; the three parts named in words). */
+   tailpipe: {
+     alt: {
+-      'zh-TW': '一輛燃油機車的側面，引擎沒熄火。排氣管排出三種東西，各走各的路。波浪線是聞得到的油氣，往上飄到一個鼻子前面；空心圈是聞不到的一氧化碳；小黑點是看不到的微粒。旁邊畫了一個鋁罐。',
+-      en: 'One petrol scooter from the side, engine running. Three kinds of mark leave the tailpipe, each in its own lane. Wavy ribbons are the fuel vapour you can smell, drifting up to a nose. Hollow rings are carbon monoxide, which has no smell. Small dark dots are particles too small to see. A drinks can is drawn beside them.',
++      'zh-TW': '一輛燃油機車的側面，引擎沒熄火。排氣管後面，地上有一團橘褐色的廢氣，裡面有幾條波浪。一個放大鏡放在這團廢氣上，上面的框把它放大，分成三條來看：有波浪的一條，寫著「聞得到：油氣和醛類」；淡淡的一條，寫著「聞不到：一氧化碳」；深色的一條，寫著「看不到：微粒」。三樣東西其實混在一起，分開畫只是為了寫上名字。',
++      en: 'One petrol scooter from the side, engine running. Behind its tailpipe, an orange-brown cloud of fumes lies low on the ground, with a few wavy lines in it. A magnifying glass rests on the fumes, and a panel above opens them up into three bands. The band with wavy lines says “Smell: fuel vapour and aldehydes”. A pale band says “No smell: carbon monoxide”. A dark band says “Too small to see: particles”. The three are really mixed together; they are drawn apart only to name them.',
+     } as L10n,
++    title: { 'zh-TW': '放大看：這團廢氣裡，混著三樣東西', en: 'Close up: three things are mixed in the fumes' } as L10n,
+     keyLegend: { 'zh-TW': '點一種，只看它', en: 'Tap one to see it alone' } as L10n,
+   },
+ 
+@@ -212,8 +213,8 @@ export const art = {
+   /** G9: the rider. */
+   riderScene: {
+     alt: {
+-      'zh-TW': '排在第二排的一位騎士，鏡片掀起來，看得到臉。旁邊寫著「他也在等」。前面那輛機車的排氣管正對著他，他的前輪和腳都在那一團深色的廢氣裡；他自己的機車後面也有一團。他的鼻子前面有一個呼吸的圈。',
+-      en: 'A rider in the second row, visor up, face showing, labelled “He is waiting too”. The tailpipe of the scooter in front points straight at him. His front wheel and feet are in its dark patch of exhaust; his own scooter leaves a patch behind it too. A breathing ring sits at his nose.',
++      'zh-TW': '排在第二排的一位騎士，鏡片掀起來，看得到臉。旁邊寫著「他也在等」。前面那輛機車的排氣管正對著他，他的前輪和腳都在那一團深色的廢氣裡；他自己的機車後面也有一團。',
++      en: 'A rider in the second row, visor up, face showing, labelled “He is waiting too”. The tailpipe of the scooter in front points straight at him. His front wheel and feet are in its dark patch of exhaust; his own scooter leaves a patch behind it too.',
+     } as L10n,
+   },
+ 
+diff --git a/src/i18n/pages/home.ts b/src/i18n/pages/home.ts
+index 8799ee6..fbccc95 100644
+--- a/src/i18n/pages/home.ts
++++ b/src/i18n/pages/home.ts
+@@ -128,8 +128,8 @@ export default copy({
+     headline: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
+     // body: est.meta.gloss + kerbSentence(scenario) from src/data/estimate.ts
+     quiet: {
+-      'zh-TW': '圈圈越多＝一氧化碳越多。街上原本就有的空氣，圖上沒有畫。',
+-      en: 'More rings mean more carbon monoxide. The air the street already holds is not drawn.',
++      'zh-TW': '停的機車越多，廢氣畫得越濃。街上原本就有的空氣，圖上沒有畫。',
++      en: 'The more scooters beside you, the thicker the fumes are drawn. The air the street already holds is not drawn.',
+     },
+     box: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
+     sheet: {
+diff --git a/src/i18n/pages/questions.ts b/src/i18n/pages/questions.ts
+index 43c13c8..ac38b16 100644
+--- a/src/i18n/pages/questions.ts
++++ b/src/i18n/pages/questions.ts
+@@ -200,8 +200,8 @@ export default copy({
+       box: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
+       headline: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
+       quiet: {
+-        'zh-TW': '圈圈越多＝一氧化碳越多。街上原本就有的空氣，圖上沒有畫。',
+-        en: 'More rings mean more carbon monoxide. The air the street already holds is not drawn.',
++        'zh-TW': '停的機車越多，廢氣畫得越濃。街上原本就有的空氣，圖上沒有畫。',
++        en: 'The more scooters beside you, the thicker the fumes are drawn. The air the street already holds is not drawn.',
+       },
+       sheet: {
+         b1: {
+diff --git a/src/pages/[...lang]/index.astro b/src/pages/[...lang]/index.astro
+index 715c001..29fe3ff 100644
+--- a/src/pages/[...lang]/index.astro
++++ b/src/pages/[...lang]/index.astro
+@@ -35,7 +35,6 @@ import ScenarioSwitch from '@/components/ui/ScenarioSwitch.astro';
+ import Screen from '@/components/ui/Screen.astro';
+ import ScreenRail from '@/components/ui/ScreenRail.astro';
+ import Segmented from '@/components/ui/Segmented.astro';
+-import AirKey from '@/components/art/AirKey.astro';
+ import AirRange from '@/components/art/AirRange.astro';
+ import ApproachPlan from '@/components/art/ApproachPlan.astro';
+ import BodyFigure from '@/components/art/BodyFigure.astro';
+@@ -184,7 +183,6 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
+           </TailpipeMarks>
+         </div>
+         <IllustrationTag locale={locale} />
+-        <div class="h-pic__ctl"><AirKey locale={locale} tap layout="row" class="h-key" /></div>
+       </div>
+       <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="recipe" title={t.s2.sheet.title} facts={['iarc-benzene-group1', 'who-benzene-no-safe-level', 'co-odourless']}>
+         <p slot="block1">{fill(t.s2.sheet.measured, { readings: F.readings })}</p>
+diff --git a/src/styles/art.css b/src/styles/art.css
+index 81d60df..b809283 100644
+--- a/src/styles/art.css
++++ b/src/styles/art.css
+@@ -270,8 +270,10 @@
+  *   - over a core it is not, so every ring carries a 1 px halo in the colour
+  *     of the paper (--air-halo): ring against halo, and halo against the
+  *     core, are both well over 3:1. On plain paper the halo cannot be seen.
+- * In the dark theme the paper is dark, so the plume is a pale smoky haze instead
+- * of going dark, the rings turn pale blue and the halo is the dark paper.
++ * In the dark theme the paper is dark, so the plume is a muted grey-brown smoke, a
++ * little lighter than the street but never pale enough to glow like a lamp (trial C),
++ * and its ribbons stay orange; the rings (only the film, the counting patch and two
++ * pictures not yet reworked still draw them) turn pale blue and the halo is the dark paper.
+  */
+ :root {
+   --air-ring: #1f5fa6;
+@@ -288,11 +290,11 @@
+   :root:not([data-theme='light']) {
+     --air-ring: #93c5f4;
+     --air-dot: #e6d3b8;
+-    --air-rib: #c9ad8a;
+-    --air-wash: #9a8771;
+-    --air-core: #c9b8a3;
+-    --air-core-mid: #a39079;
+-    --air-core-far: #7a6a59;
++    --air-rib: #dc9850;
++    --air-wash: #8f7a66;
++    --air-core: #9f8670;
++    --air-core-mid: #7c6856;
++    --air-core-far: #574a3e;
+     --air-tyre: #9aa5aa;
+     --art-mask: #27434c;
+     --art-mask-cloth: #6d4320;
+@@ -309,11 +311,11 @@
+   .tone-inverse {
+     --air-ring: #93c5f4;
+     --air-dot: #e6d3b8;
+-    --air-rib: #c9ad8a;
+-    --air-wash: #9a8771;
+-    --air-core: #c9b8a3;
+-    --air-core-mid: #a39079;
+-    --air-core-far: #7a6a59;
++    --air-rib: #dc9850;
++    --air-wash: #8f7a66;
++    --air-core: #9f8670;
++    --air-core-mid: #7c6856;
++    --air-core-far: #574a3e;
+     --air-tyre: #9aa5aa;
+     --art-mask: #27434c;
+     --art-mask-cloth: #6d4320;
+@@ -737,6 +739,20 @@ html:not(.js) .air-key--tap .air-key__item {
+   cursor: default;
+ }
+ 
++/* G2 close-up of the fume (TailpipeMarks): the panel is the same fume, opened up into three bands */
++.tm-paper { fill: var(--here, var(--bg)); }
++.tm-fume { fill: var(--air-core-mid); opacity: 0.34; }
++.tm-puff { fill: var(--air-core-mid); opacity: 0.4; }
++.tm-band--clear { fill: var(--here, var(--bg)); opacity: 0.62; }
++.tm-band--soot { fill: var(--air-core); opacity: 0.6; }
++.tm-cut { fill: none; stroke: var(--here, var(--bg)); stroke-width: 2.5; }
++.tm-frame { fill: none; stroke: var(--ink-2); stroke-width: 1.5; }
++.tm-call { fill: none; stroke: var(--ink-2); stroke-width: 1.2; stroke-dasharray: 4 3; }
++.tm-lens { fill: color-mix(in srgb, var(--here, var(--bg)) 12%, transparent); stroke: var(--ink); stroke-width: 4; }
++.tm-handle { fill: none; stroke: var(--ink); stroke-width: 7; stroke-linecap: round; }
++.tm-title { font-weight: 800; }
++.tm-name { font-size: var(--fs-sm, 0.9375rem); }
++
+ .tm-head {
+   display: flex;
+   align-items: center;
+@@ -1241,7 +1257,18 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checke
+  * the picture draws for it, so the number and the rings visibly match. 街上原本就有 has no ring:
+  * the street's own air is not drawn (the tag under the picture says so).
+  */
+-.est--ring .est__label::before,
++/* trial C: beside the number box's line the pictures draw no rings, so the line carries a small
++   puff of the same fume instead: the number is what the fumes in the picture stand for */
++.est--ring .est__label::before {
++  content: '';
++  display: inline-block;
++  inline-size: 1.5em;
++  block-size: 0.9em;
++  margin-inline-end: 0.3em;
++  vertical-align: -0.05em;
++  border-radius: 50%;
++  background: radial-gradient(ellipse closest-side at 35% 55%, var(--air-core) 0 30%, color-mix(in srgb, var(--air-core-mid) 70%, transparent) 62%, transparent 100%);
++}
+ .hud__row--est .hud__name::before {
+   content: '';
+   display: inline-block;

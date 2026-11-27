@@ -1,0 +1,9 @@
+window 30.0-64.0 s, 2187 samples; target U 0.8 m/s, inflow 1.064 m/s, turbulence {'type': 'ou', 'sigma_h': 0.36000000000000004, 'sigma_w': 0.21600000000000003, 'T_h': 5.0, 'T_w': 1.5, 'seed': 20261127}
+probe                 U_along  sig_v  sig_w  sig_v/U sig_w/U
+IN up=1.5 h=0.7      dir   -6.2   1.251  0.236  0.109    0.19    0.09
+IN up=1.5 h=1.5      dir   -8.1   1.176  0.265  0.135    0.23    0.11
+IN up=1.5 h=3.0      dir   -6.5   1.075  0.220  0.154    0.21    0.14
+IN up=6.0 h=0.7      dir  -14.8   1.144  0.222  0.092    0.19    0.08
+IN up=6.0 h=1.5      dir  -15.6   1.076  0.223  0.130    0.21    0.12
+IN up=6.0 h=3.0      dir  -16.0   1.013  0.219  0.170    0.22    0.17
+A6 targets: U within +-10 %; sigma_v/U 0.3-0.6, sigma_w/U 0.2-0.35 (or floors 0.2 / 0.1 m/s when U <= 0.5)

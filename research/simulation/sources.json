@@ -1,0 +1,204 @@
+{
+ "generated": "2026-11-27",
+ "note": "New sources opened by the inputs-and-references job of the simulation work. Existing ids are in research/estimate/sources.json; ids like 'redlight/smell-chemistry:x' refer to findings in other project files. Downloads were saved outside the repo (scratchpad run/dl).",
+ "sources": [
+  {
+   "id": "liu-chan-jeng-1994",
+   "citation": "Liu J-J, Chan C-C, Jeng F-T (1994). Predicting personal exposure levels to carbon monoxide (CO) in Taipei, based on actual CO measurements in microenvironments and a Monte Carlo simulation method. Atmospheric Environment 28(14):2361-2368.",
+   "url": "https://scholars.lib.ntu.edu.tw/bitstreams/e7770098-b91d-4087-9515-a45a44fb0089/download",
+   "opened": "full text PDF; Table 2 and methods (Dec 1989-Feb 1991 surveys)",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "kuo-2000",
+   "citation": "Kuo H-W, Wei H-C, Liu C-S, Lo Y-Y, Wang W-C, Lai J-S, Chan C-C (2000). Exposure to volatile organic compounds while commuting in Taichung, Taiwan. Atmospheric Environment 34:3331-3336.",
+   "url": "https://scholars.lib.ntu.edu.tw/bitstreams/24858b69-4202-4753-9aed-e1291c87ce88/download",
+   "opened": "full text PDF; abstract and introduction (cites Chan 1994 benzene 384 ug/m3)",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "chan-burnett-chow-1997",
+   "citation": "Chan MY, Burnett J, Chow WK (1997). Personal exposure to carbon monoxide in underground car parks in Hong Kong. Indoor and Built Environment 6:350-357.",
+   "url": "https://www.aivc.org/sites/default/files/airbase_10979.pdf",
+   "opened": "full text PDF (scan); results paragraph and criteria",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "hung-2011",
+   "citation": "Hung WT, Tseng CH, Chiang CH (2011). The indoor air quality and exposure health effects in underground parking lots. Proc. 104th A&WMA Annual Conference, pp. 1792-1805.",
+   "url": "https://ntut.elsevierpure.com/en/publications/the-indoor-air-quality-and-exposure-health-effects-in-underground/",
+   "opened": "abstract page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "who-2010-iaq",
+   "citation": "WHO Regional Office for Europe (2010). WHO guidelines for indoor air quality: selected pollutants. Copenhagen.",
+   "url": "https://www.afro.who.int/sites/default/files/2017-06/e94535.pdf",
+   "opened": "full PDF; executive summary guideline table, CO chapter Table 2.2",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "nagata-2003",
+   "citation": "Nagata Y. Measurement of odor threshold by triangle odor bag method. Japan Environmental Sanitation Center (in Odor Measurement Review, Ministry of the Environment, Japan).",
+   "url": "https://www.env.go.jp/content/900450144.pdf",
+   "opened": "full PDF; Table 2 and Table 4",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "api-1995-odour",
+   "citation": "American Petroleum Institute (1995). Odor threshold studies performed with gasoline and gasoline combined with MTBE, ETBE and TAME. API Pub. 4592 (EPA HERO 1248100).",
+   "url": "https://hero.epa.gov/hero/index.cfm/reference/details/reference_id/1248100",
+   "opened": "HERO record with abstract values",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "epa-ap122-1973",
+   "citation": "US EPA Air Pollution Technical Information Center (1973). Air Pollution Translations: A Bibliography with Abstracts, Vol. 4 (AP-122), ERIC ED099195. Contains abstracts of: Aktiebolaget Atomenergi Rept BIL-32 (1970), odour intensity of exhaust from combustion engines; Fiala E, Zeschmann E-G (1967) Laestigkeit von Abgasgeruch, VDI-Z 109:1139-1141.",
+   "url": "https://files.eric.ed.gov/fulltext/ED099195.pdf",
+   "opened": "full PDF; the two abstracts",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "dk-epa-odour",
+   "citation": "Danish Environmental Protection Agency. Industrial odour control, chapter 4: Measurement of odour.",
+   "url": "https://www2.mst.dk/udgiv/publications/2002/87-7972-297-0/html/kap04_eng.htm",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "rungratanaubon-2007",
+   "citation": "Rungratanaubon T, Panich N (2007). Benzene, toluene and xylene in exhaust from motorcycles. Research and Development Journal of the Engineering Institute of Thailand 18(3).",
+   "url": "https://ph02.tci-thaijo.org/index.php/eit-researchjournal/article/download/142669/105631/379648",
+   "opened": "full PDF; Tables 1-4, methods",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "vojtisek-lom-2020",
+   "citation": "Vojtisek-Lom M et al. (2020). A miniature PEMS for real-driving monitoring of motorcycles. Atmos. Meas. Tech. 13:5827-5843.",
+   "url": "https://amt.copernicus.org/articles/13/5827/2020/",
+   "opened": "article web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "ghafori-2016",
+   "citation": "Ghafori S, Khavanin A, Assilean H, Solimanian A (2016). Flexible joint in the exhaust pipe and braided wire damper in muffler on the sound emitted by the CG125 motorcycle exhaust. Health Scope 5(3):e24154.",
+   "url": "https://brieflands.com/articles/healthscope-20119.html",
+   "opened": "article web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "ning-2005",
+   "citation": "Ning Z, Cheung CS, Lu Y, Liu MA, Hung WT (2005). Experimental and numerical study of the dispersion of motor vehicle pollutants under idle condition. Atmospheric Environment 39(40):7880-7893.",
+   "url": "https://research.polyu.edu.hk/en/publications/experimental-and-numerical-study-of-the-dispersion-of-motor-vehic/",
+   "opened": "abstract page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "tti-2024",
+   "citation": "Wu G, Zhao X, Liao Y, Venkatram A, Hao P, Boriboonsomsin K (2024). Enhancing the modeling of emission dispersion from idling and slowly moving trucks. CARTEEH UTC report 05-58-UCR.",
+   "url": "https://chem.tti.tamu.edu/wp-content/uploads/2024/10/Enhancing-the-Modeling-of-Emission-Dispersion-from-Idling-and-Slowly-Moving-Trucks.pdf",
+   "opened": "full PDF; field-experiment section",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "hwa-2002",
+   "citation": "Hwa M-Y, Hsieh C-C, Wu T-C, Chang L-F W (2002). Real-world vehicle emissions and VOCs profile in the Taipei tunnel. Atmospheric Environment 36:1993-2002.",
+   "url": "https://scholars.lib.ntu.edu.tw/bitstream/123456789/76886/1/06.pdf",
+   "opened": "full PDF; confirms the highway tunnel excludes motorcycles (not used for values)",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "epa-aegl-co",
+   "citation": "US EPA. Carbon monoxide results, AEGL Program (final). Snapshot 19 Jan 2021.",
+   "url": "https://19january2021snapshot.epa.gov/aegl/carbon-monoxide-results-aegl-program_.html",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "epa-aegl-benzene",
+   "citation": "US EPA. Benzene results, AEGL Program (interim 12/12/06). Snapshot 19 Jan 2025.",
+   "url": "https://19january2025snapshot.epa.gov/aegl/benzene-results-acute-exposure-guideline-levels-aegl-program",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "epa-aegl-formaldehyde",
+   "citation": "US EPA. Formaldehyde results, AEGL Program (interim 12/12/06). Snapshot 19 Jan 2021.",
+   "url": "https://19january2021snapshot.epa.gov/aegl/formaldehyde-results-aegl-program_.html",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "epa-aegl-acetaldehyde",
+   "citation": "US EPA. Acetaldehyde results, AEGL Program (interim 11/30/06). Snapshot 19 Jan 2021.",
+   "url": "https://19january2021snapshot.epa.gov/aegl/acetaldehyde-results-aegl-program_.html",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "arb-oehha-rel-2025",
+   "citation": "California Air Resources Board. OEHHA/ARB approved health values, Table 2 acute RELs and 8-hour RELs (last updated 18 July 2025).",
+   "url": "https://ww2.arb.ca.gov/sites/default/files/classic/toxics/healthval/totables07182025.pdf",
+   "opened": "full PDF (text extracted); acute and 8-h tables and notes on averaging period",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "niosh-npg-co",
+   "citation": "NIOSH Pocket Guide to Chemical Hazards: Carbon monoxide.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0105.html",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "niosh-npg-benzene",
+   "citation": "NIOSH Pocket Guide to Chemical Hazards: Benzene.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0049.html",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "niosh-npg-formaldehyde",
+   "citation": "NIOSH Pocket Guide to Chemical Hazards: Formaldehyde.",
+   "url": "https://www.cdc.gov/niosh/npg/npgd0293.html",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "osha-gasoline",
+   "citation": "OSHA Occupational Chemical Database: Gasoline.",
+   "url": "https://www.osha.gov/chemicaldata/701",
+   "opened": "web page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "tw-iaq-standard-2012",
+   "citation": "室內空氣品質標準 (Indoor Air Quality Standards), MOENV, 2012-11-23, art. 2.",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=O0130005",
+   "opened": "law text page",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "openfoam-com-v2506-deb",
+   "citation": "OpenCFD Ltd. OpenFOAM v2506 (openfoam2506 Debian/Ubuntu package, build 2506.260127-1) and the repository set-up script add-debian-repo.sh.",
+   "url": "https://dl.openfoam.com/add-debian-repo.sh",
+   "opened": "the repository script (read before use: it adds pubkey https://dl.openfoam.com/pubkey.gpg and 'deb https://dl.openfoam.com/repos/deb <codename> main'); apt package index for noble listed openfoam2006 ... openfoam2606; installed openfoam2506 and openfoam2506-tutorials",
+   "used_for": "the CFD solver (buoyantPimpleFoam, WALE LES, turbulentDFSEMInlet, scalarTransport, probes, surfaceFieldValue, volFieldValue)",
+   "date": "2026-11-27"
+  },
+  {
+   "id": "openfoam-v2506-tutorials",
+   "citation": "OpenFOAM v2506 tutorials, installed locally: heatTransfer/buoyantPimpleFoam/hotRoom; compressible/rhoPimpleFoam/RAS/mixerVessel2D (system/scalarTransport); incompressible/pimpleFoam/LES/planeChannel (setups.orig/DFSEM/0.orig/U); compressible/rhoSimpleFoam/gasMixing/injectorPipe (controlDict).",
+   "url": "file:///usr/lib/openfoam/openfoam2506/tutorials",
+   "opened": "the listed dictionaries (thermophysicalProperties, fvSolution, scalarTransport function object, DFSEM inlet syntax)",
+   "used_for": "dictionary syntax of the template case",
+   "date": "2026-11-27"
+  }
+ ],
+ "notOpenedOrBlocked": [
+  "Ding et al. 2023 Atmos. Pollut. Res. doi:10.1016/j.apr.2022.101632 (blocked earlier; not found this time)",
+  "OEHHA allrels web page returned empty; ARB PDF used instead",
+  "Taiwan ambient air quality standard law text (pcode not found); value taken from MOENV annual report as verified earlier",
+  "Chan et al. 1994 Taipei commuter benzene (only as cited by Kuo 2000)",
+  "Singh et al. 1990 Delhi traffic CO; Nagendra & Khare 2003; Tirabassi 1998 Italy (located, not opened)"
+ ]
+}

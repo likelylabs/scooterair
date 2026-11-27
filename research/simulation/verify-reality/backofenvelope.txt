@@ -1,0 +1,21 @@
+1. Exhaust flow from engine arithmetic (125 cc 4-stroke, 1700 rpm, VE 0.2-0.35)
+   VE 0.2: 0.35 L/s intake
+   VE 0.35: 0.62 L/s intake
+   fuel 80 g/h AFR 12: exhaust 2.89e-04 kg/s = 0.25 L/s at 25C
+   fuel 80 g/h AFR 14.7: exhaust 3.49e-04 kg/s = 0.30 L/s at 25C
+   fuel 120 g/h AFR 12: exhaust 4.33e-04 kg/s = 0.37 L/s at 25C
+   fuel 120 g/h AFR 14.7: exhaust 5.23e-04 kg/s = 0.44 L/s at 25C
+   fuel 200 g/h AFR 12: exhaust 7.22e-04 kg/s = 0.61 L/s at 25C
+   fuel 200 g/h AFR 14.7: exhaust 8.72e-04 kg/s = 0.74 L/s at 25C
+2. Raw CO for 16 g/h at 5.5e-4 kg/s: 0.83 %
+   6.5 % CO emitter = 125 g CO/h = 52 % of fuel carbon at 120 g/h (CO/(CO+CO2+HC) ~45 % if carbon sum ~14.5 %)
+   inspection-bin mean CO % (bin mids assumed): 0.85
+3a. S1-from, 12 x 16 g/h, U 0.95, aligned wind, box W 4.5-6 m x H 2-3 m at 4 m: 2.7-5.4 ppm (sim K 4 m 1.5 m P50 3.3)
+3b. Kaohsiung A, 34 x 16 g/h, aligned, U 1.6-2.0, W 9 m, H 2.5 m: centreline 2.9-3.7 ppm; sensor 2.5-5 m to side x0.3-0.5 -> 0.9-1.8 ppm (sim highest 30-s P50 1.33; observed 48-h max 0.8-1.2)
+    at site P5 wind 0.9 m/s the aligned value scales x 2.2
+3c. S4-S5-12 6.5 % emitter at 0.5 m, U 0.5, sigma 0.2 m: centreline 486 ppm; 0.5 m off-axis 21 ppm (sim mean 121)
+3c. S4-S5-12 6.5 % emitter at 0.5 m, U 0.5, sigma 0.3 m: centreline 216 ppm; 0.5 m off-axis 54 ppm (sim mean 121)
+4. Canyon well-mixed (20 m x 12 m section), pack present continuously:
+   N 12 U_along 0.47: 0.41 ppm downstream section mean (sim K 4 m ~0.002-0.003)
+   N 30 U_along 0.3: 1.62 ppm downstream section mean (sim K 4 m ~0.002-0.003)
+5. Pushchair/adult 90-s mean ratio, K d=0.5 dx=0 (from results-simulation.json): S1 0.59, S2 0.74, A 4.3, S1-from 1.8, S5-12 1.4; measured kerb literature 1.1-1.8 (Buzzard 2009, Kenagy 2016, Sharma & Kumar)

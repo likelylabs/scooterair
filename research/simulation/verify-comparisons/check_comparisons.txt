@@ -1,0 +1,67 @@
+Conversions at 25 C: CO 100 mg/m3 = 87.3 ppm; 35 mg/m3 = 30.6 ; OEHHA CO 23 mg/m3 = 20.1 ppm; benzene 27 ug/m3 = 8.45 ppb
+At 30 C (simulated ambient): CO 100 mg/m3 = 88.8 ppm
+
+-- One red contribution: window/T --
+S5-12 d=0.5 h=0.7 dx=0.0 window 60s: CO to 15-min P50 0.7 P95 4.6 ppm; benzene to 1-h P50 0.43 P95 2.13 ppb (OEHHA 8.5)
+S4-S5-12 d=0.5 h=0.7 dx=0.0 window 60s: CO to 15-min P50 8.1 P95 15.3 ppm; benzene to 1-h P50 3.10 P95 7.00 ppb (OEHHA 8.5)
+S1-from d=0.5 h=0.7 dx=0.0 window 90s: CO to 15-min P50 1.1 P95 4.0 ppm; benzene to 1-h P50 0.66 P95 2.35 ppb (OEHHA 8.5)
+S4-S1-from d=0.5 h=0.7 dx=0.0 window 90s: CO to 15-min P50 6.2 P95 11.7 ppm; benzene to 1-h P50 2.50 P95 5.42 ppb (OEHHA 8.5)
+
+-- Stay-through (every red, duty 0.45-0.65), held conditions; NOT a pedestrian case --
+S1-from d=0.5 h=0.7 dx=0.0 CO 1-h P50 5.2-7.5 (vs WHO/TW 31, OEHHA 20) | benzene 1-h P50 11.9-17.2 P95 42-61 ppb (vs OEHHA 8.5)
+S1-from d=1.0 h=1.1 dx=0.0 CO 1-h P50 3.0-4.3 (vs WHO/TW 31, OEHHA 20) | benzene 1-h P50 6.7-9.6 P95 22-32 ppb (vs OEHHA 8.5)
+S4-S1-from d=0.5 h=0.7 dx=0.0 CO 1-h P50 27.8-40.2 (vs WHO/TW 31, OEHHA 20) | benzene 1-h P50 45.0-65.0 P95 98-141 ppb (vs OEHHA 8.5)
+S5-12 d=0.5 h=0.7 dx=0.0 CO 1-h P50 4.6-6.6 (vs WHO/TW 31, OEHHA 20) | benzene 1-h P50 11.6-16.7 P95 58-83 ppb (vs OEHHA 8.5)
+S4-S5-12 d=0.5 h=0.7 dx=0.0 CO 1-h P50 54.5-78.7 (vs WHO/TW 31, OEHHA 20) | benzene 1-h P50 83.7-120.9 P95 189-273 ppb (vs OEHHA 8.5)
+S1-from kerb-line max h0.7 mean {'P5': 11.9, 'P50': 28.3, 'P95': 69.0} -> stay-through P50 12.7 - 18.4 ppm
+
+-- THC highest 1 s at K 0.5 m vs vapour odour threshold 0.47-0.58 ppm --
+  as ppmC at C4.5: 2.11-2.61
+  as ppmC at C5: 2.35-2.90
+  as ppmC at C6: 2.82-3.48
+S1 [('d=0.5 h=0.6 dx=0.0', 2.04), ('d=0.5 h=0.7 dx=0.0', 2.04), ('d=0.5 h=0.8 dx=0.0', 5.13), ('d=0.5 h=1.1 dx=0.0', 6.79), ('d=0.5 h=1.5 dx=0.0', 6.95)]
+S2 [('d=0.5 h=0.6 dx=0.0', 1.66), ('d=0.5 h=0.7 dx=0.0', 1.66), ('d=0.5 h=0.8 dx=0.0', 1.78), ('d=0.5 h=1.1 dx=0.0', 2.31), ('d=0.5 h=1.5 dx=0.0', 2.01)]
+S5-12 [('d=0.5 h=0.6 dx=0.0', 17.4), ('d=0.5 h=0.7 dx=0.0', 17.4), ('d=0.5 h=0.8 dx=0.0', 16.1), ('d=0.5 h=1.1 dx=0.0', 14.6), ('d=0.5 h=1.5 dx=0.0', 9.9)]
+S1-from [('d=0.5 h=0.6 dx=0.0', 12.8), ('d=0.5 h=0.7 dx=0.0', 12.8), ('d=0.5 h=0.8 dx=0.0', 13.1), ('d=0.5 h=1.1 dx=0.0', 13.3), ('d=0.5 h=1.5 dx=0.0', 10.4)]
+A [('d=0.5 h=0.6 dx=0.0', 4.6), ('d=0.5 h=0.7 dx=0.0', 4.6), ('d=0.5 h=0.8 dx=0.0', 4.17), ('d=0.5 h=1.1 dx=0.0', 3.67), ('d=0.5 h=1.5 dx=0.0', 1.9)]
+
+-- Odour: P50 highest-1-s OU and share>=1 at K 0.5 m dx=0 --
+S1 0.7 OU6800 4.8 hcx1 4.52 OU800 0.565 share>=1 (6800) 0.233 (800) 0.0
+S1 1.1 OU6800 15.9 hcx1 15.1 OU800 1.87 share>=1 (6800) 0.289 (800) 0.0667
+S1 1.5 OU6800 16.3 hcx1 15.4 OU800 1.92 share>=1 (6800) 0.244 (800) 0.0222
+S2 0.7 OU6800 4.31 hcx1 4.09 OU800 0.507 share>=1 (6800) 0.111 (800) 0.0
+S2 1.1 OU6800 5.48 hcx1 4.79 OU800 0.644 share>=1 (6800) 0.111 (800) 0.0
+S2 1.5 OU6800 4.86 hcx1 4.07 OU800 0.572 share>=1 (6800) 0.2 (800) 0.0
+S5-12 0.7 OU6800 48.4 hcx1 46.7 OU800 5.7 share>=1 (6800) 0.683 (800) 0.5
+S5-12 1.1 OU6800 40.2 hcx1 38.4 OU800 4.73 share>=1 (6800) 0.767 (800) 0.4
+S5-12 1.5 OU6800 27.2 hcx1 26.1 OU800 3.2 share>=1 (6800) 0.633 (800) 0.45
+S1-from 0.7 OU6800 29.9 hcx1 26.9 OU800 3.51 share>=1 (6800) 0.967 (800) 0.756
+S1-from 1.1 OU6800 31.7 hcx1 28.7 OU800 3.73 share>=1 (6800) 0.844 (800) 0.533
+S1-from 1.5 OU6800 23.5 hcx1 21.0 OU800 2.76 share>=1 (6800) 0.756 (800) 0.356
+
+-- Acetaldehyde-only cross-check of exhaust D/T (assumption-laden) --
+  THC 367 ppm hex, ald 0.5%, acetald 20%: acetaldehyde 0.72 ppm raw -> D/T 479 (Nagata 1.5 ppb)
+  THC 367 ppm hex, ald 0.5%, acetald 30%: acetaldehyde 1.08 ppm raw -> D/T 718 (Nagata 1.5 ppb)
+  THC 367 ppm hex, ald 3.0%, acetald 20%: acetaldehyde 4.31 ppm raw -> D/T 2872 (Nagata 1.5 ppb)
+  THC 367 ppm hex, ald 3.0%, acetald 30%: acetaldehyde 6.46 ppm raw -> D/T 4308 (Nagata 1.5 ppb)
+  THC 526 ppm hex, ald 0.5%, acetald 20%: acetaldehyde 1.03 ppm raw -> D/T 686 (Nagata 1.5 ppb)
+  THC 526 ppm hex, ald 0.5%, acetald 30%: acetaldehyde 1.54 ppm raw -> D/T 1029 (Nagata 1.5 ppb)
+  THC 526 ppm hex, ald 3.0%, acetald 20%: acetaldehyde 6.17 ppm raw -> D/T 4116 (Nagata 1.5 ppb)
+  THC 526 ppm hex, ald 3.0%, acetald 30%: acetaldehyde 9.26 ppm raw -> D/T 6174 (Nagata 1.5 ppb)
+
+-- Odour shares of seconds >=1/5/30 OU (P50 over draws), K d=0.5 dx=0, from results/<case>/stats.json --
+S1 K d=0.5 dx=0.0 h=0.7 OU_hc10_DT800: 1:0.00,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.23,5:0.00,30:0.00
+S1 K d=0.5 dx=0.0 h=1.1 OU_hc10_DT800: 1:0.07,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.29,5:0.10,30:0.00
+S1 K d=0.5 dx=0.0 h=1.5 OU_hc10_DT800: 1:0.02,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.24,5:0.09,30:0.00
+S2 K d=0.5 dx=0.0 h=0.7 OU_hc10_DT800: 1:0.00,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.11,5:0.00,30:0.00
+S2 K d=0.5 dx=0.0 h=1.1 OU_hc10_DT800: 1:0.00,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.11,5:0.01,30:0.00
+S2 K d=0.5 dx=0.0 h=1.5 OU_hc10_DT800: 1:0.00,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.20,5:0.00,30:0.00
+S5-12 K d=0.5 dx=0.0 h=0.7 OU_hc10_DT800: 1:0.50,5:0.07,30:0.00 | OU_hc10_DT6800: 1:0.68,5:0.58,30:0.18
+S5-12 K d=0.5 dx=0.0 h=1.1 OU_hc10_DT800: 1:0.40,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.77,5:0.50,30:0.12
+S5-12 K d=0.5 dx=0.0 h=1.5 OU_hc10_DT800: 1:0.45,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.63,5:0.52,30:0.00
+S1-from K d=0.5 dx=0.0 h=0.7 OU_hc10_DT800: 1:0.76,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.97,5:0.88,30:0.00
+S1-from K d=0.5 dx=0.0 h=1.1 OU_hc10_DT800: 1:0.53,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.84,5:0.66,30:0.01
+S1-from K d=0.5 dx=0.0 h=1.5 OU_hc10_DT800: 1:0.36,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.76,5:0.50,30:0.00
+A K d=0.5 dx=0.0 h=0.7 OU_hc10_DT800: 1:0.13,5:0.00,30:0.00 | OU_hc10_DT6800: 1:1.00,5:0.60,30:0.00
+A K d=0.5 dx=0.0 h=1.1 OU_hc10_DT800: 1:0.03,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.87,5:0.20,30:0.00
+A K d=0.5 dx=0.0 h=1.5 OU_hc10_DT800: 1:0.00,5:0.00,30:0.00 | OU_hc10_DT6800: 1:0.53,5:0.00,30:0.00
