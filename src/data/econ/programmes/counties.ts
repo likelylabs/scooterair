@@ -196,7 +196,7 @@ export const countyProgrammes: Programme[] = [
   table('pingtung', PT, 'pingtung-new', ['屏東縣新購電動機車', 'Pingtung new electric scooter'], 3000, [residency()], ['設籍屏東縣。', 'Registered in Pingtung.'], 'pingtung-new', {
     exclusiveGroups: ['pingtung-base'],
     sources: [...MEID, 'nownews-2026-subsidy-roundup'],
-    note: t('經濟部縣市補助表列3,000元，NOWnews引述縣府圖卡為4,000元；試算採較低的官方表列金額，請向環保局（08-7352068）確認。', 'The MOEA county table says NT$3,000; NOWnews, quoting a county graphic, says NT$4,000. We use the lower official figure; confirm with the bureau (08-7352068).'),
+    note: t('經濟部縣市補助表列3,000元，NOWnews引述縣府圖卡為4,000元；計算採較低的官方表列金額，請向環保局（08-7352068）確認。', 'The MOEA county table says NT$3,000; NOWnews, quoting a county graphic, says NT$4,000. We use the lower official figure; confirm with the bureau (08-7352068).'),
   }),
   table('pingtung', PT, 'pingtung-remote', ['屏東縣偏鄉地區換購加碼', 'Pingtung remote-area replacement'], 0, [residency(), scrap, flag('remoteDistrict')], ['偏鄉地區換購最高15,000元。', 'Up to NT$15,000 for replacement in remote areas.'], 'pingtung-remote', {
     exclusiveGroups: ['pingtung-base'],
@@ -207,7 +207,7 @@ export const countyProgrammes: Programme[] = [
   {
     ...table('pingtung', PT, 'pingtung-scrap-only', ['屏東縣單純淘汰老舊機車', 'Pingtung: scrap a qualifying scooter only (no electric purchase)'], 1500, [residency(), scrap, builtBy('2007-06-30')], ['要報廢的機車須是 2007 年（民國 96 年）6 月 30 日以前出廠的1至4期燃油機車。', 'The scooter you scrap must be a phase 1–4 gasoline scooter built by 30 June 2007.'], 'pingtung-scrap', {
       note: t(
-        '經濟部縣市補助表列1,500元，ETtoday引述縣府為最高2,300元，差額800元原因不明；試算採較低的官方表列金額，請向環保局（08-7352068）確認。',
+        '經濟部縣市補助表列1,500元，ETtoday引述縣府為最高2,300元，差額800元原因不明；計算採較低的官方表列金額，請向環保局（08-7352068）確認。',
         'The MOEA county table says NT$1,500; ETtoday, quoting the county, says up to NT$2,300, and the NT$800 gap is unexplained. We use the lower official figure; confirm with the bureau (08-7352068).',
       ),
     }),

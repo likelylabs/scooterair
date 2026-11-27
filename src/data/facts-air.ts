@@ -43,7 +43,7 @@ export const kerb = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '這是測站一整年的平均，進氣口在離地幾公尺高的地方，不是紅燈時站在機車旁邊那 90 秒的空氣。它告訴我們：街上原本就有多少。',
+      '這是測站一整年的平均，吸空氣的口在離地幾公尺高的地方。它不是紅燈時，站在機車旁邊那 90 秒的空氣。它告訴我們：街上原本就有多少。',
       'These are whole-year averages at station inlets a few metres up, not the air beside a pack of scooters during one 90-second red. They tell us what the street already holds.',
     ),
     chainLink: 3,
@@ -64,8 +64,8 @@ export const kerb = {
     },
     display: t('台北路邊測站 0.80 ppm（2024年）', 'Taipei roadside stations 0.80 ppm (2024)'),
     statement: t(
-      '台北市 3 個交通測站 2024 年的一氧化碳年平均是 0.80 ppm（最高的承德站 0.90，最低的向陽站 0.67），2014 年時是 1.38 ppm；2014 到 2024 年，這 3 站每小時和每 8 小時的一氧化碳都符合空氣品質標準。',
-      "Taipei City's three traffic air-quality stations averaged 0.80 ppm of carbon monoxide in 2024 (from 0.90 at Chengde to 0.67 at Xiangyang), down from 1.38 ppm in 2014; from 2014 to 2024 their hourly and 8-hour carbon monoxide met the air-quality standards every year.",
+      '台北市 3 個交通測站 2024 年的一氧化碳年平均是 0.80 ppm；最高的承德站 0.90，最低的向陽站 0.67。2014 年時是 1.38 ppm。2014 到 2024 年，這 3 站每小時和每 8 小時的一氧化碳，都符合空氣品質標準。',
+      'Taipei City\'s three traffic air-quality stations averaged 0.80 ppm of carbon monoxide in 2024, from 0.90 at Chengde to 0.67 at Xiangyang. That is down from 1.38 ppm in 2014. From 2014 to 2024 their hourly and 8-hour carbon monoxide met the air-quality standards every year.',
     ),
     period: t('2014–2024 年；2024 年年平均', '2014–2024; 2024 annual mean'),
     place: TAIPEI,
@@ -75,7 +75,7 @@ export const kerb = {
     evidence: 'measured-tw',
     caveat: t(
       '測站的進氣口在離地 2.5 到 3.5 公尺，報的是一小時或一整年的平均；它說不出紅燈時、機車旁邊、一公尺以下那一兩分鐘的空氣。',
-      'Station inlets sit 2.5 to 3.5 m up and report hourly or yearly averages; they cannot show the air in the minute or two of a red light, beside the scooters, below one metre.',
+      'Station inlets sit 2.5 to 3.5 m up and report hourly or yearly averages. They cannot show the air in the minute or two of a red light, beside the scooters, below one metre.',
     ),
     chainLink: 3,
     editorNote: `${OPENED} Read from the downloaded PDF text of the report (scratchpad tpe113.txt, extracted from https://www.tldep.gov.taipei/Public/DownLoad/AnnualReport/113.pdf). Compare with WHO values only as a level, never as compliance: a yearly mean is not a WHO averaging time.`,
@@ -92,8 +92,8 @@ export const kerb = {
     },
     display: t('行人大約等 85 到 115 秒', 'pedestrians wait about 85 to 115 seconds'),
     statement: t(
-      '運研所調查的兩個行人專用時相路口，號誌一輪是 120 秒和 150 秒，行人綠燈 34 秒和 38 秒；所以行人每一輪大約要等 86 到 112 秒才能過馬路。',
-      "At the two scramble-crossing junctions the Institute of Transportation surveyed, the signal cycle is 120 and 150 seconds with 34 and 38 seconds of pedestrian green, so pedestrians wait about 86 to 112 seconds each cycle before they can cross.",
+      '運研所調查了兩個行人專用時相的路口。號誌一輪是 120 秒和 150 秒，行人綠燈是 34 秒和 38 秒。所以行人每一輪，大約要等 86 到 112 秒才能過馬路。',
+      'The Institute of Transportation surveyed two scramble-crossing junctions. The signal cycle is 120 and 150 seconds, with 34 and 38 seconds of pedestrian green. So pedestrians wait about 86 to 112 seconds each cycle before they can cross.',
     ),
     period: t('2023–2024 年調查的時制計畫', 'Signal plans surveyed 2023–2024'),
     place: t('台北市忠孝東路／昆陽街、高雄市高鐵路／重信路', 'Zhongxiao E Rd / Kunyang St, Taipei; Gaotie Rd / Chongxin Rd, Kaohsiung'),
@@ -120,8 +120,8 @@ export const kerb = {
     },
     display: t('小孩每公斤吸的空氣是大人的 1.5 到 2 倍', 'per kilogram, children breathe 1.5 to 2 times the air an adult does'),
     statement: t(
-      '美國環保署的暴露參數手冊列出，照體重算，1 到 10 歲小孩每天吸進的空氣，是 30 多歲大人的 1.5 到 2 倍；年紀越小，倍數越大。',
-      "The US EPA's Exposure Factors Handbook shows that, for their body weight, children aged 1 to 10 breathe 1.5 to 2 times as much air a day as adults in their thirties; the younger the child, the bigger the difference.",
+      '美國環保署有一本手冊，列出人每天吸多少空氣等數字（英文名叫 Exposure Factors Handbook）。照體重算，1 到 10 歲小孩每天吸進的空氣，是 30 多歲大人的 1.5 到 2 倍。年紀越小，倍數越大。',
+      'A US EPA handbook lists figures such as how much air people breathe each day. It shows that, for their body weight, children aged 1 to 10 breathe 1.5 to 2 times as much air a day as adults in their thirties. The younger the child, the bigger the difference.',
     ),
     period: t('2011 年版手冊（資料來源 Brochu 等，2006）', '2011 handbook (data from Brochu et al. 2006)'),
     place: NOT_PLACE,
@@ -132,7 +132,7 @@ export const kerb = {
     readerPlace: 'international',
     caveat: t(
       '這是一整天平均的呼吸量，以美國的資料算出，不是在路口量的；它說的是小孩照體重吸進比較多空氣，不是小孩高度的空氣比較髒。',
-      'These are whole-day average breathing rates from US data, not readings taken at a junction; they say children take in more air for their weight, not that the air at a child\'s height is dirtier.',
+      'These are whole-day average breathing rates from US data, not readings taken at a junction. They say children take in more air for their weight, not that the air at a child\'s height is dirtier.',
     ),
     chainLink: 6,
     editorNote: `${OPENED} Ratios are our arithmetic on Table 6-7 means, rounded to 1.5 and 2. Never print 1.7–2.2 (that multiplied this by an unpublished height factor). Chip: 研究・國際.`,
@@ -142,7 +142,7 @@ export const kerb = {
     data: {},
     display: t('會刺激眼睛和呼吸道', 'irritates the eyes and airways'),
     statement: t(
-      '美國環保署說明，短時間吸到乙醛（機車廢氣刺鼻味道最可能的來源），主要的影響是刺激眼睛、皮膚和呼吸道。',
+      '美國環保署說明，短時間吸到乙醛，主要的影響是刺激眼睛、皮膚和呼吸道。機車廢氣刺鼻的味道，最可能就是乙醛。',
       'The US EPA states that the main short-term effect of breathing acetaldehyde, the likeliest source of the sharp smell in scooter exhaust, is irritation of the eyes, skin and airways.',
     ),
     period: t('美國環保署危害摘要（2016 年上線版本）', 'US EPA hazard summary (2016 online version)'),
@@ -154,8 +154,8 @@ export const kerb = {
     readerKind: 'official',
     readerPlace: 'abroad',
     caveat: t(
-      '這是乙醛本身的性質，說的是一般的吸入。路口的乙醛跟著油氣一起排出來；聞得到，表示它就在你身邊，但一個紅燈會不會刺激到，要看濃度，這份資料沒有給。',
-      'This is what acetaldehyde itself does when breathed. At a junction it comes out with the fuel vapour; if you can smell it, it is around you, but whether one red light is enough to irritate depends on the amount, which this source does not give.',
+      '這是乙醛本身的性質，說的是一般的吸入。路口的乙醛，跟著油氣一起排出來。聞得到，表示它就在你身邊。但一個紅燈會不會刺激到，要看空氣裡有多少，這份資料沒有給。',
+      'This is what acetaldehyde itself does when breathed. At a junction it comes out with the fuel vapour; if you can smell it, it is around you. But whether one red light is enough to irritate depends on the amount, which this source does not give.',
     ),
     chainLink: 4,
     editorNote: `${OPENED} Backs home screen 6 pin ①. Word the pin as the smell (油氣和刺鼻的醛類), not as fuel vapour alone: the irritant named by the source is acetaldehyde. Never put a disease name on the pin.`,
@@ -177,7 +177,7 @@ export const kerb = {
     readerKind: 'official',
     readerPlace: 'international',
     caveat: t(
-      '世界衛生組織說的是所有來源的微粒，不是專指機車廢氣，也沒有說要多少量。',
+      '世界衛生組織說的是所有來源的微粒，不是專指機車廢氣。它也沒有說要多少量。',
       'The WHO is describing particles from every source, not scooter exhaust alone, and gives no amount.',
     ),
     chainLink: 4,
@@ -188,8 +188,8 @@ export const kerb = {
     data: {},
     display: t('減少血液能帶的氧氣', 'less oxygen carried in the blood'),
     statement: t(
-      '美國環保署說明，吸到一氧化碳很多的空氣，會減少血液能送到心臟和腦部等器官的氧氣。',
-      'The US EPA states that breathing air with a high concentration of carbon monoxide reduces the amount of oxygen the blood can carry to organs such as the heart and brain.',
+      '美國環保署說明，吸進一氧化碳很多的空氣，血液能送出的氧氣會變少。心臟和腦部等器官，就會拿到比較少的氧氣。',
+      'The US EPA states that breathing air with a lot of carbon monoxide in it reduces the oxygen the blood can carry to organs such as the heart and brain.',
     ),
     period: t('美國環保署說明頁（2026 年 11 月查閱）', 'US EPA information page (read November 2026)'),
     place: NOT_PLACE,
@@ -201,7 +201,7 @@ export const kerb = {
     readerPlace: 'abroad',
     caveat: t(
       '美國環保署說的是一氧化碳很多的時候；路口量到和本站推估的量，都比世界衛生組織的 15 分鐘指引值低很多。',
-      'The US EPA is describing high concentrations; what was measured at Taiwanese junctions and what this site estimates are both far below the WHO 15-minute guideline.',
+      'The US EPA is describing air with a lot of carbon monoxide in it. What was measured at Taiwanese junctions and what this site estimates are both far below the WHO 15-minute guideline.',
     ),
     chainLink: 4,
     editorNote: `${OPENED} Backs home screen 6 pin ③ (一氧化碳從肺進到血液，占掉載氧氣的位子). The pin must not imply harm at kerb levels; its sheet carries this caveat.`,
@@ -218,8 +218,8 @@ export const kerb = {
     },
     display: t('每年約 10 億美元的健康效益（模式）', 'about US$1 billion a year in health benefits (model)'),
     statement: t(
-      '台灣一項模式研究（Liou 與 Wu，2021）估計，燃油機車換成電動機車，每年可以少掉的空氣污染健康損失約 10.09 億美元（約新台幣 300 億元），幾乎都來自少死的人。',
-      'A Taiwanese modelling study (Liou and Wu, 2021) estimated that switching petrol scooters to electric would avoid about US$1,009 million (about NT$30 billion) a year of health harm from air pollution, almost all of it from fewer deaths.',
+      '台灣一項研究用電腦模式推估（Liou 與 Wu，2021），看燃油機車換成電動機車會怎樣。每年可以少掉的空氣污染健康損失，約 10.09 億美元（約新台幣 300 億元）。這幾乎都來自少死的人。',
+      'A Taiwanese modelling study (Liou and Wu, 2021) estimated the effect of switching petrol scooters to electric. It would avoid about US$1,009 million (about NT$30 billion) a year of health harm from air pollution, almost all of it from fewer deaths.',
     ),
     period: t('2021 年發表（空氣品質模式基準年 2016 年）', 'Published 2021 (air-quality model base year 2016)'),
     place: TW,
@@ -228,7 +228,7 @@ export const kerb = {
     confidence: 'verified',
     evidence: 'modelled-tw',
     caveat: t(
-      '這是全國的模式推算，用的是 PM2.5 和會變成 PM2.5 的氣體，不是在路邊量的。論文結論另外寫了一個比較大的總數（21.53 億美元，含溫室氣體），沒有說兩者怎麼對得上。新台幣金額是本站用 1 美元兌 30 元換算的。',
+      '這是全國的電腦模式推算，用的是 PM2.5 和會變成 PM2.5 的氣體，不是在路邊量的。論文結論另外寫了一個比較大的總數：21.53 億美元，含溫室氣體。論文沒有說兩者怎麼對得上。新台幣金額，是本站用 1 美元兌 30 元換算的。',
       'A national model built on PM2.5 and the gases that turn into it, not a measurement at the kerb. The paper\'s conclusion gives a larger total (US$2,153 million, including greenhouse gases) and does not explain how the two fit together. The NT$ figure is our conversion at NT$30 to the dollar.',
     ),
     requiresCaveat: true,
@@ -245,8 +245,8 @@ export const kerb = {
     },
     display: t('排最多的一成，約占三分之一', 'the highest tenth carry about a third'),
     statement: t(
-      '2025 年全台約 907 萬筆機車定檢讀數裡，一氧化碳讀數排最多的一成，占了所有讀數一氧化碳加起來的約 30% 到 45%，大約三分之一。',
-      "Of about 9.07 million scooter inspection readings in Taiwan in 2025, the highest tenth for carbon monoxide account for about 30% to 45% of the carbon monoxide in all readings combined: about a third.",
+      '2025 年全台約有 907 萬筆機車定檢讀數。一氧化碳讀數排最多的一成，占了全部一氧化碳的約 30% 到 45%，大約三分之一。',
+      'Taiwan had about 9.07 million scooter inspection readings in 2025. The highest tenth for carbon monoxide account for about 30% to 45% of the carbon monoxide in all readings combined: about a third.',
     ),
     period: t('2025 年（民國 114 年）', '2025'),
     place: TW,
@@ -256,8 +256,8 @@ export const kerb = {
     evidence: 'derived',
     derivedFrom: ['inspection-2025'],
     caveat: t(
-      '這是定檢時的怠速讀數，算的是讀數不是車（沒過再來驗的也算一次），而且只有來檢驗、出廠滿 5 年的車；範圍是因為最低那一組讀數的平均值要用假設的。',
-      'These are idle readings at inspection, counted per reading not per scooter (a retest counts again), and only for scooters five or more years old that came in; the range comes from an assumed average for the lowest group of readings.',
+      '這是定檢時的怠速讀數。算的是讀數，不是車：沒過再來驗的，也算一次。而且只有來檢驗、出廠滿 5 年的車。會有範圍，是因為最低那一組讀數的平均值，要用假設的。',
+      'These are idle readings at inspection, counted per reading, not per scooter: a retest counts again. They cover only scooters five or more years old that came in. The range comes from an assumed average for the lowest group of readings.',
     ),
     requiresCaveat: true,
     chainLink: 1,
@@ -269,7 +269,7 @@ export const kerb = {
     data: { highestMicroenvironmentMean: v(53.9, 'ug/m3', { note: 'Bandung, "other" microenvironment; abstract "up to 53.9"' }) },
     display: t('騎機車和走路的那一段最高（國外）', 'the scooter or walking leg was highest (abroad)'),
     statement: t(
-      '在印尼萬隆和尼泊爾加德滿都，孩子自己背的感測器顯示，上學、放學的路上，坐機車和走路的那一段，吸到的 PM2.5 最高。',
+      '在印尼萬隆和尼泊爾加德滿都，孩子自己背著感測器。結果顯示，上學、放學的路上，坐機車和走路的那一段，吸到的 PM2.5 最高。',
       "In Bandung, Indonesia and Kathmandu, Nepal, sensors the children carried showed that on the way to and from school, travelling by scooter or on foot came with the highest PM2.5.",
     ),
     period: t('2026 年發表', 'Published 2026'),
@@ -299,7 +299,7 @@ export const masks = {
     data: {},
     display: t('連 N95 都擋不住氣體', 'not even an N95 stops gases'),
     statement: t(
-      '美國職業安全衛生研究所（NIOSH）說明，N95 這類口罩只過濾微粒，擋不住一氧化碳這類氣體，也擋不住汽油、溶劑的蒸氣；醫用口罩和布口罩同樣只擋微粒和飛沫，沒有吸附氣體的材料。',
+      '美國職業安全衛生研究所（NIOSH）說明：N95 這類口罩只過濾微粒。它擋不住一氧化碳這類氣體，也擋不住汽油、溶劑的蒸氣。醫用口罩和布口罩，同樣只擋微粒和飛沫，沒有吸附氣體的材料。',
       'The US occupational-safety institute NIOSH states that N95-type respirators filter particles only: they do not protect against gases such as carbon monoxide, or vapours such as petrol and solvents. Surgical and cloth masks are likewise particle and droplet barriers with no gas-absorbing layer.',
     ),
     period: t('NIOSH 網頁 2026 年更新；2022 年手冊', 'NIOSH pages updated 2026; 2022 guide'),
@@ -311,7 +311,7 @@ export const masks = {
     readerKind: 'official',
     readerPlace: 'abroad',
     caveat: t(
-      '這是官方說明口罩材料的性質，不是在台灣街頭量的；醫用口罩、布口罩的部分是我們依此推論。工業用的全面罩防毒面具加濾罐可以處理一氧化碳，但日常口罩都不是這種。',
+      '這是官方說明口罩材料的性質，不是在台灣街頭量的。醫用口罩、布口罩的部分，是我們照這個推論的。工業用的全面罩防毒面具加濾罐，可以處理一氧化碳。但日常口罩都不是這種。',
       'An official statement about what the filter is, not a measurement on a Taiwanese street; the part about surgical and cloth masks is our reasoning from it. Full-face gas masks with a canister do exist for carbon monoxide; no everyday mask is one.',
     ),
     chainLink: 3,
@@ -329,8 +329,8 @@ export const masks = {
     },
     display: t('未認證的活性碳口罩不到 10 分鐘就穿透一半', 'unapproved carbon masks: half the vapour through in under 10 minutes'),
     statement: t(
-      '美國一項實驗室測試發現，拋棄式活性碳口罩只能短時間吸住一些溶劑蒸氣：兩款沒有認證的，不到 10 分鐘就有一半蒸氣穿過去；一款經過 NIOSH 認證的，擋丙酮約 2 到 4 小時。三款擋氨氣，都在約 10 分鐘內失效；空氣潮濕時，時間最多少 70%。',
-      'A US laboratory test found that disposable activated-carbon masks soak up some solvent vapour only briefly: two unapproved models let half the vapour through in under 10 minutes, and one NIOSH-approved model lasted about 2 to 4 hours on acetone; all three failed against ammonia within about 10 minutes, and humid air cut the time by up to 70%.',
+      '美國一項實驗室測試發現，拋棄式活性碳口罩只能短時間吸住一些溶劑蒸氣。兩款沒有認證的，不到 10 分鐘就有一半蒸氣穿過去。一款經過 NIOSH 認證的，擋丙酮約 2 到 4 小時。三款擋氨氣，都在約 10 分鐘內失效。空氣潮濕時，時間最多少 70%。',
+      'A US laboratory test found that disposable activated-carbon masks soak up some solvent vapour only briefly. Two unapproved models let half the vapour through in under 10 minutes. One NIOSH-approved model lasted about 2 to 4 hours on acetone. All three failed against ammonia within about 10 minutes, and humid air cut the time by up to 70%.',
     ),
     period: t('2019 年發表', 'Published 2019'),
     place: t('美國（實驗室）', 'USA (laboratory)'),
@@ -339,7 +339,7 @@ export const masks = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '這是三款口罩在實驗室用丙酮、四氯乙烯和氨氣測的，不是用苯或真正的廢氣；活性碳抓不住一氧化碳。台灣空氣潮濕，碳層會更快失效。我們只讀了摘要。',
+      '這是三款口罩在實驗室用丙酮、四氯乙烯和氨氣測的。不是用苯或真正的廢氣。活性碳抓不住一氧化碳。台灣空氣潮濕，碳層會更快失效。我們只讀了摘要。',
       'A laboratory test of three masks with acetone, perchloroethylene and ammonia, not benzene or real exhaust; carbon does not hold carbon monoxide. Taiwan\'s humid air makes the carbon run out faster. We read only the abstract.',
     ),
     chainLink: 3,
@@ -355,8 +355,8 @@ export const masks = {
     },
     display: t('10 款活性碳口罩，沒有一款達到標準（2005年）', '0 of 10 carbon masks met the standard (2005)'),
     statement: t(
-      '2005 年，勞委會勞工安全衛生研究所（現在屬於勞動部）測了 10 款拋棄式活性碳口罩。國家標準要求能擋有機溶劑的蒸氣 15 分鐘，沒有一款做到。正式的活性碳濾罐，可以撐 300 分鐘以上。',
-      "In 2005 the labour ministry's occupational-safety institute tested 10 disposable activated-carbon masks: none met the national standard of 15 minutes' protection against organic solvent vapour, while a proper carbon cartridge lasted over 300 minutes.",
+      '2005 年，勞委會勞工安全衛生研究所測了 10 款拋棄式活性碳口罩。這個研究所現在屬於勞動部。國家標準要求能擋有機溶劑的蒸氣 15 分鐘，沒有一款做到。正式的活性碳濾罐，可以撐 300 分鐘以上。',
+      'In 2005 the labour ministry\'s occupational-safety institute tested 10 disposable activated-carbon masks. None met the national standard of 15 minutes\' protection against organic solvent vapour. A proper carbon cartridge lasted over 300 minutes.',
     ),
     period: t('2005 年 7 月 26 日新聞稿', 'Press release, 26 July 2005'),
     place: TW,
@@ -384,11 +384,11 @@ export const masks = {
     },
     display: t('醫用口罩：約四分之一的細微粒還是吸進去', 'surgical mask: about a quarter of fine particles still get in'),
     statement: t(
-      '荷蘭一項研究讓真人戴口罩來測。對 0.02 到 1 微米的細微粒，醫用口罩只把吸進去的量降到約四分之一，布口罩約降到四成。大人戴 FFP2（歐洲的 N95）好得多，但小孩戴，效果差很多。',
-      'In a Dutch study of masks worn by real people, a surgical mask cut fine particles (0.02 to 1 micrometre) to about a quarter of what got in without it, and a cloth mask to about 40%; an FFP2 respirator (the European N95) did far better on adults, but much less well on children.',
+      '荷蘭一項研究讓真人戴口罩來測，看 0.02 到 1 微米的細微粒。醫用口罩只把吸進去的量降到約四分之一，布口罩約降到四成。大人戴 FFP2（歐洲的 N95）好得多，但小孩戴，效果差很多。',
+      'A Dutch study tested masks worn by real people, looking at fine particles of 0.02 to 1 micrometre. A surgical mask cut what got in to about a quarter of what got in without it, and a cloth mask to about 40%. An FFP2 respirator (the European N95) did far better on adults, but much less well on children.',
     ),
     period: t('2008 年發表', 'Published 2008'),
-    place: t('荷蘭（28 位成人、11 位 5 到 11 歲小孩）', 'Netherlands (28 adults, 11 children aged 5 to 11)'),
+    place: t('荷蘭（28 位大人、11 位 5 到 11 歲小孩）', 'Netherlands (28 adults, 11 children aged 5 to 11)'),
     sources: ['vandersande-2008-plosone'],
     locator: 'Table 1, "no activity" column (median, IQR): surgical 4.1 / 3.2, tea cloth 2.5 / 2.2, FFP2 113 (26–210) / 18 (6.1–165); Methods: Portacount 0.02–1 µm. Re-opened 2026-11-26.',
     confidence: 'verified',
@@ -414,7 +414,7 @@ export const masks = {
     display: t('醫用口罩 2.3、頭帶式 N95 12.2（比較用的分數）', 'medical mask 2.3, headband N95 12.2 (comparative score)'),
     statement: t(
       '勞動部勞動及職業安全衛生研究所找 70 位大人實測。平均的防護分數：頭帶式 N95 是 12.2，耳掛式 N95 是 5.2，戴兩層醫用口罩 3.3，一般醫用口罩 2.3。70 人裡，只有 1 人戴耳掛式 N95 能通過密合測試。',
-      "Taiwan's labour-ministry occupational-safety institute tested 70 adults. Mean protection scores: headband N95 12.2, ear-loop N95 5.2, two medical masks 3.3, one ordinary medical mask 2.3; only 1 of the 70 got a proper seal with an ear-loop N95.",
+      'Taiwan\'s labour-ministry occupational-safety institute tested 70 adults. Mean protection scores: headband N95 12.2, ear-loop N95 5.2, two medical masks 3.3, one ordinary medical mask 2.3. Only 1 of the 70 got a proper seal with an ear-loop N95.',
     ),
     period: t('2023 年 8 月 22 日新聞稿（111 年度研究）', 'Press release, 22 August 2023 (2022 study)'),
     place: TW,
@@ -423,7 +423,7 @@ export const masks = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '新聞稿沒有說明分數怎麼量、用多大的微粒，所以只能拿來比較不同口罩，不能當成百分比。',
+      '新聞稿沒有說明分數怎麼量、用多大的微粒。所以它只能拿來比較不同口罩，不能當成百分比。',
       'The press release does not say how the score was measured or with which particle sizes, so it compares masks with each other; it is not a percentage.',
     ),
     requiresCaveat: true,
@@ -441,8 +441,8 @@ export const masks = {
     },
     display: t('醫用口罩對超細微粒約擋三到六成', 'surgical mask stops about 30–60% of ultrafine particles'),
     statement: t(
-      '美國一項用假人頭的測試，口罩照一般人的戴法戴上：對 10 到 200 奈米的超細微粒，醫用口罩對最小的約擋六成，對比較大的約擋三成；布口罩平均約擋兩成；沒做密合測試的 N95，平均約擋八成四。',
-      'In a US manikin test with masks worn the way the public wears them, a surgical mask stopped about 60% of the smallest ultrafine particles (10 nanometres) and about 30% of the largest (200 nanometres); a cloth mask about 20% on average; an N95 without a fit test about 84%.',
+      '美國一項測試用假人頭，口罩照一般人的戴法戴上，測 10 到 200 奈米的超細微粒。醫用口罩對最小的約擋六成，對比較大的約擋三成。布口罩平均約擋兩成。沒做密合測試的 N95，平均約擋八成四。',
+      'A US test used a manikin head with masks worn the way the public wears them. A surgical mask stopped about 60% of the smallest ultrafine particles (10 nanometres) and about 30% of the largest (200 nanometres). A cloth mask stopped about 20% on average. An N95 without a fit test stopped about 84%.',
     ),
     period: t('2021年發表', 'Published 2021'),
     place: t('美國（實驗室）', 'USA (laboratory)'),
@@ -467,7 +467,7 @@ export const masks = {
     display: t('3% 到 68% 從邊緣漏進來', '3% to 68% leaked in round the edges'),
     statement: t(
       '北京賣的「防 PM2.5」口罩，濾材本身大多不錯；但志願者戴著呼吸柴油廢氣時，還是有 3% 到 68% 的黑碳微粒漏進來，主要從邊緣；四款裡只有一款漏進來的少於 10%。',
-      'Masks sold in Beijing as "anti-PM2.5" mostly had good filter material, yet when volunteers wore them in diesel exhaust 3% to 68% of the soot still got in, mainly round the edges; only one of four models kept leakage under 10%.',
+      'Masks sold in Beijing as "anti-PM2.5" mostly had good filter material. Yet when volunteers wore them in diesel exhaust, 3% to 68% of the soot still got in, mainly round the edges. Only one of four models kept leakage under 10%.',
     ),
     period: t('2018年發表', 'Published 2018'),
     place: t('英國實驗艙（北京販售的口罩）', 'UK test chamber (masks sold in Beijing)'),
@@ -515,8 +515,8 @@ export const masks = {
     },
     display: t('貼合的防塵口罩：血壓略低', 'a fitted respirator: slightly lower blood pressure'),
     statement: t(
-      '口罩對微粒不是沒用：北京一項試驗中，98 位心臟病患者戴貼合的防塵口罩走路時，血壓略低、心臟負擔較小，比不戴時好一些。',
-      'Masks are not useless against particles: in a Beijing trial, 98 heart patients who walked wearing a well-fitting dust respirator had slightly lower blood pressure and less strain on the heart than when they walked without one.',
+      '口罩對微粒不是沒用。北京一項試驗中，98 位心臟病患者戴貼合的防塵口罩走路。和不戴時比，血壓略低，心臟負擔較小，好一些。',
+      'Masks are not useless against particles. In a Beijing trial, 98 heart patients walked wearing a well-fitting dust respirator. They had slightly lower blood pressure and less strain on the heart than when they walked without one.',
     ),
     period: t('2012 年發表', 'Published 2012'),
     place: t('中國北京', 'Beijing, China'),

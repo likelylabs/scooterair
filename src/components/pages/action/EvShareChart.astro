@@ -80,15 +80,14 @@ render.table = {
   head: [names.year, locale === 'en' ? `${names.actual} (%)` : `${names.actual}（%）`, locale === 'en' ? `${names.target} (%)` : `${names.target}（%）`],
   rows: years
     .map((y, i) => [String(y), actual[i] !== null ? format(actual[i] as number) : '', targetAt(y) !== null ? format(targetAt(y) as number) : ''])
-    // a year with neither a verified figure nor a target is left out, except a gap between the
-    // first and last verified years: that row stays and says the figure could not be verified
+    // a year with neither a verified figure nor a target is left out (the drawn line breaks
+    // there too), so the table holds only years that have something to show
     .filter((r) => {
       const y = Number(r[0]);
-      const inside = y > labels.first.x && y < labels.last.x;
-      return inside || ((r[1] !== '' || r[2] !== '') && (y <= labels.last.x || r[2] !== ''));
+      return (r[1] !== '' || r[2] !== '') && (y <= labels.last.x || r[2] !== '');
     })
     // an empty cell says why in words, never a lone dash
-    .map((r) => [r[0], r[1] || (Number(r[0]) > labels.last.x ? (locale === 'en' ? 'year not reached yet' : '還沒到這一年') : locale === 'en' ? 'figure not verified' : '這年的數字沒查證到'), r[2] || (locale === 'en' ? 'no target for this year' : '這年沒有目標')]),
+    .map((r) => [r[0], r[1] || (locale === 'en' ? 'year not reached yet' : '還沒到這一年'), r[2] || (locale === 'en' ? 'no target for this year' : '這年沒有目標')]),
 };
 render.padRight = Math.max(render.padRight ?? 0, 18);
 ---

@@ -147,6 +147,7 @@ const whoLabel = m.who.label.split(' ');
             <span>
               {whoLabel[0]} <span class="hc-nw">{whoLabel.slice(1).join(' ')}{locale === 'en' ? ':' : '：'}</span> <b>{m.who.text}</b>
             </span>
+            <span class="hc-zoom__note">{m.who.note}</span>
             <Fragment set:html={chipHtml('official', locale)} />
             <span aria-hidden="true">↑</span>
           </p>

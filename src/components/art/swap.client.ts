@@ -37,7 +37,12 @@ export function setSwap(scope: HTMLElement, n: number, announce = true): void {
       range.style.setProperty('--fill', `${(n / total) * 100}%`);
     }
     const out = c.querySelector<HTMLElement>('[data-swap-text]');
-    if (out && announce) out.textContent = (out.dataset.template ?? '').replace('{n}', String(n)).replace('{rest}', String(total - n));
+    // the words always match the slider and the picture (also while the arrival plays); only the
+    // spoken announcement waits for the resting value: the live region is quiet until then
+    if (out) {
+      out.parentElement?.setAttribute('aria-live', announce ? 'polite' : 'off');
+      out.textContent = (out.dataset.template ?? '').replace('{n}', String(n)).replace('{rest}', String(total - n));
+    }
     // aria-disabled, never `disabled`: a button that disables itself while focused drops keyboard focus to <body>
     c.querySelector<HTMLButtonElement>('[data-step="-1"]')?.setAttribute('aria-disabled', String(n <= 0));
     c.querySelector<HTMLButtonElement>('[data-step="1"]')?.setAttribute('aria-disabled', String(n >= total));

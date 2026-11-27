@@ -263,10 +263,13 @@ export const LIMITS = {
   floor: 2.2,
 } as const;
 
-/** What a reader has to read: Chinese characters and digits one by one; English by the word. */
+/**
+ * What a reader has to read: Chinese characters and digits one by one; English by the word.
+ * 注音 after a character (苯（ㄅㄣˇ）) is a reading aid for that character, not more to read.
+ */
 export function readingUnits(text: string, locale: 'zh-TW' | 'en'): number {
   if (locale === 'en') return text.trim().split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
-  return [...text].filter((ch) => /[\p{L}\p{N}]/u.test(ch)).length;
+  return [...text.replace(/（[\u3100-\u312f\u02c7\u02ca\u02cb\u02d9]+）/g, '')].filter((ch) => /[\p{L}\p{N}]/u.test(ch)).length;
 }
 
 /**

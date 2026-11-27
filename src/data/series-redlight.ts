@@ -15,7 +15,7 @@ export const redlightSeries = {
   'idle-test-limits-by-build-date': {
     topic: 'inspection',
     title: t('定檢怠速合格上限，依出廠日期', 'Idle-test pass limits by build date'),
-    description: t('出廠越新，怠速時允許的一氧化碳與碳氫化合物越少。', 'The newer the scooter, the less carbon monoxide and hydrocarbon it may emit at idle.'),
+    description: t('出廠越新，怠速時允許的一氧化碳和碳氫化合物（沒燒完的油氣）越少。', 'The newer the scooter, the less carbon monoxide and hydrocarbons (unburnt fuel vapour) it may give off at idle.'),
     chart: 'grouped-bar',
     unit: 'percent',
     categories: [
@@ -39,7 +39,7 @@ export const redlightSeries = {
       },
       {
         key: 'hc',
-        label: t('碳氫化合物（ppm）', 'Hydrocarbons (ppm)'),
+        label: t('沒燒完的油氣（碳氫化合物，ppm）', 'Unburnt fuel vapour (hydrocarbons, ppm)'),
         unit: 'ppm',
         kind: 'reference',
         points: [
@@ -176,7 +176,7 @@ export const redlightSeries = {
     ],
     datasets: [
       { key: 'co', label: t('一氧化碳', 'Carbon monoxide'), points: [{ x: 'phase4', y: 0.66 }, { x: 'phase5', y: 0.42 }] },
-      { key: 'hc', label: t('碳氫化合物', 'Hydrocarbons'), points: [{ x: 'phase4', y: 0.61 }, { x: 'phase5', y: 0.57 }] },
+      { key: 'hc', label: t('碳氫化合物（大多是油氣）', 'Hydrocarbons (mostly fuel vapour)'), points: [{ x: 'phase4', y: 0.61 }, { x: 'phase5', y: 0.57 }] },
     ],
     period: t('2017年發表', 'Published 2017'),
     place: TW,
@@ -191,7 +191,7 @@ export const redlightSeries = {
   'tsai2018-by-mileage': {
     topic: 'emissions',
     title: t('低里程與高里程機車的排放（每公升燃油）', 'Low- vs high-mileage motorcycle emissions (per litre of fuel)'),
-    description: t('一氧化碳約 3.3 倍、揮發性有機物約 1.9 倍，氮氧化物反而下降。', 'CO about 3.3-fold, VOCs about 1.9-fold; NOx falls.'),
+    description: t('一氧化碳約 3.3 倍，揮發性有機物（油氣這一類的氣體）約 1.9 倍，氮氧化物反而下降。', 'Carbon monoxide about 3.3-fold, VOCs (fuel vapour and similar gases) about 1.9-fold; nitrogen oxides fall.'),
     chart: 'grouped-bar',
     unit: 'g/L-fuel',
     categories: [
@@ -200,10 +200,10 @@ export const redlightSeries = {
     ],
     datasets: [
       { key: 'co', label: t('一氧化碳', 'Carbon monoxide'), points: [{ x: 'low', y: 61, sd: 30 }, { x: 'high', y: 203, sd: 75 }] },
-      { key: 'hc', label: t('碳氫化合物', 'Hydrocarbons'), points: [{ x: 'low', y: 27, sd: 11 }, { x: 'high', y: 47, sd: 19, flags: ['significant'] }] },
+      { key: 'hc', label: t('碳氫化合物（大多是油氣）', 'Hydrocarbons (mostly fuel vapour)'), points: [{ x: 'low', y: 27, sd: 11 }, { x: 'high', y: 47, sd: 19, flags: ['significant'] }] },
       {
         key: 'voc',
-        label: t('揮發性有機物（67種）', 'VOCs (67 species)'),
+        label: t('油氣這一類氣體（揮發性有機物，67種）', 'Fuel vapour and similar gases (VOCs, 67 species)'),
         points: [
           { x: 'low', y: 25.2, sd: 8.0, note: t('摘要與圖4為25.2，內文為19.1。', 'Abstract and Fig. 4 give 25.2; text gives 19.1.') },
           { x: 'high', y: 47.1, sd: 19.8, flags: ['significant'] },
@@ -217,8 +217,8 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '比的是不同的機車，不是同一輛車追蹤；中間各組不是一路往上。揮發性有機物只有 4 萬公里以上那一組顯著；碳氫化合物在 3 萬公里以上明顯增加；一氧化碳的差別，論文沒有做顯著性檢定。',
-      'Different machines compared, not the same vehicles tracked; intermediate groups do not rise steadily. For VOCs only the group above 40,000 km is significant; hydrocarbons rose significantly above 30,000 km; the paper reports no significance test for the carbon monoxide difference.',
+      '比的是不同的機車，不是同一輛車追蹤；中間各組不是一路往上。揮發性有機物（油氣這一類的氣體）只有一組不太像是巧合（統計上顯著）：4 萬公里以上那一組。碳氫化合物在 3 萬公里以上明顯增加。一氧化碳的差別，論文沒有檢查是不是巧合。',
+      'Different machines compared, not the same vehicles tracked; intermediate groups do not rise steadily. For VOCs (fuel vapour and similar gases) only the group above 40,000 km differs by more than chance would explain (statistically significant). Hydrocarbons rose clearly above 30,000 km. The paper did not test whether the carbon monoxide difference could be chance.',
     ),
     requiresCaveat: true,
     relatedFacts: ['ef-mileage-co-tsai2018', 'ef-mileage-voc-tsai2018'],
@@ -228,12 +228,12 @@ export const redlightSeries = {
   'tsai2026-three-scooter-case': {
     topic: 'inspection',
     title: t('三台車的個案：第四期對第七期', 'Three-scooter case study: Phase 4 vs Phase 7'),
-    description: t('在台中三台車的個案中，第四期機車的一氧化碳最高是第七期的 14 倍、碳氫化合物最高 32 倍。', 'In a Taichung case study of three scooters, Phase 4 emitted up to 14 times the carbon monoxide and up to 32 times the hydrocarbons of Phase 7.'),
+    description: t('台中三台車的個案中，第四期機車的一氧化碳最高是第七期的 14 倍。碳氫化合物（大多是油氣）最高 32 倍。', 'In a Taichung case study of three scooters, Phase 4 gave off up to 14 times the carbon monoxide of Phase 7. It gave off up to 32 times the hydrocarbons, mostly fuel vapour.'),
     chart: 'bar',
     unit: 'ratio',
     categories: [
       { key: 'co', label: t('一氧化碳', 'Carbon monoxide') },
-      { key: 'hc', label: t('碳氫化合物', 'Hydrocarbons') },
+      { key: 'hc', label: t('碳氫化合物（大多是油氣）', 'Hydrocarbons (mostly fuel vapour)') },
     ],
     datasets: [{ key: 'ratio', label: t('第四期是第七期的幾倍（最多）', 'Phase 4 as a multiple of Phase 7 (up to)'), points: [{ x: 'co', y: 14.0, flags: ['maximum'] }, { x: 'hc', y: 32.1, flags: ['maximum'] }] }],
     period: t('2014與2025年量測；2026年發表', 'Measured 2014 and 2025; published 2026'),
@@ -265,7 +265,7 @@ export const redlightSeries = {
     sources: ['tsai-2023-atmosphere'],
     confidence: 'verified',
     evidence: 'modelled-tw',
-    caveat: t('學者的模式推估，只算了 2013、2016、2019 和 2021 四年，點和點之間的線不是量到的變化；這是排放量，不是行人吸到的濃度。', 'An academic modelled estimate for four years only (2013, 2016, 2019 and 2021); the lines between points are drawn, not a trend anyone observed. These are emissions, not what pedestrians breathe.'),
+    caveat: t('這是學者用電腦模式推估的，只算了 2013、2016、2019 和 2021 四年。點和點之間的線，不是量到的變化。這是排放量，不是行人吸到多少。', 'An academic modelled estimate for four years only (2013, 2016, 2019 and 2021); the lines between points are drawn, not a trend anyone observed. These are emissions, not what pedestrians breathe.'),
     requiresCaveat: true,
     relatedFacts: ['tsai2023-benzene-tonnes-2021', 'tsai2023-trend-2013-2021'],
     chainLink: 1,
@@ -273,7 +273,7 @@ export const redlightSeries = {
   },
   'tsai2023-hc-by-class': {
     topic: 'emissions',
-    title: t('各車種的碳氫化合物排放量，2013–2021 年（模式推估）', 'Hydrocarbon emissions by vehicle class, 2013–2021 (modelled)'),
+    title: t('各車種排的碳氫化合物（大多是油氣），2013–2021 年（電腦推估）', 'Hydrocarbons (mostly fuel vapour) given off by vehicle class, 2013–2021 (modelled)'),
     description: t('機車在 2019 年後略少於汽油小客車與輕型車。', 'Scooters and motorcycles slightly below petrol cars and light-duty vehicles from 2019.'),
     chart: 'line',
     unit: 'tonnes-per-year',
@@ -288,7 +288,7 @@ export const redlightSeries = {
     sources: ['tsai-2023-atmosphere'],
     confidence: 'verified',
     evidence: 'modelled-tw',
-    caveat: t('碳氫化合物總量，也算進了模式推估的油氣蒸發；這是學者的模式推估，不是環境部的 TEDS 清冊。', 'Total hydrocarbons including modelled evaporation; an academic modelled estimate, not the MOENV TEDS inventory.'),
+    caveat: t('碳氫化合物總量，也算進了電腦推估的油氣蒸發。這是學者用電腦模式推估的，不是環境部的 TEDS 清冊。', 'Total hydrocarbons, including modelled fuel vapour that evaporates; an academic modelled estimate, not the MOENV TEDS inventory.'),
     requiresCaveat: true,
     relatedFacts: ['tsai2023-hc-tonnes-2021', 'tsai2023-trend-2013-2021'],
     chainLink: 1,
@@ -377,7 +377,7 @@ export const redlightSeries = {
             x: 'pm25',
             y: -18.4,
             flags: ['not-significant'],
-            note: t('以每分鐘資料的模式計算為−21.75%，達顯著。', 'In the paper\'s one-minute model: −21.75%, significant.'),
+            note: t('用每分鐘資料的模式算，是 −21.75%，不太像是巧合（統計上顯著）。', 'In the paper\'s one-minute model: −21.75%, more than chance would explain (statistically significant).'),
           },
         ],
       },
@@ -387,7 +387,7 @@ export const redlightSeries = {
     sources: ['wu-2021-trd'],
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: t('量的是研究助理騎腳踏車和電動機車途中吸到的，不是行人，也不是一般通勤的人。', 'Research assistants riding bicycles and electric scooters, not pedestrians and not a sample of commuters.'),
+    caveat: t('量的是研究助理騎腳踏車和電動機車途中吸到的。不是行人，也不是一般通勤的人。', 'Research assistants riding bicycles and electric scooters, not pedestrians and not a sample of commuters.'),
     requiresCaveat: true,
     relatedFacts: ['wu2021-quiet-route'],
     chainLink: 2,
@@ -395,7 +395,7 @@ export const redlightSeries = {
   },
   'wu2021-station-correlation': {
     topic: 'exposure',
-    title: t('騎士暴露與測站的相關（Wu 等，2021）', 'How well stations track riders\' exposure (Wu et al., 2021)'),
+    title: t('測站能不能反映騎士吸到的（Wu 等，2021）', 'How well stations track what riders breathe (Wu et al., 2021)'),
     description: t('PM2.5 跟得上測站，苯類（BTEX）跟不上。', 'PM2.5 tracks the stations; BTEX does not.'),
     chart: 'range',
     unit: 'correlation-r',
@@ -453,8 +453,8 @@ export const redlightSeries = {
   // -------------------------------------------------------------------------
   'odour-thresholds': {
     topic: 'smell',
-    title: t('聞得到的濃度：嗅覺門檻', 'How little it takes to smell: odour thresholds'),
-    description: t('乙醛、丙烯醛在十億分之幾就聞得到，苯要到百萬分之幾，一氧化碳沒有味道。橫軸每往右一格，就是多十倍。', 'Acetaldehyde and acrolein can be smelled at parts per billion, benzene only at parts per million, and carbon monoxide has no smell. Each step to the right on the axis is ten times more.'),
+    title: t('多少才聞得到：嗅覺門檻', 'How little it takes to smell: odour thresholds'),
+    description: t('乙醛、丙烯醛在十億分之幾就聞得到，苯要到百萬分之幾。一氧化碳沒有味道。橫軸每往右一格，就是多十倍。', 'Acetaldehyde and acrolein can be smelled at parts per billion, benzene only at parts per million, and carbon monoxide has no smell. Each step to the right on the axis is ten times more.'),
     chart: 'dot-range',
     unit: 'ppm',
     categories: [
@@ -498,7 +498,7 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '不同來源相差十倍到百倍，所以只有「十億分之幾」「百萬分之幾」這樣的數量級有意義，沒有準確的單一數字。沒有研究找出機車廢氣的味道主要來自哪些物質。圖上沒有超細微粒：它聞不聞得到，我們找不到查證過的出處。',
+      '不同來源相差十倍到百倍。所以只有「十億分之幾」「百萬分之幾」這樣的大小有意義，沒有準確的單一數字。沒有研究找出機車廢氣的味道主要來自哪些物質。圖上沒有超細微粒：它聞不聞得到，我們找不到查證過的出處。',
       'Sources differ by ten to a hundred times, so only the order of magnitude (parts per billion, parts per million) is meaningful, not a single value. No study has identified the main odorants of scooter exhaust. Ultrafine particles are not shown: none of the sources we checked says anything about their smell.',
     ),
     requiresCaveat: true,
@@ -514,7 +514,7 @@ export const redlightSeries = {
   'chuang2020-effects-per-iqr': {
     topic: 'health',
     title: t('PM2.5 每高一個四分位距，同一小時的生理變化（Chuang 等，2020）', 'Same-hour changes per interquartile range of PM2.5 (Chuang et al., 2020)'),
-    description: t('點是多了幾 %，線是可能的範圍；每一種算法加的量不一樣，所以不能直接互相比較。', 'Percent change with 95% CI; each mode has its own increment, so modes cannot be compared.'),
+    description: t('點是多了幾 %，線是可能的範圍；每一種算法加的量不一樣，所以不能直接互相比較。', 'The dot is the percent change and the line is the likely range (95% confidence interval). Each mode has its own increment, so modes cannot be compared.'),
     chart: 'dot-range',
     unit: 'percent',
     categories: [
@@ -544,7 +544,7 @@ export const redlightSeries = {
         points: [
           { x: 'walking', y: 3.4, low: 0.1, high: 3.5, flags: ['significant'], note: t('區間不對稱，可能是印刷錯誤。', 'Asymmetric interval, possibly a typo.') },
           { x: 'scooter', y: 6.4, low: 2.6, high: 10.2, flags: ['significant'] },
-          { x: 'bus', y: -2.3, low: -3.3, high: -1.3, note: t('這是負的估計，作者沒有標示顯著，也沒有討論。', 'A negative estimate that the authors neither mark as significant nor discuss.') },
+          { x: 'bus', y: -2.3, low: -3.3, high: -1.3, note: t('這個結果是負的。作者沒有標示它是不是巧合，也沒有討論。', 'A negative estimate that the authors neither mark as beyond chance (significant) nor discuss.') },
           { x: 'car', y: 3.4, low: -9.2, high: 16.0 },
           { x: 'subway', y: -0.1, low: -1.4, high: 1.2 },
           { x: 'pooled', y: 0.9, low: -11.7, high: 13.5 },
@@ -569,8 +569,8 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '120 位健康的年輕人，同一小時裡的短暫變化，不是生病；走路、騎車花的力氣沒有調整；PM2.5 是所有來源的；28 個估計值沒有做多重比較的校正，所以有幾個可能只是碰巧。',
-      '120 healthy young adults and short-lived changes within the same hour, not illness; effort was not allowed for; the PM2.5 is from all sources; the 28 estimates were not corrected for testing many things at once, so a few may be flukes.',
+      '120 位健康的年輕人，同一小時裡的短暫變化，不是生病。走路、騎車花的力氣沒有調整。PM2.5 是所有來源的。28 個結果同時檢查了很多項，沒有做校正，所以有幾個可能只是碰巧。',
+      '120 healthy young adults and short-lived changes within the same hour, not illness. Effort was not allowed for. The PM2.5 is from all sources. The 28 estimates were not corrected for testing many things at once, so a few may be flukes.',
     ),
     requiresCaveat: true,
     relatedFacts: ['chuang2020-cardiovascular-association', 'chuang2020-scooter-effect-per-iqr', 'chuang2020-pooled-model'],
@@ -579,7 +579,7 @@ export const redlightSeries = {
   },
   'stroller-height-studies': {
     topic: 'children',
-    title: t('兒童或嬰兒車高度與大人高度的差異：各研究結果', 'Child or stroller height vs adult height: study by study'),
+    title: t('小孩或嬰兒車高度，和大人高度的差別：各研究結果', 'Child or stroller height vs adult height: study by study'),
     description: t('三項高約 10%，其餘為 59%、最多 44% 與逾 20%；一項較低，一項沒有一致差異；沒有台灣研究。', 'Three about 10% higher; the others 59%, up to 44% and over 20%; one lower; one with no consistent difference; none in Taiwan.'),
     chart: 'bar',
     unit: 'percent',
@@ -596,7 +596,7 @@ export const redlightSeries = {
     datasets: [
       {
         key: 'difference',
-        label: t('兒童或嬰兒車高度比大人高度高（%）', 'Child or stroller height above adult height (%)'),
+        label: t('小孩或嬰兒車高度比大人高度多（%）', 'Child or stroller height above adult height (%)'),
         points: [
           { x: 'buzzard2009', y: 59, sources: ['sharma-kumar-2018-envint'] },
           { x: 'sharma2020', y: 44, flags: ['maximum'], sources: ['sharma-kumar-2020-envint'] },
@@ -604,8 +604,8 @@ export const redlightSeries = {
           { x: 'garciaAlgar2015', y: 10, sources: ['sharma-kumar-2018-envint'] },
           { x: 'kenagy2016', y: 10, low: 5, high: 15, sources: ['sharma-kumar-2018-envint'], note: t('論文寫5%至15%。', 'Printed as 5–15%.') },
           { x: 'kumar2017Pm', y: 10, sources: ['sharma-kumar-2018-envint'] },
-          { x: 'kumar2017Am', y: -5, sources: ['sharma-kumar-2018-envint'], note: t('嬰兒高度顯著較低。', 'Baby height significantly lower.') },
-          { x: 'galea2014', y: null, sources: ['sharma-kumar-2018-envint'], note: t('沒有一致差異：部分日子成人高17%至51%，6天中只有1天兒童高16%。', 'No consistent difference: adults 17–51% higher on some days; children 16% higher on 1 of 6 days.') },
+          { x: 'kumar2017Am', y: -5, sources: ['sharma-kumar-2018-envint'], note: t('嬰兒高度明顯比較低，不太像是巧合。', 'Baby height lower, by more than chance would explain.') },
+          { x: 'galea2014', y: null, sources: ['sharma-kumar-2018-envint'], note: t('沒有一致的差別：有幾天大人高度多 17% 到 51%，6 天中只有 1 天小孩高度多 16%。', 'No consistent difference: adults 17–51% higher on some days; children 16% higher on 1 of 6 days.') },
         ],
       },
     ],
@@ -615,7 +615,7 @@ export const redlightSeries = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '污染物、高度、儀器與時間都不同，所以不能合併成一個平均值。59% 只是一項研究；44% 是「最多」；德國那一項比的是 1.0 公尺（走路的兒童）與 1.6 公尺，不是嬰兒車；沒有任何台灣研究。標了回顧來源的數字是回顧轉述的，原始論文我們沒有查閱。',
+      '污染物、高度、儀器和時間都不同，所以不能合成一個平均值。59% 只是一項研究；44% 是「最多」。德國那一項比的是 1.0 公尺（走路的小孩）和 1.6 公尺，不是嬰兒車。沒有任何台灣研究。標了回顧來源的數字，是回顧轉述的，原始論文我們沒有查閱。',
       'Pollutants, heights, instruments and averaging times all differ, so they cannot be averaged into one figure. 59% is one study; 44% is "up to"; the German study compares 1.0 m (a walking child) with 1.6 m, not a stroller; none is from Taiwan. Values sourced to the review are as the review reports them; we did not read the original papers.',
     ),
     requiresCaveat: true,

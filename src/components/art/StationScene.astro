@@ -25,7 +25,7 @@ import { est } from '@/data/estimate';
 import { fact } from '@/data/facts';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, type Box } from './air';
+import { air, type Box, AIR_KEY } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { TAILPIPE, artId, figureBoxes, person } from './parts';
 import { placed, put, shopfronts, tailOf, type Placed } from './kit';
@@ -37,8 +37,10 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, tag = false, id, class: cls } = Astro.props;
 const data = fact('taipei-roadside-co-2024').data as Record<string, { value: number; unit: string }>;
 if (data.inletLow?.unit !== 'metres' || data.inletHigh?.unit !== 'metres') throw new Error('StationScene: taipei-roadside-co-2024 must carry inletLow and inletHigh in metres');
 const lo = data.inletLow.value;
@@ -82,7 +84,7 @@ const fg = put(parent, 0, person('stroller'), { cls: 'a-figure' }) + put(child, 
 const alt = sceneAlt(locale, fill(art.station.alt, locale, { inlet: inletLabel }), { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--station', cls].filter(Boolean).join(' ')}>
+<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--station', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + station + fg} />
   <Fragment slot="labels">
     <SceneLabel box={VB} x={pipeX - 44} y={inletY - 14} anchor="end top" plate max={46}>{inletLabel}</SceneLabel>

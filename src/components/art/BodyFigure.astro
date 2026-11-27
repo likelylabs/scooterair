@@ -131,4 +131,17 @@ const kindOf: Record<BodyPin, string> = { nose: 'ribbon', lungs: 'dot', blood: '
     }
     fig.dispatchEvent(new CustomEvent('sa:pin', { bubbles: true, detail: { pin: on ? pin.dataset.bodyPin : '' } }));
   });
+  // A link to one pin's sentence (/#body-pin-lungs) picks that pin, so its sentence shows and the
+  // page goes to it, as a tap on the pin would.
+  const pickFromHash = () => {
+    const item = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+    const which = item?.closest<HTMLElement>('[data-pin-item]')?.dataset.pinItem;
+    if (!item || !which) return;
+    const scope = item.closest<HTMLElement>('[data-pick-scope]') ?? item.parentElement?.parentElement;
+    const pin = scope?.querySelector<HTMLAnchorElement>(`a[data-body-pin="${which}"]`);
+    if (pin && pin.closest<HTMLElement>('.scene')?.dataset.pin !== which) pin.click();
+    requestAnimationFrame(() => item.scrollIntoView({ block: 'center' }));
+  };
+  pickFromHash();
+  addEventListener('hashchange', pickFromHash);
 </script>

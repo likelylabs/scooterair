@@ -20,6 +20,7 @@ import Select from '@/components/ui/Select.astro';
 import RadioGroup from '@/components/ui/RadioGroup.astro';
 import Range from '@/components/ui/Range.astro';
 import Callout from '@/components/ui/Callout.astro';
+import Icon from '@/components/ui/Icon.astro';
 import electric from '@/i18n/pages/electric';
 import { fill, localize } from '@/i18n/pages/_copy';
 import { readerText } from '@/i18n/ui';
@@ -146,7 +147,7 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
     </div>
 
     <details class="el-adv">
-      <summary>{C.advanced.summary}</summary>
+      <summary><span>{C.advanced.summary}</span><Icon name="chevron-down" size="1.25rem" class="el-adv__chev" /></summary>
       <div class="el-adv__body">
         <Select id="el-ev" label={C.advanced.ev} options={evOptions} value="" aria-describedby="el-ev-chosen" />
         <p class="el-hint el-chosen" id="el-ev-chosen" data-el-chosen="el-ev" data-template={C.advanced.chosen} aria-live="polite"></p>
@@ -239,9 +240,11 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
   [data-flag][hidden] {
     display: none;
   }
+  /* year and month side by side; on a narrow phone with large text they stack, so the year
+     is never cut to 「201」 */
   .el-pair {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
     gap: var(--sp-3);
   }
   .el-checks {
@@ -324,12 +327,27 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
     color: var(--ink);
     font: inherit;
   }
+  /* a fold that looks like one: a full-width row with a rule and a chevron, like the other folds */
   .el-adv > summary {
     cursor: pointer;
     font-weight: var(--fw-bold);
     min-block-size: var(--tap);
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    border-block: 1px solid var(--line);
+    list-style: none;
+  }
+  .el-adv > summary::-webkit-details-marker {
+    display: none;
+  }
+  .el-adv :global(.el-adv__chev) {
+    flex: none;
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .el-adv[open] :global(.el-adv__chev) {
+    transform: rotate(180deg);
   }
   .el-adv__body {
     display: grid;

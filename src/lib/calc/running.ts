@@ -296,7 +296,7 @@ export function electricRunning(s: Situation, data: EconDataset, horizon: number
     const partial = renewals.filter((m) => inside(m) < 1);
     const partialNote = partial.length
       ? t(
-          `第${partial[0]}個月付的設定費涵蓋第${partial[0]}至${partial[0] + months - 1}個月，超出${horizonText(horizon)['zh-TW']}的試算期，所以只計入期內的${ntd(fee * inside(partial[0]))['zh-TW']}。`,
+          `第${partial[0]}個月付的設定費涵蓋第${partial[0]}至${partial[0] + months - 1}個月，超出${horizonText(horizon)['zh-TW']}的計算期，所以只計入期內的${ntd(fee * inside(partial[0]))['zh-TW']}。`,
           ` The fee paid in month ${partial[0]} covers months ${partial[0]}–${partial[0] + months - 1}, beyond the ${horizonText(horizon).en} comparison, so only the ${ntd(fee * inside(partial[0])).en} for months inside it is counted.`,
         )
       : t('', '');
@@ -307,7 +307,7 @@ export function electricRunning(s: Situation, data: EconDataset, horizon: number
         note: renewals.length
           ? join(
               t(
-                `開通時付${ntd(fee)['zh-TW']}，每${months}個月續約時再付一次（試算期內第${renewals.join('、')}個月）；這裡平均攤在綁約期顯示，累計花費則算在實際付款的月份。`,
+                `開通時付${ntd(fee)['zh-TW']}，每${months}個月續約時再付一次（計算期內第${renewals.join('、')}個月）；這裡平均攤在綁約期顯示，累計花費則算在實際付款的月份。`,
                 `${ntd(fee).en} at activation and again at each ${months}-month renewal (month${renewals.length > 1 ? 's' : ''} ${renewals.join(', ')} within the horizon); shown here spread over the contract, and counted in the month it is paid in the cumulative cost.`,
               ),
               partialNote,

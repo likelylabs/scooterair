@@ -18,7 +18,7 @@ export default copy({
   meta: {
     title: { 'zh-TW': '電動機車補助怎麼算？換電動，把帳攤開', en: 'Electric scooter subsidies 2026: the full bill' },
     description: {
-      'zh-TW': '2026 年各縣市的電動機車補助、報廢出廠滿 10 年機車的補助，加上每個月的電費、電池月租和油錢，一行一行算給你看。划不划算，看你住哪裡、有沒有車可以報廢、一個月騎多遠；打不平的情況也寫出來。',
+      'zh-TW': '2026 年各縣市的電動機車補助，和報廢滿 10 年機車的補助。再加上每個月的電費、電池月租和油錢，一行一行算給你看。划不划算，看你住哪裡、有沒有車報廢、一個月騎多遠。打不平的情況也寫出來。',
       en: 'Electric scooter subsidies for 2026 in every city and county, plus what charging, battery plans and petrol cost each month, worked out line by line. Whether it adds up depends on where you live, whether you have a scooter ten or more years old to scrap, and how far you ride; we say so when it does not.',
     },
   },
@@ -62,7 +62,8 @@ export default copy({
     monthTitle: { 'zh-TW': '每個月', en: 'Each month' },
     headCheaperScrap: { 'zh-TW': '報廢滿 10 年的機車|換電動，|比買新的|燃油機車便宜', en: 'Scrap a scooter ten years old for an electric and you pay less than for a new petrol one' },
     headCheaper: { 'zh-TW': '補助扣完，|電動機車比較便宜', en: 'After subsidies the electric scooter costs less' },
-    headCheaperNoSub: { 'zh-TW': '不算補助，|電動機車也比較便宜', en: 'Even with no subsidy the electric scooter costs less' },
+    /** no subsidy counted for this model: the strip right under says so in one line, so the headline does not repeat it */
+    headCheaperNoSub: { 'zh-TW': '電動機車比較便宜', en: 'The electric scooter costs less' },
     headSame: { 'zh-TW': '補助扣完，|兩種差不多錢', en: 'After subsidies the two cost about the same' },
     headSameNoSub: { 'zh-TW': '兩種差不多錢', en: 'The two cost about the same' },
     headDearer: { 'zh-TW': '這個條件下，|電動機車還比較貴', en: 'On these terms the electric scooter still costs more' },
@@ -77,10 +78,30 @@ export default copy({
     barsAlt: { 'zh-TW': '長條圖：燃油機車實付 {petrol}；電動機車實付 {ev}，原價 {list}，虛線是補助和優惠扣掉的部分。', en: 'Bar chart: petrol scooter, {petrol} paid; electric scooter, {ev} paid from a list price of {list}; the dashed part is what subsidies and offers take off.' },
     bodyClass: { 'zh-TW': '這是最便宜的綠牌電動機車：{model}，和 125cc 不同級。', en: 'This is the cheapest green-plate electric scooter, the {model}: a lighter class than a 125 cc. ' },
     swapOnly: { 'zh-TW': '這一款只能換電池，每個月要付換電費（見「每個月」）。', en: 'This model can only swap batteries, so it comes with a monthly battery plan (see “Each month”). ' },
-    worst: { 'zh-TW': '每次都挑最便宜的那一輛，最不划算的情況是：在{county}，{scrap}、要買{plate}，電動機車要多付 {n}。選比較貴的車款，差得更多。', en: 'Taking the cheapest model each time, the least favourable case is: in {county}, with {scrap} and a {plate} model, the electric scooter costs {n} more. A dearer model widens the gap.' },
+    /** The line that folds the least favourable case away (it is another place's case, not the reader's). */
+    worstSummary: { 'zh-TW': '有時候電動機車比較貴', en: 'Sometimes electric costs more' },
+    worst: { 'zh-TW': '例如在{county}，{scrap}，要買{plate}的話，電動機車多付 {n}。這已經是兩邊最便宜的車款，選貴一點的電動機車，差得更多。', en: 'For example, in {county} with {scrap}, the cheapest electric with a {plate} costs {n} more than the cheapest petrol scooter. A dearer electric widens the gap.' },
     worstScrapYes: { 'zh-TW': '有滿 10 年的機車可報廢', en: 'a scooter ten or more years old to scrap' },
     worstScrapNo: { 'zh-TW': '沒有機車可報廢', en: 'nothing to scrap' },
     worstNone: { 'zh-TW': '我們算的每個縣市，電動機車都不比較貴。', en: 'In every place we worked out, the electric scooter costs no more.' },
+    // ---- what scrapping does (opening-view scrapNotes), from the same county's two answers:
+    // {e0}/{g0} the cheapest electric/petrol price paid with nothing to scrap, {e1}/{g1} with a scooter to scrap (each with its unit).
+    // The first price is named as the one with nothing to scrap, so it is never read as a list price
+    // beside the bars' 「定價」. Said as a drop from one price to another (true even when the cheapest
+    // model changes), never as 「少 N 元」 beside the big 「少付」 figure.
+    scrapSaveYes: { 'zh-TW': '沒有機車可報廢時，最便宜的電動機車 {e0}，燃油機車 {g0}。報廢滿 10 年的機車，降到 {e1} 和 {g1}。', en: 'With nothing to scrap, the cheapest electric is {e0} and petrol {g0}. Scrap one 10+ years old and they drop to {e1} and {g1}.' },
+    /** when the petrol scooter drops more than the electric: the gap between them narrows */
+    scrapSaveYesMore: { 'zh-TW': '沒有機車可報廢時，最便宜的電動機車 {e0}，燃油機車 {g0}。報廢滿 10 年的機車，降到 {e1} 和 {g1}，差距變小。', en: 'With nothing to scrap, the cheapest electric is {e0} and petrol {g0}. Scrap one 10+ years old and they drop to {e1} and {g1}, so the gap narrows.' },
+    scrapSaveYesEv: { 'zh-TW': '沒有機車可報廢時，最便宜的電動機車 {e0}。報廢滿 10 年的機車，降到 {e1}。', en: 'With nothing to scrap, the cheapest electric is {e0}. Scrap one 10+ years old and it drops to {e1}.' },
+    scrapSaveNo: { 'zh-TW': '有滿 10 年的機車可報廢的話，最便宜的電動機車會降到 {e1}，燃油機車降到 {g1}。', en: 'With a scooter 10+ years old to scrap, the cheapest electric would drop to {e1}, and petrol to {g1}.' },
+    scrapSaveNoEv: { 'zh-TW': '有滿 10 年的機車可報廢的話，最便宜的電動機車會降到 {e1}。', en: 'With a scooter 10+ years old to scrap, the cheapest electric would drop to {e1}.' },
+    // when the cheapest model differs between the two answers: {ev}/{gas} are the OTHER answer's scooters (the bars name this one's)
+    changeYesEv: { 'zh-TW': '每款的報廢補助不同，沒有機車可報廢時，最便宜的電動機車是 {ev}。', en: 'Deals differ by model: with nothing to scrap, the cheapest electric is the {ev}.' },
+    changeYesGas: { 'zh-TW': '每款的報廢優惠不同，沒有機車可報廢時，最便宜的燃油機車是 {gas}。', en: 'Deals differ by model: with nothing to scrap, the cheapest petrol one is the {gas}.' },
+    changeYesBoth: { 'zh-TW': '每款的報廢優惠不同，沒有機車可報廢時，最便宜的是 {ev} 和 {gas}。', en: 'Deals differ by model: with nothing to scrap, the cheapest are the {ev} and {gas}.' },
+    changeNoEv: { 'zh-TW': '每款的報廢補助不同，最便宜的電動機車會換成 {ev}。', en: 'Scrapping deals differ by model, so the cheapest electric would be the {ev}.' },
+    changeNoGas: { 'zh-TW': '每款的報廢優惠不同，最便宜的燃油機車會換成 {gas}。', en: 'Scrapping deals differ by model, so the cheapest petrol one would be the {gas}.' },
+    changeNoBoth: { 'zh-TW': '每款的報廢優惠不同，最便宜的會換成 {ev} 和 {gas}。', en: 'Scrapping deals differ by model, so the cheapest would be the {ev} and {gas}.' },
     workSummary: { 'zh-TW': '怎麼算出來的', en: 'How this was worked out' },
     workList: { 'zh-TW': '原價', en: 'List price' },
     workPaid: { 'zh-TW': '實付', en: 'Price paid' },
@@ -106,18 +127,70 @@ export default copy({
       'zh-TW': '長條圖，每月騎 {km} 公里：加油 {petrol}；在家充電 {home}；換電最便宜的月租 {plan}；換電用多少付多少 {payg}。',
       en: 'Bar chart, {km} km a month: petrol {petrol}; charging at home {home}; battery swap, cheapest monthly plan {plan}; pay as you go {payg}.',
     },
-    monthNote: { 'zh-TW': '每月騎 {km} 公里，只算油錢或電錢；保養、保險和牌照稅不在裡面，新車的換電優惠也不算。換電那幾行，每一行都寫著是哪一款車、哪一個方案；下面的試算會用你選的車款和方案算。', en: '{km} km a month, fuel or power only; servicing, insurance, licence tax and new-scooter swap discounts are not included. Each swap row names its scooter and plan; the calculator below uses the scooter and plan you choose.' },
+    monthNote: { 'zh-TW': '每月騎 {km} 公里，只算油錢或電錢；保養、保險和牌照稅不在裡面，新車的換電優惠也不算。換電那幾行，每一行都寫著是哪一款車、哪一個方案；下面的計算會用你選的車款和方案算。', en: '{km} km a month, fuel or power only; servicing, insurance, licence tax and new-scooter swap discounts are not included. Each swap row names its scooter and plan; the calculator below uses the scooter and plan you choose.' },
     swapDearer: { 'zh-TW': '只看油錢和換電費：只能換電池的話，最便宜的換電方式每月 {n}，比油錢多 {diff}。下面的細算把保養、保險和新車優惠也算進去，所以數字會不一樣。', en: 'Fuel and battery fees only: if you can only swap batteries, the cheapest way costs {n} a month, {diff} more than petrol. The detailed sum below also counts servicing, insurance and new-scooter offers, so its figure differs.' },
     swapCheaper: { 'zh-TW': '只看油錢和換電費：只能換電池的話，最便宜的換電方式每月 {n}，比油錢少 {diff}。下面的細算把保養、保險和新車優惠也算進去，所以數字會不一樣。', en: 'Fuel and battery fees only: if you can only swap batteries, the cheapest way costs {n} a month, {diff} less than petrol. The detailed sum below also counts servicing, insurance and new-scooter offers, so its figure differs.' },
     beCheaper: { 'zh-TW': '能在家充電、最便宜的是 {model}：買的時候就比較便宜，之後每個月再省約 {save}。', en: 'The cheapest scooter you can charge at home, the {model}, is cheaper on the day you buy, then about {save} less each month.' },
     bePays: { 'zh-TW': '能在家充電的車裡最便宜的是 {model}：比燃油機車貴 {gap}，省下的錢約 {m} 個月補回來。', en: 'The cheapest scooter you can charge at home is the {model}: it costs {gap} more than the petrol scooter on the day, and what it saves each month makes that back in about {m} months.' },
     beNever: { 'zh-TW': '能在家充電、最便宜的是 {model}：照這樣騎，十年內回不了本。', en: 'The cheapest scooter you can charge at home is the {model}: at this distance it is not paid back within ten years.' },
-    beCatch: { 'zh-TW': '能在家充電、最便宜的是 {model}：買的時候比較便宜，可是騎起來花得比較多，大約 {m} 個月後燃油機車就追上來。', en: 'The cheapest scooter you can charge at home is the {model}: cheaper on the day, but dearer to run, so petrol catches up in about {m} months.' },
+    beCatch: { 'zh-TW': '能在家充電、最便宜的是 {model}：買的時候比較便宜，可是騎起來比較貴。大約 {m} 個月後，燃油機車就追上來。', en: 'The cheapest scooter you can charge at home is the {model}: cheaper on the day, but dearer to run, so petrol catches up in about {m} months.' },
     beNote: { 'zh-TW': '回本是十年的總帳：電費、保養、保險和牌照稅都算進去。', en: 'Paying back counts ten years of every running cost: power, servicing, insurance and licence tax.' },
     more: { 'zh-TW': '照我家的情況細算', en: 'Work it out in detail' },
     moreSub: { 'zh-TW': '家裡有小孩、低收入、指定車款、五年總帳', en: 'children, low income, a model you have in mind, five years of costs' },
     examplesLink: { 'zh-TW': '先看別人算出來的例子', en: 'See worked examples' },
     notNowLink: { 'zh-TW': '我現在不打算換車', en: 'I’m not switching now' },
+
+    // ---- the three answers: the same words above the calculator and in its result (opening-view answersHtml)
+    answerTitle: { 'zh-TW': '算出來的答案', en: 'The answer' },
+    questionsTitle: { 'zh-TW': '先回答幾個問題', en: 'A few quick questions' },
+    ansDayQ: { 'zh-TW': '買的那天差多少', en: 'On the day you buy' },
+    ansMonthQ: { 'zh-TW': '每個月差多少', en: 'Each month' },
+    ansPayQ: { 'zh-TW': '幾年打平', en: 'When it evens out' },
+    ansDayLess: { 'zh-TW': '電動機車少付 {n}', en: 'The electric scooter costs {n} less' },
+    ansDayMore: { 'zh-TW': '電動機車多付 {n}', en: 'The electric scooter costs {n} more' },
+    ansDaySame: { 'zh-TW': '兩種一樣錢', en: 'Both cost the same' },
+    ansDayPaid: { 'zh-TW': '電動的 {ev} 實付 {evNet}。燃油的 {gas} 實付 {gasNet}。', en: 'Electric: the {ev}, {evNet} paid. Petrol: the {gas}, {gasNet} paid.' },
+    ansDayIncl: { 'zh-TW': '「實付」是扣掉補助和優惠以後的車價。牌照和保險另外算。', en: '“Paid” is the price after subsidies and offers. Plates and insurance are extra.' },
+    ansDayFeeLess: { 'zh-TW': '這天還要付開通電池的設定費 {fee}，已經算進去。只看車價，電動機車少 {car}。', en: 'That day you also pay a {fee} fee to switch the battery on; it is counted. On the price alone, electric is {car} less.' },
+    ansDayFeeMore: { 'zh-TW': '這天還要付開通電池的設定費 {fee}，已經算進去。只看車價，電動機車多 {car}。', en: 'That day you also pay a {fee} fee to switch the battery on; it is counted. On the price alone, electric is {car} more.' },
+    ansMonthMore: { 'zh-TW': '電動機車每個月多花約 {n}', en: 'The electric scooter costs about {n} more a month' },
+    ansMonthLess: { 'zh-TW': '電動機車每個月少花約 {n}', en: 'The electric scooter costs about {n} less a month' },
+    ansMonthSame: { 'zh-TW': '每個月差不多一樣', en: 'About the same each month' },
+    ansMonthAvg: { 'zh-TW': '這是{h}平均下來的數字。', en: 'That is the average over {h}.' },
+    ansMore: { 'zh-TW': '多', en: 'more' },
+    ansLess: { 'zh-TW': '少', en: 'less' },
+    ansMonthPhase: { 'zh-TW': '頭 {n} 個月有新車優惠，每月{dir1} {now}；之後每月{dir2} {later}。', en: 'For the first {n} months a new-scooter discount applies: {now} {dir1} a month. After that, {later} {dir2} a month.' },
+    ansMonthPlan: { 'zh-TW': '電池用的是「{plan}」方案。', en: 'The battery plan is “{plan}”.' },
+    ansMonthIncl: { 'zh-TW': '兩邊都算了油錢或電池錢、保養、保險和規費。買車的錢不在這裡。', en: 'Both sides count fuel or battery, servicing, insurance and fees. Buying the scooter is not in this figure.' },
+    ansMonthFee: { 'zh-TW': '電池的設定費也平均攤在這裡。買的那天付的那一筆也在裡面，不要加兩次。', en: 'The battery setup fees are spread over this average too. The one you pay on the day you buy is among them, so do not add it twice.' },
+    ansYears: { 'zh-TW': '{y} 年', en: '{y} years' },
+    ansYearsMonths: { 'zh-TW': '{y} 年 {m} 個月', en: '{y} years {m} months' },
+    ansAbout: { 'zh-TW': '（約 {t}）', en: ' (about {t})' },
+    ansPayParity: { 'zh-TW': '一開始就划算：買的時候比較便宜，每個月也不比較貴', en: 'Ahead from the start: cheaper to buy, and no dearer each month' },
+    ansPayMonth: { 'zh-TW': '第 {n} 個月打平{years}', en: 'It evens out in month {n}{years}' },
+    ansPayMonthWhy: { 'zh-TW': '買的時候多付的錢，每個月省一點，到這個月就補回來。', en: 'What you pay extra at the start comes back a little each month, until then.' },
+    ansPayCatch: { 'zh-TW': '第 {n} 個月起{years}，電動機車總共花得比較多', en: 'From month {n}{years}, the electric scooter has cost more in total' },
+    ansPayCatchWhy: { 'zh-TW': '買的時候比較便宜，可是每個月比較貴，所以會被追上。', en: 'It is cheaper to buy but dearer each month, so petrol catches up.' },
+    ansPayAhead: { 'zh-TW': '{h}內，電動機車總共還是比較少', en: 'Over {h}, the electric scooter still costs less in total' },
+    ansPayAheadWhy: { 'zh-TW': '每個月比較貴，可是買的時候省下的錢比較多。', en: 'It is dearer each month, but the saving at the start is bigger.' },
+    ansPayNever: { 'zh-TW': '{h}內打不平', en: 'It does not even out within {h}' },
+    ansPayNeverWhy: { 'zh-TW': '買的時候比較貴，每個月也沒有比較省。', en: 'It costs more to buy and is no cheaper each month.' },
+    ansPaySlowKm: { 'zh-TW': '每個月是比較省，可是省得太慢。要騎到每月約 {km} 公里，才會打平。', en: 'It is cheaper each month, but too slowly. At about {km} km a month it would even out.' },
+    ansPaySlowNever: { 'zh-TW': '每個月是比較省，可是省得太慢。照現在的資料，騎再多也打不平。', en: 'It is cheaper each month, but too slowly. On current figures it would not even out at any distance.' },
+    ansPayBriefly: { 'zh-TW': '第 {n} 個月兩邊曾經一樣。可是{h}後，電動機車還是多 {gap}。', en: 'The totals are level in month {n}. But after {h}, electric still costs {gap} more.' },
+    ansPayWhat: { 'zh-TW': '「打平」是說：買車的錢加上每個月的錢，兩邊加起來一樣多。', en: '“Evens out” means: the price plus every month adds up to the same on both sides.' },
+    plateLight: { 'zh-TW': '綠牌', en: 'green plate' },
+    plateHeavy: { 'zh-TW': '白牌', en: 'white plate' },
+    plateSmall: { 'zh-TW': '小型輕型', en: 'small light class' },
+    barPetrolShort: { 'zh-TW': '燃油機車', en: 'Petrol scooter' },
+    barEvShort: { 'zh-TW': '電動機車（{plate}）', en: 'Electric scooter ({plate})' },
+    /** home screen 13's bar label (the plate is in the body under the chart) */
+    barEvKind: { 'zh-TW': '電動機車', en: 'Electric scooter' },
+    ansWho: { 'zh-TW': '比的是電動的 {ev}（{plate}）和燃油的 {gas}。', en: 'Compared: the electric {ev} ({plate}) and the petrol {gas}.' },
+    ansWhoAuto: { 'zh-TW': '兩輛都是照你的答案，買的時候最便宜的。', en: 'Each is the cheapest to buy on your answers.' },
+    ansPlateLight: { 'zh-TW': '綠牌是普通輕型機車：比較便宜，跑得比 125cc 慢，不是同一級。', en: 'A green plate is the light class: cheaper and slower than a 125 cc, so not the same class.' },
+    ansPlateHeavy: { 'zh-TW': '白牌是普通重型機車，和 125cc 燃油機車同一級。', en: 'A white plate is the heavy class, the same class as a 125 cc petrol scooter.' },
+    ansSwapOnly: { 'zh-TW': '這一款只能換電池，每個月要付換電費。', en: 'This model can only swap batteries, so there is a monthly battery fee.' },
   },
 
   /** The answer, before any input. */
@@ -128,7 +201,7 @@ export default copy({
 
   status: {
     title: { 'zh-TW': '你那裡還有沒有補助', en: 'Is there still money where you live?' },
-    lead: { 'zh-TW': '每個縣市不一樣。選了縣市，下面的試算也會用同一個。', en: 'It differs by city and county. The calculator below uses the place you choose here.' },
+    lead: { 'zh-TW': '每個縣市不一樣。選了縣市，下面的計算也會用同一個。', en: 'It differs by city and county. The calculator below uses the place you choose here.' },
     cityLabel: { 'zh-TW': '你住在哪個縣市？', en: 'Which city or county do you live in?' },
     cityHint: { 'zh-TW': '括號裡是我們查證的程度；縣市自己的補助用完了也會標出來。', en: 'In brackets: how far we could check it, and whether the local money has run out.' },
     cityStatus: {
@@ -153,11 +226,11 @@ export default copy({
   calc: {
     title: { 'zh-TW': '五個問題，|算給你看', en: 'Five questions, |and we do the sums' },
     lead: {
-      'zh-TW': '每改一個答案，結果就重算一次。算的是 {date} 這一天買車的情況，用的是 {checked}查證的價格與補助。',
+      'zh-TW': '每改一個答案，結果就馬上重算。算的是 {date} 買車，價格和補助是 {checked}查的。',
       en: 'Change any answer and the result is worked out again, for buying on {date}, with the prices and subsidies we checked on {checked}.',
     },
     noscript: {
-      'zh-TW': '這個試算要開 JavaScript 才會算。沒有也沒關係：下面有幾個預先算好的例子，每一個都有結論，第一個還列出完整的算法。',
+      'zh-TW': '這個計算要開 JavaScript 才會算。沒有也沒關係：下面有幾個預先算好的例子，每一個都有結論，第一個還列出完整的算法。',
       en: 'This calculator needs JavaScript. Without it, the worked examples below each give their answer, and the first shows the full working.',
     },
     q1: { 'zh-TW': '你住在哪個縣市？', en: 'Which city or county do you live in?' },
@@ -171,8 +244,8 @@ export default copy({
     q2: {
       legend: { 'zh-TW': '有沒有一輛燃油機車要報廢？', en: 'Do you have a petrol scooter to scrap?' },
       hint: {
-        'zh-TW': '多數補助要報廢出廠滿 10 年的機車；各縣市的規定不同，我們照你的出廠年月幫你對。',
-        en: 'Most subsidies need a scooter built ten or more years ago; places set their own cut-offs, and we check yours from its build date.',
+        'zh-TW': '報廢一輛機車、再買一輛新的，叫做「汰舊換新」。多數補助要報廢出廠滿 10 年的機車。各縣市規定不同，我們照你的出廠年月幫你對。',
+        en: 'Scrapping one scooter and buying a new one is called scrap-and-replace. Most subsidies need a scooter built ten or more years ago. Places set their own cut-offs; we check yours from its build date.',
       },
       yes: { 'zh-TW': '有', en: 'Yes' },
       no: { 'zh-TW': '沒有車可以報廢', en: 'Nothing to scrap' },
@@ -221,30 +294,30 @@ export default copy({
       yes: { 'zh-TW': '能：有插座、有自己的車位', en: 'Yes: a socket and a space of my own' },
       no: { 'zh-TW': '不能，或不確定', en: 'No, or not sure' },
       noHint: { 'zh-TW': '住公寓、沒有自己車位的人，多半選這個。', en: 'If you live in a flat with no parking space of your own, this is probably you.' },
-      noSocket: { 'zh-TW': '停車的地方不能充電，還有兩條路：用換電，或買電池拆得下來、可以提回家充的車（我們只查到兩款，都沒有查證可以取代 125cc）。詳見', en: 'With nowhere to charge where you park, there are two ways: battery swapping, or a model whose battery lifts out and charges indoors (we found only two, neither verified as a substitute for a 125cc). More under' },
+      noSocket: { 'zh-TW': '停車的地方不能充電，還有兩條路：用換電，或買電池拆得下來、提回家充的車。這種車我們只查到兩款，都沒有查證能取代 125cc。請看', en: 'With nowhere to charge where you park, there are two ways: battery swapping, or a model whose battery lifts out and charges indoors (we found only two, neither verified as a substitute for a 125cc). More under' },
       noSocketLink: { 'zh-TW': '「停車的地方沒有插座」', en: '“No socket where you park”' },
       power: { 'zh-TW': '電池怎麼來？', en: 'How would you power it?' },
       sub: { 'zh-TW': '換電，月租', en: 'Battery swap, monthly plan' },
-      subHint: { 'zh-TW': '每個月固定付一筆，多半綁約。', en: 'A fixed monthly fee, usually on a contract.' },
+      subHint: { 'zh-TW': '每個月付一筆固定的錢，多半要綁約。', en: 'A fixed monthly fee, usually on a contract.' },
       payg: { 'zh-TW': '換電，用多少付多少', en: 'Battery swap, pay per use' },
-      paygHint: { 'zh-TW': '沒有月租，按用量計費；開通時要先付一筆設定費，金額看方案。', en: 'No monthly fee; you pay for what you use, plus a one-off setup fee when the battery is switched on (the amount depends on the plan).' },
+      paygHint: { 'zh-TW': '沒有月租，用多少電付多少錢。開通時要先付一筆設定費，金額看方案。', en: 'No monthly fee; you pay for what you use, plus a one-off setup fee when the battery is switched on (the amount depends on the plan).' },
       home: { 'zh-TW': '在家充電', en: 'Charge at home' },
       homeHint: { 'zh-TW': '電池拆下來，提回家插插座充電，不付電池月租。', en: 'Take the battery out and charge it from a socket at home; no battery plan.' },
       plate: { 'zh-TW': '要哪一種車？', en: 'What kind of scooter?' },
       heavy: { 'zh-TW': '白牌（普通重型）', en: 'White plate (heavy class)' },
-      heavyHint: { 'zh-TW': '和 125cc 燃油機車同一個車種。同一個車種不等於一樣快：白牌電動車的性能，多半沒有可以查證的數字。', en: 'The same plate class as a 125cc petrol scooter. Same class is not the same performance: for most white-plate electric models no verified figures exist.' },
+      heavyHint: { 'zh-TW': '和 125cc 燃油機車同一級。同一級不等於一樣快：多數白牌電動機車，查不到可以查證的性能數字。', en: 'The same plate class as a 125cc petrol scooter. Same class is not the same performance: for most white-plate electric models no verified figures exist.' },
       light: { 'zh-TW': '綠牌也可以（普通輕型）', en: 'Green plate is fine (light class)' },
       lightHint: { 'zh-TW': '比較便宜，跑得比較慢，和 125cc 不是同一級。', en: 'Cheaper and slower; not the same class as a 125cc.' },
     },
     advanced: {
       summary: { 'zh-TW': '換車款或方案', en: 'Choose the models yourself' },
       ev: { 'zh-TW': '電動機車和電池方案', en: 'Electric scooter and battery plan' },
-      evAuto: { 'zh-TW': '照試算建議', en: 'The calculator’s pick' },
+      evAuto: { 'zh-TW': '照計算建議', en: 'The calculator’s pick' },
       gas: { 'zh-TW': '拿來比的燃油機車', en: 'The petrol scooter to compare with' },
-      gasAuto: { 'zh-TW': '照試算建議', en: 'The calculator’s pick' },
+      gasAuto: { 'zh-TW': '照計算建議', en: 'The calculator’s pick' },
       chosen: { 'zh-TW': '目前選的：{text}', en: 'Chosen: {text}' },
       note: {
-        'zh-TW': '「照試算建議」的電動機車，是符合你上面答案、買的時候實付最便宜的一輛（和上面、首頁挑的方法一樣）；燃油機車是以你的條件實付最便宜的 125cc。試算只看錢，不看品牌。每一款都寫明車種、極速和怎麼充電；列出廠牌只是照實寫，不是推薦。',
+        'zh-TW': '「照計算建議」的電動機車，是符合你的答案、買的時候最便宜的一輛。上面和首頁也是這樣挑。燃油機車是照你的條件，買的時候最便宜的 125cc。計算只看錢，不看品牌。每一款都寫出車種、極速和怎麼充電。寫出廠牌只是照實寫，不是推薦。',
         en: 'The calculator’s pick is the electric scooter that is cheapest to buy and fits your answers (the same rule as above and on the home page), and the cheapest 125cc to buy on your details. It looks only at money, never at brand. Every model is described by class, top speed and how it is powered; naming the maker is a plain fact, not a recommendation.',
       },
     },
@@ -259,18 +332,18 @@ export default copy({
     announce: { 'zh-TW': '結果已更新：{title} {value}。', en: 'Result updated: {title} {value}.' },
     /** What a screen reader hears when the result changes: one sentence per outcome, never a panel label. */
     spoken: {
-      parity: { 'zh-TW': '結果已更新：買的時候少付 {v}。', en: 'Result updated: {v} less to pay at purchase.' },
-      month: { 'zh-TW': '結果已更新：第 {n} 個月打平。', en: 'Result updated: it breaks even in month {n}.' },
-      bLess: { 'zh-TW': '結果已更新：買的時候少 {gap}，之後每個月的花費大約多 {v}。', en: 'Result updated: {gap} less to buy, then about {v} more a month to run.' },
-      bSame: { 'zh-TW': '結果已更新：買的時候差不多，之後每個月的花費大約多 {v}。', en: 'Result updated: about the same to buy, then about {v} more a month to run.' },
-      c: { 'zh-TW': '結果已更新：買的時候還差 {v}。', en: 'Result updated: {v} short at purchase.' },
+      parity: { 'zh-TW': '結果已更新：買的那天，電動機車少付 {v}。', en: 'Result updated: on the day you buy, the electric scooter costs {v} less.' },
+      month: { 'zh-TW': '結果已更新：第 {n} 個月打平。', en: 'Result updated: it evens out in month {n}.' },
+      bLess: { 'zh-TW': '結果已更新：買的那天少付 {gap}，之後每個月多花約 {v}。', en: 'Result updated: {gap} less on the day you buy, then about {v} more a month.' },
+      bSame: { 'zh-TW': '結果已更新：買的那天差不多，之後每個月多花約 {v}。', en: 'Result updated: about the same on the day you buy, then about {v} more a month.' },
+      c: { 'zh-TW': '結果已更新：買的那天，電動機車多付 {v}。', en: 'Result updated: on the day you buy, the electric scooter costs {v} more.' },
     },
     /** The same answer, short enough for the bar that stays at the bottom of the screen. */
     barShort: {
-      parity: { 'zh-TW': '買的時候少付 {v}', en: '{v} less at purchase' },
-      month: { 'zh-TW': '第 {n} 個月打平', en: 'Breaks even in month {n}' },
-      b: { 'zh-TW': '每個月的花費多 {v}', en: '{v} more a month to run' },
-      c: { 'zh-TW': '買的時候還差 {v}', en: '{v} short at purchase' },
+      parity: { 'zh-TW': '買的那天少付 {v}', en: '{v} less on the day you buy' },
+      month: { 'zh-TW': '第 {n} 個月打平', en: 'Evens out in month {n}' },
+      b: { 'zh-TW': '每個月多花約 {v}', en: 'About {v} more a month' },
+      c: { 'zh-TW': '買的那天多付 {v}', en: '{v} more on the day you buy' },
     },
     newTab: { 'zh-TW': '（另開新視窗）', en: ' (opens in a new tab)' },
     fellBack: { 'zh-TW': '照你的答案，找不到在家充電的車款，所以改用換電月租來算。', en: 'No home-charged model fits your answers, so this uses a swap subscription instead.' },
@@ -286,7 +359,7 @@ export default copy({
       month: { 'zh-TW': '每個月', en: 'Each month' },
       warn: { 'zh-TW': '提醒', en: 'Warnings' },
     },
-    asOf: { 'zh-TW': '以 {date} 買車計算；價格、補助與名額是 {checked}查證的。', en: 'For a purchase on {date}; prices, subsidies and quotas as checked on {checked}.' },
+    asOf: { 'zh-TW': '算的是 {date} 買車。價格、補助和名額是 {checked}查的。', en: 'For a purchase on {date}; prices, subsidies and quotas as checked on {checked}.' },
     summary: {
       'zh-TW': '{city}，{scrap}，每月 {km} 公里，{plan}。電動：{ev}；燃油：{gas}。',
       en: '{city}, {scrap}, {km} km a month, {plan}. Electric: {ev}. Petrol: {gas}.',
@@ -294,73 +367,26 @@ export default copy({
     scrapYes: { 'zh-TW': '報廢一輛 {year} 年 {month} 月出廠的{engine}機車', en: 'scrapping a {engine} scooter built in {monthName} {year}' },
     scrapNo: { 'zh-TW': '沒有車可以報廢', en: 'nothing to scrap' },
     verdict: {
-      parity: {
-        'zh-TW': '以你的條件，電動機車實付比新的燃油機車少 {gap}，每個月的開銷也不比加油多。',
-        en: 'On your details, an electric scooter costs {gap} less to buy than a new petrol one, and no more to run each month.',
-      },
-      month: {
-        'zh-TW': '買的時候多 {gap}，每個月少 {monthly}。算到第 {n} 個月，兩邊加起來的花費打平。',
-        en: '{gap} more to buy, and {monthly} less each month. By month {n} the two totals are level.',
-      },
-      gapWithSetupShort: { 'zh-TW': '{gap}（連同電池設定費）', en: '{gap} (battery setup fee included)' },
-      gapSetupLess: {
-        'zh-TW': '{gap}（電動車價比燃油機車少 {car}，但開通電池要先付設定費 {fee}）',
-        en: '{gap} (the electric scooter is {car} cheaper, but switching its battery on costs a {fee} setup fee)',
-      },
-      gapSetupMore: {
-        'zh-TW': '{gap}（電動車價多 {car}，再加上開通電池的設定費 {fee}）',
-        en: '{gap} (the electric scooter costs {car} more, plus a {fee} battery setup fee)',
-      },
-      monthlyThen: {
-        'zh-TW': '{now}（前 {n} 個月有新車資費優惠；之後每個月 {later}）',
-        en: '{now} (for the first {n} months, with the new-scooter plan discount; {later} a month after that)',
-      },
-      crossings: {
-        'zh-TW': '兩條線不只交叉一次（第 {months} 個月），下面的圖看得到。',
-        en: 'The lines cross more than once (months {months}); the chart below shows it.',
-      },
-      bAverage: { 'zh-TW': '{h}平均下來，每個月的花費多 {monthly}（不含買車時的差價）。', en: 'Averaged over {h}, running costs are {monthly} more a month (not counting the price gap at purchase).' },
-      bSame: {
-        'zh-TW': '買的時候差不多，但以你每月 {km} 公里、用{plan}來算，每個月大約多花 {monthly}。',
-        en: 'About the same to buy, but at {km} km a month on {plan} you would pay roughly {monthly} more each month.',
-      },
-      bLess: {
-        'zh-TW': '買的時候少 {gap}，但以你每月 {km} 公里、用{plan}來算，每個月大約多花 {monthly}。',
-        en: '{gap} less to buy, but at {km} km a month on {plan} you would pay roughly {monthly} more each month.',
-      },
-      bCatch: { 'zh-TW': '從第 {n} 個月起，加起來的總花費會超過燃油機車。', en: 'From month {n}, the total passes the petrol scooter’s.' },
-      bAhead: { 'zh-TW': '{h}加起來，還是電動的比較少。', en: 'Over {h} in total, electric still costs less.' },
       bBuysMaint: {
-        'zh-TW': '這筆錢買到的是：你騎過的每個路口少一根排氣管，還有比較少的保養。值不值得，由你決定。',
-        en: 'What that buys: one tailpipe fewer at every crossing you ride through, and less maintenance. Whether that is worth it is your call.',
+        'zh-TW': '多花的錢換到的是：你騎過的每個路口，少一根排氣管。保養也比較少。值不值得，由你決定。',
+        en: 'What the extra buys: one tailpipe fewer at every crossing you ride through, and less servicing. Whether that is worth it is your call.',
       },
       bBuys: {
-        'zh-TW': '這筆錢買到的是：你騎過的每個路口少一根排氣管。值不值得，由你決定。',
-        en: 'What that buys: one tailpipe fewer at every crossing you ride through. Whether that is worth it is your call.',
+        'zh-TW': '多花的錢換到的是：你騎過的每個路口，少一根排氣管。值不值得，由你決定。',
+        en: 'What the extra buys: one tailpipe fewer at every crossing you ride through. Whether that is worth it is your call.',
       },
-      c: {
-        'zh-TW': '以你的條件，買的時候還差 {gap}，每個月也不會比較省。我們不會叫你硬換。下面是讓差距變小的做法，還有換車之前可以先做的事。',
-        en: 'On your details there is still a gap at purchase of {gap}, and it is no cheaper to run. We will not tell you to force it. Below are ways to narrow the gap, and things you can do before you change scooters.',
-      },
-      cSlow: {
-        'zh-TW': '以你的條件，買的時候還差 {gap}；每個月少 {monthly}，但以你的里程，{h}內打不平。{more}我們不會叫你硬換。',
-        en: 'On your details there is still a gap at purchase of {gap}. It costs {monthly} less a month, but at your distance it does not break even within {h}. {more}We will not tell you to force it.',
-      },
-      cSlowKm: { 'zh-TW': '要騎到每個月 {km} 公里左右才會。', en: 'It would at about {km} km a month. ' },
-      cSlowNever: { 'zh-TW': '照目前的資料，騎得再多也打不平。', en: 'On the current figures it would not at any distance. ' },
-      cBriefly: {
-        'zh-TW': '以你的條件，兩邊的總花費第 {n} 個月曾經一樣，但{h}後電動還是多 {gap}。我們不會叫你硬換。',
-        en: 'On your details the totals are briefly level in month {n}, but after {h} electric still costs {gap} more. We will not tell you to force it.',
+      cClose: {
+        'zh-TW': '我們不會叫你硬換。下面有讓差距變小的做法，也有今年不換可以先做的事。',
+        en: 'We will not tell you to force it. Below are ways to narrow the gap, and things to do if you wait.',
       },
     },
     panel: {
-      parity: { 'zh-TW': '買的時候少付', en: 'Less to pay at purchase' },
+      parity: { 'zh-TW': '買的那天少付', en: 'Less on the day you buy' },
       month: { 'zh-TW': '打平', en: 'Breaks even' },
       monthUnit: { 'zh-TW': '個月', en: 'months' },
       monthPrefix: { 'zh-TW': '第', en: 'month' },
-      b: { 'zh-TW': '每個月的花費，大約多', en: 'Running costs: about this much more a month' },
-      bAverage: { 'zh-TW': '每個月的花費多（{h}平均，不含買車的差價）', en: 'Running costs a month, {h} average (price at purchase not included)' },
-      c: { 'zh-TW': '買的時候還差', en: 'Still short at purchase' },
+      b: { 'zh-TW': '每個月多花約', en: 'About this much more a month' },
+      c: { 'zh-TW': '買的那天多付', en: 'More on the day you buy' },
       note: { 'zh-TW': '每月 {km} 公里、{plan}。比較的燃油機車：{gas}。', en: '{km} km a month on {plan}. Compared with: {gas}.' },
     },
     dayCount: {
@@ -384,16 +410,18 @@ export default copy({
     },
     likeForLike: { 'zh-TW': '比的是不是同一級車：', en: 'Is this like for like? ' },
     sections: {
-      purchase: { 'zh-TW': '買的時候，一行一行算', en: 'The purchase, line by line' },
+      picked: { 'zh-TW': '這兩輛車是怎麼挑的', en: 'How these two scooters were chosen' },
+      evenMore: { 'zh-TW': '打平怎麼算，再多看一點', en: 'More on when it evens out' },
+      purchase: { 'zh-TW': '買的那天，一行一行算', en: 'The day you buy, line by line' },
       waterfall: { 'zh-TW': '補助一層層扣下來之後，|還差多少', en: 'After each subsidy comes off, |what is left' },
-      waterfallSub: { 'zh-TW': '新台幣；最後一行是和燃油機車的差距', en: 'NT$; the last row is the gap to the petrol scooter' },
+      waterfallSub: { 'zh-TW': '單位：元。最後一行是和燃油機車差多少。', en: 'NT$. The last row is the gap to the petrol scooter.' },
       excluded: { 'zh-TW': '算過，但沒有算進去的', en: 'Considered, but not counted' },
-      excludedLead: { 'zh-TW': '每一項都寫了原因。符合資格卻因為規定不清楚而沒算的，會在「我們要先提醒你的」裡寫出可能多領多少。', en: 'Each with its reason. Where a rule is unclear and you might still qualify, the notes under “What we want you to know first” say how much more you could get.' },
-      monthly: { 'zh-TW': '每個月要花多少', en: 'What it costs each month' },
-      monthlyLead: { 'zh-TW': '以你每月 {km} 公里計算的中間值；金額下面的小字是可能的範圍。', en: 'Middle estimates at your {km} km a month; the small figures under an amount are the likely range.' },
+      excludedLead: { 'zh-TW': '每一項都寫了原因。有些你可能領得到，只是規定寫得不清楚，所以沒算。這種的，「我們要先提醒你的」會寫出可能多領多少。', en: 'Each with its reason. Where a rule is unclear and you might still qualify, the notes under “What we want you to know first” say how much more you could get.' },
+      monthly: { 'zh-TW': '每個月，一行一行算', en: 'Each month, line by line' },
+      monthlyLead: { 'zh-TW': '照你每月騎 {km} 公里算的中間值。金額下面的小字，是可能的範圍。', en: 'Middle estimates at your {km} km a month; the small figures under an amount are the likely range.' },
       breakeven: { 'zh-TW': '兩條線在哪裡交叉，|就是哪時候打平', en: 'Where the lines cross |is where it pays back' },
-      breakevenSub: { 'zh-TW': '累計花費（購車 + 每月開銷），新台幣', en: 'Cumulative cost (purchase + running costs), NT$' },
-      breakevenAnswer: { 'zh-TW': '試算的答案：{answer}。', en: 'The calculator’s answer: {answer}.' },
+      breakevenSub: { 'zh-TW': '加起來的總花費：買車的錢加上每個月的錢，單位是元', en: 'Total so far: the purchase plus every month, NT$' },
+      breakevenAnswer: { 'zh-TW': '計算的答案：{answer}。', en: 'The calculator’s answer: {answer}.' },
       breakevenRange: { 'zh-TW': '最好的情況：{best}；最差的情況：{worst}。', en: 'Best case: {best}. Worst case: {worst}.' },
       breakevenCrossings: { 'zh-TW': '兩條線交錯的月份：{months}。', en: 'Months in which the lines change order: {months}.' },
       parityKm: { 'zh-TW': '每個月騎 {from} 到 {to} 公里時，五年總花費電動比較少。', en: 'Over five years electric costs less in total at {from} to {to} km a month.' },
@@ -401,7 +429,7 @@ export default copy({
       parityKmNone: { 'zh-TW': '照這組條件，不管每個月騎多少公里，五年總花費都是燃油機車比較少。', en: 'On these details, petrol costs less in total over five years at any monthly distance.' },
       smoothing: { 'zh-TW': '如果油價沒有被壓低', en: 'If petrol were not held down' },
       smoothingLine: {
-        'zh-TW': '沒有這項暫時措施時，燃油機車每個月大約多 {delta}；結果會是：{answer}。',
+        'zh-TW': '如果沒有這個暫時壓低油價的做法，燃油機車每個月約多 {delta}。結果會變成：{answer}。',
         en: 'Without the temporary measure the petrol scooter would cost roughly {delta} more a month, and the result would be: {answer}.',
       },
       warnings: { 'zh-TW': '我們要先提醒你的', en: 'What we want you to know first' },
@@ -409,7 +437,7 @@ export default copy({
       next: { 'zh-TW': '接下來', en: 'What next' },
     },
     nearMiss: {
-      'zh-TW': '你的車出廠還不到 {years} 年，今年不算汰舊。它要到 {date}才滿 {years} 年，還要 {n} 個月；可是 2026 年的補助都要在 {deadline}前買車。到那時候有什麼補助，還沒有一項定案。',
+      'zh-TW': '你的車出廠還不到 {years} 年，今年不算汰舊。它要到 {date}才滿 {years} 年，還要 {n} 個月。可是 2026 年的補助，都要在 {deadline}前買車。到那時候有什麼補助，還沒有一項確定。',
       en: 'Your scooter is under {years} years old, so it does not count for scrap-and-replace this year. It reaches {years} years on {date}, {n} months from now, but every 2026 subsidy needs purchase by {deadline}, and nothing is confirmed for after that.',
     },
     nearMissCutoff: {
@@ -428,8 +456,8 @@ export default copy({
       application: { 'zh-TW': '申請期限 {date}', en: 'Apply by {date}' },
       quota: { 'zh-TW': '名額', en: 'Quota' },
       payer: { 'zh-TW': '誰付', en: 'Paid by' },
-      paidAt: { 'zh-TW': '購車時折抵', en: 'taken off at the shop' },
-      paidLater: { 'zh-TW': '購車後申請，核准才入帳', en: 'claimed after purchase, paid once approved' },
+      paidAt: { 'zh-TW': '買車時直接扣掉', en: 'taken off at the shop' },
+      paidLater: { 'zh-TW': '買車後申請，核准了才匯給你', en: 'claimed after purchase, paid once approved' },
       source: { 'zh-TW': '出處', en: 'Source' },
       upTo: { 'zh-TW': '公告寫「最高」，可能領得比較少', en: 'Published as “up to”: you may get less' },
       capped: { 'zh-TW': '受上限限制', en: 'Reduced by a cap' },
@@ -446,9 +474,9 @@ export default copy({
     monthlyTable: {
       item: { 'zh-TW': '每個月', en: 'Each month' },
       none: { 'zh-TW': '不用付', en: 'nothing to pay' },
-      total: { 'zh-TW': '合計（上面各列加起來）', en: 'Total of the rows above' },
+      total: { 'zh-TW': '合計（上面幾列加起來）', en: 'Total of the rows above' },
       average: { 'zh-TW': '{h}平均，每個月', en: 'Monthly average over {h}' },
-      averageNote: { 'zh-TW': '平均那一列把優惠到期和設定費都算進去，結論和打平的圖用的就是它。', en: 'The average row counts the discount ending and the setup fee; the verdict and the break-even chart use it.' },
+      averageNote: { 'zh-TW': '「平均」那一列，把優惠到期和設定費都算進去。上面「每個月差多少」和打平的圖，用的就是它。', en: 'The average row counts the discount ending and the setup fee. “Each month” above and the break-even chart use it.' },
       creditNote: { 'zh-TW': '新車資費優惠只有前 {n} 個月；優惠結束後，電動每個月是 {after}。', en: 'The new-scooter plan discount lasts only the first {n} months; after that, electric costs {after} a month.' },
       setupNote: { 'zh-TW': '設定費 {fee} 在開通電池時付；表格把它攤在 {n} 個月裡。', en: 'The {fee} setup fee is paid when the battery is switched on; the table spreads it over {n} months.' },
       range: { 'zh-TW': '可能 {low}–{high}', en: 'likely {low}–{high}' },
@@ -463,7 +491,7 @@ export default copy({
       noSetupFee: { 'zh-TW': '沒有設定費', en: 'No setup fee' },
       terms: { 'zh-TW': '合約與提前解約：', en: 'Contract and early termination: ' },
       survey: {
-        'zh-TW': '對照：交通部調查裡，電動機車車主一年自報花 {ev}，普通重型燃油機車車主 {gas}。這是不同里程、不同方案的平均，不是同條件的比較。',
+        'zh-TW': '對照：交通部問過車主一年花多少。電動機車車主說 {ev}，白牌燃油機車車主說 {gas}。這是不同里程、不同方案的平均，不是同條件比出來的。',
         en: 'For reference: in the transport ministry’s survey, electric owners reported spending {ev} a year and heavy-class petrol owners {gas}. These are averages across distances and plans, not a like-for-like comparison.',
       },
     },
@@ -474,7 +502,7 @@ export default copy({
     },
     confidence: {
       verified: { 'zh-TW': '已查證', en: 'Verified' },
-      secondary: { 'zh-TW': '只在轉述中看到', en: 'Second-hand source' },
+      secondary: { 'zh-TW': '出處：只在轉述中看到', en: 'Source: second-hand only' },
     },
     plate: {
       heavy: { 'zh-TW': '白牌（普通重型）', en: 'white plate (heavy class)' },
@@ -520,10 +548,10 @@ export default copy({
   examples: {
     title: { 'zh-TW': '先看別人算出來的結果', en: 'Worked examples' },
     lead: {
-      'zh-TW': '這幾個人的條件不一樣，結果也不一樣，每一個都是完整的試算。打不平的排在前面。',
+      'zh-TW': '這幾個人的條件不一樣，結果也不一樣，每一個都是完整的計算。打不平的排在前面。',
       en: 'Different people, different results, each a complete calculation. The ones where it does not add up come first.',
     },
-    tabsLabel: { 'zh-TW': '試算例子', en: 'Worked examples' },
+    tabsLabel: { 'zh-TW': '計算例子', en: 'Worked examples' },
     before: { 'zh-TW': '在 {deadline}前買車、領牌（{checked}查證的資料）', en: 'Buying and registering by {deadline} (data checked {checked})' },
     after: { 'zh-TW': '{from}以後買，2027 年沒有方案時', en: 'Buying from {from}, with no 2027 programme' },
     people: {
@@ -552,7 +580,7 @@ export default copy({
       },
       parent: {
         tab: { 'zh-TW': '台北，報廢二行程', en: 'Taipei, scrapping a two-stroke' },
-        who: { 'zh-TW': '住台北，家裡有 12 歲以下的孩子，報廢一輛 {year} 年出廠的二行程，一個月騎 {km} 公里，要白牌，用換電月租。', en: 'Lives in Taipei with a child of 12 or under, scrapping a two-stroke built in {year}, {km} km a month, wants a white plate, on a swap plan.' },
+        who: { 'zh-TW': '住台北，家裡有 12 歲以下的小孩。報廢一輛 {year} 年出廠的二行程機車。一個月騎 {km} 公里，要白牌，用換電月租。', en: 'Lives in Taipei with a child of 12 or under, scrapping a two-stroke built in {year}, {km} km a month, wants a white plate, on a swap plan.' },
       },
       delivery: {
         tab: { 'zh-TW': '台南，外送', en: 'Tainan, delivery rider' },
@@ -560,8 +588,8 @@ export default copy({
       },
     },
     useThis: { 'zh-TW': '用這組條件開始算', en: 'Start the calculator from this' },
-    voice: { 'zh-TW': '下面的結果，是照試算對這個人說話的方式寫的。', en: 'The result below is written as the calculator would show it to this person.' },
-    more: { 'zh-TW': '一行一行的算法（購車明細、每月花費、打平的圖）會在你打開這個例子時算出來。', en: 'The line-by-line working (purchase, monthly costs, break-even chart) is worked out when you open this example.' },
+    voice: { 'zh-TW': '下面的結果，是照計算對這個人說話的方式寫的。', en: 'The result below is written as the calculator would show it to this person.' },
+    more: { 'zh-TW': '打開這個例子時，才會算出一行一行的算法：買車明細、每月花費和打平的圖。', en: 'The line-by-line working (purchase, monthly costs, break-even chart) is worked out when you open this example.' },
     moreNoJs: { 'zh-TW': '一行一行的算法要開 JavaScript 才會出現；第一個例子已經完整列出。', en: 'The line-by-line working needs JavaScript; the first example shows it in full.' },
   },
 
@@ -569,7 +597,7 @@ export default copy({
   closer: {
     title: { 'zh-TW': '怎麼把價差再縮小', en: 'How to narrow the gap' },
     lead: {
-      'zh-TW': '能讓實付再少一點的條件，照金額排。金額是試算用你選的縣市算的；不符合的條件，就不要為了補助硬湊。',
+      'zh-TW': '這些條件能讓實付再少一點，照金額大小排。金額照你選的縣市算。不符合的條件，不要為了補助硬湊。',
       en: 'What would bring the price down, largest first, worked out for the place you chose. Do not bend your life to fit a subsidy.',
     },
     noCity: { 'zh-TW': '選了縣市，這裡會列出每一項在你那裡差多少。', en: 'Choose a place and this lists what each would be worth there.' },
@@ -588,13 +616,13 @@ export default copy({
     leverPlanNote: { 'zh-TW': '每個月少 {amount}', en: '{amount} less a month' },
     pitfallsTitle: { 'zh-TW': '容易踩到的坑', en: 'Easy ways to lose money' },
     pitfalls: [
-      { 'zh-TW': '設籍年限：有些縣市要你在當地設籍滿一段時間，試算會寫出它假設了什麼。', en: 'Residency: some places require household registration for a set time; the result says what it assumed.' },
+      { 'zh-TW': '設籍年限：有些縣市要你在當地設籍滿一段時間，計算會寫出它假設了什麼。', en: 'Residency: some places require household registration for a set time; the result says what it assumed.' },
       { 'zh-TW': '要報廢的車通常要登記在同一個縣市。', en: 'The scooter you scrap usually has to be registered in the same place.' },
       { 'zh-TW': '要領環境部的獎勵，得先在媒合平台登錄，再買車；順序反了，那筆錢就沒了。', en: 'Register on the environment ministry’s matching platform before you buy; do it the other way round and that money is gone.' },
       { 'zh-TW': '發票和領牌都要在期限內；有些車廠優惠看的是領牌日，不是發票日。', en: 'Invoice and plate registration must both fall inside the window; some maker offers count the plate date, not the invoice.' },
       { 'zh-TW': '線上申請的截止日跟買車期限不同，各縣市也不同。', en: 'The online filing deadline is not the purchase deadline, and differs by place.' },
-      { 'zh-TW': '名額先到先得；結果裡寫名額沒有公布或沒有查證的，可能已經沒了。', en: 'Places go in order of application; where the result says the count was not published or not checked, they may already be gone.' },
-      { 'zh-TW': '汰舊換新和其他優惠不一定能一起領；試算只算能一起領的那一組。', en: 'Scrap-and-replace money and other offers do not always stack; the result counts only the combination that can be claimed together.' },
+      { 'zh-TW': '名額先到先得。結果寫名額「沒有公布」或「沒有查證」的，可能已經沒了。', en: 'Places go in order of application; where the result says the count was not published or not checked, they may already be gone.' },
+      { 'zh-TW': '汰舊換新和其他優惠不一定能一起領；計算只算能一起領的那一組。', en: 'Scrap-and-replace money and other offers do not always stack; the result counts only the combination that can be claimed together.' },
     ],
   },
 
@@ -607,11 +635,11 @@ export default copy({
       en: 'The purchase deadline has passed. If you bought by {deadline}, here is what to file; most online applications close on {filing}, and it varies by place.',
     },
     phaseC: {
-      'zh-TW': '2026 年的補助和申請都結束了。2027 年的方案定案時，我們會照新的規定改寫這份清單。',
+      'zh-TW': '2026 年的補助和申請都結束了。2027 年的方案確定後，我們會照新的規定改寫這份清單。',
       en: 'The 2026 subsidies and their filing windows have closed. When a 2027 programme is confirmed we will rewrite this checklist for its rules.',
     },
     steps: [
-      { title: { 'zh-TW': '先算', en: 'Work it out first' }, body: { 'zh-TW': '用上面的試算，確定你能領哪些、各要什麼條件。把結果印下來。', en: 'Use the calculator to see what you can claim and on what conditions. Print the result.' } },
+      { title: { 'zh-TW': '先算', en: 'Work it out first' }, body: { 'zh-TW': '用上面的計算，確定你能領哪些、各要什麼條件。把結果印下來。', en: 'Use the calculator to see what you can claim and on what conditions. Print the result.' } },
       { title: { 'zh-TW': '看官方名額', en: 'Check the official count' }, body: { 'zh-TW': '打開你縣市的官方頁面，看名額還有沒有。名額先到先得。', en: 'Open your place’s official page and check that places remain. They go in order of application.' } },
       { title: { 'zh-TW': '買車之前：到環境部媒合平台登錄', en: 'Before you buy: register on the environment ministry’s platform' }, body: { 'zh-TW': '要領環境部汰舊獎勵的人，這一步一定要在買車前做。', en: 'If you will claim the environment ministry’s scrap reward, this has to happen before you buy.' } },
       { title: { 'zh-TW': '買車、開發票、領牌', en: 'Buy, get the invoice, register the plate' }, body: { 'zh-TW': '三件事都要在期限內。問車行：經濟部補助是車行代辦，還是要你自己申請？', en: 'All three inside the window. Ask the dealer whether they or you file the economics ministry’s claim.' } },
@@ -625,7 +653,7 @@ export default copy({
       foreign: { 'zh-TW': '{date}：外籍人士向經濟部申請的期限', en: '{date}: deadline for foreign nationals to apply to the economics ministry' },
       next: { 'zh-TW': '2027 年：還沒有一項定案（{date}查）', en: '2027: nothing confirmed (checked {date})' },
     },
-    yourDates: { 'zh-TW': '你的試算裡每一行補助自己的期限，寫在結果的「買的時候，一行一行算」。', en: 'Each subsidy line in your result carries its own deadline, under “The purchase, line by line”.' },
+    yourDates: { 'zh-TW': '你的計算裡，每一行補助都有自己的期限，寫在結果的「買的那天，一行一行算」。', en: 'Each subsidy line in your result carries its own deadline, under “The day you buy, line by line”.' },
     print: { 'zh-TW': '印出清單', en: 'Print the checklist' },
   },
 
@@ -634,17 +662,17 @@ export default copy({
     title: { 'zh-TW': '騎起來|要花多少', en: 'What it costs |to run' },
     opener: { 'zh-TW': '騎起來比較省嗎？不一定。', en: 'Is it cheaper to run? Not necessarily.' },
     lead: {
-      'zh-TW': '電動機車每個月省不省，看電池怎麼來。照現在的油價，白牌換電月租在我們算的每一種里程，都比油錢貴；能在家充電，電錢才明顯比油錢少。電動機車的保養費比較少，騎得很多的人，差距會因此縮小。',
+      'zh-TW': '電動機車每個月省不省，看電池怎麼來。照現在的油價，我們算的每一種里程，白牌換電月租都比油錢貴。能在家充電，電錢才明顯比油錢少。電動機車的保養費比較少，所以騎得很多的人，差距會縮小。',
       en: 'Whether an electric scooter is cheaper each month depends on how you power it. At today’s pump price, a white-plate swap subscription costs more than petrol at every distance we worked out; charging at home costs far less than petrol. Maintenance costs less on electric, which narrows the gap for people who ride a lot.',
     },
     leadFrom: {
-      'zh-TW': '電動機車每個月省不省，看你騎多遠、電池怎麼來。照現在的油價，白牌換電月租要騎到每月 {km} 公里以上，才比油錢便宜；能在家充電，電錢明顯比油錢少。',
+      'zh-TW': '電動機車每個月省不省，看你騎多遠、電池怎麼來。照現在的油價，每月騎到 {km} 公里以上，白牌換電月租才比油錢便宜。能在家充電，電錢明顯比油錢少。',
       en: 'Whether an electric scooter is cheaper each month depends on how far you ride and how you power it. At today’s pump price, a white-plate swap subscription only beats petrol from {km} km a month; charging at home costs far less than petrol.',
     },
     tableTitle: { 'zh-TW': '每公里要多少錢，|看你一個月騎多遠', en: 'What a kilometre costs |depends on how far you ride' },
-    tableSub: { 'zh-TW': '油錢或電池錢（含月租、設定費攤提），每月與每公里，新台幣', en: 'Fuel or battery cost (plan fee and setup fee spread included), per month and per km, NT$' },
+    tableSub: { 'zh-TW': '油錢或電池錢（月租和設定費也攤進去），每月和每公里，單位是元', en: 'Fuel or battery cost (plan fee and setup fee spread included), per month and per km, NT$' },
     tableCaption: {
-      'zh-TW': '依 {checked}查證的油價、資費與電價試算。月租取該里程最便宜的白牌換電方案；不含保養與規費。新車的暫時資費優惠不計入。',
+      'zh-TW': '照 {checked}查的油價、電池方案和電價算。月租用的是那個里程最便宜的白牌換電方案。保養和規費不算在內，新車的暫時優惠也不算。',
       en: 'Worked out from fuel prices, plans and tariffs checked on {checked}. The subscription row takes the cheapest white-plate swap plan at each distance; maintenance and fees are not included. Temporary new-buyer plan credits are left out.',
     },
     km: { 'zh-TW': '每月 {km} 公里', en: '{km} km a month' },
@@ -675,7 +703,7 @@ export default copy({
       home: { 'zh-TW': '在家充電：', en: 'Charging at home: ' },
     },
     whoTitle: { 'zh-TW': '換電月租會不會比油錢便宜？', en: 'Does a subscription ever beat petrol?' },
-    whoLead: { 'zh-TW': '照試算在不同里程算出來的結果（白牌車）。', en: 'From the calculator at different distances (white-plate models).' },
+    whoLead: { 'zh-TW': '照計算在不同里程算出來的結果（白牌車）。', en: 'From the calculator at different distances (white-plate models).' },
     whoSuits: { 'zh-TW': '每月 {km} 公里以上：最便宜的月租開始比加油便宜（油價照現在算）。', en: 'From {km} km a month, the cheapest subscription costs less than petrol (at today’s pump price).' },
     whoSuitsNone: { 'zh-TW': '照現在的油價，每月騎到 {km} 公里，白牌換電月租都還是比加油貴。', en: 'At today’s pump price, a white-plate subscription costs more than petrol at every distance up to {km} km a month.' },
     whoNot: { 'zh-TW': '每月 {km} 公里以下：月租比加油貴。用多少付多少的方案比較接近油錢，但開通要付設定費。', en: 'Below that, a subscription costs more than petrol. Pay-per-use comes closer to petrol, but carries a setup fee.' },
@@ -686,11 +714,11 @@ export default copy({
     unitYear: { 'zh-TW': '元／年', en: 'NT$ a year' },
     smoothingTitle: { 'zh-TW': '油價現在被壓低了', en: 'Petrol is being held down' },
     smoothingBody: {
-      'zh-TW': '以每月 {km} 公里計，這項暫時措施讓燃油機車每個月少花大約 {delta}；措施取消時，每個月要多付這麼多。',
+      'zh-TW': '每月騎 {km} 公里，這個暫時壓低油價的做法，讓燃油機車每月少花約 {delta}。做法停掉時，每個月就要多付這麼多。',
       en: 'At {km} km a month, the temporary measure saves a petrol rider about {delta} a month; if it ends, that is the extra each month.',
     },
     surveyTitle: { 'zh-TW': '車主自己說花了多少', en: 'What owners say they spend' },
-    surveySub: { 'zh-TW': '每輛機車一年的油電、保養與停車支出，新台幣', en: 'Yearly spend per scooter on energy, maintenance and parking, NT$' },
+    surveySub: { 'zh-TW': '每輛機車一年花在油錢或電費、保養和停車的錢，單位是元', en: 'Yearly spend per scooter on energy, maintenance and parking, NT$' },
     electricityNote: { 'zh-TW': '電價：', en: 'Electricity: ' },
   },
 
@@ -702,7 +730,7 @@ export default copy({
     },
     modelsTitle: { 'zh-TW': '電池拆下來在家充、不用電池月租的車，我們查到的', en: 'Models whose battery you take out and charge at home, with no battery plan, that we could check' },
     modelsLead: {
-      'zh-TW': '試算資料裡只有這幾款。沒有一款經查證可以取代 125cc：',
+      'zh-TW': '計算資料裡只有這幾款。沒有一款經查證可以取代 125cc：',
       en: 'These are the only ones in our data. None is verified as a substitute for a 125cc:',
     },
     modelLine: { 'zh-TW': '{name}（{maker}）：{plate}，{price}起。{performance}', en: '{name} ({maker}): {plate}, from {price}. {performance}' },
@@ -726,14 +754,14 @@ export default copy({
       { label: { 'zh-TW': '充電', en: 'Charging' }, good: { 'zh-TW': '停車的地方能充電', en: 'You can charge where you park' }, bad: { 'zh-TW': '只能換電', en: 'Swapping only' } },
       { label: { 'zh-TW': '車種', en: 'Class' }, good: { 'zh-TW': '綠牌也可以', en: 'A green plate will do' }, bad: { 'zh-TW': '一定要白牌', en: 'It must be a white plate' } },
     ],
-    note: { 'zh-TW': '里程、要報廢的車和縣市這三列，是上面例子試算出來的方向；充電和車種兩列，來自「騎起來要花多少」的數字和補助的車種分級。都不是保證。', en: 'Distance, scrapping and place are the direction the calculator finds in the examples above; charging and class follow from the running-cost figures and the subsidy classes. None is a guarantee.' },
+    note: { 'zh-TW': '里程、要報廢的車和縣市這三列，是上面例子算出來的方向。充電和車種兩列，來自「騎起來要花多少」的數字，和補助怎麼分車種。都不是保證。', en: 'Distance, scrapping and place are the direction the calculator finds in the examples above; charging and class follow from the running-cost figures and the subsidy classes. None is a guarantee.' },
     youLink: { 'zh-TW': '你也是這種情況？看「今年不換，也有事可以做」', en: 'Sound like you? See “Not switching this year”' },
   },
 
   risks: {
     title: { 'zh-TW': '買之前|要知道', en: 'Before you buy' },
     class: {
-      'zh-TW': '便宜的電動機車多半是綠牌，和 125cc 不是同一級；白牌電動車的性能，多半沒有可以查證的數字。試算每一次都會寫出比的是不是同一級車。',
+      'zh-TW': '便宜的電動機車多半是綠牌，和 125cc 不是同一級。多數白牌電動機車，查不到可以查證的性能數字。計算每一次都會寫出，比的是不是同一級車。',
       en: 'The cheaper electric scooters are mostly green-plate models, not the same class as a 125cc; for most white-plate models no verified performance figures exist. Every result says whether the comparison is like for like.',
     },
     network: {
@@ -745,10 +773,10 @@ export default copy({
       en: 'The company itself says it runs more than {stations} swap stations (its own figure, relayed by the media, not an independent count).',
     },
     finance: { 'zh-TW': '這家公司的財務：', en: 'The company’s finances: ' },
-    networkTail: { 'zh-TW': '買換電車，電池的錢就跟著這家公司的資費走。資費方案可能調整；試算用的是 {checked}查到的方案。', en: 'Buying a swap scooter ties your battery costs to that company’s plans, which can change; the calculator uses the plans we checked on {checked}.' },
+    networkTail: { 'zh-TW': '買換電車，電池的錢就跟著這家公司的資費走。資費方案可能調整；計算用的是 {checked}查到的方案。', en: 'Buying a swap scooter ties your battery costs to that company’s plans, which can change; the calculator uses the plans we checked on {checked}.' },
     next: { 'zh-TW': '2027 年：', en: '2027: ' },
     nextCaveat: {
-      'zh-TW': '「沒有後續方案」是我們查詢的結果，不是官方說明；環境部的延長只是預告的草案。',
+      'zh-TW': '「沒有後續方案」是我們查出來的，不是政府說的。環境部要延長補助，現在只是預告的草案。',
       en: '“No successor” is the result of our searches, not an official statement; the MOENV extension is only a pre-announced draft.',
     },
     early: { 'zh-TW': '{places}的地方補助，購車期限是 {date}，比其他地方早。', en: '{places}: the local subsidy’s purchase deadline is {date}, earlier than elsewhere.' },
@@ -758,9 +786,9 @@ export default copy({
     title: { 'zh-TW': '今年不換，|也有事可以做', en: 'Not switching this year? |There is still plenty to do' },
     lead: { 'zh-TW': '我們不會叫你硬換。這些事今天就能做。', en: 'We will not tell you to force it. These you can do today.' },
     items: [
-      { title: { 'zh-TW': '準時定檢', en: 'Turn up for the inspection' }, body: { 'zh-TW': '收到定檢通知就去。在台灣的實驗室測試裡，出廠比較久的機車，每燒一公升油排出的一氧化碳和碳氫化合物比較多。', en: 'Go when the notice comes. In Taiwanese lab tests, older scooters gave off more carbon monoxide and hydrocarbons per litre of fuel.' }, badge: 'measured-tw' },
+      { title: { 'zh-TW': '準時定檢', en: 'Turn up for the inspection' }, body: { 'zh-TW': '收到定檢通知就去。台灣的實驗室測過：出廠比較久的機車，每燒一公升油，排出的一氧化碳和油氣（沒燒完的汽油）比較多。', en: 'Go when the notice comes. In Taiwanese lab tests, older scooters gave off more carbon monoxide and fuel vapour (unburnt petrol) per litre of fuel.' }, badge: 'measured-tw' },
       { title: { 'zh-TW': '該修就修', en: 'Fix what fails' }, body: { 'zh-TW': '定檢沒過就修，不要拖。', en: 'If it fails, get it fixed rather than waiting.' }, badge: 'inference' },
-      { title: { 'zh-TW': '家裡那台二行程，拿去報廢', en: 'Scrap the household’s two-stroke' }, body: { 'zh-TW': '單純報廢有沒有獎勵，看縣市；試算的燃油那一欄會列出來。', en: 'Whether scrapping alone pays depends on where you live; the petrol column of the calculator lists it.' }, badge: 'official-tw' },
+      { title: { 'zh-TW': '家裡那輛二行程，拿去報廢', en: 'Scrap the household’s two-stroke' }, body: { 'zh-TW': '單純報廢有沒有獎勵，看縣市；計算的燃油那一欄會列出來。', en: 'Whether scrapping alone pays depends on where you live; the petrol column of the calculator lists it.' }, badge: 'official-tw' },
       { title: { 'zh-TW': '短程試試共享電動機車', en: 'Try a shared electric scooter for short trips' }, body: { 'zh-TW': '先騎騎看，再決定要不要換。', en: 'Ride one before deciding.' }, badge: 'inference' },
       { title: { 'zh-TW': '要求公布 2027 年方案', en: 'Ask for a 2027 programme' }, body: { 'zh-TW': '把要求公布 2027 年方案的信寄出去。', en: 'Send the letter asking for a 2027 programme.' }, badge: 'inference' },
     ],
@@ -770,7 +798,7 @@ export default copy({
   cities: {
     title: { 'zh-TW': '各縣市|補助', en: 'Subsidies |by city and county' },
     lead: {
-      'zh-TW': '每個金額都附查證日。查不到的縣市會寫「地方補助查不到」，請洽當地環保局；不會寫成沒有補助。',
+      'zh-TW': '每個金額都寫了查證日。查不到的縣市，會寫「今年補助查不到，請打電話問」，請問當地環保局。我們不會把它寫成沒有補助。',
       en: 'Every amount carries its check date. Places we could not check say so (ask the local environmental bureau); they are never shown as having no subsidy.',
     },
     linesTitle: { 'zh-TW': '{city}的補助（{date}查）', en: '{city}’s subsidies (checked {date})' },
@@ -783,8 +811,8 @@ export default copy({
     to: { 'zh-TW': '購車期限 {date}', en: 'buy by {date}' },
     toScrap: { 'zh-TW': '報廢回收期限 {date}', en: 'scrap and recycle by {date}' },
     toListed: { 'zh-TW': '官方表列到 {listed}，但辦法只確認到 {confirmed}', en: 'listed to {listed}, but the rule is confirmed only to {confirmed}' },
-    notCounted: { 'zh-TW': '（未計入試算）', en: '(not counted)' },
-    notCountedWhy: { 'zh-TW': '沒有計入試算：', en: 'Not counted: ' },
+    notCounted: { 'zh-TW': '（未計入計算）', en: '(not counted)' },
+    notCountedWhy: { 'zh-TW': '沒有計入計算：', en: 'Not counted: ' },
     centralTitle: { 'zh-TW': '中央的補助（全台都適用）', en: 'Central subsidies (all of Taiwan)' },
     none: { 'zh-TW': '資料裡沒有這裡的地方補助。', en: 'No local subsidy is in our data for this place.' },
   },
@@ -806,21 +834,21 @@ export default copy({
       {
         q: { 'zh-TW': '綠牌和白牌差在哪？', en: 'What is the difference between a green and a white plate?' },
         a: {
-          'zh-TW': '白牌是普通重型，和 125cc 燃油機車同一個車種；綠牌是普通輕型，比較便宜、跑得比較慢。中央補助的金額也依車種分級。試算會寫出你選的車是哪一種，和 125cc 是不是同一級。',
+          'zh-TW': '白牌是普通重型，和 125cc 燃油機車同一個車種；綠牌是普通輕型，比較便宜、跑得比較慢。中央補助的金額也依車種分級。計算會寫出你選的車是哪一種，和 125cc 是不是同一級。',
           en: 'A white plate is the heavy class, the same as a 125cc petrol scooter; a green plate is the light class, cheaper and slower. Central subsidies are graded by class too. Every result says which class the model is and whether it matches a 125cc.',
         },
       },
       {
         q: { 'zh-TW': '補助什麼時候入帳？', en: 'When is the subsidy paid?' },
         a: {
-          'zh-TW': '多數補助是買車以後申請、核准才匯進帳戶，買車當下可能要先付比較多。試算的每一行都寫了是在車行折抵，還是核准後入帳。',
+          'zh-TW': '多數補助是買車以後申請、核准才匯進帳戶，買車當下可能要先付比較多。計算的每一行都寫了是在車行折抵，還是核准後入帳。',
           en: 'Most are claimed after purchase and paid into your account once approved, so you may pay more at the shop first. Each line in a result says whether it comes off at the shop or after approval.',
         },
       },
       {
         q: { 'zh-TW': '要報廢的車怎麼處理？', en: 'How do I scrap the scooter I am replacing?' },
         a: {
-          'zh-TW': '通常由車行或回收業者代辦，報廢也有期限，留好報廢證明。要領環境部的獎勵，得先在媒合平台登錄，再買車。各縣市對出廠年月和設籍的規定不同，試算照你的出廠年月對。',
+          'zh-TW': '通常由車行或回收業者代辦，報廢也有期限，留好報廢證明。要領環境部的獎勵，得先在媒合平台登錄，再買車。各縣市對出廠年月和設籍的規定不同，計算照你的出廠年月對。',
           en: 'A dealer or recycler usually handles it; scrapping has its own deadline, so keep the certificate. For the environment ministry’s reward, register on its matching platform before buying. Places set their own rules on build date and registration; the calculator checks yours from the build date.',
         },
       },
@@ -840,6 +868,6 @@ export default copy({
 
   sources: {
     title: { 'zh-TW': '這一頁的出處', en: 'Sources for this page' },
-    lead: { 'zh-TW': '試算用到的每一個數字，出處都在結果裡那一行旁邊。這裡是頁面上的事實與資料集。', en: 'Every figure the calculator uses has its source beside its line in the result. These are the facts and datasets on the page.' },
+    lead: { 'zh-TW': '計算用到的每一個數字，出處都在結果裡那一行旁邊。這裡列的是這一頁其他段落用到的資料。', en: 'Every figure the calculator uses has its source beside its line in the result. These are the facts and datasets on the page.' },
   },
 });

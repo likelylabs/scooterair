@@ -19,14 +19,16 @@ import KindChip from '@/components/ui/KindChip.astro';
 import EstimateValue from '@/components/ui/EstimateValue.astro';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { kSentences, site } from '@/i18n/ui';
-import { checkHeadline, est, estimateText, farBelowWho, formatEstimate, formatReference, scenarioKeys } from '@/data/estimate';
+import { checkHeadline, checkSentence, est, estimateText, farBelowWho, formatEstimate, formatReference, scenarioKeys } from '@/data/estimate';
 import act from '@/i18n/pages/act';
 import { fill, localize } from '@/i18n/pages/_copy';
+import { verified } from '@/components/pages/home/home-figures';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(act, locale);
 const b = t.brief;
+const sp = locale === 'en' ? ' ' : ''; // between two sentences
 const estimatePage = absUrl(href('/estimate/', locale), Astro.site);
 const shortUrl = estimatePage.replace(/^https?:\/\//, '');
 const child = formatEstimate('child.airPerKg', locale);
@@ -37,7 +39,7 @@ const pollutants = [
 ] as const;
 ---
 
-<PrintPage locale={locale} title={b.metaTitle} description={b.metaDescription}>
+<PrintPage locale={locale} title={b.metaTitle} description={b.metaDescription} share="brief">
   <div class="toolbar">
     <p>{b.screenNote}</p>
     <div class="toolbar__row">
@@ -66,7 +68,7 @@ const pollutants = [
 
         <section class="blk">
           <h2 class="blk__h">{checkHeadline(locale)}</h2>
-          {farBelowWho() && <p class="blk__p">{fill(b.checkLead, { sites: est.meas.iot.sites.value })}</p>}
+          <p class="blk__p">{fill(b.checkLead, { sites: est.meas.iot.sites.value })}{sp}{checkSentence(locale)}{farBelowWho() && <Fragment>{sp}{estimateText.whoCoOnly[locale]}</Fragment>}{sp}{estimateText.coMarksBenzene[locale]}{verified('who-benzene-no-safe-level') && <Fragment>{sp}{estimateText.benzeneWho[locale]}</Fragment>}</p>
           <CheckChart locale={locale} />
         </section>
       </div>

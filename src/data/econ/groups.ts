@@ -19,7 +19,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('moenv-carbon-and-air', '環境部減碳獎勵與空污補助兩項都計入（請先確認）', 'MOENV carbon reward and air subsidy both counted (confirm first)', {
       advisory: true,
       ambiguity: t(
-        '試算同時計入環境部減碳獎勵與空污補助：媒合平臺說明兩者分別審核撥款，環境部 2026 年 2 月的新聞稿也說符合資格者可同步申請；但那句話出現在汽車段落，2025 年也有報導說不能併領。申請前請向平臺確認（減碳02-6630-8000分機437，空污02-2339-0129），若只能領一項，會少這筆金額。',
+        '計算同時計入環境部減碳獎勵與空污補助：媒合平臺說明兩者分別審核撥款，環境部 2026 年 2 月的新聞稿也說符合資格者可同步申請；但那句話出現在汽車段落，2025 年也有報導說不能併領。申請前請向平臺確認（減碳02-6630-8000分機437，空污02-2339-0129），若只能領一項，會少這筆金額。',
         'We count both the MOENV carbon reward and the air subsidy: the matching platform says the two are reviewed and paid separately, and a February 2026 MOENV release says qualifying people can apply for both; but that sentence sits in a paragraph about cars and a 2025 report said they could not be combined. Confirm with the platform before relying on it (carbon 02-6630-8000 ext. 437, air 02-2339-0129); if only one can be claimed you would get that amount less.',
       ),
       sources: ['moenv-platform-faq', 'tcnews-2026-02-moenv-release'],
@@ -40,7 +40,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       advisory: true,
       atRiskIds: ['tpe-lowincome-topup'],
       ambiguity: t(
-        '試算把台北市中低及低收入戶加碼10,000元加在電池資費（與袋鼠方案）加碼之上：計畫把它列為獨立項目，但沒有寫可以疊加，只有Taiwan News引述環保局說可再加領。申請前請向台北市環保局確認；若不能疊加，會少領這筆金額。',
+        '計算把台北市中低及低收入戶加碼10,000元加在電池資費（與袋鼠方案）加碼之上：計畫把它列為獨立項目，但沒有寫可以疊加，只有Taiwan News引述環保局說可再加領。申請前請向台北市環保局確認；若不能疊加，會少領這筆金額。',
         'We count the Taipei low-income NT$10,000 on top of the battery-fee (and kangaroo) top-ups: the plan lists it as a separate line but does not say it stacks, and only a Taiwan News report quoting the bureau says it does. Confirm with the Department of Environmental Protection before relying on it; if it does not stack you would get that amount less.',
       ),
       sources: ['taipei-dep-ev-subsidy-plan', 'taiwannews-2026-04-taipei-subsidy'],
@@ -53,7 +53,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('ntpc-lowincome-vs-addons', '新北市：中低收入戶加碼與早鳥／雙汰舊加碼只計一項（保守解讀）', 'New Taipei: low-income top-up or early-bird/double-scrap add-on, one only (conservative reading)', {
       conservative: true,
       ambiguity: t(
-        '新北市計畫沒有寫明早鳥或雙汰舊加碼能否疊加在中低收入戶金額上。試算只算金額較高的一項；若可疊加，最多可再多領這筆金額。',
+        '新北市計畫沒有寫明早鳥或雙汰舊加碼能否疊加在中低收入戶金額上。計算只算金額較高的一項；若可疊加，最多可再多領這筆金額。',
         'The New Taipei plan does not say whether the early-bird or double-scrap add-ons stack on the low-income amount. We count the larger one; if they stack you could receive up to that amount in addition.',
       ),
       sources: ['ntpc-motor-2026-plan'],
@@ -61,7 +61,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('ntpc-lowincome-vs-earlybird', '新北市：中低收入戶加碼與早鳥加碼只計一項（保守解讀）', 'New Taipei: low-income top-up or early-bird add-on, one only (conservative reading)', {
       conservative: true,
       ambiguity: t(
-        '新北市計畫沒有寫明早鳥加碼能否疊加在中低收入戶金額上。試算只算金額較高的一項；若可疊加，最多可再多領這筆金額。',
+        '新北市計畫沒有寫明早鳥加碼能否疊加在中低收入戶金額上。計算只算金額較高的一項；若可疊加，最多可再多領這筆金額。',
         'The New Taipei plan does not say whether the early-bird add-on stacks on the low-income amount. We count the larger one; if it stacks you could receive up to that amount in addition.',
       ),
       sources: ['ntpc-motor-2026-plan'],
@@ -69,7 +69,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('ntpc-lowincome-vs-double', '新北市：中低收入戶加碼與雙汰舊加碼只計一項（保守解讀）', 'New Taipei: low-income top-up or double-scrap add-on, one only (conservative reading)', {
       conservative: true,
       ambiguity: t(
-        '新北市計畫沒有寫明雙汰舊加碼能否疊加在中低收入戶金額上。試算只算金額較高的一項；若可疊加，最多可再多領這筆金額。',
+        '新北市計畫沒有寫明雙汰舊加碼能否疊加在中低收入戶金額上。計算只算金額較高的一項；若可疊加，最多可再多領這筆金額。',
         'The New Taipei plan does not say whether the double-scrap add-on stacks on the low-income amount. We count the larger one; if it stacks you could receive up to that amount in addition.',
       ),
       sources: ['ntpc-motor-2026-plan'],
@@ -77,7 +77,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
     g('ntpc-earlybird-vs-double', '新北市：早鳥加碼與雙汰舊加碼只計一項（保守解讀）', 'New Taipei: early-bird or double-scrap add-on, one only (conservative reading)', {
       conservative: true,
       ambiguity: t(
-        '新北市計畫沒有寫明早鳥加碼與雙汰舊加碼可以同時領；只有一則新聞（TVBS的39,600元範例）把兩者相加。試算只算金額較高的一項；若可同時領，可再多領這筆金額。',
+        '新北市計畫沒有寫明早鳥加碼與雙汰舊加碼可以同時領；只有一則新聞（TVBS的39,600元範例）把兩者相加。計算只算金額較高的一項；若可同時領，可再多領這筆金額。',
         'The New Taipei plan does not say the early-bird and double-scrap add-ons can both be claimed; only a news report (TVBS\'s NT$39,600 example) adds them together. We count the larger one; if they combine you could receive that amount in addition.',
       ),
       sources: ['ntpc-motor-2026-plan'],
@@ -109,7 +109,7 @@ export const groups: Record<string, ExclusiveGroup> = Object.fromEntries(
       // the other. The MOENV payments still stack with each other under their own rules.
       sideA: ['kinmen-swap', 'kinmen-new', 'kinmen-small', 'kinmen-scrap-only'],
       ambiguity: t(
-        '金門縣補助要點排除「曾向環境部申請機車汰舊換新相關補助者」，同一次購車領環境部獎勵（減碳、空污與300元回收獎勵金）是否會被排除，要點沒有寫明，環保局也未回覆。試算只算金額較高的一方；若可併領，最多可再多領這筆金額。',
+        '金門縣補助要點排除「曾向環境部申請機車汰舊換新相關補助者」，同一次購車領環境部獎勵（減碳、空污與300元回收獎勵金）是否會被排除，要點沒有寫明，環保局也未回覆。計算只算金額較高的一方；若可併領，最多可再多領這筆金額。',
         'Kinmen\'s guidelines exclude anyone who "has applied to MOENV for related scrap-and-replace subsidies"; whether claiming the MOENV payments (carbon, air and the NT$300 recycling payment) for the same purchase disqualifies you is not stated. We count only the larger side; if both can be claimed you could receive up to that amount in addition.',
       ),
       sources: ['kinmen-epb-2026-guidelines'],

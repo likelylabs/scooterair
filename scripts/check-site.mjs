@@ -106,7 +106,7 @@ const TITLES = {
   10: 'Home: pictures and charts cover ≥ 45% of the height at 360 px',
   11: 'Text ≥ 14 px everywhere, body ≥ 18 px (320, 360, 390)',
   12: 'Targets ≥ 48 × 48 px and 8 px apart',
-  13: 'No sideways scroll or clipped text at 320 px (標準, 大, 特大); headlines break between phrases',
+  13: 'No sideways scroll or clipped text at 320 px (標準, 大, 特大, and 特大 with every fold open); headlines break between phrases; glued words never loose in a flex or grid box',
   14: 'Contrast: body and headlines 7:1, labels 4.5:1, marks 3:1 (light and dark)',
   15: 'JavaScript off: screens show picture, text and sheet; film shows stills and transcript',
   16: 'prefers-reduced-motion: nothing moves until asked',
@@ -1063,6 +1063,31 @@ async function browserChecks(chromium) {
       else if (r.wide.length) fail(13, where, `${r.wide.length} element(s) run past the right edge, e.g. ${r.wide.slice(0, 2).join(' · ')}`);
       if (r.clipped.length) fail(13, where, `${r.clipped.length} element(s) clip their text, e.g. ${r.clipped.slice(0, 2).join(' · ')}`);
       if (r.phrase.length) fail(13, where, `${r.phrase.length} headline break(s): ${r.phrase.slice(0, 2).join(' · ')}`);
+      // a glued word (.nobr) sitting directly in a flex or grid box becomes its own item: the box's
+      // gap opens inside the phrase and the words reflow into columns (round 3: 「關於 這些 數字」)
+      const loose = await page.evaluate(() => [...new Set([...document.querySelectorAll('.nobr')].filter((n) => /flex|grid/.test(getComputedStyle(n.parentElement).display) && __cs.visible(n.parentElement)).map((n) => `${__cs.sel(n.parentElement)} 「${n.parentElement.textContent.trim().slice(0, 16)}」`))]);
+      if (loose.length) fail(13, where, `${loose.length} glued word(s) loose in a flex or grid box, e.g. ${loose.slice(0, 2).join(' · ')}`);
+      if (size !== '130%') return;
+      // the same at 特大 with every fold opened by a tap, as a reader would (a fold's content can be
+      // wider than the page: the /en/electric/ worked-example tabs were)
+      for (let round = 0; round < 4; round++) {
+        const shut = await page.$$('main details:not([open]):not([data-how-sheet]) > summary');
+        const vis = [];
+        for (const s of shut) if (await s.isVisible()) vis.push(s);
+        if (!vis.length) break;
+        for (const s of vis) await s.click({ timeout: 2000 }).catch(() => {});
+        await page.waitForTimeout(150);
+      }
+      await page.waitForTimeout(250);
+      const open = await page.evaluate(() => {
+        const W = document.documentElement.clientWidth;
+        const inScroller = (el) => { for (let a = el.parentElement; a; a = a.parentElement) { const s = getComputedStyle(a).overflowX; if (s === 'auto' || s === 'scroll' || s === 'hidden' || s === 'clip') return a !== document.documentElement && a !== document.body; } return false; };
+        const wide = [];
+        for (const el of document.querySelectorAll('main *')) { if (!__cs.visible(el) || el.closest('svg')) continue; const box = el.getBoundingClientRect(); if (box.right > W + 1 && !inScroller(el) && el.textContent.trim()) wide.push(`${__cs.sel(el)} reaches ${Math.round(box.right)} px`); }
+        return { scroll: document.documentElement.scrollWidth - W, wide: [...new Set(wide)] };
+      });
+      if (open.scroll > 1) fail(13, `${where}, folds open`, `scrolls sideways by ${open.scroll} px${open.wide.length ? `; widest: ${open.wide.slice(0, 2).join(' · ')}` : ''}`);
+      else if (open.wide.length) fail(13, `${where}, folds open`, `${open.wide.length} element(s) run past the right edge, e.g. ${open.wide.slice(0, 2).join(' · ')}`);
     });
 
   // ---- 14 contrast, light and dark ------------------------------------------------------------

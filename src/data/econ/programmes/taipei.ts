@@ -50,7 +50,7 @@ const base = (p: Partial<Programme> & Pick<Programme, 'id' | 'name' | 'amount' |
 });
 
 const notPrinted = {
-  excluded: t('計畫將小型輕型列為補助對象，申辦系統也有小型名額，但附件二沒有印出小型輕型的市府金額；試算不假設任何金額。', 'The plan lists small-light scooters as eligible and the system has a small-class quota, but the amount table prints no city amount for them; we do not assume one.'),
+  excluded: t('計畫將小型輕型列為補助對象，申辦系統也有小型名額，但附件二沒有印出小型輕型的市府金額；計算不假設任何金額。', 'The plan lists small-light scooters as eligible and the system has a small-class quota, but the amount table prints no city amount for them; we do not assume one.'),
   reason: 'not-published' as const,
 };
 

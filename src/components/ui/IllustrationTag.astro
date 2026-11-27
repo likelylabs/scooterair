@@ -1,7 +1,8 @@
 ---
 /**
  * IllustrationTag — the tag every drawn scene carries, as HTML at 14 px or more (brief 5.1):
- * 示意圖｜廢氣其實大多看不見 / Illustration: real exhaust is mostly invisible.
+ * 示意圖｜廢氣大多看不見，街上本來的空氣沒有畫 / Illustration: real exhaust is mostly invisible, and
+ * the street's own air is not drawn (pictures draw only the scooters' exhaust: air.ts).
  * <Screen illustration> prints it on its picture; use this component for a scene anywhere else
  * (a question page figure, the poster). Scene components do not print the tag themselves.
  *
@@ -35,6 +36,8 @@ const { locale, kind = 'street', overlay = false, class: cls } = Astro.props;
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
     line-height: 1.5;
+    /* when it needs two lines, two even ones, broken at the comma (never one lone character) */
+    text-wrap: balance;
   }
   .ill-tag--overlay {
     position: absolute;

@@ -146,7 +146,8 @@ function moneyPart(m: HomeMoney, locale: Locale): MoneyPart {
 
 function captionsOf(locale: Locale, part: MoneyPart): Caption[] {
   const c = film.cues;
-  const hours = need(time.span, 'time.hoursPerYear');
+  // the default of home screen 7 (four reds a day), so film and home print the same yearly figure
+  const hours = need(time.hoursPerYear[4], 'time.hoursPerYear.4');
   const red = need(est.signal.redLength_s, 'signal.redLength_s');
   const derived = { kind: 'derived' as const, label: chips.derived.label[locale], glyph: chipGlyphSvg('derived') };
   const text: Record<CueId, { main: string; note?: string; chip?: Caption['chip'] }> = {

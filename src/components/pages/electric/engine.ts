@@ -3,4 +3,4 @@
 
 export { econData } from '../../../data/econ/index.ts';
 export { evaluate, CalcInputError } from '../../../lib/calc/index.ts';
-export { answerIssues, choose, classify, levers, renderResult, money, type Answers, type Rendered, type RenderCtx, type Lever } from './model.ts';
+export { answerIssues, choose, classify, levers, openAnswers, renderResult, money, type Answers, type Rendered, type RenderCtx, type Lever } from './model.ts';

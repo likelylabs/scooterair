@@ -21,7 +21,7 @@ import { art } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, type Box } from './air';
+import { air, type Box, AIR_KEY } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { artId, breath, figureBoxes } from './parts';
 import { placed, riderNoseOf, shopfronts, tailOf, type Placed } from './kit';
@@ -32,8 +32,10 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, tag = false, id, class: cls } = Astro.props;
 
 const VB: Box = { x: -66, y: -280, w: 400, h: 356 };
 const FAR = -92;
@@ -69,7 +71,7 @@ const scene =
 const alt = sceneAlt(locale, art.riderScene.alt[locale], { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--rider', cls].filter(Boolean).join(' ')}>
+<SceneFrame locale={locale} legend={legend && ([...AIR_KEY, 'nose'] as const)} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--rider', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={scene} />
   <SceneLabel slot="labels" box={VB} x={me.x + 84} y={-186} anchor="center bottom" plate>{art.words.waiting[locale]}</SceneLabel>
 </SceneFrame>

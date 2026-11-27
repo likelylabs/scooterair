@@ -11,7 +11,8 @@
 // screens 13 and 14 are lane I's `buyHeadline`, `monthHeadline` and `monthLine`, so the home
 // page and /electric/ can never word the same case differently. Nothing here types a figure.
 
-import { buyHeadline, monthLine, num, yuan, type OpenCase, type OpenData, type OpenMonth, type OpenTable, type OpenText, type Scrap } from '../electric/opening-view.ts';
+import { glueZh } from '../../../lib/glue.mjs';
+import { buyHeadline, monthLine, num, scrapNoteParts, scrapNotesHtml, worstFoldHtml, worstText, yuan, type OpenCase, type OpenData, type OpenMonth, type OpenTable, type OpenText, type Scrap, type ScrapSide } from '../electric/opening-view.ts';
 import type { MonthlyBarsProps } from '../../charts/core/monthlyBars.ts';
 import type { PriceBarsProps } from '../../charts/core/priceBars.ts';
 
@@ -27,10 +28,6 @@ export interface HomeMoneyText {
   bodyClass: string;
   /** added when the electric scooter of the case can only swap batteries */
   swapOnly: string;
-  /** the least favourable case, in the screen's short form: {county} {scrap} {plate} {n} */
-  worst: string;
-  worstScrapYes: string;
-  worstScrapNo: string;
   bodyKm: string;
   swapDearer: string;
   swapCheaper: string;
@@ -69,7 +66,7 @@ export function phrasedHtml(text: string): string {
   return parts
     .map((p, i) => {
       const spaceAfter = /\s$/.test(p) || (i < parts.length - 1 && /^\s/.test(parts[i + 1]));
-      return `<span class="phrase">${esc(p.trim()).replace(/([\u3400-\u9fff])([，。？！；：、）」』〉》…]+)/g, '<span class="nobr">$1$2</span>')}</span>${spaceAfter ? ' ' : ''}`;
+      return `<span class="phrase">${glueZh(esc(p.trim()))}</span>${spaceAfter ? ' ' : ''}`;
     })
     .join('');
 }
@@ -113,34 +110,65 @@ export function figureHtml(p: Pick<HomeMoneyPayload, 'D' | 'T' | 'H'>, t: OpenTa
 
 /**
  * The body: what kind of scooter this is (and, when it can only swap batteries, that it comes with
- * a monthly plan), then the least favourable case in the table, named as such.
+ * a monthly plan). The least favourable case of the table is another place's: it is folded away
+ * under the screen (worstFold), never printed here as if it were the reader's.
  */
 export function buyBody(p: HomeMoneyPayload, t: OpenTable, c: HomeChoice): string {
-  const { D, T, H } = p;
+  const { D, H } = p;
   const x = caseOf(t, c);
-  const w = t.worst;
-  const county = D.counties.find((y) => y.id === w.county)?.name ?? w.county;
-  const worst = w.d > 0 ? fill(H.worst, { scrap: w.scrap === 'yes' ? H.worstScrapYes : H.worstScrapNo, plate: D.words[w.plate], county, n: yuan(D.locale, w.d) }) : T.worstNone;
   // the class sentence runs on into the swap clause in Chinese (…小一級，只能換電池…); alone it ends there
   const cls = x.sw ? H.bodyClass : H.bodyClass.replace(/，$/, '。');
-  return join(D.locale, cls, x.sw ? H.swapOnly : '', worst);
+  return join(D.locale, cls, x.sw ? H.swapOnly : '');
 }
 
+/**
+ * What scrapping does in the reader's county (lane I's scrapNotes, the same words as /electric/):
+ * what it takes off each scooter, and, when the cheapest model changes with the answer, that it did.
+ */
+export function scrapParts(p: Pick<HomeMoneyPayload, 'D' | 'T'>, t: OpenTable, c: HomeChoice): { save: string | null; change: string | null } {
+  const { D, T } = p;
+  const row = t.buy[c.county];
+  if (!row) throw new Error(`home money: no price for ${c.county}`);
+  const side = (x: OpenCase): ScrapSide => ({ ev: { short: D.words[x.es], net: x.e }, gas: { short: D.words[x.gs], net: x.g } });
+  return scrapNoteParts(T, c.scrap, side(row.yes), side(row.no), D.locale);
+}
+/** Under the bars: the cheapest prices with nothing to scrap and with a scooter to scrap. */
+export const scrapHtml = (p: Pick<HomeMoneyPayload, 'D' | 'T'>, t: OpenTable, c: HomeChoice): string => {
+  const { save } = scrapParts(p, t, c);
+  return scrapNotesHtml(save ? [save] : [], p.D.locale, 'h-scrap');
+};
+/** In the sheet: which scooters are cheapest with the other answer ('' when they are the same ones). */
+export const scrapChange = (p: Pick<HomeMoneyPayload, 'D' | 'T'>, t: OpenTable, c: HomeChoice): string => scrapParts(p, t, c).change ?? '';
+
+/**
+ * The least favourable case of the table, behind the line 「有時候電動機車比較貴」 (a fold that works
+ * without scripting). It sits on the screen itself, under the strip, whatever the reader chose
+ * (brief 7.7: the least favourable case is always stated), never as if it were the reader's case.
+ */
+export const worstFold = (p: Pick<HomeMoneyPayload, 'D' | 'T'>, t: OpenTable): string => worstFoldHtml(worstText(p.D, p.T, t), p.T, 'h-worst');
+
 /** The deadline strip of the reader's case (brief 7.7). */
-export const stripOf = (p: Pick<HomeMoneyPayload, 'D'>, t: OpenTable, c: HomeChoice): string => p.D.words[caseOf(t, c).strip];
+export const stripOf = (p: Pick<HomeMoneyPayload, 'D'>, t: OpenTable, c: HomeChoice): string => p.D.words[caseOf(t, c).ss];
+/** The part of the strip that home screen 13 moves into its sheet: the dealer hint and the deadlines ('' when nothing moves). */
+export const stripFold = (p: Pick<HomeMoneyPayload, 'D'>, t: OpenTable, c: HomeChoice): string => p.D.words[caseOf(t, c).sf];
 
 /** 價格和補助 11 月 25 日查 */
 export const checkedText = (p: Pick<HomeMoneyPayload, 'H'>): string => p.H.checked;
 
 /** G12's two sides, for lane D's renderPriceBars(). */
-export function priceBarsProps(p: Pick<HomeMoneyPayload, 'D'>, t: OpenTable, c: HomeChoice): PriceBarsProps {
+const colon = (D: OpenData) => (D.locale === 'en' ? ': ' : '：');
+
+export function priceBarsProps(p: Pick<HomeMoneyPayload, 'D' | 'T'>, t: OpenTable, c: HomeChoice): PriceBarsProps {
   const { D } = p;
   const x = caseOf(t, c);
   return {
     locale: D.locale,
     plate: D.words[x.p],
-    petrol: { net: x.g, list: x.gl, name: D.words[x.gn] },
-    electric: { net: x.e, list: x.el, name: D.words[x.en] },
+    // each bar names its scooter, maker first (the full name is in the table and the sheet); the
+    // electric's plate is said by the body right under the chart (「最便宜的綠牌車…」), so its label
+    // stays on one line with its price at phone width
+    petrol: { net: x.g, list: x.gl, name: D.words[x.gn], label: `${p.T.barPetrolShort}${colon(D)}${D.words[x.gs]}` },
+    electric: { net: x.e, list: x.el, name: D.words[x.en], label: `${p.T.barEvKind}${colon(D)}${D.words[x.es]}` },
     table: false,
   };
 }

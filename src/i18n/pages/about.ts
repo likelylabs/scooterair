@@ -14,16 +14,16 @@ export default copy({
   meta: {
     title: { 'zh-TW': '關於', en: 'About' },
     description: {
-      'zh-TW': '誰做的、每個數字旁邊的標記是什麼意思、推估怎麼來的、我們給自己的規則、怎麼回報錯誤，以及修改紀錄。',
-      en: 'Who made the site, what the label beside every number means, where the estimate comes from, the rules we hold ourselves to, how to report an error, and the corrections log.',
+      'zh-TW': '誰做的這個網站？每個數字旁邊的標記是什麼意思？推估怎麼來的？這裡還有我們給自己的規則、怎麼回報錯誤，以及修改紀錄。',
+      en: 'Who made the site? What does the label beside every number mean? Where does the estimate come from? Here too are the rules we hold ourselves to, how to report an error, and the corrections log.',
     },
   },
   hero: {
     eyebrow: { 'zh-TW': '關於', en: 'About' },
     title: { 'zh-TW': '這個網站|是什麼', en: 'What this |site is' },
     deck: {
-      'zh-TW': '我們整理兩件事：等紅燈的時候，旁邊機車的廢氣有多少、對身體有什麼影響；還有換一輛電動機車，實際要花多少錢。',
-      en: 'We set out two things: how much exhaust the scooters beside you add at a red light and what it does to the body; and what an electric scooter really costs.',
+      'zh-TW': '我們整理兩件事。一是等紅燈的時候，旁邊機車的廢氣有多少、對身體有什麼影響。二是換一輛電動機車，實際要花多少錢。',
+      en: 'We set out two things. One is how much exhaust the scooters beside you add at a red light, and what it does to the body. The other is what an electric scooter really costs.',
     },
     toc: { 'zh-TW': '這一頁', en: 'On this page' },
   },
@@ -48,8 +48,8 @@ export default copy({
     eyebrow: { 'zh-TW': '推估', en: 'The estimate' },
     title: { 'zh-TW': '本站沒有自己去量；|我們推估，並把算法攤開', en: 'We did not measure it ourselves. |We estimate, and show all the working' },
     p1: {
-      'zh-TW': '我們用公開的資料來算：定檢讀數告訴我們一輛機車停著、引擎沒熄火時排多少，運研所的錄影告訴我們一個紅燈停幾輛，測站和現場量測告訴我們路邊的風。算出來的是一個範圍，標成「推估」。',
-      en: 'We work from published data: inspection readings tell us how much a scooter gives off standing still with its engine running, the Institute of Transportation’s video counts tell us how many stop at one red light, and weather stations and on-site readings tell us the wind at the kerb. The result is a range, labelled “estimate”.',
+      'zh-TW': '我們用公開的資料來算。定檢讀數告訴我們，一輛機車停著、引擎沒熄火時排多少。運研所的錄影告訴我們，一個紅燈停幾輛。測站和現場量測告訴我們路邊的風。算出來的是一個範圍，標成「推估」。',
+      en: 'We work from published data. Inspection readings tell us how much a scooter gives off standing still with its engine running. The Institute of Transportation’s video counts tell us how many stop at one red light. Weather stations and on-site readings tell us the wind at the kerb. The result is a range, labelled “estimate”.',
     },
     link: { 'zh-TW': '看完整的算法', en: 'See the full working' },
   },
@@ -74,10 +74,10 @@ export default copy({
     list: [
       { 'zh-TW': '研究看到的是「有關」，不是「造成」。這兩個詞差很多，我們不會混著用。', en: 'Studies show that things are associated, not that one causes the other. The two words mean very different things, and we do not mix them up.' },
       { 'zh-TW': '推估一定給範圍，旁邊一定有「推估」標記，按下去看得到算法。', en: 'An estimate always comes as a range with its “estimate” label beside it, and one tap shows the working.' },
-      { 'zh-TW': '說清楚是什麼的量、在哪裡：機車「多出來」的和街上原本就有的分開寫；推估指的是大人鼻子的高度、90 秒的平均。', en: 'We say what the amount is and where it applies: what the scooters add is kept apart from what the street already holds, and the estimate is for an adult’s nose, averaged over 90 seconds.' },
+      { 'zh-TW': '說清楚是什麼的量、在哪裡：機車「多出來」的和街上原本就有的分開寫；推估指的是大人鼻子的高度、90 秒的平均。', en: 'We say what the amount is and where it applies. What the scooters add is kept apart from what the street already holds. The estimate is for an adult’s nose, averaged over 90 seconds.' },
       { 'zh-TW': '不拿「幾倍」當標題，不說等一個紅燈就會生病，也不印比證據更大的數字。', en: 'No “so many times more” headlines, no claim that one red light makes you ill, and no figure bigger than the evidence.' },
       { 'zh-TW': '健康研究講的多半是所有車輛的廢氣，不只機車；我們每次都寫出來。', en: 'Health studies are mostly about exhaust from all traffic, not scooters alone, and we say so every time.' },
-      { 'zh-TW': '對我們不利的數字，我們先講：電動機車在有些條件下比較貴，就和比較便宜的情況寫在同一個地方。', en: 'We put the numbers that cut against us first: where an electric scooter costs more, it is said in the same place as where it costs less.' },
+      { 'zh-TW': '對我們不利的數字，我們先講。電動機車在有些條件下比較貴；這和比較便宜的情況，寫在同一個地方。', en: 'We put the numbers that cut against us first: where an electric scooter costs more, it is said in the same place as where it costs less.' },
       { 'zh-TW': '我們不叫任何人硬換車，也不怪騎車的人：大家都在同一團廢氣裡。', en: 'We tell nobody to switch regardless, and we do not blame riders: everyone is in the same cloud.' },
       { 'zh-TW': '每一個補助金額旁邊，都寫了我們查證的日期。', en: 'Every subsidy amount shows the date we checked it.' },
     ],
@@ -91,12 +91,12 @@ export default copy({
     eyebrow: { 'zh-TW': '方法', en: 'Method' },
     title: { 'zh-TW': '證據怎麼找、|怎麼查', en: 'How the evidence was |gathered and checked' },
     p1: {
-      'zh-TW': '這個網站的研究和查核，大部分是用 AI 研究工具做的：它到政府、期刊和媒體的網站下載原始文件，把數字和原文的位置一起記下來。打不開的文件，就照實寫打不開。',
+      'zh-TW': '這個網站的研究和查核，大部分是用 AI 研究工具做的。它到政府、期刊和媒體的網站下載原始文件。它把數字和原文的位置一起記下來。打不開的文件，就照實寫打不開。',
       en: 'Most of the research and checking for this site was done with AI research tools. They downloaded the original documents from government, journal and media websites and recorded each figure with where it appears in the text. Documents that could not be opened are recorded as such.',
     },
     p2: {
-      'zh-TW': '每次建置網站，都會自動檢查推估的數字和算法的檔案一致；每一句文案，也要通過一份「不能這樣說」的規則清單。',
-      en: 'Every time the site is built, it checks automatically that the estimate’s figures match the files of its working, and every sentence of copy must pass a list of “do not say” rules.',
+      'zh-TW': '每次更新網站，電腦都會自動檢查：推估的數字，和算法的檔案對得起來。網站上的每一句話，也要通過一份「不能這樣說」的規則清單。',
+      en: 'Every time the site is built, it checks automatically that the estimate’s figures match the files of its working. Every sentence of copy must also pass a list of “do not say” rules.',
     },
     levels: { 'zh-TW': '每一筆資料，都有一個查核等級：', en: 'Every fact carries a level of checking:' },
     checked: {
@@ -164,15 +164,15 @@ export default copy({
         en: 'The Institute of Transportation had in fact measured carbon monoxide and PM2.5 in the pedestrian waiting areas of junctions. We missed it.',
       },
       'iot-94': {
-        'zh-TW': '這個數字只出現在高雄一個路口、一個模擬的日子，報告自己說這一天不正常。而且這是電腦模擬，不是在路口量的。',
-        en: 'That figure comes from one simulated day at one Kaohsiung junction, and the report itself calls that day an outlier. And it is a computer simulation, not a reading at a real junction.',
+        'zh-TW': '這個數字只出現在高雄一個路口、電腦推算的一天。報告自己說，這一天不正常。而且這是電腦推算的，不是在路口量的。',
+        en: 'That figure comes from one day worked out by computer at one Kaohsiung junction, and the report itself calls that day an outlier. And it is a computer result, not a reading at a real junction.',
       },
       'pm25-source': {
         'zh-TW': '照環境部的排放清冊，機車排的 PM2.5 只占全國的 {pm25}。',
         en: 'By the environment ministry’s inventory, scooters give off only {pm25} of the country’s PM2.5.',
       },
       'ev-cheaper': {
-        'zh-TW': '能在家插電的車，電費比油錢便宜很多，但這種車我們只找到一家廠商的兩款。大多數車要付換電月租；騎得少的人，月租比油錢貴。',
+        'zh-TW': '能在家插電的車，電費比油錢便宜很多。但這種車，我們只找到一家廠商的兩款。大多數車要付換電月租；騎得少的人，月租比油錢貴。',
         en: 'A scooter you can plug in at home costs far less in electricity than petrol, but we found only two such models, from one maker. Most need a battery-swap plan, and for people who ride little the plan costs more than petrol.',
       },
       densest: {
@@ -184,7 +184,7 @@ export default copy({
         en: 'The net-zero pathway sets targets for sales. Nothing in it stops the sale of petrol scooters.',
       },
       'child-44': {
-        'zh-TW': '這個數字是英國一個實驗裡最高的一個，量的是嬰兒車高度的空氣，不是小孩比大人多吸多少。',
+        'zh-TW': '這個數字，是英國一個實驗裡最高的一個。它量的是嬰兒車高度的空氣，不是小孩比大人多吸多少。',
         en: 'That figure is the highest one in a single UK experiment. It is about the air at stroller height, not how much more a child breathes than an adult.',
       },
       'ev-zero': {
@@ -192,7 +192,7 @@ export default copy({
         en: 'An electric scooter has no tailpipe, but tyres, brakes and road dust still give off particles. Counting the power stations too, one study found more sulphur oxides.',
       },
       'idling-legal': {
-        'zh-TW': '現在的規定，管的是停下來等超過三分鐘的車，因為交通管制而停下來的不算。它管不管機車，官方也沒有說明。',
+        'zh-TW': '現在的規定，管的是停下來等超過三分鐘的車。因為交通管制而停下來的，不算。它管不管機車，官方也沒有說明。',
         en: 'The current rule covers vehicles stopped for more than three minutes, and stops for traffic control do not count. There is no official word on whether it covers scooters.',
       },
       'ufp-smell': {
@@ -211,8 +211,8 @@ export default copy({
         en: 'The site shows the Institute’s readings beside our own estimate. How much you breathe beside the scooters at a red light is worked out by us, and labelled Estimate.',
       },
       'iot-94': {
-        'zh-TW': '在運研所的模擬裡，這個路口其他幾天，PM2.5 少的比例小很多；台北和新北的路口少得更少，有幾天反而變多。',
-        en: 'In the Institute’s simulation, the other days at that junction showed much smaller falls; the Taipei and New Taipei junctions fell even less, and on some days PM2.5 rose.',
+        'zh-TW': '在運研所的電腦推算裡，這個路口其他幾天，PM2.5 少的比例小很多。台北和新北的路口少得更少，有幾天反而變多。',
+        en: 'In the Institute’s computer model, the other days at that junction showed much smaller falls. The Taipei and New Taipei junctions fell even less, and on some days PM2.5 rose.',
       },
       'pm25-source': {
         'zh-TW': '機車的問題是一氧化碳、油氣和苯，不是 PM2.5。',
@@ -235,7 +235,7 @@ export default copy({
         en: 'Children are closer to the ground, where some pollutants are thicker, and they breathe faster than adults. We do not give a figure for how much more.',
       },
       'ev-zero': {
-        'zh-TW': '換一台電動機車，路口就少一支排氣管；但它也不是完全沒有污染。',
+        'zh-TW': '換一輛電動機車，路口就少一根排氣管；但它也不是完全沒有污染。',
         en: 'Each electric scooter means one tailpipe fewer at the crossing; but it still gives off some pollution.',
       },
       'idling-legal': {
@@ -243,8 +243,8 @@ export default copy({
         en: 'An ordinary red light is not what this rule is written for, and we do not say it is.',
       },
       'ufp-smell': {
-        'zh-TW': '我們只說一氧化碳沒有味道；路邊那麼少的苯，也不太聞得出來。',
-        en: 'We say only that carbon monoxide has no smell, and that the little benzene at the roadside is unlikely to be noticed by smell.',
+        'zh-TW': '我們只說一氧化碳沒有味道；路邊那麼少的苯，也不太聞得出來。微粒，我們只說它太小、看不到。',
+        en: 'We say only that carbon monoxide has no smell, and that the little benzene at the roadside is unlikely to be noticed by smell. Of particles we say only that they are too small to see.',
       },
       'no-2027': {
         'zh-TW': '2027 年的補助還沒有確定。',

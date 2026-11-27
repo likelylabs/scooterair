@@ -56,9 +56,10 @@ const label = t(ui.sourceN, locale, { n });
     white-space: nowrap;
     margin-inline-start: 0.1em;
   }
-  /* neighbouring numbers ("13 15 16") are separate targets: keep their hit areas apart */
+  /* neighbouring numbers ("13 15 16") are separate targets: far enough apart that their 48 px
+     hit areas (below) never overlap */
   .cite + .cite {
-    margin-inline-start: 0.6em;
+    margin-inline-start: max(0.6em, calc(var(--tap) - 1.5em));
   }
   .cite a,
   .cite__n {
@@ -73,12 +74,16 @@ const label = t(ui.sourceN, locale, { n });
     text-decoration: none;
     line-height: 1.5;
   }
-  /* Enlarge the hit area to the full 44px height without disturbing the line. Sideways it
-     grows 0.25em (to at least 24px wide), so two neighbours (0.6em apart) never overlap. */
+  /* Enlarge the hit area to a full 48 x 48 px square (brief 6.3) without disturbing the line;
+     neighbours are spaced so these squares never overlap (above). */
   .cite a::after {
     content: '';
     position: absolute;
-    inset: calc((var(--tap) - 1.5em) / -2) -0.25em;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--tap));
+    block-size: var(--tap);
+    transform: translate(-50%, -50%);
   }
   .cite a:focus-visible {
     outline-offset: 1px;

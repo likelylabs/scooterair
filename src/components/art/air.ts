@@ -6,29 +6,85 @@
  * It is pure: the same options always give the same SVG, so nothing flickers
  * between renders, and nothing in it depends on time through the red light.
  *
- * THREE KINDS OF MARK
- *   ribbon  a wavy line    what you can smell: fuel vapour (benzene travels in it)
- *   ring    a hollow ring  carbon monoxide: no smell
- *   dot     a small dot    particles: too small to see
+ * WHAT A PICTURE SHOWS: ONE READABLE PLUME, AND NOTHING ELSE
+ * A picture draws only what the scooters give off. Their exhaust is one soft
+ * plume per row: it leaves the tailpipes, stays low (under about 90 cm at the
+ * tailpipe), spreads and thins toward the kerb, and wraps the waiting people
+ * from the ground up. Every edge fades to nothing; it is drawn BEHIND the
+ * people, so it never covers a face. The marks live only inside the plume:
  *
- * THREE LAYERS
- *   A  the street's own air   the whole frame, in every scene (electric and
- *                             green-light scenes too): AIR.ringsPerPatch rings
- *                             and AIR.dotsPerPatch dots in every reference
- *                             patch. No ribbons.
- *   B  what the pack adds     the kerb zone only (ground to AIR.kerbTop cm,
- *      where people stand     around the waiting people): extra rings per
- *                             patch from the signed estimate
- *                             (extraRingsPerPatch), 1 / 3 / 5 ribbons that
- *                             reach the people, and a soft wash in three fixed
- *                             steps. Even from the ground to the top of the
- *                             zone: no bands by height.
- *   C  the cores              one fixed dark core behind each petrol tailpipe,
- *                             low to the ground, thinning over about two
- *                             metres, with its own small cluster of marks.
- *                             NOT scaled by the estimate: it is drawn for the
- *                             eye, and it is what makes the picture bold where
- *                             that is true, beside a tailpipe.
+ *   ribbon  a wavy line    what you can smell: fuel vapour (benzene travels in it)
+ *   ring    a hollow ring  carbon monoxide: no smell. Every ring has a clear paper
+ *                          centre (its halo is a paper disc), so a ring over the plume
+ *                          looks exactly like a ring on a wall and like the key's ring
+ *   dot     a small dot    particles: too small to see (a paper halo keeps it visible
+ *                          inside the darkest plume)
+ * Marks are drawn big enough to count on a phone (ring r 4–5 px, dot r 1.7–2.3 px at
+ * 360 px wide), and no two rings touch: each tailpipe's own ring is placed first and the
+ * kerb's rings keep clear of it.
+ *
+ * The street's own air is NOT drawn on walls, windows, the crossing or the
+ * sky. It is still the yardstick (AIR.ringsPerPatch = 6 rings per reference
+ * patch, equal to estimate.ts AIR_BASE_PER_PATCH), and the counting patch
+ * (airPatch, on /estimate/ and in screen 4's sheet) draws it, so a reader sees
+ * "what the street holds" and "what the pack adds" side by side there. Every
+ * picture's tag says in words that the street's own air is not drawn
+ * (ui illustration.tag: 示意圖｜廢氣大多看不見，街上本來的空氣沒有畫), so an empty
+ * part of a picture is not read as clean air, and the numbers beside the
+ * pictures carry it (0.5 ppm, 實測). The key (AirLegend) names only what that
+ * picture draws.
+ *
+ * TWO PARTS OF THE PLUME
+ *   B  where people stand     the kerb zone, from the ground to AIR.kerbTop cm,
+ *      (follows the estimate) on the people's side of the nearest tailpipe:
+ *                             - the plume carried on from that tailpipe to the
+ *                               people: three overlapping soft ovals that grow
+ *                               from AIR.plume.sourceHeight cm to the top of the
+ *                               zone. Its strength has three fixed steps,
+ *                               one per scenario, and is bound by a rule: the
+ *                               plume's AVERAGE tint over the kerb zone is
+ *                               AIR.washOpacity (10 / 18 / 26 %), the same
+ *                               amount of tint the flat wash of the first
+ *                               design laid on the zone; air() works out the
+ *                               opacity that gives that average for each
+ *                               picture's shape (washStrength), and the
+ *                               strongest point stays under AIR.washMax. It is
+ *                               the same ink, gathered into a plume shape, not
+ *                               more of it;
+ *                             - rings: extraRingsPerPatch() per reference patch,
+ *                               i.e. 6 × (carbon monoxide the pack adds, middle
+ *                               value) ÷ (what the street already holds), at
+ *                               least 1: +1 / +3 / +6 for few / dozen / full.
+ *                               They are placed from the ground up to RING_ROOM
+ *                               (82 %) of the plume's height at that point (it
+ *                               is lower near the tailpipe), where the plume is
+ *                               strong, and the count is worked out over that
+ *                               same area (the people standing in it do not
+ *                               shrink it: the rings go round them, never on a
+ *                               face), so the density is the rule's. A
+ *                               plume smaller than a patch therefore holds
+ *                               fewer rings than the patch count (one patch of
+ *                               plume-shaped zone: 1 / 2 / 4); a full patch of
+ *                               plume holds exactly 1 / 3 / 6 (tested);
+ *                             - ribbons that reach the people: 1 / 3 / 5.
+ *                             The three scenarios nest (few ⊂ dozen ⊂ full).
+ *                             Even over the zone's area: no bands by height.
+ *   C  at each tailpipe       one fixed soft core behind each petrol tailpipe,
+ *      (drawn for the eye)    low on the ground, thinning over about two
+ *                             metres; the cores of one row overlap into that
+ *                             row's plume. Each keeps a small cluster of marks
+ *                             (at most 1 ring, 3 dots, 1 ribbon, fewer in a
+ *                             wide shot; a crowded scene passes 0 for its far
+ *                             rows). NOT scaled by the estimate.
+ *
+ * WHY THIS IS HONEST. The only amount a picture shows is the kerb part, and it
+ * follows the signed estimate (推估): for the dozen the pack adds about half of
+ * what the street already holds, so +3 rings per patch where the street's own
+ * 6 would be; those 6 are not drawn, so a picture never shows more than the
+ * estimate, and it never draws the pack's air on top of a lattice that could
+ * be mistaken for exhaust. The plume adds no more tint than the old flat wash
+ * did (same average), and every picture's tag says the street's air is left out. The cores and the plume's shape are fixed and are
+ * said to be drawn for the eye (alt text, /estimate/#drawing).
  *
  * The reference patch is AIR.patch × AIR.patch screen pixels when the picture
  * is AIR.refWidth pixels wide. A scene tells the function how many of its own
@@ -38,6 +94,13 @@
  *
  * What may change a drawing: the scenario (few / dozen / full), the swap
  * slider and the repair button. Nothing else, and never the countdown.
+ *
+ * MARKUP the film and kit.ts read (keep it): every ring and dot is a halo pair
+ * `<use class="air-halo X" href="#id"/><path id="id" class="air-ring|air-dot X"/>`;
+ * cores are `<g class="air-core" data-src transform opacity>` and clusters
+ * `<g class="air-src" data-src transform>` with no <g> inside; the kerb marks
+ * sit in one `<g class="air-kerb">`; the kerb plume is one element whose first
+ * ` opacity="…"` is its step.
  *
  * This file imports nothing but the seeded random-number generator, so the
  * film's client script can use it without pulling in any data. The numbers of
@@ -58,14 +121,30 @@ export const AIR = {
   /** Side of the reference patch, in pixels at refWidth. */
   patch: 120,
 
-  /** Layer A: the street's own air, per reference patch. */
+  /**
+   * The street's own air, per reference patch. NOT drawn in pictures: it is the yardstick
+   * the extra rings are measured against, and the counting patch (airPatch) draws it.
+   */
   ringsPerPatch: 6,
   dotsPerPatch: 6,
 
-  /** Layer B: the kerb zone runs from the ground to this height, in cm. */
-  kerbTop: 180,
-  /** Layer B: opacity of the wash, three fixed steps. Never opaque. */
+  /** Layer B: the plume where people stand reaches from the ground to this height, in cm. */
+  kerbTop: 150,
+  /**
+   * Layer B: how much the plume tints the kerb zone ON AVERAGE, three fixed steps (the same
+   * 10 / 18 / 26 % the flat wash of the first design used). The plume is shaped (soft ovals,
+   * darker in its middle, fading at its edges), so air() works out, for each picture, the
+   * opacity that gives exactly this average over the zone (washStrength). Never opaque.
+   */
   washOpacity: { few: 0.1, dozen: 0.18, full: 0.26 },
+  /** the plume's strongest point may never be darker than this (it stays lighter than a core) */
+  washMax: 0.62,
+  /**
+   * Layer B: the plume's shape (fixed, drawn for the eye). It leaves the nearest tailpipe at
+   * `sourceHeight` cm and grows to the top of the zone over the people. `ovals`: where each soft
+   * oval sits from the tailpipe (0) to the far side of the people (1), and its strength.
+   */
+  plume: { sourceHeight: 70, ovals: [[0.14, 0.75], [0.5, 0.68], [0.84, 0.72]] as readonly (readonly [number, number])[] },
   /** Layer B: ribbons that reach the people. */
   ribbonsToPeople: { few: 1, dozen: 3, full: 5 },
 
@@ -73,8 +152,8 @@ export const AIR = {
   core: {
     /** how far the core reaches from the tailpipe before it has thinned away */
     length: 200,
-    /** how tall it is; it sits on the ground */
-    height: 96,
+    /** how tall it is; it sits on the ground, so the plume stays below about 90 cm at the tailpipe */
+    height: 84,
     /** how far it laps past the tailpipe mouth, under the scooter */
     lap: 30,
     /** height of a tailpipe mouth above the ground (parts.TAILPIPE.y) */
@@ -85,21 +164,21 @@ export const AIR = {
      * shot, where sixteen cores share a few hundred pixels, each keeps
      * proportionally fewer (never less than one ring, two dots, one ribbon).
      */
-    rings: 3,
-    dots: 7,
-    ribbons: 3,
+    rings: 1,
+    dots: 3,
+    ribbons: 1,
     fullAtPx: 150,
     /** rows of a pack fade with distance: opacity of the core in rows 1, 2, 3 */
-    rowOpacity: [1, 0.86, 0.72],
+    rowOpacity: [1, 0.74, 0.56],
   },
   /** A car at the frame's edge keeps one small core: this scale, one ring, two dots. */
-  car: { scale: 0.6, rings: 1, dots: 2, ribbons: 2 },
+  car: { scale: 0.6, rings: 1, dots: 2, ribbons: 1 },
   /** Grey dots at each electric scooter's tyres (tyre and brake dust stays). */
   tyreDots: 3,
 
   /** Mark sizes, in pixels at refWidth. */
-  ring: { rMin: 3.1, rMax: 4.3, stroke: 1.6, halo: 1 },
-  dot: { rMin: 1.2, rMax: 1.8, halo: 0.6 },
+  ring: { rMin: 4, rMax: 5, stroke: 2, halo: 1.2 },
+  dot: { rMin: 1.7, rMax: 2.3, halo: 1 },
   ribbon: { stroke: 2.6, strokeMin: 2, wave: 34, amp: 3.6 },
 
   /** Scenario changes cross-fade over this long (ms). Drift is a few pixels, no more. */
@@ -183,6 +262,8 @@ export interface KerbZone {
   /** where the ribbons start: the nearest tailpipe mouth. Default: just outside the zone on the pack's side, at tailpipe height. */
   sourceX?: number;
   sourceY?: number;
+  /** share of the zone's height, from the ground, that holds the rings (default RING_ROOM; the counting patch uses 1) */
+  ringRoom?: number;
 }
 
 export interface AirOptions {
@@ -218,7 +299,12 @@ export interface AirOptions {
 
   /** boxes no ring or dot may sit in: faces, signs, the LED, anything that must stay clean */
   avoid?: Box[];
-  /** leave layer A out (only for a detail drawn inside another scene that already has it) */
+  /**
+   * Draw the street's own rings and dots over the whole frame (AIR.ringsPerPatch, AIR.dotsPerPatch
+   * per patch). Only the counting patch does this; pictures leave it to the words.
+   */
+  streetAir?: boolean;
+  /** @deprecated pictures no longer draw the street's own air; kept so old callers still compile */
   noStreetAir?: boolean;
 }
 
@@ -226,6 +312,7 @@ export interface AirCounts {
   /** layer A marks drawn in the whole frame */
   street: { rings: number; dots: number };
   /** layer B marks drawn in the kerb zone, for each scenario */
+  /** wash: the plume's drawn opacity, worked out so its average tint over the zone is AIR.washOpacity */
   kerb: Record<AirScenario, { rings: number; ribbons: number; wash: number }> | null;
   /** layer C */
   cores: number;
@@ -250,15 +337,59 @@ export interface AirLayers {
 /* ------------------------------------------------------------------------ */
 
 const f = (v: number): number => +v.toFixed(2);
+/** Where people stand, rings are placed from the ground up to this share of the plume's height (its strong part). */
+const RING_ROOM = 0.82;
 
-/** A ring as a filled annulus, so one stroke under the fill gives the light halo on both edges. */
+/**
+ * A ring as two circles wound the same way. Filled even-odd (the mark, .air-ring) it is a hollow
+ * annulus; filled non-zero (its halo underneath, .air-halo) it is a whole disc in the colour of the
+ * paper. So every ring looks the same everywhere: a blue ring with a clear paper centre, over the
+ * plume as on a plain wall, exactly like the ring in the key.
+ */
 function ringPath(cx: number, cy: number, r: number, sw: number): string {
   const o = r + sw / 2;
   const i = Math.max(0.01, r - sw / 2);
   return (
     `M${f(cx - o)},${f(cy)}a${f(o)},${f(o)} 0 1,0 ${f(o * 2)},0a${f(o)},${f(o)} 0 1,0 ${f(-o * 2)},0Z` +
-    `M${f(cx - i)},${f(cy)}a${f(i)},${f(i)} 0 1,1 ${f(i * 2)},0a${f(i)},${f(i)} 0 1,1 ${f(-i * 2)},0Z`
+    `M${f(cx - i)},${f(cy)}a${f(i)},${f(i)} 0 1,0 ${f(i * 2)},0a${f(i)},${f(i)} 0 1,0 ${f(-i * 2)},0Z`
   );
+}
+
+/** The radial gradient of one soft oval of the plume: stops (offset, opacity), as air() writes them. */
+const WASH_STOPS: readonly (readonly [number, number])[] = [[0, 1], [0.5, 0.9], [0.8, 0.45], [1, 0]];
+function washStop(t: number): number {
+  if (t >= 1) return 0;
+  for (let k = 1; k < WASH_STOPS.length; k++) {
+    const [o1, a1] = WASH_STOPS[k];
+    const [o0, a0] = WASH_STOPS[k - 1];
+    if (t <= o1) return a0 + ((a1 - a0) * (t - o0)) / (o1 - o0);
+  }
+  return 0;
+}
+
+/**
+ * The plume's opacity for each scenario, so that its AVERAGE tint over the kerb zone is exactly
+ * AIR.washOpacity (10 / 18 / 26 %), whatever the picture's shape. `ovals` are the plume's soft
+ * ovals (centre, radii, own opacity); the zone is sampled on a 48 × 48 grid, overlapping ovals
+ * composited as paint does (1 − Π(1 − a)). Capped so the strongest point stays under AIR.washMax.
+ */
+export function washStrength(zone: Box, ovals: readonly { cx: number; cy: number; rx: number; ry: number; k: number }[]): { group: Record<AirScenario, number>; mean: number; peak: number } {
+  const N = 48;
+  let sum = 0;
+  let peak = 0;
+  for (let j = 0; j < N; j++)
+    for (let i = 0; i < N; i++) {
+      const x = zone.x + ((i + 0.5) / N) * zone.w;
+      const y = zone.y + ((j + 0.5) / N) * zone.h;
+      let clear = 1;
+      for (const e of ovals) clear *= 1 - e.k * washStop(Math.hypot((x - e.cx) / e.rx, (y - e.cy) / e.ry));
+      sum += 1 - clear;
+      peak = Math.max(peak, 1 - clear);
+    }
+  const mean = sum / (N * N);
+  const group = { few: 0, dozen: 0, full: 0 } as Record<AirScenario, number>;
+  for (const s of AIR_SCENARIOS) group[s] = mean > 0 ? f(Math.min(AIR.washOpacity[s] / mean, AIR.washMax / Math.max(peak, 1e-6), 1)) : 0;
+  return { group, mean, peak };
 }
 
 function dotPath(cx: number, cy: number, r: number): string {
@@ -322,7 +453,10 @@ function scatter(count: number, region: Box, taken: Point[], r: () => number, av
   for (let n = 0; n < count; n++) {
     let best: Point | null = null;
     let bestD = -1;
-    for (let c = 0; c < 28 && (c < 14 || !best); c++) {
+    // 14 candidates; in a crowded region (people standing in the plume) keep trying until one is free
+    // and, if there is room for it, clear of every mark already there (two rings never touch)
+    const clear = (pad * 2.2) ** 2;
+    for (let c = 0; c < 240 && (c < 14 || !best || bestD < clear); c++) {
       const x = region.x + pad + r() * Math.max(0, region.w - pad * 2);
       const y = region.y + pad + r() * Math.max(0, region.h - pad * 2);
       if (avoid.some((b) => inBox(b, x, y, pad))) continue;
@@ -376,10 +510,12 @@ export function air(o: AirOptions): AirLayers {
   const ringEl = (cls: string, d: string, attrs = '') => haloed('air-ring', ringHalo, cls, d, attrs);
   const dotEl = (cls: string, d: string, attrs = '') => haloed('air-dot', dotHalo, cls, d, attrs);
 
-  /* ---- Layer A: the street's own air ------------------------------------ */
+  /* ---- The street's own air: NOT drawn in a picture ------------------- */
+  // Only the counting patch (airPatch) draws it, as AIR.ringsPerPatch rings and AIR.dotsPerPatch dots,
+  // so a reader can see "what the street holds" next to "what the pack adds" in the same square.
   let streetRings = 0;
   let streetDots = 0;
-  if (!o.noStreetAir) {
+  if (o.streetAir) {
     const rr = rng(seed * 7919 + 11);
     const rd = rng(seed * 7919 + 23);
     const ringGroups = ['', '', ''];
@@ -401,72 +537,10 @@ export function air(o: AirOptions): AirLayers {
     marks.push('</g>');
   }
 
-  /* ---- Layer B: what the pack adds where the people stand --------------- */
-  let wash = '';
-  let kerbCounts: AirCounts['kerb'] = null;
-  if (kerb) {
-    if (!o.extra) throw new Error('air.ts: a kerb zone needs `extra` (AIR_EXTRA from ./air-slots.ts): layer B is computed from the estimate, never typed');
-    const ground = kerb.ground ?? 0;
-    const top = kerb.top ?? AIR.kerbTop;
-    const from = kerb.from ?? 1;
-    const zone: Box = { x: kerb.x0, y: ground - top, w: kerb.x1 - kerb.x0, h: top };
-    const free = zone.w * zone.h * freeShare(zone, avoid, ringPad);
-    const want: Record<AirScenario, number> = { few: 0, dozen: 0, full: 0 };
-    let floor = 1;
-    for (const s of AIR_SCENARIOS) {
-      const perPatch = o.extra[s];
-      if (!Number.isFinite(perPatch) || perPatch < 1) throw new Error(`air.ts: extra.${s} must be at least 1 ring per patch (got ${perPatch})`);
-      want[s] = Math.max(floor, marksIn(perPatch, free, upp));
-      floor = want[s];
-    }
-    const shown: AirScenario[] = scenario === 'all' ? [...AIR_SCENARIOS] : [scenario];
-    const last = shown[shown.length - 1];
-    const stepOf = (k: number, by: Record<AirScenario, number>): number => (k < by.few ? 1 : k < by.dozen ? 2 : 3);
-
-    // the wash: one soft-edged rectangle, the same from the ground to the top of the zone
-    const w1 = AIR.washOpacity;
-    defs.push(
-      `<linearGradient id="${id}-wh" x1="0" x2="1" y1="0" y2="0"><stop class="air-wash-stop" offset="0" stop-opacity="0"/><stop class="air-wash-stop" offset="0.16" stop-opacity="1"/><stop class="air-wash-stop" offset="0.84" stop-opacity="1"/><stop class="air-wash-stop" offset="1" stop-opacity="0"/></linearGradient>`,
-      `<linearGradient id="${id}-wv" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.14" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>`,
-      `<mask id="${id}-wm" maskContentUnits="objectBoundingBox" x="0" y="0" width="1" height="1"><rect width="1" height="1" fill="url(#${id}-wv)"/></mask>`,
-    );
-    const feather = zone.w * 0.19; // the soft edge lies outside the zone, so the zone itself is evenly tinted
-    wash =
-      `<rect class="air-wash${scenario === 'all' ? ' air-wash--steps' : ''}" x="${f(zone.x - feather)}" y="${f(zone.y - zone.h * 0.16)}" width="${f(zone.w + feather * 2)}" height="${f(zone.h * 1.16)}" fill="url(#${id}-wh)" mask="url(#${id}-wm)"` +
-      ` style="--air-w1:${w1.few};--air-w2:${w1.dozen};--air-w3:${w1.full}"` +
-      // with 'all', CSS picks the step; the attribute is the fallback (the dozen) if no ancestor names a scenario
-      ` opacity="${scenario === 'all' ? w1.dozen : w1[scenario]}"` +
-      '/>';
-
-    // ribbons that reach the people, nested 1 ⊂ 3 ⊂ 5, spread evenly over the height of the zone
-    const rb = rng(seed * 7919 + 37);
-    const levels = [0.5, 0.2, 0.8, 0.35, 0.65];
-    const nRib = AIR.ribbonsToPeople[last];
-    const start = kerb.sourceX ?? (from === 1 ? zone.x + zone.w + zone.w * 0.1 : zone.x - zone.w * 0.1);
-    const startY = kerb.sourceY ?? ground - AIR.core.mouth * (top / AIR.kerbTop);
-    const farEdge = from === 1 ? zone.x : zone.x + zone.w;
-    marks.push('<g class="air-kerb">');
-    for (let k = 0; k < nRib; k++) {
-      const y1 = ground - top * (0.1 + 0.8 * levels[k % levels.length]) + (rb() - 0.5) * top * 0.05;
-      const x1 = start + (farEdge - start) * (0.8 + rb() * 0.17);
-      const y0 = startY + (levels[k % levels.length] - 0.5) * -px(9);
-      const d = wispPath(start, y0, x1, y1, px(AIR.ribbon.wave) * (0.9 + rb() * 0.4), px(AIR.ribbon.amp) * (0.85 + rb() * 0.4), k % 2 ? -1 : 1);
-      marks.push(`<path class="air-rib air-b air-b${stepOf(k, AIR.ribbonsToPeople)}" data-k="${k}" stroke-width="${f(ribSw * (0.85 + rb() * 0.3))}" d="${d}"/>`);
-    }
-
-    // the extra rings: one sequence, so a smaller scenario is a prefix of a larger one
-    const rk = rng(seed * 7919 + 41);
-    const extraRings = scatter(want[last], zone, allRings, rk, avoid, ringPad, px(AIR.ring.rMin), px(AIR.ring.rMax));
-    extraRings.forEach((m, k) => {
-      marks.push(ringEl(`air-b air-b${stepOf(k, want)} air-d${(k % 3) + 1}`, ringPath(m.x, m.y, m.r, ringSw), ` data-k="${k}"`));
-    });
-    marks.push('</g>');
-
-    kerbCounts = { few: { rings: 0, ribbons: 0, wash: 0 }, dozen: { rings: 0, ribbons: 0, wash: 0 }, full: { rings: 0, ribbons: 0, wash: 0 } };
-    for (const s of AIR_SCENARIOS) kerbCounts[s] = { rings: Math.min(want[s], extraRings.length), ribbons: AIR.ribbonsToPeople[s], wash: AIR.washOpacity[s] };
-  }
-
   /* ---- Layer C: the cores at the tailpipes ------------------------------ */
+  // drawn first so the kerb's extra rings (layer B) keep clear of each tailpipe's own ring; their
+  // markup still goes after layer B's
+  const srcMarks: string[] = [];
   const cores: string[] = [];
   const sources = [...cars.map((s) => ({ ...s, car: true })), ...tailpipes.map((s) => ({ ...s, car: false }))];
   if (sources.length) {
@@ -477,12 +551,12 @@ export function air(o: AirOptions): AirLayers {
     const fy = f(1 - C.mouth / C.height);
     defs.push(
       `<radialGradient id="${id}-c" cx="0.56" cy="0.6" r="0.5" fx="${fx}" fy="${fy}">` +
-        '<stop class="air-core-stop" offset="0" stop-opacity="0.97"/><stop class="air-core-stop" offset="0.26" stop-opacity="0.93"/>' +
-        '<stop class="air-core-stop air-core-stop--mid" offset="0.5" stop-opacity="0.72"/><stop class="air-core-stop air-core-stop--far" offset="0.76" stop-opacity="0.34"/>' +
+        '<stop class="air-core-stop" offset="0" stop-opacity="0.86"/><stop class="air-core-stop" offset="0.24" stop-opacity="0.78"/>' +
+        '<stop class="air-core-stop air-core-stop--mid" offset="0.5" stop-opacity="0.56"/><stop class="air-core-stop air-core-stop--far" offset="0.76" stop-opacity="0.24"/>' +
         '<stop class="air-core-stop air-core-stop--far" offset="1" stop-opacity="0"/></radialGradient>',
     );
     cores.push('<g class="air-cores">');
-    marks.push('<g class="air-srcs">');
+    srcMarks.push('<g class="air-srcs">');
     sources.forEach((s, i) => {
       const dir = s.dir ?? -1;
       const k = (s.scale ?? 1) * (s.car ? AIR.car.scale : 1) * (s.boost ?? 1);
@@ -502,7 +576,7 @@ export function air(o: AirOptions): AirLayers {
       const rs = rng(seed * 7919 + 101 + i * 13);
       const room = Math.min(1, w / upp / C.fullAtPx); // 1 in a close shot, less when the core is only a few dozen pixels long
       const nRings = s.rings ?? (s.car ? AIR.car.rings : Math.max(1, Math.round(C.rings * room)));
-      const nDots = s.dots ?? (s.car ? AIR.car.dots : Math.max(2, Math.round(C.dots * room)));
+      const nDots = s.dots ?? (s.car ? AIR.car.dots : Math.max(1, Math.round(C.dots * room)));
       const nRibs = s.ribbons ?? (s.car ? AIR.car.ribbons : Math.max(1, Math.round(C.ribbons * room)));
       let g = `<g class="air-src${s.car ? ' air-src--car' : ''}" data-src="${key}" transform="${t}">`;
       // ribbons leave the mouth in a narrow fan
@@ -525,6 +599,8 @@ export function air(o: AirOptions): AirLayers {
           const p = { x: -(0.07 + u * 0.93) * span, y: groundY - (0.08 + rs() * 0.92) * tall * (1 - u * 0.25) };
           let d = Infinity;
           for (const q of local) d = Math.min(d, (q.x - p.x) ** 2 + (q.y - p.y) ** 2);
+          // and clear of the rings of the tailpipes drawn before this one (a pack's rows sit close)
+          for (const q of allRings) d = Math.min(d, ((q.x - s.x) * (dir === 1 ? -1 : 1) - p.x) ** 2 + (q.y - s.y - p.y) ** 2);
           if (d > bestD) {
             bestD = d;
             best = p;
@@ -542,14 +618,124 @@ export function air(o: AirOptions): AirLayers {
       for (let j = 0; j < nRings; j++) {
         const p = spot();
         rd2 += ringPath(p.x, p.y, px(AIR.ring.rMin + rs() * (AIR.ring.rMax - AIR.ring.rMin)), ringSw);
+        // where it lands in the picture, so the kerb's rings keep clear of it
+        allRings.push({ x: s.x + p.x * (dir === 1 ? -1 : 1), y: s.y + p.y });
       }
       if (dd) g += dotEl(`air-d${(i % 3) + 1}`, dd);
       if (rd2) g += ringEl(`air-d${((i + 1) % 3) + 1}`, rd2);
-      marks.push(g + '</g>');
+      srcMarks.push(g + '</g>');
     });
     cores.push('</g>');
-    marks.push('</g>');
+    srcMarks.push('</g>');
   }
+
+  /* ---- Layer B: what the pack adds where the people stand --------------- */
+  let wash = '';
+  let kerbCounts: AirCounts['kerb'] = null;
+  if (kerb) {
+    if (!o.extra) throw new Error('air.ts: a kerb zone needs `extra` (AIR_EXTRA from ./air-slots.ts): layer B is computed from the estimate, never typed');
+    const ground = kerb.ground ?? 0;
+    const top = kerb.top ?? AIR.kerbTop;
+    const from = kerb.from ?? 1;
+    const zone: Box = { x: kerb.x0, y: ground - top, w: kerb.x1 - kerb.x0, h: top };
+    // rings live inside the plume: from the ground up to RING_ROOM of the zone's height, where the plume
+    // is still strong. The count is worked out over that same area, so the density is the rule's, never more.
+    const room = kerb.ringRoom ?? RING_ROOM;
+    const sx = kerb.sourceX ?? (from === 1 ? zone.x + zone.w + zone.w * 0.1 : zone.x - zone.w * 0.1);
+    // and only on the people's side of the nearest tailpipe: the plume leaves it toward them
+    const px0 = from === 1 ? zone.x : Math.max(zone.x, sx);
+    const px1 = from === 1 ? Math.min(zone.x + zone.w, sx) : zone.x + zone.w;
+    const inPlume: Box = { x: px0, y: ground - top * room, w: Math.max(0, px1 - px0), h: top * room };
+    // the plume is lower near the tailpipe than over the people: its height at a point `u` of the way
+    // from the tailpipe (0) to the far side of the people (1). Rings keep under RING_ROOM of it.
+    const lowH = AIR.plume.sourceHeight * (top / AIR.kerbTop);
+    const D = (from === 1 ? zone.x : zone.x + zone.w) - sx;
+    const plumeH = (x: number): number => {
+      const u = Math.min(1, Math.max(0, (x - sx) / D));
+      return lowH + (top - lowH) * (u * u * (3 - 2 * u));
+    };
+    // above that line counts as outside the plume: slices of "no room" over the zone (none in the counting patch, which is all plume)
+    const above: Box[] = [];
+    if (kerb.ringRoom === undefined && inPlume.w > 0) {
+      const N = 12;
+      for (let k = 0; k < N; k++) {
+        const x = inPlume.x + (k / N) * inPlume.w;
+        const w = inPlume.w / N;
+        const h = Math.min(plumeH(x), plumeH(x + w)) * room; // the lower edge of the slice: never above the plume
+        above.push({ x, y: ground - top * 3, w, h: top * 3 - h }); // scatter keeps a ring's own radius clear of it
+      }
+    }
+    const kerbAvoid = [...avoid, ...above];
+    // the count is the plume's own area there: the people standing in it breathe that air, so their
+    // outlines do not reduce it; the rings are placed around them (never on a face: `avoid`)
+    const free = inPlume.w * inPlume.h * freeShare(inPlume, above, 0);
+    const want: Record<AirScenario, number> = { few: 0, dozen: 0, full: 0 };
+    let floor = 1;
+    for (const s of AIR_SCENARIOS) {
+      const perPatch = o.extra[s];
+      if (!Number.isFinite(perPatch) || perPatch < 1) throw new Error(`air.ts: extra.${s} must be at least 1 ring per patch (got ${perPatch})`);
+      want[s] = Math.max(floor, marksIn(perPatch, free, upp));
+      floor = want[s];
+    }
+    const shown: AirScenario[] = scenario === 'all' ? [...AIR_SCENARIOS] : [scenario];
+    const last = shown[shown.length - 1];
+    const stepOf = (k: number, by: Record<AirScenario, number>): number => (k < by.few ? 1 : k < by.dozen ? 2 : 3);
+
+    // the plume where the people stand: the front row's exhaust, carried on from the nearest
+    // tailpipe. Low at the tailpipe, it spreads and thins as it reaches the people and wraps them
+    // from the ground up to about the top of the zone. Three overlapping soft ovals, each fading
+    // to nothing at its edge, so there is no hard outline anywhere; cut off at the ground.
+    defs.push(
+      `<radialGradient id="${id}-wr">${WASH_STOPS.map(([o, a]) => `<stop class="air-wash-stop" offset="${o}" stop-opacity="${a}"/>`).join('')}</radialGradient>`,
+      `<clipPath id="${id}-wc"><rect x="${f(Math.min(sx, sx + D) - Math.abs(D))}" y="${f(ground - top * 2)}" width="${f(Math.abs(D) * 3)}" height="${f(top * 2 + px(1))}"/></clipPath>`,
+    );
+    let ovals = '';
+    const shape = AIR.plume.ovals.map(([u, k]) => {
+      const e = u * u * (3 - 2 * u);
+      const h = lowH + (top - lowH) * e;
+      const o = { cx: sx + D * u, cy: ground - h * 0.3, rx: Math.abs(D) * (0.3 + 0.12 * u), ry: h * 0.72, k };
+      ovals += `<ellipse cx="${f(o.cx)}" cy="${f(o.cy)}" rx="${f(o.rx)}" ry="${f(o.ry)}" fill="url(#${id}-wr)" opacity="${k}"/>`;
+      return o;
+    });
+    // the plume is cut off at the ground (clip below), so its average is taken over the zone above it
+    const w1 = washStrength(zone, shape).group;
+    wash =
+      `<g class="air-wash${scenario === 'all' ? ' air-wash--steps' : ''}"` +
+      ` style="--air-w1:${w1.few};--air-w2:${w1.dozen};--air-w3:${w1.full}"` +
+      // with 'all', CSS picks the step; the attribute is the fallback (the dozen) if no ancestor names a scenario
+      ` opacity="${scenario === 'all' ? w1.dozen : w1[scenario]}" clip-path="url(#${id}-wc)">` +
+      ovals +
+      '</g>';
+
+    // ribbons that reach the people, nested 1 ⊂ 3 ⊂ 5, spread evenly over the height of the zone
+    const rb = rng(seed * 7919 + 37);
+    const levels = [0.5, 0.2, 0.8, 0.35, 0.65];
+    const nRib = AIR.ribbonsToPeople[last];
+    const start = sx;
+    const startY = kerb.sourceY ?? ground - AIR.core.mouth * (top / AIR.kerbTop);
+    const farEdge = from === 1 ? zone.x : zone.x + zone.w;
+    marks.push('<g class="air-kerb">');
+    for (let k = 0; k < nRib; k++) {
+      const y1 = ground - top * (0.1 + 0.8 * levels[k % levels.length]) + (rb() - 0.5) * top * 0.05;
+      const x1 = start + (farEdge - start) * (0.8 + rb() * 0.17);
+      const y0 = startY + (levels[k % levels.length] - 0.5) * -px(9);
+      const d = wispPath(start, y0, x1, y1, px(AIR.ribbon.wave) * (0.9 + rb() * 0.4), px(AIR.ribbon.amp) * (0.85 + rb() * 0.4), k % 2 ? -1 : 1);
+      marks.push(`<path class="air-rib air-b air-b${stepOf(k, AIR.ribbonsToPeople)}" data-k="${k}" stroke-width="${f(ribSw * (0.85 + rb() * 0.3))}" d="${d}"/>`);
+    }
+
+    // the extra rings: one sequence, so a smaller scenario is a prefix of a larger one
+    const rk = rng(seed * 7919 + 41);
+    const extraRings = scatter(want[last], inPlume, allRings, rk, kerbAvoid, ringPad, px(AIR.ring.rMin), px(AIR.ring.rMax));
+    extraRings.forEach((m, k) => {
+      marks.push(ringEl(`air-b air-b${stepOf(k, want)} air-d${(k % 3) + 1}`, ringPath(m.x, m.y, m.r, ringSw), ` data-k="${k}"`));
+    });
+    marks.push('</g>');
+
+    kerbCounts = { few: { rings: 0, ribbons: 0, wash: 0 }, dozen: { rings: 0, ribbons: 0, wash: 0 }, full: { rings: 0, ribbons: 0, wash: 0 } };
+    for (const s of AIR_SCENARIOS) kerbCounts[s] = { rings: Math.min(want[s], extraRings.length), ribbons: AIR.ribbonsToPeople[s], wash: w1[s] };
+  }
+
+  marks.push(...srcMarks);
 
   /* ---- Electric scooters: tyre and brake dust stays ---------------------- */
   if (tyres.length) {
@@ -640,10 +826,11 @@ export function airPatch(o: { extra: number; size?: number; seed?: number; id: s
   const upp = size / AIR.patch;
   const e = Math.max(1, Math.round(o.extra));
   const frame = { x: 0, y: 0, w: size, h: size };
-  const a = air({ frame, upp, seed: o.seed ?? 5, id: o.id, kerb: { x0: 0, x1: size, ground: size, top: size }, extra: { few: e, dozen: e, full: e }, scenario: 'few' });
+  const a = air({ frame, upp, seed: o.seed ?? 5, id: o.id, streetAir: true, kerb: { x0: 0, x1: size, ground: size, top: size, ringRoom: 1 }, extra: { few: e, dozen: e, full: e }, scenario: 'few' });
   // a patch has no direction and no people: keep the rings and dots, drop the ribbon and the feathered wash
   const marks = a.marks.replace(/<path class="air-rib[^>]*\/>/g, '');
-  const tint = o.wash ? `<rect class="air-wash air-wash--flat" width="${size}" height="${size}" opacity="${o.wash}"/>` : '';
+  // the plume's step as a flat tint: its average over the zone in a picture (AIR.washOpacity)
+  const tint = o.wash ? `<rect class="air-wash air-wash--flat" width="${size}" height="${size}" opacity="${f(o.wash)}"/>` : '';
   return { svg: tint + marks, rings: a.counts.street.rings + (a.counts.kerb?.few.rings ?? 0), dots: a.counts.street.dots };
 }
 
@@ -652,14 +839,32 @@ export function airPatch(o: { extra: number; size?: number; seed?: number; id: s
 /* ------------------------------------------------------------------------ */
 
 export type AirMark = 'ribbon' | 'ring' | 'dot';
+/** Entries of the key under a picture (AirLegend): the three marks, the scooters' plume, a car's plume, tyre dust. */
+export type AirKeyItem = AirMark | 'plume' | 'car' | 'tyre' | 'nose';
+/** The key most pictures carry: the plume, then the three marks inside it. */
+export const AIR_KEY: readonly AirKeyItem[] = ['plume', 'ribbon', 'ring', 'dot'];
 
 /**
  * The three marks as 24 × 24 glyphs, drawn with the same classes as the
  * scenes, for the key on screens 2 and 4 and for any legend. Wrap in
  * <svg viewBox="0 0 24 24" class="air-glyph">.
  */
-export function airGlyph(kind: AirMark): string {
+export function airGlyph(kind: AirKeyItem): string {
   switch (kind) {
+    case 'plume':
+    case 'car':
+      // a soft cloud, darkest at the left where it leaves the tailpipe (the CSS blurs its edge a little)
+      return (
+        '<g class="air-glyph-plume">' +
+        `<ellipse class="air-glyph-plume__far" cx="13.5" cy="14" rx="10.5" ry="${kind === 'car' ? 5.5 : 7}"/>` +
+        `<ellipse class="air-glyph-plume__near" cx="8" cy="15.5" rx="${kind === 'car' ? 4.5 : 6}" ry="${kind === 'car' ? 3.5 : 4.5}"/>` +
+        '</g>'
+      );
+    case 'nose':
+      // the red ring the heights and rider pictures put at each nose (parts.breath)
+      return '<circle class="a-breath" cx="12" cy="12" r="7.5" stroke-width="2.4"/>';
+    case 'tyre':
+      return `<path class="air-tyre" d="${dotPath(6, 15, 2)}${dotPath(12, 13, 2)}${dotPath(18, 15.5, 2)}"/>`;
     case 'ribbon':
       return `<path class="air-rib" stroke-width="2.8" d="${wavePath(2, 12, 20, 1, 10, 3.6)}"/>`;
     case 'ring':

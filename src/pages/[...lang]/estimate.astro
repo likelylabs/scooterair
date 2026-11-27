@@ -39,7 +39,6 @@ import { mveModel } from '@/components/charts/core/estimateCharts';
 import { workingBusiest, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
 import KerbScene from '@/components/art/KerbScene.astro';
 import AirRange from '@/components/art/AirRange.astro';
-import AirKey from '@/components/art/AirKey.astro';
 import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
 import { AIR_RULE } from '@/components/art/air-slots';
 import Composer from '@/components/pages/action/Composer.astro';
@@ -156,6 +155,7 @@ const drawingRules = t.drawing.rules.map((r) =>
     c: AIR_RULE.extra.full,
     lo: AIR_RULE.range.dozen.lo.rings,
     hi: AIR_RULE.range.dozen.hi.rings,
+    wash: AIR_RULE.washPercent.full,
   }),
 );
 const drawingHow = fill(t.drawing.how, { rings: AIR_RULE.streetRings });
@@ -206,7 +206,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
       <h2 class="es-toc__t" id="es-toc-t">{t.hero.tocLabel}</h2>
       <ol>
         {toc.map((x, i) => (
-          <li><a href={`#${x.id}`}><span class="es-toc__n" aria-hidden="true">{i + 1}</span>{x.label}</a></li>
+          <li><a href={`#${x.id}`}><span class="es-toc__n" aria-hidden="true">{i + 1}</span><span><Phrased text={x.label} locale={locale} /></span></a></li>
         ))}
       </ol>
     </nav>
@@ -216,6 +216,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   <Section id="numbers" eyebrow={t.numbers.eyebrow} title={t.numbers.title} lead={t.numbers.lead} width="wide" tone="sunken" rule>
     <p class="es-p es-gloss">{est.meta.gloss[locale]}</p>
     <EstimateTable locale={locale} id="numbers-table" />
+    <p class="es-p es-gloss">{estimateText.unitsGloss[locale]}</p>
     <div class="es-ufp">
       <h3 class="es-h3"><Phrased text={t.numbers.ultrafineTitle} /></h3>
       <p class="es-p">{kSentences.K2[locale]}{en ? ' ' : ''}{kSentences.K3[locale]}</p>
@@ -358,10 +359,8 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
         <p class="es-p es-draw__try">{t.drawing.tryIt}</p>
         <ScenarioSwitch locale={locale} />
         <div class="es-draw__nums">
-          {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} anchor="numbers" data-when-scenario={s} data-say />)}
+          {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} anchor="numbers" class="est--ring" data-when-scenario={s} data-say />)}
         </div>
-        <p class="es-h4">{t.drawing.keyTitle}</p>
-        <AirKey locale={locale} />
       </div>
     </div>
 
@@ -421,8 +420,8 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     <h3 class="es-h3"><Phrased text={t.measure.toWhomTitle} /></h3>
     <p class="es-p">{t.measure.toWhom}</p>
     <div class="es-btns">
-      <a class="es-btn" href={href('/print/brief/', locale)}>{t.measure.brief}<Icon name="arrow-right" size="1.05em" /></a>
-      <a class="es-btn es-btn--quiet" href={href('/act/', locale)}>{t.measure.act}<Icon name="arrow-right" size="1.05em" /></a>
+      <a class="es-btn" href={href('/print/brief/', locale)}><span>{t.measure.brief}</span><Icon name="arrow-right" size="1.05em" /></a>
+      <a class="es-btn es-btn--quiet" href={href('/act/', locale)}><span>{t.measure.act}</span><Icon name="arrow-right" size="1.05em" /></a>
     </div>
   </Section>
 
@@ -821,19 +820,29 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     font-size: var(--fs-base);
     line-height: var(--lh-read);
   }
+  /* the kerb drawing and its switch: the layout rule of the home page's screens (ui/Screen.astro).
+     One column below 43em, the drawing as wide as the words under it. From 43em two columns,
+     drawing left (at most 55 % and 32rem, and narrow enough that the drawing, its key and tag
+     fit the window's height, never under 14rem), switch and figures right. --pic-ar is the kerb
+     drawing's width over its height (its viewBox, 450 × 425). */
   .es-draw {
+    --pic-ar: 1.0588;
+    --win: calc(100vh - var(--header-h) - 2rem);
     margin-block: var(--sp-5);
     display: grid;
     gap: var(--sp-4);
   }
-  @media (min-width: 56em) {
+  @supports (height: 100svh) {
     .es-draw {
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-      align-items: start;
+      --win: calc(100svh - var(--header-h) - 2rem);
     }
   }
-  .es-draw__pic {
-    max-inline-size: 32rem;
+  @media (min-width: 43em) {
+    .es-draw {
+      grid-template-columns: minmax(0, min(55%, 32rem, max(14rem, calc((var(--win) - 5rem) * var(--pic-ar))))) minmax(min(17rem, 45%), 1fr);
+      column-gap: var(--sp-5);
+      align-items: start;
+    }
   }
   .es-draw__side {
     display: grid;

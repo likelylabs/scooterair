@@ -143,10 +143,12 @@ export function renderPriceBars(p: PriceBarsProps): string {
   const sumSide = (o: (typeof sides)[number]) => {
     const off = Math.round(o.s.list - o.s.net);
     const name = o.s.name ?? '';
+    // a label that already names the model (「燃油機車：山葉 Jog 125」) keeps only its kind here, so the full name is said once
+    const label = name ? o.label.split(/[:：]/)[0].trim() : o.label;
     const txt =
       off > 0
-        ? fill(o.s.offWhat ? T.sumSide : T.sumSidePlain, locale, { label: o.label, name, list: yuan(o.s.list, locale), off: yuan(off, locale), what: o.s.offWhat ?? '', net: yuan(o.s.net, locale) })
-        : fill(T.sumSideNoOff, locale, { label: o.label, name, net: yuan(o.s.net, locale) });
+        ? fill(o.s.offWhat ? T.sumSide : T.sumSidePlain, locale, { label, name, list: yuan(o.s.list, locale), off: yuan(off, locale), what: o.s.offWhat ?? '', net: yuan(o.s.net, locale) })
+        : fill(T.sumSideNoOff, locale, { label, name, net: yuan(o.s.net, locale) });
     // without a model name, drop the empty slot and its separator
     return name ? txt : txt.replace(/：，|: , /, locale === 'en' ? ': ' : '：');
   };

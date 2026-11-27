@@ -15,6 +15,7 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import { nose } from './parts';
+import Phrased from '@/components/ui/Phrased.astro';
 
 interface Props {
   locale: Locale;
@@ -28,12 +29,12 @@ const s = art.smell;
   <div class="smell__cols">
     <div class="smell__col smell__col--can">
       <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" set:html={nose(true)} />
-      <p class="smell__title">{s.canTitle[locale]}</p>
+      <p class="smell__title"><Phrased text={s.canTitle[locale]} locale={locale} /></p>
       <p class="smell__body"><slot name="can">{s.canBody[locale]}</slot></p>
     </div>
     <div class="smell__col smell__col--cannot">
       <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" set:html={nose(false)} />
-      <p class="smell__title">{s.cannotTitle[locale]}</p>
+      <p class="smell__title"><Phrased text={s.cannotTitle[locale]} locale={locale} /></p>
       <p class="smell__body"><slot name="cannot">{s.cannotBody[locale]}</slot></p>
     </div>
   </div>

@@ -14,8 +14,9 @@
  * is the film at 0:48.
  *
  * THE AIR IS DRAWN BY ONE RULE: ../../art/air.ts, the same function the home page uses.
- *   A  the street's own air   sparse rings and dots over the whole frame, in every street
- *                             shot: before the red, through it, and in the electric replay
+ *   A  the street's own air   NOT drawn (air.ts: pictures show only the scooters' plume; the
+ *                             number panel carries the street's own level). streetAir() below
+ *                             asks air() for it and gets an empty layer.
  *   B  what the pack adds     the kerb zone where the people stand: extra rings by the
  *      where people stand     signed estimate (`extra`, from air-slots.ts), three ribbons
  *                             and the soft wash. It FORMS AS THE SCOOTERS ARRIVE AND THEN
@@ -679,13 +680,13 @@ export function createFilm(opt: FilmOptions) {
       scenario: 'dozen',
       extra: opt.extra,
       kerb: { x0: PL0 - 12, x1: TB0 - 4, sourceX: NEAREST.px, sourceY: NEAREST.py },
-      // in the wide shot the far rows keep one ring, a few dots and one ribbon each, as on the home page: sixteen full clusters would bury the pack
-      tailpipes: order.map((q) => ({ x: q.px, y: q.py, scale: q.s, row: q.row, ...(sparse && q.row !== 1 ? { rings: 1, dots: 3, ribbons: 1 } : {}) })),
+      // in the wide shot the far rows keep only their plume, as on the home page: sixteen clusters would bury the pack
+      tailpipes: order.map((q) => ({ x: q.px, y: q.py, scale: q.s, row: q.row, ...(sparse && q.row !== 1 ? { rings: 0, dots: 0, ribbons: 0 } : {}) })),
       avoid,
     });
     const out: PackAir = { defs: a.defs, wash: '', cores: { 1: '', 2: '', 3: '' }, clusters: { 1: '', 2: '', 3: '' }, kerb: '' };
-    // the wash: its fixed step of opacity, times how much of the layer has formed
-    out.wash = a.wash.replace(/ opacity="[^"]*"/, dyn((c) => ({ opacity: r3(AIR.washOpacity.dozen * c.form), display: c.form > 0 ? null : 'none' }), ...AIR_T));
+    // the wash: its step of opacity (air() sets it so its average over the kerb zone is AIR.washOpacity.dozen), times how much of the layer has formed
+    out.wash = a.wash.replace(/ opacity="[^"]*"/, dyn((c) => ({ opacity: r3((a.counts.kerb?.dozen.wash ?? 0) * c.form), display: c.form > 0 ? null : 'none' }), ...AIR_T));
     // each core and its cluster of marks belong to one scooter: they come and go with it
     for (const m of a.cores.matchAll(/<g class="air-core" data-src="(\d+)" transform="[^"]*" opacity="([^"]*)">(.*?)<\/g>/g)) {
       const q = order[+m[1]];
@@ -864,8 +865,8 @@ export function createFilm(opt: FilmOptions) {
    * ATMOS: the street's own air (layer A). AIR: what the ruler shot adds over everything
    * ================================================================================ */
   /**
-   * Layer A, the street's own air: sparse rings and dots at the rule's one density, over the
-   * whole street, in every shot. It lies behind the scooters and the people, and keeps clear of
+   * Layer A, the street's own air. air.ts no longer draws it in a picture (only the counting patch
+   * does), so this layer is empty; it stays so the film's layer slots keep their order. It lies behind the scooters and the people, and keeps clear of
    * the signal. Like the pack's air it is drawn at two sizes of mark and cross-faded.
    */
   function streetAir(): string {
@@ -1171,6 +1172,13 @@ export function createFilm(opt: FilmOptions) {
    * move to the left of the two bars they belong to.
    */
   const MONEY_BOX = { w: 400, h: 300, pad: 0.98 };
+  /**
+   * The hold on the two monthly bars: once the second bar has grown, the card pushes in slowly
+   * (to 6% larger by the end card) around a point beside the home-charging bar. The scooters on
+   * the paper and the HTML bars over it use the same point and the same scale, so they move as one.
+   */
+  const PUSH = { x: 220, y: 204, by: 0.06 };
+  const pushK = (t: number): number => 1 + PUSH.by * eio(seg(t, T.bars + 3.3, T.end));
   /** Three poses of each scooter on the card: [x, y, scale] in card units. */
   const POSES = {
     gas: [[26, 232, 0.92], [96, 288, 0.34], [18, 132, 0.34]],
@@ -1189,11 +1197,14 @@ export function createFilm(opt: FilmOptions) {
       const dx = (kind === 'gas' ? -1 : 1) * 90 * (1 - inK);
       // while the price tags are up the paper is theirs alone
       const away = seg(c.t, T.tags + 0.1, T.tags + 0.5) * (1 - seg(c.t, T.bars - 0.1, T.bars + 0.4));
-      return { transform: `translate(${r1(v[0] + dx)} ${r1(v[1])}) scale(${r3(v[2])})`, opacity: r2(inK * (1 - away)) };
+      const k = pushK(c.t);
+      const x = PUSH.x + k * (v[0] + dx - PUSH.x);
+      const y = PUSH.y + k * (v[1] - PUSH.y);
+      return { transform: `translate(${r1(x)} ${r1(y)}) scale(${r3(v[2] * k)})`, opacity: r2(inK * (1 - away)) };
     };
     const inner =
       `<path class="f-ground" d="M14,233 H386"${dyn((c) => ({ opacity: r2(seg(c.t, A, A + 0.4) * (1 - seg(c.t, T.tags - 0.1, T.tags + 0.4))) }), A - 0.1, T.tags + 0.5)}/>` +
-      `<use href="#f-sc-gas-bare"${dyn(pose('gas'), A - 0.3, T.bars + 1)}/><use href="#f-sc-electric-bare"${dyn(pose('electric'), A - 0.3, T.bars + 1)}/>`;
+      `<use href="#f-sc-gas-bare"${dyn(pose('gas'), A - 0.3, Z + 0.4)}/><use href="#f-sc-electric-bare"${dyn(pose('electric'), A - 0.3, Z + 0.4)}/>`;
     return grp(
       dyn((c) => ({ opacity: r2(seg(c.t, A - 0.3, A + 0.3) * (1 - seg(c.t, Z, Z + 0.8))), display: c.t > A - 0.35 && c.t < Z + 0.9 ? null : 'none' }), A - 0.4, Z + 1),
       `${FULL} class="f-paper"/><g${dyn(fit(MONEY_BOX.w, MONEY_BOX.h, MONEY_BOX.pad))}>${inner}</g>`,
@@ -1285,11 +1296,13 @@ export function createFilm(opt: FilmOptions) {
     const B0 = T.bars;
     const max = Math.max(...TX.money.bars.map((b) => b.amount));
     box.push(`<p class="fo-permonth" style="${at(200, 22)}"${dynS(show(B0 + 0.3, T.end + 0.3), B0, T.end + 0.4)}>${esc(TX.money.perMonth)}</p>`);
+    // the hold on the two bars pushes in slowly once both are drawn (PUSH, pushK)
+    const bars: string[] = [];
     TX.money.bars.forEach((b, i) => {
       const y = 66 + i * 104;
       const t0 = B0 + 0.8 + i * 1.3;
       const w = Math.max(0.03, b.amount / max);
-      box.push(
+      bars.push(
         `<div class="fo-bar fo-bar--${i ? 'e' : 'p'}" style="${at(92, y)}"${dynS(show(t0 - 0.2, T.end + 0.3), B0, T.end + 0.4)}>` +
           `<span class="fo-bar__label">${esc(b.label)}</span>` +
           `<span class="fo-bar__track"><i style="inline-size:${pct(w)}"${dynS((c) => ({ transform: `scaleX(${r3(eo(seg(c.t, t0, t0 + 1.1)))})` }), B0, t0 + 1.2)}></i></span>` +
@@ -1297,6 +1310,8 @@ export function createFilm(opt: FilmOptions) {
           '</div>',
       );
     });
+    // the same push-in as the scooters on the paper (PUSH, pushK): origin 220/400, 204/300 in Film.astro
+    box.push(`<div class="fo-bars"${dynS((c) => ({ transform: `scale(${r3(pushK(c.t))})` }), B0, T.end + 0.4)}>${bars.join('')}</div>`);
     o.push(`<div class="fo-box">${box.join('')}</div>`);
     return o.join('');
   }

@@ -553,7 +553,7 @@ export function ledDots(d: string, o: { pitch?: number; r?: number; cls?: string
 /* These drew the street before the site had an estimate: one hatched band    */
 /* that said where the exhaust was and declined to say how much. The site now */
 /* publishes a signed estimate (research/estimate/METHOD.md), so the picture  */
-/* DOES show an amount: sparse where it is the street's own air, more where   */
+/* DOES show an amount: one soft plume per row of scooters, with rings where */
 /* people stand by the estimate, darkest at the tailpipes. That rule lives in */
 /* ./air.ts. What still holds: nothing drawn changes with time through the    */
 /* red, and every function is deterministic.                                  */

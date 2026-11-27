@@ -1,26 +1,26 @@
 ---
 /**
  * /print/card/<id>/ — one share card laid out as a page, for scripts/build-share-cards.mjs to
- * photograph at 1200 × 630 (og:image) and 1080 × 1080 (LINE). Never in the production build:
- * getStaticPaths returns nothing unless SA_SHARE_CARDS=1 (the generator sets it for its own
- * scratch build).
+ * photograph at 1200 × 630 (the og:image). Never in the production build: getStaticPaths
+ * returns nothing unless SA_SHARE_CARDS=1 (the generator sets it for its own scratch build).
  *
- * One picture and one line per card (brief 7.9). The picture is drawn with the site's own
- * scenes, so cards, pages, poster and film share one picture grammar: lane J's Picture for the
- * kerb, the electric kerb and the heights; lane C's TailpipeMarks, MaskScene, RiderScene and
- * BodyFigure when they exist (the kerb until then); the film card uses the heights picture,
- * which is the film's ruler shot (beat 10), until lane F publishes a frame of it.
+ * A poster seen at thumbnail size (brief 7.9): one picture that fills the card, one short
+ * headline in the headline face, and the 示意圖 plate, large enough to read in a chat preview.
+ * No site name: in a preview it was a speck, and the chat already shows where the link goes. The picture
+ * is a composition of src/components/art/card-art.ts, drawn with the scenes' own figures and
+ * the one air rule; its layout puts the headline and the people inside the central square
+ * (LINE crops to it) and keeps everything 60 px from the edges. The generator shrinks the
+ * headline until it fits its box.
  *
  * Words: src/lib/share-cards.ts (shareCardContent) and src/i18n/pages/share.ts.
  */
 import PrintPage from '@/components/pages/action/PrintPage.astro';
-import Picture from '@/components/pages/action/Picture.astro';
 import Phrased from '@/components/ui/Phrased.astro';
-import KindChip from '@/components/ui/KindChip.astro';
-import EstimateValue from '@/components/ui/EstimateValue.astro';
 import { localeFromParam, localeStaticPaths } from '@/i18n';
-import { illustration, site } from '@/i18n/ui';
-import { shareCardContent, shareCardIds, type CardPicture, type ShareCardId } from '@/lib/share-cards';
+import { est } from '@/data/estimate';
+import { fact } from '@/data/facts';
+import { CARD, cardArt } from '@/components/art/card-art';
+import { shareCardContent, shareCardIds, type ShareCardId } from '@/lib/share-cards';
 
 export function getStaticPaths() {
   if (process.env.SA_SHARE_CARDS !== '1') return [];
@@ -30,50 +30,31 @@ const locale = localeFromParam(Astro.params.lang);
 const id = Astro.params.id as ShareCardId;
 const c = shareCardContent(id, locale);
 
-const scenes = import.meta.glob<{ default: any }>(
-  ['/src/components/art/TailpipeMarks.astro', '/src/components/art/MaskScene.astro', '/src/components/art/RiderScene.astro', '/src/components/art/BodyFigure.astro'],
-  { eager: true },
-);
-const scene = (name: string) => scenes[`/src/components/art/${name}.astro`]?.default;
-const fromC: Partial<Record<CardPicture, any>> = { smell: scene('TailpipeMarks'), mask: scene('MaskScene'), rider: scene('RiderScene'), body: scene('BodyFigure') };
-const C = fromC[c.picture];
-const own: 'kerb' | 'kerb-electric' | 'heights' = c.picture === 'kerb-electric' ? 'kerb-electric' : c.picture === 'heights' || c.picture === 'film' ? 'heights' : 'kerb';
-// The address printed on the card is where the site lives today. The PNGs are rendered once and
-// committed, so this is not read from the build's SITE_URL (a local build has none). Override
-// with SHARE_CARD_HOST if the site moves.
-const host = process.env.SHARE_CARD_HOST || 'likelylabs.com/scooterair';
-const tagText = illustration.tag[locale];
+const station = fact('taipei-roadside-co-2024').data as Record<string, { value: number; unit: string }>;
+const art = cardArt(c.art, { inlet: { lo: station.inletLow.value, hi: station.inletHigh.value }, red: est.signal.redLength_s });
+const { head, tag } = art.layout;
+const box = `${art.box.x} ${art.box.y} ${art.box.w} ${art.box.h}`;
+const headStyle = `left:${head.x}px;top:${head.y}px;width:${head.w}px;height:${head.h}px;--align:${head.align}`;
+const tagStyle = tag.end ? `right:${CARD.w - tag.x}px;top:${tag.y}px` : `left:${tag.x}px;top:${tag.y}px`;
 ---
 
 <PrintPage locale={locale} title={c.title.replaceAll('|', '')} canonical={false} bare>
-  <script is:inline slot="head">
-    document.addEventListener('DOMContentLoaded', function () {
-      var svg = document.querySelector('.card__pic svg[viewBox]');
-      if (!svg) return;
-      var v = svg.getAttribute('viewBox').split(/[\s,]+/).map(Number);
-      var ar = v[2] / v[3];
-      document.querySelector('.card__pic').style.setProperty('--ar', String(ar));
-      // a long, low picture (the heights) goes across the top of the wide card instead of beside the words
-      if (ar > 1.8) document.querySelector('.card').classList.add('card--strip');
-    });
-  </script>
-  <div class="card" data-card={id} style="--k:1">
-    <div class="card__pic">
-      {C ? <C locale={locale} tag={c.picture === 'body' ? 'body' : 'street'} {...(c.picture === 'mask' ? { says: false } : {})} /> : <Picture locale={locale} kind={own} scenario="dozen" labels={own === 'heights'} />}
+  <div class="card" data-card={id} data-art={c.art} style="--k:1">
+    <svg class="card__art" viewBox={box} preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" data-air-scn="dozen" set:html={art.svg} />
+    <div class="card__veil" style={`left:${head.x - 140}px;width:${head.w + 280}px;height:${head.y + head.h + 40}px`}></div>
+    <div class="card__head" style={headStyle}>
+      <h1 class="card__title"><Phrased text={c.title} locale={locale} /></h1>
     </div>
-    <div class="card__text">
-      <p class="card__head"><span class="card__name">{site.name[locale]}</span><span class="card__host">{host}</span></p>
-      <div class="card__fit">
-        <p class="card__kicker">{c.kicker}</p>
-        <h1 class="card__title"><Phrased text={c.title} /></h1>
-        <p class="card__line">
-          {c.line}
-          {c.chip && <KindChip locale={locale} kind={c.chip} />}
-        </p>
-        {c.estimate && <p class="card__est"><EstimateValue locale={locale} slotId={c.estimate.slot} /></p>}
-        {c.caveat !== tagText && <p class="card__caveat">{c.caveat}</p>}
-      </div>
-    </div>
+    {
+      art.play && (
+        <span class="card__play" style={`left:${art.play.x - art.play.r}px;top:${art.play.y - art.play.r}px;width:${art.play.r * 2}px;height:${art.play.r * 2}px`} aria-hidden="true">
+          <svg viewBox="0 0 40 40">
+            <path d="M15,11 L30,20 L15,29 Z" />
+          </svg>
+        </span>
+      )
+    }
+    <p class="card__tag" style={tagStyle}>{c.tag}</p>
   </div>
 </PrintPage>
 
@@ -82,174 +63,93 @@ const tagText = illustration.tag[locale];
   html.print-page--bare body {
     margin: 0;
     overflow: hidden;
+    background: var(--art-fill);
   }
   .card {
-    --here: var(--bg);
-    box-sizing: border-box;
-    inline-size: 100vw;
-    block-size: 100vh;
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    background: var(--bg);
+    position: relative;
+    inline-size: 1200px;
+    block-size: 630px;
+    overflow: hidden;
+    background: var(--art-fill);
     color: var(--ink);
-    border-block-start: 14px solid var(--signal-red, #c62828);
+    --here: var(--art-fill);
   }
   .card p,
   .card h1 {
     margin: 0;
   }
-  .card__pic {
-    min-block-size: 0;
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-    padding: 16px 28px;
-    box-sizing: border-box;
-    background: var(--bg-sunken);
-  }
-  .card__pic {
-    container-type: size;
-  }
-  /* the picture fits the box whole, keeping its shape (--ar is set from the svg's viewBox) */
-  .card__pic .scene {
-    margin: 0;
-    position: relative;
-    inline-size: min(100cqw, calc(100cqh * var(--ar, 1)));
-  }
-  .card__pic .scene__art {
-    display: block;
+  .card__art {
+    position: absolute;
+    inset: 0;
     inline-size: 100%;
-    block-size: auto;
+    block-size: 100%;
   }
-  .card__pic .scene__label {
-    font-size: 17px;
-  }
-  .card__pic .ill-tag,
-  .card__pic [class*='tag'] {
-    font-size: 22px;
-  }
-  .card__text {
-    display: grid;
-    align-content: start;
-    gap: 18px;
-    padding: 28px 48px 36px;
-    min-inline-size: 0;
+  /* the wall behind the headline fades to paper, so the words stand clear of the shopfront lines */
+  .card__veil {
+    position: absolute;
+    top: 0;
+    background: radial-gradient(farthest-side at 50% 35%, var(--art-fill) 0, color-mix(in srgb, var(--art-fill) 90%, transparent) 55%, transparent 100%);
   }
   .card__head {
+    position: absolute;
     display: flex;
-    align-items: baseline;
-    gap: 16px;
-    font-weight: 900;
-    font-size: 26px;
-  }
-  .card__host {
-    margin-inline-start: auto;
-    font-weight: 500;
-    font-size: 20px;
-    color: var(--ink-2);
-  }
-  .card__fit {
-    display: grid;
-    gap: calc(14px * var(--k));
-  }
-  .card__kicker {
-    font-size: calc(26px * var(--k));
-    font-weight: 700;
-    color: var(--signal-red-ink, var(--ink-2));
+    flex-direction: column;
+    align-items: var(--align);
+    text-align: var(--align);
+    gap: calc(10px * var(--k));
+    box-sizing: border-box;
   }
   .card__title {
     font-family: var(--font-heading);
     font-weight: 900;
-    font-size: calc(72px * var(--k));
-    line-height: 1.16;
+    font-size: calc(96px * var(--k));
+    line-height: 1.08;
+    letter-spacing: 0.01em;
+    color: var(--ink);
     text-wrap: balance;
+    /* a paper glow, so a stroke of the drawing never cuts a letter */
+    text-shadow:
+      0 0 6px var(--art-fill),
+      0 0 14px var(--art-fill);
   }
   .card__title:lang(en) {
-    font-size: calc(64px * var(--k));
-    line-height: 1.08;
+    font-stretch: var(--display-stretch);
+    font-size: calc(104px * var(--k));
+    line-height: 0.98;
+    letter-spacing: 0;
   }
-  .card__line {
-    font-size: calc(32px * var(--k));
-    line-height: 1.45;
-    font-weight: 700;
-    text-wrap: pretty;
+  /* one phrase to a line: a headline is two phrases at most, set as large as its box allows */
+  .card__title .phrase {
+    display: block;
+    /* a phrase never wraps inside itself: the generator shrinks the headline until each fits */
+    white-space: nowrap;
   }
-  .card__line .chip {
-    font-size: calc(22px * var(--k));
-    margin-inline-start: 0.4em;
-    vertical-align: 0.15em;
+  .card__tag {
+    position: absolute;
+    box-sizing: border-box;
+    block-size: 58px;
+    padding: 6px 16px;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 46px;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
   }
-  .card__est .est {
-    font-size: calc(40px * var(--k));
-    min-block-size: 0;
-    margin: 0;
-    padding: 0;
+  .card__play {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--signal-red-led, #e0402f);
+    box-shadow:
+      0 0 0 8px color-mix(in srgb, var(--bg) 80%, transparent),
+      0 10px 30px rgb(0 0 0 / 0.25);
   }
-  .card__est .est .chip {
-    font-size: calc(24px * var(--k));
-  }
-  /* EstimateValue's own (scoped) sizes are for a phone page; on a card the range must read at
-     link-preview size (about 500 px wide), so the value takes the card's size */
-  .card .card__est .est :is(.est__line, .est__value, .est__n, .est__word, .est__unit, .est__end) {
-    font-size: calc(40px * var(--k)) !important;
-    line-height: 1.2;
-  }
-  .card .card__est .est .est__n {
-    font-weight: 900;
-  }
-  .card .card__est .est .chip {
-    font-size: calc(26px * var(--k)) !important;
-  }
-  .card .card__est .est .est__go {
-    display: none !important;
-  }
-  .card__caveat {
-    font-size: calc(22px * var(--k));
-    line-height: 1.45;
-    color: var(--ink-2);
-    padding-inline-start: 14px;
-    border-inline-start: 5px solid var(--estimate, #c98a1e);
-  }
-
-  /* the wide card (og:image, 1200 × 630): picture left, words right */
-  @media (min-aspect-ratio: 3/2) {
-    .card {
-      grid-template-rows: none;
-      grid-template-columns: 46% minmax(0, 1fr);
-    }
-    .card__text {
-      padding: 30px 48px 30px 44px;
-      grid-template-rows: auto minmax(0, 1fr);
-    }
-    .card__fit {
-      align-content: center;
-    }
-  }
-  @media (min-aspect-ratio: 3/2) {
-    .card.card--strip {
-      grid-template-columns: none;
-      grid-template-rows: 40% minmax(0, 1fr);
-    }
-    .card--strip .card__text {
-      grid-template-rows: auto minmax(0, 1fr);
-      padding: 14px 56px 16px;
-      gap: 4px;
-    }
-    .card--strip .card__fit {
-      align-content: start;
-    }
-  }
-  /* the square card (1080 × 1080): picture on top */
-  @media (max-aspect-ratio: 3/2) {
-    /* the picture keeps at least 46% of the card: long words shrink to fit (build-share-cards.mjs),
-       never the drawing (en/app-sq had shrunk it to a sliver and clipped its tag) */
-    .card__pic {
-      min-block-size: 46vh;
-      max-block-size: 52vh;
-    }
-    /* leave room under the drawing for the scene's own 示意圖 tag, which sits below the svg */
-    .card__pic .scene {
-      inline-size: min(100cqw, calc((100cqh - 88px) * var(--ar, 1)));
-    }
+  .card__play svg {
+    inline-size: 62%;
+    block-size: 62%;
+    fill: #fff;
   }
 </style>

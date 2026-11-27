@@ -6,12 +6,12 @@
 // Nothing here types a figure: every number is the engine's, and every word is from
 // src/i18n/pages/electric.ts (open.*) or the dataset's own names.
 
-import { DEFAULTS, HOME_KM, homeMoneyTimeline, stripOf, stripText, plateName, type BuyCase, type HomeKm, type HomeMoney, type ScrapKey } from '../../../lib/home-money.ts';
+import { DEFAULTS, HOME_KM, homeMoneyTimeline, stripOf, stripParts, stripText, plateName, type BuyCase, type HomeKm, type HomeMoney, type ScrapKey } from '../../../lib/home-money.ts';
 import { formatDate } from '../../../lib/site-state.ts';
 import { readerText } from '../../../i18n/ui.ts';
 import type { Locale } from '../../../i18n/pages/_copy.ts';
 import type { JurisdictionId } from '../../../data/econ/types.ts';
-import { shortName, type OpenCase, type OpenData, type OpenTable } from './opening-view.ts';
+import { shortModel, shortName, type OpenCase, type OpenData, type OpenTable } from './opening-view.ts';
 
 /** A cached page must still be right this many days after the build (the site rebuilds nightly). */
 const LOOK_AHEAD_DAYS = 45;
@@ -46,12 +46,15 @@ function table(m: HomeMoney, locale: Locale, word: (s: string) => number): OpenT
     v: c.verdict,
     en: word(readerText(c.electric.name[locale])),
     gn: word(readerText(c.gasoline.name[locale])),
+    es: word(readerText(shortModel(c.electric.brand[locale], c.electric.name[locale]))),
+    gs: word(readerText(shortModel(c.gasoline.brand[locale], c.gasoline.name[locale]))),
     p: word(plateName(c.plate, locale)),
     sub: c.electric.lines.some((l) => l.kind === 'subsidy' || l.kind === 'recycling'),
     sw: c.swapOnly ? 1 : 0,
     eLines: c.electric.lines.map((l) => [word(readerText(l.label[locale])), l.amount, l.isMaximum ? 1 : 0]),
     gLines: c.gasoline.lines.map((l) => [word(readerText(l.label[locale])), l.amount, l.isMaximum ? 1 : 0]),
-    strip: word(stripText(stripOf(c), locale)),
+    strip: word(stripText(stripOf(c), locale, readerText(shortModel(c.electric.brand[locale], c.electric.name[locale])))),
+    ...((parts) => ({ ss: word(parts.screen), sf: word(parts.fold) }))(stripParts(stripOf(c), locale, readerText(shortModel(c.electric.brand[locale], c.electric.name[locale])))),
     sm: swapIndex(c),
   });
   const ids = m.counties.map((c) => c.id);

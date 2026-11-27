@@ -29,6 +29,7 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
+import SceneLabel from './SceneLabel.astro';
 import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
 import { CAN, MASK_FACE, TAILPIPE, artId, drinksCan, maskHead, rng, scooter } from './parts';
 import { put } from './kit';
@@ -99,4 +100,6 @@ const alt = sceneAlt(locale, art.tailpipe.alt[locale], { kind: 'plain' });
     </div>
   )}
   <Fragment set:html={scene} />
+  {/* the one word for the soft cloud, on the road under it: what screen 2's key does not name */}
+  <SceneLabel slot="labels" box={VB} x={-150} y={8} anchor="start top" max={60} plate class="tm-plume">{art.key.label[locale]}</SceneLabel>
 </SceneFrame>

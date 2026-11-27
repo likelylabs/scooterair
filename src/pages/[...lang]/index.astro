@@ -16,7 +16,7 @@ import { absUrl } from '../../lib/abs-url.ts';
  *   numbers   the estimate slots (EstimateValue, formatEstimate), the registry
  *             (./home-figures.ts) and the calculator's tables (./money-view.ts). None is typed
  *   rules     screen 4's second sentence: kerbSentence(); screen 5's headline: checkHeadline()
- *             and farBelowWho(); screens 13 and 14: lane I's buyHeadline / monthHeadline /
+ *             (farBelowWho()), its first body line: checkSentence() (checkRule()); screens 13 and 14: lane I's buyHeadline / monthHeadline /
  *             monthLine; the pins of screen 6 and the quiet line of screen 2 ship only while
  *             their registry facts are verified
  *
@@ -62,7 +62,7 @@ import { openingData } from '@/components/pages/electric/opening-data';
 import { tableOn, type OpenText } from '@/components/pages/electric/opening-view';
 import { filmLength, homeFigures, verified } from '@/components/pages/home/home-figures';
 import * as V from '@/components/pages/home/money-view';
-import { checkHeadline, defaultRedsPerDay, est, estimateText, farBelowWho, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
+import { checkHeadlinePhrased, checkSentence, defaultRedsPerDay, est, waitPerRed_s, estimateText, farBelowWho, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
 import { fact } from '@/data/facts';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { homeMoney } from '@/lib/home-money';
@@ -70,7 +70,7 @@ import { formatDate } from '@/lib/site-state';
 import electric from '@/i18n/pages/electric';
 import home from '@/i18n/pages/home';
 import { fill, localize } from '@/i18n/pages/_copy';
-import { chipWhere, how, kSentences, num, site, ui } from '@/i18n/ui';
+import { chipWhere, how, kSentences, num, redHoursSentence, site, ui } from '@/i18n/ui';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -91,14 +91,17 @@ const filmHref = href('/90/', locale);
 const filmLabel = fill(t.common.film, { length: filmLength(t.common) });
 
 // ---- screen 5: the headline is chosen by the written rule; mark where its line may break ------
-const phraseAfterQuestion = (s: string) => (zh ? s.replace('？', '？|') : s.replace('? ', '? |'));
-const s5Headline = phraseAfterQuestion(checkHeadline(locale));
+const s5Headline = checkHeadlinePhrased(locale);
 const mve = mveModel(locale);
 // the cross-check paragraph: its first sentence is the measured rise, the rest is our working
 const crossCheck = estimateText.crossCheck[locale];
-const crossCut = crossCheck.indexOf(zh ? '。' : '. ') + 1;
+// (the sentences up to and including the measured rise, the one that names ppm)
+const crossCut = crossCheck.indexOf(zh ? '。' : '. ', crossCheck.indexOf('ppm')) + 1;
 const crossMeasured = crossCheck.slice(0, crossCut).trim();
 const crossOurs = crossCheck.slice(crossCut).trim();
+
+// ---- screen 7: the assumption behind the yearly hours, the same sentence the film's transcript prints
+const s7Assume = redHoursSentence(locale, waitPerRed_s.lo, waitPerRed_s.hi);
 
 // ---- screen 6: a pin ships only with its verified fact ----------------------------------------
 const pinFacts = { nose: 'route-irritant-vapour', lungs: 'route-particles-deep-lung', blood: 'route-co-blood' } as const;
@@ -123,9 +126,6 @@ const T = localize(electric, locale).open as unknown as OpenText;
 const H: V.HomeMoneyText = {
   bodyClass: t.s13.bodyClass,
   swapOnly: t.s13.swapOnly,
-  worst: t.s13.worst,
-  worstScrapYes: t.s13.worstScrapYes,
-  worstScrapNo: t.s13.worstScrapNo,
   bodyKm: t.s14.bodyKm,
   swapDearer: t.s14.swapDearer,
   swapCheaper: t.s14.swapCheaper,
@@ -223,7 +223,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
             <span class="h-box__val"><b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} where="" size="sm" /></span>
           </div>
           <div class="h-box__row h-box__row--est">
-            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" data-when-scenario={s} data-say />)}
+            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" class="est--ring" data-when-scenario={s} data-say />)}
           </div>
           <p class="h-box__gloss"><b>{t.s4.box}</b><span aria-hidden="true">｜</span>{estimateText.ppmGloss[locale]}</p>
         </div>
@@ -243,9 +243,13 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 5 · 量到的，和算的 ================================================================= -->
-    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} quiet={estimateText.coTracksVapour[locale]} next={{ label: t.s5.next }}>
+    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} quiet={verified('who-benzene-no-safe-level') ? estimateText.benzeneWho[locale] : undefined} next={{ label: t.s5.next }}>
       <div slot="picture" class="h-pic h-pic--chart h-pic--mve"><MeasuredVsEstimate locale={locale} sheet="how-5" table={false} compact /></div>
-      <p slot="body">{fill(t.s5.bodySensors, { sites: F.sites })}{farBelowWho() && <Fragment>{sp}{t.s5.bodyFarBelow}</Fragment>}</p>
+      <div slot="body" class="h-lines">
+        <p>{checkSentence(locale)}</p>
+        {farBelowWho() && <p>{estimateText.belowIsNotSafe[locale]}</p>}
+        <p>{estimateText.coMarksBenzene[locale]}</p>
+      </div>
       <HowSheet slot="sheet" id="how-5" locale={locale} kind="measured" where={chipWhere.taiwan[locale]} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']} primary={{ href: evidence(3) }} secondary={{ href: href('/estimate/#check', locale), label: how.fullMethod[locale] }}>
         <p slot="block1">{t.s5.sheet.who}</p>
         <Fragment slot="block2">
@@ -284,7 +288,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <RoadOfTime locale={locale} posts={posts} />
         <div class="h-pic__ctl"><Segmented name="reds" legend={t.s7.stepper} hideLegend value={String(defaultRedsPerDay)} options={redsPerDayOptions.map((n) => ({ value: String(n), label: fill(t.s7.stepperOption, { n }) }))} /></div>
       </div>
-      <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={String(n)} data-say>{t.s7.body[n]}</span>)}</p>
+      <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={String(n)} data-say>{t.s7.body[n]}</span>)}{sp}<span>{s7Assume}</span></p>
       <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
       <HowSheet slot="sheet" id="how-7" locale={locale} kind="study" heads={t.s7.sheet.heads as [string, string, string]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: evidence(5) }}>
         <ul slot="block1">
@@ -374,7 +378,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <div class="h-pic__ctl">
           <SwapControl locale={locale} />
           <div class="h-swapnote">
-            <span class="h-swapnote__n" data-swap-all><span data-swap-when="part" hidden>{t.s11.chipBefore}<b data-swap-out="pct">100</b>{t.s11.chipAfter}</span><span data-swap-when="all">{t.s11.chipAll}</span></span>
+            <span class="h-swapnote__n" data-swap-all><span data-swap-when="part" hidden>{t.s11.chipBefore}<b data-swap-out="pct">100</b>{t.s11.chipAfter}</span><span data-swap-when="all" set:html={V.phrasedHtml(t.s11.chipAll)} /></span>
             <KindChip locale={locale} kind="derived" size="sm" />
             <span class="h-swapnote__if">{t.s11.assume}</span>
           </div>
@@ -425,16 +429,19 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       <div slot="picture" class="h-pic h-pic--chart">
         <div class="h-fig" data-hm-fig aria-live="polite" set:html={V.figureHtml(P, table, choice)} />
         <PriceBars locale={locale} id="hm-price" petrol={price.petrol} electric={price.electric} plate={price.plate} table={false} />
+        <div class="h-scrapwrap" data-hm-scrap aria-live="polite" set:html={V.scrapHtml(P, table, choice)} />
       </div>
       <p slot="body" data-hm-body13>{V.buyBody(P, table, choice)}</p>
-      <p class="h-deadline-note" data-hm-strip>{V.stripOf(P, table, choice)}</p>
-      <p class="h-checked-note">{H.checked}</p>
+      <p class="h-deadline-note"><span data-hm-strip>{V.stripOf(P, table, choice)}</span>{sp}<span class="h-deadline-note__checked">{H.checked}</span></p>
+      <div class="h-worstwrap" data-hm-worst set:html={V.worstFold(P, table)} />
       <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
       <HowSheet slot="sheet" id="how-13" locale={locale} kind="derived" title={t.s13.sheet.title} primary={{ href: calc, label: how.myTerms[locale] }} secondary={{ href: href('/electric/#examples', locale), label: T.examplesLink }}>
         <p slot="block1">{t.s13.sheet.used}</p>
         <div slot="block2" class="h-work" data-hm-lines set:html={V.buyLinesHtml(P, table, choice)} />
         <Fragment slot="block3">
           <p>{t.s13.sheet.care}</p>
+          <p data-hm-change hidden={!V.scrapChange(P, table, choice)}>{V.scrapChange(P, table, choice)}</p>
+          <p data-hm-stripfold hidden={!V.stripFold(P, table, choice)}>{V.stripFold(P, table, choice)}</p>
           <p class="h-chipnote">{H.checked}</p>
         </Fragment>
       </HowSheet>
@@ -482,7 +489,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
           </li>
           <li><a class="h-act" href={lineHref} target="_blank" rel="noopener noreferrer"><span set:html={V.phrasedHtml(t.s15.line)} /><span class="vh">{ui.externalLink[locale]}</span></a></li>
           <li><a class="h-act" href={href('/act/', locale)}><span set:html={V.phrasedHtml(t.s15.act)} /></a></li>
-          <li><a class="h-act" href={href('/estimate/#measure', locale)}><span>{how.toMeasure[locale]}</span></a></li>
+          <li><a class="h-act" href={href('/estimate/#measure', locale)}><span set:html={V.phrasedHtml(how.toMeasure[locale])} /></a></li>
         </ul>
       </div>
       <HowSheet slot="sheet" id="how-15" locale={locale} kind="derived" title={t.s15.sheet.title} primary={{ href: href('/estimate/#drawing', locale), label: how.fullMethod[locale] }}>

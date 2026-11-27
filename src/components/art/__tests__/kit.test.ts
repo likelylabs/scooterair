@@ -42,7 +42,10 @@ test('pickSources and withoutSources split air() by tailpipe, losing nothing', (
   const clusters = pack.map((_, i) => pickSources(a.marks, (k) => k === i));
   assert.ok(clusters.every((c) => c.startsWith('<g class="air-src"')));
   assert.doesNotMatch(withoutSources(a.marks), /air-src"/);
-  assert.match(withoutSources(a.marks), /air-a/); // the street's own air stays
+  // whatever is not a tailpipe's own stays: here the street's own rings (drawn only when asked, as the counting patch does)
+  const withStreet = air({ frame, id: 't', streetAir: true, tailpipes: pack.map(tailOf) });
+  assert.doesNotMatch(withoutSources(withStreet.marks), /air-src"/);
+  assert.match(withoutSources(withStreet.marks), /air-a/);
 });
 
 test('stepSources ties far rows to the scenario switch; indexSources numbers every tailpipe', () => {

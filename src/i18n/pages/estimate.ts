@@ -17,8 +17,8 @@ export default copy({
   meta: {
     title: { 'zh-TW': '怎麼算的', en: 'How we worked it out' },
     description: {
-      'zh-TW': '紅燈時，一排機車讓路邊多了多少廢氣？本站的推估、一步一步的算法、每個數字的出處，以及它和運研所量到的數字比起來怎麼樣。',
-      en: 'How much exhaust does a row of scooters, engines running, add at the kerb? Our estimate, the working step by step, the source of every input, and how it compares with the Institute of Transportation’s readings.',
+      'zh-TW': '紅燈時，一排機車讓路邊多了多少廢氣？這裡有本站的推估、一步一步的算法、每個數字的出處。還有它和交通部運輸研究所（運研所）量到的數字比起來怎麼樣。',
+      en: 'How much exhaust does a row of scooters, engines running, add at the kerb? Here are our estimate, the working step by step and the source of every input. Here too is how it compares with the Institute of Transportation’s readings.',
     },
   },
 
@@ -88,8 +88,8 @@ export default copy({
     eyebrow: { 'zh-TW': '2　算法', en: '2 · The working' },
     title: { 'zh-TW': '怎麼算', en: 'How it is worked out' },
     lead: {
-      'zh-TW': '沒有人能在每個人的鼻子前面放一台儀器，所以我們用電腦模擬紅燈：機車停在哪裡、每輛排多少、風把廢氣吹到哪裡。每次換一種風、一批機車和一個站的位置，每種情況算 {runs} 次。',
-      en: 'Nobody can put an instrument in front of every nose, so we simulate the red light on a computer: where the scooters stop, how much each gives off, and where the wind carries it. Each run draws a new wind, a new set of scooters and a new place to stand: {runs} runs for each case.',
+      'zh-TW': '沒有人能在每個人的鼻子前面放一台儀器。所以我們用電腦把紅燈算一遍。機車停在哪裡、每輛排多少、風把廢氣吹到哪裡。每次換一種風、一批機車和一個站的位置。每種情況算 {runs} 次。',
+      en: 'Nobody can put an instrument in front of every nose. So we work through the red light on a computer: where the scooters stop, how much each gives off, and where the wind carries it. Each run draws a new wind, a new set of scooters and a new place to stand. There are {runs} runs for each case.',
     },
     flowTitle: { 'zh-TW': '四個步驟', en: 'Four steps' },
     inputsTitle: { 'zh-TW': '用到的數字，|每一個都有出處', en: 'The inputs, each with its source' },
@@ -107,7 +107,7 @@ export default copy({
         name: { 'zh-TW': '機車停著、引擎沒熄火，每小時燒多少汽油', en: 'How much petrol a stopped scooter burns an hour, engine running' },
         value: { 'zh-TW': '約 {lo} 到 {hi} 公克', en: 'about {lo} to {hi} g' },
         note: {
-          'zh-TW': '越南的實驗室量的。台灣沒有這種量測，這是最該在台灣量的一個數字：它一變，每一種廢氣都跟著變。',
+          'zh-TW': '這是越南的實驗室量的。台灣沒有這種量測。這是最該在台灣量的一個數字：它一變，每一種廢氣都跟著變。',
           en: 'Measured in laboratories in Vietnam. Taiwan has no such measurement, and it is the figure most worth measuring here: change it and every pollutant changes with it.',
         },
       },
@@ -159,7 +159,7 @@ export default copy({
     eyebrow: { 'zh-TW': '4　對照', en: '4 · The cross-check' },
     title: { 'zh-TW': '跟量到的對得起來嗎', en: 'Does it match what was measured?' },
     lead: {
-      'zh-TW': '運研所（交通部運輸研究所）在{place}的 {sites} 個路口，把儀器放在行人等候區，每個路口連續量 {hours} 小時。這是台灣在路口行人身邊量到的資料。',
+      'zh-TW': '運研所（交通部運輸研究所）在{place}的 {sites} 個路口量空氣。儀器放在行人等候區，每個路口連續量 {hours} 小時。這是台灣在路口行人身邊量到的資料。',
       en: 'Taiwan’s Institute of Transportation put instruments in the pedestrian waiting areas of {sites} junctions in {place}, for {hours} hours at each. These are Taiwan’s readings taken beside people waiting at a junction.',
     },
     coTitle: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
@@ -171,7 +171,7 @@ export default copy({
       en: 'The PM2.5 the Institute measured in the waiting areas was {lo} to {hi} µg/m³, with no visible rise from the scooters.',
     },
     pmOurs: {
-      'zh-TW': '這和我們算的對得起來：大多數紅燈，機車加上去的 PM2.5 都比街上原本就有的少很多，儀器本來就很難看出來。',
+      'zh-TW': '這和我們算的對得起來。大多數紅燈，機車加上去的 PM2.5，都比街上原本就有的少很多。所以儀器本來就很難看出來。',
       en: 'That fits our working: at most reds, the PM2.5 the scooters put in is much less than the street already holds, so an instrument would hardly see it.',
     },
     taipeiTitle: { 'zh-TW': '台北的路邊測站', en: 'Taipei’s roadside stations' },
@@ -195,7 +195,7 @@ export default copy({
     eyebrow: { 'zh-TW': '5　範圍', en: '5 · The range' },
     title: { 'zh-TW': '為什麼是一個範圍', en: 'Why the answer is a range' },
     lead: {
-      'zh-TW': '同一個路口，每個紅燈都不一樣。下面是最會改變答案的五件事，以旁邊停了十來輛機車為例：每一件從最低調到最高，答案差幾倍。',
+      'zh-TW': '同一個路口，每個紅燈都不一樣。下面是最會改變答案的五件事，以旁邊停了十來輛機車為例。每一件從最低調到最高，看答案差幾倍。',
       en: 'No two red lights are alike, even at one junction. These five things change the answer most, for a dozen or so scooters: how many times the answer moves when each goes from its low end to its high end.',
     },
     times: { 'zh-TW': '差 {x} 倍', en: '{x} times' },
@@ -227,28 +227,31 @@ export default copy({
     },
     rules: [
       {
-        'zh-TW': '每一張街景都畫街上原本就有的空氣：每 {patch} × {patch} 像素的一小格，畫 {rings} 個圈和 {dots} 個點。',
-        en: 'Every street scene shows the air the street already holds: {rings} rings and {dots} dots in every {patch} × {patch} pixel patch.',
+        'zh-TW': '圖上只畫機車排的氣：一團淡淡的煙，從排氣管出來，貼著地面飄到等紅燈的人身上。街上原本就有的空氣不畫，寫在數字裡。',
+        en: 'The pictures draw only what the scooters give off: one soft plume that leaves the tailpipes, stays low and drifts onto the people waiting. The air the street already holds is not drawn; it is in the numbers.',
       },
       {
-        'zh-TW': '人站的地方，照推估多畫幾個圈：{few}多 {a} 個，{dozen}多 {b} 個，{full}多 {c} 個。',
-        en: 'Where people stand, extra rings are drawn by the estimate: {a} more for {few}, {b} for {dozen}, {c} for {full}.',
+        'zh-TW': '人站的地方，煙裡的圈照推估畫：每 {patch} × {patch} 像素的一小格，{few}畫 {a} 個，{dozen}畫 {b} 個，{full}畫 {c} 個。',
+        en: 'Where people stand, the rings in the plume follow the estimate: in every {patch} × {patch} pixel patch, {a} for {few}, {b} for {dozen}, {c} for {full}.',
       },
       {
-        'zh-TW': '排氣管後面那一團深色，是畫給眼睛看的：每根排氣管都一樣，不跟著推估變。',
+        'zh-TW': '煙的深淺只分三級：{few}、{dozen}、{full}。最深的時候，人站的地方平均也只蓋住 {wash}%。',
+        en: 'The plume has only three shades: {few}, {dozen} and {full}. Even at its darkest it covers, on average, {wash}% of the space where people stand.',
+      },
+      {
+        'zh-TW': '排氣管後面那一團深色，是畫給眼睛看的。每根排氣管都一樣，不跟著推估變。',
         en: 'The dark patch behind each tailpipe is drawn for the eye: it is the same for every tailpipe and does not follow the estimate.',
       },
       {
-        'zh-TW': '推估是一個範圍，所以範圍的兩頭都畫給你看：十來輛的時候，一小格從 {lo} 個圈到 {hi} 個圈。',
-        en: 'The estimate is a range, so both ends are drawn for you: for a dozen or so scooters, a patch holds from {lo} to {hi} rings.',
+        'zh-TW': '推估是一個範圍，所以兩頭都畫給你看。下面的小格，先畫街上原本就有的 {rings} 個圈，再加上機車多出來的。十來輛的時候，一共從 {lo} 個到 {hi} 個圈。',
+        en: 'The estimate is a range, so both ends are drawn for you. Each small patch below holds the street’s own {rings} rings plus what the scooters add: for a dozen or so, {lo} to {hi} rings in all.',
       },
     ],
     how: {
-      'zh-TW': '多畫幾個圈，是這樣算的：機車加上去的一氧化碳，除以街上原本就有的，再乘以 {rings}，四捨五入，最少 1 個。',
+      'zh-TW': '多畫幾個圈，是這樣算的：機車加上去的一氧化碳，除以街上原本就有的，再乘以 {rings}。然後四捨五入，最少 1 個。',
       en: 'The extra rings are worked out like this: the carbon monoxide the scooters put in, divided by what the street already holds, times {rings}, rounded, and at least 1.',
     },
     tryIt: { 'zh-TW': '換換看，圖會跟著變：', en: 'Try it, and the picture changes:' },
-    keyTitle: { 'zh-TW': '圖上的記號', en: 'The marks' },
     rangeTitle: { 'zh-TW': '範圍的兩頭', en: 'The two ends of the range' },
   },
 
@@ -284,7 +287,7 @@ export default copy({
     eyebrow: { 'zh-TW': '9　實測', en: '9 · Measuring it' },
     title: { 'zh-TW': '把推估換成實測', en: 'Turn the estimate into a measurement' },
     lead: {
-      'zh-TW': '推估算得再仔細，也比不上真的去量。如果環保局或大學願意在路口量，下面是我們建議的量法，和一封可以直接寄的信。',
+      'zh-TW': '推估再仔細，也比不上真的去量。如果環保局或大學願意在路口量，下面是我們建議的量法。還有一封可以直接寄的信。',
       en: 'However carefully an estimate is worked out, it is no substitute for measuring. If an environmental bureau or a university will measure at a junction, here is how we suggest doing it, and a letter you can send today.',
     },
     promise: { 'zh-TW': '量出來的結果，不管高低，我們都會登出來。', en: 'Whatever the result, high or low, we will publish it.' },
@@ -313,7 +316,7 @@ export default copy({
     },
     body: {
       'zh-TW':
-        '{agency}承辦人員好：\n\n我住在{address}。{place}這個路口，紅燈時常常停滿機車，引擎沒熄火，等過馬路的人就站在旁邊。\n\n交通部運輸研究所在 {sites} 個路口的行人等候區，量過一氧化碳和 PM2.5。「行人呼吸」網站用這些資料和全國的機車定檢讀數做了推估，算法和出處都公開在網站上。\n\n照網站的算法，旁邊停了十來輛機車時，大人鼻子高度的一氧化碳，紅燈 {red} 秒的平均會增加{coAdd}。這個數字要靠實際量測來確認。\n\n想請貴局在這個路口量測：\n1. 在行人等候區，量大人和嬰兒車兩個高度。\n2. 量一氧化碳、苯和超細微粒，紅燈和綠燈分開記錄，也記下每個紅燈停了幾輛機車。\n3. 在離路口遠一點的地方，放一個對照點。\n4. 公開原始資料。\n\n不管結果是高是低，都請讓大家知道。謝謝。\n\n{sender} 敬上\n地址：{address}\n聯絡方式：{contact}',
+        '{agency}承辦人員好：\n\n我住在{address}。{place}這個路口，紅燈時常常停滿機車，引擎沒熄火，等過馬路的人就站在旁邊。\n\n交通部運輸研究所在 {sites} 個路口的行人等候區，量過一氧化碳和 PM2.5。「行人呼吸」網站用這些資料，加上全國的機車定檢讀數，做了推估。算法和出處，都公開在網站上。\n\n照網站的算法，旁邊停了十來輛機車時，大人鼻子高度的一氧化碳會增加。紅燈 {red} 秒的平均，會增加{coAdd}。這個數字要靠實際量測來確認。\n\n想請貴局在這個路口量測：\n1. 在行人等候區，量大人和嬰兒車兩個高度。\n2. 量一氧化碳、苯和超細微粒。紅燈和綠燈分開記錄，也記下每個紅燈停了幾輛機車。\n3. 在離路口遠一點的地方，放一個對照點。\n4. 公開原始資料。\n\n不管結果是高是低，都請讓大家知道。謝謝。\n\n{sender} 敬上\n地址：{address}\n聯絡方式：{contact}',
       en:
         'Dear {agency},\n\nI live in {address}. At the junction of {place}, the stop box often fills with scooters at a red light, engines running, while people waiting to cross stand right beside them.\n\nTaiwan’s Institute of Transportation has measured carbon monoxide and PM2.5 in the pedestrian waiting areas of {sites} junctions. The ScooterAir website has used those readings and the national scooter-inspection readings to work out what a pedestrian breathes, and publishes its method and sources.\n\nBy the website’s working, with a dozen or so scooters beside you, carbon monoxide at an adult’s nose rises by {coAdd} over a {red}-second red. That figure needs a real measurement to confirm it.\n\nI would like to ask your bureau to measure at this junction:\n1. In the pedestrian waiting area, at an adult’s height and a pushchair’s height.\n2. Carbon monoxide, benzene and ultrafine particles, recording red and green separately, with the number of scooters waiting at each red.\n3. With a comparison point a little way from the junction.\n4. And to publish the raw data.\n\nWhatever the result, high or low, please let the public know. Thank you.\n\nYours sincerely,\n{sender}\nAddress: {address}\nContact: {contact}',
     },

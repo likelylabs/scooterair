@@ -98,6 +98,10 @@ const pagesDir = join(root, 'src/i18n/pages');
 if (existsSync(pagesDir)) for (const f of readdirSync(pagesDir).sort()) if (f.endsWith('.ts') && !f.startsWith('_')) modules.push({ file: `src/i18n/pages/${f}`, name: f.replace(/\.ts$/, ''), page: true });
 // Copy modules outside src/i18n that export plain { 'zh-TW', en } leaves (lane D's chart words).
 for (const f of ['src/components/charts/strings.ts']) if (existsSync(join(root, f))) modules.push({ file: f, name: 'charts', page: false });
+// Reader-facing sentences chosen by rule in src/data/estimate.ts (screen 5's headline and body, the
+// one-page brief): only these exports, so the estimate's numbers and labels stay with check-data.
+const estimateCopy = ['checkHeadlineTable', 'checkSentenceTable', 'kerbSentenceTable', 'estimateText'];
+if (existsSync(join(root, 'src/data/estimate.ts'))) modules.push({ file: 'src/data/estimate.ts', name: 'data-estimate', page: false, only: estimateCopy });
 
 for (const m of modules) {
   let mod;
@@ -110,7 +114,7 @@ for (const m of modules) {
   if (m.page) {
     if (!mod.default) problems.push(`${m.file}: a page copy module must have a default export (export default copy({ … }))`);
     walk(mod.default, m.name, m.file);
-  } else for (const [k, v] of Object.entries(mod)) walk(v, `${m.name}.${k}`, m.file);
+  } else for (const [k, v] of Object.entries(mod)) if (!m.only || m.only.includes(k)) walk(v, `${m.name}.${k}`, m.file);
 }
 
 // K sentences: the brief's, plus lane B's shared strings when published (export `kSentences` in

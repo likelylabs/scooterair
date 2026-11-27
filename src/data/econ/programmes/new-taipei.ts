@@ -102,7 +102,7 @@ export const newTaipeiProgrammes: Programme[] = [
     exclusiveGroups: ['ntpc-lowincome-vs-earlybird', 'ntpc-lowincome-vs-double'],
     quota: quota('unlimited', '2026-11-25', t('不限名額。', 'No quota.')),
     research: ['new-taipei#ntpc-new-heavy-lowincome', 'new-taipei#ntpc-replace-lowincome-topup'],
-    note: t('計畫表列的是含基本補助的中低收入戶金額（例如新購重型14,000元），與一般金額相差10,000元，試算以加碼10,000元呈現。', 'The plan prints low-income amounts including the base (e.g. NT$14,000 for a new heavy scooter), NT$10,000 above the general rows; we show it as a NT$10,000 top-up.'),
+    note: t('計畫表列的是含基本補助的中低收入戶金額（例如新購重型14,000元），與一般金額相差10,000元，計算以加碼10,000元呈現。', 'The plan prints low-income amounts including the base (e.g. NT$14,000 for a new heavy scooter), NT$10,000 above the general rows; we show it as a NT$10,000 top-up.'),
   }),
   p({
     id: 'ntpc-earlybird-addon',

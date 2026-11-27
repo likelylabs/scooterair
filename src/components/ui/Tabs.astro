@@ -46,6 +46,16 @@ const { label, class: cls } = Astro.props;
     mask-image: none;
     -webkit-mask-image: none;
   }
+  /* a label longer than the line wraps inside its own tab instead of pushing the page sideways */
+  html[data-text='lg'] .tabs__tab,
+  html[data-text='xl'] .tabs__tab {
+    flex: 0 1 auto;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    white-space: normal;
+    text-align: start;
+    padding-block: var(--sp-2);
+  }
   /* more tabs off either edge (set by the script): fade that edge so the strip visibly continues */
   .tabs__list[data-more~='end'] {
     mask-image: linear-gradient(to left, transparent, #000 3rem);

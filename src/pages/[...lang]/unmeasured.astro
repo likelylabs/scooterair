@@ -13,4 +13,4 @@ const locale = localeFromParam(Astro.params.lang);
 const label = nav.find((n) => n.path === '/estimate/')!.label[locale];
 ---
 
-<Redirect locale={locale} to="/estimate/" label={label} hashMap={{ ask: 'measure' }} />
+<Redirect locale={locale} to="/estimate/" label={label} hashMap={{ ask: 'measure' }} share="how-much" />

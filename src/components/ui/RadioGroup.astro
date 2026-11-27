@@ -77,6 +77,12 @@ const { name, legend, options, value, variant = 'segmented', hint, class: cls } 
     border-radius: var(--radius-2);
     background: var(--surface);
   }
+  /* with large text on a narrow phone, options flow onto more rows instead of squeezing a label
+     (「中低收入戶」 is one word and is kept whole) until it is cut off */
+  .radios--segmented .radios__list {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 4.5em), 1fr));
+  }
   /* every option fills the row, so the checked fill and the separator reach the bottom
      when a neighbour's label wraps onto more lines */
   .radios--segmented .radios__opt {

@@ -27,6 +27,16 @@
  *   arrive    the scene has a one-time arrival to play (brief 5.3). Sets
  *             data-arrive; arrive.client.ts and art.css do the rest. The
  *             resting state is always the final state.
+ *   legend    the small key under the drawing (AirLegend): which entries, in
+ *             order, e.g. AIR_KEY; false or left out for none. It sits inside
+ *             the <figure>, under the drawing and above the tag.
+ *   legendSense name the marks in the key by the sense that finds them
+ *             (聞得到：油氣 / 聞不到：一氧化碳 / 看不到：微粒): the first picture and the kerb
+ *   legendTop  the key belongs to the top of the drawing (the mask: empty air above the head).
+ *             It is printed inside the canvas; on the home page art.css lays it over the top
+ *             edge, elsewhere it still reads under the drawing.
+ *   legendNote add the key's line "the street's own air is not drawn" (only where
+ *             no tag says it: the tag under every street picture already does)
  *   id, class passed to the <figure>; other data-* attributes too
  *
  * Slots
@@ -46,7 +56,8 @@
 import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import IllustrationTag from '@/components/ui/IllustrationTag.astro';
-import { AIR, type AirScenario, type Box } from './air';
+import AirLegend from './AirLegend.astro';
+import { AIR, type AirKeyItem, type AirScenario, type Box } from './air';
 import { assertSceneAlt, shortSceneAlt } from './scene';
 
 interface Props {
@@ -57,11 +68,15 @@ interface Props {
   scenario?: AirScenario;
   drift?: boolean;
   arrive?: boolean;
+  legend?: readonly AirKeyItem[] | false;
+  legendNote?: boolean;
+  legendSense?: boolean;
+  legendTop?: boolean;
   id?: string;
   class?: string;
   [key: `data-${string}`]: string | number | boolean | undefined;
 }
-const { locale, box, alt, tag = false, scenario, drift = false, arrive = false, id, class: cls, ...rest } = Astro.props;
+const { locale, box, alt, tag = false, scenario, drift = false, arrive = false, legend = false, legendNote = false, legendSense = false, legendTop = false, id, class: cls, ...rest } = Astro.props;
 assertSceneAlt(alt, locale);
 // the long closing sentence (estimate / street's own air) is read once per page: later scenes end
 // with the short 「這是示意圖。」 (still says 示意圖: check 17) — see ./alt-once.client.ts. The tag stays visible.
@@ -86,7 +101,9 @@ const n = (v: number) => +v.toFixed(2);
       <slot />
     </svg>
     {Astro.slots.has('labels') && <div class="scene__labels"><slot name="labels" /></div>}
+    {legendTop && legend && legend.length > 0 && <AirLegend locale={locale} items={legend} note={legendNote} sense={legendSense} class="air-legend--top" />}
   </div>
+  {!legendTop && legend && legend.length > 0 && <AirLegend locale={locale} items={legend} note={legendNote} sense={legendSense} />}
   {tag && <p class="scene__tag"><IllustrationTag locale={locale} kind={tag} /></p>}
 </figure>
 {/* Before first paint: hold the parts that will arrive at their starting look, but only when

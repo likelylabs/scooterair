@@ -121,7 +121,7 @@ Four fixed moves, used the same way everywhere:
 |---|---|
 | R1 | Never write that idling at a red light is 合法, 不違規, 違規 or "legal/illegal". Write: 「現行的怠速規定管的是停車等候超過三分鐘的車；一個普通的紅燈，不在它要管的範圍裡。」 Whether the rule reaches scooters is unresolved. |
 | R2 | Every PM2.5 health result says "all sources" or "traffic as a whole" in the same sentence or the one after. |
-| R3 | Never rank carbon monoxide, benzene and ultrafine particles by harm. Say only that they cannot be smelled. Carbon monoxide is a marker of exhaust, not a demonstrated hazard at the kerb; the site says so once (Link 4). |
+| R3 | Never rank carbon monoxide, benzene and ultrafine particles by harm. Say only that they cannot be smelled. *(As built, release 2: carbon monoxide has no smell; particles are only ever "too small to see", never "cannot be smelled". See `src/data/claims-policy.ts` r3 and the /about/ ufp-smell correction; the draft lines below that give particles no smell are superseded.)* Carbon monoxide is a marker of exhaust, not a demonstrated hazard at the kerb; the site says so once (Link 4). |
 | R4 | Odour thresholds are orders of magnitude (十億分之幾, 百萬分之幾), never single values. |
 | R5 | Stroller figures: "usually 5 to 15% higher"; 59% is PM2.5 in one US roadside study; 44% is "up to", fine particles, one UK experiment; two studies found no difference; none in Taiwan. A school-age child stands above the stroller band; what is established for them is faster breathing. |
 | R6 | The 1995–96 schoolchildren survey is always dated and described as station data. |

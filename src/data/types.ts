@@ -50,15 +50,15 @@ export const confidenceLabels: Record<Confidence, { label: L10n; description: L1
   verified: {
     label: t('已查證', 'Verified'),
     description: t(
-      '查證時開啟了來源本身（文件、網頁、資料，部分論文為摘要），並在其中找到這個數字。標著「本站計算」的數字，指的是計算用到的每個數字都這樣查證過。',
+      '查證時，我們打開了來源本身，並在裡面找到這個數字。來源是文件、網頁、資料，部分論文是摘要。標著「本站計算」的數字，是說計算用到的每個數字，都這樣查證過。',
       'During our research the source itself was opened (the document, page, dataset or, for some papers, the abstract) and the figure was found in it. For a figure marked "Our arithmetic", it means every number the arithmetic uses was checked this way.',
     ),
   },
   secondary: {
     label: t('只在轉述中看到', 'Second-hand'),
     description: t(
-      '這個數字只在可靠的轉述中看到，例如媒體報導的官方統計，沒有在原始來源中找到；附註會說明依據。',
-      'The figure was seen only in a reputable report of the source, such as a news report of an official statistic, not in the source itself; the note says what it rests on.',
+      '這個數字只在可靠的轉述中看到，例如媒體報導的官方統計。我們沒有在原始來源中找到它；附註會說明根據。',
+      'The figure was seen only in a reputable report of the source, such as a news report of an official statistic. It was not found in the source itself; the note says what it rests on.',
     ),
   },
 };
@@ -87,7 +87,7 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
   'market-tw': {
     label: t('業者公布資料', 'Industry figures'),
     description: t(
-      '台灣的車廠、經銷商、能源業者或產業團體公布的售價、優惠、資費、銷售與營運數字，不是政府統計。',
+      '台灣的車廠、經銷商、能源業者或產業團體公布的數字。包括售價、優惠、資費、銷售和營運數字，不是政府統計。',
       'Prices, offers, plan terms, sales and company figures published by Taiwanese manufacturers, dealers, energy operators or industry associations; not government statistics.',
     ),
   },
@@ -246,7 +246,7 @@ export const units = {
   'mg/m3': { short: t('mg/m³', 'mg/m³'), long: t('毫克／立方公尺', 'milligrams per cubic metre') },
   ppm: { short: t('ppm', 'ppm'), long: t('ppm（百萬分之一）', 'parts per million') },
   ppb: { short: t('ppb', 'ppb'), long: t('ppb（十億分之一）', 'parts per billion') },
-  'um2/cm3': { short: t('µm²/cm³', 'µm²/cm³'), long: t('平方微米／立方公分（微粒表面積濃度）', 'square micrometres per cubic centimetre (particle surface area)') },
+  'um2/cm3': { short: t('µm²/cm³', 'µm²/cm³'), long: t('平方微米／立方公分（算微粒表面積有多少的單位）', 'square micrometres per cubic centimetre (particle surface area)') },
   'particles/cm3': { short: t('個／cm³', 'particles/cm³'), long: t('微粒數／立方公分', 'particles per cubic centimetre') },
   'g/L-fuel': { short: t('克／公升燃油', 'g/L fuel'), long: t('每公升燃油排放克數', 'grams per litre of fuel') },
   'km/L': { short: t('公里／公升', 'km/L'), long: t('公里／公升', 'kilometres per litre') },
@@ -257,8 +257,8 @@ export const units = {
   people: { short: t('人', 'people'), long: t('人', 'people') },
   count: { short: t('', ''), long: t('數量', 'count') },
   ratio: { short: t('倍', '×'), long: t('倍', 'times') },
-  'odds-ratio': { short: t('OR', 'OR'), long: t('勝算比', 'odds ratio') },
-  'relative-risk': { short: t('RR', 'RR'), long: t('相對風險', 'relative risk') },
+  'odds-ratio': { short: t('OR', 'OR'), long: t('勝算比（比較機會大小，1 代表沒有差別）', 'odds ratio (compares chances; 1 means no difference)') },
+  'relative-risk': { short: t('RR', 'RR'), long: t('相對風險（機會是幾倍，1 代表沒有差別）', 'relative risk (how many times as likely; 1 means no difference)') },
   dB: { short: t('dB', 'dB'), long: t('分貝', 'decibels') },
   metres: { short: t('公尺', 'm'), long: t('公尺', 'metres') },
   hours: { short: t('小時', 'h'), long: t('小時', 'hours') },
@@ -279,7 +279,7 @@ export const units = {
   'kg/kg-fuel': { short: t('公斤／公斤燃料', 'kg/kg fuel'), long: t('每公斤燃料排放的公斤數', 'kilograms per kilogram of fuel burned') },
   'g/h': { short: t('克／小時', 'g/h'), long: t('每小時排放克數', 'grams per hour') },
   'kg-per-year': { short: t('公斤／年', 'kg/yr'), long: t('公斤／年', 'kilograms per year') },
-  'hazard-ratio': { short: t('HR', 'HR'), long: t('風險比', 'hazard ratio') },
+  'hazard-ratio': { short: t('HR', 'HR'), long: t('風險比（機會是幾倍，1 代表沒有差別）', 'hazard ratio (how many times as likely; 1 means no difference)') },
   'ug/g-creatinine': { short: t('µg/g肌酸酐', 'µg/g creatinine'), long: t('每克肌酸酐的微克數（尿液指標）', 'micrograms per gram of creatinine (urine marker)') },
   seconds: { short: t('秒', 's'), long: t('秒', 'seconds') },
   minutes: { short: t('分鐘', 'min'), long: t('分鐘', 'minutes') },

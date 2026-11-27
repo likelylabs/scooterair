@@ -16,15 +16,15 @@
  */
 import type { Locale } from '@/i18n';
 import { langHtml } from '@/i18n/ui';
+import { glueHtml } from '@/lib/glue.mjs';
 
 interface Props {
   text: string;
   locale?: Locale;
 }
-// A closing mark never starts a line on its own: the character before it and the mark stay
-// together (「警報器，」 never leaves 「，」 alone at 320 px 特大). Applied to text, never inside tags.
-const GLUE = /([\u3400-\u9fff])([，。？！；：、）」』〉》…]+)/g;
-const glue = (html: string) => html.split(/(<[^>]+>)/).map((x) => (x.startsWith('<') ? x : x.replace(GLUE, '<span class="nobr">$1$2</span>'))).join('');
+// A word never breaks inside itself and a closing mark never starts a line on its own
+// (「警報器，」 stays whole at 320 px 特大): src/lib/glue.mjs. Applied to text, never inside tags.
+const glue = (html: string) => glueHtml(html);
 const esc = (s: string) => glue(langHtml(s, Astro.props.locale ?? 'zh-TW'));
 const parts = Astro.props.text.split('|');
 const html = parts

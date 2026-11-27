@@ -64,7 +64,7 @@ export default copy({
   items: {
     smell: {
       q: { 'zh-TW': '那個味道|是什麼？', en: 'What is |that smell?' },
-      card: { 'zh-TW': '臭的是沒燒完的汽油。一氧化碳和微粒，聞不到。', en: 'The smell is unburnt petrol. Carbon monoxide and particles have no smell.' },
+      card: { 'zh-TW': '臭的是油氣和醛類。一氧化碳聞不到，微粒看不到。', en: 'The smell is fuel vapour and aldehydes. Carbon monoxide has no smell; particles are too small to see.' },
     },
     'beside-me': {
       q: { 'zh-TW': '站遠一點|有用嗎？', en: 'Does standing back |help?' },
@@ -101,7 +101,7 @@ export default copy({
   smell: {
     s1: {
       chapter: { 'zh-TW': '味道', en: 'The smell' },
-      headline: { 'zh-TW': '臭的是油氣和醛類。|一氧化碳和微粒，|聞不到', en: 'The smell is fuel vapour and sharp aldehydes. |Carbon monoxide and particles |have no smell' },
+      headline: { 'zh-TW': '臭的是油氣和醛類。|一氧化碳聞不到，|微粒看不到', en: 'The smell is fuel vapour and aldehydes. |Carbon monoxide has no smell. |Particles are too small to see' },
       body: {
         'zh-TW': '臭的是沒燒完的汽油和刺鼻的醛（ㄑㄩㄢˊ）類，最可能的主角是乙醛。味道只告訴你一件事：你正站在廢氣裡。',
         en: 'The smell is unburnt petrol and sharp aldehydes; the likeliest main contributor is acetaldehyde. It tells you one thing: you are standing in exhaust.',
@@ -113,7 +113,7 @@ export default copy({
       sheet: {
         title: { 'zh-TW': '怎麼知道|臭的是什麼？', en: 'How do we know |what the smell is?' },
         b1: {
-          'zh-TW': '台灣的實驗室量過機車廢氣裡有什麼：最多的是油氣（沒燒完的汽油），醛類裡主要是甲醛和乙醛。日本的實驗量過，每一種東西要多淡，人才聞得到。',
+          'zh-TW': '台灣的實驗室量過機車廢氣裡有什麼。最多的是油氣（沒燒完的汽油）；醛類裡，主要是甲醛和乙醛。日本的實驗量過，每一種東西要多淡，人才聞得到。',
           en: 'A Taiwanese laboratory measured what is in scooter exhaust: mostly fuel vapour (unburnt petrol), and among the aldehydes mainly formaldehyde and acetaldehyde. Experiments in Japan measured how little of each a person can smell.',
         },
         flow: [
@@ -141,11 +141,11 @@ export default copy({
       },
     },
     s2: {
-      chapter: { 'zh-TW': '聞不到的', en: 'What has no smell' },
-      headline: { 'zh-TW': '聞不到，|不代表沒有', en: 'No smell |does not mean none is there' },
+      chapter: { 'zh-TW': '聞不到、看不到的', en: 'What you cannot smell or see' },
+      headline: { 'zh-TW': '聞不到、看不到，|不代表沒有', en: 'Cannot smell it or see it |does not mean none is there' },
       body: {
-        'zh-TW': '一氧化碳沒有味道，微粒也聞不到。油氣裡還有苯（ㄅㄣˇ），是確定會致癌的東西。',
-        en: 'Carbon monoxide has no smell, and neither do particles. The vapour also carries benzene, a proven carcinogen.',
+        'zh-TW': '一氧化碳沒有味道，微粒太小看不到。油氣裡還有苯（ㄅㄣˇ），是確定會致癌的東西。',
+        en: 'Carbon monoxide has no smell, and particles are too small to see. The vapour also carries benzene, a proven carcinogen.',
       },
       quiet: { 'zh-TW': '世界衛生組織說，苯找不到安全的量。', en: 'The WHO says no safe level of benzene can be recommended.' },
       sheet: {
@@ -155,7 +155,7 @@ export default copy({
         },
         b2: {
           'zh-TW': '一氧化碳沒有顏色，也沒有味道。苯列在「確定會讓人得癌症」的那一級，會讓人得一種血癌；世界衛生組織說，找不到可以建議的安全量。',
-          en: 'Carbon monoxide has no colour and no smell. Benzene is classed as “carcinogenic to humans” and can give people a kind of leukaemia; the WHO says no safe level of exposure can be recommended.',
+          en: 'Carbon monoxide has no colour and no smell. Benzene is classed as “carcinogenic to humans” and can give people a kind of leukaemia; the WHO says it cannot recommend any safe amount to breathe.',
         },
         b3: {
           'zh-TW': '這說的是苯這種東西本身，講的是長年一直吸。只等一個紅燈會怎麼樣，不能拿它來算。',
@@ -182,7 +182,7 @@ export default copy({
       },
       sheet: {
         b1: {
-          'zh-TW': '交通部運輸研究所（運研所）。它把幾個路口的行人等候區往後移，離機車待轉區遠一點，在尖峰時段去量。',
+          'zh-TW': '交通部運輸研究所（運研所）。它把幾個路口的行人等候區往後移，離機車待轉區遠一點。然後在尖峰時段去量。',
           en: 'Taiwan’s Institute of Transportation, part of the transport ministry. It moved a pedestrian waiting area away from the scooters’ turn box and measured there at rush hour.',
         },
         b2: {
@@ -200,8 +200,8 @@ export default copy({
       box: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
       headline: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
       quiet: {
-        'zh-TW': '圈圈越密＝一氧化碳越多。到處都有的稀疏圈圈，是街上原本就有的。',
-        en: 'More rings mean more carbon monoxide. The sparse rings everywhere are what the street already holds.',
+        'zh-TW': '圈圈越多＝一氧化碳越多。街上原本就有的空氣，圖上沒有畫。',
+        en: 'More rings mean more carbon monoxide. The air the street already holds is not drawn.',
       },
       sheet: {
         b1: {
@@ -229,12 +229,12 @@ export default copy({
       },
       sheet: {
         b1: {
-          'zh-TW': '台北市環保局的交通測站（{coYear} 年年報）、交通部運輸研究所（運研所）放在路口行人等候區的感測器（2024 年 7 月），和環境部的全台一般測站（2025 年平均）。',
-          en: 'Taipei’s roadside air-quality stations (the city’s {coYear} annual report), the sensors Taiwan’s Institute of Transportation put in pedestrian waiting areas (July 2024), and the environment ministry’s general stations across Taiwan (2025 average).',
+          'zh-TW': '一是台北市環保局的交通測站（{coYear} 年年報）。二是交通部運輸研究所（運研所）放在路口行人等候區的感測器（2024 年 7 月）。三是環境部的全台一般測站（2025 年平均）。',
+          en: 'First, Taipei’s roadside air-quality stations (the city’s {coYear} annual report). Second, the sensors Taiwan’s Institute of Transportation put in pedestrian waiting areas (July 2024). Third, the environment ministry’s general stations across Taiwan (2025 average).',
         },
         b2: {
-          'zh-TW': '測站的進氣口離地 {lo} 到 {hi} 公尺，報的是每小時的平均。運研所在路口等候區量到的 PM2.5，大多是每立方公尺 {pmLo} 到 {pmHi} 微克；環境部的全台一般測站 2025 年的平均是 {pmBg} 微克，大小差不多（不同年份、不同季節，只能看大小）。',
-          en: 'Station inlets are {lo} to {hi} m above the ground and report hourly averages. The Institute’s waiting-area PM2.5 was mostly {pmLo} to {pmHi} µg/m³; the environment ministry’s general stations across Taiwan averaged {pmBg} µg/m³ in 2025, much the same size (a different year and season, so a comparison of size only).',
+          'zh-TW': '測站的進氣口離地 {lo} 到 {hi} 公尺，報的是每小時的平均。運研所在路口等候區量到的 PM2.5，大多是每立方公尺 {pmLo} 到 {pmHi} 微克。環境部的全台一般測站，2025 年的平均是 {pmBg} 微克，大小差不多。不過年份和季節都不同，只能看大小。',
+          en: 'Station inlets are {lo} to {hi} m above the ground and report hourly averages. The Institute’s waiting-area PM2.5 was mostly {pmLo} to {pmHi} µg/m³. The environment ministry’s general stations across Taiwan averaged {pmBg} µg/m³ in 2025, much the same size. The year and season differ, so this compares size only.',
         },
         b3: {
           'zh-TW': 'App 上最常看到的數字是 PM2.5。機車在紅燈時排的，主要是一氧化碳和油氣，這兩樣 App 的 PM2.5 看不出來。',
@@ -304,8 +304,8 @@ export default copy({
           en: 'One red light is counted as {secLo} to {secHi} seconds, and a year as {days} days. How many a day is your choice.',
         },
         b3: {
-          'zh-TW': '一天四個紅燈，讓你一整天吸到的一氧化碳多不到 {share}%。整天在路邊工作的人（交通警察、攤販、導護）就不一樣，一個紅燈接一個紅燈，加起來就像一直待在路邊。',
-          en: 'Four red lights a day add less than {share}% to the carbon monoxide you breathe over a whole day. It is different for people who work at the kerb all day (traffic police, street vendors, school crossing guards): one red light after another adds up to standing at the roadside all the time.',
+          'zh-TW': '一天四個紅燈，讓你一整天吸到的一氧化碳多不到 {share}%。整天在路邊工作的人就不一樣，像交通警察、攤販、導護。一個紅燈接一個紅燈，加起來就像一直待在路邊。',
+          en: 'Four red lights a day add less than {share}% to the carbon monoxide you breathe over a whole day. It is different for people who work at the kerb all day, such as traffic police, street vendors and school crossing guards. One red light after another adds up to standing at the roadside all the time.',
         },
         studiesTitle: { 'zh-TW': '三個路牌，各是什麼研究', en: 'The study behind each signpost' },
         studies: [
@@ -314,7 +314,7 @@ export default copy({
             en: 'Kaohsiung: {people} people wore sensors through their days. In the {minutes} minutes after PM2.5 jumped, the heart’s rhythm shifted a little: a signal, not an illness. The peaks found in Kaohsiung came mainly from factories, mosquito coils, straw burning and incense.',
           },
           {
-            'zh-TW': '倫敦：{asthma} 個有氣喘的大人，在柴油車很多的街上走了 {hours} 小時，肺功能小幅下降，本人沒有感覺。',
+            'zh-TW': '倫敦：{asthma} 個有氣喘的大人，在柴油車很多的街上走了 {hours} 小時。他們的肺功能小幅下降，本人沒有感覺。',
             en: 'London: {asthma} adults with asthma walked for {hours} hours along a street full of diesel traffic. Their lung function fell a little, without symptoms they could feel.',
           },
           {
@@ -335,7 +335,7 @@ export default copy({
         en: 'That is the finding of a review of {studies} long-term studies of exhaust from all traffic, not scooters alone. The picture shows where exhaust goes once it is inside the body.',
       },
       pins: {
-        nose: { 'zh-TW': '鼻子、喉嚨：聞得到的油氣和醛（ㄑㄩㄢˊ）類，會刺激鼻子和喉嚨。', en: 'Nose and throat: the vapour and aldehydes you can smell irritate them.' },
+        nose: { 'zh-TW': '鼻子、喉嚨：聞得到的油氣和醛（ㄑㄩㄢˊ）類，會刺激鼻子和喉嚨。', en: 'Nose and throat: the fuel vapour and aldehydes you can smell irritate them.' },
         lungs: { 'zh-TW': '肺：很小的微粒，可以進到肺的深處。', en: 'Lungs: very small particles reach deep into the lungs.' },
         blood: {
           'zh-TW': '血液：一氧化碳從肺進到血液，占掉載氧氣的位子。',
@@ -384,12 +384,12 @@ export default copy({
     backSeat: {
       q: { 'zh-TW': '坐在機車後座的|小孩呢？', en: 'And a child |on the back seat?' },
       answer: {
-        'zh-TW': '國外量過：在印尼萬隆和尼泊爾加德滿都，小孩上學的路上，坐機車和走路的那一段，吸到的 PM2.5 最高。坐在後座的小孩，吸到的應該和騎士差不多；這是我們的推論。',
+        'zh-TW': '國外量過，在印尼萬隆和尼泊爾加德滿都。小孩上學的路上，坐機車和走路的那一段，吸到的 PM2.5 最高。坐在後座的小孩，吸到的應該和騎士差不多；這是我們的推論。',
         en: 'It has been measured abroad: in Bandung, Indonesia and Kathmandu, Nepal, the stretches of a child’s school journey spent on a scooter or on foot came with the highest PM2.5. A child on the back seat probably breathes about what the rider breathes; that is our inference.',
       },
       sheet: {
         b1: {
-          'zh-TW': '一項 {year} 年發表的研究，讓印尼萬隆和尼泊爾加德滿都的小孩，自己背著感測器上學、放學。',
+          'zh-TW': '一項 {year} 年發表的研究，找了印尼萬隆和尼泊爾加德滿都的小孩。他們自己背著感測器上學、放學。',
           en: 'A study published in {year} gave children in Bandung and Kathmandu sensors to carry to school and back.',
         },
         b2: {
@@ -417,7 +417,7 @@ export default copy({
       },
       sheet: {
         b1: {
-          'zh-TW': '台北一項研究（Chuang 等，{year} 年發表），讓健康的年輕人用不同的方式通勤，早上量一小時，儀器帶在身上。',
+          'zh-TW': '台北一項研究（Chuang 等，{year} 年發表），讓健康的年輕人用不同的方式通勤。他們早上量一小時，儀器帶在身上。',
           en: 'A Taipei study (Chuang et al., published {year}) had healthy young adults commute in different ways for one morning hour, carrying the instrument with them.',
         },
         b2: {
@@ -426,7 +426,7 @@ export default copy({
         },
         b3: {
           'zh-TW': '這是各種來源的 PM2.5，只量早上一小時。騎機車和走路都明顯比搭捷運、坐汽車多；這兩種之間差多少，統計上分不出來。量的是每個人自己吸到的；這項研究只量 PM2.5，不包括一氧化碳和苯。',
-          en: 'This is PM2.5 from all sources, over one morning hour only. Scooter and walking were clearly higher than metro and car, but did not differ significantly from each other. It is what each person breathed; the study covered PM2.5 only, not carbon monoxide or benzene.',
+          en: 'This is PM2.5 from all sources, over one morning hour only. Scooter and walking were clearly higher than metro and car. The gap between scooter and walking could be chance (not statistically significant). It is what each person breathed; the study covered PM2.5 only, not carbon monoxide or benzene.',
         },
       },
     },
@@ -435,7 +435,7 @@ export default copy({
       headline: { 'zh-TW': '騎機車和走路，|吸到的都比搭捷運多', en: 'On a scooter or on foot, |more PM2.5 than on the metro' },
       body: {
         'zh-TW': '這是台北一項研究，早上通勤一小時量到的 PM2.5 平均，各種來源都算。騎機車和走路的差別，統計上分不出來。',
-        en: 'This is the mean PM2.5 from all sources over a one-hour morning commute in a Taipei study. Scooter and walking did not differ significantly.',
+        en: 'This is the mean PM2.5 from all sources over a one-hour morning commute in a Taipei study. The gap between scooter and walking could be chance (not statistically significant).',
       },
       quiet: {
         'zh-TW': '量的是通勤的人自己吸到的，不是紅燈時機車旁邊的空氣。',
@@ -453,10 +453,10 @@ export default copy({
           metro: { 'zh-TW': '搭捷運', en: 'Metro' },
         },
         summary: {
-          'zh-TW': '台北通勤一小時吸到的 PM2.5 平均，由多到少：{rows}。騎機車和走路的差別，統計上分不出來。',
-          en: 'Mean PM2.5 breathed over a one-hour commute in Taipei, highest first: {rows}. Scooter and walking did not differ significantly.',
+          'zh-TW': '台北通勤一小時，平均吸到多少 PM2.5？單位是微克／立方公尺。由多到少：{rows}。騎機車和走路的差別，統計上分不出來。',
+          en: 'Mean PM2.5 breathed over a one-hour commute in Taipei, highest first: {rows}. The gap between scooter and walking could be chance (not statistically significant).',
         },
-        row: { 'zh-TW': '{mode} {value} 微克／立方公尺', en: '{mode} {value} µg/m³' },
+        row: { 'zh-TW': '{mode} {value}', en: '{mode} {value} µg/m³' },
         tableMode: { 'zh-TW': '通勤方式', en: 'Way of commuting' },
         tableValue: { 'zh-TW': 'PM2.5 平均（微克／立方公尺）', en: 'Mean PM2.5 (µg/m³)' },
       },
@@ -487,7 +487,7 @@ export default copy({
           en: 'N95-type respirators filter particles only: they do not stop gases such as carbon monoxide, or petrol vapour. Surgical and cloth masks are the same: nothing in them can hold a gas.',
         },
         b3: {
-          'zh-TW': '這講的是口罩材料的性質，不是在台灣街頭量的；醫用口罩和布口罩的部分，是我們照同樣的道理推論的。工業用的防毒面具加上濾罐，可以處理一氧化碳，可是平常戴的口罩都不是這種。',
+          'zh-TW': '這講的是口罩材料的性質，不是在台灣街頭量的。醫用口罩和布口罩的部分，是我們照同樣的道理推論的。工業用的防毒面具加上濾罐，可以處理一氧化碳。可是平常戴的口罩，都不是這種。',
           en: 'This is about what the filter is, not a reading taken on a Taiwanese street; the part about surgical and cloth masks is our reasoning from the same principle. An industrial gas mask with a canister can deal with carbon monoxide, but no everyday mask is one.',
         },
       },
@@ -554,7 +554,7 @@ export default copy({
       sheet: {
         title: { 'zh-TW': '這張表|是怎麼來的', en: 'Where this table |comes from' },
         b1: {
-          'zh-TW': '荷蘭、美國、英國的口罩實驗，還有台灣勞動部勞動及職業安全衛生研究所（勞安所）的兩次測試。',
+          'zh-TW': '荷蘭、美國、英國的口罩實驗。還有台灣勞動部勞動及職業安全衛生研究所（勞安所）的兩次測試。',
           en: 'Mask experiments in the Netherlands, the United States and Britain, and two tests by the research institute of Taiwan’s labour ministry.',
         },
         tests: [
@@ -563,7 +563,7 @@ export default copy({
             en: 'A Dutch study tested masks on real people: with surgical and cloth masks a good share of the smallest particles still got in. An FFP2 (the European N95) did far better on adults, and much less well on children.',
           },
           {
-            'zh-TW': '台灣，{molYear} 年：當時勞委會的勞工安全衛生研究所測了 {molTested} 款拋棄式活性碳口罩，沒有一款撐得過國家標準要求的 {molMinutes} 分鐘。',
+            'zh-TW': '台灣，{molYear} 年：當時勞委會的勞工安全衛生研究所，測了 {molTested} 款拋棄式活性碳口罩。國家標準要求撐 {molMinutes} 分鐘，沒有一款撐得過。',
             en: 'Taiwan, {molYear}: the labour ministry’s institute tested {molTested} disposable activated-carbon masks, and none lasted the {molMinutes} minutes the national standard asks for.',
           },
           {
@@ -572,7 +572,7 @@ export default copy({
           },
         ],
         b3: {
-          'zh-TW': '口罩對微粒不是沒有用：北京一項試驗裡，心臟病患者戴貼合的防塵口罩走路，血壓低了一點。這些測試用的是鹽粒、蠟燭煙或柴油廢氣，不是台灣路口的機車廢氣。',
+          'zh-TW': '口罩對微粒不是沒有用。北京一項試驗裡，心臟病患者戴貼合的防塵口罩走路，血壓低了一點。這些測試用的是鹽粒、蠟燭煙或柴油廢氣，不是台灣路口的機車廢氣。',
           en: 'Against particles a mask is not without use: in a Beijing trial, heart patients who walked wearing a well-fitting dust respirator had slightly lower blood pressure. These tests used salt particles, candle smoke or diesel exhaust, not scooter exhaust at a Taiwanese junction.',
         },
       },

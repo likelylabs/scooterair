@@ -22,7 +22,7 @@ export default copy({
     /** <title> on the home page is the site's name and tagline (Base, `home`); this is the fallback. */
     title: { 'zh-TW': '一個紅燈', en: 'One red light' },
     description: {
-      'zh-TW': '等紅燈時，旁邊機車的廢氣有多少、對身體有什麼影響、換電動機車要多少錢。一張圖講一件事，看懂路口的空氣污染。',
+      'zh-TW': '等紅燈時，旁邊機車的廢氣有多少？對身體有什麼影響？換電動機車要多少錢？一張圖講一件事，看懂路口的空氣污染。',
       en: 'How much exhaust the scooters beside you add at a red light, what it does to the body, and what an electric scooter costs. One picture at a time: the air pollution at Taiwan’s junctions.',
     },
     /** Read by screen readers before the fifteen screens. */
@@ -69,13 +69,13 @@ export default copy({
   // 2 ─────────────────────────────────────────────────────────────────────────────────────────
   s2: {
     chapter: { 'zh-TW': '排出什麼', en: 'What comes out' },
-    headline: { 'zh-TW': '臭的是油氣和醛類。|一氧化碳和微粒，|聞不到', en: 'The smell is fuel vapour and sharp aldehydes. |Carbon monoxide and particles |have no smell' },
+    headline: { 'zh-TW': '臭的是油氣和醛類。|一氧化碳聞不到，|微粒看不到', en: 'The smell is fuel vapour and aldehydes. |Carbon monoxide has no smell. |Particles are too small to see' },
     body: {
-      'zh-TW': '味道只告訴你一件事：你正站在廢氣裡。油氣裡有苯（ㄅㄣˇ），是確定會致癌的東西。',
-      en: 'The smell tells you one thing: you are standing in exhaust. The vapour carries benzene, a proven cause of cancer.',
+      'zh-TW': '味道只告訴你一件事：你正站在廢氣裡。油氣（沒燒完的汽油）裡有苯（ㄅㄣˇ），是確定會致癌的東西。',
+      en: 'The smell tells you one thing: you are standing in exhaust. The fuel vapour carries benzene, a proven cause of cancer.',
     },
     /** Printed only while the registry fact who-benzene-no-safe-level is verified. */
-    quiet: { 'zh-TW': '世界衛生組織說，苯找不到安全的量。', en: 'The WHO says no safe level of benzene can be recommended.' },
+    quiet: { 'zh-TW': '世界衛生組織說，苯找不到安全的量。', en: 'The WHO names no safe level of benzene.' },
     /** Beside the drawn can; the range and the 推估 chip follow it. */
     canLabel: { 'zh-TW': '一輛機車等一個紅燈，排出的一氧化碳', en: 'Carbon monoxide from one scooter through one red light' },
     sheet: {
@@ -101,13 +101,13 @@ export default copy({
     chapter: { 'zh-TW': '排在哪裡', en: 'Where it goes' },
     headline: { 'zh-TW': '待轉區的機車，|排氣管就對著斑馬線', en: 'In the turn box, the tailpipes sit |right in front of the crossing' },
     body: {
-      'zh-TW': '排氣管比膝蓋低（運研所算的時候設在離地 {h} 公分），廢氣就排在腳邊。待轉區和斑馬線之間，規定只要留 {gap} 公分以上。',
+      'zh-TW': '排氣管比膝蓋低（官方算的時候設在離地 {h} 公分），廢氣就排在腳邊。待轉區和斑馬線之間，規定只要留 {gap} 公分以上。',
       en: 'A tailpipe sits below knee height (the Institute of Transportation’s model puts it {h} cm up), so the exhaust comes out by your feet. The rules ask for at least {gap} cm between the turn box and the crossing.',
     },
     sheet: {
       title: { 'zh-TW': '這兩個 {gap} 公分，|是誰說的', en: 'Those two figures of {gap} cm: |who says so' },
       who: {
-        'zh-TW': '交通部的標線規則；排氣管的高度，是運研所算路口空氣的時候設定的。',
+        'zh-TW': '交通部的標線規則；排氣管的高度，是交通部運輸研究所（運研所）算路口空氣的時候設定的。',
         en: 'The transport ministry’s road-marking rules. The tailpipe height is what the Institute of Transportation set when it modelled junction air.',
       },
       what: {
@@ -128,8 +128,8 @@ export default copy({
     headline: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
     // body: est.meta.gloss + kerbSentence(scenario) from src/data/estimate.ts
     quiet: {
-      'zh-TW': '圈圈越密＝一氧化碳越多。到處都有的稀疏圈圈，是街上原本就有的。',
-      en: 'More rings mean more carbon monoxide. The sparse rings everywhere are what the street already holds.',
+      'zh-TW': '圈圈越多＝一氧化碳越多。街上原本就有的空氣，圖上沒有畫。',
+      en: 'More rings mean more carbon monoxide. The air the street already holds is not drawn.',
     },
     box: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
     sheet: {
@@ -143,23 +143,18 @@ export default copy({
         en: 'A change in the wind can move the answer about four-fold. The two patches below draw the two ends of the range for the same case.',
       },
     },
-    next: { 'zh-TW': '有人實際量過嗎？', en: 'Has anyone actually measured it?' },
+    next: { 'zh-TW': '實際量到的，算多嗎？', en: 'And the real readings: is that a lot?' },
   },
 
   // 5 ─────────────────────────────────────────────────────────────────────────────────────────
   s5: {
     chapter: { 'zh-TW': '量到的，和算的', en: 'Measured, estimated' },
-    // headline: checkHeadline() from src/data/estimate.ts (the written rule of brief 3.2)
-    bodySensors: {
-      'zh-TW': '運研所在 {sites} 個路口的行人等候區放了儀器。',
-      en: 'Taiwan’s Institute of Transportation put sensors where pedestrians wait at {sites} junctions.',
-    },
-    /** Printed only while the highest value on the chart is under a quarter of the WHO value. */
-    bodyFarBelow: {
-      'zh-TW': '量到的和算的，都比世界衛生組織的 15 分鐘指引值低很多。',
-      en: 'Both the readings and our estimate are far below the WHO 15-minute guideline.',
-    },
-    // quiet: estimateText.coTracksVapour
+    // headline: checkHeadline() from src/data/estimate.ts (farBelowWho(); brief 3.2 as amended)
+    // body, one idea per line, all from src/data/estimate.ts:
+    //   checkSentence() (how the readings compare with the estimate: checkRule())
+    //   estimateText.belowIsNotSafe (only while farBelowWho())
+    //   estimateText.coMarksBenzene (the link from the chart to benzene)
+    // quiet: estimateText.benzeneWho (only while who-benzene-no-safe-level is verified)
     sheet: {
       who: {
         'zh-TW': '路口的行人等候區，是交通部運輸研究所（運研所）量的；平常的路邊，是環境部的交通測站。',
@@ -167,7 +162,7 @@ export default copy({
       },
       table: { 'zh-TW': '圖上的數字', en: 'The numbers on the chart' },
     },
-    next: { 'zh-TW': '吸進去以後，去了哪裡？', en: 'Once breathed in, where does it go?' },
+    next: { 'zh-TW': '天天吸進去的，會跑到哪裡？', en: 'Day after day, where does it all go?' },
   },
 
   // 6 ─────────────────────────────────────────────────────────────────────────────────────────
@@ -189,7 +184,7 @@ export default copy({
     },
     sheet: {
       who: {
-        'zh-TW': '美國健康效應研究所整理了 {n} 篇長期研究，看的是長年住在車多的地方、吸車子廢氣的人。',
+        'zh-TW': '美國健康效應研究所整理了 {n} 篇長期研究。研究的是長年住在車多的地方、吸車子廢氣的人。',
         en: 'The Health Effects Institute, in the United States, reviewed {n} long-term studies of people who lived for years with traffic exhaust.',
       },
       what: {
@@ -202,8 +197,8 @@ export default copy({
       },
       /** Printed with the pins that ship: what the three routes do and do not say. */
       routes: {
-        'zh-TW': '圖上三條路，是這些東西進到身體以後去的地方。一氧化碳要很多，才會明顯占掉載氧氣的位子；路口量到的和本站算的，都比世界衛生組織的 15 分鐘指引值低很多。',
-        en: 'The three routes show where these things go in the body. It takes a lot of carbon monoxide to take up much of the room meant for oxygen; what was measured at junctions and what this site works out are both far below the WHO 15-minute guideline.',
+        'zh-TW': '圖上三條路，是這些東西進到身體以後去的地方。一氧化碳要很多，才會明顯占掉載氧氣的位子。路口量到的和本站算的，都比世界衛生組織的 15 分鐘指引值低很多。',
+        en: 'The three routes show where these things go in the body. It takes a lot of carbon monoxide to take up much of the room meant for oxygen. What was measured at junctions and what this site works out are both far below the WHO 15-minute guideline.',
       },
     },
     next: { 'zh-TW': '一個紅燈那麼短，也算嗎？', en: 'One red light is so short. Does it count?' },
@@ -216,6 +211,8 @@ export default copy({
     /**
      * By the stepper. The day-words are checked against time.hoursPerYear at build time
      * (12–18, 24–36 and 36–55 hours); if the arithmetic changes the build stops here.
+     * The hours themselves are printed on the picture (RoadOfTime); the second sentence is the
+     * assumption, ui.ts redHoursSentence, the same words as the film's transcript.
      */
     body: {
       2: { 'zh-TW': '一天等兩個紅燈，一年就在路邊站了半天到快一天。', en: 'Two red lights a day add up to half a day to nearly a day a year at the kerb.' },
@@ -262,8 +259,8 @@ export default copy({
         en: 'Four red lights a day raise the carbon monoxide you breathe over a whole day by under {pct}%.',
       },
       workers: {
-        'zh-TW': '整天在路邊工作的人（交通警察、攤販、導護）就不一樣：一個紅燈接一個紅燈，加起來就像一直待在路邊。',
-        en: 'It is different for people who work at the kerb all day (traffic police, street vendors, crossing guards): one red light after another adds up to standing in it all the time.',
+        'zh-TW': '整天在路邊工作的人就不一樣，像交通警察、攤販、導護。一個紅燈接一個紅燈，加起來就像一直待在路邊。',
+        en: 'It is different for people who work at the kerb all day, such as traffic police, street vendors and crossing guards. One red light after another adds up to standing in it all the time.',
       },
     },
     next: { 'zh-TW': '同一個路口，誰離得最近？', en: 'At the same junction, who is closest?' },
@@ -309,7 +306,7 @@ export default copy({
     },
     sheet: {
       who: {
-        'zh-TW': '台北的研究人員，請一群健康的年輕人在早上通勤的一個小時裡，身上帶著儀器。',
+        'zh-TW': '台北的研究人員找了一群健康的年輕人。他們在早上通勤的一個小時裡，身上帶著儀器。',
         en: 'Researchers in Taipei asked a group of healthy young adults to carry a monitor through one hour of the morning commute.',
       },
       what: { 'zh-TW': '每個人身邊的 PM2.5，平均是：', en: 'Mean PM2.5 beside each person:' },
@@ -322,7 +319,7 @@ export default copy({
       },
       care: {
         'zh-TW': '量的是各種來源的 PM2.5，只有早上的一個小時。騎機車和走路的差別，統計上分不出來。量的是騎士自己吸到的，不是站在機車旁邊的行人。',
-        en: 'It is PM2.5 from all sources, over one morning hour only. The difference between riding a scooter and walking was not statistically significant. It is what riders themselves breathed, not a pedestrian standing beside the scooters.',
+        en: 'It is PM2.5 from all sources, over one morning hour only. The gap between riding a scooter and walking could be chance (not statistically significant). It is what riders themselves breathed, not a pedestrian standing beside the scooters.',
       },
     },
     next: { 'zh-TW': '戴口罩，擋得住嗎？', en: 'Would a mask stop it?' },
@@ -355,8 +352,8 @@ export default copy({
         { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
       ],
       who: {
-        'zh-TW': '美國職業安全衛生研究所說明：一氧化碳這類氣體和油氣（沒燒完的汽油），連 N95 都擋不住，它只過濾微粒。照同樣的道理，醫用口罩和布口罩也沒有吸附氣體的材料；這一句是我們的推論。',
-        en: 'The US occupational-safety institute, NIOSH, states that N95-type respirators filter particles only: they do not stop gases such as carbon monoxide, or petrol vapour. By the same reasoning, surgical and cloth masks have no gas-absorbing layer either; that part is our inference.',
+        'zh-TW': '美國職業安全衛生研究所說明了兩件事。一氧化碳這類氣體和油氣（沒燒完的汽油），連 N95 都擋不住。這種口罩只過濾微粒。照同樣的道理，醫用口罩和布口罩也沒有吸附氣體的材料；這一句是我們的推論。',
+        en: 'The US occupational-safety institute, NIOSH, states that N95-type respirators filter particles only. They do not stop gases such as carbon monoxide, or petrol vapour. By the same reasoning, surgical and cloth masks have no gas-absorbing layer either; that part is our inference.',
       },
       cols: {
         mask: { 'zh-TW': '口罩', en: 'Mask' },
@@ -394,14 +391,14 @@ export default copy({
       taiwan: { 'zh-TW': '台灣做過的兩個測試', en: 'Two tests done in Taiwan' },
       /** Always with its year (must-not-say: never as if it described today's products). */
       mol: {
-        'zh-TW': '2005 年，勞委會的勞工安全衛生研究所測了 {tested} 款拋棄式活性碳口罩：國家標準要求擋得住有機溶劑的蒸氣 {min} 分鐘，{result}。',
+        'zh-TW': '2005 年，勞委會的勞工安全衛生研究所測了 {tested} 款拋棄式活性碳口罩。國家標準要求，要擋得住有機溶劑的蒸氣 {min} 分鐘：{result}。',
         en: 'In 2005 the labour ministry’s occupational-safety institute tested {tested} disposable activated-carbon masks against the national standard of {min} minutes’ protection from organic solvent vapour: {result}.',
       },
       molNone: { 'zh-TW': '沒有一款做到', en: 'none met it' },
       molSome: { 'zh-TW': '有 {passed} 款做到', en: '{passed} met it' },
       /** A comparison between masks, never a percentage. */
       ilosh: {
-        'zh-TW': '勞動部勞動及職業安全衛生研究所（勞安所）找 {people} 位大人實測，給每種口罩一個防護分數：頭帶式 N95 是 {n95}，一般醫用口罩是 {medical}。這是拿來互相比較的分數，不是百分比。',
+        'zh-TW': '勞動部勞動及職業安全衛生研究所（勞安所）找 {people} 位大人實測。他們給每種口罩一個防護分數：頭帶式 N95 是 {n95}，一般醫用口罩是 {medical}。這是拿來互相比較的分數，不是百分比。',
         en: 'The labour ministry’s institute tested {people} adults and gave each mask a protection score: {n95} for a headband N95, {medical} for an ordinary medical mask. The scores compare masks with each other; they are not percentages.',
       },
       care: {
@@ -442,8 +439,8 @@ export default copy({
       },
       /** Printed only while liou-wu-2021-electric-scooter-benefit is verified. */
       national: {
-        'zh-TW': '全台灣來看：一項台灣的模式研究估計，燃油機車都換成電動機車，每年可以少掉大約 {usd} 億美元（約新台幣 {ntd} 億元）的健康損失。',
-        en: 'For Taiwan as a whole: a Taiwanese modelling study estimated that switching every petrol scooter to electric would avoid about US${usd} billion (about NT${ntd} billion) a year of harm to health.',
+        'zh-TW': '全台灣來看，有一項台灣的研究用電腦模式推估。燃油機車都換成電動機車，每年的健康損失可以少掉大約 {usd} 億美元（約 {ntd} 億元）。',
+        en: 'For Taiwan as a whole, a Taiwanese modelling study estimated the gain. Switching every petrol scooter to electric would avoid about US${usd} billion (about NT${ntd} billion) a year of harm to health.',
       },
     },
     next: { 'zh-TW': '還沒要換車呢？', en: 'Not switching yet?' },
@@ -455,10 +452,10 @@ export default copy({
     shareLabel: { 'zh-TW': '占一氧化碳{share}', en: '{share} of the carbon monoxide' },
     chapter: { 'zh-TW': '還沒要換車', en: 'Not switching yet' },
     headline: { 'zh-TW': '還沒要換車？|有一件事也很有用', en: 'Not switching yet? |One thing still helps a lot' },
-    /** 「三分之一到快一半」 is checked against inspect.top10share at build time. */
+    /** 「三成到快一半」 is checked against inspect.top10share at build time. */
     body: {
-      'zh-TW': '定檢讀數裡，排最多的一成，占了全部一氧化碳的三分之一到快一半。準時定檢、該修就修，路口就少一大團。',
-      en: 'In Taiwan’s inspection readings, the highest tenth account for a third to nearly half of all the carbon monoxide. Get inspected on time and fix what fails, and a big cloud leaves the junction.',
+      'zh-TW': '定檢讀數裡，排最多的一成，占了全部一氧化碳的三成到快一半。準時定檢、該修就修，路口就少一大團。',
+      en: 'In Taiwan’s inspection readings, the highest tenth account for 30% to nearly half of all the carbon monoxide. Get inspected on time and fix what fails, and a big cloud leaves the junction.',
     },
     sheet: {
       used: {
@@ -502,10 +499,6 @@ export default copy({
       'zh-TW': '只能換電池、付月費。',
       en: 'It only swaps batteries, so it needs a battery plan.',
     },
-    /** The least favourable case in the table, named as such (the screen's word budget is 45 characters). */
-    worst: { 'zh-TW': '最不划算：{county}、{scrap}、最便宜的{plate}，多付 {n}。', en: 'Worst case: {county}, {scrap}, the cheapest {plate} model: {n} more.' },
-    worstScrapYes: { 'zh-TW': '可報廢', en: 'one to scrap' },
-    worstScrapNo: { 'zh-TW': '沒車報廢', en: 'nothing to scrap' },
     sheet: {
       title: { 'zh-TW': '這個價錢，|是怎麼算的', en: 'How this price |was worked out' },
       used: {
@@ -578,8 +571,8 @@ export default copy({
         en: 'The same junction and the same {n} scooters, every one of them electric.',
       },
       how: {
-        'zh-TW': '機車排的廢氣沒有了，所以路邊多出來的那一層、排氣管旁邊的深色都不畫。街上原本就有的稀疏圈圈、汽車的廢氣、輪胎的粉塵還在。',
-        en: 'With no scooter exhaust, the added layer at the kerb and the dark patches at the tailpipes are not drawn. The street’s own sparse rings, the car’s exhaust and the dust at the tyres remain.',
+        'zh-TW': '機車排的廢氣沒有了，所以機車那一團氣都不畫了。汽車的廢氣、輪胎的粉塵還在。街上原本就有的空氣，圖上本來就沒畫。',
+        en: 'With no scooter exhaust, the scooters’ plume is gone from the picture. The car’s exhaust and the dust at the tyres remain. The air the street already holds is never drawn.',
       },
       care: {
         'zh-TW': '這是示意圖，不是預測：要每一輛都換，才是圖上的樣子。發電也有排放，只是不在路口。',

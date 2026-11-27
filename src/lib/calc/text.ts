@@ -77,7 +77,7 @@ export const reasonText: Record<ExclusionReason, L10n> = {
   'not-yet-valid': t('尚未開始', 'Not yet open'),
   unconfirmed: t('公告的期限比較長，但它所依據的補助辦法只確定到 2026 年底', 'Listed as running longer, but the rule it rests on is confirmed only to the end of 2026'),
   'quota-exhausted': t('名額或經費已用完', 'Quota or budget used up'),
-  unverified: t('未能查證', 'Not verified'),
+  unverified: t('沒有查證到', 'Not verified'),
   'not-published': t('官方未公布金額', 'Amount not published'),
   'secondary-only': t('只見於新聞稿或媒體報導', 'Only in a press release or media report'),
   ambiguous: t('規定不明確，未計入', 'Rule unclear, not counted'),

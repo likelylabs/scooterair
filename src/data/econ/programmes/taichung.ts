@@ -27,7 +27,7 @@ const oldLocal: Condition = { kind: 'scrap-registered-locally', byDate: '2026-01
 const ownerNotMovedIn: Condition = {
   kind: 'residency',
   registeredBy: '2025-12-31',
-  why: t('要報廢機車的車主（試算假設就是你）的戶籍在 2026 年 1 月 1 日以後有從外縣市遷入的紀錄，不能領汰舊換購金額', 'the scooter you scrap\'s owner (taken to be you) moved household registration in from another county on or after 1 January 2026, which rules out the scrap tiers'),
+  why: t('要報廢機車的車主（計算假設就是你）的戶籍在 2026 年 1 月 1 日以後有從外縣市遷入的紀錄，不能領汰舊換購金額', 'the scooter you scrap\'s owner (taken to be you) moved household registration in from another county on or after 1 January 2026, which rules out the scrap tiers'),
   assumption: t('假設要報廢機車的車主就是你，而且你的戶籍在 2026 年 1 月 1 日以後沒有從外縣市遷入', 'Assumes you own the scooter you scrap and your household registration has not moved in from another county since 1 January 2026'),
 };
 const BUY_SCRAP = t('發票須在這天以前開立，要報廢的機車須在這天以前報廢回收；新車可在 2027 年 1 月 10 日前領牌並線上申請。', 'Invoice by this date and scrap and recycle the scooter you scrap by this date; the new scooter can be plated and the online application made by 10 January 2027.');

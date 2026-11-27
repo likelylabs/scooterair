@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { AIR, AIR_SCENARIOS, air, airGlyph, airPatch, extraRingsPerPatch, marksIn, unitsPerPx } from '../air.ts';
+import { AIR, AIR_SCENARIOS, air, airGlyph, airPatch, extraRingsPerPatch, marksIn, unitsPerPx, washStrength } from '../air.ts';
 import { AIR_BACKGROUND_CO, AIR_EXTRA, AIR_RANGE, AIR_RULE } from '../air-slots.ts';
 import { BODY, MASK_FACE, MOUTH, bodyFigure, drinksCan, figureBoxes, maskFace, person, pushchair, scooter } from '../parts.ts';
 
@@ -15,6 +15,7 @@ test('layer B follows the signed estimate: +1, +3, +6; the dozen range is 7 and 
   assert.equal(AIR_RANGE.dozen.lo.rings, 7);
   assert.equal(AIR_RANGE.dozen.hi.rings, 17);
   assert.equal(AIR_BACKGROUND_CO, 0.54);
+  // the plume's AVERAGE tint over the kerb zone: the flat wash of the first design, unchanged
   assert.deepEqual(AIR_RULE.washPercent, { few: 10, dozen: 18, full: 26 });
 });
 
@@ -36,10 +37,24 @@ test('extraRingsPerPatch: at least 1, and it refuses a missing slot', () => {
   assert.throws(() => extraRingsPerPatch(0.3, 0));
 });
 
-test('layer A: 6 rings and 6 dots in every reference patch, whatever the units', () => {
+test('a picture never draws the street\'s own air: no rings, dots or ribbons outside the plume', () => {
+  for (const w of [360, 450, 1000, 1200]) {
+    const a = air({ frame: { x: 0, y: 0, w, h: (w * 2) / 3 }, id: 'a' });
+    assert.deepEqual(a.counts.street, { rings: 0, dots: 0 });
+    assert.doesNotMatch(a.marks, /air-(?:ring|dot|rib)/);
+    assert.equal(a.all, '<g class="air-marks"></g>');
+  }
+  // with tailpipes and a kerb, every mark sits in a core's cluster or in the kerb group
+  const k = scene({ scenario: 'full' });
+  assert.doesNotMatch(k.marks, /air-a"/);
+  const outside = k.marks.replace(/<g class="air-src"[^>]*>.*?<\/g>/g, '').replace(/<g class="air-kerb">.*?<\/g>/g, '');
+  assert.doesNotMatch(outside, /air-(?:ring|dot|rib)/);
+});
+
+test('the yardstick (streetAir, the counting patch only): 6 rings and 6 dots in every reference patch, whatever the units', () => {
   for (const w of [360, 450, 1000, 1200]) {
     const upp = unitsPerPx(w);
-    const a = air({ frame: { x: 0, y: 0, w, h: (w * 2) / 3 }, id: 'a' });
+    const a = air({ frame: { x: 0, y: 0, w, h: (w * 2) / 3 }, id: 'a', streetAir: true });
     // 3 patches across, 2 down
     assert.equal(a.counts.street.rings, 36, `rings at width ${w}`);
     assert.equal(a.counts.street.dots, 36, `dots at width ${w}`);
@@ -78,13 +93,47 @@ test('the scenarios nest: few is a prefix of dozen, dozen of full', () => {
   const c = all.counts.kerb!;
   assert.ok(c.few.rings >= 1 && c.few.rings <= c.dozen.rings && c.dozen.rings <= c.full.rings);
   assert.deepEqual([c.few.ribbons, c.dozen.ribbons, c.full.ribbons], [1, 3, 5]);
-  assert.deepEqual([c.few.wash, c.dozen.wash, c.full.wash], [0.1, 0.18, 0.26]);
+  assert.ok(c.few.wash < c.dozen.wash && c.dozen.wash < c.full.wash && c.full.wash < 1);
+  // the group opacity is written into the drawing for each step, and the dozen is the fallback
+  assert.match(all.wash, new RegExp(`--air-w1:${c.few.wash};--air-w2:${c.dozen.wash};--air-w3:${c.full.wash}" opacity="${c.dozen.wash}"`));
+});
+
+test('the plume tints the kerb zone by AIR.washOpacity on average (10 / 18 / 26 %), never more, and stays lighter than washMax', () => {
+  // sample the drawn ovals ourselves: parse them out of the SVG and composite them on a fine grid
+  const a = scene({ scenario: 'all' });
+  const ovals = [...a.wash.matchAll(/<ellipse cx="([-\d.]+)" cy="([-\d.]+)" rx="([-\d.]+)" ry="([-\d.]+)"[^>]*opacity="([\d.]+)"/g)].map((m) => ({ cx: +m[1], cy: +m[2], rx: +m[3], ry: +m[4], k: +m[5] }));
+  assert.equal(ovals.length, AIR.plume.ovals.length);
+  const zone = { x: kerb.x0, y: -AIR.kerbTop, w: kerb.x1 - kerb.x0, h: AIR.kerbTop };
+  const w = washStrength(zone, ovals);
+  for (const s of AIR_SCENARIOS) {
+    const g = a.counts.kerb![s].wash;
+    assert.ok(Math.abs(g * w.mean - AIR.washOpacity[s]) < 0.006, `${s}: average ${(g * w.mean).toFixed(3)} vs ${AIR.washOpacity[s]}`);
+    assert.ok(g * w.peak <= AIR.washMax + 0.006, `${s}: strongest point ${(g * w.peak).toFixed(3)}`);
+  }
+  // and in a differently shaped picture (the hero's wide zone) the average is the same
+  const wide = air({ frame: { x: 0, y: -690, w: 720, h: 860 }, id: 'w', seed: 9, kerb: { x0: 14, x1: 262, sourceX: 274 }, extra: AIR_EXTRA, scenario: 'dozen' });
+  const ov2 = [...wide.wash.matchAll(/<ellipse cx="([-\d.]+)" cy="([-\d.]+)" rx="([-\d.]+)" ry="([-\d.]+)"[^>]*opacity="([\d.]+)"/g)].map((m) => ({ cx: +m[1], cy: +m[2], rx: +m[3], ry: +m[4], k: +m[5] }));
+  const w2 = washStrength({ x: 14, y: -AIR.kerbTop, w: 248, h: AIR.kerbTop }, ov2);
+  assert.ok(Math.abs(wide.counts.kerb!.dozen.wash * w2.mean - AIR.washOpacity.dozen) < 0.006);
 });
 
 test('a kerb zone one patch in size gets exactly the extra rings of the rule', () => {
   const side = AIR.patch; // 1 unit = 1 px at 360 wide
-  const a = air({ frame: { x: 0, y: 0, w: 360, h: 240 }, id: 'k', kerb: { x0: 0, x1: side, ground: 240, top: side }, extra: AIR_EXTRA, scenario: 'all' });
+  const a = air({ frame: { x: 0, y: 0, w: 360, h: 240 }, id: 'k', kerb: { x0: 0, x1: side, ground: 240, top: side, ringRoom: 1 }, extra: AIR_EXTRA, scenario: 'all' });
   assert.deepEqual([a.counts.kerb!.few.rings, a.counts.kerb!.dozen.rings, a.counts.kerb!.full.rings], [1, 3, 6]);
+  // in a picture the rings keep inside the plume (under 82 % of its height, which is lower near the
+  // tailpipe than over the people) and are counted over that area only: the same density as the
+  // rule, so fewer rings, never more
+  const b = air({ frame: { x: 0, y: 0, w: 360, h: 240 }, id: 'k', kerb: { x0: 0, x1: side, ground: 240, top: side }, extra: AIR_EXTRA, scenario: 'all' });
+  assert.deepEqual([b.counts.kerb!.few.rings, b.counts.kerb!.dozen.rings, b.counts.kerb!.full.rings], [1, 2, 4]);
+  const ys = [...b.marks.matchAll(/class="air-ring[^"]*"[^>]*d="M(-?[\d.]+),(-?[\d.]+)/g)].map((m) => +m[2]);
+  assert.ok(ys.length === 4 && ys.every((y) => y >= 240 - side * 0.82 - 1), 'rings sit inside the plume');
+});
+
+test('the kerb rings stay on the people\'s side of the nearest tailpipe', () => {
+  const a = air({ frame, id: 'q', kerb: { x0: 8, x1: 440, sourceX: 200 }, extra: AIR_EXTRA, scenario: 'full' });
+  const xs = [...a.marks.matchAll(/class="air-ring[^"]*"[^>]*d="M(-?[\d.]+),(-?[\d.]+)a(-?[\d.]+)/g)].map((m) => +m[1] + +m[3]);
+  assert.ok(xs.length > 0 && xs.every((x) => x <= 200), `rings at ${xs.join(', ')}`);
 });
 
 test('layer B is never typed: a kerb zone without `extra` stops the build', () => {
@@ -93,7 +142,7 @@ test('layer B is never typed: a kerb zone without `extra` stops the build', () =
 
 test('no ring or dot is drawn inside an `avoid` box', () => {
   const box = { x: 150, y: -250, w: 120, h: 160 };
-  const a = air({ frame, id: 'v', seed: 2, avoid: [box], kerb, extra: AIR_EXTRA, scenario: 'full' });
+  const a = air({ frame, id: 'v', seed: 2, avoid: [box], kerb, extra: AIR_EXTRA, scenario: 'full', streetAir: true });
   const centres = [...a.marks.matchAll(/M(-?[\d.]+),(-?[\d.]+)a(-?[\d.]+),/g)].map((m) => ({ x: +m[1] + +m[3], y: +m[2] }));
   assert.ok(centres.length > 40);
   for (const p of centres) assert.ok(!(p.x > box.x && p.x < box.x + box.w && p.y > box.y && p.y < box.y + box.h), `mark at ${p.x},${p.y}`);

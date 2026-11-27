@@ -3,10 +3,12 @@ import { absUrl } from '../../../lib/abs-url.ts';
 /**
  * ShareBlock — the share block that ends a question page (brief 7.5): the card the link will
  * carry, a LINE button, and (with JavaScript) a button that copies the page's link. The card
- * images are lane J's (public/share/<zh|en>/<id>.png, rendered by scripts/build-share-cards.mjs);
- * this block shows a card only when it exists and was rendered in the redesign's template, so a
- * page never shows a broken picture, or an old card that contradicts the page, while the new
- * cards are waiting to be rendered. Until then the block is the two buttons alone.
+ * images are lane J's (public/share/<zh|en>/<id>.png, 1200 × 630, rendered by
+ * scripts/build-share-cards.mjs); the block shows the card whole, across its width, as a chat
+ * shows the link, with the words and buttons under it (beside it on a wide screen). It shows a
+ * card only when it exists and was rendered in the poster template (7 or later), so a page never
+ * shows a broken picture, or an old card, while the new cards are waiting to be rendered. Until
+ * then the block is the two buttons alone.
  *
  * Props
  *   locale  Locale
@@ -19,6 +21,7 @@ import { asset, htmlLang } from '@/i18n';
 import { shareCard, type ShareCardId } from '@/lib/share-cards';
 import Icon from '@/components/ui/Icon.astro';
 import { ui } from '@/i18n/ui';
+import { glueHtml } from '@/lib/glue.mjs';
 import questions from '@/i18n/pages/questions';
 
 interface Props {
@@ -28,22 +31,25 @@ interface Props {
 const { locale, id } = Astro.props;
 const S = questions.page.share;
 const card = shareCard(id, locale);
-// A card is shown only once it has been rendered in the redesign's template (6 or later, written
-// to the manifest by scripts/build-share-cards.mjs): the older cards carry the old pages' claims.
-const REDESIGN_TEMPLATE = 6;
+// the lead keeps its words whole (「家|長」) and its last word with the one before it (never 「群組。」 alone)
+const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const lead = glueHtml(escHtml(S.lead[locale])).replace(/<span class="nobr">([^<]*)<\/span><span class="nobr">([^<]*)<\/span>(<\/span>)?$/, '<span class="nobr">$1$2</span>$3');
+// A card is shown only once it has been rendered in the poster template (7 or later, written to
+// the manifest by scripts/build-share-cards.mjs): older cards are small text beside a small picture.
+const POSTER_TEMPLATE = 7;
 const manifestPath = join(process.cwd(), 'public', 'share', 'manifest.json');
 const manifest: { template?: number; cards?: Record<string, string> } = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
 const key = `${locale === 'en' ? 'en' : 'zh'}/${id}`;
-const rendered = (manifest.template ?? 0) >= REDESIGN_TEMPLATE && !!manifest.cards?.[key] && existsSync(join(process.cwd(), 'public', card.square));
+const rendered = (manifest.template ?? 0) >= POSTER_TEMPLATE && !!manifest.cards?.[key] && existsSync(join(process.cwd(), 'public', card.wide));
 const pageUrl = absUrl(Astro.url.pathname, Astro.site);
 const line = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}`;
 ---
 
 <section class:list={['share', !rendered && 'share--plain']} aria-labelledby="share-h">
-  {rendered && <a class="share__card" href={asset(card.wide)} aria-label={S.picture[locale]}><img src={asset(card.square)} width="1080" height="1080" alt={card.alt} loading="lazy" decoding="async" lang={htmlLang[locale]} /></a>}
+  {rendered && <a class="share__card" href={asset(card.wide)} aria-label={S.picture[locale]}><img src={asset(card.wide)} width="1200" height="630" alt={card.alt} loading="lazy" decoding="async" lang={htmlLang[locale]} /></a>}
   <div class="share__side">
     <h2 class="share__title" id="share-h">{S.title[locale]}</h2>
-    <p class="share__lead">{S.lead[locale]}</p>
+    <p class="share__lead" set:html={lead} />
     <div class="share__actions">
       <a class="share__btn share__btn--line" href={line} target="_blank" rel="noopener noreferrer">{S.line[locale]}<Icon name="arrow-up-right" size="1.05em" /><span class="vh">{ui.externalLink[locale]}</span></a>
       <button class="share__btn" type="button" data-copy={pageUrl} data-done={S.copied[locale]} hidden>{S.copy[locale]}</button>
@@ -71,9 +77,7 @@ const line = `https://social-plugins.line.me/lineit/share?url=${encodeURICompone
 <style>
   .share {
     display: grid;
-    grid-template-columns: 6.5rem minmax(0, 1fr);
     gap: var(--sp-4);
-    align-items: start;
     inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
     margin: var(--sp-6) auto 0;
     padding: var(--sp-4);
@@ -81,23 +85,7 @@ const line = `https://social-plugins.line.me/lineit/share?url=${encodeURICompone
     border-radius: var(--radius-2);
     background: var(--surface);
   }
-  .share--plain {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  /* the picture beside the words while the words keep at least 9rem; on a narrow phone or at a
-     large text size the picture goes above them, so the buttons keep the whole width */
-  @supports (display: flex) {
-    .share:not(.share--plain) {
-      display: flex;
-      flex-wrap: wrap;
-    }
-    .share:not(.share--plain) .share__card {
-      flex: 0 0 6.5rem;
-    }
-    .share:not(.share--plain) .share__side {
-      flex: 1 1 9rem;
-    }
-  }
+  /* the card whole, as a chat shows the link: the picture is the point, the words follow it */
   .share__card {
     display: block;
     border-radius: var(--radius-1);
@@ -108,6 +96,7 @@ const line = `https://social-plugins.line.me/lineit/share?url=${encodeURICompone
     display: block;
     inline-size: 100%;
     block-size: auto;
+    aspect-ratio: 1200 / 630;
   }
   .share__side {
     display: grid;
@@ -137,8 +126,10 @@ const line = `https://social-plugins.line.me/lineit/share?url=${encodeURICompone
     align-items: center;
     justify-content: center;
     gap: 0.35em;
+    /* the two buttons share one row on a 360 px phone in both languages, and share it evenly */
+    flex: 1 1 auto;
     min-block-size: var(--tap);
-    padding: 0.4rem 1.1rem;
+    padding: 0.4rem 0.75rem;
     border: 2px solid var(--ink);
     border-radius: var(--radius-pill, 999px);
     background: var(--bg);
@@ -166,14 +157,13 @@ const line = `https://social-plugins.line.me/lineit/share?url=${encodeURICompone
   .share__status:empty {
     display: none;
   }
+  /* a wide screen: the card on the left at half the width, the words beside it, centred on it */
   @media (min-width: 40em) {
-    .share {
-      grid-template-columns: 11rem minmax(0, 1fr);
+    .share:not(.share--plain) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
       gap: var(--sp-5);
       padding: var(--sp-5);
-    }
-    .share--plain {
-      grid-template-columns: minmax(0, 1fr);
     }
   }
   @media print {
