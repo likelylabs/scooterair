@@ -1,9 +1,11 @@
 ---
 /**
- * ElectricResult — one calculator result for /electric/: the verdict panel (ResultPanel, V36)
- * with the working underneath (ledgers, waterfall V37, monthly bill V39, break-even V38,
- * warnings), all from one `Rendered` produced by ./model.ts. The same function renders the
- * worked examples here at build time and the live result in the browser, so both look alike.
+ * ElectricResult — one calculator result for /electric/: the three answers (買的那天差多少 ·
+ * 每個月差多少 · 幾年打平) with the scooters compared and one chart (break-even), then the working,
+ * each part folded (ledgers, waterfall, monthly bill, warnings). All from one `Rendered` produced
+ * by ./model.ts, which prints the answers with the same function as the opening above, so the
+ * same answers give the same figures in both places. The same markup serves the worked examples
+ * (built here at build time) and the live result (filled in the browser).
  *
  * Props
  *   id        unique id (the browser script targets #id)
@@ -13,11 +15,9 @@
  *   hidden    render hidden (the live result before any answer)
  *
  * Script hooks
- *   [data-el-result] root; [data-el-slot="deadline|next|body"] slot containers;
- *   ResultPanel's own [data-part] hooks and data-verdict.
+ *   [data-el-result] root; [data-verdict] (A, B or C); [data-el-slot="answers|deadline|next|body"].
  */
 import type { Locale } from '@/i18n';
-import ResultPanel from '@/components/ui/ResultPanel.astro';
 import type { Rendered } from './model';
 
 interface Props {
@@ -27,16 +27,17 @@ interface Props {
   city?: string;
   hidden?: boolean;
 }
-const { id, locale, rendered, city, hidden = false } = Astro.props;
-const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix: 'NT$', value: '', unit: '', spoken: '', short: '', note: '', deadlineHtml: '', nextHtml: '', bodyHtml: '' };
+const { id, rendered, city, hidden = false } = Astro.props;
+const r: Rendered = rendered ?? { verdict: 'C', sentence: '', answersHtml: '', title: '', prefix: 'NT$', value: '', unit: '', spoken: '', short: '', note: '', deadlineHtml: '', nextHtml: '', bodyHtml: '' };
 ---
 
 <div class="el-result" id={id} data-el-result data-city={city} hidden={hidden}>
-  <ResultPanel id={`${id}-panel`} locale={locale} verdict={r.verdict} sentence={r.sentence} title={r.title} value={r.value} prefix={r.prefix || ' '} unit={r.unit || ' '} note={r.note}>
-    <div slot="deadline" data-el-slot="deadline" set:html={r.deadlineHtml} />
-    <div slot="next" data-el-slot="next" set:html={r.nextHtml} />
+  <div class="el-panel" id={`${id}-panel`} data-verdict={r.verdict}>
+    <div class="el-answers" data-el-slot="answers" set:html={r.answersHtml} />
+    <div data-el-slot="deadline" set:html={r.deadlineHtml} />
+    <div data-el-slot="next" set:html={r.nextHtml} />
     <div class="el-body" data-el-slot="body" set:html={r.bodyHtml} />
-  </ResultPanel>
+  </div>
 </div>
 
 <style is:global>
@@ -44,6 +45,134 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
      so its styles are global, scoped by the .el-result wrapper. */
   .el-result {
     min-inline-size: 0;
+  }
+  .el-panel,
+  .el-answers {
+    display: grid;
+    gap: var(--sp-5);
+    min-inline-size: 0;
+  }
+  .el-answers > *,
+  .el-panel > * {
+    min-inline-size: 0;
+  }
+  .el-panel [data-el-slot]:empty {
+    display: none;
+  }
+  /* the three answers (opening-view answersHtml): one card each, the figure first */
+  .ans {
+    display: grid;
+    gap: var(--sp-3);
+    min-inline-size: 0;
+  }
+  .ans-q {
+    display: grid;
+    gap: var(--sp-2);
+    min-inline-size: 0;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--line-strong);
+    border-inline-start: var(--rule-stop) solid var(--ink-3);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .ans-q > * {
+    min-inline-size: 0;
+  }
+  .ans--go {
+    border-inline-start-color: var(--clean);
+  }
+  .ans--dear {
+    border-inline-start-color: var(--exhaust);
+  }
+  .ans-q__q {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+  }
+  .ans-q__a {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .ans-q__n {
+    font-size: var(--fs-xl);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .ans-q__part {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .el-who,
+  .el-voice {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .el-voice {
+    font-weight: var(--fw-bold);
+  }
+  /* the working: each part folded under a title that says what it holds */
+  .el-folds {
+    display: grid;
+    gap: var(--tap-gap);
+    border-block-start: 1px solid var(--line);
+  }
+  .el-fold {
+    border-block-end: 1px solid var(--line);
+  }
+  .el-fold > .el-fold__sum {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-block-size: var(--tap);
+    padding-block: var(--sp-2);
+    list-style: none;
+    cursor: pointer;
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+  }
+  .el-fold > .el-fold__sum::-webkit-details-marker {
+    display: none;
+  }
+  .el-fold > .el-fold__sum::before {
+    content: '';
+    flex: none;
+    inline-size: 0.55em;
+    block-size: 0.55em;
+    margin-inline: 0.2em 0.3em;
+    border-inline-end: 2.5px solid currentColor;
+    border-block-end: 2.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .el-fold[open] > .el-fold__sum::before {
+    transform: rotate(45deg);
+  }
+  .el-fold__body {
+    display: grid;
+    gap: var(--sp-5);
+    padding-block: var(--sp-2) var(--sp-5);
+    min-inline-size: 0;
+  }
+  .el-fold__body > * {
+    min-inline-size: 0;
+  }
+  .el-next__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tap-gap) var(--sp-4);
+  }
+  .el-nextc {
+    display: grid;
+    gap: var(--sp-2);
+    padding-inline-start: 1.2em;
+  }
+  .el-nextc a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
   }
   .el-result .result__affix:empty,
   .el-result .result__affix:is(:empty) {
@@ -366,7 +495,7 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
     color: var(--ink-2);
     font-weight: var(--fw-regular);
   }
-  /* "?" opens the row's note; the visible circle is small, the tap area is 44px */
+  /* "?" opens the row's note; the visible circle is small, the tap area is 48 px (brief 6.3) */
   .el-note {
     position: relative;
     display: inline-grid;
@@ -388,7 +517,7 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
   .el-note::after {
     content: '';
     position: absolute;
-    inset: calc((1.6em - 44px) / 2);
+    inset: calc((1.6em - var(--tap)) / 2);
   }
   .el-note[aria-expanded='true'] {
     background: var(--ink);

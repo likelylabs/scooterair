@@ -1,107 +1,135 @@
-// Share cards (brief 7.9, 8.3): the words inside the generated images, and nowhere else.
-// One picture and one line per card. A card with an estimated number carries 推估 and its range
-// inside the image (the number itself is filled from src/data/estimate.ts). Tokens in {braces}
-// are filled by src/lib/share-cards.ts; never type a number here.
+// Share cards (brief 7.9, 8.3): the words on the generated images, their alt text, and the
+// title and one-sentence description a link preview prints under the image.
+//
+// A card is a poster seen at thumbnail size: one picture that fills it, one short headline
+// (Chinese: 10 characters or fewer; English: 6 words or fewer), the site name small, and the
+// small 示意圖 plate. No numbers on a card: the page carries the numbers, their 推估 marks and
+// their caveats. '|' marks where a headline may break.
 
 import { copy } from './_copy.ts';
 
 export default copy({
-  /** The default card (home page, /about/): the opening screen and the kerb estimate. */
-  home: {
-    kicker: { 'zh-TW': '一個紅燈', en: 'One red light' },
-    title: { 'zh-TW': '那個味道，|你也聞過', en: 'You know |that smell' },
-    line: { 'zh-TW': '這排機車多出來的一氧化碳', en: 'Carbon monoxide added by these scooters' },
-  },
-  /** The site's general card (/evidence/, /sources/, /questions/): the sentence to repeat. */
-  brief: {
-    kicker: { 'zh-TW': '等紅燈的時候', en: 'At the red light' },
-    title: { 'zh-TW': '排氣管離小孩|只有一兩步', en: 'The tailpipes are |a step or two from a child' },
-  },
-  /** /act/ */
-  act: {
-    kicker: { 'zh-TW': '我能做什麼', en: 'What I can do' },
-    title: { 'zh-TW': '不換車，|也有事可以做', en: 'Not switching yet? |There is still a lot to do' },
-    line: {
-      'zh-TW': '準時定檢、該修就修。口罩擋不住廢氣裡的氣體，別站在車陣正後方。',
-      en: 'Get inspected on time and fix what fails. A mask does not stop the gases in exhaust, so do not stand right behind the pack.',
-    },
-  },
-  /** /90/ (brief 8.3) */
-  film: {
-    kicker: { 'zh-TW': '短片', en: 'Film' },
-    title: { 'zh-TW': '一個紅燈', en: 'One red light' },
-    line: {
-      'zh-TW': '紅燈那 90 秒，一整排機車的廢氣就排在膝蓋的高度；換成電動的，那一層就沒有了。',
-      en: 'For ninety seconds of red, a whole row of scooters puts its exhaust out at knee height. Make them electric and that layer is gone.',
-    },
-    caveat: {
-      'zh-TW': '畫面是示意圖；多了多少，依本站推估，不是實測。',
-      en: 'The picture is an illustration. How much is added follows this site’s estimate, not a measurement.',
-    },
+  /** The headline on each card (src/lib/share-cards.ts maps card ids to these). */
+  title: {
+    home: { 'zh-TW': '那個味道，|你也聞過', en: 'You know |that smell' },
+    brief: { 'zh-TW': '排氣管|離小孩一兩步', en: 'A step or two |from children' },
+    act: { 'zh-TW': '不換車，|也有事可以做', en: 'What you |can do today' },
+    film: { 'zh-TW': '一個紅燈', en: 'One red light' },
+    money: { 'zh-TW': '換電動，|要花多少？', en: 'Going electric: |what does it cost?' },
+    smell: { 'zh-TW': '那個味道|是什麼？', en: 'What is |that smell?' },
+    'my-child': { 'zh-TW': '我的小孩呢？', en: 'What about |my child?' },
+    app: { 'zh-TW': 'App 為什麼|看不出來？', en: 'Why the air app |misses it' },
+    'one-red-light': { 'zh-TW': '等一個紅燈|有差嗎？', en: 'One red light. |Does it matter?' },
+    rider: { 'zh-TW': '騎車的人呢？', en: 'And the rider?' },
+    'beside-me': { 'zh-TW': '站遠一點|有用嗎？', en: 'Does stepping |back help?' },
+    mask: { 'zh-TW': '口罩擋得住|廢氣嗎？', en: 'Does a mask |stop exhaust?' },
+    'how-much': { 'zh-TW': '一排機車，|多了多少？', en: 'How much does |one row add?' },
   },
   /**
-   * /electric/ and the old /questions/electric/ address: the money card. One picture, one
-   * headline (the default case's result), one line (the least favourable case, so the
-   * unfavourable figure always travels with the favourable one), and the check date in small
-   * print. The kicker names the case the headline is for.
+   * What each picture shows, plainly, for the image's alt text (og:image:alt). Every one says
+   * it is an illustration.
    */
-  money: {
-    kicker: { 'zh-TW': '{county}・報廢出廠滿 10 年的機車', en: '{county} · scrapping a scooter 10+ years old' },
-    cheaper: { 'zh-TW': '換電動，|比燃油機車|少付 {amount}', en: 'Electric costs |{amount} less |than petrol' },
-    same: { 'zh-TW': '換電動，|和燃油機車|差不多錢', en: 'Electric costs |about the same |as petrol' },
-    dearer: { 'zh-TW': '換電動，|比燃油機車|多付 {amount}', en: 'Electric costs |{amount} more |than petrol' },
-    worst: { 'zh-TW': '挑最便宜的車，最不划算多付 {amount}。', en: 'Cheapest models, worst case: {amount} more.' },
-    best: { 'zh-TW': '我們算的每個縣市，電動機車都不比較貴。', en: 'In every place we worked out, electric costs no more.' },
-    caveat: { 'zh-TW': '價格和補助是 {date}查的。', en: 'Prices and subsidies checked {date}.' },
-  },
-  questionKicker: { 'zh-TW': '問題', en: 'Questions' },
-  /** The question pages (brief 7.5). Titles are the questions; the line is the one-sentence answer. */
-  questions: {
+  picture: {
+    kerb: {
+      'zh-TW': '示意圖：紅燈亮著，家長推著嬰兒車，小學生摀著口鼻，站在路邊。機車的排氣管離他們一兩步，排出的廢氣飄到他們身邊。',
+      en: 'Illustration: the light is red. A parent with a pushchair and a schoolchild covering her nose wait at the kerb. A scooter’s tailpipe is a step or two away, and its exhaust drifts around them.',
+    },
     smell: {
-      title: { 'zh-TW': '那個味道|是什麼？', en: 'What is |that smell?' },
-      line: { 'zh-TW': '臭的是沒燒完的汽油和刺鼻的醛類。一氧化碳和微粒沒有味道。', en: 'The smell is unburnt petrol and sharp aldehydes. Carbon monoxide and particles have no smell.' },
+      'zh-TW': '示意圖：小學生摀著口鼻，站在路邊，旁邊機車排出的廢氣飄過來。',
+      en: 'Illustration: a schoolchild at the kerb covers her nose as exhaust drifts over from the scooter beside her.',
     },
-    'my-child': {
-      title: { 'zh-TW': '我的小孩呢？', en: 'What about |my child?' },
-      line: {
-        'zh-TW': '排氣管和嬰兒車裡的寶寶，都不到一公尺高。照體重算，小孩吸進的空氣是大人的 {lo} 到 {hi} 倍。',
-        en: 'The tailpipe and a baby in a pushchair are both less than a metre off the ground. For their body weight, children breathe {lo} to {hi} times as much air as adults.',
-      },
+    child: {
+      'zh-TW': '示意圖：家長推著嬰兒車，停在機車排氣管旁邊。寶寶的臉和廢氣差不多高。',
+      en: 'Illustration: a parent stops a pushchair beside a scooter’s tailpipe. The baby’s face is at about the height of the exhaust.',
     },
-    app: {
-      title: { 'zh-TW': '空氣品質 App|為什麼|看不出來？', en: 'Why doesn’t |the air app show it?' },
-      line: {
-        'zh-TW': '測站的進氣口比人高，一小時才報一次；紅燈只有 {red} 秒，廢氣排在一公尺以下。',
-        en: 'Station inlets sit above head height and report once an hour; a red light lasts {red} seconds, and the exhaust comes out below a metre.',
-      },
+    station: {
+      'zh-TW': '示意圖：空氣品質測站的進氣口在高高的管子上；機車的廢氣在下面，在行人和嬰兒車的高度。',
+      en: 'Illustration: an air-quality station’s inlet sits high on a pipe; the scooters’ exhaust stays down low, around the people and the pushchair.',
     },
-    'one-red-light': {
-      title: { 'zh-TW': '等一個紅燈|有差嗎？', en: 'Does one red light |make a difference?' },
-      line: {
-        'zh-TW': '一個紅燈很短，可是天天都要等：一天等四個紅燈，一年就在路邊站了 {lo} 到 {hi} 小時。',
-        en: 'One red light is short, but you wait at one every day: four a day add up to {lo} to {hi} hours a year at the kerb.',
-      },
+    signal: {
+      'zh-TW': '示意圖：行人號誌是紅燈，倒數 {red} 秒。大人、小孩和長輩在路邊等，旁邊是一排機車。',
+      en: 'Illustration: the pedestrian signal is red, counting down from {red}. An adult, a child and an older woman wait at the kerb beside a row of scooters.',
     },
     rider: {
-      title: { 'zh-TW': '騎車的人呢？', en: 'And the rider?' },
-      line: { 'zh-TW': '騎車的人，也在這一團裡。這不是誰的錯，大家都在同一團廢氣裡。', en: 'The rider is in the cloud too. This is nobody’s fault: everyone at the junction is in the same cloud.' },
+      'zh-TW': '示意圖：兩台機車一前一後等紅燈。前面那台的廢氣，正對著後面騎車的人。',
+      en: 'Illustration: two scooters wait at the light, one behind the other. The exhaust of the one in front blows straight at the rider behind.',
     },
-    'beside-me': {
-      title: { 'zh-TW': '站遠一點|有用嗎？', en: 'Does standing back |help?' },
-      line: { 'zh-TW': '離排氣管遠一點，通常比較淡；差多少要看風，沒有準確的數字。', en: 'Further from the tailpipe it is usually thinner. How much depends on the wind; there is no exact figure.' },
+    distance: {
+      'zh-TW': '示意圖：一個大人牽著小孩，站得離機車遠一點；一位長輩站在排氣管旁邊。',
+      en: 'Illustration: an adult holding a child’s hand stands back from the scooters; an older woman stands next to a tailpipe.',
     },
     mask: {
-      title: { 'zh-TW': '口罩擋得住|廢氣嗎？', en: 'Does a mask |stop exhaust?' },
-      line: {
-        'zh-TW': '醫用口罩擋不住機車廢氣：一氧化碳和苯是氣體，一般口罩擋不住氣體。',
-        en: 'A surgical mask won’t stop scooter exhaust: carbon monoxide and benzene are gases, and ordinary masks do not stop gases.',
-      },
+      'zh-TW': '示意圖：一個戴醫用口罩的人。排氣管排出的氣體穿過口罩，一些微粒停在口罩上。',
+      en: 'Illustration: a person in a surgical mask. The gases from a tailpipe pass through the mask; some particles stop on it.',
     },
-    'how-much': {
-      title: { 'zh-TW': '旁邊停|一排機車，|路邊多多少？', en: 'How much does a row |of scooters add?' },
-      line: { 'zh-TW': '這排機車多出來的一氧化碳', en: 'Carbon monoxide added by these scooters' },
+    pack: {
+      'zh-TW': '示意圖：路邊停滿三排機車，廢氣飄到旁邊等紅燈的長輩、家長、嬰兒車和小學生身邊。',
+      en: 'Illustration: three rows of scooters fill the box, and their exhaust drifts around an older woman, a parent with a pushchair and a schoolchild waiting at the kerb.',
+    },
+    electric: {
+      'zh-TW': '示意圖：同一個路口，機車都換成電動的。行人號誌是綠燈，沒有排氣管的廢氣，只剩輪胎的粉塵，和遠處一台汽車的一點廢氣。',
+      en: 'Illustration: the same crossing with every scooter electric. The pedestrian light is green; there is no scooter exhaust, only a little tyre dust and a car’s exhaust at the far edge.',
+    },
+    fix: {
+      'zh-TW': '示意圖：一排機車等紅燈，其中一台沒保養好，排出的廢氣比旁邊的多很多。',
+      en: 'Illustration: a row of scooters at the light. One of them is badly kept, and puts out far more exhaust than the others.',
+    },
+    film: {
+      'zh-TW': '短片的畫面（示意圖）：紅燈倒數 {red} 秒，三排機車停在路邊的家長、嬰兒車和小學生旁邊；中間有播放鍵。',
+      en: 'A still from the film (illustration): the red light counts down from {red}, three rows of scooters beside a parent, a pushchair and a schoolchild; a play button in the middle.',
+    },
+    heights: {
+      'zh-TW': '示意圖：家長推著嬰兒車，旁邊是小學生和一台機車，一條虛線標出一公尺。排氣管和寶寶都在虛線下面。',
+      en: 'Illustration: a parent with a pushchair, a schoolchild and a scooter side by side, with a dashed line at one metre. The tailpipe and the baby are both below it.',
     },
   },
-  /** Shared words on the cards. */
-  alt: { 'zh-TW': '{title}{line}（圖上小字：{caveat}）{note}', en: '{title} {line} (Note on the card: {caveat}) {note}' },
+  /** The alt text: the headline, then the picture. */
+  alt: { 'zh-TW': '{title}{picture}', en: '{title} {picture}' },
+  /**
+   * The title and one-sentence description of a link to each page (og:title, og:description).
+   * A question page uses its own question and one-sentence answer instead.
+   */
+  og: {
+    home: {
+      title: { 'zh-TW': '等紅燈的時候，我們吸進了什麼', en: 'What we breathe at the red light' },
+      description: {
+        'zh-TW': '旁邊機車的廢氣有多少、對身體有什麼影響、換電動要多少錢，一張圖講一件事。',
+        en: 'What the scooters beside you add at a red light, what it does to the body and what going electric costs, one picture at a time.',
+      },
+    },
+    about: {
+      title: { 'zh-TW': '關於這個網站', en: 'About this site' },
+      description: { 'zh-TW': '誰做的、數字旁的標記是什麼意思、推估怎麼來的，還有修改紀錄。', en: 'Who made it, what the labels beside the numbers mean, where the estimate comes from, and the corrections log.' },
+    },
+    act: {
+      title: { 'zh-TW': '我能做什麼', en: 'What you can do' },
+      description: { 'zh-TW': '走路的人、家長、騎車的人、學校和民意代表，各自做得到的一件事，還有寫好的信。', en: 'One thing each for people who walk, parents, riders, schools and officials, with letters ready to send.' },
+    },
+    electric: {
+      title: { 'zh-TW': '換電動，要花多少？', en: 'What does going electric cost?' },
+      description: { 'zh-TW': '各縣市的補助、電費、電池月租和油錢，一行一行算給你看。', en: 'Subsidies in every city and county, plus charging, battery plans and petrol, worked out line by line.' },
+    },
+    estimate: {
+      title: { 'zh-TW': '一排機車，路邊多了多少？', en: 'How much does a row of scooters add?' },
+      description: { 'zh-TW': '本站的推估、一步一步的算法，和每個數字的出處。', en: 'Our estimate, the working step by step, and where every input comes from.' },
+    },
+    evidence: {
+      title: { 'zh-TW': '證據鏈，一環一環看', en: 'The chain, link by link' },
+      description: { 'zh-TW': '機車廢氣和路口行人之間的每一環：誰量了什麼，量到多少。', en: 'Every link between scooter exhaust and the people at the crossing: who measured what, and what they found.' },
+    },
+    sources: {
+      title: { 'zh-TW': '資料來源', en: 'Sources' },
+      description: { 'zh-TW': '網站用到的每一個來源，都有原文連結，和我們拿它來說明什麼。', en: 'Every source the site uses, with a link to the original and what we use it for.' },
+    },
+    questions: {
+      title: { 'zh-TW': '路口的七個問題', en: 'Seven questions at the crossing' },
+      description: { 'zh-TW': '那個味道是什麼、小孩呢、口罩擋得住嗎：每一題一張圖，一句話回答。', en: 'What the smell is, what about a child, whether a mask helps: one picture and one sentence each.' },
+    },
+    film: {
+      title: { 'zh-TW': '短片：一個紅燈', en: 'Film: one red light' },
+      description: { 'zh-TW': '一段動畫：機車停下來，廢氣排在膝蓋的高度；換成電動，那一層就沒有了。', en: 'An animation: the scooters stop and their exhaust comes out at knee height; make them electric and that layer is gone.' },
+    },
+  },
+  /** The small plate on every card. */
+  tag: { 'zh-TW': '示意圖', en: 'Illustration' },
 });

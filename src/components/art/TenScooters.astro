@@ -27,7 +27,7 @@ import type { Locale } from '@/i18n';
 import { art, fill } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
-import { air, type Box } from './air';
+import { air, type Box, AIR_KEY } from './air';
 import { artId, scooter } from './parts';
 import { pickSources, put, tailOf, type Placed } from './kit';
 
@@ -37,8 +37,10 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, fixed = false, tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, fixed = false, tag = false, id, class: cls } = Astro.props;
 
 const TOTAL = 10;
 const VB: Box = { x: 0, y: -700, w: 1310, h: 870 };
@@ -90,6 +92,6 @@ const alt =
   fill(art.ten.alt, locale, { total: TOTAL, rest: TOTAL - 1, rings: allRings, big: bigRings, fix: art.ten.fix[locale] }) + (locale === 'en' ? ' ' : '') + art.alt2.plain[locale];
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} id={id} class={['scene--ten', cls].filter(Boolean).join(' ')} data-fixed={fixed ? '' : undefined} data-rings={allRings} data-big-rings={bigRings}>
+<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} id={id} class={['scene--ten', cls].filter(Boolean).join(' ')} data-fixed={fixed ? '' : undefined} data-rings={allRings} data-big-rings={bigRings}>
   <Fragment set:html={scene} />
 </SceneFrame>

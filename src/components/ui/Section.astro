@@ -15,7 +15,10 @@
  *   rule     draw a stop-line rule across the top of the section
  *   fold     the title becomes the summary of a closed <details> holding the lead and the
  *            content: a long reference block a reader opens on purpose. A link to the
- *            section's id (or to anything inside it) opens it.
+ *            section's id (or to anything inside it) opens it. The id then sits on an empty
+ *            anchor inside the <details>, not on the <section>: a browser opens a closed
+ *            <details> by itself only when the link's target is inside it, so this works
+ *            without JavaScript too.
  * Slots
  *   default  the content
  *   head     replaces the generated head entirely
@@ -39,9 +42,10 @@ const { id, tone = 'default', width = 'page', eyebrow, title, lead, level = 2, p
 const H = `h${level}` as 'h2' | 'h3';
 const titleId = id && title ? `${id}-title` : undefined;
 const container = width === 'page' ? 'container' : `container container--${width}`;
+const folded = fold && !!title;
 ---
 
-<section id={id} class:list={['section', `section--pad-${pad}`, tone !== 'default' && `tone-${tone}`, cls]} aria-labelledby={titleId}>
+<section id={folded ? undefined : id} class:list={['section', `section--pad-${pad}`, tone !== 'default' && `tone-${tone}`, cls]} aria-labelledby={titleId}>
   <div class={container}>
     {rule && <hr class="stopline section__rule" />}
     {fold && title ? (
@@ -50,6 +54,7 @@ const container = width === 'page' ? 'container' : `container container--${width
           <H id={titleId} class="section__title"><Phrased text={title} /></H>
           <svg class="section__chev" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
         </summary>
+        {id && <div id={id} class="section__anchor" data-section-anchor></div>}
         {lead && <p class="lead">{lead}</p>}
         <slot />
       </details>
@@ -100,16 +105,7 @@ const container = width === 'page' ? 'container' : `container container--${width
   };
   openFor(location.hash, true);
   addEventListener('hashchange', () => openFor(location.hash));
-  // printing from the browser prints what is folded too; the folds close again afterwards
-  let printed: HTMLDetailsElement[] = [];
-  addEventListener('beforeprint', () => {
-    printed = [...document.querySelectorAll<HTMLDetailsElement>('main details:not([open])')];
-    printed.forEach((d) => (d.open = true));
-  });
-  addEventListener('afterprint', () => {
-    printed.forEach((d) => (d.open = false));
-    printed = [];
-  });
+  // printing opens every fold: the shell does it for every page (Header.astro)
   document.addEventListener('click', (e) => {
     const a = (e.target as Element | null)?.closest?.('a[href*="#"]') as HTMLAnchorElement | null;
     if (a && a.pathname === location.pathname && a.hash) openFor(a.hash);
@@ -122,6 +118,11 @@ const container = width === 'page' ? 'container' : `container container--${width
   }
   .section--pad-tight {
     padding-block: calc(var(--section-y) / 2);
+  }
+  /* a folded section's anchor lands with the fold's title in view, below the site bar */
+  .section__anchor {
+    display: block;
+    scroll-margin-block-start: calc(var(--header-h, 3.5rem) + 5.5rem);
   }
   .section__rule {
     margin-block-end: var(--sp-5);

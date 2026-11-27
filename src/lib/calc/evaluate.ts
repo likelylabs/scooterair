@@ -52,10 +52,10 @@ function checkDate(out: InputIssue[], field: string, v: unknown, allowMonth = fa
 export function validateSituation(input: Partial<Situation>, data: EconDataset, opts: { requireModels?: boolean } = {}): InputIssue[] {
   const out: InputIssue[] = [];
   const requireModels = opts.requireModels ?? true;
-  if (!input || typeof input !== 'object') return [issue('situation', 'missing', '缺少試算條件', 'the situation is missing')];
+  if (!input || typeof input !== 'object') return [issue('situation', 'missing', '缺少計算條件', 'the situation is missing')];
   if (!input.jurisdiction || !data.jurisdictions[input.jurisdiction]) out.push(issue('jurisdiction', 'unknown-id', `不認得的縣市「${String(input.jurisdiction)}」`, `unknown jurisdiction "${String(input.jurisdiction)}"`));
   checkNumber(out, 'monthlyKm', input.monthlyKm, { minExclusive: 0, max: MAX_MONTHLY_KM }, ['每個月大約騎幾公里', 'The distance you ride a month']);
-  if (input.horizonMonths !== undefined) checkNumber(out, 'horizonMonths', input.horizonMonths, { min: 1, max: MAX_HORIZON, integer: true }, ['試算月數', 'The number of months to work out']);
+  if (input.horizonMonths !== undefined) checkNumber(out, 'horizonMonths', input.horizonMonths, { min: 1, max: MAX_HORIZON, integer: true }, ['計算月數', 'The number of months to work out']);
   if (input.offWindowShare !== undefined) checkNumber(out, 'offWindowShare', input.offWindowShare, { min: 0, max: 1 }, ['免費時段外換電的比例', 'The share of swaps outside the free windows']);
   if (input.date !== undefined) {
     try {
@@ -90,14 +90,14 @@ export function validateSituation(input: Partial<Situation>, data: EconDataset, 
   }
   const gas = data.gasModels.find((m) => m.id === input.gasolineModel);
   if (!gas) out.push(issue('gasolineModel', 'unknown-id', `不認得的燃油機車款「${String(input.gasolineModel)}」`, `Unknown model or plan: gasoline model "${String(input.gasolineModel)}"`));
-  else if (gas.calculator !== true) out.push(issue('gasolineModel', 'unknown-id', `「${gas.id}」不在試算中：${gas.calculator.excluded['zh-TW']}`, `Model "${gas.id}" is not available in the calculator: ${gas.calculator.excluded.en}`));
+  else if (gas.calculator !== true) out.push(issue('gasolineModel', 'unknown-id', `「${gas.id}」不在計算中：${gas.calculator.excluded['zh-TW']}`, `Model "${gas.id}" is not available in the calculator: ${gas.calculator.excluded.en}`));
   if (requireModels) {
     const ev = data.evModels.find((m) => m.id === input.electricModel);
     const plan = data.plans.find((p) => p.id === input.energyPlan);
     if (!ev) out.push(issue('electricModel', 'unknown-id', `不認得的電動車款「${String(input.electricModel)}」`, `Unknown model or plan: electric model "${String(input.electricModel)}"`));
-    else if (ev.calculator !== true) out.push(issue('electricModel', 'unknown-id', `「${ev.id}」不在試算中：${ev.calculator.excluded['zh-TW']}`, `Model "${ev.id}" is not available in the calculator: ${ev.calculator.excluded.en}`));
+    else if (ev.calculator !== true) out.push(issue('electricModel', 'unknown-id', `「${ev.id}」不在計算中：${ev.calculator.excluded['zh-TW']}`, `Model "${ev.id}" is not available in the calculator: ${ev.calculator.excluded.en}`));
     if (!plan) out.push(issue('energyPlan', 'unknown-id', `不認得的方案「${String(input.energyPlan)}」`, `Unknown model or plan: energy plan "${String(input.energyPlan)}"`));
-    else if (plan.calculator !== true) out.push(issue('energyPlan', 'unknown-id', `方案「${plan.id}」不在試算中`, `Plan "${plan.id}" is not available in the calculator`));
+    else if (plan.calculator !== true) out.push(issue('energyPlan', 'unknown-id', `方案「${plan.id}」不在計算中`, `Plan "${plan.id}" is not available in the calculator`));
     else if (ev && !ev.plans.includes(plan.id)) out.push(issue('energyPlan', 'unknown-id', `方案「${plan.id}」不適用車款「${ev.id}」`, `Plan "${plan.id}" does not fit model "${ev.id}"`));
   }
   return out;
@@ -122,11 +122,14 @@ function prepare(input: Situation, data: EconDataset): Evaluation['situation'] {
 
 function likeForLike(ev: EvModel, gas: GasModel): Comparison['likeForLike'] {
   if (ev.plateClass !== 'heavy' || ev.comparableTo125 === 'no') {
+    // short sentences; the class sentence is left out when the performance text already says it
+    const saysZh = ev.performance.text['zh-TW'].includes('不是同一級');
+    const saysEn = ev.performance.text.en.includes('like-for-like');
     return {
       verdict: 'different-class',
       note: t(
-        `${ev.name['zh-TW']}：${ev.performance.text['zh-TW']}和${gas.displacementCc}cc燃油機車比價時，比的不是同級車；價差較小，部分原因是買的車比較小。`,
-        `${ev.name.en}: ${ev.performance.text.en} Against a ${gas.displacementCc}cc petrol scooter this is not a like-for-like comparison; part of any price advantage comes from buying a smaller vehicle.`,
+        `${ev.name['zh-TW']}：${ev.performance.text['zh-TW']}${saysZh ? '' : `它和 ${gas.displacementCc}cc 燃油機車不是同一級的車。`}如果電動機車比較便宜，有一部分是因為買的車比較小。`,
+        `${ev.name.en}: ${ev.performance.text.en}${saysEn ? '' : ` It is not a like-for-like comparison with a ${gas.displacementCc}cc petrol scooter.`} Part of any price advantage comes from buying a smaller vehicle.`,
       ),
     };
   }
@@ -289,7 +292,7 @@ function buildMessages(c: Ctx): Message[] {
       severity: 'critical',
       text: join(
         t(
-          `2026 年的電動機車補助已在 ${date(data.meta.programmeYearEnd)['zh-TW']}結束。資料最後查證日（${date(data.meta.checkedOn)['zh-TW']}）時，尚未有 2027 年方案獲得確認，所以試算不列入任何 2027 年補助。`,
+          `2026 年的電動機車補助已在 ${date(data.meta.programmeYearEnd)['zh-TW']}結束。資料最後查證日（${date(data.meta.checkedOn)['zh-TW']}）時，尚未有 2027 年方案獲得確認，所以計算不列入任何 2027 年補助。`,
           `The 2026 electric scooter subsidies ended on ${date(data.meta.programmeYearEnd).en}. When the data was last checked (${date(data.meta.checkedOn).en}) no 2027 programme had been confirmed, so no 2027 subsidy is counted.`,
         ),
         data.meta.nextYear,
@@ -318,8 +321,8 @@ function buildMessages(c: Ctx): Message[] {
       severity: 'warning',
       text: join(
         ended
-          ? t(`${jur.name['zh-TW']}的地方補助未能查證；2026 年方案結束後，試算不計任何補助。`, `${jur.name.en}'s local subsidy could not be verified; after the 2026 programmes ended no subsidy is counted.`)
-          : t(`${jur.name['zh-TW']}的地方補助未能查證，試算只計中央補助。`, `${jur.name.en}'s local subsidy could not be verified, so only central money is counted.`),
+          ? t(`${jur.name['zh-TW']}的地方補助沒有查證到；2026 年方案結束後，計算不計任何補助。`, `${jur.name.en}'s local subsidy could not be verified; after the 2026 programmes ended no subsidy is counted.`)
+          : t(`${jur.name['zh-TW']}的地方補助沒有查證到，計算只計中央補助。`, `${jur.name.en}'s local subsidy could not be verified, so only central money is counted.`),
         jur.statusNote,
       ),
       links: jur.officialLinks,
@@ -622,7 +625,7 @@ function buildMessages(c: Ctx): Message[] {
         text: sided(
           side,
           t(
-            `${pu.label['zh-TW']}（${ntd(pu.amount)['zh-TW']}）沒有寫明是否須汰舊，沒有機車可報廢時試算不計入；若車行不要求汰舊，實付約${ntd(now - pu.amount)['zh-TW']}，不是${ntd(now)['zh-TW']}。請先問車行。`,
+            `${pu.label['zh-TW']}（${ntd(pu.amount)['zh-TW']}）沒有寫明是否須汰舊，沒有機車可報廢時計算不計入；若車行不要求汰舊，實付約${ntd(now - pu.amount)['zh-TW']}，不是${ntd(now)['zh-TW']}。請先問車行。`,
             `${pu.label.en} (${ntd(pu.amount).en}) does not say whether it needs scrapping, so with nothing to scrap it is not counted; if the dealer grants it without scrapping you would pay about ${ntd(now - pu.amount).en}, not ${ntd(now).en}. Ask the dealer.`,
           ),
         ),
@@ -664,7 +667,7 @@ function buildMessages(c: Ctx): Message[] {
     push({
       code: 'ambiguity',
       severity: 'info',
-      text: t('經濟部國產電池芯加碼3,000元確實存在，但查不到任何車款被列為符合（Gogoro自己的補助試算也沒有這一項），試算不計入；除非車行書面確認，不要指望這筆錢。', 'The MOEA NT$3,000 Taiwan-made cell bonus exists, but no model could be shown to qualify (Gogoro\'s own calculator does not include it), so it is not counted; do not rely on it unless the dealer confirms in writing.'),
+      text: t('經濟部國產電池芯加碼3,000元確實存在，但查不到任何車款被列為符合（Gogoro自己的補助計算也沒有這一項），計算不計入；除非車行書面確認，不要指望這筆錢。', 'The MOEA NT$3,000 Taiwan-made cell bonus exists, but no model could be shown to qualify (Gogoro\'s own calculator does not include it), so it is not counted; do not rely on it unless the dealer confirms in writing.'),
       amount: 3000,
       about: ['moea-domestic-cells'],
       sources: ['meid-lev-subsidy-portal'],
@@ -676,7 +679,7 @@ function buildMessages(c: Ctx): Message[] {
   if (plan.usage.kind === 'time-window') {
     assumptions.push(
       t(
-        `${plan.name['zh-TW']}的中間估計假設${Math.round(s.offWindowShare * 100)}%的換電在免費時段外（沒有資料顯示一般騎士的比例）；低估計假設全部在免費時段內，高估計假設全部在時段外`,
+        `${plan.name['zh-TW']}的中間值假設${Math.round(s.offWindowShare * 100)}%的換電在免費時段外（沒有資料顯示一般騎士的比例）；低值假設全部在免費時段內，高值假設全部在時段外`,
         `The middle estimate for ${plan.name.en} assumes ${Math.round(s.offWindowShare * 100)}% of swaps are outside the free windows (no data shows what is typical); the low estimate assumes all are inside, the high estimate that all are outside`,
       ),
     );
@@ -694,7 +697,7 @@ function buildMessages(c: Ctx): Message[] {
   if (gasP.ledger.listPrice.confidence === 'secondary') secondary.push(t(`${gas.name['zh-TW']}售價或牌險扣除`, `${gas.name.en} price or plate-insurance adjustment`));
   if (plan.setupFee?.confidence === 'secondary') secondary.push(t(`${plan.name['zh-TW']}設定費`, `${plan.name.en} setup fee`));
   if (plan.confidence === 'secondary') secondary.push(plan.name);
-  secondary.push(t('保養費估計', 'maintenance estimates'), t('實際油耗下限（每公升45公里）', 'real-world fuel economy (45 km/L)'), t('強制險金額（兩邊相同）', 'compulsory insurance (same on both sides)'));
+  secondary.push(t('保養費的推算', 'maintenance estimates'), t('實際油耗下限（每公升45公里）', 'real-world fuel economy (45 km/L)'), t('強制險金額（兩邊相同）', 'compulsory insurance (same on both sides)'));
   secondary.push(...secondaryStacked);
   for (const l of lines) if (l.confidence === 'secondary') secondary.push(l.label);
   push({
@@ -719,7 +722,7 @@ function buildMessages(c: Ctx): Message[] {
     text: join(
       smoothingOver ? (data.fuel.smoothing.mechanismAfterEnd ?? data.fuel.smoothing.mechanism) : data.fuel.smoothing.mechanism,
       t(
-        `以每月${n(s.monthlyKm)}公里計，這台燃油機車每月油錢約${ntd(fuelNow)['zh-TW']}；如果這項壓低油價的措施結束（每公升多${data.fuel.smoothing.typical}元），每個月要多花約${ntd(fuelDelta)['zh-TW']}，結果會是：${be(comparison.withoutSmoothing.breakEven)['zh-TW']}（${smoothingOver ? '以查證時的油價計' : '現在'}：${be(comparison.breakEven)['zh-TW']}）。`,
+        `以每月${n(s.monthlyKm)}公里計，這輛燃油機車每月油錢約${ntd(fuelNow)['zh-TW']}；如果這項壓低油價的措施結束（每公升多${data.fuel.smoothing.typical}元），每個月要多花約${ntd(fuelDelta)['zh-TW']}，結果會是：${be(comparison.withoutSmoothing.breakEven)['zh-TW']}（${smoothingOver ? '以查證時的油價計' : '現在'}：${be(comparison.breakEven)['zh-TW']}）。`,
         `At ${n(s.monthlyKm)} km a month this petrol scooter uses about ${ntd(fuelNow).en} of fuel. If this help with the pump price ended (NT$${data.fuel.smoothing.typical} more a litre), it would cost about ${ntd(fuelDelta).en} more a month, and the result would be: ${be(comparison.withoutSmoothing.breakEven).en} (${smoothingOver ? 'at the price we checked' : 'now'}: ${be(comparison.breakEven).en}).`,
       ),
     ),
@@ -759,7 +762,7 @@ function buildMessages(c: Ctx): Message[] {
       code: 'dealer-promo-expired',
       severity: 'warning',
       text: t(
-        `車廠優惠已結束：${names(promoGone)['zh-TW']}。之後的優惠在資料查證時尚未公布，試算以建議售價計算，門市實際價格可能較低。`,
+        `車廠優惠已結束：${names(promoGone)['zh-TW']}。之後的優惠在資料查證時尚未公布，計算以建議售價計算，門市實際價格可能較低。`,
         `Manufacturer offers have ended: ${names(promoGone).en}. Later offers had not been published when the data was checked, so the list price is used; the shop price may be lower.`,
       ),
       about: promoGone.map((x) => x.id),
@@ -788,7 +791,7 @@ function buildMessages(c: Ctx): Message[] {
         code: 'plan-lock-in',
         severity: 'warning',
         text: t(
-          `以每月${n(s.monthlyKm)}公里估計約用${n(units)}安時，接近或超過${plan.name['zh-TW']}的${n(plan.usage.fairUseUnits)}安時商業使用門檻，可能被要求改用其他方案。`,
+          `以每月${n(s.monthlyKm)}公里大約用${n(units)}安時，接近或超過${plan.name['zh-TW']}的${n(plan.usage.fairUseUnits)}安時商業使用門檻，可能被要求改用其他方案。`,
           `At ${n(s.monthlyKm)} km a month you would use about ${n(units)} Ah, close to or above the ${n(plan.usage.fairUseUnits)} Ah commercial-use threshold of ${plan.name.en}; you may be moved to another plan.`,
         ),
         sources: plan.sources,
@@ -1048,7 +1051,7 @@ function rankResults(base: Omit<Situation, 'electricModel' | 'energyPlan'>, done
       severity: 'warning',
       text: closestSame
         ? t(
-            `沒有任何選項經查證是125cc燃油機車的同級替代品。同屬白牌、最接近打平的是${closestSame.modelName['zh-TW']}，但它的性能是否相當未能查證。`,
+            `沒有任何選項經查證是125cc燃油機車的同級替代品。同屬白牌、最接近打平的是${closestSame.modelName['zh-TW']}，但它的性能是否相當沒有查證到。`,
             `No option is verified as a like-for-like substitute for a 125cc petrol scooter. The closest white-plate option is ${closestSame.modelName.en}, but whether its performance is equivalent is not verified.`,
           )
         : t('沒有任何選項經查證是125cc燃油機車的同級替代品，也沒有同屬白牌的選項。', 'No option is verified as a like-for-like substitute for a 125cc petrol scooter, and none is in the same white-plate class.'),

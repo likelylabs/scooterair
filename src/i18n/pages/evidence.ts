@@ -8,8 +8,8 @@ export default copy({
   meta: {
     title: { 'zh-TW': '證據鏈，一環一環看', en: 'The chain, link by link' },
     description: {
-      'zh-TW': '機車廢氣和路口行人之間的每一環：誰量了什麼、量到多少、證據是哪一種、這一項沒有說什麼，以及本站自己推估的部分。',
-      en: 'Every link between scooter exhaust and the people at the crossing: who measured what, what they found, what kind of evidence it is, what each item does not show, and which parts are this site’s own estimate.',
+      'zh-TW': '機車廢氣和路口行人之間的每一環。誰量了什麼、量到多少、證據是哪一種、沒有說什麼。還有本站自己推估的部分。',
+      en: 'Every link between scooter exhaust and the people at the crossing. Who measured what, what they found, what kind of evidence it is, what each item does not show, and which parts are this site’s own estimate.',
     },
   },
 
@@ -17,7 +17,7 @@ export default copy({
     kicker: { 'zh-TW': '證據', en: 'Evidence' },
     title: { 'zh-TW': '證據鏈，|一環一環看', en: 'The chain, |link by link' },
     lead: {
-      'zh-TW': '想查證的人看這一頁。網站上每個有出處的數字都在這裡：誰做的、怎麼做的、是哪一種證據，還有它沒有說什麼。',
+      'zh-TW': '想查證的人看這一頁。網站上每個有出處的數字都在這裡。誰做的、怎麼做的、是哪一種證據，還有它沒有說什麼。',
       en: 'This page is for anyone who wants to check our work. Every sourced figure on the site is here: who produced it, how, what kind of evidence it is, and what it does not show.',
     },
     estimate: { 'zh-TW': '本站的推估怎麼算的', en: 'How our estimate was worked out' },
@@ -39,8 +39,8 @@ export default copy({
   howTo: {
     title: { 'zh-TW': '怎麼讀這一頁', en: 'How to read this page' },
     body: {
-      'zh-TW': '每一環先講一句話，再放一個重要的數字和一張圖。想看更多，按「看這一環的細節」：裡面有常見問題的答案、證據表和出處。證據表每一列都寫著：我們說什麼、數字、誰做的、哪一種證據，還有它沒有說什麼。每一列都有自己的連結，可以分享。數字旁邊的小標籤，說它是哪一種：',
-      en: 'Each link starts with one sentence, then one key number and one chart. For more, press “See the detail for this link”: inside are answers to common questions, the table of evidence and the sources. Each row of the table says what we say, the number, who did it, what kind of evidence it is, and what it does not show. Every row has its own link you can share. The small label beside a number says what kind it is:',
+      'zh-TW': '每一環先講一句話，再放一個重要的數字和一張圖。想看更多，按「看這一環的細節」。裡面有常見問題的答案、證據表和出處。證據表每一列都寫著：我們說什麼、數字、誰做的、哪一種證據，還有它沒有說什麼。每一列都有自己的連結，可以分享。數字旁邊的小標籤，說它是哪一種：',
+      en: 'Each link starts with one sentence, then one key number and one chart. For more, press “See the detail for this link”. Inside are answers to common questions, the table of evidence and the sources. Each row of the table says what we say, the number, who did it, what kind of evidence it is, and what it does not show. Every row has its own link you can share. The small label beside a number says what kind it is:',
     },
   },
 
@@ -176,8 +176,8 @@ export default copy({
     },
     rulerLabel: { 'zh-TW': '注意這把尺', en: 'Mind the ruler' },
     ruler: {
-      'zh-TW': '這一環的台灣健康研究，看到的是「有關」，不是「造成」，我們也不會寫成「造成」。說到「造成」的，是國際機構的整理：HEI 認為交通污染會讓兒童氣喘惡化，美國胸腔學會認為長期的空氣污染是兒童氣喘的病因之一，美國心臟學會認為證據符合 PM2.5 引發心血管疾病的因果解釋。它們講的是一般的交通或空氣污染，時間從幾小時到好幾年，不是機車，也不是一個紅燈。這一環沒有任何一項健康研究把機車廢氣單獨分出來；量的是整體車流的污染，或所有來源的 PM2.5。而 PM2.5 粉塵，正是第 1 環說機車排得很少的那一種。',
-      en: 'The Taiwanese health studies in this link show association, not cause, and we do not write them up as cause. Where cause is stated, it is by international bodies: HEI found sufficient evidence that traffic pollution makes children’s asthma worse, the American Thoracic Society concluded that long-term air pollution is a cause of childhood asthma, and the American Heart Association found the evidence consistent with PM2.5 causing cardiovascular disease. They mean traffic or air pollution in general, over hours to years: not scooters, and not one red light. Not one health study in this link isolates scooter exhaust; they measured traffic pollution as a whole, or PM2.5 from all sources. PM2.5 dust is the pollutant Link 1 found scooters emit little of.',
+      'zh-TW': '這一環的台灣健康研究，看到的是「有關」，不是「造成」；我們也不會寫成「造成」。說到「造成」的，是國際機構的整理。HEI 認為，交通污染會讓小孩的氣喘惡化。美國胸腔學會認為，長年的空氣污染是小孩氣喘的病因之一。美國心臟學會認為，證據符合 PM2.5 引發心血管疾病的因果解釋。它們講的是一般的交通或空氣污染，時間從幾小時到好幾年。講的不是機車，也不是一個紅燈。這一環沒有任何一項健康研究，把機車廢氣單獨分出來。它們量的是整體車流的污染，或所有來源的 PM2.5。而 PM2.5 微粒，正是第 1 環說機車排得很少的那一種。',
+      en: 'The Taiwanese health studies in this link show association, not cause, and we do not write them up as cause. Where cause is stated, it is by international bodies. HEI found sufficient evidence that traffic pollution makes children’s asthma worse. The American Thoracic Society concluded that long-term air pollution is a cause of childhood asthma. The American Heart Association found the evidence consistent with PM2.5 causing cardiovascular disease. They mean traffic or air pollution in general, over hours to years: not scooters, and not one red light. Not one health study in this link isolates scooter exhaust. They measured traffic pollution as a whole, or PM2.5 from all sources. PM2.5 particles are the pollutant Link 1 found scooters emit little of.',
     },
   },
 
@@ -191,8 +191,8 @@ export default copy({
     },
     chartTitle: { 'zh-TW': '燃油機車排放量占比的長條圖，每一條從 0 到 100%', en: 'Bar chart of petrol scooters’ emission shares, each from 0 to 100%' },
     desc: {
-      'zh-TW': '每一種污染物一條，從 0 到 100%。PM2.5 和 PM10 的機車段很細，一氧化碳和碳氫化合物的機車段比較寬，沒有一條過半。',
-      en: 'One bar per pollutant, from 0 to 100%. The scooter segment is a sliver for PM2.5 and PM10, wider for carbon monoxide and hydrocarbons, and nowhere a majority.',
+      'zh-TW': '每一種污染物一條，從 0 到 100%。PM2.5 和 PM10 的機車段很細。一氧化碳和碳氫化合物（大多是油氣）的機車段比較寬。沒有一條過半。',
+      en: 'One bar per pollutant, from 0 to 100%. The scooter segment is a sliver for PM2.5 and PM10. It is wider for carbon monoxide and hydrocarbons (mostly fuel vapour). It is nowhere a majority.',
     },
   },
   v34: {
@@ -207,16 +207,16 @@ export default copy({
   },
   v20: {
     title: { 'zh-TW': '台北一座隧道裡，|機車的一氧化碳', en: 'In one Taipei tunnel: |scooters’ carbon monoxide' },
-    subtitle: { 'zh-TW': '迴歸估計的排放係數，兩種算法並排', en: 'Regression estimates of emission factors, two ways of counting side by side' },
+    subtitle: { 'zh-TW': '用統計方法推估的排放係數，兩種算法並排', en: 'Regression estimates of emission factors, two ways of counting side by side' },
     perKm: { 'zh-TW': '每公里（克）', en: 'Per kilometre (grams)' },
     perKg: { 'zh-TW': '每公斤燃料（公斤）', en: 'Per kilogram of fuel (kilograms)' },
     caption: {
-      'zh-TW': '每公里的比較放在前面，因為它比較不會誇大。一座台北隧道，量的是行駛中的車流，不是停著等紅燈的車；同一座隧道的粉塵主要來自大型車。',
-      en: 'The per-kilometre comparison comes first because it flatters the case less. One Taipei tunnel, moving traffic, not vehicles stopped at a light; the dust in the same tunnel came mainly from heavy vehicles.',
+      'zh-TW': '每公里的比較放在前面，因為它比較不會誇大。這是一座台北隧道，量的是行駛中的車流，不是停著等紅燈的車。同一座隧道的微粒，主要來自大型車。',
+      en: 'The per-kilometre comparison comes first because it flatters the case less. One Taipei tunnel, moving traffic, not vehicles stopped at a light. The particles in the same tunnel came mainly from heavy vehicles.',
     },
   },
   v21: {
-    title: { 'zh-TW': '二行程退場、標準加嚴之後：|機車的苯 {benzene}，碳氫化合物 {hc}', en: 'As two-strokes left the road and standards tightened: |scooter benzene {benzene}, hydrocarbons {hc}' },
+    title: { 'zh-TW': '二行程退場、標準加嚴之後：|機車的苯 {benzene}，油氣這類碳氫 {hc}', en: 'As two-strokes left the road and standards tightened: |scooter benzene {benzene}, fuel vapour and similar gases {hc}' },
     subtitle: { 'zh-TW': '推估的排放量（公噸／年），依車種，時間軸照實際年份畫', en: 'Estimated emissions (tonnes a year) by vehicle class, on a true time axis' },
     caption: {
       'zh-TW': '這是推估的排放量，不是量到的空氣。只有四個年度。交通排的苯，汽油車比機車多。',
@@ -228,8 +228,8 @@ export default copy({
     low: { 'zh-TW': '低里程', en: 'Low mileage' },
     high: { 'zh-TW': '高里程', en: 'High mileage' },
     caption: {
-      'zh-TW': '這是實驗室裡的少數車，不是路上所有機車的平均。外框的長條，代表研究自己說差別在統計上不顯著。',
-      en: 'A small number of machines in a laboratory, not an average of the fleet on the road. An outlined bar means the study itself found the difference not statistically significant.',
+      'zh-TW': '這是實驗室裡的少數車，不是路上所有機車的平均。外框的長條，代表研究自己說：差別可能只是巧合（統計上不顯著）。',
+      en: 'A small number of machines in a laboratory, not an average of the fleet on the road. An outlined bar means the study itself found the difference could be chance (not statistically significant).',
     },
   },
   casePanel: {
@@ -237,26 +237,26 @@ export default copy({
     chartSub: { 'zh-TW': '第四期是第七期的幾倍（最多）', en: 'Phase 4 as a multiple of Phase 7 (up to)' },
     title: { 'zh-TW': '三台車的個案，|不是路上機車的平均', en: 'A case study of three scooters, |not a fleet average' },
     lead: {
-      'zh-TW': '這個數字常被拿來說「老車髒很多倍」。它只來自三台車，所以我們把它放在這個框裡，不和其他證據混在一起，也不放在首頁。',
+      'zh-TW': '這個數字常被拿來說「老車髒很多倍」。它只來自三台車。所以我們把它放在這個框裡，不和其他證據混在一起，也不放在首頁。',
       en: 'This figure is often used to say older scooters are many times dirtier. It comes from three scooters, so we keep it in this panel, apart from the other evidence and off the home page.',
     },
   },
   v23: {
     title: { 'zh-TW': '定檢的排氣上限，|依出廠時間', en: 'Inspection limits |by build date' },
-    subtitle: { 'zh-TW': '排氣管口的法定上限：一氧化碳（%）與碳氫化合物（ppm）', en: 'Legal limits at the tailpipe: carbon monoxide (%) and hydrocarbons (ppm)' },
+    subtitle: { 'zh-TW': '排氣管口的法定上限：一氧化碳（%）和沒燒完的油氣（碳氫化合物，ppm）', en: 'Legal limits at the tailpipe: carbon monoxide (%) and unburnt fuel vapour (hydrocarbons, ppm)' },
     caption: {
-      'zh-TW': '這是排氣管口的法定上限，不是實際排放，也不是空氣裡的濃度。',
-      en: 'These are legal limits at the tailpipe, not actual emissions and not concentrations in the air.',
+      'zh-TW': '這是排氣管口的法定上限，不是實際排放，也不是空氣裡有多少。',
+      en: 'These are legal limits at the tailpipe, not actual emissions and not how much is in the air.',
     },
   },
   v24: {
     title: { 'zh-TW': '{total} 台被通知定檢的四行程機車', en: '{total} four-stroke scooters notified for inspection' },
-    subtitle: { 'zh-TW': '每一格是一台；空心的是沒有來的', en: 'One cell is one scooter; hollow cells did not come' },
+    subtitle: { 'zh-TW': '每一格是一輛；空心的是沒有來的', en: 'One cell is one scooter; hollow cells did not come' },
     caption: { 'zh-TW': '沒有來的那些，排多少不在統計裡。', en: 'What the ones that did not come emit is not in the figures.' },
   },
   v25: {
     title: { 'zh-TW': '測站跟得上 PM2.5，|跟不上苯這一類', en: 'Stations track PM2.5, |not the benzene family' },
-    subtitle: { 'zh-TW': '通勤的人身上的讀數，跟最近的測站跟得多緊（0 是完全跟不上，1 是完全跟得上）', en: 'Range of correlation between commuters’ readings and the nearest station (−1 to 1)' },
+    subtitle: { 'zh-TW': '通勤的人身上的讀數，跟最近的測站跟得多緊。0 是完全跟不上，1 是完全跟得上。', en: 'Range of correlation between commuters’ readings and the nearest station (−1 to 1)' },
     zero: { 'zh-TW': '0：完全跟不上', en: '0: no relation' },
     one: { 'zh-TW': '1：完全跟得上', en: '1: perfect' },
     caption: { 'zh-TW': '量的是台北騎腳踏車和電動機車的通勤者，不是行人。', en: 'Commuters on bicycles and rented electric scooters in Taipei, not pedestrians.' },
@@ -268,7 +268,7 @@ export default copy({
     b: { 'zh-TW': '（乙）早上通勤的一小時，個人身上的 PM2.5', en: '(b) Personal PM2.5 over a morning commuting hour' },
     c: { 'zh-TW': '（丙）低價感測器：人行道上和停等紅燈的機車上', en: '(c) A low-cost sensor: on the sidewalk and on a scooter stopped at red lights' },
     diffLabel: { 'zh-TW': '和現場差在哪：', en: 'How this differs from the scene: ' },
-    aDiff: { 'zh-TW': '量的是在車道上騎租來電動機車的研究助理，和騎腳踏車的人，不是站在路口的行人。', en: 'Research assistants riding rented electric scooters in the traffic lane, and cyclists; not pedestrians standing at a crossing.' },
+    aDiff: { 'zh-TW': '量的是在車道上騎租來電動機車的研究助理，還有騎腳踏車的人。不是站在路口的行人。', en: 'Research assistants riding rented electric scooters in the traffic lane, and cyclists; not pedestrians standing at a crossing.' },
     bDiff: { 'zh-TW': '所有來源的 PM2.5，一小時的通勤，不是一個紅燈。', en: 'PM2.5 from all sources over an hour’s commute, not one red light.' },
     cDiff: { 'zh-TW': '感測器沒有校正，讀數可能偏高；人行道上查得出來源的最高讀數，來自廟宇的香和小吃攤。', en: 'The sensor was not calibrated and may read high; the highest sidewalk readings with a named source came from temple incense and food stalls.' },
     aTitle: { 'zh-TW': '苯和它的同類（BTEX）總和長條圖', en: 'Bar chart of total benzene family (BTEX)' },
@@ -297,7 +297,7 @@ export default copy({
   v13: {
     title: { 'zh-TW': '早上通勤，|三種方式', en: 'Morning commutes, |three ways to travel' },
     subtitle: { 'zh-TW': '台北通勤一小時，個人身上的 PM2.5 平均（µg/m³），所有來源', en: 'Personal PM2.5 over one Taipei morning commuting hour, mean (µg/m³), all sources' },
-    caption: { 'zh-TW': '量的是不同的人、在三年裡不同的早上，不是同一個早上；PM2.5 是所有來源的，不是只算廢氣。騎機車和走路的人之間，差別在統計上不顯著。另一項台北研究的數字另外畫，不合併。', en: 'Different people on different mornings over three years, not one morning; PM2.5 from all sources, not exhaust alone. The difference between scooter riders and walkers was not statistically significant. Another Taipei study’s figures are drawn separately and never merged with these.' },
+    caption: { 'zh-TW': '量的是不同的人、在三年裡不同的早上，不是同一個早上。PM2.5 是所有來源的，不是只算廢氣。騎機車和走路的人之間，差別可能只是巧合（統計上不顯著）。另一項台北研究的數字另外畫，不合併。', en: 'Different people on different mornings over three years, not one morning. PM2.5 from all sources, not exhaust alone. The difference between scooter riders and walkers could be chance (not statistically significant). Another Taipei study’s figures are drawn separately and never merged with these.' },
   },
   v29: {
     title: { 'zh-TW': '嬰兒車高度，|各國研究怎麼說', en: 'Stroller height: |what each study found' },
@@ -309,7 +309,7 @@ export default copy({
     noDiff: { 'zh-TW': '沒有一致的差別', en: 'no consistent difference' },
     foot: { 'zh-TW': '台灣：沒有任何一項', en: 'Taiwan: none' },
     caption: {
-      'zh-TW': '各研究的污染物、高度和儀器都不一樣，不能合成一個數字。學齡兒童站得比嬰兒車高；對他們確定的，是呼吸比大人快。',
+      'zh-TW': '各研究的污染物、高度和儀器都不一樣，不能合成一個數字。上小學的孩子，站得比嬰兒車高。對他們來說，確定的是呼吸比大人快。',
       en: 'The studies differ in pollutant, height and instrument, so they cannot be combined into one number. A school-age child stands above the stroller band; what is established for them is faster breathing.',
     },
   },
@@ -320,8 +320,8 @@ export default copy({
   },
   v32: {
     title: { 'zh-TW': '安靜的那條路', en: 'The quieter route' },
-    subtitle: { 'zh-TW': '走巷弄小路，比走大馬路少多少（%，已調整背景濃度和風速）', en: 'How much lower on the side-street route than the main road (%, adjusted for background and wind)' },
-    caption: { 'zh-TW': '量的是騎車的通勤者，不是站著的行人。外框的長條，研究自己說不顯著。', en: 'Commuters riding, not pedestrians standing. Outlined bars: the study itself found the difference not significant.' },
+    subtitle: { 'zh-TW': '走巷弄小路，比走大馬路少多少（%，已扣掉街上本來就有的污染和風速的影響）', en: 'How much lower on the side-street route than the main road (%, adjusted for background and wind)' },
+    caption: { 'zh-TW': '量的是騎車的通勤者，不是站著的行人。外框的長條：研究自己說，差別可能只是巧合（統計上不顯著）。', en: 'Commuters riding, not pedestrians standing. Outlined bars: the study itself found the difference could be chance (not statistically significant).' },
   },
 
   // Generic chart vocabulary
@@ -329,7 +329,7 @@ export default copy({
     category: { 'zh-TW': '項目', en: 'Item' },
     value: { 'zh-TW': '數值', en: 'Value' },
     note: { 'zh-TW': '註記', en: 'Notes' },
-    estimate: { 'zh-TW': '估計值', en: 'Estimate' },
+    estimate: { 'zh-TW': '研究推估的值', en: 'Study estimate' },
     ciLow: { 'zh-TW': '範圍最低', en: 'Range, low end' },
     ciHigh: { 'zh-TW': '範圍最高', en: 'Range, high end' },
     noChange: { 'zh-TW': '沒有差別', en: 'No difference' },
@@ -344,8 +344,8 @@ export default copy({
     hollowModel: { 'zh-TW': '外框：未通過模式效能檢核', en: 'Outline: failed the model-performance check' },
     filled: { 'zh-TW': '實心：研究報告的數值', en: 'Filled: the value as reported' },
     significant: { 'zh-TW': '＊ 研究算過：這個差別不是碰巧', en: '* the study checked: this difference is not down to chance' },
-    sigFilled: { 'zh-TW': '實心：統計顯著', en: 'Filled: statistically significant' },
-    sigHollow: { 'zh-TW': '空心：統計上不顯著', en: 'Hollow: not statistically significant' },
+    sigFilled: { 'zh-TW': '實心：不太像是巧合（統計顯著）', en: 'Filled: beyond chance (statistically significant)' },
+    sigHollow: { 'zh-TW': '空心：可能只是巧合（統計上不顯著）', en: 'Hollow: could be chance (not statistically significant)' },
     // '|' breaks the band label into two lines (the ppm band is narrow on a phone)
     ppb: { 'zh-TW': '十億分之幾|就聞得到', en: 'smelled at|parts per billion' },
     ppm: { 'zh-TW': '要到|百萬分之幾', en: 'needs parts|per million' },
@@ -368,25 +368,25 @@ export default copy({
     rowsTitle: { 'zh-TW': '證據', en: 'The evidence' },
     items: {
       scramble: {
-        quote: { 'zh-TW': '「行人專用時相讓 PM2.5 暴露少 {outlier}」', en: '“A pedestrian scramble cuts PM2.5 exposure by {outlier}”' },
+        quote: { 'zh-TW': '「行人專用時相讓吸到的 PM2.5 少 {outlier}」', en: '“A pedestrian scramble cuts the PM2.5 people breathe by {outlier}”' },
         actually: {
-          'zh-TW': '這是高雄一個路口、一個模擬日的模式值，報告自己標為離群值。同一個路口，報告文字給的範圍是降低{typical}（不含這一天）。台北和新北的路口降得比較少，有一個模擬日 PM2.5 反而上升（那一天沒有通過模式檢核）。',
-          en: 'It is a modelled value for one simulated day at one Kaohsiung intersection, flagged by the report itself as an outlier. For that same intersection the report’s text gives a fall of {typical}, leaving that day out. At the Taipei and New Taipei intersections the falls were smaller, and on one simulated day PM2.5 rose (a day that failed the model check).',
+          'zh-TW': '這是高雄一個路口、電腦推算的一天，報告自己標為特別高的值。同一個路口，報告文字給的範圍是降低{typical}，不算這一天。台北和新北的路口降得比較少。有一個推算日 PM2.5 反而上升，那一天沒有通過模式檢查。',
+          en: 'It is a value worked out by computer for one day at one Kaohsiung junction, flagged by the report itself as an outlier. For that same junction the report’s text gives a fall of {typical}, leaving that day out. At the Taipei and New Taipei junctions the falls were smaller. On one computed day PM2.5 rose, and that day failed the model check.',
         },
         weSay: {
-          'zh-TW': '在運研所的模式裡，高雄一個路口全天實施行人專用時相，報告文字給的行人等候區 PM2.5 變化是降低{typical}。這是模擬，不是在路口前後量的，也只是一個路口。',
-          en: 'In the Institute of Transportation’s model of one Kaohsiung intersection, an all-day scramble phase changed PM2.5 at the pedestrian waiting area by a fall of {typical}, according to the report’s text. That is a simulation of one intersection, not a before-and-after measurement.',
+          'zh-TW': '運研所用電腦模式，推算高雄一個路口全天實施行人專用時相。報告文字寫，行人等候區 PM2.5 降低{typical}。這是電腦推算，不是在路口前後量的，也只是一個路口。',
+          en: 'The Institute of Transportation modelled an all-day scramble phase at one Kaohsiung junction. The report’s text says PM2.5 at the pedestrian waiting area fell by {typical}. That is a computer result for one junction, not a before-and-after measurement.',
         },
         stripTitle: { 'zh-TW': '{outlier} 是怎麼來的', en: 'Where {outlier} comes from' },
-        stripSub: { 'zh-TW': '高雄一個路口，模式裡行人等候區 PM2.5 降低的百分比，0 到 100%', en: 'One Kaohsiung intersection: modelled reduction in PM2.5 at the pedestrian waiting area, 0 to 100%' },
+        stripSub: { 'zh-TW': '高雄一個路口，模式裡行人等候區 PM2.5 降低的百分比，0 到 100%', en: 'One Kaohsiung junction: modelled fall in PM2.5 at the pedestrian waiting area, 0 to 100%' },
         stripTypical: { 'zh-TW': '報告第 4-28 頁給的範圍（不含離群的那一天）', en: 'The range the report gives on p.4-28 (outlier day left out)' },
-        stripOutlier: { 'zh-TW': '高雄一個路口、一個模擬日，報告自己標為離群值', en: 'One Kaohsiung intersection, one simulated day, flagged by the report as an outlier' },
-        stripCaption: { 'zh-TW': '這是模擬，不是量測；也不是機車專屬的結果。', en: 'A simulation, not a measurement, and not a result about scooters in particular.' },
+        stripOutlier: { 'zh-TW': '高雄一個路口、電腦推算的一天，報告自己標為特別高', en: 'One Kaohsiung junction, one computed day, flagged by the report as an outlier' },
+        stripCaption: { 'zh-TW': '這是電腦推算，不是量測，也不是只看機車的結果。', en: 'A simulation, not a measurement, and not a result about scooters in particular.' },
       },
       neverSmokers: {
         quote: { 'zh-TW': '「肺癌病人有 {share} 不吸菸，所以是空污害的」', en: '“{share} of lung cancer patients never smoked, so it must be air pollution”' },
         actually: {
-          'zh-TW': '比例出自一項台灣研究，是真的。但不吸菸者的肺癌原因還沒有確定，這個數字也和機車無關。另一項研究看到的關聯，算的是所有來源的 PM2.5。',
+          'zh-TW': '比例出自一項台灣研究，是真的。但不吸菸者得肺癌的原因，還沒有確定；這個數字也和機車無關。另一項研究看到的「有關」，算的是所有來源的 PM2.5。',
           en: 'The share is from one Taiwanese study, and it is true. But the cause of lung cancer in never-smokers is not established, and the figure says nothing about scooters. The association another study found is with PM2.5 from all sources.',
         },
         weSay: { 'zh-TW': '我們不在首頁和問題頁用這幾個數字。它們只放在這裡，附上全部的條件。', en: 'We do not use these figures on the home page or the question pages. They appear only here, with all their conditions.' },
@@ -394,7 +394,7 @@ export default copy({
       density: {
         quote: { 'zh-TW': '「台灣機車密度全世界最高」', en: '“Taiwan has the most scooters per person in the world”' },
         actually: {
-          'zh-TW': '有一份非官方的區域排名把台灣排第一，但只比第二名多一點點，資料來源和年份也不清楚。',
+          'zh-TW': '有一份非官方的區域排名，把台灣排第一。但它只比第二名多一點點，資料來源和年份也不清楚。',
           en: 'One unofficial regional ranking puts Taiwan first, but only just ahead of second place, with unclear data and no stated year.',
         },
         weSay: { 'zh-TW': '「名列前茅」。', en: '“Among the highest.”' },
@@ -406,7 +406,7 @@ export default copy({
           en: 'Those multiples come from a case study of only three scooters, not an average of the fleet.',
         },
         weSay: {
-          'zh-TW': '我們用測了幾十輛車的研究：舊期別和高里程的機車，每公升燃料排得比較多。三台車的個案只放在第 1 環它自己的框裡。',
+          'zh-TW': '我們用測了幾十輛車的研究：舊期別和高里程的機車，每公升燃料排得比較多。三台車的個案，只放在第 1 環它自己的框裡。',
           en: 'We use studies that tested dozens of scooters: older-phase and high-mileage scooters emit more per litre of fuel. The three-scooter case study appears only in its own panel in link 1.',
         },
         go: { 'zh-TW': '看三台車的個案', en: 'See the three-scooter case study' },
@@ -414,7 +414,7 @@ export default copy({
       idling: {
         quote: { 'zh-TW': '「機車在等紅燈的時候排最多」', en: '“Scooters emit the most while they wait at the light”' },
         actually: {
-          'zh-TW': '國外的路口研究看到的微粒高峰，多半在車子起步的時候，而且量的多半是汽車和柴油車。台灣唯一一筆機車的怠速微粒數據，怠速時反而略低於行駛時。機車起步那一陣有多大，台灣沒有公開的數字。',
+          'zh-TW': '國外的路口研究看到的微粒高峰，多半在車子起步的時候；量的也多半是汽車和柴油車。台灣唯一一筆機車的怠速微粒資料，怠速時反而略低於行駛時。機車起步那一陣有多大，台灣沒有公開的數字。',
           en: 'Junction studies abroad mostly find particle peaks as vehicles pull away, and they mostly measured cars and diesels. Taiwan’s only idle particle datum for a scooter was slightly lower at idle than when moving. Taiwan has no published figure for the burst as a scooter pulls away.',
         },
         weSay: { 'zh-TW': '等的時候和起步的那一陣都算。本站的推估只算等紅燈的 90 秒，起步那一陣不印倍數。', en: 'The wait and the pull-away both count. This site’s estimate covers only the 90 seconds of red, and prints no multiplier for the pull-away.' },
@@ -436,7 +436,7 @@ export default copy({
     title: { 'zh-TW': '我們不會說的話', en: 'What we will not say' },
     short: { 'zh-TW': '每一句說得太過頭的話，和我們改說的話。', en: 'Each claim that goes too far, and what we say instead.' },
     lead: {
-      'zh-TW': '下面這些話，網站上不會出現。每一句後面寫著我們說的是什麼。網站上的每一段文字，在建置時都會自動比對這些規則。',
+      'zh-TW': '下面這些話，網站上不會出現。每一句後面寫著我們說的是什麼。每次更新網站，電腦都會拿網站上的每一段文字，自動比對這些規則。',
       en: 'None of these sentences appears on the site. Each is followed by what we say instead. Every piece of copy on the site is checked against these rules automatically when the site is built.',
     },
     // Brief 4.6, right-hand column: what never appears, and what we say instead.
@@ -491,7 +491,7 @@ export default copy({
       },
       {
         no: { 'zh-TW': '騎車的人吸到的比誰都多。', en: 'That riders breathe more than anyone.' },
-        instead: { 'zh-TW': '台北量過：騎機車和走路的人，PM2.5 平均都比搭捷運的多；騎車和走路的差別不明顯。', en: 'Measured in Taipei: people on scooters and on foot both breathed more PM2.5 than metro riders, on average; the two did not differ significantly.' },
+        instead: { 'zh-TW': '台北量過：騎機車和走路的人，PM2.5 平均都比搭捷運的多；騎車和走路的差別不明顯。', en: 'Measured in Taipei: people on scooters and on foot both breathed more PM2.5 than metro riders, on average. The gap between the two could be chance.' },
       },
       {
         no: { 'zh-TW': '台灣的路口沒有任何一氧化碳或 PM2.5 的量測。', en: 'That Taiwanese crossings have no carbon monoxide or PM2.5 readings at all.' },
@@ -506,7 +506,7 @@ export default copy({
     insteadLabel: { 'zh-TW': '我們說', en: 'We say' },
     changeMindTitle: { 'zh-TW': '什麼會讓我們改口', en: 'What would change our mind' },
     changeMindLead: {
-      'zh-TW': '下面任何一項有了新的量測，我們就會照著改，並且把舊的版本留在修改紀錄裡：',
+      'zh-TW': '下面任何一項有了新的量測，我們就會照著改。舊的版本會留在修改紀錄裡：',
       en: 'A new measurement of any of these would change what we say, and the old version would stay in the corrections log:',
     },
     changeMind: [
@@ -562,16 +562,16 @@ export default copy({
     badges: { 'zh-TW': '證據的細分類', en: 'The finer kinds of evidence' },
     body: [
       {
-        'zh-TW': '網站上每一個數字，都來自本站的同一份資料。每一筆記著它的出處、原文在哪一頁或哪一段、證據的種類，以及一定要一起說的限制。頁面上的數字是從這份資料直接帶進來的；資料改了，頁面就跟著改。本站自己的推估，也一樣從同一份結果帶進來。',
+        'zh-TW': '網站上每一個數字，都來自本站的同一份資料。每一筆都記著出處、原文在哪一頁或哪一段、證據的種類。還有一定要一起說的限制。頁面上的數字，是從這份資料直接帶進來的；資料改了，頁面就跟著改。本站自己的推估，也一樣從同一份結果帶進來。',
         en: 'Every number on the site comes from one set of our data. Each entry records its source, where in the source it appears, what kind of evidence it is, and the limitation that must go with it. Pages take their numbers straight from that data, so a correction there corrects every page. Our own estimate reaches every page the same way, from one set of results.',
       },
       {
-        'zh-TW': '這個網站的研究和查核，大部分是用 AI 研究工具做的，再由第二輪重新打開同一批文件，逐筆核對。查不到原文、只見於轉述的，標「次級來源」。標示為未查證的，一律不收進來。',
+        'zh-TW': '這個網站的研究和查核，大部分是用 AI 研究工具做的。第二輪再重新打開同一批文件，一筆一筆核對。查不到原文、只在轉述中看到的，標「只在轉述中看到」。標示為未查證的，一律不收進來。',
         en: 'Most of the research and checking for this site was done with AI research tools, followed by a second round that reopened the same documents and checked each entry. Anything we could reach only through a report of it is tagged “secondary”. Anything marked unverified is left out.',
       },
       {
-        'zh-TW': '每一段文字在建置時都會自動比對一份「我們不會說的話」的規則；規則抓到的句子要改寫，或寫明為什麼沒有違反規則。',
-        en: 'Every piece of copy is checked automatically at build time against the rules of what we will not say; a sentence a rule catches is either rewritten or kept with a recorded reason why it does not break the rule.',
+        'zh-TW': '每次更新網站，電腦都會拿每一段文字，自動比對一份「我們不會說的話」的規則。規則抓到的句子要改寫，或寫明為什麼沒有違反規則。',
+        en: 'Every piece of copy is checked automatically at build time against the rules of what we will not say. A sentence a rule catches is either rewritten or kept with a recorded reason why it does not break the rule.',
       },
     ],
     readLevels: { 'zh-TW': '來源讀到哪裡', en: 'How far we read each source' },

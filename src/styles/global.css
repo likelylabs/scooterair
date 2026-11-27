@@ -21,12 +21,14 @@ html.has-rail {
   scroll-padding-top: calc(var(--header-h) + var(--rail-h) + 1rem);
 }
 
-/* Smooth scrolling for the next-question buttons: only while animation is on (see "Motion" below). */
-html[data-motion='on'] {
+/* Smooth scrolling for the next-question buttons: only while animation is on (see "Motion" below),
+   and only once the page has loaded (.sa-ready, Header.astro), so a deep link lands on its target
+   at once instead of gliding there from the top. */
+html.sa-ready[data-motion='on'] {
   scroll-behavior: smooth;
 }
 @media (prefers-reduced-motion: no-preference) {
-  html:not([data-motion='off']) {
+  html.sa-ready:not([data-motion='off']) {
     scroll-behavior: smooth;
   }
 }

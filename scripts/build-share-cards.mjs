@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// Share-card generator (brief 7.9, 8.3). One picture and one line per card, in both languages
-// and two sizes; a card with an estimated number carries 推估 and its range INSIDE the image,
-// so a screenshot cannot shed it.
+// Share-card generator (brief 7.9, 8.3). One card per page that is shared, in both languages:
+// a poster seen at thumbnail size, 1200 × 630, the page's one og:image.
 //
 //   npm run share-cards                    build the card pages, render every card into public/share/{zh,en}/
 //   npm run share-cards -- smell           render only the cards whose id contains "smell"
@@ -11,18 +10,22 @@
 //                                          from the current words and pictures (part of `npm run check`)
 //
 // HOW IT DRAWS. Each card is a page of the site, /print/card/<id>/ (src/pages/[...lang]/print/card/[id].astro),
-// built only when SA_SHARE_CARDS=1. The page draws its picture with the site's own scenes and
-// air() rule, so cards, pages, poster and film share one picture grammar, and its words come
-// from src/lib/share-cards.ts. This script builds those pages into a scratch folder, serves
-// them, and photographs each at 1200 × 630 and 1080 × 1080 with the Playwright and Chromium
-// already on the machine. CI runs only --check.
+// built only when SA_SHARE_CARDS=1. The page draws its picture with the scenes' own figures and the
+// air() rule, composed for the card's shape in src/components/art/card-art.ts, so cards, pages,
+// poster and film share one picture grammar; its words come from src/lib/share-cards.ts. This
+// script builds those pages into a scratch folder, serves them, sets each headline as large as its
+// box allows, and photographs the card at 1200 × 630 with the Playwright and Chromium already on
+// the machine. CI runs only --check.
+//
+// One size only. The card keeps its headline and its people inside the central 630 × 630 square,
+// so LINE's square crop and the 4:3 crops of some Android previews keep what matters; a separate
+// square image is not needed (and a second og:image makes iMessage show a split collage).
 //
 // WHAT --check COMPARES. A hash of: the template version, every card's words, and the source
-// files the pictures are drawn from (the art folder, lane J's picture modules, the card page,
-// the art and token stylesheets). Change any of them, run this script, commit public/share/.
+// files the pictures are drawn from (the art folder, the card page, the art and token
+// stylesheets). Change any of them, run this script, commit public/share/.
 //
-// Output:  public/share/<zh|en>/<id>.png      1200 × 630  (og:image)
-//          public/share/<zh|en>/<id>-sq.png   1080 × 1080 (LINE and other square previews)
+// Output:  public/share/<zh|en>/<id>.png      1200 × 630  (og:image, and the picture in ShareBlock)
 //          public/share/manifest.json         hash per card, read by --check
 //
 // The PNGs are re-encoded with sharp as 8-bit palette PNGs (see pack()): about a third of the
@@ -51,16 +54,16 @@ const OUT_ARG = opt('--out');
 const only = args.filter((a, i) => !a.startsWith('--') && !['--dist', '--out'].includes(args[i - 1]));
 
 /** Bump when the card design changes, so --check asks for a re-render. */
-const TEMPLATE = 6;
+const TEMPLATE = 7;
 const OUT = OUT_ARG ? resolve(OUT_ARG) : join(root, 'public/share');
 const MANIFEST = join(root, 'public/share/manifest.json');
-const SIZES = { wide: [1200, 630], square: [1080, 1080] };
+const SIZE = [1200, 630];
 
 const { shareCardIds, shareCardContent } = await load('src/lib/share-cards.ts');
 const { site } = await load('src/i18n/ui.ts');
 
 // ---- what the pictures are drawn from ------------------------------------------------
-const PICTURE_SOURCES = ['src/components/art', 'src/components/pages/action/art.ts', 'src/components/pages/action/Picture.astro', 'src/pages/[...lang]/print/card', 'src/styles/art.css', 'src/styles/tokens.css'];
+const PICTURE_SOURCES = ['src/components/art', 'src/pages/[...lang]/print/card', 'src/styles/art.css', 'src/styles/tokens.css'];
 function filesUnder(p) {
   const abs = join(root, p);
   if (!existsSync(abs)) return [];
@@ -82,22 +85,26 @@ const jobs = [];
 for (const [locale, dir] of locales) for (const id of shareCardIds) jobs.push({ locale, dir, id, content: shareCardContent(id, locale) });
 const hashOf = (job) => createHash('sha256').update(JSON.stringify([TEMPLATE, job.content, site.name[job.locale], pictures])).digest('hex').slice(0, 16);
 const key = (job) => `${job.dir}/${job.id}`;
+/** PNGs in public/share/{zh,en} that are no card's (the square cards of template 6 and older). */
+const strays = () =>
+  locales.flatMap(([, d]) => (existsSync(join(OUT, d)) ? readdirSync(join(OUT, d)).filter((f) => f.endsWith('.png') && !jobs.some((j) => j.dir === d && `${j.id}.png` === f)).map((f) => `${d}/${f}`) : []));
 
 // ---- check mode: no browser ---------------------------------------------------
 if (CHECK) {
   const manifest = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : { cards: {} };
   const bad = [];
   for (const job of jobs) {
-    for (const f of [`${key(job)}.png`, `${key(job)}-sq.png`]) if (!existsSync(join(OUT, f))) bad.push(`missing public/share/${f}`);
+    if (!existsSync(join(OUT, `${key(job)}.png`))) bad.push(`missing public/share/${key(job)}.png`);
     if (manifest.cards[key(job)] !== hashOf(job)) bad.push(`out of date: ${key(job)} (its words or its picture changed since it was rendered)`);
   }
+  for (const f of strays()) bad.push(`not a card any more: public/share/${f} (a full render removes it)`);
   if (bad.length) {
     console.error(`\n✖ share cards: ${bad.length} problem(s). Run \`npm run share-cards\` and commit public/share/.\n`);
     for (const b of [...new Set(bad)]) console.error(`  ${b}`);
     console.error('');
     process.exit(1);
   }
-  console.log(`✔ share cards: ${jobs.length} cards × 2 sizes present and current.`);
+  console.log(`✔ share cards: ${jobs.length} cards present and current.`);
   process.exit(0);
 }
 
@@ -169,34 +176,36 @@ const manifest = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8'
 try {
   for (const job of todo) {
     mkdirSync(join(OUT, job.dir), { recursive: true });
-    for (const size of ['wide', 'square']) {
-      const [width, height] = SIZES[size];
-      const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1, colorScheme: 'light' });
-      await page.goto(`${base}${job.locale === 'en' ? '/en' : ''}/print/card/${job.id}/`, { waitUntil: 'networkidle' });
-      await page.addStyleTag({ content: bodyFont });
-      // the site's motion setting gives every property a 0.01 ms transition; a transition keeps the
-      // old size until the next frame, so the fitting loop below would never see its own change
-      await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
-      await page.evaluate(() => document.fonts.ready);
-      // shrink the words until they fit, so no line is ever clipped
-      const k = await page.evaluate(async () => {
-        const card = document.querySelector('[data-card]');
-        const text = document.querySelector('.card__text');
-        // the square card is seen smaller (LINE): start larger and shrink to fit
-        let k = innerHeight > innerWidth * 0.8 ? 1.45 : 1;
-        card.style.setProperty('--k', String(k));
-        // also against the picture's own bottom edge: a text box taller than the card is not "overflowing" itself
-        const last = () => [...text.querySelectorAll('.card__fit > *, .card__head')].reduce((m, e) => Math.max(m, e.getBoundingClientRect().bottom), 0);
-        const over = () => text.scrollHeight > text.clientHeight + 1 || text.scrollWidth > text.clientWidth + 1 || last() > innerHeight - 24;
-        while (over() && k > 0.55) card.style.setProperty('--k', String((k -= 0.03)));
-        await document.fonts.ready;
-        return k;
-      });
-      if (k <= 0.55) console.warn(`  ! ${key(job)} (${size}) is very long: words shrunk to ${Math.round(k * 100)}%`);
-      const shot = await page.screenshot({ type: 'png' });
-      writeFileSync(join(OUT, job.dir, `${job.id}${size === 'square' ? '-sq' : ''}.png`), await pack(shot));
-      await page.close();
-    }
+    const [width, height] = SIZE;
+    const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1, colorScheme: 'light' });
+    await page.goto(`${base}${job.locale === 'en' ? '/en' : ''}/print/card/${job.id}/`, { waitUntil: 'networkidle' });
+    await page.addStyleTag({ content: bodyFont });
+    // the site's motion setting gives every property a 0.01 ms transition; a transition keeps the
+    // old size until the next frame, so the fitting loop below would never see its own change
+    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
+    await page.evaluate(() => document.fonts.ready);
+    // set the headline as large as its box allows: shrink it until every phrase fits across and
+    // the last line ends inside the box (card-art.ts puts the box in the central square)
+    const k = await page.evaluate(async () => {
+      const card = document.querySelector('[data-card]');
+      const head = document.querySelector('.card__head');
+      const title = document.querySelector('.card__title');
+      let k = 1;
+      card.style.setProperty('--k', String(k));
+      const over = () => {
+        const h = head.getBoundingClientRect();
+        const t = title.getBoundingClientRect();
+        const phrases = [...title.querySelectorAll('.phrase')].map((s) => s.getBoundingClientRect());
+        return t.bottom > h.bottom + 1 || phrases.some((s) => s.left < h.left - 1 || s.right > h.right + 1) || title.scrollWidth > title.clientWidth + 1;
+      };
+      while (over() && k > 0.5) card.style.setProperty('--k', String((k -= 0.02)));
+      await document.fonts.ready;
+      return k;
+    });
+    if (k <= 0.6) console.warn(`  ! ${key(job)}: the headline is long for its box, set at ${Math.round(k * 100)}%`);
+    const shot = await page.screenshot({ type: 'png' });
+    writeFileSync(join(OUT, job.dir, `${job.id}.png`), await pack(shot));
+    await page.close();
     manifest.cards[key(job)] = hashOf(job);
     console.log(`  ✓ ${key(job)}`);
   }
@@ -206,10 +215,11 @@ try {
   rmSync(tmp, { recursive: true, force: true });
 }
 if (!OUT_ARG) {
+  if (!only.length) for (const f of strays()) rmSync(join(OUT, f));
   manifest.template = TEMPLATE;
   manifest.cards = Object.fromEntries(Object.entries(manifest.cards).filter(([k]) => jobs.some((j) => key(j) === k)).sort());
   writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
-  console.log(`\n✔ share cards: rendered ${todo.length} card(s) × 2 sizes into public/share/. Commit them.`);
+  console.log(`\n✔ share cards: rendered ${todo.length} card(s) into public/share/. Commit them.`);
 } else {
-  console.log(`\n✔ share cards: rendered ${todo.length} card(s) × 2 sizes into ${OUT} (preview; manifest untouched).`);
+  console.log(`\n✔ share cards: rendered ${todo.length} card(s) into ${OUT} (preview; manifest untouched).`);
 }

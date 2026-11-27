@@ -21,7 +21,7 @@ export default copy({
   meta: {
     title: { 'zh-TW': '短片：一個紅燈', en: 'The film: one red light' },
     description: {
-      'zh-TW': '一個紅燈，用動畫演一次：機車停下來，廢氣排在膝蓋的高度，誰站得最近，換成電動機車差在哪裡。沒有聲音，每一句都有字幕，可以暫停，也可以拖。',
+      'zh-TW': '一個紅燈，用動畫演一次。看機車停下來，廢氣排在膝蓋的高度；誰站得最近；換成電動機車，差在哪裡。沒有聲音，每一句都有字幕，可以暫停，也可以拖。',
       en: 'One red light as an animation: the scooters pull up, the exhaust comes out at knee height, who stands closest, and what changes when they are electric. No sound, every line captioned; pause or scrub at any point.',
     },
   },
@@ -113,7 +113,7 @@ export default copy({
     co: { main: { 'zh-TW': '一氧化碳：沒有味道。', en: 'Carbon monoxide: no smell at all.' } },
     fuel: {
       main: { 'zh-TW': '臭味，是沒燒完的汽油。', en: 'The smell is unburnt fuel.' },
-      note: { 'zh-TW': '油氣裡有苯，會致癌', en: 'The vapour holds benzene, known to give cancer' },
+      note: { 'zh-TW': '油氣裡有苯（ㄅㄣˇ），會致癌', en: 'The fuel vapour holds benzene, known to give cancer' },
     },
     specks: { main: { 'zh-TW': '還有微粒，小到看不見。', en: 'And particles too small to see.' } },
     mask: { main: { 'zh-TW': '一般口罩，擋不住這些氣體。', en: 'An ordinary mask does not stop these gases.' } },
@@ -122,8 +122,10 @@ export default copy({
     rider: { main: { 'zh-TW': '騎士也在這一層裡。', en: 'The rider is in it too.' } },
     daily: {
       main: { 'zh-TW': '紅燈很短，天天都等。', en: 'One red light is short. But it’s daily.' },
-      // (U+2060 after each dash keeps a range on one line) the condition goes with the figure, so it never reads as a different yearly figure from home screen 7
-      note: { 'zh-TW': '一天 2–\u20606 個，一年 {lo}–\u2060{hi} 小時', en: 'Two to six lights a day: {lo}–\u2060{hi} hours a year' },
+      // (U+2060 after the dash keeps a range on one line) home screen 7's default (four lights a day, time.hoursPerYear[4])
+      // (the quiet line has room for 20 characters, so the assumption, ui.ts estText.redHours, is printed
+      // under this line in the transcript, in the same words as home screen 7's second sentence)
+      note: { 'zh-TW': '一天 4 個，一年 {lo}–\u2060{hi} 小時', en: 'Four lights a day: {lo}–\u2060{hi} hours a year' },
     },
     years: {
       main: { 'zh-TW': '長年吸車子的廢氣，', en: 'Years of breathing traffic exhaust' },

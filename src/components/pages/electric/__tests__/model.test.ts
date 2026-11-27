@@ -18,6 +18,12 @@ const { evaluate } = await import('../../../../lib/calc/index.ts');
 const { econData } = await import('../../../../data/econ/index.ts');
 
 const DATE = '2026-11-26';
+const await_view = await (async () => {
+  const view = await import('../opening-view.ts');
+  const { default: electric } = await import('../../../../i18n/pages/electric.ts');
+  const { localize } = await import('../../../../i18n/pages/_copy.ts');
+  return { ...view, T: localize(electric, 'zh-TW').open as unknown as import('../opening-view.ts').OpenText };
+})();
 const ctx = (locale: 'zh-TW' | 'en') => ({
   locale,
   data: econData,
@@ -83,4 +89,18 @@ test('a distance with a decimal is shown as typed', () => {
 test('a list message is shown as a list', () => {
   const { r } = run({ jurisdiction: 'taipei', monthlyKm: 400 });
   assert.match(r.bodyHtml, /<ul class="el-msg__items"><li>/);
+});
+
+test('the result says what scrapping does, as the opening does (same choose(), same words)', () => {
+  const builtOn = '2015-12';
+  const V = await_view;
+  const T = V.T;
+  const a = M.openAnswers({ county: 'new-taipei', scrap: 'yes', km: 300, charge: 'no', builtOn, date: DATE }, econData, 'zh-TW');
+  const b = M.openAnswers({ county: 'new-taipei', scrap: 'no', km: 300, charge: 'no', builtOn, date: DATE }, econData, 'zh-TW');
+  assert.equal(a.ev.short, 'Gogoro EZZY');
+  const notes = V.ansScrapNotes('zh-TW', T, 'yes', a, b);
+  assert.ok(notes.length >= 1 && /49,812/.test(notes[0]) && /44,580/.test(notes[0]), notes.join(' '));
+  // the calculator's own result for the same answers prints the same note
+  const { r } = run({ jurisdiction: 'new-taipei', monthlyKm: 300, plate: 'any', power: 'subscription', scrap: { engine: 'four-stroke', builtOn } });
+  assert.ok(r.answersHtml.includes(notes[0]), r.answersHtml.slice(0, 400));
 });

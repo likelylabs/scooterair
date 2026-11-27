@@ -17,6 +17,8 @@
  *   marks   which marks, in order (default all three)
  *   layout  'list' (default: one per line) | 'row' (wraps; for a legend)
  *   tap     items are buttons that light their marks (default false)
+ *   plume   first, a plain line naming the soft cloud the marks sit in
+ *           (機車排的氣): never a button (default false)
  *   class
  *
  *   <AirKey slot="controls" locale={locale} tap />
@@ -31,12 +33,21 @@ interface Props {
   marks?: AirMark[];
   layout?: 'list' | 'row';
   tap?: boolean;
+  plume?: boolean;
   class?: string;
 }
-const { locale, marks = ['ribbon', 'ring', 'dot'], layout = 'list', tap = false, class: cls } = Astro.props;
+const { locale, marks = ['ribbon', 'ring', 'dot'], layout = 'list', tap = false, plume = false, class: cls } = Astro.props;
 ---
 
 <ul class:list={['air-key', `air-key--${layout}`, tap && 'air-key--tap', cls]} data-air-key={tap ? '' : undefined} aria-label={tap ? art.tailpipe.keyLegend[locale] : undefined}>
+  {plume && (
+    <li class="air-key__plume">
+      <span class="air-key__item">
+        <svg class="air-glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={airGlyph('plume')} />
+        <span>{art.key.plume[locale]}</span>
+      </span>
+    </li>
+  )}
   {
     marks.map((m) => (
       <li>
@@ -66,6 +77,18 @@ const { locale, marks = ['ribbon', 'ring', 'dot'], layout = 'list', tap = false,
   /* the static legend is for readers without scripting; with it, the buttons above take its place */
   html.js .air-key__item[data-nojs-legend] {
     display: none;
+  }
+  /* the plume's line takes a row of its own above the buttons */
+  .air-key__plume {
+    flex: 1 0 100%;
+  }
+  /* it names the cloud; it is not a button, so it does not look like one */
+  .air-key--tap .air-key__plume .air-key__item {
+    min-block-size: 0;
+    padding: 0.25rem 0;
+    border-color: transparent;
+    background: none;
+    cursor: default;
   }
 </style>
 

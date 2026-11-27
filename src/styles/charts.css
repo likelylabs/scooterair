@@ -745,6 +745,11 @@ a.hc-row__link .hc-row__n {
   padding-inline-end: calc(var(--hc-in-end) - 0.35rem);
   text-align: end;
 }
+/* what the WHO value covers: carbon monoxide only, not a line under which exhaust is safe */
+.hc-zoom__note {
+  font-weight: var(--fw-regular, 400);
+  color: var(--ink-2);
+}
 .hc-zoom__limit b {
   white-space: nowrap;
   font-weight: var(--fw-black);

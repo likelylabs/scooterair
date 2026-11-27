@@ -51,20 +51,20 @@ function scrapNeeded(c: Condition): L10n {
   switch (c.kind) {
     case 'scrap-engine':
       return c.engines.includes('two-stroke') && !c.engines.includes('four-stroke')
-        ? t('要報廢一台二行程機車', 'requires scrapping a two-stroke scooter')
-        : t('要報廢一台四行程機車', 'requires scrapping a four-stroke scooter');
+        ? t('要報廢一輛二行程機車', 'requires scrapping a two-stroke scooter')
+        : t('要報廢一輛四行程機車', 'requires scrapping a four-stroke scooter');
     case 'scrap-min-age':
-      return t(`要報廢一台出廠滿${c.years}年的燃油機車`, `requires scrapping a petrol scooter at least ${c.years} years old`);
+      return t(`要報廢一輛出廠滿${c.years}年的燃油機車`, `requires scrapping a petrol scooter at least ${c.years} years old`);
     case 'scrap-built':
-      if (c.onOrBefore && c.onOrAfter) return t(`要報廢一台 ${date(c.onOrAfter)['zh-TW']}到 ${date(c.onOrBefore)['zh-TW']}之間出廠的燃油機車`, `requires scrapping a petrol scooter built between ${date(c.onOrAfter).en} and ${date(c.onOrBefore).en}`);
-      if (c.onOrBefore) return t(`要報廢一台 ${date(c.onOrBefore)['zh-TW']}以前出廠的燃油機車`, `requires scrapping a petrol scooter built on or before ${date(c.onOrBefore).en}`);
-      return t(`要報廢一台 ${date(c.onOrAfter as string)['zh-TW']}以後出廠的燃油機車`, `requires scrapping a petrol scooter built on or after ${date(c.onOrAfter as string).en}`);
+      if (c.onOrBefore && c.onOrAfter) return t(`要報廢一輛 ${date(c.onOrAfter)['zh-TW']}到 ${date(c.onOrBefore)['zh-TW']}之間出廠的燃油機車`, `requires scrapping a petrol scooter built between ${date(c.onOrAfter).en} and ${date(c.onOrBefore).en}`);
+      if (c.onOrBefore) return t(`要報廢一輛 ${date(c.onOrBefore)['zh-TW']}以前出廠的燃油機車`, `requires scrapping a petrol scooter built on or before ${date(c.onOrBefore).en}`);
+      return t(`要報廢一輛 ${date(c.onOrAfter as string)['zh-TW']}以後出廠的燃油機車`, `requires scrapping a petrol scooter built on or after ${date(c.onOrAfter as string).en}`);
     case 'scrap-registered-locally':
-      return t('要報廢一台在本縣市設籍的燃油機車', 'requires scrapping a petrol scooter registered here');
+      return t('要報廢一輛在本縣市設籍的燃油機車', 'requires scrapping a petrol scooter registered here');
     case 'scrap-max-cc':
-      return t(`要報廢一台${c.cc}cc以下的燃油機車`, `requires scrapping a petrol scooter of ${c.cc}cc or less`);
+      return t(`要報廢一輛${c.cc}cc以下的燃油機車`, `requires scrapping a petrol scooter of ${c.cc}cc or less`);
     default:
-      return t('要報廢一台燃油機車（車齡規定見這項補助的條件）', 'requires scrapping a petrol scooter (see this line\'s conditions for the age rule)');
+      return t('要報廢一輛燃油機車（車齡規定見這項補助的條件）', 'requires scrapping a petrol scooter (see this line\'s conditions for the age rule)');
   }
 }
 
@@ -121,7 +121,7 @@ export function checkCondition(c: Condition, ctx: EligibilityContext): CondResul
       return (old.displacementCc ?? 125) <= c.cc ? OK : fail(c.kind, t(`要報廢的機車須為${c.cc}cc以下`, `the scooter you scrap must be ${c.cc}cc or less`));
     }
     case 'scrap-second-scooter':
-      return old?.secondScooter ? OK : fail(c.kind, t('要同時報廢第二台符合規定的機車', 'requires scrapping a second qualifying scooter'));
+      return old?.secondScooter ? OK : fail(c.kind, t('要同時報廢第二輛符合規定的機車', 'requires scrapping a second qualifying scooter'));
     case 'ev-plate-class':
       if (!ctx.ev) return fail(c.kind, t('只適用電動機車', 'electric scooters only'));
       return c.classes.includes(ctx.ev.plateClass) ? OK : fail(c.kind, t('不適用這個車種等級', 'does not cover this vehicle class'));

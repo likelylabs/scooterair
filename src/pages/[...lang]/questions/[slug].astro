@@ -123,7 +123,30 @@ const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppm'], 'beside-m
   .qp :global(.screen__chips > .howbtn) {
     margin-inline-start: auto;
   }
-  @media (min-width: 56.25em) {
+  /* --pic-extra: how tall a picture's box is besides its drawing (ui/Screen.astro narrows the
+     picture until both fit the window's height), measured at 1,280 px and rounded up: the tag and
+     key; the can and its chip; the mask switch; the number box over the kerb */
+  .qp :global(article.screen) {
+    --pic-extra: 3.5rem;
+    /* no screen rail here */
+    --chrome: calc(var(--header-h) + 2px);
+  }
+  /* the first picture sits under the question and its words (.qp-head, about 11rem): a reader
+     arriving at the page sees them, the whole picture and the answer's headline together */
+  .qp :global(#answer) {
+    --chrome: calc(var(--header-h) + 2px + 11rem);
+  }
+  .qp :global(article.screen:has(.scene--tailpipe)) {
+    --pic-extra: 13.5rem;
+  }
+  .qp :global(article.screen:has(.scene--mask)) {
+    --pic-extra: 17.5rem;
+  }
+  .qp :global(article.screen:has(.scene--kerb)) {
+    --pic-extra: 23rem;
+  }
+  /* two columns from 43em, as every screen (ui/Screen.astro) */
+  @media (min-width: 43em) {
     .qp-head {
       padding-block: var(--sp-5) 0;
     }
@@ -132,6 +155,13 @@ const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppm'], 'beside-m
     }
     .qp :global(.q-plate) {
       padding: 0;
+    }
+    /* the answer's picture never narrows below 26rem: on a short window (1024 × 768) the question
+       block's 11rem would otherwise shrink it to a strip, with its key items and the tag wrapping
+       and the headline running in one long line beside it. Its foot may then pass the window's
+       bottom, but the headline beside it is in view */
+    .qp :global(#answer) {
+      --pic-min: 26rem;
     }
     /* the second and third pictures are part of the same answer: no rule between them */
     .qp :global(.screen + .screen) {

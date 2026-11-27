@@ -17,14 +17,14 @@ const roc: Condition = {
   flag: 'foreignNational',
   value: false,
   ambiguous: true,
-  why: t('外籍人士須持居留證、住在桃園市並符合配偶設籍條件才能申請，試算無法判斷，未計入；請向環保局確認', 'foreign nationals qualify only with a residence permit, living in Taoyuan and meeting the spouse-registration condition, which we cannot check, so it is not counted (ask the bureau)'),
+  why: t('外籍人士須持居留證、住在桃園市並符合配偶設籍條件才能申請，計算無法判斷，未計入；請向環保局確認', 'foreign nationals qualify only with a residence permit, living in Taoyuan and meeting the spouse-registration condition, which we cannot check, so it is not counted (ask the bureau)'),
 };
 // roc is appended last to every line (in p() below), so a foreign buyer's other conditions are
 // tested first and only lines they would otherwise get are reported as ambiguous.
 const general: Condition[] = [residency(undefined, '2024-12-31'), age(18)];
 const GENERAL = '年滿18歲、2024 年 12 月 31 日前設籍桃園市（或持居留證並符合配偶設籍條件）。';
 const GENERAL_EN = 'Aged 18+ and registered in Taoyuan by 31 December 2024 (or a residence-permit holder meeting the spouse rule).';
-const STACK_NOTE = t('桃園市公告沒有說明能否與中央補助併領；試算照其他縣市的做法同時計入中央補助，請向環保局確認。', 'The Taoyuan notice does not say whether its money stacks with central subsidies; like other cities we count both, so confirm with the bureau.');
+const STACK_NOTE = t('桃園市公告沒有說明能否與中央補助併領；計算照其他縣市的做法同時計入中央補助，請向環保局確認。', 'The Taoyuan notice does not say whether its money stacks with central subsidies; like other cities we count both, so confirm with the bureau.');
 const generalQuota = quota('unknown', '2026-11-26', t('一般性補助共6,000名；我們打不開線上系統，還剩多少請上線上系統查，或打電話問環保局。', '6,000 general places; we could not open the online system, so check what is left there or phone the bureau.'), { total: 6000 });
 const projectQuota = (n: number, per = '') =>
   quota('unknown', '2026-11-26', t(`名額${n.toLocaleString('en')}名${per}；還剩多少請打電話問環保局。`, `${n.toLocaleString('en')} places${per ? ' per team' : ''}; phone the bureau to ask what is left.`), { total: n });

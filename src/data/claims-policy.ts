@@ -682,8 +682,8 @@ export const claimRules = {
     kind: 'do-not-claim',
     topic: 'smell',
     rule: t(
-      '不可依危害大小排序一氧化碳、苯與超細微粒，只能說它們聞不到；一氧化碳在路口是廢氣的指標，沒有證據顯示路口濃度會危害健康。',
-      'Never rank carbon monoxide, benzene and ultrafine particles by harm; say only that they cannot be smelled. At the kerb carbon monoxide is a marker of exhaust, not a demonstrated hazard.',
+      '不可依危害大小排序一氧化碳、苯與超細微粒，只能說一氧化碳沒有味道、微粒小到看不到；一氧化碳在路口是廢氣的指標，沒有證據顯示路口濃度會危害健康。',
+      'Never rank carbon monoxide, benzene and ultrafine particles by harm; say only that carbon monoxide has no smell and particles are too small to see. At the kerb carbon monoxide is a marker of exhaust, not a demonstrated hazard.',
     ),
     why: t('路口的一氧化碳只有運研所在夏天幾天用微型感測器量到的讀數（遠低於WHO的短時間指引值）；沒有碳氧血紅素的量測，也沒有比較三者危害的研究。', 'Kerbside carbon monoxide has been measured only by the Institute of Transportation\'s micro-sensors on a few summer days (far below WHO\'s short-term values); there are no carboxyhaemoglobin measurements and no study comparing the three for harm.'),
     patterns: { 'zh-TW': ['(一氧化碳|苯|超細微粒).{0,10}(最毒|更毒|最危險|更危險|最致命)'], en: ['(carbon monoxide|benzene|ultrafine).{0,20}(most|more) (toxic|dangerous|harmful|deadly)'] },

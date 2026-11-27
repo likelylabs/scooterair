@@ -1,24 +1,25 @@
-// Share cards (brief 7.9, 8.3): the list of cards, where their images live, and what each one
-// says. One module for both sides: scripts/build-share-cards.mjs renders the PNGs (it
-// screenshots the card pages /print/card/<id>/, built only for it); Base.astro points og:image
-// at shareCard(). Loadable by plain Node: relative imports only.
+// Share cards (brief 7.9, 8.3): the list of cards, where their images live, what each one
+// shows and says, and the title and description a link preview prints under it. One module for
+// both sides: scripts/build-share-cards.mjs renders the PNGs (it screenshots the card pages
+// /print/card/<id>/, built only for it); Base.astro points og:image at shareCard(). Loadable by
+// plain Node: relative imports only.
 //
-//   npm run share-cards             build the card pages, render public/share/{zh,en}/<id>.png and <id>-sq.png
-//   npm run share-cards -- --check  verify the committed PNGs match the current copy and pictures
+//   npm run share-cards             build the card pages, render public/share/{zh,en}/<id>.png
+//   npm run share-cards -- --check  verify the committed PNGs match the current words and pictures
 //                                   (part of `npm run check`)
 //
-// One picture and one line per card. A card that prints an estimated number carries 推估 and
-// the range inside the image; every number is filled here from src/data/estimate.ts, the
-// registry or the money engine, never typed.
+// A card is a poster seen at thumbnail size (about 320 px wide in a chat): one picture that
+// fills the 1200 × 630 card (src/components/art/card-art.ts), one short headline and the
+// 示意圖 plate (no site name: in a preview it was a speck). No numbers, so no card needs a 推估 mark or a caveat: the
+// page the link opens carries both. One image per page: a second og:image makes iMessage show
+// a split collage, and LINE crops this one to its central square, where the headline and the
+// people at the kerb are drawn.
 
 import share from '../i18n/pages/share.ts';
-import { illustration, site } from '../i18n/ui.ts';
-import { art } from '../i18n/art.ts';
-import { est, formatEstimate, hoursPerYear } from '../data/estimate.ts';
-import { homeMoney } from './home-money.ts';
+import { est } from '../data/estimate.ts';
+import type { CardArtKind } from '../components/art/card-art.ts';
 
 type Locale = 'zh-TW' | 'en';
-type L10n = Record<Locale, string>;
 
 /** Question pages with a card (brief 7.5). `how-much` and `electric` are redirect pages whose old shares must still show a picture. */
 export const questionSlugs = ['smell', 'my-child', 'app', 'one-red-light', 'rider', 'beside-me', 'mask', 'how-much', 'electric'] as const;
@@ -26,30 +27,34 @@ export type QuestionSlug = (typeof questionSlugs)[number];
 export type ShareCardId = 'home' | 'brief' | 'act' | 'film' | 'money' | QuestionSlug;
 export const shareCardIds: ShareCardId[] = ['home', 'brief', 'act', 'film', 'money', ...questionSlugs];
 
-/**
- * The picture a card draws. 'kerb' and 'kerb-electric' and 'heights' are drawn by lane J's
- * Picture.astro (lane C's KerbScene / HeightsScene when they exist); the others are lane C's
- * scenes, with the kerb as the stand-in until they exist (see the card page).
- */
-export type CardPicture = 'kerb' | 'kerb-electric' | 'heights' | 'smell' | 'mask' | 'rider' | 'body' | 'film';
-
-/** The chip on a card's line (brief 4.1 ids). */
-export type CardChip = 'measured' | 'estimate' | 'official' | 'study' | 'derived';
+/** Each card's picture and the headline it carries (a key of share.title). */
+const CARDS: Record<ShareCardId, { art: CardArtKind; title: keyof typeof share.title }> = {
+  home: { art: 'kerb', title: 'home' },
+  brief: { art: 'heights', title: 'brief' },
+  act: { art: 'fix', title: 'act' },
+  film: { art: 'film', title: 'film' },
+  money: { art: 'electric', title: 'money' },
+  electric: { art: 'electric', title: 'money' },
+  smell: { art: 'smell', title: 'smell' },
+  'my-child': { art: 'child', title: 'my-child' },
+  app: { art: 'station', title: 'app' },
+  'one-red-light': { art: 'signal', title: 'one-red-light' },
+  rider: { art: 'rider', title: 'rider' },
+  'beside-me': { art: 'distance', title: 'beside-me' },
+  mask: { art: 'mask', title: 'mask' },
+  'how-much': { art: 'pack', title: 'how-much' },
+};
 
 export interface ShareCardContent {
   id: ShareCardId;
-  picture: CardPicture;
-  kicker: string;
-  /** May contain '|' phrase marks. */
+  /** the picture: a composition of src/components/art/card-art.ts */
+  art: CardArtKind;
+  /** the headline; may contain '|' phrase marks */
   title: string;
-  /** The one line. With `estimate`, the words that name what the number is the amount of. */
-  line: string;
-  /** An estimated number printed under the line, with its 推估 chip: 約 0.05 到 1 ppm. */
-  estimate?: { text: string; slot: string };
-  /** The chip for the line when it carries a number that is not an estimate. */
-  chip?: CardChip;
-  /** The small print under the line. */
-  caveat: string;
+  /** the small plate on the picture */
+  tag: string;
+  /** the image's alt text */
+  alt: string;
 }
 
 const dir = (locale: Locale) => (locale === 'en' ? 'en' : 'zh');
@@ -59,92 +64,34 @@ const fill = (s: string, vars: Record<string, string | number>) =>
     if (vars[k] === undefined) throw new Error(`[share cards] no value for {${k}} in: ${s}`);
     return String(vars[k]);
   });
-const L = (v: L10n, locale: Locale) => v[locale];
-const ntd = (n: number, locale: Locale) => (locale === 'en' ? `NT$${new Intl.NumberFormat('en').format(n)}` : `${new Intl.NumberFormat('zh-TW').format(n)} 元`);
-const readerDate = (iso: string, locale: Locale) => {
-  const [y, m, d] = iso.split('-').map(Number);
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  return locale === 'en' ? `${d} ${months[m - 1]} ${y}` : `${y} 年 ${m} 月 ${d} 日`;
-};
-
-/** The estimate's caveat for any card that shows the kerb picture or an estimated number. */
-const estimateCaveat = (locale: Locale) => L(share.film.caveat, locale);
-
-/**
- * The money card, chosen by rule from the money engine (screen 13's rule): the headline is the
- * default case's result, the one line under it the least favourable case, so the unfavourable
- * figure always travels with the favourable one. The kicker names the case (place, and a scooter
- * built 10 or more years ago to scrap). Uses the prices' check date, not today's, so the card
- * only changes when the prices are re-checked; the card names that date in small print.
- */
-function moneyCard(locale: Locale): { kicker: string; title: string; line: string; caveat: string } {
-  const m = homeMoney(homeMoney().checkedOn);
-  const c = m.buy[m.defaults.county][m.defaults.scrap];
-  const county = L(c.countyName as L10n, locale);
-  const t = share.money;
-  const title = c.verdict === 'cheaper' ? fill(L(t.cheaper, locale), { amount: ntd(-c.difference, locale) }) : c.verdict === 'dearer' ? fill(L(t.dearer, locale), { amount: ntd(c.difference, locale) }) : L(t.same, locale);
-  const line = m.worst.difference > 0 ? fill(L(t.worst, locale), { amount: ntd(m.worst.difference, locale) }) : L(t.best, locale);
-  return { kicker: fill(L(t.kicker, locale), { county }), title, line, caveat: fill(L(t.caveat, locale), { date: readerDate(m.checkedOn, locale) }) };
-}
 
 /** Everything that is drawn on a card, in one language. */
 export function shareCardContent(id: ShareCardId, locale: Locale): ShareCardContent {
-  const coAdd = { text: formatEstimate('co.dozen.add', locale).text, slot: 'co.dozen.add' };
-  switch (id) {
-    case 'home':
-      return { id, picture: 'kerb', kicker: L(share.home.kicker, locale), title: L(share.home.title, locale), line: L(share.home.line, locale), estimate: coAdd, caveat: estimateCaveat(locale) };
-    case 'brief':
-      return { id, picture: 'heights', kicker: L(share.brief.kicker, locale), title: L(share.brief.title, locale), line: L(site.sentence, locale), caveat: L(illustration.tag, locale) };
-    case 'act':
-      return { id, picture: 'kerb-electric', kicker: L(share.act.kicker, locale), title: L(share.act.title, locale), line: L(share.act.line, locale), chip: 'official', caveat: L(illustration.tag, locale) };
-    case 'film':
-      return { id, picture: 'film', kicker: L(share.film.kicker, locale), title: L(share.film.title, locale), line: L(share.film.line, locale), caveat: L(share.film.caveat, locale) };
-    case 'money':
-    case 'electric': {
-      const { kicker, title, line, caveat } = moneyCard(locale);
-      return { id, picture: 'kerb-electric', kicker, title, line, chip: 'derived', caveat };
-    }
-  }
-  const q = share.questions[id];
-  const kicker = L(share.questionKicker, locale);
-  switch (id) {
-    case 'smell':
-      return { id, picture: 'smell', kicker, title: L(q.title, locale), line: L(q.line, locale), chip: 'estimate', caveat: L(illustration.tag, locale) };
-    case 'my-child': {
-      const r = formatEstimate('child.airPerKg', locale);
-      return { id, picture: 'heights', kicker, title: L(q.title, locale), line: fill(L(q.line, locale), { lo: r.lo, hi: r.hi }), chip: 'study', caveat: L(illustration.tag, locale) };
-    }
-    case 'app':
-      return { id, picture: 'kerb', kicker, title: L(q.title, locale), line: fill(L(q.line, locale), { red: est.signal.redLength_s }), chip: 'official', caveat: estimateCaveat(locale) };
-    case 'one-red-light': {
-      const h = hoursPerYear(4);
-      return { id, picture: 'body', kicker, title: L(q.title, locale), line: fill(L(q.line, locale), { lo: h.lo, hi: h.hi }), chip: 'derived', caveat: L(illustration.tag, locale) };
-    }
-    case 'rider':
-      return { id, picture: 'rider', kicker, title: L(q.title, locale), line: L(q.line, locale), caveat: estimateCaveat(locale) };
-    case 'beside-me':
-      return { id, picture: 'kerb', kicker, title: L(q.title, locale), line: L(q.line, locale), caveat: estimateCaveat(locale) };
-    case 'mask':
-      return { id, picture: 'mask', kicker, title: L(q.title, locale), line: L(q.line, locale), chip: 'official', caveat: L(illustration.tag, locale) };
-    default:
-      // 'how-much'
-      return { id, picture: 'kerb', kicker, title: L(q.title, locale), line: L(q.line, locale), estimate: coAdd, caveat: estimateCaveat(locale) };
-  }
+  const c = CARDS[id];
+  const title = share.title[c.title][locale];
+  const head = plain(title);
+  const stop = /[？?。.！]$/.test(head) ? '' : locale === 'en' ? '.' : '。';
+  const picture = fill(share.picture[c.art][locale], { red: est.signal.redLength_s });
+  return { id, art: c.art, title, tag: share.tag[locale], alt: fill(share.alt[locale], { title: `${head}${stop}`, picture }) };
 }
 
-/** The alt text of a card (brief 5.1): what it says, its caveat, and that the picture is an illustration. */
-export function shareCardAlt(c: ShareCardContent, locale: Locale): string {
-  const en = locale === 'en';
-  // the money card's kicker names the case its headline is for, so the alt text keeps it
-  const title = c.id === 'money' || c.id === 'electric' ? `${c.kicker}${en ? ': ' : '：'}${plain(c.title)}` : plain(c.title);
-  const stop = /[？?。.！]$/.test(title) ? '' : en ? '.' : '。';
-  const line = c.estimate ? `${c.line}${en ? ': ' : '：'}${c.estimate.text}${en ? ' (estimate)' : '（推估）'}${en ? '.' : '。'}` : c.line;
-  const note = c.picture === 'kerb-electric' ? L(art.alt2.electric, locale) : c.picture === 'body' || c.picture === 'mask' || c.picture === 'smell' ? L(art.alt2.plain, locale) : L(illustration.altNote, locale);
-  return fill(L(share.alt, locale), { title: `${title}${stop}`, line, caveat: c.caveat, note });
+/** Path under /public (pass through asset()) and the alt text for a card. */
+export function shareCard(id: ShareCardId, locale: Locale): { wide: string; alt: string } {
+  return { wide: `/share/${dir(locale)}/${id}.png`, alt: shareCardContent(id, locale).alt };
 }
 
-/** Paths under /public (pass through asset()) and the alt text for a card. */
-export function shareCard(id: ShareCardId, locale: Locale): { wide: string; square: string; alt: string } {
-  const c = shareCardContent(id, locale);
-  return { wide: `/share/${dir(locale)}/${id}.png`, square: `/share/${dir(locale)}/${id}-sq.png`, alt: shareCardAlt(c, locale) };
+export type OgPage = keyof typeof share.og;
+
+/**
+ * The title and one-sentence description a link preview prints for a page (og:title,
+ * og:description), from its path without the base path or the /en prefix ('' for the home
+ * page, 'evidence', 'questions/smell', '90'). Null for a page that names its own (a question
+ * page's question and answer) or has none here.
+ */
+export function ogText(path: string, locale: Locale): { title: string; description: string } | null {
+  const key = path.replace(/^\/+|\/+$/g, '');
+  const page: OgPage | null = key === '' ? 'home' : key === '90' ? 'film' : key in share.og ? (key as OgPage) : null;
+  if (!page) return null;
+  const o = share.og[page];
+  return { title: o.title[locale], description: o.description[locale] };
 }

@@ -1,52 +1,55 @@
 ---
 /**
- * /sources/ — 資料來源 / Sources (redesign brief 7.4; blueprint 4.8). A reference list only,
- * reached from the footer and from /evidence/. The full bibliography from the registry: every
- * source with its stable number, its citation in the reader's language, a working link (DOI or
- * URL), how far it was read, and every fact, chart dataset and answer that cites it. Sources the
- * site's own estimate rests on (estimateSourceIds) say so and link to /estimate/#recipe; the
- * mask facts' sources are ordinary entries (link 3). The old gap section is gone.
- * Citation markers across the site link to /sources/#<source id>.
+ * /sources/ — 資料來源 / Sources (redesign brief 7.4). A reference list, reached from the footer,
+ * from /evidence/ and from every citation marker on the site (/sources/#<source id>).
  *
- * The filter (by link of the chain and by kind of source) is two groups of radio buttons and
- * CSS :has(), so it works without JavaScript; a short script only updates the count. Where :has()
- * is not supported, every source stays listed.
+ * Layout: a short plain introduction (what a source is, what the read-level labels mean, the
+ * hard words), a text filter, then the sources grouped by the question they help answer: the
+ * seven links of the chain, our estimate, masks, money, background
+ * (src/components/pages/sources/groups.ts says how a source's group is chosen). Each group is a
+ * closed <details> with its count and a one-line summary. A source used by several groups is
+ * listed once, under its main group; the entry names its other groups and each of those groups
+ * links back to it.
  *
- * Copy: src/i18n/pages/sources.ts.
+ * Deep links: /sources/#<source id> lands on the entry. Without JavaScript the browser opens the
+ * closed group around the target itself (fragment navigation reveals a closed <details>); with
+ * JavaScript the script below does the same on arrival, on hashchange and on in-page links, and
+ * keeps the entry in view. The filter is shown only when JavaScript runs; without it every group
+ * reads as before.
+ *
+ * Copy: src/i18n/pages/sources.ts (including one plain sentence per source: what we use it for).
  */
 import Base from '@/layouts/Base.astro';
 import Phrased from '@/components/ui/Phrased.astro';
 import Tag from '@/components/ui/Tag.astro';
 import KindChip from '@/components/ui/KindChip.astro';
 import Icon from '@/components/ui/Icon.astro';
+import WordHelp from '@/components/ui/WordHelp.astro';
 import Mixed from '@/components/pages/evidence/Mixed.astro';
 import { citeN, dataAnchor, lf, ls, neverSmokerFacts, readLabel, sourceShort, sourceUses } from '@/components/pages/evidence/ev';
+import { groupAnchor, groupOrder, sourceGroups, sourceWhen, sourceWhere, sourceWho, type GroupId } from '@/components/pages/sources/groups';
 import evidenceCopy from '@/i18n/pages/evidence';
 import { href, htmlLang, localeFromParam, localeStaticPaths } from '@/i18n';
 import { readerText, ui } from '@/i18n/ui';
 import sourcesCopy from '@/i18n/pages/sources';
 import { fill, localize } from '@/i18n/pages/_copy';
-import { answerList, chainLinks, facts, formatCitation, getSource, localizeAnswer, readLevelLabels, readLevels, sourceIds, sourceKindLabels, sourceKinds, sourceUrl, type AnswerId, type SourceId } from '@/data';
-import { estimateSourceIds } from '@/data/estimate';
-import { econData } from '@/data/econ';
+import { answerList, facts, getSource, localizeAnswer, readLevelLabels, readLevels, sourceIds, sourceKindLabels, sourceUrl, type AnswerId, type SourceId } from '@/data';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const T = localize(sourcesCopy, locale);
-const plain = (s: string) => s.replaceAll('|', '');
 const uses = sourceUses();
-/** Percent-encoded Chinese in a URL, shown as characters (the link itself is unchanged). */
-const readableUrl = (u: string) => {
-  try {
-    return decodeURI(u);
-  } catch {
-    return u;
-  }
-};
+const groupsOf = sourceGroups();
 const total = sourceIds.length;
+const colon = locale === 'en' ? ': ' : '：';
+const dot = locale === 'en' ? ' · ' : '・';
+const sp = locale === 'en' ? ' ' : '';
+
 /** A link of the chain is named by its topic ("排氣管排出什麼"), not its number. */
 const TE = localize(evidenceCopy, locale);
 const topic = (n: number) => { const t = TE.answerLink.topics[n - 1]; return t.charAt(0).toUpperCase() + t.slice(1); };
+const groupName = (g: GroupId): string => (/^\d$/.test(g) ? topic(Number(g)) : T.group.names[g as 'estimate' | 'masks' | 'money' | 'background']);
+const groupSummary = (g: GroupId): string => (T.group.summary as Record<string, string>)[g];
 
 /** The answers (former gaps) that rest on a source, through their facts or their own sources. */
 const answersBySource = new Map<SourceId, AnswerId[]>();
@@ -54,221 +57,303 @@ for (const a of answerList) {
   const srcs = new Set<SourceId>([...(a.sources ?? []), ...a.facts.flatMap((f) => facts[f].sources)]);
   for (const id of srcs) answersBySource.set(id, [...(answersBySource.get(id) ?? []), a.id]);
 }
-const estimateSet = new Set<string>(estimateSourceIds);
-// sources the calculator's data cites (prices, plans, county programmes): "used in" names /electric/, never "background"
-const econText = JSON.stringify(econData);
-const econSet = new Set<string>(sourceIds.filter((id) => econText.includes(`"${id}"`)));
-/**
- * The citation is written in the reader's language; only the original title (and the journal or
- * series name) are in the source's. Split those out so each part carries the right lang (WCAG 3.1.2).
- */
-const citeParts = (citation: string, s: ReturnType<typeof getSource>): { text: string; lang?: string }[] => {
-  if (s.language === locale) return [{ text: citation }];
-  const lang = htmlLang[s.language];
-  const foreign = [s.title, s.container].filter((x): x is string => !!x && !s.titleIsDescriptive).map((x) => readerText(x));
-  let parts: { text: string; lang?: string }[] = [{ text: citation }];
-  for (const f of foreign) {
-    parts = parts.flatMap((p) => {
-      if (p.lang || !f || !p.text.includes(f)) return [p];
-      const i = p.text.indexOf(f);
-      return [{ text: p.text.slice(0, i) }, { text: f, lang }, { text: p.text.slice(i + f.length) }].filter((x) => x.text);
-    });
-  }
-  return parts;
-};
+
+const usedFor = sourcesCopy.usedFor as Record<string, { 'zh-TW': string; en: string }>;
 const entries = sourceIds.map((id) => {
   const s = getSource(id);
   const u = uses.get(id)!;
-  // The address and the date we checked it are shown by the link and the line under it, so the
-  // printed citation stops before the address (a long URL is unreadable on a phone).
-  const full = readerText(formatCitation(id, locale)).replace(sourceUrl(id), readableUrl(sourceUrl(id)));
-  const at = full.indexOf(readableUrl(sourceUrl(id)));
-  const citation = at > 0 ? full.slice(0, at).trim() : full;
+  const g = groupsOf.get(id)!;
+  const foreign = s.language !== locale;
+  const title = readerText(s.title);
+  const translated = s.titleTranslated && foreign ? readerText(s.titleTranslated) : undefined;
+  const who = sourceWho(s, locale);
+  // a document that prints no year shows none here (its 檢索日期 / Accessed line is under it)
+  const when = sourceWhen(s, '');
+  const where = sourceWhere(s, locale);
+  const use = usedFor[id]?.[locale];
+  if (!use) throw new Error(`/sources/: no usedFor sentence for source "${id}" in src/i18n/pages/sources.ts`);
+  const answers = answersBySource.get(id) ?? [];
+  const search = [title, s.titleTranslated, who, s.org?.['zh-TW'], s.org?.en, ...(s.authors ?? []), s.container, s.year, s.date, use, id]
+    .filter(Boolean)
+    .join(' ')
+    .replaceAll('\u81fa', '\u53f0')
+    .toLowerCase();
   return {
     id,
     n: citeN(id),
     s,
     u,
-    answers: answersBySource.get(id) ?? [],
-    estimate: estimateSet.has(id),
-    econ: econSet.has(id),
-    citation,
-    parts: citeParts(citation, s),
+    g,
+    title,
+    titleLang: foreign && !s.titleIsDescriptive ? htmlLang[s.language] : undefined,
+    translated,
+    who,
+    when,
+    where,
+    use,
+    answers,
+    search,
     url: sourceUrl(id),
     kind: readerText(sourceKindLabels[s.kind][locale]),
     read: readLabel(s, locale),
-    count: u.facts.length + u.series.length + (answersBySource.get(id)?.length ?? 0),
+    count: u.facts.length + u.series.length + answers.length,
   };
 });
-const kindsUsed = sourceKinds.filter((k) => entries.some((e) => e.s.kind === k));
-const linkCount = (n: number) => entries.filter((e) => (n === 0 ? e.u.links.length === 0 : e.u.links.includes(n as never))).length;
+type Entry = (typeof entries)[number];
+const groups = groupOrder
+  .map((g) => ({
+    g,
+    list: entries.filter((e) => e.g.main === g),
+    alsoHere: entries.filter((e) => e.g.also.includes(g)),
+  }))
+  .filter((x) => x.list.length > 0);
 const readCounts = readLevels.map((lvl) => ({ label: readerText(readLevelLabels[lvl][locale]), n: entries.filter((e) => e.s.readLevel === lvl).length })).filter((r) => r.n > 0);
-
-// No-JS filter: hide what does not match the checked radio in each group.
-const css = [
-  ...chainLinks.map((n) => `.sx:has(#sx-l-${n}:checked) .sx-src:not([data-l${n}]){display:none}`),
-  `.sx:has(#sx-l-0:checked) .sx-src:not([data-l0]){display:none}`,
-  `.sx:has(#sx-l-est:checked) .sx-src:not([data-est]){display:none}`,
-  ...kindsUsed.map((k) => `.sx:has(#sx-k-${k}:checked) .sx-src:not([data-kind="${k}"]){display:none}`),
-  `.sx .sx-src:target{display:grid !important}`,
-].join('');
+const siteLinks = (e: Entry) => [
+  ...(e.g.main === 'estimate' || e.g.also.includes('estimate') ? [{ href: href('/estimate/#recipe', locale), label: T.entry.estimate }] : []),
+  ...(e.g.main === 'money' || e.g.also.includes('money') ? [{ href: href('/electric/#cities', locale), label: T.entry.electric }] : []),
+];
 ---
 
 <Base locale={locale} title={T.meta.title} description={T.meta.description} share="brief">
-  <Fragment slot="head" set:html={`<style>${css}</style>`} />
   <header class="sx-head">
     <div class="container"><div class="sx-head__inner">
       <p class="eyebrow">{T.head.kicker}</p>
       <h1 class="display"><Phrased text={T.head.title} /></h1>
       <p class="lead">{fill(T.head.lead, { n: total })}</p>
-      <p>{T.head.evidence}</p>
-      <div><a class="sx-go" href={href('/evidence/', locale)}>{T.head.evidenceLink}<Icon name="arrow-right" size="1.05em" /></a></div>
+      <p>{T.head.labels}</p>
+      <WordHelp locale={locale} words={['pm25', 'ufp', 'benzene', 'ppm']} />
       <details class="sx-reads">
         <summary><span>{T.reads.title}</span><Icon name="chevron-down" size="1.25rem" /></summary>
-        <p>{T.reads.lead}</p>
         <ul>
           {readCounts.map((r) => <li><span>{r.label}</span><b>{fill(T.reads.count, { n: r.n })}</b></li>)}
         </ul>
       </details>
+      <p class="sx-head__ev">{T.head.evidence} <a class="sx-go" href={href('/evidence/', locale)}><span>{T.head.evidenceLink}</span><Icon name="arrow-right" size="1.05em" /></a></p>
     </div></div>
   </header>
 
-  <div class="sx">
-    <form class="sx-filter container" id="filter" aria-labelledby="sx-filter-title" onsubmit="return false">
-      <h2 class="sx-filter__title" id="sx-filter-title">{T.filter.title}</h2>
-      <p class="sx-filter__hint">{T.filter.hint}</p>
-      <fieldset>
-        <legend>{T.filter.link}</legend>
-        <div class="sx-chips">
-          <span class="sx-chip"><input type="radio" name="link" id="sx-l-all" value="" checked /><label for="sx-l-all">{T.filter.all} <span>{total}</span></label></span>
-          {chainLinks.map((n) => (
-            <span class="sx-chip"><input type="radio" name="link" id={`sx-l-${n}`} value={String(n)} /><label for={`sx-l-${n}`}>{topic(n)} <span>{linkCount(n)}</span></label></span>
-          ))}
-          <span class="sx-chip"><input type="radio" name="link" id="sx-l-0" value="0" /><label for="sx-l-0">{T.filter.none} <span>{linkCount(0)}</span></label></span>
-          <span class="sx-chip"><input type="radio" name="link" id="sx-l-est" value="est" /><label for="sx-l-est">{T.filter.estimate} <span>{entries.filter((e) => e.estimate).length}</span></label></span>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>{T.filter.kind}</legend>
-        <div class="sx-chips">
-          <span class="sx-chip"><input type="radio" name="kind" id="sx-k-all" value="" checked /><label for="sx-k-all">{T.filter.all} <span>{total}</span></label></span>
-          {kindsUsed.map((k) => (
-            <span class="sx-chip"><input type="radio" name="kind" id={`sx-k-${k}`} value={k} /><label for={`sx-k-${k}`}>{readerText(sourceKindLabels[k][locale])} <span>{entries.filter((e) => e.s.kind === k).length}</span></label></span>
-          ))}
-        </div>
-      </fieldset>
-      <p class="sx-count" aria-live="polite" data-sx-count data-template={T.filter.showing} hidden></p>
-    </form>
-
-    <div class="container">
-      <ol class="sx-list" aria-label={plain(T.meta.title)}>
-        {entries.map((e) => (
-          <li
-            class="sx-src"
-            id={e.id}
-            data-kind={e.s.kind}
-            data-l0={e.u.links.length === 0 ? '' : undefined}
-            data-l1={e.u.links.includes(1) ? '' : undefined}
-            data-l2={e.u.links.includes(2) ? '' : undefined}
-            data-l3={e.u.links.includes(3) ? '' : undefined}
-            data-l4={e.u.links.includes(4) ? '' : undefined}
-            data-l5={e.u.links.includes(5) ? '' : undefined}
-            data-l6={e.u.links.includes(6) ? '' : undefined}
-            data-l7={e.u.links.includes(7) ? '' : undefined}
-            data-est={e.estimate ? '' : undefined}
-          >
-            <p class="sx-src__n"><span class="vh">{fill(T.entry.number, { n: '' }).trim()} </span>{e.n}</p>
-            <div class="sx-src__body">
-              <p class="sx-src__tags">
-                <Tag>{e.kind}</Tag>
-                <span class="sx-src__read"><span class="vh">{T.entry.read} </span>{e.read}</span>
-                {e.s.titleIsDescriptive && <Tag tone="signal">{T.entry.descriptive}</Tag>}
-                {e.estimate && <KindChip locale={locale} kind="estimate" size="sm" />}
-              </p>
-              <p class="sx-src__cite">{e.parts.map((p) => (p.lang ? <span lang={p.lang}>{p.text}</span> : p.text))}</p>
-              {e.s.titleIsDescriptive && <p class="sx-src__hint">{T.entry.descriptiveHelp}</p>}
-              {e.s.readerNote && <p class="sx-src__hint">{readerText(e.s.readerNote[locale])}</p>}
-              <div class="sx-src__actions">
-                <a href={e.url} rel="noopener noreferrer" target="_blank">{e.s.doi && !e.s.url ? `${T.entry.doi} ${e.s.doi}` : T.entry.open}<span class="vh">{locale === 'en' ? ': ' : '：'}{sourceShort(e.id, locale)} {ui.externalLink[locale]}</span> ↗</a>
-                <span class="sx-src__checked">{fill(T.entry.checked, { date: e.s.accessed })}</span>
-              </div>
-              <div class="sx-src__links">
-                <b>{T.entry.links}</b>
-                {e.u.links.length ? e.u.links.map((n) => <a href={href(`/evidence/#link-${n}`, locale)}>{topic(n)}</a>) : !e.estimate && !e.econ && <span>{T.entry.noLink}</span>}
-                {e.estimate && <a href={href('/estimate/#recipe', locale)}>{T.entry.estimate}</a>}
-                {e.econ && <a href={href('/electric/#cities', locale)}>{T.entry.electric}</a>}
-              </div>
-              {e.count > 0 && (
-                <details class="sx-src__uses">
-                  <summary>{fill(T.entry.uses, { n: e.count })}</summary>
-                  {e.u.facts.length > 0 && (
-                    <Fragment>
-                      <p class="sx-src__ulabel">{T.entry.facts}</p>
-                      <ul>
-                        {e.u.facts.map((f) => {
-                          const x = lf(f, locale);
-                          // R14: the never-smoker figures are printed only on /evidence/#not-used
-                          if (neverSmokerFacts.includes(f)) return <li><a href={href(`/evidence/#${f}`, locale)}>{evidenceCopy.row.neverSmokerPointer[locale]}</a> <span class="sx-src__st">{evidenceCopy.row.alsoNotUsed[locale]}</span></li>;
-                          return <li><a href={href(`/evidence/#${f}`, locale)}>{x.display}</a> <KindChip locale={locale} kind={x.evidence} size="sm" /> <span class="sx-src__st"><Mixed text={x.statement} locale={locale} /></span></li>;
-                        })}
-                      </ul>
-                    </Fragment>
-                  )}
-                  {e.u.series.length > 0 && (
-                    <Fragment>
-                      <p class="sx-src__ulabel">{T.entry.series}</p>
-                      <ul>{e.u.series.map((x) => <li><a href={href(`/evidence/#${dataAnchor(x)}`, locale)}>{ls(x, locale).title}</a></li>)}</ul>
-                    </Fragment>
-                  )}
-                  {e.answers.length > 0 && (
-                    <Fragment>
-                      <p class="sx-src__ulabel">{T.entry.answers}</p>
-                      <ul>{e.answers.map((a) => <li><a href={href(`/evidence/#${a}`, locale)}>{localizeAnswer(a, locale).question}</a></li>)}</ul>
-                    </Fragment>
-                  )}
-                </details>
-              )}
-            </div>
-          </li>
-        ))}
-      </ol>
-      <div class="sx-top"><a href="#filter">{T.top}</a></div>
+  <div class="container sx" data-sx>
+    <div class="sx-find" data-sx-find hidden>
+      <label class="sx-find__label" for="sx-q">{T.find.label}</label>
+      <p class="sx-find__hint" id="sx-q-hint">{T.find.hint}</p>
+      <div class="sx-find__row">
+        <input class="sx-find__input" id="sx-q" type="search" autocomplete="off" aria-describedby="sx-q-hint" />
+        <button class="sx-find__clear" type="button" data-sx-clear>{T.find.clear}</button>
+      </div>
+      <p class="sx-find__out" role="status" aria-live="polite" data-sx-out data-found={T.find.found} data-none={T.find.none}></p>
     </div>
-  </div>
 
+    <h2 class="sx-groups__title" id="groups">{T.groupsTitle}</h2>
+    <p class="sx-groups__hint">{T.groupsHint}</p>
+
+    {groups.map(({ g, list, alsoHere }) => (
+      <section class="sg" id={groupAnchor(g)} aria-labelledby={`${groupAnchor(g)}-h`} data-sg>
+        <details class="sg__fold">
+          <summary class="sg__sum">
+            <span class="sg__text">
+              <h3 class="sg__name" id={`${groupAnchor(g)}-h`}>{groupName(g)}</h3>
+              <span class="sg__count">{list.length === 1 ? T.group.countOne : fill(T.group.count, { n: list.length })}</span>
+              <span class="sg__line">{groupSummary(g)}</span>
+            </span>
+            <svg class="sg__chev" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+          </summary>
+          <div class="sg__start" id={`${groupAnchor(g)}-list`}></div>
+          <ol class="sx-list" aria-label={groupName(g)}>
+            {list.map((e) => (
+              <li class="sx-src" id={e.id} data-search={e.search}>
+                <p class="sx-src__title">
+                  <span class="sx-src__n"><span class="vh">{fill(T.entry.number, { n: '' }).trim()} </span>{e.n}</span>
+                  {e.s.titleIsDescriptive ? <span>[{e.title}]</span> : <cite lang={e.titleLang}>{e.title}</cite>}
+                  {e.translated && <span class="sx-src__tr">{locale === 'en' ? ` [${e.translated}]` : `〔${e.translated}〕`}</span>}
+                </p>
+                <p class="sx-src__meta">
+                  <Mixed text={[e.who, e.when, ...e.where].filter(Boolean).join(dot)} locale={locale} />
+                </p>
+                {e.s.titleIsDescriptive && (
+                  <p class="sx-src__hint"><Tag tone="signal">{T.entry.descriptive}</Tag> {T.entry.descriptiveHelp}</p>
+                )}
+                <p class="sx-src__use"><b>{T.entry.usedFor}</b>{sp}{e.use}</p>
+                <p class="sx-src__read"><b>{T.entry.read}</b>{sp}{e.read}<span class="sx-src__kind">{dot}{e.kind}</span></p>
+                {e.s.readerNote && <p class="sx-src__hint">{readerText(e.s.readerNote[locale])}</p>}
+                <p class="sx-src__actions">
+                  <a href={e.url} rel="noopener noreferrer" target="_blank">{e.s.doi && !e.s.url ? `${T.entry.doi} ${e.s.doi}` : T.entry.open}<span class="vh">{colon}{sourceShort(e.id, locale)} {ui.externalLink[locale]}</span> ↗</a>
+                  <span class="sx-src__checked">{fill(T.entry.checked, { date: e.s.accessed })}</span>
+                </p>
+                {siteLinks(e).length > 0 && (
+                  <p class="sx-src__links"><b>{T.entry.where}</b>{siteLinks(e).map((l) => <a href={l.href}>{l.label}</a>)}</p>
+                )}
+                {e.g.also.length > 0 && (
+                  <p class="sx-src__links sx-src__also"><b>{T.entry.also}</b>{e.g.also.map((o) => <a href={`#${groupAnchor(o)}-list`}>{groupName(o)}</a>)}</p>
+                )}
+                {e.count > 0 && (
+                  <details class="sx-src__uses">
+                    <summary>{fill(T.entry.uses, { n: e.count })}</summary>
+                    {e.u.facts.length > 0 && (
+                      <Fragment>
+                        <p class="sx-src__ulabel">{T.entry.facts}</p>
+                        <ul>
+                          {e.u.facts.map((f) => {
+                            const x = lf(f, locale);
+                            // R14: the never-smoker figures are printed only on /evidence/#not-used
+                            if (neverSmokerFacts.includes(f)) return <li><a href={href(`/evidence/#${f}`, locale)}>{evidenceCopy.row.neverSmokerPointer[locale]}</a> <span class="sx-src__st">{evidenceCopy.row.alsoNotUsed[locale]}</span></li>;
+                            return <li><a href={href(`/evidence/#${f}`, locale)}>{x.display}</a> <KindChip locale={locale} kind={x.evidence} size="sm" /> <span class="sx-src__st"><Mixed text={x.statement} locale={locale} /></span></li>;
+                          })}
+                        </ul>
+                      </Fragment>
+                    )}
+                    {e.u.series.length > 0 && (
+                      <Fragment>
+                        <p class="sx-src__ulabel">{T.entry.series}</p>
+                        <ul>{e.u.series.map((x) => <li><a href={href(`/evidence/#${dataAnchor(x)}`, locale)}>{ls(x, locale).title}</a></li>)}</ul>
+                      </Fragment>
+                    )}
+                    {e.answers.length > 0 && (
+                      <Fragment>
+                        <p class="sx-src__ulabel">{T.entry.answers}</p>
+                        <ul>{e.answers.map((a) => <li><a href={href(`/evidence/#${a}`, locale)}>{localizeAnswer(a, locale).question}</a></li>)}</ul>
+                      </Fragment>
+                    )}
+                  </details>
+                )}
+              </li>
+            ))}
+          </ol>
+          <div class="sg__end">
+            {alsoHere.length > 0 && (
+              <p class="sx-src__links sg__also" data-sg-also>
+                <b>{T.group.alsoHere}</b>{sp}
+                {alsoHere.map((e) => <a href={`#${e.id}`}>{sourceShort(e.id, locale)}</a>)}
+              </p>
+            )}
+          </div>
+        </details>
+      </section>
+    ))}
+    <div class="sx-top"><a href="#groups">{T.top}</a></div>
+  </div>
 </Base>
 
 <script>
-  // Enhancement only: say how many sources the filter leaves.
-  const form = document.querySelector<HTMLFormElement>('.sx-filter');
-  const out = document.querySelector<HTMLElement>('[data-sx-count]');
+  // 1. Opening a group for a link: /sources/#<source id>, #topic-<group>(-list), on arrival, on
+  //    hashchange and on in-page links. 2. The text filter (shown only when this script runs).
+  const root = document.querySelector<HTMLElement>('[data-sx]');
   const items = Array.from(document.querySelectorAll<HTMLElement>('.sx-src'));
-  if (form && out && CSS.supports('selector(:has(*))')) {
-    const update = () => {
-      const shown = items.filter((el) => el.offsetParent !== null || getComputedStyle(el).display !== 'none').length;
-      out.textContent = (out.dataset.template ?? '').replace('{n}', String(shown)).replace('{total}', String(items.length));
-      out.hidden = false;
-    };
-    form.addEventListener('change', update);
-    update();
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-sg]'));
+  const input = document.querySelector<HTMLInputElement>('#sx-q');
+  const out = document.querySelector<HTMLElement>('[data-sx-out]');
+  const autoOpened = new Set<HTMLDetailsElement>();
+  let filtering = false;
+
+  const clearFilter = () => {
+    if (!input || !filtering) return;
+    input.value = '';
+    applyFilter();
+  };
+
+  const openFor = (hash: string, settle = false) => {
+    if (!hash || hash === '#') return;
+    let el: HTMLElement | null = null;
+    try {
+      el = document.getElementById(decodeURIComponent(hash.slice(1)));
+    } catch {
+      return;
+    }
+    if (!el || !root?.contains(el)) return;
+    if (filtering && (el.hidden || el.closest('[hidden]'))) clearFilter();
+    const own = el.matches('[data-sg]') ? el.querySelector<HTMLDetailsElement>('details.sg__fold') : null;
+    if (own) own.open = true;
+    for (let d = el.closest('details'); d; d = d.parentElement?.closest('details') ?? null) (d as HTMLDetailsElement).open = true;
+    const target = el.matches('.sg__start') ? (el.closest('[data-sg]') as HTMLElement) : el;
+    const go = () => target.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'start' });
+    requestAnimationFrame(go);
+    if (!settle) return;
+    // fonts and the header may still settle after arrival: keep the entry in view a moment
+    let stop = false;
+    for (const ev of ['wheel', 'touchstart', 'keydown', 'mousedown']) addEventListener(ev, () => (stop = true), { once: true, passive: true });
+    const ro = new ResizeObserver(() => !stop && go());
+    ro.observe(document.body);
+    setTimeout(() => ro.disconnect(), 3000);
+  };
+  openFor(location.hash, true);
+  addEventListener('hashchange', () => openFor(location.hash));
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element | null)?.closest?.('a[href*="#"]') as HTMLAnchorElement | null;
+    if (a && a.pathname === location.pathname && a.hash) openFor(a.hash);
+  });
+
+  // printing prints every group: the shell opens every fold (Header.astro)
+
+  // --- filter ---
+  let timer = 0;
+  function applyFilter() {
+    if (!input || !out) return;
+    const words = input.value.replaceAll('\u81fa', '\u53f0').toLowerCase().trim().split(/\s+/).filter(Boolean);
+    filtering = words.length > 0;
+    let found = 0;
+    for (const li of items) {
+      const ok = !filtering || words.every((w) => (li.dataset.search ?? '').includes(w));
+      li.hidden = !ok;
+      if (ok) found++;
+    }
+    for (const sec of sections) {
+      const d = sec.querySelector<HTMLDetailsElement>('details.sg__fold')!;
+      const n = sec.querySelectorAll('.sx-src:not([hidden])').length;
+      sec.hidden = filtering && n === 0;
+      sec.querySelectorAll<HTMLElement>('[data-sg-also]').forEach((x) => (x.hidden = filtering));
+      if (filtering && n > 0 && !d.open) {
+        d.open = true;
+        autoOpened.add(d);
+      }
+      if (!filtering && autoOpened.has(d)) {
+        d.open = false;
+        autoOpened.delete(d);
+      }
+    }
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      out.textContent = !filtering ? '' : found ? (out.dataset.found ?? '').replace('{n}', String(found)) : (out.dataset.none ?? '');
+    }, 250);
+  }
+  const box = document.querySelector<HTMLElement>('[data-sx-find]');
+  if (box && input) {
+    box.hidden = false;
+    input.addEventListener('input', applyFilter);
+    document.querySelector('[data-sx-clear]')?.addEventListener('click', () => {
+      input.value = '';
+      applyFilter();
+      input.focus();
+    });
   }
 </script>
 
 <style>
   .sx-head {
-    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-6);
+    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-5);
   }
   .sx-head__inner {
     display: grid;
     gap: var(--sp-4);
-    max-inline-size: 52rem;
+    max-inline-size: 46rem;
+  }
+  .sx-head__ev {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--sp-2);
+  }
+  .sx-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
   }
   .sx-reads {
     font-size: var(--fs-sm);
     border-block: 1px solid var(--line-strong);
   }
   .sx-reads summary {
-    min-block-size: var(--tap, 44px);
+    min-block-size: var(--tap);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -284,10 +369,6 @@ const css = [
   .sx-reads[open] summary :global(svg) {
     transform: rotate(180deg);
   }
-  .sx-reads p {
-    color: var(--ink-2);
-    margin-block-end: var(--sp-3);
-  }
   .sx-reads ul {
     list-style: none;
     margin: 0 0 var(--sp-3);
@@ -300,77 +381,156 @@ const css = [
     padding-block: var(--sp-1);
     border-block-end: 1px solid var(--line);
   }
-  .sx-filter {
+  .sx-reads li b {
+    flex: none;
+  }
+
+  .sx {
+    padding-block-end: var(--sp-6);
+  }
+  .sx-find {
     display: grid;
-    gap: var(--sp-4);
-    padding-block: var(--sp-5);
-    scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
-  }
-  .sx-filter__title {
-    font-size: var(--fs-lg);
-  }
-  .sx-filter__hint {
-    font-size: var(--fs-sm);
-    color: var(--ink-2);
-  }
-  .sx-filter fieldset {
-    border: 0;
-    margin: 0;
-    padding: 0;
-    min-inline-size: 0;
-  }
-  .sx-filter legend {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    margin-block-end: var(--sp-2);
-  }
-  .sx-chips {
-    display: flex;
-    flex-wrap: wrap;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--sp-2);
+    padding: var(--sp-4);
+    margin-block-end: var(--sp-5);
+    background: var(--bg-sunken);
+    border-radius: var(--radius-3);
+    max-inline-size: 46rem;
   }
-  .sx-chip {
-    position: relative;
+  .sx-find[hidden] {
+    display: none;
   }
-  .sx-chip input {
-    position: absolute;
-    opacity: 0;
-    inline-size: 1px;
-    block-size: 1px;
-  }
-  .sx-chip label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    min-block-size: var(--tap, 44px);
-    padding: 0 0.85em;
-    border: 1.5px solid var(--line-strong);
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-sm);
-    cursor: pointer;
-    max-inline-size: 100%;
-  }
-  .sx-chip label span {
-    font-size: var(--fs-xs);
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
-  }
-  .sx-chip input:checked + label {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--bg);
+  .sx-find__label {
+    font-size: var(--fs-md);
     font-weight: var(--fw-bold);
   }
-  .sx-chip input:checked + label span {
-    color: var(--bg);
+  .sx-find__hint {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
   }
-  .sx-chip input:focus-visible + label {
+  .sx-find__row {
+    display: flex;
+    gap: var(--tap-gap);
+  }
+  .sx-find__input {
+    flex: 1;
+    min-inline-size: 0;
+    min-block-size: var(--tap);
+    padding: 0 var(--sp-3);
+    font: inherit;
+    font-size: var(--fs-base);
+    color: var(--ink);
+    background: var(--surface);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+  }
+  .sx-find__input:focus-visible,
+  .sx-find__clear:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
-  .sx-count {
+  .sx-find__clear {
+    flex: none;
+    min-block-size: var(--tap);
+    min-inline-size: var(--tap);
+    padding: 0 var(--sp-4);
+    font: inherit;
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+    background: var(--surface);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    cursor: pointer;
+  }
+  .sx-find__out {
     font-weight: var(--fw-bold);
   }
+  .sx-find__out:empty {
+    display: none;
+  }
+
+  .sx-groups__title {
+    font-size: var(--fs-xl);
+    scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
+  }
+  .sx-groups__hint {
+    color: var(--ink-2);
+    margin-block: var(--sp-2) var(--sp-4);
+    max-inline-size: 46rem;
+  }
+
+  .sg {
+    border-block-start: 1px solid var(--line-strong);
+    scroll-margin-block-start: calc(var(--header-h) + var(--sp-2));
+  }
+  .sg:last-of-type {
+    border-block-end: 1px solid var(--line-strong);
+  }
+  .sg[hidden] {
+    display: none;
+  }
+  .sg__sum {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    margin-block: var(--sp-1);
+    padding-block: var(--sp-3);
+    cursor: pointer;
+    list-style: none;
+  }
+  .sg__sum::-webkit-details-marker {
+    display: none;
+  }
+  .sg__sum:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .sg__text {
+    display: grid;
+    gap: var(--sp-1);
+    min-inline-size: 0;
+  }
+  .sg__name {
+    font-size: var(--fs-lg);
+    line-height: 1.35;
+    margin: 0;
+    color: var(--ink);
+  }
+  .sg__count {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .sg__line {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+  .sg__chev {
+    flex: none;
+    color: var(--accent);
+    transition: transform 0.2s;
+  }
+  .sg__fold[open] .sg__chev {
+    transform: rotate(180deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sg__chev {
+      transition: none;
+    }
+  }
+  .sg__end {
+    padding-block-end: var(--sp-4);
+  }
+  .sg__start {
+    /* the target of "also used for" links: lands just under the group's own title */
+    scroll-margin-block-start: calc(var(--header-h) + 9rem);
+  }
+
   .sx-list {
     list-style: none;
     margin: 0;
@@ -378,83 +538,81 @@ const css = [
   }
   .sx-src {
     display: grid;
-    /* wide enough for three heavy digits (sources 100–222) on one line */
-    grid-template-columns: 4rem minmax(0, 1fr);
-    gap: var(--sp-3);
-    padding-block: var(--sp-5);
+    gap: var(--sp-2);
+    padding-block: var(--sp-4);
     border-block-start: 1px solid var(--line);
     scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
+    max-inline-size: 46rem;
+  }
+  .sx-src[hidden] {
+    display: none;
   }
   .sx-src:target {
     background: var(--mark-bg);
     box-shadow: 0 0 0 var(--sp-2) var(--mark-bg);
   }
-  @media (max-width: 40em) {
-    .sx-src {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--sp-1);
-    }
-    .sx-src__n {
-      font-size: var(--fs-lg) !important;
-    }
-  }
-  .sx-src__n {
-    font-family: var(--font-en-display, inherit);
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-black, 900);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink-2);
-    white-space: nowrap;
-  }
-  .sx-src__body {
-    display: grid;
-    gap: var(--sp-2);
-    min-inline-size: 0;
-  }
-  .sx-go {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35em;
-    min-block-size: var(--tap);
+  .sx-src__title {
+    font-size: var(--fs-base);
     font-weight: var(--fw-bold);
-  }
-  .sx-src__tags :global(.tag) {
-    white-space: normal;
-  }
-  .sx-src__tags {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--sp-1) var(--sp-2);
-  }
-  .sx-src__read {
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    color: var(--ink-2);
-  }
-  .sx-src__cite {
-    font-size: var(--fs-sm);
-    line-height: var(--lh-body);
+    line-height: 1.5;
     overflow-wrap: anywhere;
   }
+  .sx-src__title cite {
+    font-style: normal;
+  }
+  .sx-src__n {
+    display: inline-block;
+    min-inline-size: 2.4em;
+    margin-inline-end: var(--sp-2);
+    padding: 0 0.35em;
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--ink-2);
+  }
+  .sx-src__tr {
+    font-weight: var(--fw-regular);
+  }
+  .sx-src__meta {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+  .sx-src__use,
+  .sx-src__read {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .sx-src__read {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .sx-src__use b,
+  .sx-src__read b {
+    font-weight: var(--fw-bold);
+  }
   .sx-src__hint {
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     color: var(--ink-2);
     padding-inline-start: var(--sp-3);
     border-inline-start: 2px dashed var(--line-strong);
+  }
+  .sx-src__hint :global(.tag) {
+    white-space: normal;
   }
   .sx-src__actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--sp-2) var(--sp-4);
+    gap: 0 var(--sp-4);
     font-size: var(--fs-sm);
   }
   .sx-src__actions a {
     display: inline-flex;
     align-items: center;
-    min-block-size: var(--tap, 44px);
+    min-block-size: var(--tap);
     font-weight: var(--fw-bold);
     color: var(--accent);
     overflow-wrap: anywhere;
@@ -467,8 +625,12 @@ const css = [
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--tap-gap) var(--sp-3);
+    gap: 0 var(--sp-4);
     font-size: var(--fs-sm);
+  }
+  .sx-src__links b {
+    color: var(--ink-2);
+    margin-inline-end: calc(var(--sp-4) * -1 + var(--sp-1));
   }
   .sx-src__links a {
     display: inline-flex;
@@ -476,11 +638,15 @@ const css = [
     min-block-size: var(--tap);
     min-inline-size: var(--tap);
   }
+  .sg__also {
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px dashed var(--line-strong);
+  }
   .sx-src__uses {
     font-size: var(--fs-sm);
   }
   .sx-src__uses summary {
-    min-block-size: var(--tap, 44px);
+    min-block-size: var(--tap);
     display: flex;
     align-items: center;
     color: var(--accent);
@@ -508,53 +674,12 @@ const css = [
     line-height: var(--lh-snug);
   }
   .sx-top {
-    padding-block: var(--sp-5);
+    padding-block: var(--sp-5) 0;
     font-weight: var(--fw-bold);
   }
   .sx-top a {
     display: inline-flex;
     align-items: center;
     min-block-size: var(--tap);
-  }
-  .sx-gaps {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--sp-4);
-  }
-  @media (min-width: 48em) {
-    .sx-gaps {
-      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-    }
-  }
-  .sx-gap {
-    display: grid;
-    gap: var(--sp-2);
-    align-content: start;
-    padding: var(--sp-4);
-    border: 2px dashed var(--ink-3);
-    border-radius: var(--radius-2);
-    background: var(--bg);
-    scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
-  }
-  .sx-gap:target {
-    border-color: var(--accent);
-  }
-  .sx-gap__title {
-    font-size: var(--fs-md);
-    line-height: var(--lh-snug);
-  }
-  .sx-gap__who {
-    font-size: var(--fs-sm);
-    color: var(--ink-2);
-  }
-  .sx-gap__who b {
-    color: var(--ink);
-  }
-  .sx-gap__more {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--tap, 44px);
   }
 </style>

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { SKIP, coveredChars, scanDist } from './scripts/display-font.mjs';
+import { gluePunct, glueZh } from './src/lib/glue.mjs';
 
 // SITE_URL / BASE_PATH let the same build serve a custom domain (default)
 // or a GitHub Pages project path (BASE_PATH=/scooterair).
@@ -76,18 +77,37 @@ const headlineFont = {
 };
 
 /**
- * A closing mark never starts a line on its own (brief 9.3 check 13): in headings, buttons, links
- * styled as buttons, fold titles and the film transcript, a Chinese character and the closing
+ * A closing mark never starts a line on its own, and a word never breaks inside itself (brief 9.3
+ * check 13; src/lib/glue.mjs): in headings, buttons, links, labels, fold titles and the film transcript,
+ * each short Chinese word, and a Chinese character and the closing
  * punctuation after it are kept together in <span class="nobr"> (white-space: nowrap, global.css).
  * Done once over the built HTML, text only: tags, attributes, <svg>, <script> and <style> are
  * left alone. Phrased and the home page's phrasedHtml() do the same for text drawn in the browser.
  */
 const ZHUYIN = /[\u3400-\u9fff]（[\u3100-\u312f\u02c7\u02ca\u02cb\u02d9]+）[，。？！；：、]?/g;
-const GLUE_MARKS = /([\u3400-\u9fff])([，。？！；：、）」』〉》…]+)/g;
-const GLUE_IN = /(<(h[1-4]|button|summary|figcaption|li|a)\b[^>]*>)([\s\S]*?)(<\/\2>)/g;
-function glueText(inner) {
-  if (/<(svg|script|style|textarea)\b/.test(inner)) return inner.replace(/(<(svg|script|style|textarea)\b[\s\S]*?<\/\2>)|(<[^>]*>)|([^<]+)/g, (m, keep, _t, tag, text) => (keep || tag ? m : text.replace(GLUE_MARKS, '<span class="nobr">$1$2</span>')));
-  return inner.split(/(<[^>]+>)/).map((x) => (x.startsWith('<') ? x : x.replace(GLUE_MARKS, '<span class="nobr">$1$2</span>'))).join('');
+const GLUE_IN = /(<(h[1-4]|button|summary|figcaption|li|a|label|legend|th)\b[^>]*>)([\s\S]*?)(<\/\2>)/g;
+// Whole words are glued only where a line is short and a split word reads worst: headings,
+// buttons, fold titles, labels, legends, table headers and links styled as buttons. List items, captions and
+// plain links keep the closing-mark rule only: gluing words there widens the narrowest a
+// grid or flex column can get, and at 320 px 特大 that pushed pages sideways.
+const WORDS_IN = /^<(h[1-4]|button|summary|label|legend|th)\b|^<a\b[^>]*class="[^"]*\b(btn|button|next|cta)/;
+// text already inside a nobr span (Phrased glued it) is left as it is
+const glueRun = (x, inNobr, words) => (inNobr ? x : words ? glueZh(x) : gluePunct(x));
+function glueText(inner, words) {
+  let depth = 0; // nobr spans open around the current text
+  const stack = [];
+  return inner.replace(/(<(svg|script|style|textarea)\b[\s\S]*?<\/\2>)|(<[^>]*>)|([^<]+)/g, (m, keep, _t, tag, text) => {
+    if (keep) return m;
+    if (tag) {
+      if (/^<span\b/.test(tag)) {
+        const nb = /class="nobr"/.test(tag);
+        stack.push(nb);
+        if (nb) depth++;
+      } else if (/^<\/span>/.test(tag) && stack.length && stack.pop()) depth--;
+      return m;
+    }
+    return glueRun(text, depth > 0, words);
+  });
 }
 function walkHtml(dir, out = []) {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -108,7 +128,7 @@ const gluePunctuation = {
         const head = html.slice(0, body);
         const rest = html
           .slice(body)
-          .replace(GLUE_IN, (m, open, _tag, inner, close) => open + glueText(inner) + close)
+          .replace(GLUE_IN, (m, open, _tag, inner, close) => open + glueText(inner, WORDS_IN.test(open)) + close)
           // a character and its 注音 never part: 「苯（ㄅㄣˇ）」 stays on one line, anywhere in the body
           .replace(/(<(svg|script|style|textarea)\b[\s\S]*?<\/\2>)|(<[^>]*>)|([^<]+)/g, (m, keep, _t, tag, text) => (keep || tag ? m : text.replace(ZHUYIN, '<span class="nobr">$&</span>')))
           // text a component already glued (Phrased) is not wrapped twice

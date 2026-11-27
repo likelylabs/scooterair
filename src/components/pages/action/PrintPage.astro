@@ -12,6 +12,8 @@ import { absUrl } from '../../../lib/abs-url.ts';
  *   description  meta description
  *   canonical    true: print a canonical link and the language alternates (default true)
  *   bare         true: no on-screen toolbar spacing (the card pages) (default false)
+ *   share        optional share-card id: one og:image (1200 × 630) with its alt text, so a shared
+ *                link to the sheet shows the site's card
  *
  * Slots
  *   default  the page
@@ -28,6 +30,7 @@ import cjkDisplayCss from '@fontsource/noto-sans-tc/900.css?url';
 import cjkHeadlineUrl from '@/styles/fonts/noto-sans-tc-900-headline.woff2?url';
 import { asset, htmlLang, locales, switchLocalePath, type Locale } from '@/i18n';
 import { site } from '@/i18n/ui';
+import { shareCard, type ShareCardId } from '@/lib/share-cards';
 
 interface Props {
   locale: Locale;
@@ -35,8 +38,10 @@ interface Props {
   description?: string;
   canonical?: boolean;
   bare?: boolean;
+  share?: ShareCardId;
 }
-const { locale, title, description = site.description[locale], canonical = true, bare = false } = Astro.props;
+const { locale, title, description = site.description[locale], canonical = true, bare = false, share } = Astro.props;
+const card = share ? shareCard(share, locale) : null;
 const abs = (p: string) => absUrl(p, Astro.site);
 // Keep the range in step with UNICODE_RANGE in scripts/display-font.mjs (as Base.astro does).
 const cjkHeadlineFace = `@font-face{font-family:'Noto Sans TC Headline';font-style:normal;font-weight:900;font-display:swap;src:url(${cjkHeadlineUrl}) format('woff2');unicode-range:U+00B7,U+2000-2BFF,U+2E80-FFEF}`;
@@ -56,6 +61,22 @@ const cjkHeadlineFace = `@font-face{font-family:'Noto Sans TC Headline';font-sty
         <Fragment>
           <link rel="canonical" href={abs(Astro.url.pathname)} />
           {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(switchLocalePath(Astro.url.pathname, l))} />)}
+        </Fragment>
+      )
+    }
+    {
+      card && (
+        <Fragment>
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content={site.name[locale]} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          {canonical && <meta property="og:url" content={abs(Astro.url.pathname)} />}
+          <meta property="og:image" content={abs(asset(card.wide))} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={card.alt} />
+          <meta name="twitter:card" content="summary_large_image" />
         </Fragment>
       )
     }

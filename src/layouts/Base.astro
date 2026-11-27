@@ -10,7 +10,9 @@ import { absUrl } from '../lib/abs-url.ts';
  *   share        id of a generated share card (V44): 'home' (default), 'brief', or a
  *                question slug ('smell', 'my-child', …). See src/lib/share-cards.ts.
  *                Sets ONE og:image (1200 × 630; a second image makes iMessage show a split collage) and the
- *                image alt text — the card carries its caveat inside the picture.
+ *                image alt text. og:title and og:description are the page's point in a few words and
+ *                one plain sentence (share.og in src/i18n/pages/share.ts, found by the page's path);
+ *                a page without an entry there (a question page) uses its title and description.
  *   ogImage      path under /public for a hand-made share image (overrides `share`)
  *   noindex      true for utility pages such as the styleguide
  *   home         true on the landing page: <title> is "site name — tagline"
@@ -57,7 +59,7 @@ import Header from '@/components/shell/Header.astro';
 import Footer from '@/components/shell/Footer.astro';
 import MoneySnapshot from '@/components/ui/MoneySnapshot.astro';
 import { prePaintScript, snapshot } from '@/lib/site-state.data';
-import { shareCard, type ShareCardId } from '@/lib/share-cards';
+import { ogText, shareCard, type ShareCardId } from '@/lib/share-cards';
 
 interface Props {
   locale: Locale;
@@ -76,9 +78,12 @@ const { locale, title, description = site.description[locale], share = 'home', o
 const switchTo = alternates ? undefined : href('/', locale === 'en' ? 'zh-TW' : 'en');
 const hasRail = Astro.slots.has('rail');
 const card = shareCard(share, locale);
+// the path without the base path and the language prefix: '' (home), 'evidence', 'questions/smell', '90'
+const pagePath = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '').length).replace(/^\/en(?=\/|$)/, '');
 
 const siteName = site.name[locale];
 const fullTitle = home ? `${siteName} — ${site.tagline[locale]}` : `${title} — ${siteName}`;
+const og = (alternates && ogText(pagePath, locale)) || { title: home ? fullTitle : title, description };
 const abs = (p: string) => absUrl(p, Astro.site);
 const canonical = abs(Astro.url.pathname);
 const image = abs(asset(ogImage ?? card.wide));
@@ -149,8 +154,8 @@ const ld = home
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
-    <meta property="og:title" content={home ? fullTitle : title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={og.title} />
+    <meta property="og:description" content={og.description} />
     {/* a page with no address of its own (the 404 page, served for every missing address) has no og:url */}
     {alternates && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={image} />
@@ -160,8 +165,8 @@ const ld = home
     <meta property="og:locale" content={ogLocale[locale]} />
     <meta property="og:locale:alternate" content={ogLocale[other]} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={home ? fullTitle : title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:title" content={og.title} />
+    <meta name="twitter:description" content={og.description} />
     <meta name="twitter:image" content={image} />
     {!ogImage && <meta name="twitter:image:alt" content={card.alt} />}
 

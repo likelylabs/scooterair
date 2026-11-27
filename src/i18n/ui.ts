@@ -27,8 +27,8 @@ export const site = {
   } as L10n,
   /** Site description (brief 7.10): says 空氣污染 and 廢氣, so a search for either finds the site. */
   description: {
-    'zh-TW': '台灣路口的機車廢氣和空氣污染：等紅燈時，旁邊機車的廢氣有多少、對身體有什麼影響、換電動機車要多少錢。',
-    en: 'Scooter exhaust and air pollution at Taiwan’s junctions: how much exhaust the scooters beside you add at a red light, what it does to the body, and what an electric scooter costs.',
+    'zh-TW': '台灣路口的機車廢氣和空氣污染。等紅燈時，旁邊機車的廢氣有多少？對身體有什麼影響？換電動機車要多少錢？',
+    en: 'Scooter exhaust and air pollution at Taiwan’s junctions. How much exhaust do the scooters beside you add at a red light? What does it do to the body, and what does an electric scooter cost?',
   } as L10n,
   /**
    * The one sentence a reader should be able to repeat (brief section 1). The home page, the film,
@@ -478,11 +478,23 @@ export const estText = {
   includingStreet: { 'zh-TW': '含街上原本就有的', en: 'including what the street already holds' } as L10n,
   /** Label before the confidence word in an estimate's sheet (rule 9): 可信程度：中. */
   confidence: { 'zh-TW': '可信程度', en: 'Confidence' } as L10n,
+  /**
+   * The one assumption behind every yearly red-light figure (time.hoursPerYear): home screen 7,
+   * the film's daily cue. Fill with waitPerRed_s. Keep both places printing this same string.
+   */
+  redHours: { 'zh-TW': '每個紅燈算 {lo} 到 {hi} 秒', en: 'each light counted as {lo} to {hi} seconds' } as L10n,
 } as const;
+
+/** estText.redHours as a sentence of its own: home screen 7 and the film's transcript print exactly this. */
+export const redHoursSentence = (locale: Locale, lo: number, hi: number): string => {
+  const s = estText.redHours[locale].replace('{lo}', String(lo)).replace('{hi}', String(hi));
+  return locale === 'en' ? `${s.charAt(0).toUpperCase()}${s.slice(1)}.` : `${s}。`;
+};
 
 /** The tag on every drawn scene, as HTML at 14 px or more (brief 5.1), and its relatives. */
 export const illustration = {
-  tag: { 'zh-TW': '示意圖｜廢氣其實大多看不見', en: 'Illustration: real exhaust is mostly invisible' } as L10n,
+  /** Under every street picture. Pictures draw only the scooters' exhaust, so the tag also says the street's own air is not drawn. */
+  tag: { 'zh-TW': '示意圖｜廢氣大多看不見，街上本來的空氣沒有畫', en: 'Illustration: real exhaust is mostly invisible, and the street’s own air is not drawn' } as L10n,
   /** On the body picture. */
   body: { 'zh-TW': '示意圖・不是醫學圖', en: 'Illustration, not a medical drawing' } as L10n,
   /** The sentence every scene's alt text ends with. Name the scenario before it. */

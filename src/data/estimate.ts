@@ -487,7 +487,7 @@ export function hoursPerYear(reds: RedsPerDay): EstRange & { exact: { lo: number
 /** time.hoursPerYear[2|4|6] */
 export const time = {
   hoursPerYear: { 2: hoursPerYear(2), 4: hoursPerYear(4), 6: hoursPerYear(6) } as Record<RedsPerDay, ReturnType<typeof hoursPerYear>>,
-  /** The whole span the film and /questions/one-red-light/ quote: 12 to 55 hours. */
+  /** The whole span (12 to 55 hours): the scale of the road-of-time bar. The film and home quote time.hoursPerYear[4]. */
   span: { lo: hoursPerYear(2).lo, hi: hoursPerYear(6).hi },
 };
 
@@ -554,10 +554,27 @@ export const kerbSentenceTable = kerbSentences;
 
 export type CheckRule = 'overlap' | 'higher' | 'lower';
 
-const checkHeadlines: Record<CheckRule, L10n> = {
-  overlap: t('行人等候區量過嗎？有，和我們算的差不多', 'Measured where people wait to cross? Yes, and it roughly matches our estimate'),
-  higher: t('行人等候區量過嗎？有，我們算的比較高', 'Measured where people wait to cross? Yes. Our estimate is higher'),
-  lower: t('行人等候區量過嗎？有，我們算的比較低', 'Measured where people wait to cross? Yes. Our estimate is lower'),
+/**
+ * Screen 5's first body sentence: the relation between the readings and the estimate, chosen by
+ * checkRule() (brief 3.2, 4.4). On the one-page brief it follows the sentence naming who measured.
+ */
+const checkSentences: Record<CheckRule, L10n> = {
+  overlap: t('量到的和算的差不多。', 'Readings roughly match our estimate.'),
+  higher: t('我們算的比量到的高。', 'Our estimate is above the readings.'),
+  lower: t('我們算的比量到的低。', 'Our estimate is below the readings.'),
+};
+
+/**
+ * Screen 5's headline answers screen 4's "實際量到的，算多嗎？", chosen by farBelowWho().
+ * `far`: carbon monoxide is far below the WHO 15-minute guideline value, which is good news, and
+ * the headline says in the same breath that exhaust holds more than carbon monoxide (brief 12.4).
+ * It states two facts side by side and ranks nothing (claims policy r3-no-harm-ranking): never add
+ * 更 / 真正 / 反而 / "what matters more". `near`: the chart comes within a quarter of the WHO
+ * value; the headline then claims nothing about it.
+ */
+const checkHeadlines: Record<'far' | 'near', L10n> = {
+  far: t('一氧化碳比指引值低很多，是好消息，但廢氣不只有它', 'Carbon monoxide is far below the WHO guideline. Good news, but exhaust holds more than that'),
+  near: t('路口的一氧化碳，量過也算過', 'Carbon monoxide at the crossing: measured and worked out'),
 };
 
 /** Screen 5: compare co.dozen.total with the lowest and highest measured peak. Today: overlap. */
@@ -571,16 +588,31 @@ export function checkRule(): CheckRule {
   return 'overlap';
 }
 export function checkHeadline(locale: Locale): string {
-  return checkHeadlines[checkRule()][locale];
+  return checkHeadlines[farBelowWho() ? 'far' : 'near'][locale];
 }
 export const checkHeadlineTable = checkHeadlines;
+/**
+ * Screen 5's headline with its phrase marks ('|', ui/Phrased): the line may break after the first
+ * clause (the comparison), then the good news and the turn.
+ */
+export function checkHeadlinePhrased(locale: Locale): string {
+  const s = checkHeadline(locale);
+  // Chinese may also break after the subject, so a narrow column never leaves 「很多，」 alone on a line
+  return locale === 'en' ? s.replace('. ', '. |') : s.replace('一氧化碳比', '一氧化碳|比').replaceAll('，', '，|');
+}
+/** Screen 5's relation sentence (and the one-page brief's), chosen by checkRule(). */
+export function checkSentence(locale: Locale): string {
+  return checkSentences[checkRule()][locale];
+}
+export const checkSentenceTable = checkSentences;
 
 /** The highest value screen 5's chart draws (total hi, peaks, background), ppm. */
 export function chartMaxPpm(): number {
   return Math.max(est.co.dozen.total.hi, ...est.meas.iot.co.peaks, est.bg.co.traffic.value);
 }
 
-/** Screen 5's "far below the WHO 15-minute value" sentence prints only while this is true. */
+/** Screen 5's "far below the guideline, good news, but exhaust holds more" headline and its line
+ * on what the guideline covers print only while this is true. */
 export function farBelowWho(maxPpm: number = chartMaxPpm()): boolean {
   return maxPpm < est.who.co15min_ppm.exact / 4;
 }
@@ -596,6 +628,11 @@ export const estimateText = {
   addedByPack: t('這排機車多出來', 'Added by these scooters'),
   /** Screen 4's ppm gloss. */
   ppmGloss: t('ppm＝一百萬份空氣裡有幾份', 'ppm = parts in a million parts of air'),
+  /** The three units of the estimate table, under it on /estimate/. */
+  unitsGloss: t(
+    '表上的單位：ppm＝一百萬份空氣裡有幾份。ppb＝十億份空氣裡有幾份。µg/m³＝每立方公尺空氣裡有幾微克（一微克是一百萬分之一公克）。',
+    'Units in the table: ppm = parts in a million parts of air. ppb = parts in a billion. µg/m³ = micrograms in each cubic metre of air (a microgram is a millionth of a gram).',
+  ),
   /** Two-item legend under every measured-beside-estimated chart (4.4). */
   legendMeasured: t('量到的', 'measured'),
   legendEstimated: t('算出來的', 'worked out'),
@@ -606,6 +643,27 @@ export const estimateText = {
   ),
   /** PM2.5 sentence for /estimate/#numbers. */
   pm25Small: t('機車讓 PM2.5 多出來的量，比街上原本就有的少很多。', 'The PM2.5 the scooters add is much less than the street already holds.'),
+  /**
+   * What the WHO comparison does and does not cover (brief 12.4). Printed beside the comparison
+   * wherever it stands on its own, so "far below" is never the last word. It says the guideline
+   * is not a line under which exhaust is safe; it does not say exhaust at the kerb harms anyone.
+   */
+  whoCoOnly: t('這個指引值只看一氧化碳，低於它不代表廢氣就安全。', 'That guideline is for carbon monoxide only. It does not mean exhaust is safe.'),
+  /**
+   * Screen 5's short form of whoCoOnly, for the phone screen: the headline has just named the
+   * guideline and the chart's WHO bar says 只看一氧化碳 / Carbon monoxide only.
+   */
+  belowIsNotSafe: t('低於指引值，不代表廢氣就安全。', 'Below the guideline does not mean safe.'),
+  /** Screen 5's link from the chart to benzene: the short form of coTracksVapour (claims policy brief-no-everything-rises). */
+  coMarksBenzene: t('一氧化碳多的地方，苯也多。', 'Benzene goes up with carbon monoxide.'),
+  /**
+   * Benzene, said on its own and in the registry's strength (fact who-benzene-no-safe-level: the
+   * WHO names no safe level; nothing more is attributed to the WHO). Print only while that fact is verified. It is a callback to screen
+   * 2's quiet line and says nothing about the amount at the kerb or the risk of one red light.
+   */
+  benzeneWho: t('世界衛生組織說，苯找不到安全的量。', 'The WHO names no safe level of benzene.'),
+  /** The label under the WHO bar of every measured-beside-estimated chart. */
+  whoIsCoLimit: t('只看一氧化碳', 'Carbon monoxide only'),
   /** Screen 5 quiet line: limited to fresh fuel vapour and benzene. */
   coTracksVapour: t('一氧化碳多的地方，剛排出來的油氣和苯也多。', 'Where there is more carbon monoxide, there is more fresh fuel vapour and benzene too.'),
   /** The flow the recipe sheet draws (no operators: the kerb estimate is a simulation). */
@@ -619,8 +677,8 @@ export const estimateText = {
   flowResult: t('大人鼻子的高度，多出{range}', "At an adult's nose: {range} added"),
   /** The cross-check paragraph (4.5), worded truthfully. */
   crossCheck: t(
-    '運研所量了 10 個路口，報告寫出等候區一氧化碳最高值的，是高雄 3 個路口；其中只有最忙的一個看得出機車讓一氧化碳變多，最高的一分鐘多出約 0.8 到 1.2 ppm。把我們的算法放到那支儀器的位置和當時的風，算出來差不多。照行人站的位置算，大約是它的兩倍，所以我們的數字比較可能偏高，不是偏低。另外兩個路口，最高值沒有比附近的測站高。這個比對只檢查了離儀器 2 到 8 公尺、風不小時的算法；行人身邊 0.3 到 3 公尺的部分，是照同樣的算法推出來的，所以這不算驗證。',
-    "The Institute of Transportation measured 10 junctions and gives the highest waiting-area carbon monoxide for 3 of them, all in Kaohsiung; only the busiest of those shows scooters raising carbon monoxide, about 0.8 to 1.2 ppm more in the highest minute. Run at that sensor's position and that day's wind, our method gives about the same. At the spot where pedestrians stand it gives about twice that, so our figures are more likely too high than too low. At the other two junctions the highest reading was no higher than the nearby station's. This checks the method only 2 to 8 metres from the sensor in a fair wind; the 0.3 to 3 metres beside a pedestrian is extrapolated by the same method, so this is not a validation.",
+    '運研所量了 10 個路口。報告寫出等候區一氧化碳最高值的，是高雄 3 個路口。其中只有最忙的一個，看得出機車讓一氧化碳變多。在最高的一分鐘，多出約 0.8 到 1.2 ppm。把我們的算法放到那支儀器的位置和當時的風，算出來差不多。照行人站的位置算，大約是它的兩倍。所以我們的數字比較可能偏高，不是偏低。另外兩個路口，最高值沒有比附近的測站高。這個比對，只檢查了離儀器 2 到 8 公尺、風不小時的算法。行人身邊 0.3 到 3 公尺的部分，是照同樣的算法推出來的，所以這不算驗證。',
+    'The Institute of Transportation measured 10 junctions. The report gives the highest waiting-area carbon monoxide for 3 of them, all in Kaohsiung. Only the busiest of those 3 shows scooters raising carbon monoxide: about 0.8 to 1.2 ppm more in the highest minute. Run at that sensor\'s position and that day\'s wind, our method gives about the same. At the spot where pedestrians stand it gives about twice that. So our figures are more likely too high than too low. At the other two junctions the highest reading was no higher than the nearby station\'s. This checks the method only 2 to 8 metres from the sensor in a fair wind. The 0.3 to 3 metres beside a pedestrian is extrapolated by the same method, so this is not a validation.',
   ),
   /** What the estimate cannot say (METHOD §8), for /estimate/#limits. */
   limits: [

@@ -86,9 +86,9 @@ export const answers = {
     question: t('紅燈時站在機車旁邊，吸到多少？', 'At a red light, how much does the person beside the scooters breathe?'),
     answer: t(
       '旁邊停了十來輛機車時，大人鼻子高度的一氧化碳，90 秒平均多出約 0.05 到 1 ppm；街上原本就有約 0.5 ppm。運研所在行人等候區量到的最高一分鐘，是 0.5 到 1.3 ppm。',
-      "With a dozen or so scooters beside you, the pack adds about 0.05 to 1 ppm of carbon monoxide at an adult's nose, averaged over 90 seconds; the street already holds about 0.5 ppm. The highest minute the Institute of Transportation recorded in pedestrian waiting areas was 0.5 to 1.3 ppm.",
+      'With a dozen or so scooters beside you, the pack adds about 0.05 to 1 ppm of carbon monoxide at an adult\'s nose, averaged over 90 seconds. The street already holds about 0.5 ppm. The highest minute the Institute of Transportation recorded in pedestrian waiting areas was 0.5 to 1.3 ppm.',
     ),
-    basis: t('本站的推估（模擬 3 萬次），放在運研所 3 個路口的實測旁邊。', "This site's estimate (30,000 simulated reds), beside the Institute of Transportation's readings at 3 junctions."),
+    basis: t('本站的推估（用電腦算了 3 萬個紅燈），放在運研所 3 個路口的實測旁邊。', "This site's estimate (30,000 simulated reds), beside the Institute of Transportation's readings at 3 junctions."),
     caveat: t(
       '推估是算的，不是量的；運研所的讀數是整天、所有來源的空氣，不是紅燈時機車旁邊那 90 秒。',
       'The estimate is worked out, not read off an instrument; the Institute\'s readings are all-source air over whole days, not the 90 seconds beside the scooters at a red.',
@@ -106,7 +106,7 @@ export const answers = {
     question: t('一輛機車怠速，排多少？', 'How much does one idling scooter give off?'),
     answer: t(
       '平均一輛機車怠速，每小時約排 15 公克一氧化碳（這個平均值在 8 到 27 公克之間；排得最多的車多很多）；等一個 90 秒的紅燈，約 0.2 到 0.7 公克，大約裝滿一個鋁罐。',
-      'On average an idling scooter gives off about 15 g of carbon monoxide an hour (the average lies between 8 and 27 g; the dirtiest scooters give off far more); through one 90-second red that is about 0.2 to 0.7 g, roughly enough to fill one drinks can.',
+      'On average an idling scooter gives off about 15 g of carbon monoxide an hour. The average lies between 8 and 27 g, and the scooters that give off most give off far more. Through one 90-second red that is about 0.2 to 0.7 g, roughly enough to fill one drinks can.',
     ),
     basis: t('2025 年 907 萬筆定檢讀數，乘上國外實驗室量的怠速耗油量。', "Taiwan's 9.07 million inspection readings from 2025, multiplied by idle fuel use measured in laboratories abroad."),
     caveat: t(
@@ -131,7 +131,7 @@ export const answers = {
     ),
     basis: t('運研所的錄影車流計數和號誌時制；一個方向每小時約 1,500 輛（路口每小時的機車 ÷ 4）× 83 秒的紅燈 ÷ 3,600 秒 ≈ 34 輛。', "The Institute's video counts and signal plans: about 1,500 scooters an hour in one direction (the junction's hourly count ÷ 4) × an 83-second red ÷ 3,600 seconds ≈ 34."),
     caveat: t(
-      '34 輛是把路口一小時的車流平均分到四個方向，再平均分給每個紅燈算的，不是數某一個紅燈；實際的路口會多也會少。',
+      '34 輛是這樣算的：把路口一小時的車流，平均分到四個方向，再平均分給每個紅燈。它不是數某一個紅燈；實際的路口會多也會少。',
       'The 34 spreads the junction\'s hourly traffic evenly over four directions and then over each red; it is not a count of one red, and real junctions vary.',
     ),
     chips: [est()],
@@ -145,8 +145,8 @@ export const answers = {
     chainLink: 7,
     question: t('換成電動機車，街上的空氣會好多少？', 'What does going electric do to street air?'),
     answer: t(
-      '一項台灣的全國模式研究（Liou 與 Wu，2021）估計，燃油機車換成電動的，每年可少掉約 10 億美元（約新台幣 300 億元）的空氣污染健康損失。在路口，電動機車沒有排氣管，換一輛就少一根。',
-      'A national Taiwanese model (Liou and Wu, 2021) estimated that switching petrol scooters to electric would avoid about US$1 billion (about NT$30 billion) a year of health harm from air pollution. At the junction, an electric scooter has no tailpipe: every one is one tailpipe fewer.',
+      '一項台灣的全國研究（Liou 與 Wu，2021），用電腦模式推估燃油機車換成電動的效果。每年可少掉的空氣污染健康損失，約 10 億美元（約新台幣 300 億元）。在路口，電動機車沒有排氣管，換一輛就少一根。',
+      'A national Taiwanese model (Liou and Wu, 2021) estimated the effect of switching petrol scooters to electric. It would avoid about US$1 billion (about NT$30 billion) a year of health harm from air pollution. At the junction, an electric scooter has no tailpipe: every one is one tailpipe fewer.',
     ),
     basis: t('環境部的空氣品質模式（基準年 2016 年）加上健康效益的換算。', "Taiwan EPA's air-quality model (base year 2016) with a health-benefit valuation."),
     caveat: t(
@@ -166,7 +166,7 @@ export const answers = {
       'For their body weight, children breathe 1.5 to 2 times the air an adult does. Measurements abroad mostly find the exhaust the same or higher lower down.',
     ),
     basis: t('美國環保署的呼吸量資料；英國、西班牙、美國、德國的高度比較研究。', "US EPA breathing-rate data; height comparisons from the UK, Spain, the US and Germany."),
-    caveat: t('台灣沒有小孩高度的量測，各研究的結果也不一致，所以本站自己不算小孩高度的倍數；國外研究各自的數字，放在證據頁「誰離得最近」那一環。', "There are no child-height measurements in Taiwan and the studies disagree, so this site works out no child-height multiple of its own; each foreign study's own figures are on the evidence page, under “who is closest”."),
+    caveat: t('台灣沒有小孩高度的量測，各研究的結果也不一致。所以本站自己不算小孩高度的倍數。國外研究各自的數字，放在證據頁「誰離得最近」那一環。', 'There are no child-height measurements in Taiwan and the studies disagree. So this site works out no child-height multiple of its own. Each foreign study\'s own figures are on the evidence page, under “who is closest”.'),
     chips: [chip('study', 'international')],
     kSentence: 'K4',
     facts: ['child-air-per-kg', 'stroller-height-review', 'child-height-harr2022'],
@@ -179,12 +179,12 @@ export const answers = {
     chainLink: 3,
     question: t('路邊的一氧化碳，和世界衛生組織的指引比呢？', 'How does roadside carbon monoxide compare with WHO values?'),
     answer: t(
-      '台北市 3 個路邊測站，2024 年一氧化碳平均 0.80 ppm；2014 到 2024 年，每小時和每 8 小時的值年年都符合空氣品質標準。世界衛生組織的 15 分鐘指引值約 87 ppm。',
-      "Taipei's three roadside stations averaged 0.80 ppm of carbon monoxide in 2024, and their hourly and 8-hour values met the air-quality standards every year from 2014 to 2024. The WHO 15-minute guideline is about 87 ppm.",
+      '台北市 3 個路邊測站，2024 年一氧化碳平均 0.80 ppm；2014 到 2024 年，每小時和每 8 小時的值年年都符合空氣品質標準。世界衛生組織的 15 分鐘指引值約 87 ppm。這個指引值只看一氧化碳，低於它不代表廢氣就安全。',
+      "Taipei's three roadside stations averaged 0.80 ppm of carbon monoxide in 2024, and their hourly and 8-hour values met the air-quality standards every year from 2014 to 2024. The WHO 15-minute guideline is about 87 ppm. That guideline is for carbon monoxide only. It does not mean exhaust is safe.",
     ),
     basis: t('台北市環保局 2024 年空氣品質年報；世界衛生組織 2021 年指引。', "Taipei's 2024 air-quality annual report; the WHO 2021 guidelines."),
     caveat: t(
-      '測站進氣口在 2.5 到 3.5 公尺高，報的是一小時或一年的平均，說不出紅燈時機車旁邊那一兩分鐘。',
+      '測站吸空氣的口在 2.5 到 3.5 公尺高，報的是一小時或一年的平均。它說不出紅燈時，機車旁邊那一兩分鐘的空氣。',
       'Station inlets sit 2.5 to 3.5 m up and report hourly or yearly averages; they cannot show the minute or two beside the scooters at a red.',
     ),
     chips: [chip('measured', 'tw')],
@@ -196,10 +196,10 @@ export const answers = {
     chainLink: 6,
     question: t('小孩坐機車後座上學，吸到多少？', 'What does a child on the back seat breathe on the way to school?'),
     answer: t(
-      '在印尼萬隆和尼泊爾加德滿都，孩子身上的感測器顯示，坐機車和走路的那一段 PM2.5 最高。坐在後座的孩子，可以當作吸到的和騎士差不多；在台北，騎機車的人一小時平均吸到的 PM2.5 是搭捷運的兩倍多。',
-      'In Bandung and Kathmandu, sensors on children showed the scooter and walking legs had the highest PM2.5. A child on the back seat can be assumed to breathe what the rider breathes; in Taipei, people on scooters breathed more than twice the PM2.5 of metro riders over an hour, on average.',
+      '在印尼萬隆和尼泊爾加德滿都，孩子身上戴著感測器。坐機車和走路的那一段，PM2.5 最高。坐在後座的孩子，可以當作吸到的和騎士差不多。在台北，騎機車的人一小時平均吸到的 PM2.5，是搭捷運的兩倍多。',
+      'In Bandung and Kathmandu, sensors on children showed the scooter and walking legs had the highest PM2.5. A child on the back seat can be assumed to breathe what the rider breathes. In Taipei, people on scooters breathed more than twice the PM2.5 of metro riders over an hour, on average.',
     ),
-    basis: t('萬隆、加德滿都的兒童個人量測；台北通勤者的量測（Chuang 等，2020）。', 'Personal measurements on children in Bandung and Kathmandu; Taipei commuters (Chuang et al., 2020).'),
+    basis: t('萬隆、加德滿都小孩身上的量測；台北通勤者的量測（Chuang 等，2020）。', 'Personal measurements on children in Bandung and Kathmandu; Taipei commuters (Chuang et al., 2020).'),
     caveat: t('量到的孩子在國外，台北的數字是大人騎士；台灣小孩坐後座吸到多少，是推論出來的。', 'The children measured were abroad and the Taipei figures are adult riders, so what a Taiwanese child on the back seat breathes is inferred.'),
     chips: [chip('measured', 'abroad')],
     facts: ['child-commute-scooter-carson2026', 'commute-scooter-vs-subway-chuang2020'],
@@ -214,7 +214,7 @@ export const answers = {
       '起步是只有幾秒鐘、很猛的一陣：油門一開，一氧化碳和油氣一下子變多。',
       'A short, sharp burst lasting a few seconds: as the throttles open, carbon monoxide and fuel vapour jump.',
     ),
-    basis: t('義大利的機車隨車量測，看得到起步時一氧化碳和油氣變多，但沒有給數字。', 'On-board measurements of motorcycles in Italy show the rise at pull-away but give no rates.'),
+    basis: t('義大利有把儀器裝在機車上的量測。看得到起步時一氧化碳和油氣變多，但沒有給數字。', 'On-board measurements of motorcycles in Italy show the rise at pull-away but give no rates.'),
     caveat: t('機車起步的排放沒有公開的量測數字，本站的推估也只算紅燈那 90 秒。', 'No published measurement gives scooter emissions at pull-away, and this site\'s estimate covers only the 90 seconds of red.'),
     chips: [chip('study', 'abroad')],
     kSentence: 'K6',
@@ -228,13 +228,13 @@ export const answers = {
     chainLink: 5,
     question: t('等一兩分鐘的紅燈，會傷身體嗎？', 'Can a minute or two at a red light do harm?'),
     answer: t(
-      '高雄和印尼萬隆的研究看到，細懸浮微粒升高後 5 分鐘內，心跳的節奏就小小變了一下；國外的實驗要在車多的路上待 1 到 2 小時，才看得到肺功能下降。一天等 2 到 6 個紅燈，一年加起來約 12 到 55 小時。',
-      'Studies in Kaohsiung and Bandung, Indonesia, saw a small change in the heart\'s rhythm within 5 minutes of a rise in fine particles; experiments abroad needed 1 to 2 hours in heavy traffic before lung function fell. Two to six red lights a day add up to about 12 to 55 hours a year.',
+      '高雄和印尼萬隆有研究看到：細懸浮微粒升高，5 分鐘內心跳的節奏就小小變了一下。國外的實驗，要在車多的路上待 1 到 2 小時，才看得到肺功能下降。一天等 2 到 6 個紅燈，一年加起來約 12 到 55 小時。這是照每個紅燈等 60 到 90 秒、一年 365 天都等算的。',
+      'Studies in Kaohsiung and Bandung, Indonesia, saw a small change in the heart\'s rhythm within 5 minutes of a rise in fine particles. Experiments abroad needed 1 to 2 hours in heavy traffic before lung function fell. Two to six red lights a day add up to about 12 to 55 hours a year. That assumes 60 to 90 seconds at each light, every day of the year.',
     ),
     basis: t('Lung 等（2025）在高雄和萬隆的研究、倫敦的步行實驗，加上本站的時間計算。', "Lung et al. (2025) in Kaohsiung and Bandung, the London walking experiment, and this site's arithmetic on time."),
     caveat: t(
       '5 分鐘的變化很小，是身體的訊號，不是生病；高雄找到的高峰，主要來自工廠、蚊香、燒稻草和燒香；研究沒有在機車旁邊量。',
-      'The five-minute change is small, a signal and not an illness; the peaks found in Kaohsiung came mainly from factories, mosquito coils, burning straw and incense; the study did not measure beside scooters.',
+      'The five-minute change is small, a signal and not an illness. The peaks found in Kaohsiung came mainly from factories, mosquito coils, burning straw and incense. The study did not measure beside scooters.',
     ),
     chips: [chip('study', 'tw'), chip('derived')],
     kSentence: 'K5',
@@ -248,8 +248,8 @@ export const answers = {
     chainLink: 4,
     question: t('那個味道是什麼？', 'What is the smell?'),
     answer: t(
-      '臭的是沒燒完的汽油和刺鼻的醛（ㄑㄩㄢˊ）類，最可能的主角是乙醛：大約十億分之 1.5 就聞得到。一氧化碳和微粒沒有味道。',
-      'The smell is unburnt petrol and sharp aldehydes; the likeliest main contributor is acetaldehyde, noticeable at about 1.5 parts per billion. Carbon monoxide and particles have no smell.',
+      '臭的是沒燒完的汽油，和刺鼻的醛（ㄑㄩㄢˊ）類。最可能的主角是乙醛：大約十億分之 1.5 就聞得到。一氧化碳沒有味道。微粒太小，看不到。',
+      'The smell is unburnt petrol and sharp aldehydes; the likeliest main contributor is acetaldehyde, noticeable at about 1.5 parts per billion. Carbon monoxide has no smell. Particles are too small to see.',
     ),
     basis: t('把台灣機車廢氣的成分，和日本量的嗅覺門檻放在一起比。', 'Taiwanese scooter-exhaust composition set against odour thresholds measured in Japan.'),
     caveat: t('這是用門檻排出來的順序，不是真的去聞廢氣的測試；真正的味道是混在一起的。', 'This is a ranking from thresholds, not a smell test of real exhaust; real smells are mixtures.'),
@@ -296,7 +296,7 @@ export const answers = {
     question: t('等紅燈不熄火，規定怎麼說？', 'What does the idling rule say about scooters at red lights?'),
     answer: t(
       '怠速規定是停車等候超過三分鐘才要熄火，一般的紅燈比這短；規定裡的「汽車」，依空氣污染防制法也包括機車。',
-      'The idling rule asks engines off after more than three minutes of waiting, and an ordinary red light is shorter; under the Air Pollution Control Act, the rule\'s "汽車" (motor vehicles) includes motorcycles.',
+      'The idling rule asks engines off after more than three minutes of waiting, and an ordinary red light is shorter. Under the Air Pollution Control Act, the rule\'s "汽車" (motor vehicles) includes motorcycles.',
     ),
     basis: t('汽車停車怠速管理辦法第 2 到 4 條，空氣污染防制法第 3 條。', 'The idling regulation, articles 2 to 4; the Air Pollution Control Act, article 3.'),
     caveat: t('這是我們讀條文的結果，不是官方解釋；等紅燈算不算「停車怠速等候」，沒有官方說明。', 'This is our reading of the text, not an official interpretation; no official statement says whether waiting at a signal counts.'),

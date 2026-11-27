@@ -23,7 +23,7 @@ export const maintenance: MaintenanceProfile[] = [
       sources: ['2motor-maintenance-prices', 'sym-maintenance-schedule-2022'],
       confidence: 'secondary',
       research: ['maintenance-fees#derived-gas-5k', 'maintenance-fees#derived-gas-10k', 'maintenance-fees#price-oil', 'maintenance-fees#sched-sym-oil'],
-      note: t('「照表保養」的估計，很多車主換機油的頻率較低。', 'A "by the book" estimate; many riders change oil less often.'),
+      note: t('「照表保養」算出來的，很多車主換機油的頻率較低。', 'A "by the book" estimate; many riders change oil less often.'),
     },
     ownerAverage: {
       value: 2070,
@@ -64,7 +64,7 @@ export const maintenance: MaintenanceProfile[] = [
   },
   {
     id: 'ev-generic',
-    label: t('電動機車定期保養（其他品牌，以Gogoro舊款發票估計）', 'Scheduled maintenance, other electric scooters (estimated from older Gogoro invoices)'),
+    label: t('電動機車定期保養（其他品牌，以Gogoro舊款發票推算）', 'Scheduled maintenance, other electric scooters (estimated from older Gogoro invoices)'),
     kind: 'visits',
     intervalKm: 3000,
     minVisitsPerYear: 2,
@@ -137,7 +137,7 @@ export const fees: FixedFees = {
   inspection: {
     gasolineFromAgeYears: 5,
     fee: null,
-    note: t('出廠滿5年的燃油機車每年須做排氣檢驗（逾期罰500元）；檢驗費100元由環境部空污基金支付，車主不用付錢。新車在五年試算期內不會用到。', 'Petrol scooters 5+ years old need a yearly emission test (NT$500 fine if missed); the NT$100 fee is paid by MOENV\'s air-pollution fund, so owners pay nothing. A new scooter does not reach this within the five-year horizon.'),
+    note: t('出廠滿5年的燃油機車每年須做排氣檢驗（逾期罰500元）；檢驗費100元由環境部空污基金支付，車主不用付錢。新車在五年計算期內不會用到。', 'Petrol scooters 5+ years old need a yearly emission test (NT$500 fine if missed); the NT$100 fee is paid by MOENV\'s air-pollution fund, so owners pay nothing. A new scooter does not reach this within the five-year horizon.'),
     sources: ['moenv-motor-inspection', 'udn-2026-emission-test'],
     confidence: 'verified',
     research: ['gas-baseline-r2#r2-emis-fee-official', 'gas-baseline-r2#r2-emis-rules-official'],

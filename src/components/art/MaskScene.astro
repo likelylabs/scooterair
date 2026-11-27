@@ -33,7 +33,7 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
-import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
+import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box, AIR_KEY } from './air';
 import { MASK_CHOICES as MASKS, MASK_FACE, artId, maskHead, maskOn, type MaskChoice } from './parts';
 
 interface Props {
@@ -43,8 +43,10 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, mask = 'surgical', says = true, tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, mask = 'surgical', says = true, tag = false, id, class: cls } = Astro.props;
 
 const VB: Box = { x: 0, y: -240, w: 270, h: 240 };
 const upp = unitsPerPx(VB.w);
@@ -130,7 +132,7 @@ const scene = [
 const alt = [art.mask.alt[locale], art.alt2.plain[locale]].join(locale === 'en' ? ' ' : '');
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--mask', cls].filter(Boolean).join(' ')} data-mask={mask}>
+<SceneFrame locale={locale} legend={legend && AIR_KEY} legendTop box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--mask', cls].filter(Boolean).join(' ')} data-mask={mask}>
   {says && (
     <div slot="before" class="mk-says" aria-live="polite">
       {MASKS.map((m) => (

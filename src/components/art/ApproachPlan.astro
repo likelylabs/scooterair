@@ -32,7 +32,7 @@ import { est } from '@/data/estimate';
 import { fact } from '@/data/facts';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air } from './air';
+import { air, AIR_KEY } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { TAILPIPE, artId, scooter } from './parts';
 import { PLAN3, planView } from './plan-view';
@@ -51,8 +51,10 @@ interface Props {
   kind?: 'gas' | 'electric';
   /** @deprecated ignored (see `kind`). */
   caption?: string | false;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, inset = true, labels = true, tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, inset = true, labels = true, tag = false, id, class: cls } = Astro.props;
 const cm = (factId: string, key: string): number => {
   const v = (fact(factId as Parameters<typeof fact>[0]).data as Record<string, { value: number; unit: string }>)[key];
   if (!v || v.unit !== 'metres') throw new Error(`ApproachPlan: ${factId}.${key} is not a length in metres`);
@@ -92,7 +94,7 @@ const scene = a.defs + plan.ground + a.wash + `<g class="plan3-slide">${a.cores}
 const alt = sceneAlt(locale, fill(art.plan3.alt, locale, { gap: gapLabel, height: heightLabel }), { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive id={id} class={['scene--plan', cls].filter(Boolean).join(' ')}>
+<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive id={id} class={['scene--plan', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={scene} />
   <Fragment slot="labels">
     <SceneLabel box={VB} x={VB.x + VB.w - 16} y={T.y0 - 46} anchor="end bottom" max={96} plate class="plan3-gap">{gapLabel}</SceneLabel>

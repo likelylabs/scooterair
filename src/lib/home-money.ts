@@ -147,6 +147,12 @@ export interface BuyCase {
    */
   otherSubsidy: string | null;
   /**
+   * The electric model's MOEA approval is not confirmed (moeaClass 'light-unknown': not found in the
+   * MOEA approved-model file), so neither MOEA nor local money is counted for it, in either
+   * scrapping answer. The strip says so whenever this model is the one compared.
+   */
+  moeaUnconfirmed: boolean;
+  /**
    * The engine's messages for this case, most severe first: deadlines, quotas, the "check first"
    * ambiguities (the carbon reward stacked on the air subsidy), payout timing, like-for-like...
    * Empty in a slim table (slimHomeMoney).
@@ -223,6 +229,8 @@ export interface Strip {
   date: string;
   subsidy: string | null;
   promo: string | null;
+  /** The compared electric model's MOEA and local subsidies are not confirmed (BuyCase.moeaUnconfirmed). */
+  unconfirmed?: true;
 }
 
 export interface HomeMoney {
@@ -393,6 +401,7 @@ export function buyCase(county: JurisdictionId, scrap: ScrapKey, opts: { date?: 
     deadlines: deadlinesOf(electric, gasoline),
     swapOnly: !!evModel && evModel.battery.system !== 'home',
     otherSubsidy,
+    moeaUnconfirmed: evModel?.moeaClass === 'light-unknown',
     messages: e.messages.map(rzMsg),
   };
 }
@@ -508,7 +517,7 @@ export function breakevenCase(county: JurisdictionId, scrap: ScrapKey, km: numbe
 // money.deadline and the strip (brief 7.7)
 
 /** Which strip sentence is true on `date` for a buy case. */
-export function stripOf(c: Pick<BuyCase, 'date' | 'deadlines'> & Partial<Pick<BuyCase, 'otherSubsidy'>>, data: EconDataset = econData): Strip {
+export function stripOf(c: Pick<BuyCase, 'date' | 'deadlines'> & Partial<Pick<BuyCase, 'otherSubsidy' | 'moeaUnconfirmed'>>, data: EconDataset = econData): Strip {
   const { date, deadlines } = c;
   const before = cmp(date, data.meta.programmeYearEnd) <= 0;
   const own = deadlines.subsidy?.last ?? null;
@@ -520,14 +529,43 @@ export function stripOf(c: Pick<BuyCase, 'date' | 'deadlines'> & Partial<Pick<Bu
   if (other) kind = promo ? 'other-subsidy-and-promo' : 'other-subsidy';
   else if (own) kind = !before ? 'next-programme' : promo ? 'subsidy-and-promo' : 'subsidy';
   else kind = before ? 'no-subsidy' : 'nothing-confirmed';
-  return { kind, date, subsidy, promo: kind === 'subsidy-and-promo' || kind === 'other-subsidy-and-promo' ? promo : null };
+  return { kind, date, subsidy, promo: kind === 'subsidy-and-promo' || kind === 'other-subsidy-and-promo' ? promo : null, ...(c.moeaUnconfirmed ? { unconfirmed: true as const } : {}) };
 }
 
-/** The strip as one sentence. Dates carry their year when it is not the reader's year. */
-export function stripText(s: Strip, locale: Locale): string {
+/**
+ * The strip as one sentence. Dates carry their year when it is not the reader's year. `model` is
+ * the electric scooter's short name, which the 'other-subsidy' sentences name (the model whose
+ * subsidy is not counted); without it they say 「這一款」 / "this model".
+ */
+export function stripText(s: Strip, locale: Locale, model?: string): string {
   const y = s.date.slice(0, 4);
   const d = (x: string | null) => (x ? formatDate(x, locale, x.slice(0, 4) !== y) : '');
-  return fill(money.home.strip[s.kind][locale], { subsidy: d(s.subsidy), promo: d(s.promo), year: y });
+  const m = model ?? money.home.thisModel[locale];
+  // the compared model's MOEA approval is unconfirmed: one plain line first, in either scrapping answer
+  // (not once nothing is confirmed for anyone: the sums then count no subsidy at all)
+  const lead = s.unconfirmed && s.kind !== 'nothing-confirmed' && s.kind !== 'next-programme' ? money.home.unconfirmed[locale] + (locale === 'en' ? ' ' : '') : '';
+  const out = fill(lead + money.home.strip[s.kind][locale], { subsidy: d(s.subsidy), promo: d(s.promo), year: y, model: m });
+  // 「這一款 的補助」 → 「這一款的補助」: a space stays only beside Latin letters and digits
+  return locale === 'en' ? out : out.replace(/([\u4e00-\u9fff]) (?=[\u4e00-\u9fff])/g, '$1');
+}
+
+/**
+ * Home screen 13's strip in two parts: `screen` stays on the screen, `fold` goes into its sheet
+ * (empty when there is nothing to move). Only when the compared model's subsidies are unconfirmed
+ * does the line split: the screen says they are not counted, the fold says to ask the dealer and
+ * gives the deadlines. Otherwise the screen keeps the whole of stripText().
+ */
+export function stripParts(s: Strip, locale: Locale, model?: string): { screen: string; fold: string } {
+  const whole = stripText(s, locale, model);
+  if (!s.unconfirmed || s.kind === 'nothing-confirmed' || s.kind === 'next-programme') return { screen: whole, fold: '' };
+  const m = model ?? money.home.thisModel[locale];
+  const tidy = (x: string) => (locale === 'en' ? x : x.replace(/([\u4e00-\u9fff]) (?=[\u4e00-\u9fff])/g, '$1'));
+  const { unconfirmed: _u, ...plain } = s;
+  const rest = stripText(plain, locale, model);
+  return {
+    screen: tidy(fill(money.home.unconfirmedShort[locale], { model: m })),
+    fold: tidy(fill(money.home.askDealer[locale], { model: m })) + (locale === 'en' ? ' ' : '') + rest,
+  };
 }
 
 /** 綠牌 / green plate, 白牌 / white plate. */

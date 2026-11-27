@@ -28,7 +28,7 @@ import { art, fill } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, type Box } from './air';
+import { air, airGlyph, type Box, AIR_KEY } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { MOUTH, RIDER_MOUTH, STROLLER_BAND, TAILPIPE, artId, breath, figureBoxes, person, scooter } from './parts';
 import { put } from './kit';
@@ -42,8 +42,10 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, figures = ['pushchair', 'adult', 'schoolchild', 'rider'], band = true, tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, figures = ['pushchair', 'adult', 'schoolchild', 'rider'], band = true, tag = false, id, class: cls } = Astro.props;
 
 // x starts far enough left that the ruler's numbers and 「公分」 sit inside the picture at 320 px and 特大
 const VB: Box = { x: -100, y: -262, w: 584, h: 374 };
@@ -60,8 +62,8 @@ const a = air({
   id: artId('air'),
   scenario: 'dozen',
   extra: AIR_EXTRA,
-  // one even zone from the ground to above the adult's head, right across the picture
-  kerb: { x0: RULER + 6, x1: VB.x + VB.w - 8, top: 190, sourceX: has('rider') ? pipe.x : VB.x + VB.w },
+  // the plume from the rider's tailpipe to the people, from the ground to the top of the zone (air.ts keeps its rings on the people's side)
+  kerb: { x0: RULER + 6, x1: VB.x + VB.w - 8, sourceX: has('rider') ? pipe.x : VB.x + VB.w },
   tailpipes: has('rider') ? [pipe] : [],
   avoid: [
     ...(has('pushchair') ? figureBoxes('pushchair', X.pushchair) : []),
@@ -110,7 +112,7 @@ const names: Record<Who, string> = { pushchair: art.heights.names.pushchair[loca
 const alt = sceneAlt(locale, fill(art.heights.alt, locale, { top: TOP, lo: STROLLER_BAND.low, hi: STROLLER_BAND.high }), { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--heights', cls].filter(Boolean).join(' ')}>
+<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--heights', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={scene} />
   <Fragment slot="labels">
     {nums.map((n) => <SceneLabel box={VB} x={RULER - 20} y={-n} anchor="end middle" quiet class="hs-num">{n}</SceneLabel>)}
@@ -119,5 +121,7 @@ const alt = sceneAlt(locale, fill(art.heights.alt, locale, { top: TOP, lo: STROL
     {/* two rows, so five names fit side by side on a 320 px phone at the largest text size */}
     {figures.map((w) => <SceneLabel box={VB} x={centre[w]} y={8} anchor="center top" class={w === 'adult' ? 'hs-row2' : undefined}>{names[w]}</SceneLabel>)}
     {has('rider') && <SceneLabel box={VB} x={pipe.x} y={8} anchor="center top" class="hs-pipe-label hs-row2">{art.words.tailpipe[locale]}</SceneLabel>}
+    {/* what the red rings are: named in the empty air above the rider, with the same ring (the key below names the exhaust) */}
+    <SceneLabel box={VB} x={VB.x + VB.w - 8} y={VB.y + 10} anchor="end top" plate class="hs-nose-label"><svg class="air-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false" set:html={airGlyph('nose')} /> {art.key.nose[locale]}</SceneLabel>
   </Fragment>
 </SceneFrame>

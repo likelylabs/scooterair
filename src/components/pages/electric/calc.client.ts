@@ -198,21 +198,11 @@ function apply(root: HTMLElement, r: Rendered) {
   const panel = root.querySelector<HTMLElement>('[data-verdict]');
   if (!panel) return;
   panel.dataset.verdict = r.verdict;
-  const set = (sel: string, text: string) => {
-    const el = panel.querySelector(sel);
-    if (el) el.textContent = text;
-  };
-  set('[data-part="sentence"]', r.sentence);
-  set('[data-part="value"]', r.value);
-  set('[data-part="note"]', r.note);
-  set('.result__title > span', r.title);
-  const affix = panel.querySelectorAll('.result__value .result__affix');
-  if (affix[0]) affix[0].textContent = r.prefix;
-  if (affix[1]) affix[1].textContent = r.unit;
   const slot = (name: string, html: string) => {
     const el = root.querySelector(`[data-el-slot="${name}"]`);
     if (el) el.innerHTML = html;
   };
+  slot('answers', r.answersHtml);
   slot('deadline', r.deadlineHtml);
   slot('next', r.nextHtml);
   slot('body', r.bodyHtml);

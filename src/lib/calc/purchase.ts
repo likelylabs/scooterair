@@ -291,7 +291,7 @@ export function purchaseLedger(side: 'electric' | 'gasoline', input: Situation, 
     }
     const amount = programmeAmount(p, ev, gas);
     if (amount === null) {
-      exclusions.push(excluded(p, 'model-unknown', t('這款車的電池數量未能查證', 'the battery count of this model is not verified'), {}, 0));
+      exclusions.push(excluded(p, 'model-unknown', t('這款車的電池數量沒有查證到', 'the battery count of this model is not verified'), {}, 0));
       continue;
     }
     candidates.push({ p, amount, assumptions: r.assumptions });

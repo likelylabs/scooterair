@@ -5,9 +5,10 @@
  *
  * A parent with a pushchair and a schoolchild stand at the left; the tail of
  * the nearest scooter is a step or two to their right, its rider in view, with
- * rows of the pack behind. The three layers of air.ts are all here: the
- * street's own sparse air everywhere, more where the people stand (by the
- * estimate), and a dark core behind every tailpipe.
+ * rows of the pack behind. The plume of air.ts runs from the tailpipe to the
+ * people, low, with rings inside it where they stand (by the estimate), and a
+ * soft dark core behind every tailpipe. Nothing is drawn on the wall: the
+ * street's own air is left to the number box above the picture.
  *
  * The scenario switch changes layer B, the rows behind and nothing else. It
  * needs no script: drawn with scenario="all" the picture follows the
@@ -29,7 +30,7 @@ import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
-import { air, type AirScenario, type Box } from './air';
+import { air, type AirScenario, type Box, AIR_KEY } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { TAILPIPE, artId, figureBoxes, person } from './parts';
 import { placed, put, shopfronts, stepSources, tailOf, type Placed } from './kit';
@@ -42,8 +43,10 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, scenario = 'all', initial = 'dozen', tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, scenario = 'all', initial = 'dozen', tag = false, id, class: cls } = Astro.props;
 const shown: AirScenario = scenario === 'all' ? initial : scenario;
 
 const VB: Box = { x: 0, y: -340, w: 450, h: 425 };
@@ -92,6 +95,6 @@ const fg = [
 const alt = sceneAlt(locale, art.kerb.alt[locale], { scenario: shown, count: est.scn[shown].count });
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario={shown} drift id={id} class={['scene--kerb', cls].filter(Boolean).join(' ')}>
+<SceneFrame locale={locale} legend={legend && AIR_KEY} legendSense box={VB} alt={alt} tag={tag} scenario={shown} drift id={id} class={['scene--kerb', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={a.defs + street + a.wash + far + stepped(a.cores) + stepped(a.marks) + fg} />
 </SceneFrame>

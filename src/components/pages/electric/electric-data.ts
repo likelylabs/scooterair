@@ -7,7 +7,7 @@
 
 import { econData } from '@/data/econ';
 import type { JurisdictionId, Programme } from '@/data/econ/types';
-import { fact, localizeFact, localizeSeries, seriesMatrix, shortCitation, sourceUrl, type FactId, type SeriesId, type SourceId } from '@/data';
+import { fact, getSource, localizeFact, localizeSeries, seriesMatrix, shortCitation, sourceUrl, type FactId, type SeriesId, type SourceId } from '@/data';
 import { DEFAULT_OFF_WINDOW_SHARE, electricRunning, evaluate, gasolineRunning, type Evaluation, type RunningCosts, type Situation } from '@/lib/calc';
 import { cityMoney, formatDate, moneyPhase, snapshot, todayInTaipei } from '@/lib/site-state.data';
 import { href, type Locale } from '@/i18n';
@@ -36,6 +36,22 @@ function collectSources(v: unknown, out: Set<string>, seen = new Set<unknown>())
   }
 }
 
+/**
+ * A source chip: 「publisher, year」, and the source's own title after it when that title is short
+ * enough to read at a glance (in the reader's language: the original, or our translation of it).
+ * A long headline is replaced by the registry's shortTitle; without one it is left out rather than cut.
+ */
+function chipText(id: SourceId, locale: Locale): string {
+  const short = shortCitation(id, locale);
+  const s = getSource(id);
+  const own = s.shortTitle?.[locale];
+  if (own) return `${short}${locale === 'en' ? ': ' : '：'}${own}`;
+  const title = s.language === locale && !s.titleIsDescriptive ? s.title : s.titleTranslated;
+  if (!title) return short;
+  const fits = locale === 'en' ? title.length <= 40 : [...title].reduce((n, ch) => n + (/[\u4e00-\u9fff]/.test(ch) ? 1 : 0.5), 0) <= 16;
+  return fits ? `${short}${locale === 'en' ? ': ' : '：'}${title}` : short;
+}
+
 const citeCache = new Map<Locale, Record<string, { short: string; url: string }>>();
 export function citeMap(locale: Locale): Record<string, { short: string; url: string }> {
   const hit = citeCache.get(locale);
@@ -45,7 +61,7 @@ export function citeMap(locale: Locale): Record<string, { short: string; url: st
   const out: Record<string, { short: string; url: string }> = {};
   for (const id of ids) {
     try {
-      out[id] = { short: readerText(shortCitation(id as SourceId, locale)), url: sourceUrl(id as SourceId) };
+      out[id] = { short: readerText(chipText(id as SourceId, locale)), url: sourceUrl(id as SourceId) };
     } catch {
       /* a source without a link is shown without one */
     }

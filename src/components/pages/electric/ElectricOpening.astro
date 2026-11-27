@@ -1,15 +1,19 @@
 ---
 /**
  * ElectricOpening — the first screen of /electric/ (brief 7.7): a finished result before any
- * input, in the form of home screens 12 and 13. Figure first, bars, working below; then each
- * month. Three large questions refine it (有沒有舊車可以報廢？ · 停車的地方能充電嗎？ · 一個月騎多遠？)
- * beside the county select. There is no empty state.
+ * input. Three large questions (有沒有舊車可以報廢？ · 停車的地方能充電嗎？ · 一個月騎多遠？) beside the
+ * county, then the three answers (買的那天差多少 · 每個月差多少 · 幾年打平): figure first, the price
+ * bars, the working folded below. There is no empty state.
  *
- * Without JavaScript: the default county (新北市), with every scrapping answer, distance and
- * charging answer printed as variants that the switches show (Segmented, :has()).
- * With JavaScript (./opening.client.ts): the county select redraws the variants from the same
- * table; ?county=&scrap=&km=(&charge=) from the home page set the answers and the line
- * 「你在首頁選的：…」; the table true on the reader's day is used (a cached page is never stale).
+ * The answers are the calculator's own: the same function (model.ts openAnswers) and the same
+ * words (opening-view answersHtml) as the result further down, so the opening and the calculator
+ * print the same figures for the same answers.
+ *
+ * Without JavaScript: the default county (新北市), every scrapping, charging and distance answer
+ * printed as a variant the switches show (Segmented, :has()).
+ * With JavaScript (./opening.client.ts): the variant true on the reader's day is drawn from the
+ * page's table; another county is worked out by the calculator engine in the browser; and
+ * ?county=&scrap=&km=(&charge=) from the home page set the answers and the line 「你在首頁選的：…」.
  * Each change is told to the detailed calculator below (event `el:open` on document).
  *
  * Props
@@ -21,7 +25,8 @@ import KindChip from '@/components/ui/KindChip.astro';
 import electric from '@/i18n/pages/electric';
 import { fill, localize } from '@/i18n/pages/_copy';
 import { openingData } from './opening-data';
-import { buyHtml, caseText, monthHtml, monthLine, tableOn, type OpenText, type Scrap, type Charge } from './opening-view';
+import { caseKey, openingAnswers } from './opening-answers';
+import { answersHtml, ansScrapNotes, ansWho, caseText, escHtml, tableOn, worstFoldHtml, worstText, type OpenText, type Scrap, type Charge } from './opening-view';
 
 interface Props {
   locale: Locale;
@@ -29,32 +34,34 @@ interface Props {
 const { locale } = Astro.props;
 const T = localize(electric, locale).open as unknown as OpenText;
 const D = openingData(locale);
+const A = openingAnswers(locale, D.built);
 const t = tableOn(D, D.built);
+const at = A.tables[A.periods[0].t];
 const def = D.defaults;
 const scraps: Scrap[] = ['yes', 'no'];
 const charges: Charge[] = ['no', 'yes'];
 const countyName = D.counties.find((c) => c.id === def.county)!.name;
 const chosen = fill(T.chosenDefault, { case: caseText(D, T, def) });
-
-// The month card prints one set of bars per swap group (opening-view monthHtml): −1 (a scooter
-// that charges at home: the cheapest swap plans of any make) and one per swap-only scooter on
-// show. The set shown is the one whose group the buy card on show names (its hidden
-// [data-op-shows]), for the scrapping answer that is checked; the client redraws the buy card
-// per county, so this follows the county too. Without :has(), the any-make set shows.
-const groups = Math.max(0, ...D.tables.map((x) => x.swap.length));
-const swapCss =
-  '[data-op] .op-swap{display:none!important}' +
-  '@supports not selector(:has(*)){[data-op] .op-swap[data-op-sm="-1"]{display:grid!important}}' +
-  scraps
-    .flatMap((s) =>
-      [-1, ...Array.from({ length: groups }, (_, i) => i)].map(
-        (g) => `[data-op]:has([data-pick-input="scrap"][value="${s}"]:checked):has([data-op-buy="${s}"] [data-op-shows="${g}"]) .op-swap[data-op-sm="${g}"]{display:grid!important}`,
-      ),
-    )
-    .join('');
+const variant = (s: Scrap, km: number, c: Charge) => {
+  const a = at[caseKey(s, km, c)];
+  // what scrapping does: the same case with the other scrapping answer (the same function as the calculator)
+  const notes = ansScrapNotes(D.locale, T, s, a, at[caseKey(s === 'yes' ? 'no' : 'yes', km, c)]);
+  return `${answersHtml(D.locale, T, a, { level: 3, bars: true, working: true, notes })}<p class="op-body">${escHtml(ansWho(D.locale, T, a))}</p>${worstFoldHtml(worstText(D, T, t), T)}`;
+};
+// What the browser needs, and no more: the strip and the worst case per table, and the answers
+// for the default county per period (every other figure comes from the engine when asked).
+const S = {
+  locale: D.locale,
+  built: D.built,
+  defaults: D.defaults,
+  km: D.km,
+  counties: D.counties,
+  periods: D.periods,
+  strips: D.tables.map((x) => Object.fromEntries(D.counties.map((c) => [c.id, { yes: D.words[x.buy[c.id].yes.strip], no: D.words[x.buy[c.id].no.strip] }]))),
+  worst: D.tables.map((x) => worstText(D, T, x)),
+  answers: A,
+};
 ---
-
-<style is:inline set:html={swapCss}></style>
 
 <div class="op" data-op data-pick-scope>
   <p class="op-chosen" data-op-chosen aria-live="polite">{chosen}</p>
@@ -63,46 +70,29 @@ const swapCss =
     {scraps.map((s) => <p data-when-scrap={s}>{D.words[t.buy[def.county][s].strip]}</p>)}
   </div>
 
-  <div class="op-county">
-    <label class="op-label" for="op-county" data-js-only>{T.county}</label>
-    <select id="op-county" class="op-select" data-op-county data-js-only>
-      {D.counties.map((c) => <option value={c.id} selected={c.id === def.county}>{c.name}</option>)}
-    </select>
-    <p class="op-small op-nojs">{fill(T.countyStatic, { county: countyName })}</p>
-  </div>
+  <section class="op-card op-qs" aria-labelledby="op-qs-title">
+    <h2 id="op-qs-title" class="op-card__title">{T.questionsTitle}</h2>
+    <div class="op-county">
+      <label class="op-label" for="op-county" data-js-only>{T.county}</label>
+      <select id="op-county" class="op-select" data-op-county data-js-only>
+        {D.counties.map((c) => <option value={c.id} selected={c.id === def.county}>{c.name}</option>)}
+      </select>
+      <p class="op-small op-nojs">{fill(T.countyStatic, { county: countyName })}</p>
+    </div>
+    <Segmented name="scrap" legend={T.scrapLegend} value={def.scrap} options={[{ value: 'yes', label: T.scrapYes }, { value: 'no', label: T.scrapNo }]} />
+    <Segmented name="charge" legend={T.chargeLegend} value={def.charge} options={[{ value: 'no', label: T.chargeNo, sub: T.chargeNoSub }, { value: 'yes', label: T.chargeYes, sub: T.chargeYesSub }]} />
+    <Segmented name="km" legend={T.kmLegend} value={String(def.km)} columns={4} options={D.km.map((k) => ({ value: String(k), label: String(k), sub: T.kmSub }))} />
+  </section>
 
-  <div class="op-grid">
-    <section class="op-card" aria-labelledby="op-buy-title">
-      <h2 id="op-buy-title" class="op-card__title">{T.buyTitle}</h2>
-      <Segmented name="scrap" legend={T.scrapLegend} value={def.scrap} options={[{ value: 'yes', label: T.scrapYes }, { value: 'no', label: T.scrapNo }]} />
-      <div class="op-buy">
-        {scraps.map((s) => <div class="op-variant" data-when-scrap={s} data-op-buy={s} set:html={buyHtml(D, T, t, def.county, s)} />)}
-      </div>
-      <p class="op-chip"><KindChip locale={locale} kind="derived" /> <span>{fill(T.chipChecked, { date: t.checked })}</span></p>
-    </section>
-
-    <section class="op-card" aria-labelledby="op-month-title">
-      <h2 id="op-month-title" class="op-card__title">{T.monthTitle}</h2>
-      <Segmented name="charge" legend={T.chargeLegend} value={def.charge} options={[{ value: 'no', label: T.chargeNo, sub: T.chargeNoSub }, { value: 'yes', label: T.chargeYes, sub: T.chargeYesSub }]} />
-      <Segmented name="km" legend={T.kmLegend} value={String(def.km)} columns={4} options={D.km.map((k) => ({ value: String(k), label: String(k), sub: T.kmSub }))} />
-      <div class="op-month">
-        {D.km.map((k) => <div class="op-variant" data-when-km={String(k)} data-op-month={k} set:html={monthHtml(D, T, t, k)} />)}
-      </div>
-      <div class="op-lines">
-        {scraps.flatMap((s) =>
-          D.km.flatMap((k) =>
-            charges.map((c) => (
-              <p class="op-line" data-when-scrap={s} data-when-km={String(k)} data-when-charge={c} data-op-line={`${s}-${k}-${c}`}>
-                {monthLine(D, T, t, { county: def.county, scrap: s, km: k, charge: c })}
-              </p>
-            )),
-          ),
-        )}
-        <p class="op-small" data-when-charge="yes">{T.beNote}</p>
-      </div>
-      <p class="op-chip"><KindChip locale={locale} kind="derived" /> <span>{fill(T.chipChecked, { date: t.checked })}</span></p>
-    </section>
-  </div>
+  <section class="op-card op-answer" aria-labelledby="op-ans-title" data-op-answer>
+    <h2 id="op-ans-title" class="op-card__title">{T.answerTitle}</h2>
+    {scraps.flatMap((s) =>
+      D.km.flatMap((k) =>
+        charges.map((c) => <div class="op-variant" data-when-scrap={s} data-when-km={String(k)} data-when-charge={c} data-op-case={caseKey(s, k, c)} set:html={variant(s, k, c)} />),
+      ),
+    )}
+    <p class="op-chip"><KindChip locale={locale} kind="derived" /> <span>{fill(T.chipChecked, { date: t.checked })}</span></p>
+  </section>
 
   <div class="op-actions">
     <a class="op-more" href="#calc" data-op-more>
@@ -116,7 +106,7 @@ const swapCss =
   </div>
 </div>
 
-<script type="application/json" id="op-data" set:html={JSON.stringify({ D, T })} />
+<script type="application/json" id="op-data" set:html={JSON.stringify({ S, T })} />
 
 <script>
   import './opening.client';
@@ -127,6 +117,66 @@ const swapCss =
     display: grid;
     gap: var(--sp-5);
     margin-block-start: var(--sp-4);
+    max-inline-size: 46rem;
+  }
+  /* figures of another county, or of another day, while they are worked out again */
+  .op :global([data-op-stale]),
+  .op-answer[aria-busy='true'] .op-variant {
+    opacity: 0.45;
+  }
+  .op-card :global(.ans-q) {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    border-inline-start: var(--rule-paint) solid var(--ink-3);
+    padding-inline-start: var(--sp-3);
+  }
+  .op-card :global(.ans--go) {
+    border-inline-start-color: var(--clean);
+  }
+  .op-card :global(.ans--dear) {
+    border-inline-start-color: var(--exhaust);
+  }
+  .op-card :global(.ans) {
+    gap: var(--sp-5);
+  }
+  .op-card :global(.op-scrap),
+  :global(.op-scrap) {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-regular, 400);
+    line-height: var(--lh-read);
+  }
+  .op-card :global(.op-worst > summary) {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    list-style: none;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-base);
+    cursor: pointer;
+  }
+  .op-card :global(.op-worst > summary::-webkit-details-marker) {
+    display: none;
+  }
+  .op-card :global(.op-worst > summary)::before {
+    content: '';
+    flex: none;
+    inline-size: 0.55em;
+    block-size: 0.55em;
+    border-inline-end: 2.5px solid currentColor;
+    border-block-end: 2.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .op-card :global(.op-worst[open] > summary)::before {
+    transform: rotate(45deg);
+  }
+  .op-card :global(.op-worst p) {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    padding-block-end: var(--sp-2);
   }
   .op-chosen {
     font-size: var(--fs-base);

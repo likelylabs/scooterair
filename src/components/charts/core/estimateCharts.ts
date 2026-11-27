@@ -77,7 +77,7 @@ export interface MveModel {
   /** linear axis from 0 */
   axis: { max: number; ticks: number[]; unit: string };
   /** the zoom-out strip: the whole axis against the WHO 15-minute value */
-  who: { value: number; text: string; label: string; here: string; share: number };
+  who: { value: number; text: string; label: string; note: string; here: string; share: number };
   legend: { measured: string; estimated: string };
   table: ChartTable;
   /** the text alternative: every row in words, then the finding chosen by rule */
@@ -140,7 +140,7 @@ export function mveModel(locale: Loc, scenario: ScenarioKey = 'dozen'): MveModel
     title: T.title[locale],
     rows,
     axis: { max, ticks, unit: ppm },
-    who: { value: who.exact, text: whoText, label: T.zoomWho[locale], here: T.zoomHere[locale], share: (max / who.exact) * 100 },
+    who: { value: who.exact, text: whoText, label: T.zoomWho[locale], note: estimateText.whoIsCoLimit[locale], here: T.zoomHere[locale], share: (max / who.exact) * 100 },
     legend: { measured: estimateText.legendMeasured[locale], estimated: estimateText.legendEstimated[locale] },
     table,
     summary,

@@ -162,11 +162,16 @@ share cards.
 
 ## Share cards
 
-Every page has a link-preview picture in two sizes, 1200 × 630 (`og:image`) and 1080 × 1080
-(LINE), in both languages, under `public/share/`. Each card is drawn by a page of the site,
-`/print/card/<id>/`, which is only built when the renderer asks for it, so the cards use the same
-scenes and the same air rule as the pages. A card with an estimated number carries 推估 and its
-range inside the picture. Words come from `src/lib/share-cards.ts` and `src/i18n/pages/share.ts`.
+Every page has one link-preview picture, 1200 × 630 (`og:image`), in both languages, under
+`public/share/`. A card is a poster seen at thumbnail size: one picture that fills it, one short
+headline (Chinese 10 characters or fewer, English 6 words or fewer) and a 示意圖 plate large
+enough to read in a chat preview, at the bottom right of the central square; no numbers, so the page carries the numbers, their 推估 marks and caveats. The
+headline and the people stay inside the central 630 × 630 square, which is what LINE keeps.
+Each card is drawn by a page of the site, `/print/card/<id>/`, which is only built when the
+renderer asks for it; its picture is composed for the card's shape in
+`src/components/art/card-art.ts` from the scenes' own figures and the same air rule. Words, alt
+text and each page's `og:title` / `og:description` come from `src/lib/share-cards.ts` and
+`src/i18n/pages/share.ts`.
 
 ```sh
 npm run share-cards                 # render every card (Playwright with Chromium), then commit public/share/
@@ -228,6 +233,10 @@ stays as it is.
    Numbers are never typed into copy: copy reads them from the registry.
 3. If a correction changes what the site claims, add an entry to the corrections log
    (`src/components/pages/action/corrections.ts`).
+   A source the calculator cites shows on `/electric/` as a chip, 「publisher, year：title」. When
+   the headline is long, give the source a `shortTitle` (our short name for the document, at most
+   16 Chinese characters or 40 English letters, no figure the title does not carry); without one
+   the chip shows only the publisher and year.
 4. `npm run check`, then look at the pages that use the fact (`npm run dev`).
 5. If the text on a share card changed, `npm run share-cards` (needs Playwright with Chromium)
    and commit `public/share/`.
@@ -275,6 +284,19 @@ never as the county's own figure.
 - After any of these, push to `main` (or run the workflow by hand) so the static pages are rebuilt.
 
 ## When headlines change
+
+Line breaks in Chinese: `src/lib/glue.mjs` wraps each short word (two to four characters, as the
+browser's word segmenter finds them), with any closing mark or 注音 after it, in
+`<span class="nobr">`, so a word never breaks across two lines at 320 px 特大. It runs on
+`<Phrased>` headlines, on text the home page draws in the browser, and, as a build step
+(`astro.config.mjs`), on every heading, button, link styled as a button, label, legend and fold
+title, table header and the film's captions. A lone character never stands on a line by itself:
+before a closing mark it joins its neighbour (「換車，」), and at either end of a run it joins the
+glued word beside it (「沒有了」). Every glued run is held in one `<span class="gl">`, so inside a
+flex or grid box it stays one item (loose nobr spans each became an item, and the box's gap
+opened inside words); check-site 13 fails on a nobr loose in a flex or grid box. List items,
+captions and plain links keep only the rule that a closing mark stays with the character before
+it. Longer runs stay breakable. Mark phrase breaks in a headline with `|` as before.
 
 Chinese headlines use Noto Sans TC Black cut down to the characters the headlines actually use
 (`src/styles/fonts/noto-sans-tc-900-headline.woff2`, about 45 kB, instead of hundreds of kB of

@@ -276,6 +276,17 @@ const items = nav.map((item) => {
       font-size: 16px;
     }
   }
+  /* English, from 62em until about 1,120 px: the five inline links leave no room for the word
+     "Menu" (it was cut to "Mer" at 1,024 px), so the button is its icon, as on a small phone */
+  @media (min-width: 62em) and (max-width: 69.99em) {
+    .menu__word:lang(en) {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+  }
   @media (min-width: 62em) {
     .site-header__bar {
       position: relative;
@@ -346,14 +357,46 @@ const items = nav.map((item) => {
   });
 
   // Language switches (header and footer) keep the reader's place: both languages use the same
-  // anchors, so carry the current #fragment over to the other language's URL.
-  const syncLangSwitch = () =>
+  // anchors, so carry the current #fragment over to the other language's URL. On a page of screens
+  // (home, the question pages) scrolling does not change the address, so at the moment of the
+  // click the screen being read (the one crossing a line a third of the way down, as the rail
+  // counts it) becomes the fragment; the first screen needs none.
+  const readingScreen = (): string => {
+    const screens = [...document.querySelectorAll<HTMLElement>('article[data-screen][id]')];
+    if (screens.length < 2) return '';
+    const line = innerHeight / 3;
+    const on = screens.find((s) => {
+      const r = s.getBoundingClientRect();
+      return r.top <= line && r.bottom > line;
+    });
+    return on && on !== screens[0] ? `#${on.id}` : '';
+  };
+  const syncLangSwitch = (atClick = false) =>
     document.querySelectorAll<HTMLAnchorElement>('a[data-lang-switch]').forEach((a) => {
       const u = new URL(a.href, location.href);
-      u.hash = location.hash;
+      u.hash = (atClick && readingScreen()) || location.hash;
+      // the reader's answers in the address (the calculator's ?county=…&km=…) go along too
+      if (location.search) u.search = location.search;
       a.href = u.href;
     });
   syncLangSwitch();
-  window.addEventListener('hashchange', syncLangSwitch);
-  document.addEventListener('click', (e) => (e.target as Element | null)?.closest?.('a[data-lang-switch]') && syncLangSwitch(), true);
+  window.addEventListener('hashchange', () => syncLangSwitch());
+
+  // smooth scrolling starts once the page has settled on its first position (global.css)
+  const ready = () => setTimeout(() => document.documentElement.classList.add('sa-ready'), 800);
+  if (document.readyState === 'complete') ready();
+  else addEventListener('load', ready, { once: true });
+
+  // Printing from the browser prints what is folded too, on every page (the /act/ caveats and
+  // chart tables, the /evidence/ and /sources/ folds); the folds close again afterwards.
+  let printed: HTMLDetailsElement[] = [];
+  addEventListener('beforeprint', () => {
+    printed = [...document.querySelectorAll<HTMLDetailsElement>('main details:not([open])')];
+    printed.forEach((d) => (d.open = true));
+  });
+  addEventListener('afterprint', () => {
+    printed.forEach((d) => (d.open = false));
+    printed = [];
+  });
+  document.addEventListener('click', (e) => (e.target as Element | null)?.closest?.('a[data-lang-switch]') && syncLangSwitch(true), true);
 </script>

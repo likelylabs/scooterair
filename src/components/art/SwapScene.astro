@@ -6,8 +6,8 @@
  * Ten scooters at the kerb, in two rows. Each can be a petrol scooter (with
  * its dark core and its cluster of marks) or an electric one (a motor in the
  * wheel, a green light strip, nothing behind it but three grey dots at the
- * tyre). The street's own sparse air, the people at the kerb and one car with
- * its own small plume stay whatever the slider says.
+ * tyre). The people at the kerb and one car with its own small plume stay
+ * whatever the slider says. The street's own air is not drawn (air.ts).
  *
  * The slider is <SwapControl> (put it in the Screen's `controls` slot); the
  * two talk through the Screen (data-swap-n) and swap.client.ts. On arrival the
@@ -28,7 +28,7 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { art, fill } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
-import { air, airTyreDust, unitsPerPx, type Box } from './air';
+import { air, airTyreDust, unitsPerPx, type Box, AIR_KEY } from './air';
 import { CAR_TAILPIPE, artId, car, figureBoxes, person, rider, scooter } from './parts';
 import { ROW_CLASS, pickSources, put, tailOf, tyreOf, withoutSources, type Placed } from './kit';
 import { sceneAlt } from './scene';
@@ -40,8 +40,10 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
+  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  legend?: boolean;
 }
-const { locale, play = true, tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, play = true, tag = false, id, class: cls } = Astro.props;
 const TOTAL = 10;
 const value = Math.max(0, Math.min(TOTAL, Math.round(Astro.props.value ?? TOTAL)));
 
@@ -102,7 +104,7 @@ const scene = a.defs + street + put(carAt.x, carAt.y, car(), { s: carAt.s, cls: 
 const alt = sceneAlt(locale, fill(art.swap.alt, locale, { total: TOTAL }), { kind: 'electric' });
 ---
 
-<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} drift arrive={play} id={id} class={['scene--swap', cls].filter(Boolean).join(' ')} data-swap-total={TOTAL} data-swap-rest={value} data-swap-n={value} data-swap-play={play ? 'true' : undefined}>
+<SceneFrame locale={locale} legend={legend && ([...AIR_KEY, 'car', 'tyre'] as const)} box={VB} alt={alt} tag={tag} drift arrive={play} id={id} class={['scene--swap', cls].filter(Boolean).join(' ')} data-swap-total={TOTAL} data-swap-rest={value} data-swap-n={value} data-swap-play={play ? 'true' : undefined}>
   <Fragment set:html={scene} />
 </SceneFrame>
 

@@ -79,8 +79,18 @@ if (raw) {
     setHtml('[data-hm-fig]', V.figureHtml(P, table, c));
     const price = $('#hm-price');
     if (price) updateHtmlChart(price, renderPriceBars(V.priceBarsProps(P, table, c)));
+    setHtml('[data-hm-scrap]', V.scrapHtml(P, table, c));
     setText('[data-hm-body13]', V.buyBody(P, table, c));
+    // the folded worst case: keep it open if the reader opened it
+    const worst = $('[data-hm-worst]');
+    if (worst && !worst.querySelector('details[open]')) setHtml('[data-hm-worst]', V.worstFold(P, table));
     setText('[data-hm-strip]', V.stripOf(P, table, c));
+    const change = V.scrapChange(P, table, c);
+    setText('[data-hm-change]', change);
+    $$('[data-hm-change]').forEach((el) => (el.hidden = !change));
+    const fold = V.stripFold(P, table, c);
+    setText('[data-hm-stripfold]', fold);
+    $$('[data-hm-stripfold]').forEach((el) => (el.hidden = !fold));
     setHtml('[data-hm-lines]', V.buyLinesHtml(P, table, c));
     // 14 · each month
     setHtml('#s-14-h', V.phrasedHtml(V.headlineMarks(V.monthHead(P, table, c.km), D.locale)));

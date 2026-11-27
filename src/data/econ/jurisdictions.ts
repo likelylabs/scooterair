@@ -76,7 +76,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     kind: 'special-municipality',
     status: 'partly-verified',
     statusNote: t(
-      '已查閱環保局 2026 年公告（2026 年 11 月 26 日再次核對）：換購最高15,000元、新購最高4,000元，一般補助共6,000名，2027 年 1 月 10 日前申請。公告只寫「最高」金額，所以試算把它當上限。還剩多少名額、能不能和中央補助一起領，請上線上申請系統或打電話問環保局。',
+      '已查閱環保局 2026 年公告（2026 年 11 月 26 日再次核對）：換購最高15,000元、新購最高4,000元，一般補助共6,000名，2027 年 1 月 10 日前申請。公告只寫「最高」金額，所以計算把它當上限。還剩多少名額、能不能和中央補助一起領，請上線上申請系統或打電話問環保局。',
       'We read the Department of Environmental Protection\'s 2026 notice (checked again on 26 November 2026): up to NT$15,000 to scrap and replace, up to NT$4,000 for a new scooter, 6,000 general places, apply by 10 January 2027. The notice gives only maximums, so the calculator shows them as ceilings. For places left and whether it stacks with central money, use the online system or phone the bureau.',
     ),
     officialLinks: [
@@ -160,7 +160,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     kind: 'provincial-city',
     status: 'partly-verified',
     statusNote: t(
-      '只有汰舊換購補助；市府金額取自經濟部縣市補助表。市府新聞稿寫的22,600至50,500元已經包含中央補助，試算另外加上中央補助，所以兩個數字不一樣。中低收入戶的市府金額沒有分開寫，沒有算進去；每年名額很少。',
+      '只有汰舊換購補助；市府金額取自經濟部縣市補助表。市府新聞稿寫的22,600至50,500元已經包含中央補助，計算另外加上中央補助，所以兩個數字不一樣。中低收入戶的市府金額沒有分開寫，沒有算進去；每年名額很少。',
       'Scrap-and-replace only; city amounts come from the MOEA county table. The NT$22,600–50,500 in the city\'s press release already includes central money; the calculator adds central money separately, so the two are not the same figure. The low-income city amount is not given separately and is not counted; places are few each year.',
     ),
     officialLinks: [{ label: t('新竹市政府官網', 'Hsinchu City Government website'), url: 'https://www.hccg.gov.tw' }, meidLink],
@@ -232,7 +232,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     kind: 'provincial-city',
     status: 'partly-verified',
     statusNote: t(
-      '換購12,000元、新購8,000元取自經濟部產業發展署的縣市補助表。市府 2026 年 2 月 23 日的新聞稿說，加碼到 2026 年 12 月 31 日或經費用完為止；中低收入戶和「學生家庭」可以多領，但新聞稿只寫加總後的金額，所以試算沒有算進去，符合的人請向市府環保局問清楚。',
+      '換購12,000元、新購8,000元取自經濟部產業發展署的縣市補助表。市府 2026 年 2 月 23 日的新聞稿說，加碼到 2026 年 12 月 31 日或經費用完為止；中低收入戶和「學生家庭」可以多領，但新聞稿只寫加總後的金額，所以計算沒有算進去，符合的人請向市府環保局問清楚。',
       'Scrap-and-replace NT$12,000 and new purchase NT$8,000 come from the MOEA\'s county table. The city\'s press release of 23 February 2026 says the money runs to 31 December 2026 or until it is used up; low-income and student households can get more, but the release gives only totals, so the calculator leaves that out. If you qualify, ask the city\'s Environmental Protection Bureau.',
     ),
     officialLinks: [meidLink],
@@ -258,7 +258,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     kind: 'county',
     status: 'partly-verified',
     statusNote: t(
-      '換購6,000元、新購3,000元取自經濟部產業發展署的縣市補助表（媒體另報新購4,000元，試算採較低的官方表列金額）。偏遠鄉鎮可以多領，但 2026 年的鄉鎮名單我們沒找到，所以沒有算進去；住在山區或離島鄉鎮的人，請打補助專線 08-7352068 問。',
+      '換購6,000元、新購3,000元取自經濟部產業發展署的縣市補助表（媒體另報新購4,000元，計算採較低的官方表列金額）。偏遠鄉鎮可以多領，但 2026 年的鄉鎮名單我們沒找到，所以沒有算進去；住在山區或離島鄉鎮的人，請打補助專線 08-7352068 問。',
       'Scrap-and-replace NT$6,000 and new purchase NT$3,000 come from the MOEA\'s county table (a news report says NT$4,000 for new purchases; we use the lower official figure). Remote townships can get more, but we could not find the 2026 list of townships, so it is not counted; if you live in a mountain or island township, phone the subsidy line on 08-7352068.',
     ),
     officialLinks: [meidLink],
@@ -283,7 +283,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     t('花蓮縣', 'Hualien County'),
     'county',
     t(
-      '我們找不到花蓮縣 2026 年的機車補助：環保局網站和經濟部的表上，最新的都是 2025 年的（已經結束）。這不代表一定沒有。中央的補助全國都能領，試算已經算進去；縣裡有沒有加碼，請打電話問花蓮縣環保局：03-8239935。',
+      '我們找不到花蓮縣 2026 年的機車補助：環保局網站和經濟部的表上，最新的都是 2025 年的（已經結束）。這不代表一定沒有。中央的補助全國都能領，計算已經算進去；縣裡有沒有加碼，請打電話問花蓮縣環保局：03-8239935。',
       'We could not find a Hualien County scooter subsidy for 2026: on the bureau\'s site and the MOEA table the newest one is for 2025, which has ended. That does not prove there is none. Central money can be claimed anywhere and the calculator counts it; to ask about county money, phone the Hualien County EPB on 03-8239935.',
     ),
     ['counties-south-east-islands', 'counties-remaining-r2'],
@@ -296,7 +296,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     'taitung',
     t('台東縣', 'Taitung County'),
     'county',
-    t('我們找不到台東縣 2026 年的機車補助：經濟部的縣市補助表沒有列，台東縣環保局的網站我們也打不開。這不代表一定沒有。中央的補助全國都能領，試算已經算進去；縣裡有沒有加碼，請打電話或上官網問台東縣環保局。', 'We could not find a Taitung County scooter subsidy for 2026: the MOEA county table does not list one, and the bureau\'s site would not open for us. That does not prove there is none. Central money can be claimed anywhere and the calculator counts it; to ask about county money, phone or visit the website of the Taitung County Environmental Protection Bureau.'),
+    t('我們找不到台東縣 2026 年的機車補助：經濟部的縣市補助表沒有列，台東縣環保局的網站我們也打不開。這不代表一定沒有。中央的補助全國都能領，計算已經算進去；縣裡有沒有加碼，請打電話或上官網問台東縣環保局。', 'We could not find a Taitung County scooter subsidy for 2026: the MOEA county table does not list one, and the bureau\'s site would not open for us. That does not prove there is none. Central money can be claimed anywhere and the calculator counts it; to ask about county money, phone or visit the website of the Taitung County Environmental Protection Bureau.'),
     ['counties-south-east-islands', 'counties-remaining-r2'],
     [{ label: t('台東縣環保局官網', 'Taitung EPB website'), url: 'https://ttepb.taitung.gov.tw/' }],
   ),
@@ -304,7 +304,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     'penghu',
     t('澎湖縣', 'Penghu County'),
     'county',
-    t('我們找不到澎湖縣 2026 年的機車補助：經濟部的縣市補助表沒有列，澎湖縣環保局的網站我們也打不開。這不代表一定沒有。中央的補助全國都能領，試算已經算進去；縣裡有沒有加碼，請打電話或上官網問澎湖縣環保局。', 'We could not find a Penghu County scooter subsidy for 2026: the MOEA county table does not list one, and the bureau\'s site would not open for us. That does not prove there is none. Central money can be claimed anywhere and the calculator counts it; to ask about county money, phone or visit the website of the Penghu County Environmental Protection Bureau.'),
+    t('我們找不到澎湖縣 2026 年的機車補助：經濟部的縣市補助表沒有列，澎湖縣環保局的網站我們也打不開。這不代表一定沒有。中央的補助全國都能領，計算已經算進去；縣裡有沒有加碼，請打電話或上官網問澎湖縣環保局。', 'We could not find a Penghu County scooter subsidy for 2026: the MOEA county table does not list one, and the bureau\'s site would not open for us. That does not prove there is none. Central money can be claimed anywhere and the calculator counts it; to ask about county money, phone or visit the website of the Penghu County Environmental Protection Bureau.'),
     ['counties-south-east-islands', 'counties-remaining-r2'],
     [{ label: t('澎湖縣環保局官網', 'Penghu EPB website'), url: 'https://www.phepb.gov.tw/' }],
   ),
@@ -325,7 +325,7 @@ export const jurisdictions: Record<JurisdictionId, Jurisdiction> = {
     'lienchiang',
     t('連江縣', 'Lienchiang County (Matsu)'),
     'county',
-    t('我們找不到連江縣 2026 年的機車補助：經濟部的縣市補助表沒有列，連江縣政府的網站我們也打不開。這不代表一定沒有。中央的補助全國都能領，試算已經算進去；縣裡有沒有加碼，請打電話或上官網問連江縣政府。', 'We could not find a Lienchiang County scooter subsidy for 2026: the MOEA county table does not list one, and the county government\'s site would not open for us. That does not prove there is none. Central money can be claimed anywhere and the calculator counts it; to ask about county money, phone or visit the website of the Lienchiang County Government.'),
+    t('我們找不到連江縣 2026 年的機車補助：經濟部的縣市補助表沒有列，連江縣政府的網站我們也打不開。這不代表一定沒有。中央的補助全國都能領，計算已經算進去；縣裡有沒有加碼，請打電話或上官網問連江縣政府。', 'We could not find a Lienchiang County scooter subsidy for 2026: the MOEA county table does not list one, and the county government\'s site would not open for us. That does not prove there is none. Central money can be claimed anywhere and the calculator counts it; to ask about county money, phone or visit the website of the Lienchiang County Government.'),
     ['counties-south-east-islands', 'counties-remaining-r2'],
     [{ label: t('連江縣政府官網', 'Lienchiang County Government website'), url: 'https://www.matsu.gov.tw/' }],
   ),

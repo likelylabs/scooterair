@@ -115,7 +115,7 @@ export const centralProgrammes: Programme[] = [
     amount: fixed(5100),
     conditions: [{ kind: 'moea-class', classes: ['light-2', 'small', 'light-unknown'] }, foreignApplyBy],
     conditionText: t(
-      '普通輕型（綠牌）第2級或小型輕型電動機車。綠牌車款如果無法確認是第1級還是第2級，試算先以5,100元計。',
+      '普通輕型（綠牌）第2級或小型輕型電動機車。綠牌車款如果無法確認是第1級還是第2級，計算先以5,100元計。',
       'A light-class (green plate, 普通輕型) model at level 2, or a small light-class (小型輕型) model. Where we cannot confirm whether a green-plate model is level 1 or 2, we count NT$5,100.',
     ),
     exclusiveGroups: ['moea-base'],
@@ -139,7 +139,7 @@ export const centralProgrammes: Programme[] = [
     side: 'electric',
     amount: fixed(3000),
     conditions: [{ kind: 'domestic-cells' }, foreignApplyBy],
-    conditionText: t('車款使用經認定的國產電池芯；哪些車款符合未能查證。', 'The model uses certified Taiwan-made battery cells; which models qualify could not be checked.'),
+    conditionText: t('車款使用經認定的國產電池芯；哪些車款符合沒有查證到。', 'The model uses certified Taiwan-made battery cells; which models qualify could not be checked.'),
     validFrom: '2022-12-11',
     validTo: '2026-12-31',
     applicationNote: MOEA_APPLY,
@@ -177,7 +177,7 @@ export const centralProgrammes: Programme[] = [
   {
     ...carbon('moenv-carbon-park', ['環境部減碳獎勵（園管局買下減碳額度）', 'MOENV carbon-reduction reward (credits bought by the Industrial Park Administration)'], 2000, '2025-11-10', '2026-12-31', 546),
     calculator: {
-      excluded: t('官方表格列出此選項，但研究資料未記下適用地區；金額與經濟部全國選項相同，試算不另計。', 'The official table lists this option but our research did not record its eligible area; it pays the same as the nationwide MOEA option, so it is not counted separately.'),
+      excluded: t('官方表格列出此選項，但研究資料未記下適用地區；金額與經濟部全國選項相同，計算不另計。', 'The official table lists this option but our research did not record its eligible area; it pays the same as the nationwide MOEA option, so it is not counted separately.'),
       reason: 'unverified',
     },
   },
@@ -221,7 +221,7 @@ export const centralProgrammes: Programme[] = [
   {
     ...air('moenv-air-national', ['環境部空污補助（全國）', 'MOENV air-pollution subsidy (nationwide)'], 1000, '2023-01-01', '2026-12-31', quota('unlimited', '2026-07-21', t('不限名額。', 'No quota.'))),
     status2027: t(
-      '環境部 2026 年 11 月 11 日預告草案，擬將空污補助延長至 2030 年底，但尚未定案，草案中的機車金額也未查證；試算不計入 2027 年。',
+      '環境部 2026 年 11 月 11 日預告草案，擬將空污補助延長至 2030 年底，但尚未定案，草案中的機車金額也未查證；計算不計入 2027 年。',
       'On 11 November 2026 MOENV pre-announced a draft extending the air subsidy to the end of 2030, but it is not final and the scooter amount in the draft was not verified; it is not counted for 2027.',
     ),
     sources: [...PDF, 'moenv-platform-faq', 'chinatimes-2026-11-moenv-draft'],
@@ -282,19 +282,19 @@ export const centralProgrammes: Programme[] = [
     jurisdiction: 'central',
     payer: 'moenv',
     payerName: t('環境部', 'Ministry of Environment (MOENV)'),
-    name: t('環境部廢機車回收獎勵金（第二台）', 'MOENV recycling payment for a second scrapped scooter'),
+    name: t('環境部廢機車回收獎勵金（第二輛）', 'MOENV recycling payment for a second scrapped scooter'),
     kind: 'recycling-bonus',
     side: 'both',
     amount: fixed(300),
     conditions: [scrap, scrapAge(7), { kind: 'scrap-second-scooter' }],
     conditionText: t(
-      '同一次申請再報廢第二台機車（例如新北市的「雙汰舊」）時，第二台也能領一份 300 元回收獎勵金。這一點只見於新聞報導，請向環境部或回收業者確認。',
+      '同一次申請再報廢第二輛機車（例如新北市的「雙汰舊」）時，第二輛也能領一份 300 元回收獎勵金。這一點只見於新聞報導，請向環境部或回收業者確認。',
       'When a second scooter is scrapped in the same application (New Taipei\'s double-scrap route, for example), the second one earns its own NT$300 recycling payment. Only a news report says so; check with MOENV or the recycler.',
     ),
     exclusiveGroups: ['kinmen-vs-moenv'],
     validFrom: '2026-01-01',
     validTo: '2026-12-31',
-    validToRule: t('兩台要報廢的機車都須在這天以前完成報廢回收。', 'Scrap and recycle both scooters by this date.'),
+    validToRule: t('兩輛要報廢的機車都須在這天以前完成報廢回收。', 'Scrap and recycle both scooters by this date.'),
     quota: quota('unknown', '2026-06-01', t('沒有公布名額。', 'No limit on places is published.')),
     status2027: t('2027 年是否續辦未查證。', 'Whether it continues in 2027 was not checked.'),
     sources: ['tvbs-health-2026-01-subsidy'],
@@ -349,7 +349,7 @@ export const centralProgrammes: Programme[] = [
     confidence: 'verified',
     research: ['central#goods-tax-scrap-replace-4000', 'gas-prices#kymco-gov-tax-table', 'gas-prices#sym-duke125-nov-promo'],
     note: t(
-      '財政部網頁把新購2,000元與汰舊4,000元分開列，沒有寫可以相加；光陽與三陽的11月官方優惠與台中市環保局的金額表則兩者都算。試算依車廠做法相加，這會讓燃油機車看起來較便宜，對電動機車的比較是保守的；但相加只有次級依據，財政部未確認。',
+      '財政部網頁把新購2,000元與汰舊4,000元分開列，沒有寫可以相加；光陽與三陽的11月官方優惠與台中市環保局的金額表則兩者都算。計算依車廠做法相加，這會讓燃油機車看起來較便宜，對電動機車的比較是保守的；但相加只有次級依據，財政部未確認。',
       'The MOF page lists the new-purchase NT$2,000 and scrap NT$4,000 separately and does not say they add up; KYMCO\'s and SYM\'s official November offers and Taichung\'s EPB amount table count both. We follow the manufacturers, which makes the petrol scooter look cheaper and keeps the comparison conservative for electric; but the stacking rests on secondary evidence and the MOF has not confirmed it.',
     ),
     calculator: true,

@@ -15,8 +15,22 @@
  *   │ row 2     slot `actions`, then the full-width next button        │
  *   └ slot `sheet` — the <HowSheet> (an open block here without JS) ──┘
  *
- * From 900 px wide a screen is two columns (picture left, at most 560 px; text right) inside a
- * 1,040 px column. Scrolling is ordinary scrolling: nothing is pinned or snapped.
+ * THE LAYOUT RULE: a reader arriving at a screen sees the whole picture and, with it, at least
+ * the headline and the first line of words, at every width and height.
+ *   - From 688 px wide (43em: a tablet held upright, a phone on its side, a laptop) a screen is
+ *     two columns, picture left and words right, inside a 1,040 px column. The picture column is
+ *     at most 55 % of the row and 560 px, and never taller than the window leaves room for: its
+ *     width follows the window's height through the drawing's own proportions (--pic-ar), so a
+ *     picture is shrunk whole, never cropped, and never letterboxed inside its column.
+ *   - Narrower, the picture sits above the words, edge to edge on a phone. When the window is
+ *     too short for the picture and the headline together, the whole screen (picture and words)
+ *     is narrowed to the width at which they fit, so both keep the same edges.
+ * --pic-ar is the width over the height of the first drawing in the picture slot (the viewBox
+ * of its `scene__art`), read here at build time. --pic-extra (default 3rem) is how much the
+ * picture's box holds besides the drawing (the tag, a key, a number box, a switch); a page sets
+ * it per screen where that is more (home.css, questions/[slug].astro). A picture that is not
+ * a scene (a chart, a table) has no --pic-ar and is never narrowed: those are short. Scrolling
+ * is ordinary scrolling: nothing is pinned or snapped.
  *
  * THE LIMITS ARE ENFORCED. A headline over 22 Chinese characters, a body over 45 or a quiet
  * line over 30 throws, and the build fails. Han characters are counted; digits, units, Latin
@@ -99,6 +113,12 @@ const isBlock = (html: string) => /<(p|div|ul|ol|dl|table)\b/i.test(html);
 const BodyTag = isBlock(bodyHtml) ? 'div' : 'p';
 const QuietTag = isBlock(quietHtml) ? 'div' : 'p';
 
+// the drawing's proportions, for the layout rule above (first <svg class="scene__art …" viewBox>)
+const pictureHtml = await render('picture');
+const artTag = pictureHtml.match(/<svg\b[^>]*\bclass="scene__art\b[^>]*>/)?.[0];
+const viewBox = artTag?.match(/\bviewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)\s*"/);
+const picAr = viewBox && Number(viewBox[2]) > 0 ? Number((Number(viewBox[1]) / Number(viewBox[2])).toFixed(4)) : null;
+
 const hasSheet = Astro.slots.has('sheet');
 const how = Astro.props.how ?? `how-${n}`;
 const hasChips = Astro.slots.has('chips');
@@ -108,11 +128,11 @@ const phaseWord = phase === 'green' ? screenText.green[locale] : screenText.red[
 const position = fill(screenText.position, locale, { n, total });
 ---
 
-<article class:list={['screen', `screen--${phase}`, cls]} id={id} data-screen data-n={n} data-chapter={chapter} data-phase={phase} data-pick-scope aria-labelledby={`${id}-h`}>
+<article class:list={['screen', `screen--${phase}`, cls]} id={id} data-screen data-n={n} data-chapter={chapter} data-phase={phase} data-pick-scope aria-labelledby={`${id}-h`} style={picAr ? `--pic-ar:${picAr}` : undefined}>
   <div class="screen__stage">
     {hasAbove && <div class="screen__above"><slot name="above" /></div>}
     <div class="screen__pic">
-      <slot name="picture" />
+      <Fragment set:html={pictureHtml} />
       {illustration && <IllustrationTag locale={locale} kind={illustration === 'body' ? 'body' : 'street'} />}
     </div>
     {hasControls && <div class="screen__controls"><slot name="controls" /></div>}
@@ -156,11 +176,23 @@ const position = fill(screenText.position, locale, { n, total });
 <style>
   .screen {
     --pad: var(--gutter);
+    /* the layout rule (see the top of this file). --pic-ar: the drawing's width over its height;
+       9 (no drawing) never narrows anything. --chrome: the sticky header and screen rail. */
+    --pic-ar: 9;
+    --chrome: calc(var(--header-h) + var(--rail-h) + 2px);
+    /* the window's height, less the chrome: svh where the browser knows it (a phone's toolbars
+       shown), vh before */
+    --win: calc(100vh - var(--chrome));
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     padding-block-end: var(--sp-6);
     /* the next button lands the screen flush under the rail: undo the page's 1rem scroll padding */
     scroll-margin-block-start: -1rem;
+  }
+  @supports (height: 100svh) {
+    .screen {
+      --win: calc(100svh - var(--chrome));
+    }
   }
   .screen + :global(.screen) {
     border-block-start: 1px solid var(--line);
@@ -310,17 +342,37 @@ const position = fill(screenText.position, locale, { n, total });
     display: none;
   }
 
-  /* ---- wide screens: picture left, words right ---- */
-  @media (min-width: 56.25em) {
+  /* ---- one column (a phone): the picture above the words ----
+     When the window is too short for the whole picture (the drawing, plus --pic-extra for what
+     its box holds besides: the tag, a key, a number box, a switch) and 7rem under it (the
+     headline and a first line), the screen narrows to the width at which they fit: picture and
+     words narrow together and keep the same edges. Never below 24rem, so a phone held upright
+     is never narrowed: there the picture runs edge to edge. */
+  @media (max-width: 42.99em) {
+    .screen {
+      max-inline-size: max(24rem, calc((var(--win) - 7rem - var(--pic-extra, 3rem)) * var(--pic-ar)));
+      margin-inline: auto;
+    }
+  }
+
+  /* ---- two columns (from 688 px: a tablet held upright, a phone on its side, a desktop):
+     picture left, words right. The picture column is at most 55 % of the row and 35rem, and
+     narrow enough that the whole picture (the drawing plus --pic-extra) fits the window's height,
+     but never under 14rem (--pic-min), where a drawing's words would crowd. The words take the rest, never
+     less than 17rem (or 45 %). A window under 30em tall (a phone on its side) has less air
+     around the screen. */
+  @media (min-width: 43em) {
     .screen {
       --pad: 0px;
-      grid-template-columns: minmax(0, 35rem) minmax(0, 1fr);
-      column-gap: var(--sp-7);
+      --screen-pad: var(--sp-5);
+      --pic-col: min(55%, 35rem, max(var(--pic-min, 14rem), calc((var(--win) - 2 * var(--screen-pad) - var(--pic-extra, 3rem)) * var(--pic-ar))));
+      grid-template-columns: minmax(0, var(--pic-col)) minmax(min(17rem, 45%), 1fr);
+      column-gap: var(--sp-5);
       align-items: center;
       inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
       margin-inline: auto;
-      padding-block: var(--sp-7);
-      scroll-margin-block-start: 0;
+      padding-block: var(--screen-pad);
+      scroll-margin-block-start: -1rem;
     }
     /* the drawing is rounded, not the box: the tag's line sits under it */
     .screen__pic > :global(:first-child) {
@@ -333,6 +385,19 @@ const position = fill(screenText.position, locale, { n, total });
     }
     .screen__sheet {
       grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 43em) and (max-height: 30em) {
+    .screen {
+      --screen-pad: var(--sp-3);
+    }
+  }
+  /* a desktop: more air between and around the two columns */
+  @media (min-width: 56.25em) and (min-height: 37.5em) {
+    .screen {
+      --screen-pad: var(--sp-7);
+      column-gap: var(--sp-7);
+      scroll-margin-block-start: 0;
     }
   }
   @media print {

@@ -8,26 +8,31 @@
  */
 
 /* ---- the frame, tuned for fifteen screens on a phone (the page's length is budgeted: brief 9.3, check 9) ---- */
-@media (max-width: 56.24em) {
+@media (max-width: 42.99em) {
   .h-home article.screen {
     padding-block-end: var(--sp-4);
   }
   .h-home article .screen__text {
-    gap: 0.625rem;
+    gap: 0.5rem;
     padding-block-start: var(--sp-3);
   }
   .h-home article .screen__foot {
     margin-block-start: 0;
   }
 }
-/* a tablet held upright: one column, kept to a phone-and-a-half wide so a picture does not fill
-   a whole screen by itself and a line of text stays easy to follow */
-@media (min-width: 40em) and (max-width: 56.24em) {
-  .h-home article.screen {
-    max-inline-size: 36rem;
-    margin-inline: auto;
-  }
-}
+/* A tablet held upright is two columns, like a desktop (ui/Screen.astro, from 43em): one column
+   there let the picture fill the whole window by itself and pushed the words below it. */
+/* --pic-extra: how tall each picture's box is besides its drawing (the tag, the key, a number
+   box, a chip, a switch), measured at 1,280 px in both languages and rounded up. ui/Screen.astro
+   narrows a picture until the drawing and this fit the window's height, with the words beside or
+   under it. The default (3rem) is the tag and a one-line key. */
+.h-home #s-2 { --pic-extra: 14rem; }   /* the can and its chip above the drawing */
+.h-home #s-4 { --pic-extra: 8rem; }    /* the number box above */
+.h-home #s-6,
+.h-home #s-12 { --pic-extra: 5.5rem; }
+.h-home #s-10,
+.h-home #s-11 { --pic-extra: 15.5rem; } /* the masks; the switch */
+.h-home:lang(en) #s-1 { --pic-extra: 9rem; } /* the English key under the first picture */
 /* the chips share foot row 1 with 怎麼知道的？: they take the room that is left and wrap among
    themselves there; a chip is never cut (when even one chip does not fit beside the button, the
    button moves to a line of its own) */
@@ -83,7 +88,7 @@
 .h-pic--chart > .h-pic__ctl {
   padding: 0;
 }
-@media (min-width: 56.25em) {
+@media (min-width: 43em) {
   /* the drawing is rounded, not the block that also holds its control */
   .h-home .screen__pic > .h-pic {
     border-radius: 0;
@@ -159,7 +164,9 @@
 }
 
 /* ---- screen 4: the number box. In flow above the drawing; on a phone of 360 px or more at
-   標準 text size it lies over the top of the drawing, where the scene is only shopfronts ---- */
+   標準 text size it lies over the top of the drawing, where the scene is only shopfronts. In two
+   columns (from 43em) the picture column is narrow, so the box always sits above the drawing:
+   over it, it would hide the people ---- */
 .h-box {
   margin: var(--sp-3) var(--pad, var(--gutter)) var(--sp-2);
   padding: 0.25rem var(--sp-3);
@@ -205,7 +212,7 @@
 .h-box__gloss b {
   color: var(--ink);
 }
-@media (min-width: 22.5em) {
+@media (min-width: 22.5em) and (max-width: 42.99em) {
   html:not([data-text]) .h-s4 .h-box {
     position: absolute;
     z-index: 1;
@@ -353,6 +360,50 @@ html.js .h-pick__fixed {
     color: var(--clean-ink);
   }
 }
+/* what scrapping does: under the bars, in the reader's county (money-view scrapHtml) */
+.h-scrap {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-regular, 400);
+  line-height: 1.4;
+  color: var(--ink);
+}
+/* another place's case, folded behind one plain line (money-view worstFold) */
+/* on screen 13 it follows the strip directly: its 48 px line already has air above its words */
+.h-home .h-worstwrap {
+  margin-block-start: -0.5rem;
+}
+.h-worst > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap);
+  list-style: none;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+}
+.h-worst > summary::-webkit-details-marker {
+  display: none;
+}
+.h-worst > summary::before {
+  content: '';
+  flex: none;
+  inline-size: 0.55em;
+  block-size: 0.55em;
+  border-inline-end: 2.5px solid currentColor;
+  border-block-end: 2.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.h-worst[open] > summary::before {
+  transform: rotate(45deg);
+}
+.h-worst > p {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-base);
+  line-height: var(--lh-read);
+}
 .h-deadline-note {
   margin: 0;
   padding: 0.35rem 0.75rem;
@@ -361,7 +412,28 @@ html.js .h-pick__fixed {
   color: var(--estimate-ink);
   font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
-  line-height: 1.5;
+  line-height: 1.4;
+}
+/* the day the prices were checked, on the strip's own line (it is also in the sheet) */
+.h-deadline-note__checked {
+  font-weight: var(--fw-regular, 400);
+}
+/* on home the dashed key is said by each bar's own line (「定價…，扣掉…」 beside the same dashed mark) */
+.h-home .hc-pricebars .hc-keyline {
+  display: none;
+}
+/* on home the gap is the big figure right above the bars (「電動機車少付 2,120 元」): the bracket
+   stays as the drawing of it, its label is left to screen readers so the figure is not said twice */
+.h-home .hc-pricebars .hc-gap {
+  min-block-size: 1.25rem;
+}
+.h-home .hc-pricebars .hc-gap__label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .h-checked-note {
   margin: 0;
@@ -522,6 +594,14 @@ html.js .h-pick__fixed {
 .h-work__paid {
   font-weight: var(--fw-black);
   border-block-end: 0;
+}
+
+/* ---- screen 5: one idea per line in the body ---- */
+.h-lines {
+  display: grid;
+  /* one idea per line: each short sentence starts its own line; the reading line height spaces them
+     (no extra gap, so screen 5 keeps the page inside its budget, check 9) */
+  gap: 0;
 }
 
 /* ---- screen 5: the chart sits on the page's gutters, with air above it ---- */

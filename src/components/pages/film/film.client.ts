@@ -15,6 +15,19 @@
 import { createFilm, SVG_LAYERS, type Film, type FilmNode } from './scene.ts';
 import { hudApply, hudHTML, type HudMemo, type HudText } from './hud.ts';
 import { DURATION, POSTER_T, clock } from './timeline.ts';
+import { glueZh } from '../../../lib/glue.mjs';
+
+// A caption line never leaves a lone character or mark on its own line, and a number keeps its
+// unit (「24–36 小時」): the same word glue as the site's headlines (src/lib/glue.mjs).
+const escCap = (x: string) => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function captionHtml(text: string): string {
+  const held: string[] = [];
+  const kept = escCap(text).replace(/\d[\d,.]*(?:[–-]\d[\d,.]*)?\s?[㐀-鿿]{1,2}[，。、？！；：]*/g, (m) => {
+    held.push(m);
+    return `\u0001${held.length - 1}\u0001`;
+  });
+  return glueZh(kept).replace(/\u0001(\d+)\u0001/g, (_m, i) => `<span class="nobr">${held[+i]}</span>`);
+}
 
 interface CaptionData {
   id: string;
@@ -162,8 +175,8 @@ function start(root: HTMLElement): void {
     const cue = cueAt(time);
     if (cue !== lastCue) {
       lastCue = cue;
-      capMain.textContent = cue.main;
-      capNote.textContent = cue.note ?? '';
+      capMain.innerHTML = captionHtml(cue.main);
+      capNote.innerHTML = captionHtml(cue.note ?? '');
       if (cue.note && cue.chip) capNote.insertAdjacentHTML('beforeend', ` <span class="cap__chip">${cue.chip.glyph}${cue.chip.label}</span>`);
       if (say && begun) say.textContent = cue.main + (cue.note ? ' ' + cue.note : '');
       lines.forEach((li) => li.toggleAttribute('data-now', begun && li.dataset.line === cue.id));
