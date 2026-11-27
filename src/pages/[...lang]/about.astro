@@ -32,6 +32,7 @@ import { formatDate, snapshot, STALE_DAYS } from '@/lib/site-state.data';
 import about from '@/i18n/pages/about';
 import { fill, localize } from '@/i18n/pages/_copy';
 import SimText from '@/components/pages/estimate/SimText.astro';
+import { sim } from '@/data/simulation';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -50,6 +51,7 @@ const tokens = {
   t1: pct(D('netzero-ev-sales-targets', 'target2035')),
   y2: 'target2040'.slice('target'.length),
   t2: pct(D('netzero-ev-sales-targets', 'target2040')),
+  near: sim.co.nearTailpipeAbout,
 };
 const log = corrections
   .map((c) => {

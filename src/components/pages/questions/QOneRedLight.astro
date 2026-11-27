@@ -22,6 +22,8 @@ import { defaultRedsPerDay, redsPerDayOptions } from '@/data/estimate';
 import questions from '@/i18n/pages/questions';
 import { filler, yearHours } from './q';
 import SimText from '@/components/pages/estimate/SimText.astro';
+import { sim } from '@/data/simulation';
+import { fill } from '@/i18n/pages/_copy';
 
 interface Props {
   locale: Locale;
@@ -50,7 +52,7 @@ const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung', 'route
     <WorkingSum slot="block2" locale={locale} {...workingHoursPerYear(defaultRedsPerDay, locale)} />
     <Fragment slot="block3">
       <p>{f(s1.sheet.b3[locale])}</p>
-      {s1.sheet.stayers.map((l) => <SimText locale={locale} text={l[locale]} slots={{ range: 'sim.co.stay15', times: 'sim.benzene.stay1hTimes' }} />)}
+      {[`${s1.sheet.stayers[0][locale]}${locale === 'en' ? ' ' : ''}${s1.sheet.stayers[1][locale]}`, ...s1.sheet.stayers.slice(2).map((l) => l[locale])].map((l) => <SimText locale={locale} text={l} slots={{ range: 'sim.co.stay15', times: 'sim.benzene.stay1hTimes' }} />)}
     </Fragment>
     <section class="q-studies">
       <h3 class="q-studies__title">{s1.sheet.studiesTitle[locale]}</h3>
@@ -76,7 +78,7 @@ const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung', 'route
     <Fragment slot="block3">
       <p>{f(s2.sheet.b3[locale])}</p>
       <p>{f(s2.sheet.routes[locale])}</p>
-      <SimText locale={locale} text={s2.sheet.routesCo[locale]} slots={{ range: 'sim.co.oneRed15' }} />
+      <SimText locale={locale} text={fill(s2.sheet.routesCo[locale], { near: sim.co.nearTailpipeAbout })} slots={{ range: 'sim.co.oneRed15' }} />
     </Fragment>
   </HowSheet>
 </Screen>

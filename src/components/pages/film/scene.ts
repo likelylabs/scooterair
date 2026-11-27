@@ -47,6 +47,30 @@ import { AIR, air, airPuff, airPuffDefs, airRibbon, airWisp, type AirScenario, t
 import { T, signalAt, type Signal } from './timeline.ts';
 import { pedSignal } from '../../art/kit.ts';
 
+/**
+ * The day numbers printed on the calendar card's pages, drawn as strokes (the film holds no
+ * <text>): each digit on a 10 × 16 box, top-left at 0,0, for a round-capped stroke.
+ */
+const DATE_DIGITS: Record<string, string> = {
+  '0': 'M5,0C1.6,0 0,3.4 0,8C0,12.6 1.6,16 5,16C8.4,16 10,12.6 10,8C10,3.4 8.4,0 5,0Z',
+  '1': 'M2,3.4L6,0V16',
+  '2': 'M0.6,4C0.8,1.5 2.6,0 5,0C7.6,0 9.4,1.6 9.4,4.2C9.4,7.2 6.8,9 0.4,16H10',
+  '3': 'M0.8,2C2,0.7 3.4,0 5,0C7.8,0 9.4,1.6 9.4,4C9.4,6.4 7.6,7.6 4.4,7.6C7.9,7.6 10,9.2 10,11.8C10,14.6 7.8,16 5,16C3.2,16 1.6,15.3 0.4,14',
+  '4': 'M7.6,16V0L0,11H10',
+  '5': 'M9.2,0H1.4L0.8,7.2C2,6.4 3.4,6 5,6C8,6 10,8 10,11C10,14 8,16 5,16C3,16 1.4,15.2 0.4,14',
+  '6': 'M8.6,1C7.6,0.3 6.4,0 5.2,0C1.8,0 0,3.4 0,9C0,13.6 2,16 5,16C8,16 10,14 10,11C10,8 8,6.2 5.2,6.2C3,6.2 1,7.4 0.2,9.6',
+  '7': 'M0,0H10L3.6,16',
+  '8': 'M5,7.4C2.4,7.4 0.8,6 0.8,3.8C0.8,1.5 2.6,0 5,0C7.4,0 9.2,1.5 9.2,3.8C9.2,6 7.6,7.4 5,7.4C2,7.4 0,9 0,11.8C0,14.4 2.2,16 5,16C7.8,16 10,14.4 10,11.8C10,9 8,7.4 5,7.4Z',
+  '9': 'M9.8,6.4C9,8.6 7,9.8 4.8,9.8C2,9.8 0,8 0,5C0,2 2,0 5,0C8,0 10,2.4 10,7C10,12.6 8.2,16 4.8,16C3.6,16 2.4,15.7 1.4,15',
+};
+/** A day number centred at cx with its top at y, `h` units tall. */
+const dateNumber = (n: number, cx: number, y: number, h: number): string => {
+  const ds = String(n).split('');
+  const k = h / 16;
+  const w = (ds.length * 10 + (ds.length - 1) * 4) * k;
+  return `<g class="f-date" transform="translate(${r1(cx - w / 2)} ${r1(y)}) scale(${r3(k)})" stroke-width="${r2(2.4)}">${ds.map((d, i) => `<path transform="translate(${i * 14} 0)" d="${DATE_DIGITS[d]}"/>`).join('')}</g>`;
+};
+
 /** The calendar card's red pedestrian signal (no countdown), its head's top-left at (x, y) of the card, the pole to the card's foot. */
 const P_SIGNAL = (x: number, y: number): string => pedSignal({ x, y, scale: 2.4, state: 'red', poleTo: 300 });
 
@@ -62,6 +86,10 @@ const r1 = (v: number): number => Math.round(v * 10) / 10;
 const r2 = (v: number): number => Math.round(v * 100) / 100;
 const r3 = (v: number): number => Math.round(v * 1000) / 1000;
 const mod = (v: number, m: number): number => ((v % m) + m) % m;
+/** How much of a wisp must be drawn before it shows: a zero-length dash with round caps is a dot. */
+const DRAWN = 0.02;
+/** A wisp drawn on from its start (pathLength 1, dasharray 1): hidden until a short line of it is drawn. */
+const drawOn = (p: number, opacity: number): { 'stroke-dashoffset': number; opacity: number } => ({ 'stroke-dashoffset': r3(1 - p), opacity: p < DRAWN ? 0 : opacity });
 
 /* ---- the street, left to right (cm) ----------------------------------------------- */
 const X0 = -1500; // drawn extent
@@ -903,7 +931,8 @@ export function createFilm(opt: FilmOptions) {
             const ph = mod(c.t / n.period, 1);
             const draw = ph < 0.45 ? eio(ph / 0.45) : 1;
             const fade = ph < 0.45 ? 1 : 1 - eio((ph - 0.45) / 0.55);
-            return { 'stroke-dashoffset': r3(1 - draw), opacity: r2(show * (0.35 + 0.65 * fade)) };
+            // a wisp not yet drawn is hidden: a zero-length dash with round caps would show as a dot
+            return { 'stroke-dashoffset': r3(1 - draw), opacity: draw < DRAWN ? 0 : r2(show * (0.35 + 0.65 * fade)) };
           }, ...CT)}`,
         }),
       );
@@ -953,7 +982,7 @@ export function createFilm(opt: FilmOptions) {
     [-7, 0, 7].forEach((dy, i) => {
       local += airRibbon(airWisp(MO.x - 4, MO.y - 3 - i * 1.5, NOSE.x + 2 + (i % 2) * 4, NOSE.y + dy, CARD_UPP), CARD_UPP, {
         weight: i === 1 ? 1.15 : 0.95,
-        attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ 'stroke-dashoffset': r3(1 - eio(seg(c.t, B0 + 0.3 + i * 0.2, B0 + 1.8 + i * 0.2))), opacity: c.t < B0 + 0.3 ? 0 : 1, transform: `translate(0 ${r1(1.6 * Math.sin(c.t * 2.4 + i * 1.3))})` }), B0 - 0.1, M + 0.6)}`,
+        attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ ...drawOn(eio(seg(c.t, B0 + 0.3 + i * 0.2, B0 + 1.8 + i * 0.2)), 1), transform: `translate(0 ${r1(1.6 * Math.sin(c.t * 2.4 + i * 1.3))})` }), B0 - 0.1, M + 0.6)}`,
       });
     });
     local += `<g class="a-figure" transform="translate(4 0)">${P.scooter({ kind: 'gas', rider: true })}</g>`;
@@ -1010,11 +1039,11 @@ export function createFilm(opt: FilmOptions) {
     const inP = F(P.MASK_FACE.inside);
     [[-20, 132, -3], [-20, 168, 4]].forEach(([x0, y0, dy], k) => {
       mask += airRibbon(airWisp(x0, y0, inP.x - 2, inP.y + dy, U * 0.8, k ? -1 : 1), U * 0.8, {
-        attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ 'stroke-dashoffset': r3(1 - eio(seg(c.t, M + 0.5 + k * 0.3, M + 1.9 + k * 0.3))), opacity: c.t < M + 0.5 ? 0 : 0.95, transform: `translate(0 ${r1(1.8 * Math.sin(c.t * 2.6 + k * 1.4))})` }), M - 0.1, Z + 0.9)}`,
+        attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ ...drawOn(eio(seg(c.t, M + 0.5 + k * 0.3, M + 1.9 + k * 0.3)), 0.95), transform: `translate(0 ${r1(1.8 * Math.sin(c.t * 2.6 + k * 1.4))})` }), M - 0.1, Z + 0.9)}`,
       });
     });
     const airwayRib = `M${F({ x: 24, y: -86 }).x},${F({ x: 24, y: -86 }).y} C${F({ x: 40, y: -91 }).x},${F({ x: 40, y: -91 }).y} ${F({ x: 56, y: -86 }).x},${F({ x: 56, y: -86 }).y} ${F({ x: 61, y: -70 }).x},${F({ x: 61, y: -70 }).y}`;
-    mask += airRibbon(airwayRib, U * 0.8, { attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ 'stroke-dashoffset': r3(1 - eio(seg(c.t, M + 1.9, M + 2.7))), opacity: c.t < M + 1.9 ? 0 : 0.95 }), M - 0.1, M + 2.8)}` });
+    mask += airRibbon(airwayRib, U * 0.8, { attrs: ` pathLength="1" stroke-dasharray="1"${dyn((c) => drawOn(eio(seg(c.t, M + 1.9, M + 2.7)), 0.95), M - 0.1, M + 2.8)}` });
     // some particles do stop on the mask: it is a particle filter, loose at the edges. Soot gathers on its front
     mask += airPuff(FP, [F({ x: 14, y: -88 }), F({ x: 16, y: -74 }), F({ x: 20, y: -62 })].map((p) => ({ cx: p.x - 3, cy: p.y, rx: 20, ry: 24 })), {
       tone: 'soot',
@@ -1029,31 +1058,33 @@ export function createFilm(opt: FilmOptions) {
 
   /**
    * Health, card A: one red light is short, but it is every day. A red pedestrian signal beside a
-   * tear-off day calendar whose pages keep flipping, faster and faster: the days going by. No
-   * circles or dots to decode (the owner, 2026-11-27); the caption says the hours.
+   * tear-off day calendar: each page carries its day's number in large print (1, 2, 3 …), and the
+   * pages keep flipping, faster and faster, so the numbers count the days going by. No circles or
+   * dots to decode (the owner, 2026-11-27); the caption says the hours.
    */
   function calendarCard(): string {
     const A = T.health;
     const Z = T.body;
     const PAD = { x: 178, y: 62, w: 170, h: 178 };
-    const page = (cls = '') =>
+    const page = (day: number, cls = '') =>
       `<rect class="f-sheet${cls}" x="${PAD.x}" y="${PAD.y}" width="${PAD.w}" height="${PAD.h}" rx="7"/>` +
       `<rect class="f-sheet-top" x="${PAD.x}" y="${PAD.y}" width="${PAD.w}" height="30" rx="7"/>` +
-      // two rings that hold the pad, and a few lines of a day's page
       `<rect class="f-sheet-top" x="${PAD.x}" y="${PAD.y + 16}" width="${PAD.w}" height="14"/>` +
-      [0, 1, 2].map((k) => `<rect class="f-day" x="${PAD.x + 24}" y="${PAD.y + 70 + k * 30}" width="${PAD.w - 48 - k * 26}" height="12" rx="6"/>`).join('');
+      // the day's number, large, under the red-and-dark binding strip
+      dateNumber(day, PAD.x + PAD.w / 2, PAD.y + 58, 92);
+    const N = 26;
     let inner = '';
     // the signal at red, its pole down to the bottom of the card
     inner += P_SIGNAL(70, 72);
-    // the pad: pages underneath, then the pages that flip away one after another
-    inner += `<g transform="translate(6 6)">${page()}</g>${page()}`;
-    const N = 26;
+    // the pad: the page underneath (the day after the last flip), then the pages that flip away
+    // one after another, day 1 on top
+    inner += `<g transform="translate(6 6)">${page(N + 1)}</g>${page(N + 1)}`;
     for (let d = N - 1; d >= 0; d--) {
       const at = A + 0.7 + 5.0 * Math.pow(d / (N - 1), 0.7);
       inner += `<g${dyn((c) => {
         const e = eio(seg(c.t, at, at + 0.32));
-        return { opacity: c.t > at + 0.32 ? 0 : r2(1 - 0.6 * e), transform: `translate(0 ${PAD.y}) scale(1 ${r3(1 - e)}) translate(0 ${-PAD.y})` };
-      }, A, A + 6.2)}>${page()}</g>`;
+        return { opacity: c.t > at + 0.32 ? 0 : 1, transform: `translate(0 ${PAD.y}) scale(1 ${r3(1 - e)}) translate(0 ${-PAD.y})` };
+      }, A, A + 6.2)}>${page(d + 1)}</g>`;
     }
     const body = `${FULL} class="f-freeze"/><g${dyn(fit(400, 300, 0.98))}>${inner}</g>`;
     return grp(dyn((c) => ({ opacity: r2(seg(c.t, A + 0.1, A + 0.7) * (1 - seg(c.t, Z - 0.2, Z + 0.3))), display: c.t > A && c.t < Z + 0.35 ? null : 'none' }), A - 0.1, Z + 0.4), body);
@@ -1085,7 +1116,7 @@ export function createFilm(opt: FilmOptions) {
       `${extra}${dyn((c) => ({ opacity: r2(peak * eo(seg(c.t, start + i * step, start + i * step + 1.1)) * lit(c, kind)) }), A, Z + 0.5)}`;
     // 1 · wisps: in at the nose, and no further than the throat
     const ribAttr = (i: number) =>
-      ` pathLength="1" stroke-dasharray="1"${dyn((c) => ({ 'stroke-dashoffset': r3(1 - eio(seg(c.t, start + i * step, start + i * step + 1.1))), opacity: c.t < start + i * step ? 0 : r2(lit(c, 0)) }), A, Z + 0.5)}`;
+      ` pathLength="1" stroke-dasharray="1"${dyn((c) => drawOn(eio(seg(c.t, start + i * step, start + i * step + 1.1)), r2(lit(c, 0))), A, Z + 0.5)}`;
     const ribbons =
       [-262, -246, -230].map((y0, i) => airRibbon(airWisp(206, y0, 66, -238 + i * 2, U), U, { weight: i === 1 ? 1.15 : 0.95, attrs: ribAttr(i) })).join('') +
       airRibbon('M57,-237 C50,-241 44,-232 37,-235 C29,-238 24,-229 17,-230 C10,-231 8,-221 5,-213', U, { weight: 1.15, attrs: ribAttr(5) });

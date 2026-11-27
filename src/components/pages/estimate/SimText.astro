@@ -32,6 +32,20 @@ const { locale, text, slots = {}, sheet, class: cls } = Astro.props;
 const parts = text.split(/\{(\w+)\}/);
 const Tag = Astro.props.as ?? (parts.length > 1 ? 'div' : 'p');
 for (let i = 1; i < parts.length; i += 2) if (!slots[parts[i]]) throw new Error(`SimText: no slot for {${parts[i]}} in 「${text}」`);
+/** The punctuation that opens the text after a figure: kept with the figure so it never starts a line. */
+const glue = (s: string) => /^[，。、；：,.;:)）」’”]+/.exec(s)?.[0] ?? '';
 ---
 
-<Tag class={cls}>{parts.map((p, i) => (i % 2 === 0 ? p : <EstimateValue locale={locale} slotId={slots[p]} value={simRange(slots[p])} anchor={simRange(slots[p]).anchor ?? 'simulation'} sheet={sheet} />))}</Tag>
+<Tag class={cls}>{parts.map((p, i) => {
+  if (i % 2 === 0) return i > 0 ? p.slice(glue(p).length) : p;
+  const after = glue(parts[i + 1] ?? '');
+  const value = <EstimateValue locale={locale} slotId={slots[p]} value={simRange(slots[p])} anchor={simRange(slots[p]).anchor ?? 'simulation'} sheet={sheet} />;
+  return after ? <span class="sim-text__glue">{value}{after}</span> : value;
+})}</Tag>
+
+<style>
+  /* a comma or full stop right after a figure stays on the figure's line */
+  .sim-text__glue {
+    white-space: nowrap;
+  }
+</style>

@@ -74,7 +74,7 @@ export default copy({
     /** One idea per line (printed as separate lines, so one more line can follow without a rewrite). */
     body: [
       /** what-is-in-it, short form: the "if", 推估, the first names in the signed statement's own order, benzene glossed once in plain words. The line links to /questions/smell/ (the full answer, with what the IARC groups mean). */
-      { 'zh-TW': '推估：如果你聞到的是身旁機車的廢氣，裡面也有苯（ㄅㄣˇ，汽油裡的成分）、甲醛等十幾種成分。', en: 'Estimate: if what you smell is the exhaust of the scooters beside you, that air also holds benzene (a substance found in petrol), formaldehyde and about ten other exhaust chemicals.' },
+      { 'zh-TW': '推估：如果你聞到的是身旁機車的廢氣，裡面也有苯（ㄅㄣˇ，廢氣的一種）、甲醛等十幾種成分。', en: 'Estimate: if what you smell is the exhaust of the scooters beside you, that air also holds benzene (a gas in exhaust), formaldehyde and about ten other exhaust chemicals.' },
       /** no-smell-not-clean (its carbon monoxide and particle halves are the picture's labels). */
       { 'zh-TW': '聞不到，不代表空氣乾淨。', en: 'No smell does not mean clean air.' },
     ],
@@ -259,8 +259,8 @@ export default copy({
       },
       /** Statement 1 with its range ({range} is the EstimateValue of sim.co.oneRed15). */
       routesCo: {
-        'zh-TW': '推估：等一個紅燈多出來的一氧化碳，攤成 15 分鐘的平均，多{range}，比世界衛生組織的指引值低很多。',
-        en: 'Estimate: the carbon monoxide one red light adds, spread over 15 minutes, is {range}, far below the WHO guideline.',
+        'zh-TW': '推估：在一般的街上等一個紅燈，一氧化碳的 15 分鐘平均多{range}，比世界衛生組織的指引值低很多；排氣管正後方、幾乎沒風時，最多約 {near} ppm。只有一個少見的例外：嬰兒車停在排氣管正後方，寫在「怎麼算的」那一頁。',
+        en: 'Estimate: waiting one red light on an ordinary street adds {range} to your 15-minute carbon monoxide average, far below the WHO guideline; right behind a tailpipe in almost no wind, up to about {near} ppm. There is one rare exception, a pushchair right behind a tailpipe: see the ‘How we worked it out’ page.',
       },
     },
     next: { 'zh-TW': '一個紅燈那麼短，也算嗎？', en: 'One red light is so short. Does it count?' },
@@ -343,7 +343,7 @@ export default copy({
       en: 'The tailpipe and a baby in a pushchair are both less than a metre off the ground. For their body weight, children breathe {lo} to {hi} times as much air as adults.',
     },
     /** Statement 5 (replaces K4, whose 「多多少，還算不出來」 the simulation has answered). */
-    quiet: { 'zh-TW': '推估：風從機車吹來，嬰兒車高度和大人差不多到兩倍；不是每種風都這樣。', en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much. Not in every wind.' },
+    quiet: { 'zh-TW': '推估：風從機車吹來，嬰兒車高度的廢氣是大人一到兩倍；換風向就不一定。', en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much. Not in every wind.' },
     sheet: {
       who: {
         'zh-TW': '美國環保署的手冊，整理了各個年齡每天吸進多少空氣。',

@@ -187,7 +187,7 @@ export const smellChemicals = {
     confidence: 'verified',
     evidence: 'estimate',
     caveat: t(
-      '推估。這是常見的量，不是最少的量。兩個數字來自 1967 和 1970 年兩個汽車廢氣的嗅覺研究，兩者差 8.5 倍。算了 10,000 輛單獨一輛的機車。幾秒鐘的量，沒有官方的數值可以比，所以沒辦法說它高或低。',
+      '推估。這是常見的量，不是最少的量。兩個數字來自 1967 和 1970 年兩個汽車廢氣的嗅覺研究，兩者差 8.5 倍。電腦換了 10,000 種單獨一輛機車的排放量來算。幾秒鐘的量，沒有官方的數值可以比，所以沒辦法說它高或低。',
       'Estimate. A typical value, not a minimum. The two numbers come from two smell tests of car exhaust from 1967 and 1970, 8.5 times apart. Worked out for 10,000 single scooters. No official value exists for a few seconds, so it cannot be called high or low.',
     ),
     requiresCaveat: true,

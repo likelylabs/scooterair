@@ -98,10 +98,12 @@ const carPipe = { x: carAt.x - CAR_TAILPIPE.x * carAt.s, y: carAt.y + CAR_TAILPI
 const carLabelAt = { x: carPipe.x - 70, y: -500 };
 const carLead = !red && legend ? leader(carPipe.x - 40, carLabelAt.y + 46, carPipe.x - 30, carPipe.y - 8, unitsPerPx(VB.w)) : '';
 // green: one scooter of the back row named in words, from the empty air above the pack at the right,
-// with a thin line down to it (the bottom of the picture is cropped on the home page)
+// with a thin line down to the front of its body, in front of the rider (never on the rider's head;
+// the bottom of the picture is cropped on the home page)
 const evAt = pack.findIndex((q) => q.row === 3) + 5;
 const EV = { x: VB.x + VB.w - 8, y: -500 };
-const evLead = !red && legend ? leader(pack[evAt].x + 70, EV.y + 46, pack[evAt].x + 70, -216 - 128, unitsPerPx(VB.w)) : '';
+const evTo = { x: pack[evAt].x + 116, y: -216 - 76 };
+const evLead = !red && legend ? leader(evTo.x - 4, EV.y + 46, evTo.x, evTo.y, unitsPerPx(VB.w)) : '';
 
 const a = air({
   frame: VB,

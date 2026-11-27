@@ -468,8 +468,11 @@ html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:c
   from { opacity: 0; transform: translate(var(--dx, 0), var(--dy, 0)); }
 }
 @keyframes sa-draw {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
+  /* hidden until a short line of it is drawn: a zero-length dash with round caps would be a dot */
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  4% { opacity: 0; }
+  5% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
 }
 @media screen {
   .scene.is-armed :is(.sa-go, .sa-draw, .sa-fade) { opacity: 0; }

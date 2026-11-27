@@ -178,6 +178,8 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: 'date' in l && l.date
 
 // ---- #simulation ------------------------------------------------------------------------------
 const S = t.simulation;
+/** Two lines of copy that make one sentence, printed as one paragraph (a sentence is never split across blocks). */
+const joinLines = (a: string, b: string) => (locale === 'en' ? `${a} ${b}` : `${a}${b}`);
 // the full generated extract (research/simulation/site-extract.json), described as such on the page
 const simJson = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(simData, null, 2))}`;
 
@@ -306,8 +308,7 @@ const stayTable = {
     <p class="es-p">{S.compareWhy}</p>
     <SimCompare locale={locale} />
     <div class="es-sim__lines">
-      <p class="es-p">{S.stay[0]}</p>
-      <SimText locale={locale} text={S.stay[1]} slots={{ range: 'sim.co.stay15' }} class="es-p" />
+      <SimText locale={locale} text={joinLines(S.stay[0], S.stay[1])} slots={{ range: 'sim.co.stay15' }} class="es-p" />
       <p class="es-p">{S.stay[2]}</p>
     </div>
     <h3 class="es-h3"><Phrased text={S.pushchairTitle} locale={locale} /></h3>
@@ -329,7 +330,7 @@ const stayTable = {
     <h3 class="es-h3"><Phrased text={S.aboveTitle} locale={locale} /></h3>
     <SimAbove locale={locale} />
     <div class="es-sim__lines">
-      {S.stayers.map((l) => <SimText locale={locale} text={l} slots={{ times: 'sim.benzene.stay1hTimes' }} class="es-p" />)}
+      {[joinLines(S.stayers[0], S.stayers[1]), ...S.stayers.slice(2)].map((l) => <SimText locale={locale} text={l} slots={{ times: 'sim.benzene.stay1hTimes' }} class="es-p" />)}
     </div>
 
     <details class="es-more">

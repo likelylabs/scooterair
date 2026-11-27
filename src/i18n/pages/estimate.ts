@@ -207,7 +207,7 @@ export default copy({
     withTitle: { 'zh-TW': '聞到的不是苯，|但苯跟著一起來', en: 'What you smell is not benzene, |but benzene comes with it' },
     with: [
       /** smell-comes-with-benzene, verbatim */
-      { 'zh-TW': '聞到的不是苯，但苯跟著一起來。只要你聞得到身旁怠速機車的廢氣，同一口空氣裡就有苯（推估）。', en: 'What you smell is not benzene, but benzene comes with it. Whenever you can smell the exhaust of the idling scooters beside you, the same breath of air holds benzene (estimate).' },
+      { 'zh-TW': '聞到的不是苯，但苯跟著一起來。只要你聞得到身旁引擎沒熄火的機車廢氣，同一口空氣裡就有苯（推估）。', en: 'What you smell is not benzene, but benzene comes with it. Whenever you can smell the exhaust of the idling scooters beside you, the same breath of air holds benzene (estimate).' },
       /** what-is-in-it, in share order (hydrogen cyanide is named in the table only: its share is of carbon monoxide) */
       { 'zh-TW': '如果你聞到的是身旁機車的廢氣，那口空氣裡也有甲苯、二甲苯、乙苯、苯、1,3-丁二烯、正己烷、甲醛、乙醛、萘、苯乙烯和丙烯醛（照在廢氣裡占的多少排，推估）。', en: 'If what you smell is the exhaust of the scooters beside you, that air also holds toluene, xylenes, ethylbenzene, benzene, 1,3-butadiene, n-hexane, formaldehyde, acetaldehyde, naphthalene, styrene and acrolein (in order of their share of the exhaust; estimate).' },
       /** no-smell-not-clean, with the standing wording 小到看不到 */
@@ -222,7 +222,7 @@ export default copy({
     just: [
       { 'zh-TW': '推估：剛好聞得到廢氣味的時候，苯是{just}（最低約 {lo}，最高約 {hi}）。ppb＝十億份空氣裡有幾份。', en: 'Estimate: at the moment the exhaust is just noticeable, benzene is {just} (lowest about {lo}, highest about {hi}). ppb = parts in a billion of air.' },
       { 'zh-TW': '這是常見的量，不是最少的量。兩個數字來自 1967 和 1970 年兩個汽車廢氣的嗅覺研究；它們差 8.5 倍，是這個數字最大的不確定。', en: 'A typical value, not a minimum. The two numbers come from two smell tests of car exhaust from 1967 and 1970; they are 8.5 times apart, the largest single uncertainty in this number.' },
-      { 'zh-TW': '算了 10,000 輛單獨一輛的機車，和風怎麼吹無關。幾秒鐘的量，沒有官方的數值可以比，所以沒辦法說它高或低。', en: 'Worked out for 10,000 single scooters; it does not depend on the wind. No official value exists for a few seconds, so it cannot be called high or low.' },
+      { 'zh-TW': '電腦換了 10,000 種單獨一輛機車的排放量來算，和風怎麼吹無關。幾秒鐘的量，沒有官方的數值可以比，所以沒辦法說它高或低。', en: 'Worked out for 10,000 single scooters; it does not depend on the wind. No official value exists for a few seconds, so it cannot be called high or low.' },
     ],
     secondsTitle: { 'zh-TW': '風從機車吹來，|聞得到的那幾秒', en: 'Wind from the scooters: |the seconds you can smell it' },
     seconds: [
@@ -253,7 +253,7 @@ export default copy({
       { 'zh-TW': '範圍從低於參考值到好幾倍；風要整整一小時都這樣吹，很少見；每個紅燈都用同一個電腦算的紅燈；這個參考值是用比較長時間（6 小時）的資料訂的；超過參考值，不等於證明有害。', en: 'The range runs from below the reference to several times above it; the wind must hold for the whole hour, which is rare; every red is the same simulated red; the reference was derived from a longer (6-hour) exposure; being above a reference level is not proof of harm.' },
     ],
     table: {
-      caption: { 'zh-TW': '每一種成分：一小時（或 30 分鐘）每個紅燈都待在路邊的推估平均，和它自己同樣時間長度的參考值比。風一直從機車吹來，離最近的機車半公尺、小孩鼻子的高度（約 0.7 公尺，和上面「待一小時」圖裡「嬰兒車的高度」是同一個位置）。這種風最多大約八個紅燈有一個，整整一小時更少。', en: 'Each chemical: the estimated average for someone who stays through every red for an hour (or 30 minutes), against its own reference of the same averaging time. Wind always from the scooters, half a metre from the nearest scooter at a child’s nose height (about 0.7 m, the same spot as “pushchair height” in the stay-an-hour chart above). Such a wind comes in at most about 1 red in 8, and for a whole hour more rarely.' },
+      caption: { 'zh-TW': '每一種成分：一小時（或 30 分鐘）每個紅燈都待在路邊的推估平均，和它自己同樣時間長度的參考值比。風一直從機車吹來，離最近的機車半公尺、小孩鼻子的高度（約 0.7 公尺，和上面「待一小時」圖裡「嬰兒車的高度」是同一個位置）。這種風最多大約八個紅燈有一個，整整一小時更少。上面那張圖只畫中間到偏高、但還算常見的情形；這張表寫的是中間值，括號裡是從低到高的整個範圍，所以兩邊的數字不一樣。', en: 'Each chemical: the estimated average for someone who stays through every red for an hour (or 30 minutes), against its own reference of the same averaging time. Wind always from the scooters, half a metre from the nearest scooter at a child’s nose height (about 0.7 m, the same spot as “pushchair height” in the stay-an-hour chart above). Such a wind comes in at most about 1 red in 8, and for a whole hour more rarely. The chart above shows only the middle to a high-but-ordinary case; this table gives the middle value with the full low-to-high range in brackets, so the numbers differ.' },
       head: [
         { 'zh-TW': '成分（照在廢氣裡占的多少排）', en: 'Chemical (in order of share of the exhaust)' },
         { 'zh-TW': '推估平均（範圍），µg/m³', en: 'Estimated average (range), µg/m³' },

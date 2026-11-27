@@ -62,7 +62,7 @@ import { tableOn, type OpenText } from '@/components/pages/electric/opening-view
 import { filmLength, homeFigures, verified } from '@/components/pages/home/home-figures';
 import * as V from '@/components/pages/home/money-view';
 import { checkHeadlinePhrased, checkSentence, defaultRedsPerDay, est, waitPerRed_s, estimateText, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
-import { simBelowWho, simChipWhere, simRange, simStamp, smellFiles } from '@/data/simulation';
+import { sim, simBelowWho, simChipWhere, simRange, simStamp, smellFiles } from '@/data/simulation';
 import { fact } from '@/data/facts';
 import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { homeMoney } from '@/lib/home-money';
@@ -286,7 +286,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <Fragment slot="block3">
           <p>{t.s6.sheet.care}</p>
           {pins.length > 0 && <p>{t.s6.sheet.routes}</p>}
-          {pins.length > 0 && <SimText locale={locale} text={t.s6.sheet.routesCo} slots={{ range: 'sim.co.oneRed15' }} />}
+          {pins.length > 0 && <SimText locale={locale} text={fill(t.s6.sheet.routesCo, { near: sim.co.nearTailpipeAbout })} slots={{ range: 'sim.co.oneRed15' }} />}
         </Fragment>
       </HowSheet>
     </Screen>

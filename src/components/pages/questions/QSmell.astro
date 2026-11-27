@@ -2,8 +2,9 @@
 /**
  * /questions/smell/ — 那個味道是什麼？ (brief 7.5), from the signed smell-chemicals step
  * (research/simulation/smell-chemicals/statements-smell.json):
- *   1  #answer  smell-comes-with-benzene, what-is-in-it, no-smell-not-clean (same view), and the
- *               hazard labels as their own paragraph (no smell word, no number)
+ *   1  #answer  smell-comes-with-benzene, what-is-in-it, no-smell-not-clean (same view); the
+ *               hazard labels as their own paragraph in the sheet, apart from the smell lines
+ *               (no smell word, no number)
  *   2  #what    not-unburnt-petrol; picture: the SmellBenzene chart (seconds-long benzene only)
  *   3  #more    no-smell-not-clean with how-often-wind; one-red in its sheet, away from the labels
  *   +  #how-much  seconds-long benzene (how-much-just-smellable, level-in-smellable-seconds) with
@@ -69,7 +70,6 @@ const method = asset(smellFiles.method);
   <TailpipeMarks slot="picture" locale={locale} can={false} />
   <div class="q-smell__more">
     <p class="q-smell__names">{s1.names[locale]}</p>
-    <p class="q-smell__hazard">{s1.hazard[locale]}</p>
   </div>
   <Fragment slot="chips">
     <KindChip locale={locale} kind="estimate" fact="smell-comes-with-benzene" />
@@ -88,6 +88,7 @@ const method = asset(smellFiles.method);
     </Fragment>
     <Fragment slot="block3">
       <p>{s1.sheet.b3[locale]}</p>
+      <p class="q-smell__hazard">{s1.hazard[locale]}</p>
       <p><a href={method}>{s1.sheet.method[locale]}</a></p>
     </Fragment>
   </HowSheet>
@@ -169,7 +170,7 @@ const method = asset(smellFiles.method);
 </section>
 
 <style>
-  /* screen 1: the names and the hazard labels, after the quiet line, in body type (visible, not folded) */
+  /* screen 1: the names, after the quiet line, in body type (visible, not folded) */
   .q-smell__more {
     display: grid;
     gap: var(--sp-2);

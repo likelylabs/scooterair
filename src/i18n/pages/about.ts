@@ -227,8 +227,8 @@ export default copy({
         en: 'What you smell is not benzene, but benzene comes with it (estimate): whenever the smell is the exhaust of the scooters beside you, benzene is in the same breath of air. No smell does not mean clean air. The cancer labels of benzene, 1,3-butadiene and formaldehyde are given separately, with what the groups mean and with petrol-engine exhaust’s own Group 2B.',
       },
       'sim-guideline': {
-        'zh-TW': '推估：等一個紅燈，一氧化碳攤成 15 分鐘的平均，多{range}，比世界衛生組織的指引值低很多。例外是嬰兒車停在排氣管正後方約半公尺，幾乎沒風、風向不變，連續 15 分鐘每個紅燈都在：這時 15 分鐘的平均，可能超過世界衛生組織 15 分鐘的指引值（這樣的 15 分鐘，約十次有一到兩次；這種風很少見，信心低）；往旁邊移開半公尺，就沒有了。其他的數字，都在「怎麼算的」那一頁。',
-        en: 'Estimate: the carbon monoxide one red light adds, spread over 15 minutes, is {range}, far below the WHO guideline. The exception is a pushchair half a metre directly behind a tailpipe, in almost no wind that keeps its direction, through every red for 15 minutes: then the 15-minute average can pass the WHO 15-minute guideline (in about 1 or 2 of 10 such periods; such a wind is rare, and confidence is low); half a metre to the side, and it is gone. The other figures are on the ‘How we worked it out’ page.',
+        'zh-TW': '推估：在一般的街上等一個紅燈，一氧化碳的 15 分鐘平均多{range}，比世界衛生組織的指引值低很多；排氣管正後方、幾乎沒風時，最多約 {near} ppm。例外是嬰兒車停在排氣管正後方約半公尺，幾乎沒風、風向不變，連續 15 分鐘每個紅燈都在：這時 15 分鐘的平均，可能超過世界衛生組織 15 分鐘的指引值（這樣的 15 分鐘，約十次有一到兩次；這種風很少見，信心低）；往旁邊移開半公尺，就沒有了。其他的數字，都在「怎麼算的」那一頁。',
+        en: 'Estimate: waiting one red light on an ordinary street adds {range} to your 15-minute carbon monoxide average, far below the WHO guideline; right behind a tailpipe in almost no wind, up to about {near} ppm. The exception is a pushchair half a metre directly behind a tailpipe, in almost no wind that keeps its direction, through every red for 15 minutes: then the 15-minute average can pass the WHO 15-minute guideline (in about 1 or 2 of 10 such periods; such a wind is rare, and confidence is low); half a metre to the side, and it is gone. The other figures are on the ‘How we worked it out’ page.',
       },
       'crossings-measured': {
         'zh-TW': '網站把運研所的量測，和本站自己的推估放在一起。紅燈時站在機車旁邊吸到多少，是本站算的，標著「推估」。',

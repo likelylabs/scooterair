@@ -69,10 +69,10 @@ export const chartText = {
       axis: t('15 分鐘平均（ppm）', '15-minute average (ppm)'),
       oneRed: {
         label: t('在一般的街上，等一個紅燈', 'One red light, on an ordinary street'),
-        sub: t('路邊半公尺。排氣管正後方、幾乎沒風時，最多約 {near}', 'At the kerb, half a metre away. Right behind a tailpipe in almost no wind: up to about {near}'),
+        sub: t('路邊半公尺。排氣管正後方、幾乎沒風時，最多約 {near} ppm', 'At the kerb, half a metre away. Right behind a tailpipe in almost no wind: up to about {near} ppm'),
       },
       stay: {
-        label: t('每個紅燈都站在路邊，站滿 15 分鐘', 'At the kerb through every red for 15 minutes'),
+        label: t('每個紅燈都站在路邊，連續 15 分鐘', 'At the kerb through every red for 15 minutes'),
         sub: t('風一直從機車吹向你・很少見・小孩和嬰兒車的高度', 'Wind always from the scooters to you · rare · child and pushchair height'),
       },
       pushchair: {
@@ -85,14 +85,14 @@ export const chartText = {
       /** The compact form on home screen 5, where every pixel of height counts (check-site check 9). */
       short: {
         oneRed: t('在一般的街上，等一個紅燈', 'One red, ordinary street'),
-        oneRedSub: t('排氣管正後方、幾乎沒風：最多約 {near}', 'Behind a tailpipe, almost no wind: up to about {near}'),
-        stay: t('每個紅燈都站滿 15 分鐘', 'Every red for 15 minutes'),
+        oneRedSub: t('排氣管正後方、幾乎沒風：最多約 {near} ppm', 'Behind a tailpipe, almost no wind: up to about {near} ppm'),
+        stay: t('每個紅燈都在，連續 15 分鐘', 'Every red for 15 minutes'),
         staySub: t('風一直吹向你・很少見', 'Wind always toward you · rare'),
         pushchair: t('嬰兒車在排氣管正後方半公尺', 'Pushchair half a metre behind a tailpipe'),
-        pushchairSub: t('幾乎沒風、風向不變、每個紅燈都在・很少見・信心低', 'Still, steady air, every red · rare · low confidence'),
+        pushchairSub: t('幾乎沒風、風向不變、每個紅燈都在・少見・信心低', 'Still, steady air, every red · rare · low confidence'),
         whoLine: t('世界衛生組織 15 分鐘指引值 {who}', 'WHO 15-min guideline: {who}'),
         caption: t('每種情況只算了一個紅燈。比上面的 90 秒推估多：這裡離機車半公尺、在嬰兒車的高度，也算了風從機車吹來的紅燈。', 'Each case: one simulated red. Higher than the 90-second estimate above: half a metre from the scooters, at pushchair height, including reds with the wind from them.'),
-        over: t('這樣的 15 分鐘，每十次約有一到兩次超過 {who}', 'Of such 15-min periods, 1 or 2 in 10 pass {who}'),
+        over: t('這樣的 15 分鐘平均，十次約有一到兩次超過 {who}', '1 or 2 in 10 of these pass {who}'),
         whoNote: t('只看一氧化碳；廢氣不只有它，低於它不代表安全。', 'Carbon monoxide only. Exhaust holds more; below it is not ‘safe’.'),
       },
       whoNote: t('只看一氧化碳；低於它，不代表廢氣安全。', 'Carbon monoxide only; below it does not mean exhaust is safe.'),
@@ -104,7 +104,7 @@ export const chartText = {
       tableWho: t('世界衛生組織 15 分鐘指引值（只看一氧化碳）', 'WHO 15-minute guideline (carbon monoxide only)'),
       tableOver: t('{middle}；這樣的 15 分鐘，每十次約有一到兩次超過 {who}', '{middle}; about 1 or 2 in 10 such 15-minute periods pass {who}'),
       sum: t(
-        '推估，每種情況只算了一個紅燈。在一般的街上等一個紅燈，或每個紅燈都站滿 15 分鐘、風一直吹向你，一氧化碳的 15 分鐘平均都低於世界衛生組織的指引值 {who}。例外是嬰兒車停在一輛機車排氣管正後方、幾乎沒風、風向不變：這樣的 15 分鐘，每十次約有一到兩次超過（信心低，很少見）。',
+        '推估，每種情況只算了一個紅燈。在一般的街上等一個紅燈，或每個紅燈都站在路邊、連續 15 分鐘、風一直吹向你，一氧化碳的 15 分鐘平均都低於世界衛生組織的指引值 {who}。例外是嬰兒車停在一輛機車排氣管正後方、幾乎沒風、風向不變：這樣的 15 分鐘，每十次約有一到兩次超過（信心低，很少見）。',
         'Estimate; each case is one simulated red light. One red light on an ordinary street, or every red for 15 minutes with the wind always toward you, keeps the 15-minute carbon monoxide average below the WHO guideline of {who}. The exception is a pushchair right behind one tailpipe in almost no wind that keeps its direction: about 1 or 2 in 10 such 15-minute periods pass it (low confidence, rare).',
       ),
     },
@@ -151,7 +151,7 @@ export const chartText = {
       secondsSub: t('離最近的機車半公尺、小孩鼻子的高度（約 0.7 公尺）・這種風最多約八個紅燈有一個', 'Half a metre from the nearest scooter, child’s nose height (about 0.7 m) · such a wind comes in at most about 1 red in 8'),
       odour: t('鼻子聞得出「苯」自己的濃度：公開數值裡最低的（不是健康標準）', 'Where benzene itself can be smelled: the lowest published value (not a health limit)'),
       caption: t(
-        '推估。每條是從低到高的範圍，沒有標中間。上面一條是常見的量，不是最少的量；兩個「聞得到」的標準來自 1967 和 1970 年的汽車廢氣研究，算了 {nj} 輛單獨一輛的機車。下面一條是電腦算的一個紅燈，換了 {ns} 次排放量；聞得到的時間，依中間推估約占紅燈的 {a}%（1967 年的標準）到 {b}%（1970 年的標準）。這是機車另外加進空氣裡的量；成分比例來自舊型機車。幾秒鐘的量沒有官方的數值可以比，所以沒辦法說它高或低。',
+        '推估。每條是從低到高的範圍，沒有標中間。上面一條是常見的量，不是最少的量；兩個「聞得到」的標準來自 1967 和 1970 年的汽車廢氣研究，電腦換了 {nj} 種單獨一輛機車的排放量來算。下面一條是電腦算的一個紅燈，換了 {ns} 次排放量；聞得到的時間，依中間推估約占紅燈的 {a}%（1967 年的標準）到 {b}%（1970 年的標準）。這是機車另外加進空氣裡的量；成分比例來自舊型機車。幾秒鐘的量沒有官方的數值可以比，所以沒辦法說它高或低。',
         'Estimate. Each band runs from low to high; its middle is not marked. The top band is a typical value, not a minimum; its two "can smell it" levels come from car-exhaust studies of 1967 and 1970, worked out for {nj} single scooters. The lower band is one simulated red with {ns} draws of the emissions; at the central estimate the smell is there for about {a} % (1967 level) to {b} % (1970 level) of the red. These are amounts the scooters add; the shares come from older scooters. No official value exists for a few seconds, so they cannot be called high or low.',
       ),
       summary: t(

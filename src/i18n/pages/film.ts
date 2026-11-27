@@ -54,8 +54,8 @@ export default copy({
     },
     /** The note under the player: what is time-lapse, what follows the estimate, what is drawn for the eye. */
     notes: {
-      'zh-TW': '片裡的紅燈是 {red} 秒。畫面右上角出現「快轉」記號的時候，倒數走得比實際快。人站的地方畫了多少廢氣，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
-      en: 'The red light in the film lasts {red} seconds. While the time-lapse mark shows at the top right, the countdown runs faster than real time. How much exhaust is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
+      'zh-TW': '片裡的紅燈是 {red} 秒。畫面右上角出現「快轉」記號的時候，倒數走得比實際快；出現「‖」的時候，紅燈先停在那裡，等字幕講完再繼續。人站的地方畫了多少廢氣，照本站的推估；排氣管旁邊的深色，是畫給眼睛看的。',
+      en: 'The red light in the film lasts {red} seconds. While the time-lapse mark shows at the top right, the countdown runs faster than real time; while the ‖ mark shows, the light waits there until the captions finish. How much exhaust is drawn where the people stand follows this site’s estimate; the dark patches at the tailpipes are drawn for the eye.',
     },
     how: { 'zh-TW': '怎麼算的', en: 'How we worked it out' },
     line: { 'zh-TW': '傳給家人（LINE）', en: 'Send to family (LINE)' },
@@ -81,7 +81,7 @@ export default copy({
       noScrap: { 'zh-TW': '沒有機車可報廢', en: 'nothing to scrap' },
       where: { 'zh-TW': '{county}・{scrap}', en: '{county} · {scrap}' },
       /** In front of the second tag: it is the least favourable case in the table, not the reader's county. */
-      worst: { 'zh-TW': '挑最便宜的車，最不划算：', en: 'Cheapest models, worst case: ' },
+      worst: { 'zh-TW': '最不划算的例子：', en: 'Least favourable case: ' },
       less: { 'zh-TW': '少付 {amount}', en: '{amount} less' },
       more: { 'zh-TW': '多付 {amount}', en: '{amount} more' },
       same: { 'zh-TW': '差不多，只差 {amount}', en: 'about the same: {amount} apart' },

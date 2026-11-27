@@ -379,6 +379,11 @@ const position = fill(screenText.position, locale, { n, total });
     .screen[data-solo] {
       align-items: start;
     }
+    /* and while a long column of words scrolls by, the picture stays in view beside it */
+    .screen[data-solo] > .screen__stage {
+      position: sticky;
+      inset-block-start: calc(var(--header-h) + var(--sp-3));
+    }
     /* the drawing is rounded, not the box: the tag's line sits under it */
     .screen__pic > :global(:first-child) {
       border-radius: var(--radius-3);

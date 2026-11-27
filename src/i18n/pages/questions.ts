@@ -104,7 +104,7 @@ export default copy({
       chapter: { 'zh-TW': '跟著味道來的', en: 'What comes with the smell' },
       headline: { 'zh-TW': '聞到的不是苯，|但苯跟著一起來', en: 'What you smell is not benzene, |but benzene comes with it' },
       body: {
-        'zh-TW': '推估：只要聞得到身旁怠速機車的廢氣，同一口空氣裡就有苯（ㄅㄣˇ）和十幾種廢氣成分。聞不到，不代表空氣乾淨。',
+        'zh-TW': '推估：只要聞得到身旁沒熄火的機車廢氣，同一口空氣裡就有苯（ㄅㄣˇ）和十幾種廢氣成分。聞不到，不代表空氣乾淨。',
         en: 'Estimate: whenever you can smell the exhaust of the idling scooters beside you, the same breath of air holds benzene and about ten other exhaust chemicals. No smell does not mean clean air.',
       },
       /** what-is-in-it, in its signed order (benzene, 1,3-butadiene, formaldehyde, then the largest shares, toluene and xylenes), each name given once with a plain gloss; the full share-ordered list is in the sheet and on /estimate/. */
@@ -124,13 +124,13 @@ export default copy({
       sheet: {
         title: { 'zh-TW': '怎麼知道|苯跟著一起來？', en: 'How do we know |benzene comes with it?' },
         b1: {
-          'zh-TW': '我們用電腦，一秒一秒算了紅燈時的風和廢氣。廢氣裡每一種成分占多少，用的是台灣、印度、尼泊爾在機車怠速時量的資料。',
+          'zh-TW': '我們用電腦，一秒一秒算了紅燈時的風和廢氣。廢氣裡每一種成分占多少，用的是台灣、印度、尼泊爾在機車引擎沒熄火、停著不動時量的資料。',
           en: 'On a computer we worked out the wind and the exhaust second by second through a red light. The share of each chemical in the exhaust comes from measurements of idling scooters in Taiwan, India and Nepal.',
         },
         flow: [
           {
             value: { 'zh-TW': '每一種成分占多少', en: 'How much of each chemical' },
-            label: { 'zh-TW': '量的：舊型機車怠速', en: 'measured: older scooters idling' },
+            label: { 'zh-TW': '量的：舊型機車停著、引擎沒熄火', en: 'measured: older scooters idling' },
           },
           {
             value: { 'zh-TW': '廢氣怎麼飄到你身邊', en: 'How the exhaust reaches you' },
@@ -225,7 +225,7 @@ export default copy({
       hourLink: { 'zh-TW': '換成 30 分鐘或 1 小時的平均', en: 'As 30-minute or 1-hour averages' },
       sheet: {
         b1: {
-          'zh-TW': '每種情況算一個紅燈；換了 1,000 次機車排多少、每種成分占多少。風整個紅燈都從機車吹來。剛好聞得到的那個數字，算了 10,000 輛單獨一輛的機車，和風無關。',
+          'zh-TW': '每種情況算一個紅燈；換了 1,000 次機車排多少、每種成分占多少。風整個紅燈都從機車吹來。剛好聞得到的那個數字，電腦換了 10,000 種單獨一輛機車的排放量來算，和風無關。',
           en: 'One simulated red per case, with 1,000 draws of what the scooters give off and of each chemical’s share. The wind blows from the scooters for the whole red. The just-noticeable figure was worked out for 10,000 single scooters and does not depend on the wind.',
         },
         b2: {
@@ -474,8 +474,8 @@ export default copy({
         },
         /** A separate sentence from the routes: like-with-like averaging only, with its label. */
         routesCo: {
-          'zh-TW': '推估：等一個紅燈多出來的一氧化碳，攤成 15 分鐘的平均，多{range}，比世界衛生組織的指引值低很多。',
-          en: 'Estimate: the carbon monoxide one red light adds, spread over 15 minutes, is {range}, far below the WHO guideline.',
+          'zh-TW': '推估：在一般的街上等一個紅燈，一氧化碳的 15 分鐘平均多{range}，比世界衛生組織的指引值低很多；排氣管正後方、幾乎沒風時，最多約 {near} ppm。只有一個少見的例外：嬰兒車停在排氣管正後方，寫在「怎麼算的」那一頁。',
+          en: 'Estimate: waiting one red light on an ordinary street adds {range} to your 15-minute carbon monoxide average, far below the WHO guideline; right behind a tailpipe in almost no wind, up to about {near} ppm. There is one rare exception, a pushchair right behind a tailpipe: see the ‘How we worked it out’ page.',
         },
       },
     },
@@ -493,7 +493,7 @@ export default copy({
         en: 'The tailpipe and a baby in a pushchair are both less than a metre off the ground. For their body weight, children breathe {lo} to {hi} times as much air as adults.',
       },
       /** Statement 5 (replaces K4, which the simulation has answered). */
-      quiet: { 'zh-TW': '推估：風從機車吹來，嬰兒車高度和大人差不多到兩倍；不是每種風都這樣。', en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much. Not in every wind.' },
+      quiet: { 'zh-TW': '推估：風從機車吹來，嬰兒車高度的廢氣是大人一到兩倍；換風向就不一定。', en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much. Not in every wind.' },
       sheet: {
         b1: {
           'zh-TW': '美國環保署的《暴露參數手冊》，整理了每個年紀的人，一天吸進多少空氣。',

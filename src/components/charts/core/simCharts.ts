@@ -95,7 +95,7 @@ export function simCompareModel(locale: Loc): SimCompareModel {
       unit: mid.unit,
       slot: 'sim.co.pushchairMiddle',
       band: { lo: sim.co.pushchairMiddle.lo, hi: sim.co.pushchairMiddle.hi },
-      over: fill(T.pushchair.over, locale, { who: num(who, locale) }),
+      over: fill(T.pushchair.over, locale, { who: whoText }),
       lowConfidence: true,
     },
   ];
@@ -114,7 +114,7 @@ export function simCompareModel(locale: Loc): SimCompareModel {
   const K = T.short;
   return {
     short: {
-      rows: [{ label: K.oneRed[locale], sub: fill(K.oneRedSub, locale, { near: num(sim.co.nearTailpipeAbout, locale) }) }, { label: K.stay[locale], sub: K.staySub[locale] }, { label: K.pushchair[locale], sub: K.pushchairSub[locale], over: fill(K.over, locale, { who: num(who, locale) }) }],
+      rows: [{ label: K.oneRed[locale], sub: fill(K.oneRedSub, locale, { near: num(sim.co.nearTailpipeAbout, locale) }) }, { label: K.stay[locale], sub: K.staySub[locale] }, { label: K.pushchair[locale], sub: K.pushchairSub[locale], over: fill(K.over, locale, { who: whoText }) }],
       whoLine: fill(K.whoLine, locale, { who: whoText }),
       whoNote: K.whoNote[locale],
       caption: K.caption[locale],

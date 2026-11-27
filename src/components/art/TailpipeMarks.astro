@@ -68,12 +68,16 @@ const ribbons = [-7, 0, 7]
   .map((dy, i) => airRibbon(airWisp(M.x - 4, M.y - 3 - i * 1.5, NOSE.x + 2 + (i % 2) * 4, NOSE.y + dy, upp), upp, { weight: i === 1 ? 1.15 : 0.95, cls: 'sa-draw', attrs: ` pathLength="1" style="--i:${i * 2}"` }))
   .join('');
 
-// the three labels and where their leader lines end, inside the fume
+// the three labels and where their leader lines end. Each line starts under its label's plate (so
+// at every text size it comes straight out of the words) and ends on the thing it names:
+//   vapour  the wisps just in front of the nose
+//   co      the fume in front of the face, below the wisps (the air that is breathed)
+//   pm      the fume right behind the tailpipe
 const BOTTOM = VB.y + VB.h - 6;
 const L = {
-  vapour: { x: -192, y: VB.y + 6, to: { x: -60, y: -100 }, from: { x: -110, y: -216 } },
-  co: { x: -192, y: BOTTOM, to: { x: -128, y: -64 }, from: { x: -150, y: 64 } },
-  pm: { x: 184, y: BOTTOM, to: { x: M.x - 50, y: -34 }, from: { x: 84, y: 64 } },
+  vapour: { x: -192, y: VB.y + 6, to: { x: NOSE.x + 16, y: NOSE.y - 3 }, from: { x: NOSE.x + 14, y: VB.y + 16 } },
+  co: { x: -192, y: BOTTOM, to: { x: HEAD.x + 12, y: HEAD.y + 8 }, from: { x: -150, y: BOTTOM - 10 } },
+  pm: { x: 184, y: BOTTOM, to: { x: M.x - 20, y: M.y + 22 }, from: { x: 100, y: BOTTOM - 10 } },
 };
 const leaders = Object.values(L).map((l) => leader(l.from.x, l.from.y, l.to.x, l.to.y, upp)).join('');
 
