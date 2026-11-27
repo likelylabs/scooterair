@@ -1,0 +1,140 @@
+---
+/**
+ * EstimateBands — the estimate as range bands, for /estimate/ (docs/redesign-brief.md 7.2 and
+ * the scientists' chart brief, as the site's brief amends it).
+ *
+ * One panel per pollutant that has a published estimate: carbon monoxide, benzene, PM2.5.
+ * Rows are the three scenarios, each named with its count of scooters. The axis is what the
+ * pack ADDS (多出來), on a log scale, so the order of magnitude shows and the comparison values
+ * fit: what the street already holds, and for carbon monoxide the WHO 15-minute guideline and
+ * the one rise the Institute of Transportation measured.
+ *
+ *   estimate   hatched band with a dashed edge, from the low end to the high end. No dot,
+ *              no line, and no mark at the middle value (it is never printed)
+ *   measured   solid dot (one value) or solid bar (a range)
+ *   official   solid square
+ *
+ * There is NO ultrafine-particle panel and NO height panel: nothing is published for them, and
+ * the site draws no empty chart. The page says so in sentences (K2, K3, K4 in `kSentences`).
+ * No time curve, and no 8-hour, 24-hour or yearly limit, is ever drawn here.
+ *
+ * Props
+ *   locale     Locale
+ *   pollutant  'co' | 'benzene' | 'pm25' | 'all' (default 'all': three panels, carbon monoxide
+ *              first and full width, the other two side by side on a wide screen)
+ *   zhuyin     true prints 苯（ㄅㄣˇ） in the benzene panel's name (first use on the page)
+ *   table      false leaves out each panel's "view data table" toggle. Default true
+ *   id, class
+ *
+ *   <EstimateBands locale={locale} />
+ *   <EstimateBands locale={locale} pollutant="co" />
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import type { Pollutant } from '@/data/estimate';
+import { estText } from '@/i18n/ui';
+import { uid as makeId } from '@/components/uid';
+import { bandsModel } from './core/estimateCharts';
+import { chipHtml, guides, hatchDef, pc } from './core/html';
+import { tableHtml } from './core/shared';
+import { chartText } from './strings';
+
+interface Props {
+  locale: Locale;
+  pollutant?: Pollutant | 'all';
+  zhuyin?: boolean;
+  table?: boolean;
+  id?: string;
+  class?: string;
+}
+const { locale, pollutant = 'all', zhuyin = false, table = true, id, class: cls } = Astro.props;
+const list: Pollutant[] = pollutant === 'all' ? ['co', 'benzene', 'pm25'] : [pollutant];
+const panels = list.map((p) => ({ m: bandsModel(p, locale, { zhuyin }), u: makeId('bands') }));
+const H = 26;
+const T = chartText.bands;
+const colon = locale === 'en' ? ': ' : '：';
+---
+
+<div id={id} class:list={[panels.length > 1 && 'hc-bands-set', cls]}>
+  {
+    panels.map(({ m, u }, pi) => {
+      const tickXs = m.axis.ticks.map(m.x);
+      const g = m.axis.guide;
+      const groups = (['compare', 'added'] as const).map((key) => ({ key, name: key === 'compare' ? T.compare[locale] : T.addedHead[locale], rows: m.rows.filter((r) => r.group === key) })).filter((x) => x.rows.length);
+      return (
+        <section class="chart hc hc-bands" data-chart={`estimate-bands-${m.pollutant}`} data-grow="" role="group" aria-label={m.title}>
+          <p class="vh" data-chart-summary>{m.summary}</p>
+          <header class="hc-panel__head">
+            <span class="hc-panel__name">{m.name}</span>
+            <span class="hc-panel__unit">{m.unit}</span>
+          </header>
+          {groups.map((grp) => (
+            <div class="hc-group">
+              <p class="hc-group__name">
+                <span>{grp.name}</span>
+              </p>
+              <ol class="hc-rows" role="list">
+                {grp.rows.map((r) => {
+                  const a = m.x(r.at[0]);
+                  const b = m.x(r.at[r.at.length - 1]);
+                  return (
+                    <li class:list={['hc-row', `hc-row--${r.kind}`]} data-fact={r.factId} data-slot={r.slot}>
+                      <div class="hc-row__text">
+                        <span class="hc-row__head">
+                          <span class="hc-row__label">{r.label}</span>
+                          <span class="hc-row__value hc-row__value--sm">{r.value}</span>
+                        </span>
+                        <span class="hc-row__sub">
+                          <Fragment set:html={chipHtml(r.kind, locale)} />
+                          {r.sub && <span>{r.sub}</span>}
+                          {r.total && <span>{T.totalLine[locale].replace('{v}', r.total)}</span>}
+                        </span>
+                      </div>
+                      <svg class="hc-plot" width="100%" height={H} aria-hidden="true" focusable="false">
+                        {r.mark === 'band' && <Fragment set:html={hatchDef(`${u}-${r.id}`)} />}
+                        <rect class="hc-track" x="0" y={H / 2 - 9} width="100%" height="18" rx="2" />
+                        <Fragment set:html={guides(tickXs, H)} />
+                        {r.group === 'added' && g && g.length === 2 && <rect class="hc-guide-zone" x={pc(m.x(g[0]))} y="0" width={pc(m.x(g[1]) - m.x(g[0]))} height={H} />}
+                        {r.group === 'added' && g && g.length === 1 && <line class="hc-guide" x1={pc(m.x(g[0]))} x2={pc(m.x(g[0]))} y1="0" y2={H} />}
+                        {r.mark === 'band' && <rect class="hc-band hc-g" data-mark="estimate" x={pc(a)} y={H / 2 - 10} width={pc(b - a)} height="20" rx="2" fill={`url(#${u}-${r.id})`} />}
+                        {r.mark === 'bar' && <rect class="hc-solid hc-g" data-mark="measured" x={pc(a)} y={H / 2 - 5.5} width={pc(b - a)} height="11" rx="5.5" />}
+                        {r.mark === 'dot' && <Fragment><circle class="hc-ring hc-p" cx={pc(a)} cy={H / 2} r="8.5" /><circle class="hc-dot hc-p" data-mark="measured" cx={pc(a)} cy={H / 2} r="6.5" /></Fragment>}
+                        {r.mark === 'square' && (
+                          <svg x={pc(a)} y={H / 2} width="1" height="1" overflow="visible">
+                            <rect class="hc-ring hc-p" x="-8" y="-8" width="16" height="16" /><rect class="hc-square hc-p" data-mark="official" x="-6" y="-6" width="12" height="12" />
+                          </svg>
+                        )}
+                      </svg>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          ))}
+          <div class="hc-axis" data-chart-axis aria-hidden="true">
+            {m.axis.ticks.map((t, i) => (
+              <span style={`inset-inline-start:${pc(tickXs[i])}`}>{new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 6 }).format(t)}</span>
+            ))}
+          </div>
+          <p class="hc-note">
+            <strong>
+              {estText.confidence[locale]}
+              {colon}
+              {m.confidence.word}
+            </strong>
+            {locale === 'en' ? '. ' : '。'}
+            {m.note}
+            {m.note && (locale === 'en' ? ' ' : '')}
+            {m.confidence.why}
+          </p>
+          {pi === 0 && <p class="hc-note">{m.logNote}</p>}
+          {table && <Fragment set:html={tableHtml(m.table, { title: m.title, tableLabel: chartText.dataTable[locale] })} />}
+        </section>
+      );
+    })
+  }
+</div>
+
+<script>
+  import './core/grow';
+</script>

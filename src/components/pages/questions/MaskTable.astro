@@ -1,0 +1,189 @@
+---
+/**
+ * MaskTable — the four-row table of research/masks/VERIFIED.json → tableRows (brief 12.2):
+ * what each of four masks stops, for gases, the smallest particles and PM2.5. No percentage is
+ * printed: a filter-material figure is not protection as worn (the file's must-not-say list).
+ *
+ * The rows, their order and the facts behind each row come from the research file. The words
+ * are in src/i18n/pages/questions.ts (mask.s2.table), Chinese first; the English there must
+ * equal the research file's own wording, and the build stops if it does not, so the table
+ * cannot drift from what was verified. Each row prints `data-fact` with the registry facts its
+ * `basis` names; the page's sheet carries the caveats of those that require one.
+ *
+ * Where the table has less than 40rem of room (a phone, or beside its text on a laptop) each
+ * mask is a block with three labelled lines; with more room it is an ordinary table.
+ *
+ * Props
+ *   locale  Locale
+ *   id, class
+ */
+import type { Locale } from '@/i18n';
+import { langHtml, typeset } from '@/i18n/ui';
+import { facts, type FactId } from '@/data/facts';
+import questions from '@/i18n/pages/questions';
+import verified from '../../../../research/masks/VERIFIED.json';
+
+interface Props {
+  locale: Locale;
+  id?: string;
+  class?: string;
+}
+const { locale, id, class: cls } = Astro.props;
+const T = questions.mask.s2.table;
+const source = verified.tableRows as { maskEn: string; maskZh: string; gases: string; ultrafine: string; pm25: string; basis: string }[];
+if (source.length !== T.rows.length) throw new Error(`MaskTable: the research file has ${source.length} rows, the copy has ${T.rows.length}.`);
+const cols = ['gases', 'ultrafine', 'pm25'] as const;
+const rows = source.map((src, i) => {
+  const row = T.rows[i];
+  if (row.name.en !== src.maskEn) throw new Error(`MaskTable row ${i + 1}: the copy says "${row.name.en}", research/masks/VERIFIED.json says "${src.maskEn}".`);
+  for (const c of cols) if (row[c].en !== src[c]) throw new Error(`MaskTable row ${i + 1} (${src.maskEn}), ${c}: the copy says "${row[c].en}", research/masks/VERIFIED.json says "${src[c]}".`);
+  const basis = [...new Set(src.basis.match(/mask-[a-z0-9-]+/g) ?? [])];
+  for (const b of basis) if (!(b in facts)) throw new Error(`MaskTable row ${i + 1}: basis fact "${b}" is not in the registry.`);
+  if (!basis.length) throw new Error(`MaskTable row ${i + 1}: no fact stands behind it.`);
+  return { name: row.name[locale], cells: cols.map((c) => ({ col: c, text: row[c][locale] })), basis: basis as FactId[] };
+});
+const h = (s: string) => langHtml(typeset(s, locale), locale);
+---
+
+<div id={id} class:list={['mask-table', cls]}>
+  <table>
+    <caption>{T.caption[locale]}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{T.mask[locale]}</th>
+        {cols.map((c) => <th scope="col">{T[c][locale]}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr data-fact={r.basis.join(' ')}>
+            <th scope="row" set:html={h(r.name)} />
+            {r.cells.map((c) => (
+              <td>
+                <span class="mask-table__label" aria-hidden="true">{T.short[c.col][locale]}</span>
+                <span class="mask-table__text" set:html={h(c.text)} />
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .mask-table {
+    min-inline-size: 0;
+    color: var(--ink);
+    /* the layout follows the room the table has, not the screen: beside its text on a laptop
+       it has a phone's width */
+    container-type: inline-size;
+  }
+  table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+  }
+  caption {
+    padding-block-end: var(--sp-2);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-black);
+    line-height: 1.35;
+    text-align: start;
+  }
+  th {
+    text-align: start;
+    font-weight: var(--fw-black);
+  }
+
+  /* a phone: one block per mask; each line is a short label and what the mask does about it */
+  @container (max-width: 39.99rem) {
+    table,
+    caption,
+    tbody,
+    tr,
+    tbody th {
+      display: block;
+    }
+    thead {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    tbody {
+      display: grid;
+      gap: var(--sp-2);
+    }
+    tr {
+      padding: var(--sp-2) var(--sp-3);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius-2);
+      background: var(--surface);
+    }
+    tbody th {
+      padding-block-end: 0.15rem;
+      font-size: var(--fs-base);
+    }
+    td,
+    tbody th {
+      border-block-end: 0;
+    }
+    td {
+      display: grid;
+      grid-template-columns: 5.2em minmax(0, 1fr);
+      gap: 0 var(--sp-2);
+      align-items: baseline;
+      padding-block: 0.3rem;
+      border-block-start: 1px solid var(--line);
+    }
+    .mask-table__label {
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-bold);
+      color: var(--ink-2);
+    }
+    .mask-table__text {
+      font-size: var(--fs-sm);
+      font-weight: var(--fw-medium);
+    }
+  }
+
+  /* very little room (a 320 px phone at 大 or 特大): the label sits above its line, so the
+     line keeps the whole width instead of wrapping every five characters */
+  @container (max-width: 17rem) {
+    td {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* wider: an ordinary table */
+  @container (min-width: 40rem) {
+    .mask-table__label {
+      display: none;
+    }
+    thead th {
+      padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
+      border-block-end: 2px solid var(--ink);
+      color: var(--ink-2);
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-bold);
+      vertical-align: bottom;
+    }
+    tbody th,
+    td {
+      padding: var(--sp-3) var(--sp-3) var(--sp-3) 0;
+      border-block-end: 1px solid var(--line);
+      vertical-align: top;
+    }
+    tbody th {
+      inline-size: 22%;
+    }
+    td {
+      inline-size: 26%;
+    }
+  }
+</style>

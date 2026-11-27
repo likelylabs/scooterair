@@ -2,6 +2,10 @@
  * Illustration classes. Parts in src/components/art/parts.ts only ever use
  * these classes, so every drawing re-themes with the --art-* tokens.
  * `--here` is the surface behind the drawing (set by tones), used for cut-outs.
+ *
+ * The air (rings, dots, ribbons, the wash, the cores) is drawn by
+ * src/components/art/air.ts and styled in the section "The air rule" at the
+ * end of this file. Its colours are the --air-* properties defined there.
  */
 .a-ink { fill: var(--art-ink); }
 .a-deep { fill: var(--art-deep); }
@@ -24,6 +28,12 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.a-bg-s {
+  fill: none;
+  stroke: var(--here);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .a-ink-s { stroke: var(--art-ink); }
 .a-deep-s { stroke: var(--art-deep); }
 .a-metal-s { stroke: var(--art-metal); }
@@ -31,6 +41,27 @@
 .a-line { stroke: var(--art-line); stroke-width: 1.5; }
 .a-rule { stroke: var(--ink-3); stroke-width: 1.5; }
 .a-rule--dot { stroke-dasharray: 0.1 6; stroke-width: 2.2; }
+
+/* The drinks can: bare metal, one plain band, a blank roundel, no brand. */
+.a-can { fill: var(--art-can, #c3cbce); stroke: var(--art-ink); stroke-width: 2.2; stroke-linejoin: round; }
+.a-can-band { fill: var(--art-can-band, #7c8992); stroke: var(--art-ink); stroke-width: 2.2; }
+.a-can-mark { fill: var(--art-can, #c3cbce); }
+.a-can-shine { fill: none; stroke: var(--here); stroke-width: 3.5; stroke-linecap: round; opacity: 0.7; }
+.a-can-lid { fill: var(--art-can-lid, #e6eaea); stroke: var(--art-ink); stroke-width: 2.2; }
+.a-can-tab { fill: var(--art-can, #c3cbce); stroke: var(--art-ink); stroke-width: 1.4; }
+
+/* Masks (parts.maskFace). The mask is pale on the dark head; its outline keeps
+   it readable where it stands off the face, in both themes. */
+.a-mask { fill: var(--art-mask, #d7ebee); stroke: var(--art-ink); stroke-width: 1.6; stroke-linejoin: round; }
+.a-mask--cloth { fill: var(--art-mask-cloth, #f2c9a0); }
+.a-mask--carbon { fill: var(--art-mask-carbon, #9aa5aa); }
+.a-mask--n95 { fill: var(--art-mask-n95, #fbfcfb); }
+.a-mask-line { fill: none; stroke: var(--art-mask-line, #6f8f98); stroke-width: 1.3; stroke-linecap: round; }
+.a-mask-s { fill: none; stroke: var(--art-mask, #d7ebee); stroke-linecap: round; }
+
+/* The body figure (parts.bodyFigure): the heart is the one warm thing in it. */
+.a-heart { fill: var(--signal-red); stroke: var(--here); stroke-width: 3; stroke-linejoin: round; paint-order: stroke; }
+.a-heart-s { fill: none; stroke: var(--signal-red); stroke-linecap: round; }
 
 /* Depth: the second and third rows of a pack are the same drawings, lighter. */
 .a-row-2 {
@@ -162,6 +193,13 @@
   stroke: var(--art-haze);
   stroke-linecap: round;
 }
+/* A person or the nearest scooter standing in front of the wash or a core:
+   a one-pixel edge in the colour of the paper keeps the silhouette whole.
+   Put the class on the <g> that holds the figure. (Screen pixels, whatever
+   the drawing's scale. Not for anything that animates every frame.) */
+.a-figure {
+  filter: drop-shadow(1px 0 0 var(--here)) drop-shadow(-1px 0 0 var(--here)) drop-shadow(0 1px 0 var(--here)) drop-shadow(0 -1px 0 var(--here));
+}
 /* a figure that must stay separate from what is behind it */
 .a-halo {
   stroke: var(--here);
@@ -215,32 +253,887 @@
   stroke-width: 2;
 }
 
-/* ---- plan view (ApproachPlan, MeasurementDiagram) ------------------------- */
-.plan-box {
-  fill: none;
-  stroke: var(--art-paint);
-  stroke-width: 5;
+/* ==== The air rule (src/components/art/air.ts; redesign brief 5.1) ==========
+ *
+ * Three kinds of mark, three layers:
+ *   .air-ring  hollow blue ring   carbon monoxide
+ *   .air-dot   small dark dot     particles
+ *   .air-rib   wavy ochre ribbon  what you can smell (fuel vapour)
+ *   .air-wash  layer B, the soft tint where people stand: three fixed steps
+ *   .air-core  layer C, the dark patch behind a tailpipe
+ *
+ * Contrast (measured on the test sheets, scratchpad build/C):
+ *   - a ring is at least 3:1 against the page, the road, the walls and the
+ *     wash at its strongest step;
+ *   - over a core it is not, so every ring carries a 1 px halo in the colour
+ *     of the paper (--air-halo): ring against halo, and halo against the
+ *     core, are both well over 3:1. On plain paper the halo cannot be seen.
+ * In the dark theme the paper is dark, so the cores glow amber instead of
+ * going dark, the rings turn pale blue and the halo is the dark paper.
+ */
+:root {
+  --air-ring: #1f5fa6;
+  --air-dot: #33230f;
+  --air-rib: #8f4a08;
+  --air-wash: #c4853c;
+  --air-core: #2a1a0b;
+  --air-core-mid: #6b3a0e;
+  --air-core-far: #b0651a;
+  --air-tyre: #5a666e;
+  /* --air-halo is the paper behind the drawing: var(--here), read where the mark is drawn */
 }
-.plan-yellow {
-  fill: none;
-  stroke: var(--art-yellow);
-  stroke-width: 3;
+@media screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --air-ring: #93c5f4;
+    --air-dot: #f6ead9;
+    --air-rib: #f3b663;
+    --air-wash: #d9933f;
+    --air-core: #f6b25c;
+    --air-core-mid: #dc8a30;
+    --air-core-far: #a85c16;
+    --air-tyre: #9aa5aa;
+    --art-mask: #27434c;
+    --art-mask-cloth: #6d4320;
+    --art-mask-carbon: #4b575d;
+    --art-mask-n95: #151b1e;
+    --art-mask-line: #8fb4bf;
+    --art-can: #5f6b72;
+    --art-can-band: #2a3237;
+    --art-can-lid: #8e999c;
+  }
 }
-.plan-lane {
-  fill: none;
-  stroke: var(--art-paint);
-  stroke-width: 4;
-  stroke-dasharray: 22 18;
+@media screen {
+  :root[data-theme='dark'],
+  .tone-inverse {
+    --air-ring: #93c5f4;
+    --air-dot: #f6ead9;
+    --air-rib: #f3b663;
+    --air-wash: #d9933f;
+    --air-core: #f6b25c;
+    --air-core-mid: #dc8a30;
+    --air-core-far: #a85c16;
+    --air-tyre: #9aa5aa;
+    --art-mask: #27434c;
+    --art-mask-cloth: #6d4320;
+    --art-mask-carbon: #4b575d;
+    --art-mask-n95: #151b1e;
+    --art-mask-line: #8fb4bf;
+    --art-can: #5f6b72;
+    --art-can-band: #2a3237;
+    --art-can-lid: #8e999c;
+  }
 }
-.a-ribbon-s {
+
+.air-ring {
+  fill: var(--air-ring);
+  fill-rule: evenodd;
+}
+.air-dot {
+  fill: var(--air-dot);
+}
+/* The halo of a ring or dot: the same path drawn again underneath (air.ts), stroked in the
+   colour of the paper. The mark itself is only its fill, so its paint is its own colour. */
+.air-halo {
   fill: none;
-  stroke: var(--art-haze);
-  stroke-width: 3;
+  fill-rule: evenodd;
+  stroke: var(--air-halo, var(--here, var(--bg)));
+  stroke-linejoin: round;
+}
+.air-rib {
+  fill: none;
+  stroke: var(--air-rib);
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.plan-n {
-  font-family: var(--font-body);
-  font-size: 20px;
+.air-tyre { fill: var(--air-tyre); }
+.air-wash-stop { stop-color: var(--air-wash); }
+.air-wash--flat { fill: var(--air-wash); }
+.air-core-stop { stop-color: var(--air-core); }
+.air-core-stop--mid { stop-color: var(--air-core-mid); }
+.air-core-stop--far { stop-color: var(--air-core-far); }
+
+/* Glyphs of the three marks in a key or legend: <svg class="air-glyph" viewBox="0 0 24 24"> */
+.air-glyph {
+  inline-size: 1.5em;
+  block-size: 1.5em;
+  flex: none;
+  vertical-align: -0.35em;
+  overflow: visible;
+}
+
+/* ---- Scenario steps -------------------------------------------------------
+ * air({ scenario: 'all' }) draws the fullest set once (.air-steps). Which part
+ * shows is decided here, in this order:
+ *   1. nothing said                      the dozen
+ *   2. data-air-scn on the <svg>         (SceneFrame's `scenario` prop: right without JavaScript)
+ *   3. data-pick-scenario on the Screen  (set by ScenarioSwitch: wins)
+ *   .air-b1  shown from 'few'      .air-b2  from 'dozen'      .air-b3  'full' only
+ * A scene's own parts can follow the same switch (rows of scooters behind).
+ */
+.air-b,
+.air-wash {
+  transition: opacity 0.6s ease;
+}
+.air-steps .air-b3 { opacity: 0; }
+[data-air-scn='few'] .air-steps :is(.air-b2, .air-b3) { opacity: 0; }
+[data-air-scn='full'] .air-steps .air-b3 { opacity: 1; }
+[data-air-scn='few'] .air-wash--steps { opacity: var(--air-w1); }
+[data-air-scn='dozen'] .air-wash--steps { opacity: var(--air-w2); }
+[data-air-scn='full'] .air-wash--steps { opacity: var(--air-w3); }
+
+[data-pick-scenario='few'] .air-steps :is(.air-b2, .air-b3),
+[data-pick-scenario='dozen'] .air-steps .air-b3 {
+  opacity: 0;
+}
+[data-pick-scenario='dozen'] .air-steps .air-b2,
+[data-pick-scenario='full'] .air-steps :is(.air-b2, .air-b3) {
+  opacity: 1;
+}
+[data-pick-scenario='few'] .air-wash--steps { opacity: var(--air-w1); }
+[data-pick-scenario='dozen'] .air-wash--steps { opacity: var(--air-w2); }
+[data-pick-scenario='full'] .air-wash--steps { opacity: var(--air-w3); }
+
+/* ---- Drift: a few pixels, all the time, and nothing else -------------------
+ * It never changes how much is drawn. The reader's 動畫 switch (html
+ * data-motion) and the system's reduced-motion setting both stop it; the
+ * shared stylesheet also stops every animation when data-motion is off.
+ */
+@keyframes air-drift-1 {
+  from { transform: translate(calc(-1.5px * var(--air-upp, 1)), calc(0.6px * var(--air-upp, 1))); }
+  to { transform: translate(calc(1.5px * var(--air-upp, 1)), calc(-0.9px * var(--air-upp, 1))); }
+}
+@keyframes air-drift-2 {
+  from { transform: translate(calc(1.2px * var(--air-upp, 1)), calc(-1px * var(--air-upp, 1))); }
+  to { transform: translate(calc(-1.6px * var(--air-upp, 1)), calc(0.8px * var(--air-upp, 1))); }
+}
+@keyframes air-drift-3 {
+  from { transform: translate(calc(-0.8px * var(--air-upp, 1)), calc(-1.3px * var(--air-upp, 1))); }
+  to { transform: translate(calc(1px * var(--air-upp, 1)), calc(1.2px * var(--air-upp, 1))); }
+}
+/* Inside an <svg> a CSS pixel is one unit of the drawing, so the distances are
+   multiplied by --air-upp (drawing units per screen pixel at 360 px, set by
+   SceneFrame): the drift is the same three pixels on screen in every scene. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion='off']) .air--drift :is(.air-d1, .air-d2, .air-d3) { animation: air-drift-1 7s ease-in-out infinite alternate; }
+  html:not([data-motion='off']) .air--drift .air-d2 { animation-name: air-drift-2; animation-duration: 9s; }
+  html:not([data-motion='off']) .air--drift .air-d3 { animation-name: air-drift-3; animation-duration: 11s; }
+}
+html[data-motion='on'] .air--drift :is(.air-d1, .air-d2, .air-d3) { animation: air-drift-1 7s ease-in-out infinite alternate; }
+html[data-motion='on'] .air--drift .air-d2 { animation-name: air-drift-2; animation-duration: 9s; }
+html[data-motion='on'] .air--drift .air-d3 { animation-name: air-drift-3; animation-duration: 11s; }
+
+/* ==== The frame every scene shares =========================================
+ * .scene         the picture: one <svg> and, over it, HTML words (SceneFrame.astro)
+ * .scene__labels the layer the words sit in
+ * .scene__label  a word placed at a point of the drawing (SceneLabel.astro);
+ *                never SVG <text>, never under 14 px
+ * The tag 示意圖｜廢氣其實大多看不見 is ui/IllustrationTag.astro (lane B): the home
+ * page's <Screen illustration> prints it, and SceneFrame prints it when asked
+ * (`tag`), for a scene used anywhere else.
+ */
+.scene {
+  position: relative;
+  margin: 0;
+  container-type: inline-size;
+  --here: var(--bg);
+}
+.scene__art {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+.scene__canvas {
+  position: relative;
+}
+.scene__labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* the tag on a line of its own under the drawing (a scene used outside a Screen) */
+.scene__tag {
+  margin: 0;
+  padding: 0.375rem 0.5rem;
+}
+.scene__before {
+  padding: 0.625rem 0.75rem 0.25rem;
+}
+.scene__label {
+  position: absolute;
+  margin: 0;
+  /* as wide as its words, so a label near the right edge does not fold into a column */
+  inline-size: max-content;
+  max-inline-size: 60%;
+  font-size: var(--fs-sm, 0.9375rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+  /* a paper-coloured edge instead of a plate, so the word sits in the picture */
+  text-shadow:
+    0 0 2px var(--here),
+    0 0 2px var(--here),
+    0 0 4px var(--here),
+    0 0 6px var(--here);
+  pointer-events: none;
+}
+.scene__label--plate {
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-1, 4px);
+  background: color-mix(in srgb, var(--here, var(--bg)) 88%, transparent);
+  text-shadow: none;
+}
+.scene__label--quiet {
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.scene__label[data-anchor~='center'] { translate: -50% 0; text-align: center; }
+.scene__label[data-anchor~='end'] { translate: -100% 0; text-align: end; }
+.scene__label[data-anchor~='middle'] { translate: 0 -50%; }
+.scene__label[data-anchor~='bottom'] { translate: 0 -100%; }
+.scene__label[data-anchor~='center'][data-anchor~='middle'] { translate: -50% -50%; }
+.scene__label[data-anchor~='center'][data-anchor~='bottom'] { translate: -50% -100%; }
+.scene__label[data-anchor~='end'][data-anchor~='middle'] { translate: -100% -50%; }
+.scene__label[data-anchor~='end'][data-anchor~='bottom'] { translate: -100% -100%; }
+
+
+/* ==== Arrival: once, under four seconds, then rest (brief 5.3) ===============
+ * A scene with `data-arrive` (SceneFrame's `arrive` prop) is held at its
+ * starting look by `.is-armed` (set before first paint, only when motion is
+ * welcome) and played by `.is-arrived` (arrive.client.ts). Every animation is
+ * written FROM a starting look TO the resting state, so the picture at rest is
+ * the picture with no script, with reduced motion and in print.
+ */
+@keyframes sa-fade-in {
+  from { opacity: 0; }
+}
+@keyframes sa-rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+/* ---- G1 HeroStreet: the scooters roll in and settle, each with its core ---- */
+.scene--hero { --hero-step: 150ms; }
+@keyframes hero-roll {
+  from { transform: translateX(560px); }
+  72% { transform: translateX(-7px); }
+  to { transform: none; }
+}
+@media screen {
+  .scene--hero.is-armed :is(.hero-sc, .air-core, .air-src, .air-kerb, .air-wash, .hero-waiting) { opacity: 0; }
+  .scene--hero.is-arrived .hero-sc {
+    animation: hero-roll 0.95s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+    animation-delay: calc(var(--i) * var(--hero-step));
+  }
+  .scene--hero.is-arrived :is(.air-core, .air-src) {
+    animation: sa-fade-in 0.7s ease-out backwards;
+    animation-delay: calc(var(--i) * var(--hero-step) + 0.55s);
+  }
+  .scene--hero.is-arrived :is(.air-kerb, .air-wash, .hero-waiting) {
+    animation: sa-fade-in 1.1s ease-out 1.6s backwards;
+  }
+}
+
+/* ---- Scenario steps without scripting: read the checked radio of lane B's switch ---- */
+html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='few']:checked) .air-steps :is(.air-b2, .air-b3),
+html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='dozen']:checked) .air-steps .air-b3 {
+  opacity: 0;
+}
+html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='dozen']:checked) .air-steps .air-b2,
+html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:checked) .air-steps :is(.air-b2, .air-b3) {
+  opacity: 1;
+}
+html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='few']:checked) .air-wash--steps { opacity: var(--air-w1); }
+html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='dozen']:checked) .air-wash--steps { opacity: var(--air-w2); }
+html:not(.js) [data-pick-scope]:has([data-pick-input='scenario'][value='full']:checked) .air-wash--steps { opacity: var(--air-w3); }
+
+/* ---- Marks that travel in once (G2, G6, G17) ---------------------------------
+ * .sa-go    a ring or dot: starts part of the way back along its lane (--dx, --dy, in
+ *           drawing units) and fades in, in turn (--i)
+ * .sa-draw  a ribbon with pathLength="1": drawn from its start to its end
+ */
+@keyframes sa-go {
+  from { opacity: 0; transform: translate(var(--dx, 0), var(--dy, 0)); }
+}
+@keyframes sa-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@media screen {
+  .scene.is-armed :is(.sa-go, .sa-draw, .sa-fade) { opacity: 0; }
+  .scene.is-arrived .sa-go {
+    animation: sa-go 0.75s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * var(--go-step, 90ms));
+  }
+  .scene.is-arrived .sa-draw {
+    stroke-dasharray: 1;
+    animation: sa-draw 0.9s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * var(--go-step, 90ms));
+  }
+  .scene.is-arrived .sa-fade {
+    animation: sa-fade-in 0.6s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * var(--go-step, 90ms));
+  }
+}
+
+/* ---- Lighting one kind of mark (AirKey with `tap`; pins of the body) ---------
+ * A picture groups its marks by kind: .tm-lane--ribbon | --ring | --dot.
+ */
+.tm-lane { transition: opacity 0.3s ease; }
+[data-pick-mark='ribbon'] .tm-lane:not(.tm-lane--ribbon),
+[data-pick-mark='ring'] .tm-lane:not(.tm-lane--ring),
+[data-pick-mark='dot'] .tm-lane:not(.tm-lane--dot) {
+  opacity: 0.16;
+}
+
+/* ---- AirKey ------------------------------------------------------------------ */
+.air-key {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.air-key--row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+}
+.air-key__item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--fs-sm, 0.9375rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  text-align: start;
+}
+.air-key__item .air-glyph {
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+}
+.air-key--tap .air-key__item {
+  min-block-size: var(--tap, 3rem);
+  padding: 0.375rem 0.75rem;
+  border: 2px solid var(--line-strong, var(--ink-3));
+  border-radius: var(--radius-3, 10px);
+  background: var(--surface);
+  cursor: pointer;
+}
+.air-key--tap .air-key__item[aria-pressed='true'] {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.air-key--tap .air-key__item:focus-visible {
+  outline: 3px solid var(--focus, var(--accent));
+  outline-offset: 2px;
+}
+html:not(.js) .air-key--tap .air-key__item {
+  border-color: transparent;
+  background: none;
+  padding-inline: 0;
+  cursor: default;
+}
+
+.tm-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.tm-can {
+  flex: none;
+  inline-size: 2.25rem;
+  block-size: auto;
+}
+.tm-chip {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+/* ---- G6 BodyFigure: the numbered pins, and the sentences under the picture ---- */
+.body-pin {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap, 3rem);
+  block-size: var(--tap, 3rem);
+  translate: -50% -50%;
+  border-radius: 50%;
+  color: var(--ink);
+  font-size: var(--fs-btn, 1.0625rem);
   font-weight: 900;
-  fill: var(--ink);
+  text-decoration: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.body-pin > span {
+  display: grid;
+  place-items: center;
+  inline-size: 1.875rem;
+  block-size: 1.875rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--here, var(--bg));
+  box-shadow: 0 0 0 2px var(--here, var(--bg));
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.body-pin[aria-pressed='true'] > span,
+.body-pin:hover > span {
+  background: var(--ink);
+  color: var(--here, var(--bg));
+}
+.body-pin:focus-visible { outline: none; }
+.body-pin:focus-visible > span { outline: 3px solid var(--focus, var(--accent)); outline-offset: 3px; }
+.body-pins {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.body-pins__item {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border-inline-start: 4px solid transparent;
+  border-radius: var(--radius-2, 6px);
+  font-size: var(--fs-sm, 0.9375rem);
+  line-height: 1.5;
+  color: var(--ink);
+  scroll-margin-block: 6rem;
+}
+.body-pins__n {
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  font-size: var(--fs-xs, 0.875rem);
+  font-weight: 900;
+  line-height: 1;
+}
+.body-pins__item .air-glyph { inline-size: 1.5rem; block-size: 1.5rem; vertical-align: 0; }
+.body-pins__item:target,
+[data-pick-pin='nose'] .body-pins__item[data-pin-item='nose'],
+[data-pick-pin='lungs'] .body-pins__item[data-pin-item='lungs'],
+[data-pick-pin='blood'] .body-pins__item[data-pin-item='blood'] {
+  border-inline-start-color: var(--ink);
+  background: var(--surface);
+}
+
+/* ---- G17 MaskScene: which parts show for which mask ---------------------------
+ * .mk-v is a part that belongs to some masks only; .mk-on-<mask> names them.
+ * The figure's data-mask is the first choice; the Screen's data-pick-mask
+ * (lane B's Segmented name="mask") wins; without scripting the checked radio does.
+ */
+.mk-v { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
+/* the mask lets the face show through a little, so what is inside it can be told from what is on it */
+.scene--mask .a-mask { fill-opacity: 0.78; }
+.mk-leak { fill: none; stroke: var(--air-dot); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mk-leak--on-head { stroke: var(--here, var(--bg)); }
+[data-mask='cloth'] .mk-on-cloth,
+[data-mask='surgical'] .mk-on-surgical,
+[data-mask='carbon'] .mk-on-carbon,
+[data-mask='n95'] .mk-on-n95 { visibility: visible; opacity: 1; }
+[data-pick-mask] .mk-v { visibility: hidden; opacity: 0; }
+[data-pick-mask='cloth'] .mk-on-cloth,
+[data-pick-mask='surgical'] .mk-on-surgical,
+[data-pick-mask='carbon'] .mk-on-carbon,
+[data-pick-mask='n95'] .mk-on-n95 { visibility: visible; opacity: 1; }
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask']:checked) .mk-v { visibility: hidden; opacity: 0; }
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='cloth']:checked) .mk-on-cloth,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='surgical']:checked) .mk-on-surgical,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='carbon']:checked) .mk-on-carbon,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checked) .mk-on-n95 { visibility: visible; opacity: 1; }
+
+/* ---- G8 HeightsScene and the breathing rings ---------------------------------- */
+.hs-band { fill: var(--art-yellow); opacity: 0.34; }
+.hs-band-edge { fill: none; stroke: var(--ink-2); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.hs-metre { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-dasharray: 9 6; }
+.hs-pipe { fill: none; stroke: var(--air-rib); stroke-width: 2.6; }
+.scene--heights .hs-num { font-variant-numeric: tabular-nums; font-weight: 600; }
+.scene--heights .hs-pipe-label { color: var(--exhaust-ink); }
+/* one breath in and out: an adult about every four seconds, a child faster */
+@keyframes hs-breathe {
+  0%, 100% { transform: scale(0.82); opacity: 0.7; }
+  45% { transform: scale(1.2); opacity: 1; }
+}
+.hs-breath { transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion='off']) .hs-breath { animation: hs-breathe 4.2s ease-in-out infinite; }
+  html:not([data-motion='off']) .hs-breath--fast { animation-duration: 2.6s; }
+}
+html[data-motion='on'] .hs-breath { animation: hs-breathe 4.2s ease-in-out infinite; }
+html[data-motion='on'] .hs-breath--fast { animation-duration: 2.6s; }
+
+/* ---- G10 SwapScene and SwapControl -------------------------------------------- */
+.swap-gas,
+.swap-ev {
+  transition: opacity 0.45s ease;
+}
+.swap-gas.is-off,
+.swap-ev:not(.is-on) {
+  opacity: 0;
+}
+@media screen {
+  /* waiting to play: all ten are petrol */
+  .scene--swap.is-armed .swap-gas { opacity: 1; }
+  .scene--swap.is-armed .swap-ev { opacity: 0; }
+}
+html:not(.js) [data-js-only] { display: none; }
+.swapctl {
+  display: grid;
+  gap: 0.375rem;
+}
+.swapctl__q {
+  font-size: var(--fs-sm, 0.9375rem);
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.swapctl__row {
+  display: grid;
+  grid-template-columns: var(--tap, 3rem) minmax(0, 1fr) var(--tap, 3rem);
+  align-items: center;
+  gap: 0.5rem;
+}
+.swapctl__btn {
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap, 3rem);
+  block-size: var(--tap, 3rem);
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.swapctl__btn:disabled,
+.swapctl__btn[aria-disabled='true'] {
+  border-color: var(--line-strong, var(--ink-3));
+  color: var(--ink-3);
+  cursor: default;
+}
+.swapctl__btn:focus-visible,
+.swapctl__range:focus-visible {
+  outline: 3px solid var(--focus, var(--accent));
+  outline-offset: 2px;
+}
+.swapctl__range {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 100%;
+  block-size: var(--tap, 3rem);
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.swapctl__range::-webkit-slider-runnable-track {
+  block-size: 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--clean) var(--fill, 100%), var(--exhaust) var(--fill, 100%));
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.swapctl__range::-moz-range-track {
+  block-size: 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--clean) var(--fill, 100%), var(--exhaust) var(--fill, 100%));
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.swapctl__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  inline-size: 2rem;
+  block-size: 2rem;
+  margin-block-start: -0.625rem;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+}
+.swapctl__range::-moz-range-thumb {
+  inline-size: 1.625rem;
+  block-size: 1.625rem;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.swapctl__out {
+  margin: 0;
+  font-size: var(--fs-sm, 0.9375rem);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- G11 TenScooters and FixButton -------------------------------------------- */
+.ten-big,
+.ten-fixed {
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.ten-fixed { opacity: 0; }
+.scene--ten[data-fixed] .ten-big,
+[data-fixed] .scene--ten .ten-big,
+[data-pick-scope]:has(input[data-fix]:checked) .scene--ten .ten-big {
+  opacity: 0;
+  transform: scale(0.3);
+}
+.scene--ten[data-fixed] .ten-fixed,
+[data-fixed] .scene--ten .ten-fixed,
+[data-pick-scope]:has(input[data-fix]:checked) .scene--ten .ten-fixed {
+  opacity: 1;
+}
+.fixbtn {
+  position: relative;
+  display: block;
+}
+.fixbtn__box {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.fixbtn__face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: var(--tap, 3rem);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-3, 10px);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--fs-btn, 1.0625rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+.fixbtn__icon {
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  flex: none;
+  fill: currentColor;
+}
+.fixbtn__undo { display: none; }
+.fixbtn__box:checked + .fixbtn__face {
+  background: var(--surface);
+  color: var(--ink);
+}
+.fixbtn__box:checked + .fixbtn__face .fixbtn__do { display: none; }
+.fixbtn__box:checked + .fixbtn__face .fixbtn__undo { display: inline; }
+.fixbtn__box:checked + .fixbtn__face .fixbtn__icon { display: none; }
+.fixbtn__box:focus-visible + .fixbtn__face {
+  outline: 3px solid var(--focus, var(--accent));
+  outline-offset: 2px;
+}
+
+/* ---- G3 ApproachPlan (plan-view.ts) --------------------------------------------- */
+.plan3-yellow { fill: none; stroke: var(--art-yellow); stroke-width: 6; }
+.plan3-box { fill: none; stroke: var(--art-paint); stroke-width: 9; stroke-linejoin: round; }
+.plan3-dim { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.plan3-inset-bg { fill: var(--here, var(--bg)); stroke: var(--ink); stroke-width: 3; }
+.scene--plan .plan3-gap {
+  font-size: var(--fs-lg, 1.25rem);
+  font-weight: 900;
+  line-height: 1.2;
+  background: var(--here, var(--bg));
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.scene--plan .hs-pipe-label { color: var(--exhaust-ink); }
+@keyframes plan3-slide {
+  from { opacity: 0; transform: translateX(170px); }
+}
+@media screen {
+  .scene--plan.is-armed :is(.plan3-slide, .air-srcs, .air-kerb, .air-wash) { opacity: 0; }
+  .scene--plan.is-arrived .plan3-slide { animation: plan3-slide 1.7s cubic-bezier(0.2, 0.7, 0.3, 1) 0.2s backwards; }
+  .scene--plan.is-arrived :is(.air-srcs, .air-kerb, .air-wash) { animation: sa-fade-in 1s ease-out 1.6s backwards; }
+}
+
+/* ---- G7 RoadOfTime ------------------------------------------------------------- */
+.road {
+  margin: 0;
+  padding: 0.75rem 1rem 0.5rem;
+  background: var(--bg-sunken, var(--art-fill));
+  --here: var(--bg-sunken, var(--art-fill));
+}
+.road__posts {
+  position: relative;
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* the road: a grey band under the signposts with a dashed centre line */
+.road__posts::before {
+  content: '';
+  position: absolute;
+  inset-block: -0.75rem -0.25rem;
+  inset-inline-start: 1.125rem;
+  inline-size: 2.25rem;
+  background:
+    repeating-linear-gradient(to bottom, var(--art-paint) 0 0.75rem, transparent 0.75rem 1.75rem) center / 0.25rem 100% no-repeat,
+    var(--art-road);
+}
+.road__post {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+.road__sign {
+  display: block;
+  inline-size: 4.5rem;
+  block-size: auto;
+}
+.road-board { fill: var(--surface, var(--bg)); stroke: var(--ink); stroke-width: 2.5; }
+.road-post { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.road-trace { fill: none; stroke: var(--signal-red); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.road-ink { fill: var(--ink); }
+.road-ink-s { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.road-cut { fill: none; stroke: var(--surface, var(--bg)); stroke-width: 2.5; }
+.road-paper { fill: var(--surface, var(--bg)); }
+.road__words {
+  display: grid;
+  justify-items: start;
+  gap: 0.125rem;
+  min-inline-size: 0;
+}
+.road__when {
+  font-size: var(--fs-btn, 1.0625rem);
+  font-weight: 900;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.road__text {
+  font-size: var(--fs-sm, 0.9375rem);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.road__year {
+  position: relative;
+  margin-block-start: 0.5rem;
+  padding-block-start: 0.5rem;
+  border-block-start: 2px solid var(--ink);
+}
+.road__sum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.125rem 0.75rem;
+  margin: 0 0 0.25rem;
+  font-size: var(--fs-xs, 0.875rem);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.road__sum b {
+  font-size: var(--fs-btn, 1.0625rem);
+  font-weight: 900;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.road__strip { position: relative; padding-block-end: 1.375rem; }
+.road__strip svg { display: block; inline-size: 100%; block-size: auto; }
+.road-days circle { fill: var(--ink); }
+.road-bar-track { fill: var(--chart-track, var(--line)); }
+.road-bar { fill: var(--ink); }
+.road-bar--range { opacity: 0.45; }
+.road-tick { fill: none; stroke: var(--ink-2); stroke-width: 1.5; }
+.road__ticks span {
+  position: absolute;
+  inset-block-end: 0;
+  translate: -50% 0;
+  font-size: var(--fs-xs, 0.875rem);
+  line-height: 1.3;
+  color: var(--ink-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.road__ticks span:first-child { translate: 0 0; }
+/* which year strip shows: the first choice, then whatever the Screen's switch says */
+.road-v { display: none; }
+.road-v.is-first { display: block; }
+[data-pick-reds='2'] .road-v[data-when-reds='2'],
+[data-pick-reds='4'] .road-v[data-when-reds='4'],
+[data-pick-reds='6'] .road-v[data-when-reds='6'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds'][value='2']:checked) .road-v[data-when-reds='2'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds'][value='4']:checked) .road-v[data-when-reds='4'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds'][value='6']:checked) .road-v[data-when-reds='6'] {
+  display: block;
+}
+[data-pick-reds]:not([data-pick-reds='2']) .road-v[data-when-reds='2'],
+[data-pick-reds]:not([data-pick-reds='4']) .road-v[data-when-reds='4'],
+[data-pick-reds]:not([data-pick-reds='6']) .road-v[data-when-reds='6'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value='2'])) .road-v[data-when-reds='2'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value='4'])) .road-v[data-when-reds='4'],
+html:not(.js) [data-pick-scope]:has([data-pick-input='reds']:checked:not([value='6'])) .road-v[data-when-reds='6'] {
+  display: none;
+}
+
+/* ---- MeasurementDiagram: numbered instrument positions --------------------------- */
+.scene__label.measure-n {
+  display: grid;
+  place-items: center;
+  inline-size: 1.875rem;
+  block-size: 1.875rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--here, var(--bg));
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- StationScene ---------------------------------------------------------------- */
+.st-cabinet { fill: #fbfcfb; stroke: var(--art-ink); stroke-width: 3; }
+.scene--station .st-name { padding: 0 0.25rem; border-radius: 3px; background: #fbfcfb; color: #14191c; text-shadow: none; }
+
+/* the line of words about the chosen mask, above the drawing */
+.mk-says { min-block-size: 3em; }
+.mk-says p { margin: 0; font-size: var(--fs-sm, 0.9375rem); line-height: 1.45; color: var(--ink); }
+.mk-says b { display: block; font-weight: 900; }
+.mk-t { display: none; }
+[data-mask='cloth'] .mk-t.mk-on-cloth,
+[data-mask='surgical'] .mk-t.mk-on-surgical,
+[data-mask='carbon'] .mk-t.mk-on-carbon,
+[data-mask='n95'] .mk-t.mk-on-n95 { display: block; }
+[data-pick-mask] .mk-t.mk-t { display: none; }
+[data-pick-mask='cloth'] .mk-t.mk-on-cloth,
+[data-pick-mask='surgical'] .mk-t.mk-on-surgical,
+[data-pick-mask='carbon'] .mk-t.mk-on-carbon,
+[data-pick-mask='n95'] .mk-t.mk-on-n95 { display: block; }
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask']:checked) .mk-t { display: none; }
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='cloth']:checked) .mk-t.mk-on-cloth,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='surgical']:checked) .mk-t.mk-on-surgical,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='carbon']:checked) .mk-t.mk-on-carbon,
+html:not(.js) [data-pick-scope]:has([data-pick-input='mask'][value='n95']:checked) .mk-t.mk-on-n95 { display: block; }
+
+/* G8: the second row of names under the figures */
+.scene--heights .hs-row2 { margin-block-start: 1.45em; }
+.scene--plan .plan3-gap { white-space: nowrap; }
+
+/* a picture scrolled off screen: its looping motion waits (arrive.client.ts sets the class) */
+.scene.is-offscreen,
+.scene.is-offscreen * {
+  animation-play-state: paused !important;
 }

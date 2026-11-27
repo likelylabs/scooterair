@@ -10,6 +10,8 @@ import type { L10n } from './text.ts';
 import type { BreakEven, Evaluation, PurchaseLedger } from './types.ts';
 
 const pick = (v: L10n, locale: Locale) => v[locale];
+// Built once (a formatter per call is slow; see text.ts).
+const MONEY = { en: new Intl.NumberFormat('en-US'), 'zh-TW': new Intl.NumberFormat('zh-TW') } as const;
 
 /** Ledger line label for display: adds "(up to)" to maximums (once, even if the label already says so). */
 export function lineLabel(line: PurchaseLedger['lines'][number], locale: Locale): string {
@@ -51,7 +53,7 @@ export interface LedgerRow {
 export function toLedgerRows(e: Evaluation, locale: Locale, side: 'electric' | 'gasoline' = 'electric'): LedgerRow[] {
   const ledger = side === 'electric' ? e.electric.purchase : e.gasoline.purchase;
   const other = side === 'electric' ? e.gasoline.purchase : e.electric.purchase;
-  const money = (v: number) => `NT$ ${Math.round(Math.abs(v)).toLocaleString(locale === 'en' ? 'en-US' : 'zh-TW')}`;
+  const money = (v: number) => `NT$ ${MONEY[locale === 'en' ? 'en' : 'zh-TW'].format(Math.round(Math.abs(v)))}`;
   const gap = ledger.net.value - other.net.value;
   return [
     { id: 'list', label: pick(side === 'electric' ? ui.list : ui.listGas, locale), amount: money(ledger.listPrice.value), ...(ledger.listPrice.note ? { note: pick(ledger.listPrice.note, locale) } : {}) },

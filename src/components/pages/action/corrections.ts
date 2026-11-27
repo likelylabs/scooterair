@@ -14,13 +14,14 @@ import type { ClaimRuleId, FactId } from '@/data';
 /** The date the evidence behind these corrections was checked (the research files' date). */
 export const SEED_DATE = '2026-11-25';
 
-export type CorrectionKey = 'iot-94' | 'pm25-source' | 'ev-cheaper' | 'densest' | 'netzero-2035' | 'child-44' | 'ev-zero' | 'idling-legal' | 'ufp-smell' | 'no-2027';
+export type CorrectionKey = 'crossings-measured' | 'iot-94' | 'pm25-source' | 'ev-cheaper' | 'densest' | 'netzero-2035' | 'child-44' | 'ev-zero' | 'idling-legal' | 'ufp-smell' | 'no-2027';
 
 export type Correction =
   | { key: CorrectionKey; date: string; rule: ClaimRuleId; facts?: FactId[] }
   | { key: CorrectionKey; date: string; own: true; facts: FactId[] };
 
 export const corrections: Correction[] = [
+  { key: 'crossings-measured', date: '2026-11-26', own: true, facts: ['iot-waiting-area-co-2024', 'iot-waiting-area-pm25-2024'] },
   { key: 'iot-94', date: SEED_DATE, rule: 'iot-94-percent-needs-context' },
   { key: 'pm25-source', date: SEED_DATE, rule: 'no-scooters-main-source' },
   { key: 'ev-cheaper', date: SEED_DATE, rule: 'econ-electric-not-always-cheaper-to-run' },

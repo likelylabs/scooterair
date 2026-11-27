@@ -15,6 +15,8 @@
  *   level     heading level of the title (default 4)
  *   tone      top rule colour
  *   anchor    false to leave the anchor off (when the same dataset is drawn twice)
+ *   brief     true: the page's reading line and the sources stay in view; what the chart does
+ *             not show, the source's notes, the period and the CSV fold under one 48 px button
  * Slots
  *   before    content above the chart (e.g. a lead sentence)
  */
@@ -39,8 +41,9 @@ interface Props {
   level?: 2 | 3 | 4;
   tone?: 'ink' | 'exhaust' | 'clean' | 'signal';
   anchor?: boolean;
+  brief?: boolean;
 }
-const { locale, view, title, subtitle, caption, level = 4, tone = 'ink', anchor = true } = Astro.props;
+const { locale, view, title, subtitle, caption, level = 4, tone = 'ink', anchor = true, brief = false } = Astro.props;
 const T = localize(evidenceCopy, locale);
 const { s, panels, table, notes } = view;
 /** Registry titles have no phrase marks: break after the first colon so a headline never splits mid-word. */
@@ -83,6 +86,24 @@ const file = `${s.id}.csv`;
       </table>
     </div>
   )}
+  {brief && caption && <p class="sfig__read">{caption}</p>}
+  {brief && (
+    <details class="sfig__more" data-ev-fold>
+      <summary><span>{T.chart.more}</span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg></summary>
+      <div class="sfig__morebody">
+        {s.caveat && (
+          <p class:list={['sfig__line', 'sfig__caveat', s.requiresCaveat && 'sfig__caveat--must']}>
+            <b>{T.columns.notShow}{locale === 'en' ? ': ' : '：'}</b><Mixed text={s.caveat} locale={locale} />
+          </p>
+        )}
+        {notes.length > 0 && <p class="sfig__line sfig__notes"><Mixed text={notes.map(end).join(' ')} locale={locale} /></p>}
+        <p class="sfig__line sfig__meta">{s.period} · {s.place}</p>
+        <p class="sfig__line sfig__dl"><a href={csv} download={file}>{T.chart.download}</a></p>
+        <p class="sfig__line sfig__chips"><span>{T.chart.sources}</span>{chips.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</p>
+      </div>
+    </details>
+  )}
+  {!brief && (
   <Fragment slot="caption">
     {caption && <span class="sfig__line">{caption}</span>}
     {s.caveat && (
@@ -93,17 +114,71 @@ const file = `${s.id}.csv`;
     {notes.length > 0 && (
       <span class="sfig__line sfig__notes"><Mixed text={notes.map(end).join(' ')} locale={locale} /></span>
     )}
-    <span class="sfig__line sfig__meta">
-      {s.period} · {s.place} ·{' '}
-      <a href={csv} download={file}>{T.chart.download}</a>
-    </span>
+    {<span class="sfig__line sfig__meta">{s.period} · {s.place}</span>}
+    {<span class="sfig__line sfig__dl"><a href={csv} download={file}>{T.chart.download}</a></span>}
   </Fragment>
-  <Fragment slot="source">{chips.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+  )}
+  <Fragment slot="source">{!brief && chips.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
 </Figure>
 
 <style>
+  .sfig__more {
+    margin-block-start: var(--sp-3);
+    border-block: 1px solid var(--line);
+  }
+  .sfig__more > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    min-block-size: var(--tap);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    cursor: pointer;
+    list-style: none;
+  }
+  .sfig__more > summary::-webkit-details-marker {
+    display: none;
+  }
+  .sfig__more > summary svg {
+    flex: none;
+  }
+  .sfig__more[open] > summary svg {
+    transform: rotate(180deg);
+  }
+  .sfig__read {
+    margin-block-start: var(--sp-3);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+  }
+  .sfig__chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap);
+  }
+  .sfig__morebody {
+    padding-block: var(--sp-1) var(--sp-3);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+  }
+  .sfig__dl a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+  }
+  :global(figure.sfig p.fig__source) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap);
+  }
   .sfig {
-    scroll-margin-block-start: calc(var(--header-h) + var(--rail-h) + var(--sp-4));
+    scroll-margin-block-start: calc(var(--header-h) + var(--sp-4));
   }
   .sfig__panels--many {
     display: grid;
@@ -136,9 +211,31 @@ const file = `${s.id}.csv`;
   .sfig__meta a {
     color: var(--accent);
   }
-  .sfig__table {
+  /*
+   * A wide table scrolls inside its box. The right-edge shadow says so: a cover in the surface
+   * colour rides at the end of the content ('local') and hides the shadow once the reader has
+   * scrolled to the end.
+   */
+  .sfig__table,
+  .sfig :global(.chart__table) {
     overflow-x: auto;
     max-inline-size: 100%;
+    background:
+      linear-gradient(to left, var(--here, var(--bg)) 40%, transparent) right center / 2.5rem 100% no-repeat local,
+      linear-gradient(to left, color-mix(in srgb, var(--ink) 22%, transparent), transparent) right center / 0.85rem 100% no-repeat scroll;
+  }
+  /* the first column stays put while the numbers scroll under it */
+  .sfig__table tbody th,
+  .sfig__table thead th:first-child {
+    position: sticky;
+    inset-inline-start: 0;
+    background: var(--here, var(--bg));
+    max-inline-size: 12em;
+  }
+  /* notes columns in the chart data tables are words, not figures: let them wrap */
+  .sfig :global(.chart__table td.num:last-child) {
+    white-space: normal;
+    min-inline-size: 7em;
   }
   .sfig__tnote {
     font-size: var(--fs-xs);
@@ -161,10 +258,16 @@ const file = `${s.id}.csv`;
     font-size: var(--fs-xs);
     color: var(--ink-2);
     border-block-end-color: var(--line-strong);
+    /* column names wrap, between words, instead of setting the width of the table */
+    white-space: normal;
+    min-inline-size: 5.5em;
+    vertical-align: bottom;
   }
   .sfig__table .num {
     text-align: end;
     font-variant-numeric: tabular-nums;
+  }
+  .sfig__table td.num {
     white-space: nowrap;
   }
 </style>

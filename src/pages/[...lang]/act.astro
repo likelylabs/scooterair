@@ -1,496 +1,676 @@
 ---
+import { absUrl } from '../../lib/abs-url.ts';
 /**
- * /act/ — 行動 / Take action (blueprint 4.6, Part 6; V6, V24, V19, V46).
+ * /act/ — 我能做什麼 / What I can do (redesign brief 7.6, amendment 12.2).
  *
- * One section per role, in the priority order of Part 6: #walk · #buy · #keep · #parents ·
- * #neighbourhood · #policy, then #asks (the six asks of government, each with the agency we
- * propose) and #letter. Every action carries a label for how well supported it is: the badges of
- * the registry facts behind it, 我們的推論, or 請求 (a plain request). No prices and no
- * calculator button here: #buy links to /electric/ for the money (R9 spirit; blueprint 4.6).
+ * Five cards by who you are, each with ONE action on top (先做這一件) and a short list below:
+ *   #walk · #parents · #ride · #community · #policy
+ * then the measurement card (#measure → /estimate/#measure) and the letters (#letters:
+ * #letter to a councillor, #committee note). The EV-share chart lives on the policy card.
  *
- * Copy: src/i18n/pages/act.ts. Numbers are filled from the registry.
+ * Copy: src/i18n/pages/act.ts. Every number is filled from the registry or src/data/estimate.ts.
+ * Chips (KindChip) sit beside the number they qualify; actions without a number carry none.
  */
 import Base from '@/layouts/Base.astro';
-import Section from '@/components/ui/Section.astro';
-import Figure from '@/components/ui/Figure.astro';
-import Cite from '@/components/ui/Cite.astro';
-import Card from '@/components/ui/Card.astro';
-import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
-import Icon from '@/components/ui/Icon.astro';
 import Phrased from '@/components/ui/Phrased.astro';
-import Tag from '@/components/ui/Tag.astro';
-import MoneyBanner from '@/components/ui/MoneyBanner.astro';
-import SubsidyTimeline from '@/components/ui/SubsidyTimeline.astro';
-import WaffleChart from '@/components/charts/WaffleChart.astro';
-import ApproachPlan from '@/components/art/ApproachPlan.astro';
-import Act from '@/components/pages/action/Act.astro';
-import Claim from '@/components/pages/action/Claim.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import Cite from '@/components/ui/Cite.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Figure from '@/components/ui/Figure.astro';
+import WordHelp from '@/components/ui/WordHelp.astro';
+import EvShareChart from '@/components/pages/action/EvShareChart.astro';
 import Composer from '@/components/pages/action/Composer.astro';
-import { badgesFor, count, datum, lf, lg, num, requiredCaveats, sourcesOf } from '@/components/pages/action/ev';
+import { datum, lf, num, requiredCaveats, sourcesOf } from '@/components/pages/action/ev';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { chipWhere, kSentences, readerDate, site } from '@/i18n/ui';
+import { est, formatEstimate } from '@/data/estimate';
+import { facts, localizeSeries, type FactId } from '@/data';
 import { snapshot } from '@/lib/site-state.data';
-import type { FactId } from '@/data';
 import act from '@/i18n/pages/act';
 import { fill, localize } from '@/i18n/pages/_copy';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(act, locale);
-const R = t.roles;
+const en = locale === 'en';
 const nextYear = Number(snapshot.yearEnd.slice(0, 4)) + 1;
 const yearOf = (id: FactId) => Number(/\d{4}/.exec(lf(id, 'en').period)![0]);
 const abs = (v: number) => num(locale, Math.abs(v), 0);
 
-// ---- numbers from the registry
+// ---- numbers, all from the registry or the estimate
+const tailpipeCm = num(locale, datum('iot-exhaust-height-assumption', 'exhaustHeight') * 100, 0);
+const turnGapCm = num(locale, datum('marking-rules-turn-box', 'turnBoxGap') * 100, 0);
 const quiet = { benzene: abs(datum('wu2021-quiet-route', 'benzene')), pm25: abs(datum('wu2021-quiet-route', 'pm25')) };
-const stroller = {
-  low: num(locale, datum('stroller-height-review', 'kenagy2016Low'), 0),
-  high: num(locale, datum('stroller-height-review', 'kenagy2016High'), 0),
-  us: num(locale, datum('stroller-height-review', 'buzzard2009'), 0),
-  uk: num(locale, datum('pram-height-sharma2020', 'fineParticlesUpTo'), 0),
-  lower: abs(datum('stroller-height-review', 'kumar2017Morning')),
-};
+const child = formatEstimate('child.airPerKg', locale);
+const top10 = formatEstimate('inspect.top10share', locale);
+const twoStrokeN = datum('two-stroke-remaining', 'y2024');
+const twoStroke = { year: 2024, count: fill(t.fmt.wan, { n: en ? num(locale, twoStrokeN, 0) : num(locale, twoStrokeN / 10000, 1) }) };
 const per100 = { passed: datum('inspection-2025-per-100', 'passed'), failed: datum('inspection-2025-per-100', 'failed'), absent: datum('inspection-2025-per-100', 'absent') };
 const per100Total = per100.passed + per100.failed + per100.absent;
-const inspectYear = yearOf('inspection-2025-per-100');
-const twoStroke = count(locale, datum('two-stroke-remaining', 'y2024'));
-/** The net-zero milestone the ask quotes (blueprint ask 4: the 2030 target). */
-const TARGET_KEY = 'target2030';
-const evShare = { share: num(locale, datum('ev-share-2025', 'share'), 1), year: yearOf('ev-share-2025'), target: num(locale, datum('netzero-ev-sales-targets', TARGET_KEY), 0), targetYear: Number(TARGET_KEY.slice(-4)) };
-const turnGapCm = num(locale, datum('marking-rules-turn-box', 'turnBoxGap') * 100, 0);
-const siteUrl = new URL(href('/', locale), Astro.site).href;
-const lineText = fill(R.walk.line, { url: siteUrl });
+const evYear = yearOf('ev-share-2025');
+const evTargetKey = `target${evYear}`;
+const evShare = { year: evYear, share: num(locale, datum('ev-share-2025', 'share'), 1), target: num(locale, datum('netzero-ev-sales-targets', evTargetKey), 0) };
+const deadline = en ? readerDate(snapshot.yearEnd, locale).replace(/ \d{4}$/, '') : readerDate(snapshot.yearEnd, locale).replace(/^\d{4}\s*\S\s*/, '');
+const askVars = { nextYear, deadline, total: per100Total, absent: per100.absent, ...evShare };
+const askFacts: FactId[][] = [[], [], ['inspection-2025-per-100', 'two-stroke-remaining'], ['ev-share-2025', 'netzero-ev-sales-targets'], ['marking-rules-turn-box'], []];
+const fact = (id: FactId) => facts[id];
 
-// ---- the six asks: numbers and the facts behind them
-const askFacts: FactId[][] = [[], [], ['inspection-2025-per-100', 'two-stroke-remaining'], ['ev-share-2025', 'netzero-ev-sales-targets'], [], []];
-const askUnconfirmed = [false, false, false, true, false, true];
-const askPosition = [false, false, false, false, false, true];
-const askVars = { nextYear, total: per100Total, absent: per100.absent, twoStroke, ...evShare };
+// ---- the EV-share chart (moved here from the old home page, brief 5.4)
+const series = localizeSeries('ev-share-new-registrations', locale);
+const actual = series.datasets.find((d) => d.kind !== 'target')!;
+const target = series.datasets.find((d) => d.kind === 'target')!;
+const observed = actual.points.filter((p) => p.y !== null);
+const first = observed[0];
+const last = observed[observed.length - 1];
+const allX = [...new Set([...actual.points, ...target.points].map((p) => Number(p.x)))].sort((a, b) => a - b);
+const years: number[] = [];
+for (let y = allX[0]; y <= allX[allX.length - 1]; y++) years.push(y);
+const pct = (v: number) => num(locale, v, v % 1 ? 1 : 0);
+// targets from the latest observed year on, so the 2025 target sits beside the 2025 figure
+const targets = target.points.filter((p) => Number(p.x) >= Number(last.x)).map((p) => ({ x: Number(p.x), y: p.y! }));
+const chartDesc = fill(t.policy.chart.desc, {
+  y1: first.x,
+  s1: pct(first.y!),
+  y2: last.x,
+  s2: pct(last.y!),
+  targets: targets.map((p) => fill(t.fmt.target, { pct: pct(p.y), year: p.x })).join(t.fmt.listSep),
+});
+const chartCites = sourcesOf(['ev-share-2025', 'netzero-ev-sales-targets']);
+const chartCaveats = requiredCaveats(['ev-share-2025', 'netzero-ev-sales-targets'], locale);
 
-const roles = [
-  { id: 'walk', title: R.walk.title },
-  { id: 'buy', title: R.buy.title },
-  { id: 'keep', title: R.keep.title },
-  { id: 'parents', title: R.parents.title },
-  { id: 'neighbourhood', title: R.neighbourhood.title.replaceAll('|', '') },
-  { id: 'policy', title: R.policy.title },
-];
+// ---- the forwarded message
+const siteUrl = absUrl(href('/', locale), Astro.site);
+const lineText = fill(t.walk.line, { sentence: site.sentence[locale], url: siteUrl });
 const composerLabels = { subject: t.composer.subject, copied: t.composer.copied, failed: t.composer.failed, mail: t.composer.mail, noStore: t.composer.noStore };
-const waffleCaveats = requiredCaveats(['inspection-2025'], locale);
-const per100Fact = lf('inspection-2025-per-100', locale);
+
+const cards = [
+  { id: 'walk', jump: t.walk.jump },
+  { id: 'parents', jump: t.parents.jump },
+  { id: 'ride', jump: t.ride.jump },
+  { id: 'community', jump: t.community.jump },
+  { id: 'policy', jump: t.policy.jump },
+  { id: 'measure', jump: t.measure.jump },
+];
+const quietRoute = lf('wu2021-quiet-route', locale);
+const guo = lf('mj-cohort-mortality-guo2021', locale);
+const idle = lf('idle-stop-mixed-evidence', locale);
 ---
 
-<Base locale={locale} title={t.meta.title} description={t.meta.description} share="brief" money>
-  <Section id="act" pad="normal" width="wide" class="act-hero">
-    <p class="eyebrow">{t.hero.eyebrow}</p>
-    <h1 class="display"><Phrased text={t.hero.title} /></h1>
-    <p class="lead act-deck">{t.hero.deck}</p>
+<Base locale={locale} title={t.meta.title} description={t.meta.description} share="act" money>
+  <div class="act">
+    <header class="act-hero container container--wide">
+      <p class="eyebrow">{t.hero.eyebrow}</p>
+      <h1 class="display act-hero__t"><Phrased text={t.hero.title} /></h1>
+      <p class="act-hero__deck">{t.hero.deck}</p>
+      <WordHelp locale={locale} words={['benzene', 'pm25', 'ufp']} />
+      <nav class="jump" aria-labelledby="jump-label">
+        <p class="jump__label" id="jump-label">{t.hero.jump}</p>
+        <ul>
+          {cards.map((c) => (
+            <li>
+              <a href={`#${c.id}`}>
+                <span>{c.jump}</span>
+                <Icon name="arrow-down" size="1.1em" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
 
-    <div class="legend" role="group" aria-labelledby="legend-t">
-      <h2 id="legend-t" class="legend__t">{t.labels.title}</h2>
-      <ul class="legend__list">
-        <li><span class="legend__b"><EvidenceBadge locale={locale} kind="measured-tw" /><EvidenceBadge locale={locale} kind="official-tw" /></span><span>{t.labels.evidence}</span></li>
-        <li><span class="legend__b"><EvidenceBadge locale={locale} kind="inference" /></span><span>{t.labels.inference}</span></li>
-        <li><span class="legend__b"><Tag>{t.labels.request}</Tag></span><span>{t.labels.requestHelp}</span></li>
-      </ul>
-    </div>
+    <div class="cards container container--wide">
+      <!-- ============================================================ WALK -->
+      <section class="card" id="walk" aria-labelledby="walk-t">
+        <h2 class="card__t" id="walk-t">{t.walk.title}</h2>
+        <div class="first">
+          <p class="first__kicker">{t.first}</p>
+          <p class="first__do">{t.walk.top}</p>
+          <div class="first__why has-chip"><p>{fill(t.walk.topWhy, { cm: tailpipeCm })}</p><KindChip locale={locale} of={fact('iot-exhaust-height-assumption')} size="sm" /></div>
+          <div class="first__mask has-chip"><p><span>{t.walk.mask}</span></p><KindChip locale={locale} of={fact('mask-niosh-no-gas')} size="sm" /></div>
+          <a class="card__link" href={href('/questions/mask/', locale)}>{t.walk.maskLink}<Icon name="arrow-right" size="1.05em" /></a>
+        </div>
+        <h3 class="more__t">{t.more}</h3>
+        <ul class="more">
+          <li>
+            <p class="more__do">{t.walk.route}</p>
+            <div class="more__why has-chip"><p>{fill(t.walk.routeWhy, quiet)}</p><KindChip locale={locale} of={fact('wu2021-quiet-route')} size="sm" /></div>
+            {quietRoute.caveat && <details class="careful" data-sheet open data-shut-with-js><summary>{t.careful}</summary><p>{quietRoute.caveat}</p></details>}
+          </li>
+          <li>
+            <p class="more__do">{t.walk.keepWalking}</p>
+            <div class="more__why has-chip"><p>{t.walk.keepWalkingWhy}</p><KindChip locale={locale} kind="study" where={chipWhere.taiwan[locale]} size="sm" /></div>
+            {guo.caveat && <details class="careful" data-sheet open data-shut-with-js><summary>{t.careful}</summary><p>{guo.caveat}</p></details>}
+          </li>
+          <li>
+            <p class="more__do">{t.walk.smoky}</p>
+          </li>
+          <li>
+            <p class="more__do">{t.walk.share}</p>
+            <div class="msg" id="message">
+              <h4 class="msg__t">{t.walk.lineTitle}</h4>
+              <Composer
+                locale={locale}
+                id="line-message"
+                title={t.walk.lineTitle}
+                body={lineText}
+                labels={{ copy: t.walk.copy, copied: t.composer.copied, failed: t.composer.failed }}
+                share={{ href: `https://line.me/R/share?text=${encodeURIComponent(lineText)}`, label: t.walk.lineShare }}
+              />
+            </div>
+          </li>
+        </ul>
+      </section>
 
-    <nav class="jump" aria-label={t.hero.jump}>
-      <p class="jump__label" aria-hidden="true">{t.hero.jump}</p>
-      <ul>
-        {roles.map((r) => <li><a href={`#${r.id}`}>{r.title}</a></li>)}
-        <li><a href="#asks">{t.asks.eyebrow}</a></li>
-      </ul>
-    </nav>
-  </Section>
+      <!-- ============================================================ PARENTS -->
+      <section class="card" id="parents" aria-labelledby="parents-t">
+        <h2 class="card__t" id="parents-t">{t.parents.title}</h2>
+        <div class="first">
+          <p class="first__kicker">{t.first}</p>
+          <p class="first__do">{t.parents.top}</p>
+          <div class="first__why has-chip"><p>{fill(t.parents.topWhy, { lo: child.lo, hi: child.hi })}</p><KindChip locale={locale} of={fact('child-air-per-kg')} size="sm" /></div>
+        </div>
+        <h3 class="more__t">{t.more}</h3>
+        <ul class="more">
+          <li>
+            <p class="more__do">{t.parents.poster}</p>
+            <a class="card__link" href={href('/print/poster/', locale)}>{t.parents.posterLink}<Icon name="arrow-right" size="1.05em" /></a>
+          </li>
+          <li>
+            <p class="more__do">{t.parents.film}</p>
+            <a class="card__link" href={href('/90/', locale)}>{t.parents.filmLink}<Icon name="arrow-right" size="1.05em" /></a>
+          </li>
+          <li>
+            <p class="more__do">{t.parents.child}</p>
+            <a class="card__link" href={href('/questions/my-child/', locale)}>{t.parents.childLink}<Icon name="arrow-right" size="1.05em" /></a>
+          </li>
+        </ul>
+      </section>
 
-  <!-- ============================================================== WALK -->
-  <Section id="walk" title={R.walk.title} lead={R.walk.lead} width="wide" rule>
-    <ol class="acts">
-      <Act locale={locale} n={1} label="request" text={R.walk.a1} link={{ href: href('/', locale) + '#brief', label: R.walk.a1Link }} />
-      <Act locale={locale} n={2} label="request" text={R.walk.a2} link={{ href: href('/unmeasured/#ask', locale), label: R.walk.a2Link }} />
-      <Act locale={locale} n={3} label="inference" text={R.walk.a3} why={R.walk.a3Why} whyFacts={['first-metre-sharma-kumar-2018']} />
-      <Act locale={locale} n={4} label="evidence" text={R.walk.a4} facts={['wu2021-quiet-route']} why={fill(R.walk.a4Why, quiet)} />
-      <Act locale={locale} n={5} label="evidence" text={R.walk.a5} facts={['mj-cohort-mortality-guo2021']} why={R.walk.a5Why} />
-    </ol>
-    <div class="tool" id="message">
-      <h3 class="tool__t">{R.walk.lineTitle}</h3>
-      <Composer
-        locale={locale}
-        id="line-message"
-        title={R.walk.lineName}
-        body={lineText}
-        labels={{ copy: R.walk.copy, copied: t.composer.copied, failed: t.composer.failed }}
-        share={{ href: `https://line.me/R/share?text=${encodeURIComponent(lineText)}`, label: R.walk.lineShare }}
-      />
-    </div>
-    <div class="tool">
-      <h3 class="tool__t">{R.walk.smokyTitle}</h3>
-      <Claim locale={locale} facts={['apca-inspection-and-reporting']} />
-      <p class="tool__p">{R.walk.smoky}</p>
-    </div>
-  </Section>
+      <!-- ============================================================ RIDE -->
+      <section class="card" id="ride" aria-labelledby="ride-t">
+        <h2 class="card__t" id="ride-t">{t.ride.title}</h2>
+        <div class="first">
+          <p class="first__kicker">{t.first}</p>
+          <p class="first__do">{t.ride.top}</p>
+          <div class="first__why has-chip"><p>{fill(t.ride.topWhy, { share: top10.text })}</p><KindChip locale={locale} kind="derived" size="sm" /></div>
+          <a class="card__link card__link--primary" href={href('/electric/', locale)}>{t.ride.calcLink}<Icon name="arrow-right" size="1.05em" /></a>
+        </div>
+        <h3 class="more__t">{t.more}</h3>
+        <ul class="more">
+          <li>
+            <div class="more__do has-chip"><p>{fill(t.ride.twoStroke, twoStroke)}</p><KindChip locale={locale} of={fact('two-stroke-remaining')} size="sm" /></div>
+          </li>
+          <li>
+            <div class="more__do has-chip"><p>{t.ride.idle}</p><KindChip locale={locale} of={fact('idle-stop-mixed-evidence')} size="sm" /></div>
+            {idle.caveat && <details class="careful" data-sheet open data-shut-with-js><summary>{t.careful}</summary><p>{idle.caveat}</p></details>}
+          </li>
+          <li>
+            <p class="more__do">{t.ride.rider}</p>
+            <a class="card__link" href={href('/questions/rider/', locale)}>{t.ride.riderLink}<Icon name="arrow-right" size="1.05em" /></a>
+          </li>
+        </ul>
+      </section>
 
-  <!-- ============================================================== BUY -->
-  <Section id="buy" title={R.buy.title} lead={R.buy.lead} width="wide" tone="sunken" rule>
-    <ol class="acts">
-      <Act locale={locale} n={1} label="arithmetic" text={R.buy.a1} link={{ href: href('/electric/', locale), label: R.buy.a1Link }} />
-      <Act locale={locale} n={2} label="evidence" text={R.buy.a2} facts={['econ-taichung-subsidy-2026']} />
-      <Act locale={locale} n={3} label="evidence" text={R.buy.a3} facts={['econ-swap-vs-petrol-low-mileage']} />
-    </ol>
-    <p class="money-link"><a href={href('/electric/', locale)}>{t.money.link}<Icon name="arrow-right" size="1.05em" /></a></p>
-  </Section>
+      <!-- ============================================================ COMMUNITY -->
+      <section class="card" id="community" aria-labelledby="community-t">
+        <h2 class="card__t" id="community-t">{t.community.title}</h2>
+        <div class="first">
+          <p class="first__kicker">{t.first}</p>
+          <p class="first__do">{t.community.top}</p>
+          <a class="card__link card__link--primary" href={href('/print/poster/', locale)}>{t.community.topLink}<Icon name="arrow-right" size="1.05em" /></a>
+        </div>
+        <h3 class="more__t">{t.more}</h3>
+        <ul class="more">
+          <li>
+            <p class="more__do">{t.community.charge}</p>
+            <a class="card__link" href="#committee">{t.community.chargeLink}<Icon name="arrow-down" size="1.05em" /></a>
+          </li>
+          <li>
+            <p class="more__do">{t.community.crossing}</p>
+            <div class="more__why has-chip"><p>{fill(t.community.crossingWhy, { gap: turnGapCm })}</p><KindChip locale={locale} of={fact('marking-rules-turn-box')} size="sm" /></div>
+          </li>
+          <li>
+            <p class="more__do">{t.community.notice}</p>
+          </li>
+        </ul>
+      </section>
 
-  <!-- ============================================================== KEEP (not this year) -->
-  <Section id="keep" width="wide" rule>
-    <p class="eyebrow">{R.keep.title}</p>
-    <h2 class="h2 keep__h"><Phrased text={R.keep.headline} /></h2>
-    <p class="lead">{R.keep.lead}</p>
-    <ol class="acts">
-      <Act locale={locale} n={1} label="evidence" text={R.keep.a1} facts={['ef-older-phase-tsai2018', 'ef-mileage-co-tsai2018']} why={R.keep.a1Why} />
-      <Act locale={locale} n={2} label="evidence" text={R.keep.a2} facts={['two-stroke-idle-hc-lin2006', 'two-stroke-remaining']}>
-        <Fragment slot="why">
-          <Claim locale={locale} facts={['two-stroke-idle-hc-lin2006']} size="sm" />
-          <Claim locale={locale} facts={['two-stroke-remaining']} size="sm" />
-        </Fragment>
-      </Act>
-      <Act locale={locale} n={3} label="request" text={fill(R.keep.a3, { nextYear })} link={{ href: '#letter', label: R.keep.a3Link }} />
-      <Act locale={locale} n={4} label="evidence" text={R.keep.a4} facts={['idle-stop-mixed-evidence']}>
-        <Fragment slot="why"><Claim locale={locale} facts={['idle-stop-mixed-evidence']} size="sm" /></Fragment>
-      </Act>
-    </ol>
+      <!-- ============================================================ POLICY -->
+      <section class="card card--wide" id="policy" aria-labelledby="policy-t">
+        <h2 class="card__t" id="policy-t">{t.policy.title}</h2>
+        <div class="first">
+          <p class="first__kicker">{t.first}</p>
+          <p class="first__do">{fill(t.policy.top, { nextYear })}</p>
+          <p class="first__why">
+            {fill(t.policy.topWhy, { nextYear })}
+          </p>
+        </div>
 
-    <Figure
-      locale={locale}
-      title={fill(R.keep.waffle.title, { total: per100Total, absent: per100.absent })}
-      subtitle={fill(R.keep.waffle.subtitle, { year: inspectYear, total: per100Total })}
-      badge="derived"
-      class="keep__fig"
-    >
-      <WaffleChart
-        locale={locale}
-        title={R.keep.waffle.chart}
-        desc={fill(R.keep.waffle.desc, { total: per100Total, ...per100 })}
-        parts={[
-          { value: per100.passed, label: R.keep.waffle.passed, tone: 'clean' },
-          { value: per100.failed, label: R.keep.waffle.failed, tone: 'exhaust' },
-        ]}
-        restLabel={R.keep.waffle.absent}
-        total={per100Total}
-        categoryLabel={R.keep.waffle.category}
-        valueLabel={fill(R.keep.waffle.value, { total: per100Total })}
-      />
-      <Fragment slot="caption">
-        {per100Fact.caveat}
-        {waffleCaveats.map((c) => <><br />{c.text}</>)}
-      </Fragment>
-      <Fragment slot="source">{sourcesOf(['inspection-2025-per-100', 'inspection-2025']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-
-    <div class="watch">
-      <h3 class="tool__t">{R.keep.watchTitle}</h3>
-      <p class="watch__status"><b>{R.keep.watchStatus}</b></p>
-      <MoneyBanner locale={locale} />
-      <SubsidyTimeline locale={locale} />
-      <p>{R.keep.watch}</p>
-    </div>
-  </Section>
-
-  <!-- ============================================================== PARENTS -->
-  <Section id="parents" title={R.parents.title} lead={R.parents.lead} width="wide" tone="sunken" rule>
-    <div class="known">
-      <h3 class="tool__t">{R.parents.known}</h3>
-      <Claim locale={locale} facts={['who-children-vulnerable']} />
-      <Claim locale={locale} text={fill(R.parents.stroller, stroller)} facts={['stroller-height-review', 'pram-height-sharma2020']} />
-      <Claim locale={locale} text={lg('gap-tw-child-height', locale).statement} gaps={['gap-tw-child-height']} />
-    </div>
-    <ol class="acts">
-      <Act locale={locale} n={1} label="inference" text={R.parents.a1} why={R.parents.a1Why} whyFacts={['first-metre-sharma-kumar-2018']} />
-      <Act locale={locale} n={2} label="inference" text={R.parents.a2}>
-        <Fragment slot="why"><Claim locale={locale} facts={['traffic-near-school-kumar2017-pram']} size="sm" /></Fragment>
-      </Act>
-      <Act locale={locale} n={3} label="request" text={R.parents.a3} link={{ href: href('/print/poster/', locale), label: R.parents.a3Link }} />
-      <Act locale={locale} n={4} label="evidence" text={R.parents.a4} facts={['econ-taichung-subsidy-2026']} link={{ href: href('/electric/', locale), label: R.parents.a4Link }} />
-    </ol>
-  </Section>
-
-  <!-- ============================================================== NEIGHBOURHOOD -->
-  <Section id="neighbourhood" title={R.neighbourhood.title} lead={R.neighbourhood.lead} width="wide" rule>
-    <ol class="acts">
-      <Act locale={locale} n={1} label="request" text={R.neighbourhood.a1} link={{ href: href('/unmeasured/#ask', locale), label: R.neighbourhood.a1Link }} />
-      <Act locale={locale} n={2} label="request" text={R.neighbourhood.a2}>
-        <Fragment slot="why">
-          <Claim locale={locale} facts={['pedestrian-facilities-act-2024']} size="sm" />
-          <Claim locale={locale} facts={['marking-rules-turn-box']} size="sm" />
-          <Claim locale={locale} facts={['iot-setback-measured']} size="sm" />
-        </Fragment>
-      </Act>
-      <Act locale={locale} n={3} label="request" text={R.neighbourhood.a3} facts={['two-stroke-remaining', 'inspection-2025']} />
-      <Act locale={locale} n={4} label="request" text={R.neighbourhood.a4} link={{ href: '#committee', label: R.neighbourhood.a4Link }} />
-    </ol>
-
-    <Figure
-      locale={locale}
-      title={fill(R.neighbourhood.plan.title, { gap: turnGapCm })}
-      subtitle={R.neighbourhood.plan.subtitle}
-      badge="official-tw"
-      frame="none"
-      class="plan-fig"
-    >
-      <ApproachPlan locale={locale} />
-      <Fragment slot="source">{sourcesOf(['marking-rules-turn-box']).map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
-    </Figure>
-
-    <div class="cards">
-      <Card title={R.neighbourhood.posterTitle} href={href('/print/poster/', locale)} level={3}>
-        <p>{R.neighbourhood.posterBody}</p>
-      </Card>
-    </div>
-
-    <div class="tool" id="committee">
-      <h3 class="tool__t">{R.neighbourhood.noteTitle}</h3>
-      <p class="honest">{R.neighbourhood.noteHonest}</p>
-      <Composer
-        locale={locale}
-        id="committee-note"
-        title={R.neighbourhood.noteTitle}
-        fields={[
-          { key: 'building', label: R.neighbourhood.noteBuilding },
-          { key: 'name', label: R.neighbourhood.noteName },
-        ]}
-        subject={R.neighbourhood.noteSubject}
-        body={R.neighbourhood.note}
-        labels={{ ...composerLabels, copy: R.neighbourhood.noteCopy, fields: R.neighbourhood.noteFields }}
-      />
-    </div>
-  </Section>
-
-  <!-- ============================================================== POLICY -->
-  <Section id="policy" title={R.policy.title} lead={R.policy.lead} width="wide" tone="sunken" rule>
-    <ol class="acts">
-      <Act locale={locale} n={1} label="request" text={fill(R.policy.a1, { nextYear })} />
-      <Act locale={locale} n={2} label="request" text={R.policy.a2} link={{ href: href('/unmeasured/#plan', locale), label: R.policy.a2Link }} />
-      <Act locale={locale} n={3} label="evidence" text={R.policy.a3} facts={['apca-maintenance-zones', 'pedestrian-facilities-act-2024']} />
-    </ol>
-    <div class="watch">
-      <p class="watch__status"><b>{R.policy.status}</b></p>
-      <MoneyBanner locale={locale} />
-    </div>
-  </Section>
-
-  <Section id="asks" eyebrow={t.asks.eyebrow} title={t.asks.title} lead={t.asks.lead} width="wide" rule>
-    <ol class="asks">
-      {
-        t.asks.items.map((a, i) => {
-          const fs = askFacts[i];
-          return (
+        <h3 class="more__t" id="asks">{t.policy.asksTitle}</h3>
+        <p class="asks__lead">{t.policy.asksLead}</p>
+        <ol class="asks">
+          {t.policy.asks.map((a, i) => (
             <li class="ask">
               <span class="ask__n" aria-hidden="true">{i + 1}</span>
               <div class="ask__body">
-                <p class="ask__text">
-                  {fill(a.ask, askVars)}
-                  {sourcesOf(fs).map((c) => <Cite locale={locale} id={c.id} n={c.n} />)}
+                <div class="ask__text has-chip">
+                  <p>{fill(a.ask, askVars)}</p>
+                  {askFacts[i].length > 0 && <KindChip locale={locale} of={fact(askFacts[i][0])} size="sm" />}
+                </div>
+                <p class="ask__label">
+                  <span class="ask__label-l">{t.policy.to}</span>
+                  {a.to}
                 </p>
-                <p class="ask__tags">
-                  <Tag>{t.labels.request}</Tag>
-                  {badgesFor(fs).map((b) => <EvidenceBadge locale={locale} kind={b.kind} secondary={b.secondary} />)}
-                  {askPosition[i] && <Tag tone="signal">{t.asks.position}</Tag>}
-                </p>
-                <p class="ask__to">
-                  <span class="ask__to-l">{t.asks.to}</span> {a.to}
-                  {askUnconfirmed[i] && <> <Tag tone="exhaust">{t.asks.unconfirmed}</Tag></>}
-                </p>
+                {i === 5 && <p class="ask__label">{t.policy.position}</p>}
               </div>
             </li>
-          );
-        })
-      }
-    </ol>
+          ))}
+        </ol>
 
-    <div class="tool" id="letter">
-      <h3 class="tool__t">{t.letter.title}</h3>
-      <p>{t.letter.lead}</p>
-      <Composer
-        locale={locale}
-        id="councillor-letter"
-        title={t.letter.title}
-        fields={[
-          { key: 'name', label: t.letter.name },
-          { key: 'city', label: t.letter.city },
-        ]}
-        subject={fill(t.letter.subject, { nextYear })}
-        body={fill(t.letter.body, { nextYear })}
-        labels={{ ...composerLabels, copy: t.letter.copy, fields: t.letter.fields }}
-      />
+        <Figure locale={locale} title={t.policy.chart.title} subtitle={t.policy.chart.subtitle} badge="official-tw" class="ev-fig">
+          <EvShareChart
+            locale={locale}
+            title={t.policy.chart.chart}
+            desc={chartDesc}
+            years={years}
+            actual={years.map((y) => actual.points.find((p) => Number(p.x) === y)?.y ?? null)}
+            targets={targets}
+            labels={{ first: { x: Number(first.x), y: first.y!, text: `${pct(first.y!)}%` }, last: { x: Number(last.x), y: last.y!, text: `${pct(last.y!)}%` } }}
+            format={(v: number) => `${pct(v)}%`}
+            names={{ actual: t.policy.chart.actual, target: t.policy.chart.target, year: t.policy.chart.year }}
+          />
+          <Fragment slot="caption">{chartCaveats.map((c, i) => <>{i > 0 && <br />}{c.text}</>)}</Fragment>
+          <Fragment slot="source">{chartCites.map((c) => <Cite locale={locale} id={c.id} n={c.n} variant="chip" />)}</Fragment>
+        </Figure>
+        <a class="card__link" href="#letter">{t.letter.title}<Icon name="arrow-down" size="1.05em" /></a>
+      </section>
+
+      <!-- ============================================================ MEASURE -->
+      <section class="card card--measure" id="measure" aria-labelledby="measure-t">
+        <h2 class="card__t" id="measure-t">{t.measure.title}</h2>
+        <p class="measure__k">{kSentences.K1[locale]}</p>
+        <p class="measure__p">{t.measure.body}</p>
+        <a class="card__link card__link--primary" href={href('/estimate/#measure', locale)}>{t.measure.link}<Icon name="arrow-right" size="1.05em" /></a>
+      </section>
     </div>
-  </Section>
+
+    <!-- ============================================================ LETTERS -->
+    <section class="letters container container--wide" id="letters" aria-labelledby="letters-t">
+      <h2 class="letters__t" id="letters-t">{t.letters.title}</h2>
+      <p class="letters__lead">{t.letters.lead}</p>
+
+      <div class="letter" id="letter">
+        <h3 class="letter__t">{t.letter.title}</h3>
+        <p>{t.letter.lead}</p>
+        <Composer
+          locale={locale}
+          id="councillor-letter"
+          title={t.letter.title}
+          fields={[
+            { key: 'name', label: t.letter.name },
+            { key: 'city', label: t.letter.city, hint: t.letter.cityHint, autocomplete: 'address-level1' },
+            { key: 'sender', label: t.letter.sender, autocomplete: 'name' },
+            { key: 'contact', label: t.letter.contact, autocomplete: 'email' },
+          ]}
+          subject={fill(t.letter.subject, { nextYear })}
+          body={fill(t.letter.body, { nextYear, sites: est.meas.iot.sites.value })}
+          labels={{ ...composerLabels, copy: t.letter.copy, fields: t.letter.fields }}
+        />
+      </div>
+
+      <div class="letter" id="committee">
+        <h3 class="letter__t">{t.note.title}</h3>
+        <p class="letter__honest">{t.note.honest}</p>
+        <Composer
+          locale={locale}
+          id="committee-note"
+          title={t.note.title}
+          fields={[
+            { key: 'building', label: t.note.building },
+            { key: 'name', label: t.note.name, autocomplete: 'name' },
+          ]}
+          subject={t.note.subject}
+          body={t.note.body}
+          labels={{ ...composerLabels, copy: t.note.copy, fields: t.note.fields }}
+        />
+      </div>
+    </section>
+  </div>
 </Base>
 
+<script>
+  // "What to be careful about" is open without JavaScript (every sheet's content shows, brief
+  // 9.3 check 15) and starts closed with it, like the HowSheet fallback.
+  document.querySelectorAll<HTMLDetailsElement>('details[data-shut-with-js]').forEach((d) => (d.open = false));
+</script>
+
 <style>
-  .act-deck {
-    max-inline-size: 40rem;
+  .act {
+    padding-block-end: var(--sp-8);
   }
-  .act-hero :global(.display) {
-    margin-block: var(--sp-2) var(--sp-4);
+  .act-hero {
+    padding-block: var(--sp-6) var(--sp-5);
   }
-  .legend {
-    margin-block-start: var(--sp-6);
-    padding: var(--sp-4);
-    border: 2px solid var(--line-strong);
-    border-radius: var(--radius-2);
-    max-inline-size: 44rem;
+  .act-hero__t {
+    margin-block: var(--sp-2) var(--sp-3);
   }
-  .legend__t {
-    font-size: var(--fs-md);
-    margin: 0 0 var(--sp-3);
-  }
-  .legend__list {
-    list-style: none;
+  .act-hero__deck {
     margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--sp-3);
-  }
-  .legend__list li {
-    display: grid;
-    gap: var(--sp-1);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
-  }
-  .legend__b {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-2);
+    max-inline-size: 38rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
   }
   .jump {
     margin-block-start: var(--sp-5);
   }
   .jump__label {
+    margin: 0 0 var(--sp-2);
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
-    margin: 0 0 var(--sp-2);
+    color: var(--ink-2);
   }
   .jump ul {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
-  }
-  .jump li {
-    flex: 1 1 9rem;
-    max-inline-size: 100%;
-  }
-  @media (min-width: 48em) {
-    .jump li {
-      flex: 0 1 auto;
-    }
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--tap-gap, 0.5rem);
   }
   .jump a {
-    block-size: 100%;
-    box-sizing: border-box;
     display: flex;
     align-items: center;
-    min-block-size: 44px;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    min-block-size: var(--tap, 3rem);
     padding: var(--sp-2) var(--sp-3);
     border: 2px solid var(--ink);
     border-radius: var(--radius-2);
-    font-weight: var(--fw-bold);
-    text-decoration: none;
+    background: var(--surface);
     color: var(--ink);
-    line-height: var(--lh-snug);
+    font-size: var(--fs-btn, 1.0625rem);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
+    text-decoration: none;
   }
   .jump a:hover {
     background: var(--bg-sunken);
   }
-  .acts {
+  .jump a :global(svg) {
+    flex: none;
+  }
+
+  .cards {
+    display: grid;
+    gap: var(--sp-5);
+  }
+  @media (min-width: 56em) {
+    .cards {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+    .card--wide,
+    .card--measure {
+      grid-column: 1 / -1;
+    }
+  }
+  .card {
+    scroll-margin-block-start: calc(var(--header-h, 48px) + var(--sp-3));
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+    min-inline-size: 0;
+    padding: var(--sp-5) var(--sp-4);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-3, 12px);
+    background: var(--surface);
+  }
+  @media (min-width: 40em) {
+    .card {
+      padding: var(--sp-5);
+    }
+  }
+  .card p {
+    margin: 0;
+  }
+  .card__t {
+    margin: 0;
+    font-size: var(--fs-headline, 1.6875rem);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-headline, 1.28);
+    text-wrap: balance;
+  }
+  .first {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-radius: var(--radius-2);
+    background: var(--bg-sunken);
+    border-inline-start: 6px solid var(--clean);
+  }
+  .first__kicker {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+  }
+  .first__do {
+    font-size: 1.3125rem;
+    font-weight: var(--fw-black);
+    line-height: 1.45;
+  }
+  .first__why,
+  .first__mask,
+  .more__why,
+  .more__do {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
+  }
+  .first__mask {
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    font-weight: var(--fw-bold);
+  }
+  .has-chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+  .has-chip > p {
+    flex: 1 1 100%;
+    margin: 0;
+  }
+  .card__link {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-block-size: var(--tap, 3rem);
+    padding: 0 var(--sp-3);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    color: var(--ink);
+    background: var(--surface);
+    font-size: var(--fs-btn, 1.0625rem);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+  }
+  .card__link:hover {
+    background: var(--bg-sunken);
+  }
+  .card__link--primary {
+    background: var(--go-ink-bg, var(--clean));
+    border-color: var(--go-ink-bg, var(--clean));
+    color: #fff;
+  }
+  .card__link--primary:hover {
+    background: var(--go-ink-bg, var(--clean));
+    filter: brightness(1.08);
+  }
+  .more__t {
+    margin: var(--sp-2) 0 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .more {
     list-style: none;
     margin: 0;
     padding: 0;
+    display: grid;
   }
-  .keep__h {
-    margin-block: var(--sp-2) var(--sp-3);
+  .more > li {
+    display: grid;
+    gap: var(--sp-2);
+    padding-block: var(--sp-3);
+    border-block-start: 1px solid var(--line);
   }
-  .tool,
-  .watch,
-  .known {
-    margin-block-start: var(--sp-6);
+  .more > li:first-child {
+    border-block-start: 0;
+    padding-block-start: 0;
+  }
+  .more__do {
+    font-weight: var(--fw-bold);
+  }
+  .more__why {
+    color: var(--ink);
+  }
+  .careful summary {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    list-style: none;
+    min-block-size: var(--tap, 3rem);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .careful summary::-webkit-details-marker {
+    display: none;
+  }
+  .careful summary::before {
+    content: '';
+    inline-size: 0.5em;
+    block-size: 0.5em;
+    border-inline-end: 2px solid currentColor;
+    border-block-end: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 0.15s;
+  }
+  .careful[open] summary::before {
+    transform: rotate(45deg);
+  }
+  .careful p {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
+    color: var(--ink);
+  }
+  .ev-fig :global(.cite-chip) {
+    margin: 4px;
+  }
+  .msg {
     display: grid;
     gap: var(--sp-3);
+    margin-block-start: var(--sp-2);
   }
-  .tool__t {
+  .msg__t {
     margin: 0;
-    font-size: var(--fs-lg);
-  }
-  .tool__p,
-  .watch p {
-    margin: 0;
-  }
-  .honest {
-    margin: 0;
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
+    color: var(--ink-2);
   }
-  .money-link {
-    margin-block-start: var(--sp-4);
-    font-weight: var(--fw-bold);
-  }
-  .keep__fig,
-  .plan-fig {
-    margin-block-start: var(--sp-6);
-  }
-  .cards {
-    margin-block-start: var(--sp-6);
-    max-inline-size: 28rem;
+
+  .asks__lead {
+    font-size: var(--fs-base);
   }
   .asks {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: var(--sp-4);
+    gap: var(--sp-3);
   }
   .ask {
     display: grid;
-    grid-template-columns: 2.25rem 1fr;
+    grid-template-columns: 2rem minmax(0, 1fr);
     gap: var(--sp-3);
-    padding: var(--sp-4);
-    border: 2px solid var(--line-strong);
-    border-radius: var(--radius-2);
-    background: var(--surface);
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
   }
   .ask__n {
     font-family: var(--font-en-display, var(--font-heading));
     font-weight: var(--fw-black);
-    font-size: var(--fs-2xl);
+    font-size: 1.75rem;
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
   .ask__body {
     display: grid;
-    gap: var(--sp-2);
-    min-inline-size: 0;
-  }
-  .ask__body p {
-    margin: 0;
+    gap: var(--sp-1);
   }
   .ask__text {
-    font-size: var(--fs-md);
+    font-size: var(--fs-base);
     font-weight: var(--fw-bold);
-    line-height: var(--lh-snug);
+    line-height: 1.55;
   }
-  .ask__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-2);
-  }
-  .ask__to {
+  .ask__label {
     font-size: var(--fs-sm);
     color: var(--ink-2);
-    line-height: var(--lh-snug);
+    line-height: 1.5;
   }
-  .ask__to-l {
+  .ask__label-l {
     font-weight: var(--fw-bold);
     color: var(--ink);
+    margin-inline-end: 0.4em;
+  }
+  .ev-fig {
+    margin-block-start: var(--sp-3);
+  }
+
+  .card--measure {
+    border-style: dashed;
+    border-color: var(--estimate, var(--line-strong));
+  }
+  .measure__k {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-read, 1.6);
+  }
+  .measure__p {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
+  }
+
+  .letters {
+    margin-block-start: var(--sp-7, 3rem);
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .letters__t {
+    margin: 0;
+    font-size: var(--fs-headline, 1.6875rem);
+    font-weight: var(--fw-black);
+  }
+  .letters__lead,
+  .letter p {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
+  }
+  .letter {
+    scroll-margin-block-start: calc(var(--header-h, 48px) + var(--sp-3));
+    display: grid;
+    gap: var(--sp-3);
+    padding-block-start: var(--sp-4);
+    border-block-start: 2px solid var(--line-strong);
+  }
+  .letter__t {
+    margin: 0;
+    font-size: 1.3125rem;
+    font-weight: var(--fw-black);
+  }
+  .letter__honest {
+    font-weight: var(--fw-bold);
   }
 </style>

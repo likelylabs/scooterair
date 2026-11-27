@@ -1,0 +1,52 @@
+---
+/**
+ * IllustrationTag — the tag every drawn scene carries, as HTML at 14 px or more (brief 5.1):
+ * 示意圖｜廢氣其實大多看不見 / Illustration: real exhaust is mostly invisible.
+ * <Screen illustration> prints it on its picture; use this component for a scene anywhere else
+ * (a question page figure, the poster). Scene components do not print the tag themselves.
+ *
+ * Props
+ *   locale  Locale
+ *   kind    'street' (default: the tag above) | 'body' (示意圖・不是醫學圖)
+ *   overlay true = sit on the picture's bottom-left corner (the parent must be position: relative)
+ */
+import type { Locale } from '@/i18n';
+import { illustration } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  kind?: 'street' | 'body';
+  overlay?: boolean;
+  class?: string;
+}
+const { locale, kind = 'street', overlay = false, class: cls } = Astro.props;
+---
+
+<p class:list={['ill-tag', overlay && 'ill-tag--overlay', cls]} data-illustration-tag>{kind === 'body' ? illustration.body[locale] : illustration.tag[locale]}</p>
+
+<style>
+  .ill-tag {
+    display: inline-block;
+    margin: 0;
+    padding: 0.15em 0.55em;
+    border-radius: var(--radius-1);
+    background: var(--surface);
+    color: var(--ink-2);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.5;
+  }
+  .ill-tag--overlay {
+    position: absolute;
+    inset-block-end: 0.5rem;
+    inset-inline-start: 0.5rem;
+    max-inline-size: calc(100% - 1rem);
+    /* a see-through plate: the picture stays visible, the words stay 7:1 */
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+  }
+  @media (forced-colors: active) {
+    .ill-tag {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

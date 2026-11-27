@@ -1,4 +1,4 @@
-// Copy for /sources/ (blueprint 4.8): the full bibliography from the registry. Every count is
+// Copy for /sources/ (redesign brief 7.4; blueprint 4.8): the reference list. Every count is
 // filled in at render time from src/data. See ./_copy.ts.
 
 import { copy } from './_copy.ts';
@@ -15,10 +15,10 @@ export default copy({
     kicker: { 'zh-TW': '資料來源', en: 'Sources' },
     title: { 'zh-TW': '每一個數字，|都從這裡來', en: 'Every number |starts here' },
     lead: {
-      'zh-TW': '這裡列出網站用到的全部 {n} 個來源。每一個有固定的編號，網站上的來源標記都連到這裡。每一筆都寫著我們讀到哪裡，以及網站用它說了什麼。',
-      en: 'Here are all {n} sources the site uses. Each has a fixed number, and every citation marker on the site links here. Each entry says how far we read it and what the site says on the strength of it.',
+      'zh-TW': '這裡列出網站用到的全部 {n} 個來源，包括本站推估和口罩說明用到的。每一個有固定的編號，網站上的來源標記都連到這裡。每一筆都寫著我們讀到哪裡，以及網站用它說了什麼。',
+      en: 'Here are all {n} sources the site uses, including those behind our estimate and the mask facts. Each has a fixed number, and every citation marker on the site links here. Each entry says how far we read it and what the site says on the strength of it.',
     },
-    evidence: { 'zh-TW': '想看每一項證據怎麼接起來，請到證據鏈。', en: 'To see how each piece of evidence fits together, go to the chain.' },
+    evidence: { 'zh-TW': '想看每一項證據怎麼接起來，請到證據頁。', en: 'To see how each piece of evidence fits together, go to the evidence page.' },
     evidenceLink: { 'zh-TW': '證據鏈，一環一環看', en: 'The chain, link by link' },
   },
   reads: {
@@ -35,7 +35,7 @@ export default copy({
     kind: { 'zh-TW': '來源類型', en: 'Kind of source' },
     all: { 'zh-TW': '全部', en: 'All' },
     none: { 'zh-TW': '不在鏈上', en: 'Outside the chain' },
-    linkN: { 'zh-TW': '第 {n} 環', en: 'Link {n}' },
+    estimate: { 'zh-TW': '推估用到的', en: 'Used by our estimate' },
     showing: { 'zh-TW': '顯示 {n} 個來源，共 {total} 個', en: 'Showing {n} of {total} sources' },
     hint: {
       'zh-TW': '選了之後，下面只留下符合的來源。兩組可以一起用。',
@@ -45,32 +45,23 @@ export default copy({
   entry: {
     open: { 'zh-TW': '開啟原文', en: 'Open the original' },
     doi: { 'zh-TW': 'DOI', en: 'DOI' },
-    read: { 'zh-TW': '我們讀到：', en: 'How we read it:' },
-    checked: { 'zh-TW': '查核日期：{date}', en: 'Checked: {date}' },
+    read: { 'zh-TW': '閱讀程度：', en: 'How we read it:' },
+    // the same date the citation gives as 檢索日期 / Accessed: one name for it
+    checked: { 'zh-TW': '檢索日期：{date}', en: 'Accessed: {date}' },
     descriptive: { 'zh-TW': '描述，不是原標題', en: 'A description, not the title' },
     descriptiveHelp: {
-      'zh-TW': '我們的研究筆記沒有記下這篇的原標題。方括號裡是我們寫的描述；請用作者、期刊和連結找到原文。',
-      en: 'Our research notes did not record this item’s title. The words in square brackets are our description; use the authors, journal and link to find the original.',
+      'zh-TW': '我們的研究筆記沒有記下這篇的原標題。方括號裡是我們寫的描述；請用作者或發布單位、出版處和連結找到原文。',
+      en: 'Our research notes did not record this item’s title. The words in square brackets are our description; use the author or publisher, where it was published, and the link to find the original.',
     },
     links: { 'zh-TW': '用在：', en: 'Used in:' },
-    linkN: { 'zh-TW': '第 {n} 環', en: 'link {n}' },
-    noLink: { 'zh-TW': '寫作規則與背景', en: 'writing rules and background' },
+    noLink: { 'zh-TW': '背景資料', en: 'background' },
     uses: { 'zh-TW': '網站用它說的事（{n}）', en: 'What the site says on its strength ({n})' },
     facts: { 'zh-TW': '事實', en: 'Facts' },
     series: { 'zh-TW': '圖表資料', en: 'Chart data' },
-    gaps: { 'zh-TW': '沒人量過的空白', en: 'Recorded gaps' },
-    rules: { 'zh-TW': '寫作規則（我們不會說的話）', en: 'Writing rules (what we will not say)' },
+    answers: { 'zh-TW': '回答了哪些問題', en: 'Questions it helps answer' },
+    estimate: { 'zh-TW': '本站的推估', en: 'Our estimate' },
+    electric: { 'zh-TW': '電動機車試算和各縣市補助', en: 'The electric-scooter calculator and local subsidies' },
     number: { 'zh-TW': '來源 {n}', en: 'Source {n}' },
-  },
-  gaps: {
-    title: { 'zh-TW': '查過、沒找到的事', en: 'Searched for, not found' },
-    lead: {
-      'zh-TW': '「沒人量過」也是一筆可以引用的紀錄。下面每一筆寫著我們查的是什麼、查找的日期，以及誰量得出來。',
-      en: '“Nobody has measured this” is a record you can cite too. Each entry says what we searched for, when, and who could measure it.',
-    },
-    searched: { 'zh-TW': '查找日期：{date}', en: 'Searched: {date}' },
-    who: { 'zh-TW': '誰量得出來：', en: 'Who could measure it: ' },
-    more: { 'zh-TW': '在證據鏈上看這一格', en: 'See this gap on the chain' },
   },
   top: { 'zh-TW': '回到篩選', en: 'Back to the filter' },
 });

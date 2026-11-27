@@ -70,7 +70,8 @@ export function headlineClasses(css) {
     for (const sel of m[1].split(',')) {
       // the last compound selector names the element that gets the family
       const last = sel.trim().split(/[\s>+~]+/).pop() ?? '';
-      for (const c of last.matchAll(/\.([\w-]+)/g)) out.add(c[1]);
+      // (an Astro scoping class, astro-xxxxxxxx, marks every element of a component: never the headline)
+      for (const c of last.matchAll(/\.([\w-]+)/g)) if (!/^astro-[a-z0-9]+$/.test(c[1])) out.add(c[1]);
     }
   }
   return out;

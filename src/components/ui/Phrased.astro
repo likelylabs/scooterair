@@ -9,13 +9,23 @@
  *         zh: "等紅燈的時候，|我們吸進了什麼"   en: "What we breathe |at the red light"
  *         (in English keep the normal space next to the bar)
  *
+ *   locale (optional) on English pages, Chinese runs inside the text get lang="zh-Hant-TW"
+ *
  * Renders inline spans only: put it inside your own heading element.
  *   <h1 class="display"><Phrased text={t.headline} /></h1>
  */
+import type { Locale } from '@/i18n';
+import { langHtml } from '@/i18n/ui';
+
 interface Props {
   text: string;
+  locale?: Locale;
 }
-const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// A closing mark never starts a line on its own: the character before it and the mark stay
+// together (「警報器，」 never leaves 「，」 alone at 320 px 特大). Applied to text, never inside tags.
+const GLUE = /([\u3400-\u9fff])([，。？！；：、）」』〉》…]+)/g;
+const glue = (html: string) => html.split(/(<[^>]+>)/).map((x) => (x.startsWith('<') ? x : x.replace(GLUE, '<span class="nobr">$1$2</span>'))).join('');
+const esc = (s: string) => glue(langHtml(s, Astro.props.locale ?? 'zh-TW'));
 const parts = Astro.props.text.split('|');
 const html = parts
   .map((p, i) => {

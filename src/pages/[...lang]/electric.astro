@@ -2,7 +2,7 @@
 /**
  * /electric/ — 換電動，把帳攤開 / Going electric: the full bill (blueprint 4.3).
  *
- * The answer first, then the reader's own sums (#status, #calc, #result), worked examples that
+ * A worked result first (ElectricOpening: the price on the day and each month, brief 7.7), then the reader's own sums (#status, #calc, #result), worked examples that
  * are complete results without JavaScript (#examples), how to get closer (#closer), the dated
  * checklist (#checklist), running costs on their own (#monthly), the honest limits (#no-socket,
  * #who, #risks), what to do if not this year (#not-yet), the 22 places (#cities), our asks
@@ -34,8 +34,10 @@ import RangePlot from '@/components/charts/RangePlot.astro';
 import GroupedBarChart from '@/components/charts/GroupedBarChart.astro';
 import Calculator from '@/components/pages/electric/Calculator.astro';
 import ElectricResult from '@/components/pages/electric/ElectricResult.astro';
+import ElectricOpening from '@/components/pages/electric/ElectricOpening.astro';
 import { afterDate, cityDetails, citeMap, data, examples, F, factIds, factValue, flagsByCity, pageLinks, runningTables, seriesIds, surveyChart, today, yearEnd } from '@/components/pages/electric/electric-data';
 import { money } from '@/components/pages/electric/model';
+import { DEFAULTS, defaultScrap } from '@/lib/home-money';
 import { formatCitation, sourcesFor, sourceUrl } from '@/data';
 import { cityMoney, formatDate, snapshot } from '@/lib/site-state.data';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
@@ -53,7 +55,7 @@ const deadline = d(yearEnd);
 const checked = d(data.meta.checkedOn);
 const filing = d(snapshot.filingEnd);
 const nf = (v: number, digits = 0) => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'zh-TW', { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(v);
-const perKm = (v: number) => `NT$ ${nf(v, 2)}`;
+const perKm = (v: number) => fill(T.fmt.perKm, { n: nf(v, 2) });
 const links = pageLinks(locale);
 
 // ---- city select (#status): every place with how far we could check it ----------------------
@@ -65,7 +67,7 @@ const statusWord = (id: JurisdictionId) => {
   if (j.status !== 'not-verified' && m.status === 'ended') return T.status.cityStatus.ended;
   return T.status.cityStatus[j.status];
 };
-const cityOptions = [{ value: '', label: T.status.cityNone }, ...ids.map((id) => ({ value: id, label: `${readerText(data.jurisdictions[id].name[locale])}${locale === 'en' ? ' (' : '（'}${statusWord(id)}${locale === 'en' ? ')' : '）'}` }))];
+const cityOptions = [...ids.map((id) => ({ value: id, label: `${readerText(data.jurisdictions[id].name[locale])}${locale === 'en' ? ' (' : '（'}${statusWord(id)}${locale === 'en' ? ')' : '）'}` }))];
 
 // ---- the calculator's settings ---------------------------------------------------------------
 const cfg = {
@@ -92,21 +94,49 @@ const cfg = {
     noCity: T.closer.noCity,
     statusNote: T.status.statusNote,
     officialLinks: T.status.officialLinks,
+    announce: T.result.announce,
+    barEmpty: T.calc.bar.empty,
+    barFix: T.calc.bar.fix,
   },
+  examples: [] as { key: string; answers: unknown; before: boolean; after: string; full: boolean }[],
+  built: today,
 };
 
 // ---- worked examples, running costs, cities, facts -------------------------------------------
 const ex = examples(locale);
+// The first worked example ships complete (it is the no-JavaScript answer too); the others ship
+// their verdict only, and the browser builds their working when one is opened, for the reader's day.
+const lazy = (i: number) => i > 0;
+cfg.examples = ex.map((x, i) => ({ key: x.key, answers: x.answers, before: !!x.before, after: afterDate, full: !lazy(i) }));
+const headOnly = (r: (typeof ex)[number]['after']['rendered'], i: number) => (lazy(i) ? { ...r, bodyHtml: '' } : r);
 const run = runningTables(locale);
 const { cities, central } = cityDetails(locale);
 const survey = surveyChart(locale);
 const fx = Object.fromEntries(factIds.map((id) => [id, F(id, locale)])) as Record<(typeof factIds)[number], ReturnType<typeof F>>;
 const badgeOf = (id: (typeof factIds)[number]) => evidenceBadge(fx[id].evidence, fx[id].confidence);
 const factSources = (id: (typeof factIds)[number]) => fx[id].citations;
-const band = run.band;
 const share = factValue('econ-ev-brand-share-2026-07', 'gogoroShare');
 const stations = factValue('econ-gogoro-network', 'stations');
 const pageSources = sourcesFor({ facts: [...factIds], series: [...seriesIds] });
+// the checklist's dates, earliest first
+const foreignDates = data.programmes.flatMap((p) => p.conditions.flatMap((c) => (c.kind === 'applicant-deadline' ? [c.date] : []))).filter((x, i, a) => a.indexOf(x) === i);
+const dateItems = [
+  { date: yearEnd, text: fill(T.checklist.dates.purchase, { date: deadline }) },
+  { date: snapshot.filingEnd, text: fill(T.checklist.dates.filing, { date: filing }) },
+  ...foreignDates.map((date) => ({ date, text: fill(T.checklist.dates.foreign, { date: d(date) }) })),
+].sort((a, b) => a.date.localeCompare(b.date));
+// places whose own money closes before the central deadline (Keelung and Kinmen: 30 November)
+const earlyByDate = new Map<string, string[]>();
+for (const p of data.programmes) {
+  if (p.jurisdiction === 'central' || p.calculator !== true || p.validTo >= yearEnd) continue;
+  const name = readerText(data.jurisdictions[p.jurisdiction as JurisdictionId].name[locale]);
+  const list = earlyByDate.get(p.validTo) ?? [];
+  if (!list.includes(name)) list.push(name);
+  earlyByDate.set(p.validTo, list);
+}
+const early = [...earlyByDate.entries()].map(([date, places]) => fill(T.risks.early, { places: places.join(locale === 'en' ? ' and ' : '、'), date: d(date) })).join(' ');
+// a row whose low and high are the same figure is one value: say it once, not 「1.64 元到 1.64 元」
+const rangeDesc = run.range.map((r) => (perKm(r.min) === perKm(r.max) ? fill(T.monthly.rangeDescOne, { label: r.label, v: perKm(r.min) }) : fill(T.monthly.rangeDescItem, { label: r.label, mid: perKm(r.mid), min: perKm(r.min), max: perKm(r.max) }))).join(locale === 'en' ? '; ' : '；');
 
 // running-cost table: one row per distance, a column per way of powering it (CompareTable stacks on phones)
 const homeCols = run.homeModels.map((m) => ({ id: m.id, label: `${T.monthly.rows.home} · ${readerText(m.name[locale]).replace(/[（(].*$/, '')} · ${T.result.plate[m.plateClass]}` }));
@@ -116,39 +146,22 @@ const useOf = (x: (typeof ex)[number]) => JSON.stringify({ ...x.answers, charge:
 const notYetBadge = (k: string) => k as EvidenceKind;
 ---
 
-<Base locale={locale} title={T.meta.title} description={T.meta.description} money>
+<Base locale={locale} title={T.meta.title} description={T.meta.description} share="money" money>
   <header class="el-head">
     <div class="container container--wide el-head__inner">
       <p class="eyebrow">{T.head.eyebrow}</p>
       <h1 class="display el-title"><Phrased text={T.head.title} /></h1>
       <p class="lead">{T.head.lead}</p>
 
-      <div class="el-answer-first" aria-labelledby="answer-title">
-        <h2 id="answer-title" class="el-answer-first__title">{T.answer.title}</h2>
-        <p>{T.answer.body}</p>
-        {band && <p data-money-when="A B C D static">{fill(T.answer.monthly, { low: nf(band.low), high: nf(band.high) })}</p>}
-        <p data-money-when="B C D" class="el-answer-first__after">{fill(T.answer.after, { deadline, checked })}</p>
-        <p data-money-when="static" class="el-answer-first__after">{fill(T.answer.staticNote, { deadline, checked })}</p>
-        <div data-money-when="A static">
-          <div class="el-actions">
-            <Button href="#calc" size="lg" data-js-only>{T.answer.calcLink}</Button>
-            <Button href="#examples" variant="secondary" size="lg">{T.answer.examplesLink}</Button>
-            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
-          </div>
+      <ElectricOpening locale={locale} />
+      <div data-money-when="B">
+        <div class="el-actions">
+          <Button href="#checklist" variant="secondary" size="lg">{T.answer.boughtLink}</Button>
         </div>
-        <div data-money-when="B">
-          <div class="el-actions">
-            <Button href="#checklist" size="lg">{T.answer.boughtLink}</Button>
-            <Button href="#calc" variant="secondary" size="lg">{T.answer.noSubsidyLink}</Button>
-            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
-          </div>
-        </div>
-        <div data-money-when="C D">
-          <div class="el-actions">
-            <Button href={href('/act/#policy', locale)} size="lg">{T.answer.askLink}</Button>
-            <Button href="#calc" variant="secondary" size="lg">{T.answer.noSubsidyLink}</Button>
-            <Button href="#not-yet" variant="secondary" size="lg">{T.answer.notNowLink}</Button>
-          </div>
+      </div>
+      <div data-money-when="C D">
+        <div class="el-actions">
+          <Button href={href('/act/#policy', locale)} variant="secondary" size="lg">{T.answer.askLink}</Button>
         </div>
       </div>
     </div>
@@ -159,7 +172,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     <div class="el-status">
       <div class="stack" style="--stack: var(--sp-4)">
         <div data-js-only>
-          <Select id="el-city" label={T.status.cityLabel} options={cityOptions} value="" hint={T.status.cityHint} data-money-city />
+          <Select id="el-city" label={T.status.cityLabel} options={cityOptions} value={DEFAULTS.county} hint={T.status.cityHint} data-money-city />
         </div>
         <MoneyBanner locale={locale} tone="box" />
         <div class="el-citynote" data-el-citynote hidden></div>
@@ -172,40 +185,12 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   <Section id="calc" title={T.calc.title} width="wide">
     <p id="el-calc-lead" class="el-calc-lead" data-js-only>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[0]}<span data-money-fill="today">{d(today)}</span>{fill(T.calc.lead, { date: '\u0000', checked }).split('\u0000')[1]}</p>
     <div class="el-calc-grid">
-      <Calculator locale={locale} cfg={cfg} today={today} />
+      <Calculator locale={locale} cfg={cfg} today={today} cityOptions={cityOptions} defaults={{ county: DEFAULTS.county, km: DEFAULTS.km, scrap: defaultScrap(today) }} />
     </div>
   </Section>
 
-  <!-- Worked examples: complete results without JavaScript, on both sides of the deadline -->
-  <Section id="examples" title={T.examples.title} lead={T.examples.lead} width="wide" tone="sunken">
-    <Tabs label={T.examples.tabsLabel}>
-      {ex.map((x) => (
-        <TabPanel id={`example-${x.key}`} label={x.tab}>
-          <div class="el-example">
-            <p class="el-example__who">{x.who}</p>
-            {x.before && (
-              <div data-money-when="A static">
-                <div class="el-example__phase">
-                  <h4 class="el-example__when">{fill(T.examples.before, { deadline, checked })}</h4>
-                  <ElectricResult id={`ex-${x.key}-a`} locale={locale} rendered={x.before.rendered} city={x.answers.jurisdiction} />
-                </div>
-              </div>
-            )}
-            <div data-money-when={x.before ? 'B C D static' : 'A B C D static'}>
-              <div class="el-example__phase">
-                <h4 class="el-example__when">{fill(T.examples.after, { from: d(afterDate) })}</h4>
-                <ElectricResult id={`ex-${x.key}-c`} locale={locale} rendered={x.after.rendered} city={x.answers.jurisdiction} />
-              </div>
-            </div>
-            <p data-js-only><Button variant="secondary" data-el-use={useOf(x)}>{T.examples.useThis}</Button></p>
-          </div>
-        </TabPanel>
-      ))}
-    </Tabs>
-  </Section>
-
   <!-- How to get closer: the levers for the chosen place, from the engine -->
-  <Section id="closer" title={T.closer.title} lead={T.closer.lead} width="wide">
+  <Section fold id="closer" title={T.closer.title} lead={T.closer.lead} width="wide" tone="sunken">
     <div class="el-two">
       <div>
         <p class="el-small" data-js-only>{T.closer.leverNote}</p>
@@ -221,8 +206,43 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     </div>
   </Section>
 
+  <!-- Worked examples: complete results without JavaScript, on both sides of the deadline -->
+  <Section fold id="examples" title={T.examples.title} lead={T.examples.lead} width="wide">
+    <Tabs label={T.examples.tabsLabel}>
+      {ex.map((x, i) => (
+        <TabPanel id={`example-${x.key}`} label={x.tab}>
+          <div class="el-example">
+            <p class="el-example__who">{x.who}</p>
+            <p class="el-small">{T.examples.voice}</p>
+            {lazy(i) && (
+              <p class="el-small" data-el-more>
+                <span data-js-only>{T.examples.more}</span>
+                <span class="el-nojs">{T.examples.moreNoJs}</span>
+              </p>
+            )}
+            {x.before && (
+              <div data-money-when="A static">
+                <div class="el-example__phase">
+                  <h4 class="el-example__when">{fill(T.examples.before, { deadline, checked })}</h4>
+                  <ElectricResult id={`ex-${x.key}-a`} locale={locale} rendered={headOnly(x.before.rendered, i)} city={x.answers.jurisdiction} />
+                </div>
+              </div>
+            )}
+            <div data-money-when={x.before ? 'B C D static' : 'A B C D static'}>
+              <div class="el-example__phase">
+                <h4 class="el-example__when">{fill(T.examples.after, { from: d(afterDate) })}</h4>
+                <ElectricResult id={`ex-${x.key}-c`} locale={locale} rendered={headOnly(x.after.rendered, i)} city={x.answers.jurisdiction} />
+              </div>
+            </div>
+            <p data-js-only><Button variant="secondary" data-el-use={useOf(x)}>{T.examples.useThis}</Button></p>
+          </div>
+        </TabPanel>
+      ))}
+    </Tabs>
+  </Section>
+
   <!-- What to do next: the ordered, dated checklist -->
-  <Section id="checklist" title={T.checklist.title} lead={T.checklist.lead} width="wide" tone="sunken">
+  <Section fold id="checklist" title={T.checklist.title} lead={T.checklist.lead} width="wide" tone="sunken">
     <p data-money-when="B" class="el-phase-note">{fill(T.checklist.phaseB, { deadline, filing })}</p>
     <p data-money-when="C" class="el-phase-note">{T.checklist.phaseC}</p>
     <ol class="el-steps">
@@ -235,9 +255,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     </ol>
     <h3 class="el-h3">{T.checklist.datesTitle}</h3>
     <ul class="el-dates">
-      <li>{fill(T.checklist.dates.purchase, { date: deadline })}</li>
-      <li>{fill(T.checklist.dates.filing, { date: filing })}</li>
-      {data.programmes.flatMap((p) => p.conditions.flatMap((c) => (c.kind === 'applicant-deadline' ? [c.date] : []))).filter((x, i, a) => a.indexOf(x) === i).map((date) => <li>{fill(T.checklist.dates.foreign, { date: d(date) })}</li>)}
+      {dateItems.map((x) => <li>{x.text}</li>)}
       <li>{fill(T.checklist.dates.next, { date: checked })}</li>
     </ul>
     <p class="el-small">{T.checklist.yourDates}</p>
@@ -245,9 +263,9 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Running costs, on their own -->
-  <Section id="monthly" title={T.monthly.title} width="wide">
+  <Section fold id="monthly" title={T.monthly.title} width="wide">
     <p class="el-opener">{T.monthly.opener}</p>
-    <p class="lead">{T.monthly.lead}</p>
+    <p class="lead">{run.suitsFrom !== null ? fill(T.monthly.leadFrom, { km: nf(run.suitsFrom) }) : T.monthly.lead}</p>
 
     <Figure locale={locale} title={T.monthly.tableTitle} subtitle={T.monthly.tableSub} caption={fill(T.monthly.tableCaption, { checked })} badge={['derived', 'market-tw']} secondary>
       <div class="el-kms">
@@ -272,15 +290,16 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     </Figure>
 
     <div class="el-two">
-      <Figure locale={locale} title={T.monthly.rangeTitle} subtitle={`${T.monthly.rangeSub}; ${fill(T.monthly.rangeAt, { km: nf(run.REF) })}`} badge="derived" secondary>
+      <Figure locale={locale} title={T.monthly.rangeTitle} subtitle={`${T.monthly.rangeSub}${locale === 'en' ? '; ' : '；'}${fill(T.monthly.rangeAt, { km: nf(run.REF) })}`} badge="derived" secondary>
         <RangePlot
           locale={locale}
           title={plain(T.monthly.rangeTitle)}
           data={run.range}
           labels={{ min: T.monthly.rangeLabels.min, mid: T.monthly.rangeLabels.mid, max: T.monthly.rangeLabels.max }}
           decimals={2}
-          unit="NT$/km"
-          categoryLabel={T.monthly.perKm}
+          unit={T.monthly.rangeUnit}
+          categoryLabel={T.monthly.rangeCategory}
+          desc={rangeDesc}
         />
       </Figure>
       <div class="stack" style="--stack: var(--sp-4)">
@@ -338,7 +357,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- No socket where you park -->
-  <Section id="no-socket" title={T.noSocket.title} width="wide" tone="sunken">
+  <Section fold id="no-socket" title={T.noSocket.title} width="wide" tone="sunken">
     <p class="lead">{T.noSocket.body}</p>
     <h3 class="el-h3">{T.noSocket.modelsTitle}</h3>
     <p>{T.noSocket.modelsLead}</p>
@@ -356,7 +375,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Who it adds up for -->
-  <Section id="who" title={T.who.title} width="wide">
+  <Section fold id="who" title={T.who.title} width="wide">
     <CompareTable
       caption={T.who.caption}
       hideCaption
@@ -370,23 +389,29 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Before you buy -->
-  <Section id="risks" title={T.risks.title} width="wide" tone="sunken">
+  <Section fold id="risks" title={T.risks.title} width="wide" tone="sunken">
     <ul class="el-facts">
       <li>{T.risks.class}</li>
       <li>
-        {fill(T.risks.network, { month: fx['econ-ev-brand-share-2026-07'].period, share: `${nf(share ?? 0, 0)}%`, stations: nf(stations ?? 0) })}
-        {' '}{fill(T.risks.networkTail, { checked })}
+        {fill(T.risks.network, { month: fx['econ-ev-brand-share-2026-07'].period, share: `${nf(share ?? 0, 0)}%` })}
         <EvidenceBadge locale={locale} {...badgeOf('econ-ev-brand-share-2026-07')} variant="icon" />
-        <span class="el-small">{[...factSources('econ-ev-brand-share-2026-07'), ...factSources('econ-gogoro-network')].map((c) => c.short).join(' · ')}</span>
+        <span class="el-small">{factSources('econ-ev-brand-share-2026-07').map((c) => c.short).join(' · ')}</span>
+        {' '}{fill(T.risks.stations, { stations: nf(stations ?? 0) })}
+        <EvidenceBadge locale={locale} {...badgeOf('econ-gogoro-network')} variant="icon" />
+        <span class="el-small">{factSources('econ-gogoro-network').map((c) => c.short).join(' · ')}</span>
+        {' '}{fill(T.risks.networkTail, { checked })}
       </li>
-      <li>{T.risks.finance}</li>
-      <li>{T.risks.resale}</li>
-      <li><b>{T.risks.next}</b>{readerText(data.meta.nextYear[locale])} {fx['econ-no-2027-programme'].caveat}</li>
+      <li>
+        <b>{T.risks.finance}</b>{fx['econ-gogoro-finances-2026'].statement} {fx['econ-gogoro-finances-2026'].caveat}
+        <EvidenceBadge locale={locale} {...badgeOf('econ-gogoro-finances-2026')} variant="icon" />
+        <span class="el-small">{factSources('econ-gogoro-finances-2026').map((c) => c.short).join(' · ')}</span>
+      </li>
+      <li><b>{T.risks.next}</b>{readerText(data.meta.nextYear[locale])} {T.risks.nextCaveat} {early}</li>
     </ul>
   </Section>
 
   <!-- Not this year -->
-  <Section id="not-yet" title={T.notYet.title} lead={T.notYet.lead} width="wide">
+  <Section fold id="not-yet" title={T.notYet.title} lead={T.notYet.lead} width="wide">
     <ul class="el-cards">
       {T.notYet.items.map((it, i) => (
         <li class="el-card">
@@ -397,7 +422,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
       ))}
     </ul>
     <p class="el-actions">
-      <Button href={href('/act/#keep', locale)} variant="secondary" arrow>{T.notYet.act}</Button>
+      <Button href={href('/act/#ride', locale)} variant="secondary" arrow>{T.notYet.act}</Button>
     </p>
   </Section>
 
@@ -406,13 +431,14 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     <TileMap locale={locale} name="el-city-tile">
       {ids.map((id) => (
         <Fragment slot={id}>
-          <p class="el-small">{cities[id].statusNote}</p>
+          <Details summary={T.status.statusNote.replace(/[：:]\s*$/, '')}><p class="el-small">{cities[id].statusNote}</p></Details>
           {cities[id].lines.length ? (
             <ul class="el-citylines">
               {cities[id].lines.map((l) => (
                 <li>
-                  {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({l.side === 'gasoline' ? T.result.side.gasoline : T.result.side.electric}; {fill(T.cities.to, { date: l.to })}){!l.counted && ` ${T.cities.notCounted}`}</span>
+                  {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({l.side === 'gasoline' ? T.result.side.gasoline : T.result.side.electric}{l.when && `; ${l.when}`})</span>
                   <br /><span class="el-small">{T.cities.quota}{l.quota}</span>
+                  {l.excluded && <><br /><span class="el-small">{T.cities.notCountedWhy}{l.excluded}</span></>}
                 </li>
               ))}
             </ul>
@@ -427,8 +453,9 @@ const notYetBadge = (k: string) => k as EvidenceKind;
       <ul class="el-citylines">
         {central.map((l) => (
           <li>
-            {fill(T.cities.line, { name: l.name, amount: l.amount })} <span class="el-small">({fill(T.cities.to, { date: l.to })}){!l.counted && ` ${T.cities.notCounted}`}</span>
+            {fill(T.cities.line, { name: l.name, amount: l.amount })} {l.when && <span class="el-small">({l.when})</span>}
             <br /><span class="el-small">{l.condition}</span>
+            {l.excluded && <><br /><span class="el-small">{T.cities.notCountedWhy}{l.excluded}</span></>}
           </li>
         ))}
       </ul>
@@ -436,7 +463,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Our asks -->
-  <Section id="asks" title={T.asks.title} lead={T.asks.lead} width="wide">
+  <Section fold id="asks" title={T.asks.title} lead={T.asks.lead} width="wide">
     <ol class="el-list">
       {T.asks.items.map((a) => <li>{fill(a, { deadline })}</li>)}
     </ol>
@@ -445,7 +472,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   </Section>
 
   <!-- Questions -->
-  <Section id="faq" title={T.faq.title} width="prose" tone="sunken">
+  <Section fold id="faq" title={T.faq.title} width="prose" tone="sunken">
     {T.faq.items.map((f, i) => (
       <Details summary={f.q} name="el-faq">
         <p>{f.a}</p>
@@ -462,7 +489,7 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     ))}
   </Section>
 
-  <Section id="sources" title={T.sources.title} lead={T.sources.lead} width="prose">
+  <Section fold id="sources" title={T.sources.title} lead={T.sources.lead} width="prose">
     <ol class="el-sources">
       {pageSources.map((s) => (
         <li><a href={sourceUrl(s)} rel="noopener" target="_blank">{readerText(formatCitation(s, locale))}</a></li>
@@ -470,6 +497,58 @@ const notYetBadge = (k: string) => k as EvidenceKind;
     </ol>
   </Section>
 </Base>
+
+<style is:global>
+  /* Reading and touch rules (brief 6.1, 6.3) for the detailed calculator below the opening.
+     The result is drawn by script (electric/render.ts), so its rows are styled here. */
+  #calc .el-calc-lead,
+  #calc .el-live__status,
+  #calc .el-asof,
+  #calc .el-plan {
+    font-size: var(--fs-base);
+  }
+  #el-live-panel .el-src a,
+  #el-live-panel .el-next__links a,
+  #status .el-citynote a,
+  #calc .el-nosocket a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    /* 8 px from the next link, also on the next line (brief 6.3) */
+    margin-block: 0.25rem;
+    margin-inline-end: 0.5rem;
+  }
+  #calc .el-num {
+    font-size: var(--fs-base);
+  }
+  #el-live-panel .el-next__links a {
+    color: var(--ink);
+  }
+  #el-live-panel .el-jump {
+    gap: 0.5rem;
+  }
+  #el-live-panel .el-jump a,
+  #el-live-panel .el-row__more > summary {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    min-inline-size: var(--tap);
+    justify-content: center;
+  }
+  /* a select sizes itself to its longest option; in a one-column grid that pushed the opening
+     past a 320 px screen at the largest text size */
+  .el-head .op :is(.op-grid, .op-county) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .el-head .op .op-select {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  #el-live-panel .el-note {
+    min-inline-size: var(--tap);
+    min-block-size: var(--tap);
+  }
+</style>
 
 <style>
   .el-head {
@@ -481,23 +560,6 @@ const notYetBadge = (k: string) => k as EvidenceKind;
   }
   .el-title {
     max-inline-size: 18ch;
-  }
-  .el-answer-first {
-    display: grid;
-    gap: var(--sp-3);
-    margin-block-start: var(--sp-4);
-    padding: var(--sp-5);
-    border: var(--rule-paint) solid var(--ink);
-    max-inline-size: 46rem;
-  }
-  .el-answer-first__title {
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-black);
-    line-height: var(--lh-heading);
-  }
-  .el-answer-first__after {
-    border-inline-start: var(--rule-paint) solid var(--exhaust);
-    padding-inline-start: var(--sp-3);
   }
   .el-actions {
     display: flex;

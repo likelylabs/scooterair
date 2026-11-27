@@ -1,46 +1,49 @@
 ---
+import { absUrl } from '../../../lib/abs-url.ts';
 /**
- * /print/brief/ — 一張紙的量測需求 / the measurement brief on one page (blueprint V47).
- * The empty chart, the central gap, the proposal (V35, the art layer's MeasurementDiagram),
- * who could do it and our promise, laid out for one A4 page. On screen it is a preview with a
- * print button; in print only the sheet is printed.
+ * /print/brief/ — 一頁說明 / the one-page brief for a borough chief or a councillor (brief 7.9).
  *
- * Copy: src/i18n/pages/unmeasured.ts (`brief`, `plan`, `promise`). The gap comes from the registry.
+ * One A4 page: G4 (the kerb, dozen) with what the street holds and what the pack adds; G5
+ * (measured beside estimated, with the zoom-out strip, headline chosen by the written rule);
+ * the numbers table of /estimate/#numbers (three scenarios × carbon monoxide, benzene, PM2.5);
+ * G8 with home screen 8's sentence; K1; the ask and the promise; short references.
+ * Light tokens on paper and no site chrome (PrintPage).
+ *
+ * Copy: src/i18n/pages/act.ts (`brief`). Numbers: src/data/estimate.ts.
  */
-import Base from '@/layouts/Base.astro';
+import PrintPage from '@/components/pages/action/PrintPage.astro';
+import Picture from '@/components/pages/action/Picture.astro';
+import CheckChart from '@/components/pages/action/CheckChart.astro';
 import Phrased from '@/components/ui/Phrased.astro';
-import Button from '@/components/ui/Button.astro';
-import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
-import EmptyChart from '@/components/charts/EmptyChart.astro';
-import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
-import { lg, sourcesOf } from '@/components/pages/action/ev';
+import KindChip from '@/components/ui/KindChip.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { site } from '@/i18n/ui';
-import { gapList } from '@/data';
-import { formatDate } from '@/lib/site-state.data';
-import unmeasured from '@/i18n/pages/unmeasured';
+import { kSentences, site } from '@/i18n/ui';
+import { checkHeadline, est, estimateText, farBelowWho, formatEstimate, formatReference, scenarioKeys } from '@/data/estimate';
+import act from '@/i18n/pages/act';
 import { fill, localize } from '@/i18n/pages/_copy';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
-const t = localize(unmeasured, locale);
+const t = localize(act, locale);
 const b = t.brief;
-const gap = lg('gap-pedestrian-red-light-exposure', locale);
-const pageUrl = new URL(href('/unmeasured/', locale), Astro.site).href.replace(/\/$/, '/');
-const shortUrl = pageUrl.replace(/^https?:\/\//, '');
-const checked = formatDate(gapList.map((g) => g.searchedOn).sort().at(-1)!, locale, true);
-const cites = sourcesOf([], ['gap-pedestrian-red-light-exposure']);
+const estimatePage = absUrl(href('/estimate/', locale), Astro.site);
+const shortUrl = estimatePage.replace(/^https?:\/\//, '');
+const child = formatEstimate('child.airPerKg', locale);
+const pollutants = [
+  { key: 'co', name: b.co, street: formatReference(est.bg.co.traffic.shown, 'ppm', locale), conf: est.confidence.co.word[locale] },
+  { key: 'benzene', name: b.benzene, street: fill(t.fmt.ppbRange, { lo: est.bg.benzene.lo, hi: est.bg.benzene.hi }), conf: est.confidence.benzene.word[locale] },
+  { key: 'pm25', name: b.pm25, street: formatReference(est.bg.pm25.shown, 'ug/m3', locale), conf: est.confidence.pm25.word[locale] },
+] as const;
 ---
 
-<Base locale={locale} title={b.metaTitle} description={b.metaDescription} noindex>
-  <!-- A print page is paper: show it in the light theme (not stored, so the reader's choice stands elsewhere). -->
-  <script is:inline>document.documentElement.dataset.theme = 'light';</script>
-  <div class="container print-ui">
+<PrintPage locale={locale} title={b.metaTitle} description={b.metaDescription}>
+  <div class="toolbar">
     <p>{b.screenNote}</p>
-    <p class="print-ui__row">
-      <Button data-print data-js-only>{b.printButton}</Button>
-      <a href={href('/unmeasured/', locale)}>{b.back}</a>
-    </p>
+    <div class="toolbar__row">
+      <button type="button" class="toolbar__btn" data-print hidden>{b.printButton}</button>
+      <a class="toolbar__link" href={href('/act/#policy', locale)}>{b.back}</a>
+    </div>
   </div>
 
   <article class="sheet" aria-labelledby="brief-t">
@@ -50,199 +53,375 @@ const cites = sourcesOf([], ['gap-pedestrian-red-light-exposure']);
     </header>
 
     <div class="sheet__cols">
-      <div class="sheet__left">
-        <section>
-          <h2 class="sheet__h"><EvidenceBadge locale={locale} kind="gap" /> <span>{b.gapLabel}</span></h2>
-          <p>{gap.statement}{cites.length > 0 && <sup class="sheet__cite">[{cites.map((c) => c.n).join(', ')}]</sup>}</p>
+      <div class="sheet__col">
+        <section class="blk">
+          <h2 class="blk__h">{b.kerbHead}</h2>
+          <div class="pic" data-fit><Picture locale={locale} kind="kerb" scenario="dozen" /></div>
+          <div class="kv">
+            <div class="kv__row"><span class="kv__label">{estimateText.alreadyThere[locale]}</span><span class="kv__v">{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</span><KindChip locale={locale} kind="measured" size="sm" /></div>
+            <div class="kv__row"><span class="kv__label">{estimateText.addedByPack[locale]}</span><EstimateValue locale={locale} slotId="co.dozen.add" /></div>
+            <p class="kv__note">{estimateText.ppmGloss[locale]}</p>
+          </div>
         </section>
-        <div class="sheet__chart">
-          <EmptyChart locale={locale} title={t.hero.figure.chart} desc={t.hero.figure.desc} panelHeight={34} />
-        </div>
-        <section>
-          <h2 class="sheet__h">{b.whoLabel}</h2>
-          <p>{gap.whoCouldMeasure}</p>
-        </section>
-        <section>
-          <h2 class="sheet__h">{b.promiseLabel}</h2>
-          <p>{t.promise.pledge}</p>
-          <p>{t.promise.small}</p>
+
+        <section class="blk">
+          <h2 class="blk__h">{checkHeadline(locale)}</h2>
+          {farBelowWho() && <p class="blk__p">{fill(b.checkLead, { sites: est.meas.iot.sites.value })}</p>}
+          <CheckChart locale={locale} />
         </section>
       </div>
-      <div class="sheet__right">
-        <h2 class="sheet__h">{b.proposalLabel}</h2>
-        <MeasurementDiagram locale={locale} />
-        <p class="sheet__small">{t.plan.howLong}</p>
-        <p class="sheet__small">{t.plan.stamp}</p>
+
+      <div class="sheet__col">
+        <section class="blk">
+          <h2 class="blk__h">{b.tableHead}</h2>
+          <div class="nt-wrap"><table class="nt">
+            <thead>
+              <tr>
+                <th scope="col">{b.tableScenario}</th>
+                {pollutants.map((p) => <th scope="col">{p.name}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {scenarioKeys.map((s) => (
+                <tr>
+                  <th scope="row">
+                    {est.scn[s].name[locale]}
+                    <span class="nt__sub">{est.scn[s].count.lo}–{est.scn[s].count.hi}</span>
+                  </th>
+                  {pollutants.map((p) => (
+                    <td>
+                      <EstimateValue locale={locale} slotId={`${p.key}.${s}.add`} />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+              <tr class="nt__street">
+                <th scope="row">{b.tableStreet} <KindChip locale={locale} kind="measured" size="sm" /></th>
+                {pollutants.map((p) => <td>{p.street}</td>)}
+              </tr>
+              <tr class="nt__conf">
+                <th scope="row">{b.tableConfidence}</th>
+                {pollutants.map((p) => <td>{p.conf}</td>)}
+              </tr>
+            </tbody>
+          </table></div>
+          <p class="blk__small">{b.tableNote}</p>
+        </section>
+
+        <section class="blk">
+          <h2 class="blk__h">{b.heightsHead}</h2>
+          <div class="pic" data-fit><Picture locale={locale} kind="heights" /></div>
+          <div class="blk__p has-chip">
+            <p>{fill(b.heightsBody, { lo: child.lo, hi: child.hi })}</p>
+            <KindChip locale={locale} kind="study" size="sm" />
+          </div>
+        </section>
+
+        <section class="blk blk--ask">
+          <p class="blk__k1">{kSentences.K1[locale]}</p>
+          <h2 class="blk__h">{b.askHead}</h2>
+          <p class="blk__ask">{b.ask}</p>
+          <p class="blk__p">{b.promise}</p>
+        </section>
       </div>
     </div>
 
     <footer class="sheet__foot">
-      <p><b>{site.name[locale]}</b> · {site.tagline[locale]}</p>
+      <p>{fill(b.refs, { stamp: est.meta.stamp[locale] })}</p>
       <p>{b.more} <span class="sheet__url">{shortUrl}</span></p>
-      <p>{fill(b.checked, { date: checked })}</p>
+      <p><b>{site.name[locale]}</b> · {site.tagline[locale]}</p>
     </footer>
   </article>
-</Base>
+</PrintPage>
 
 <script>
-  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+  // print: size each picture by its height (its shape comes from the svg's viewBox)
+  for (const box of document.querySelectorAll<HTMLElement>('[data-fit]')) {
+    const v = box.querySelector('svg.scene__art')?.getAttribute('viewBox')?.split(/[\s,]+/).map(Number);
+    if (v && v[3]) box.style.setProperty('--ar', String(v[2] / v[3]));
+  }
+  const btn = document.querySelector<HTMLButtonElement>('[data-print]');
+  if (btn) {
+    btn.hidden = false;
+    btn.addEventListener('click', () => window.print());
+  }
 </script>
 
 <style>
-  .print-ui {
+  .toolbar {
+    box-sizing: border-box;
+    inline-size: min(210mm, calc(100% - 2 * var(--gutter, 16px)));
+    margin: 0 auto;
     padding-block: var(--sp-5) var(--sp-4);
     display: grid;
     gap: var(--sp-3);
+    font-size: var(--fs-base);
   }
-  .print-ui p {
+  .toolbar p {
     margin: 0;
   }
-  .print-ui__row {
+  .toolbar__row {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--sp-4);
+    gap: var(--sp-3);
     align-items: center;
   }
-  /* The sheet: an A4 page on screen, and the only thing that prints. */
+  .toolbar__btn,
+  .toolbar__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 3rem);
+    padding: 0 var(--sp-4);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    font: inherit;
+    font-size: var(--fs-btn, 1.0625rem);
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+    background: var(--surface);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .toolbar__btn {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
   .sheet {
+    --here: #fff;
     box-sizing: border-box;
     inline-size: min(210mm, calc(100% - 2 * var(--gutter, 16px)));
     margin: 0 auto var(--sp-8);
-    padding: 12mm;
+    padding: clamp(16px, 5vw, 11mm);
     background: #fff;
-    color: #111;
-    border: 1px solid #c9cfcc;
-    box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+    color: var(--ink);
+    box-shadow: 0 2px 18px rgb(0 0 0 / 0.14);
     display: grid;
-    gap: 5mm;
-    font-size: 10.5pt;
-    line-height: 1.5;
-    /* print colours in both themes: the sheet is paper */
-    --ink: #111;
-    --ink-2: #333;
-    --ink-3: #555;
-    --bg: #fff;
-    --surface: #fff;
-    --line: #c9cfcc;
-    --line-strong: #8a938f;
-    color-scheme: light;
+    gap: 14px;
+    border-block-start: 6mm solid var(--signal-red, #c62828);
+    overflow-x: clip;
   }
-  .sheet p {
+  .sheet p,
+  .sheet h2 {
     margin: 0;
   }
   .sheet__kicker {
-    font-size: 9pt;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: #333;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
   }
   .sheet__title {
+    margin: 4px 0 0;
     font-family: var(--font-heading);
     font-weight: var(--fw-black);
-    font-size: 22pt;
-    line-height: 1.2;
-    margin: 1mm 0 0;
+    font-size: clamp(1.5rem, 5.4vw, 2rem);
+    line-height: 1.25;
+    text-wrap: balance;
   }
   .sheet__cols {
     display: grid;
-    gap: 6mm;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 70mm), 1fr));
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
   }
-  .sheet__left,
-  .sheet__right {
+  @media (min-width: 46em) {
+    .sheet__cols {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 7mm;
+    }
+  }
+  .sheet__col {
     display: grid;
-    gap: 4mm;
+    gap: 14px;
+    align-content: start;
     min-inline-size: 0;
   }
-  .sheet__left section {
+  .blk {
     display: grid;
-    gap: 1.5mm;
+    gap: 8px;
+    min-inline-size: 0;
   }
-  .sheet__h {
+  .blk__h {
+    font-size: 1.0625rem;
+    font-weight: var(--fw-black);
+    line-height: 1.35;
+    padding-block-start: 6px;
+    border-block-start: 2px solid var(--ink);
+  }
+  .has-chip {
     display: flex;
     flex-wrap: wrap;
-    gap: 2mm;
     align-items: center;
-    font-size: 11pt;
-    margin: 0;
-    padding-block-end: 1mm;
-    border-block-end: 1.5px solid #111;
+    gap: 4px 8px;
   }
-  .sheet__cite {
-    font-size: 7pt;
+  .blk__p,
+  .blk__ask {
+    font-size: var(--fs-base);
+    line-height: 1.55;
   }
-  .sheet__chart :global(.chart) {
-    margin: 0;
+  .blk__p :global(.chip) {
+    margin-inline-start: 0.3em;
+    vertical-align: 0.1em;
   }
-  .sheet__small {
-    font-size: 9pt;
-    color: #333;
+  .blk__ask {
+    font-weight: var(--fw-bold);
   }
-  .sheet__right :global(.measure) {
-    padding: 3mm;
-    gap: 3mm;
+  .blk__small {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    line-height: 1.5;
   }
-  .sheet__foot {
-    border-block-start: 1.5px solid #111;
-    padding-block-start: 2mm;
+  .blk__k1 {
+    font-size: var(--fs-base);
+    line-height: 1.55;
+    padding: 8px 10px;
+    background: var(--bg-sunken);
+    border-inline-start: 4px solid var(--estimate, #c98a1e);
+  }
+  .kv {
     display: grid;
-    gap: 1mm;
-    font-size: 9pt;
+    gap: 2px;
   }
-  .sheet__url {
-    font-weight: 700;
-    overflow-wrap: anywhere;
+  .kv__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 10px;
+    font-size: var(--fs-sm);
   }
-  @page {
-    size: A4;
+  .kv__label {
+    flex: 1 1 8em;
+    font-weight: var(--fw-bold);
+  }
+  .kv__v {
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+  }
+  .kv__note {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+  .nt-wrap {
+    position: relative;
+    overflow-x: auto;
+  }
+
+  .nt {
+    inline-size: 100%;
+    min-inline-size: 34rem;
+    border-collapse: collapse;
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+    table-layout: fixed;
+  }
+  .nt th,
+  .nt td {
+    padding: 6px 5px;
+    border-block-end: 1px solid var(--line);
+    text-align: start;
+    vertical-align: top;
+  }
+  .nt thead th {
+    font-weight: var(--fw-bold);
+    border-block-end: 1.5px solid var(--ink);
+  }
+  .nt tbody th {
+    font-weight: var(--fw-bold);
+  }
+  .nt__sub {
+    display: block;
+    font-weight: normal;
+    color: var(--ink-2);
+  }
+  .nt__street td,
+  .nt__conf td {
+    color: var(--ink-2);
+  }
+  /* in the table an estimate is text with its chip; on paper, everywhere: no tap target, no arrow */
+  .nt :global(.est) {
+    min-block-size: var(--tap, 3rem);
+    padding: 0;
     margin: 0;
+    font-size: inherit;
   }
   @media print {
-    :global(.site-header),
-    :global(.site-footer),
-    :global(.skip-link),
-    .print-ui {
-      display: none !important;
+    .sheet :global(.est) {
+      min-block-size: 0;
+      padding: 0;
+      margin: 0;
     }
-    :global(html),
-    :global(body) {
-      background: #fff !important;
+  }
+  .sheet :global(.est__go) {
+    display: none;
+  }
+  .nt :global(.est__line) {
+    gap: 2px;
+  }
+  .nt :global(.est__value) {
+    text-underline-offset: 0.22em;
+  }
+  .sheet__foot {
+    display: grid;
+    gap: 2px;
+    padding-block-start: 8px;
+    border-block-start: 1.5px solid var(--line-strong);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .sheet__url {
+    overflow-wrap: anywhere;
+    color: var(--ink);
+    font-weight: var(--fw-bold);
+  }
+
+  @media print {
+    .toolbar {
+      display: none !important;
     }
     .sheet {
       inline-size: 210mm;
-      min-block-size: 0;
+      block-size: 297mm;
       margin: 0;
-      border: 0;
+      padding: 9mm 11mm 8mm;
+      gap: 3.5mm;
       box-shadow: none;
-      break-inside: avoid;
+      overflow: hidden;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-    .sheet {
-      padding: 10mm 11mm;
-      gap: 3.5mm;
-      font-size: 9.5pt;
-      line-height: 1.45;
-    }
-    .sheet__title {
-      font-size: 20pt;
-    }
     .sheet__cols {
-      grid-template-columns: 1fr 1.15fr;
-      gap: 5mm;
-    }
-    .sheet__right :global(.measure__grid) {
       grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+    }
+    .nt {
+      min-inline-size: 0;
+    }
+    .sheet__col {
       gap: 3mm;
     }
-    .sheet__right :global(.measure__heights svg) {
-      max-block-size: 28mm;
+    .sheet__title {
+      font-size: 19pt;
     }
-    /* the data table toggle is not useful on paper */
+    /* paper is read at arm's length, not on a phone: the whole sheet at 10pt body */
+    :global(html) {
+      font-size: 72%;
+    }
+    :global(html:lang(en)) {
+      font-size: 68%;
+    }
+    .pic {
+      --fit-h: 58mm;
+    }
+    .sheet:lang(en) .pic {
+      --fit-h: 50mm;
+    }
+    [data-fit] :global(.scene) {
+      inline-size: min(100%, calc(var(--fit-h) * var(--ar, 1.3)));
+      margin-inline: auto;
+    }
   }
-  /* a print piece: the data-table toggle is not useful on paper or in the preview */
-  .sheet :global(details) {
+  /* the print button works only with JavaScript: until the script shows it, it stays hidden */
+  .toolbar__btn[hidden] {
     display: none;
   }
 </style>

@@ -1,0 +1,142 @@
+---
+/**
+ * MaskScene — G17: what a mask stops and what it does not (brief 12.2).
+ *
+ * A face in profile, in the signal-figure style, wearing a mask. The three
+ * marks of screen 2 arrive from a tailpipe at the left:
+ *   rings    (carbon monoxide)        pass straight through, whichever mask
+ *   ribbons  (fuel vapour, benzene)   pass through; an activated-carbon mask
+ *                                     holds a few and lets the rest through
+ *   dots     (particles)              some stop on the mask; some slip in at
+ *                                     the gaps beside the nose and at the
+ *                                     cheek (two small arrows). Cloth lets most
+ *                                     through. A fitted N95 stops most and has
+ *                                     no gap.
+ * Every state is drawn from research/masks/VERIFIED.json → tableRows; nothing
+ * here is a percentage.
+ *
+ * The switch is lane B's <Segmented name="mask"> in the same Screen, with the
+ * values cloth · surgical · carbon · n95. The picture follows data-pick-mask
+ * (and, without scripting, the checked radio) through CSS alone.
+ *
+ * Props
+ *   locale  Locale
+ *   mask    the mask shown first: 'cloth' | 'surgical' (default) | 'carbon' | 'n95'
+ *   says    print one line above the drawing about the chosen mask (default true)
+ *   tag     false (default; <Screen illustration> prints it) | 'street'
+ *   id, class
+ *
+ *   <MaskScene slot="picture" locale={locale} />
+ *   <Segmented slot="controls" name="mask" legend={…} value="surgical" options={MASK_CHOICES.map((m) => ({ value: m, label: art.mask.names[m][locale] }))} />
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+import SceneFrame from './SceneFrame.astro';
+import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
+import { MASK_CHOICES as MASKS, MASK_FACE, artId, maskHead, maskOn, type MaskChoice } from './parts';
+
+interface Props {
+  locale: Locale;
+  mask?: MaskChoice;
+  says?: boolean;
+  tag?: false | 'street';
+  id?: string;
+  class?: string;
+}
+const { locale, mask = 'surgical', says = true, tag = false, id, class: cls } = Astro.props;
+
+const VB: Box = { x: 0, y: -240, w: 270, h: 240 };
+const upp = unitsPerPx(VB.w);
+const K = 1.38;
+const TX = 94;
+/** A point of maskFace(), in this picture. */
+const F = (p: { x: number; y: number }) => ({ x: TX + p.x * K, y: p.y * K });
+const noseIn = F(MASK_FACE.inside);
+const front = TX + MASK_FACE.front.x * K - 3;
+const gapNose = F(MASK_FACE.gaps.nose);
+const gapCheek = F(MASK_FACE.gaps.cheek);
+const PIPE = { x: 22, y: -62 };
+
+const on = (...kinds: MaskChoice[]) => 'mk-v ' + kinds.map((k) => `mk-on-${k}`).join(' ');
+const go = (i: number, x: number, y: number) => ` style="--i:${i};--dx:${((PIPE.x - x) * 0.5).toFixed(1)}px;--dy:${((PIPE.y - y) * 0.5).toFixed(1)}px"`;
+const ring = (x: number, y: number, i: number) => airRing(x, y, upp, { size: 0.7, cls: 'sa-go', attrs: go(i, x, y) });
+const dot = (x: number, y: number, i: number) => airDot(x, y, upp, { size: 0.9, cls: 'sa-go', attrs: go(i, x, y) });
+
+// a small dark core at the pipe: where it all comes from
+const a = air({ frame: VB, id: artId('air'), noStreetAir: true, tailpipes: [{ ...PIPE, dir: 1, scale: 0.42, rings: 0, dots: 0, ribbons: 0 }] });
+
+// three lanes, as on screen 2: ribbons high, rings in the middle, dots low
+const lane = (u: number, y1: number, x1: number) => {
+  const e = u * u * (3 - 2 * u);
+  return { x: PIPE.x + 12 + u * (x1 - PIPE.x - 12), y: PIPE.y - 6 + (y1 - PIPE.y + 6) * e };
+};
+
+// rings: two lanes that run straight on through the mask to the mouth
+const ringLanes = [-104, -93].map((y1, l) => {
+  let s = '';
+  for (let k = 0; k < 6; k++) {
+    const p = lane((k + 0.8 + l * 0.35) / 6.4, y1, noseIn.x + 2);
+    s += ring(p.x, p.y, k * 2 + l);
+  }
+  return s;
+}).join('');
+
+// ribbons: to the nose, through the mask
+const ribTo = (y: number, i: number, cls = '', short = false) =>
+  airRibbon(airWisp(PIPE.x + 4, PIPE.y - 4 - i, short ? front - 2 : noseIn.x - 3, y, upp), upp, { weight: 1, cls: `sa-draw ${cls}`.trim(), attrs: ` pathLength="1" style="--i:${i * 2}"` });
+const ribbons =
+  [-121, -113].map((y, i) => ribTo(y, i)).join('') +
+  // two more: an activated-carbon layer holds these at the mask; every other mask lets them through
+  [-129, -137].map((y, i) => ribTo(y + (i ? 8 : 2), i + 2, on('cloth', 'surgical', 'n95')) + ribTo(y, i + 2, on('carbon'), true)).join('');
+
+// dots: loose in the air on the way, then their fate depends on the mask
+const loose = [[40, -62], [52, -76], [60, -56], [70, -84], [78, -66], [88, -80], [94, -62], [48, -50], [82, -50], [98, -72]].map(([x, y], i) => dot(x, y, i)).join('');
+const pile = (ys: number[], i0: number) => ys.map((y, i) => dot(front - 3 - ((i + i0) % 2) * 4.5, y, i0 + i)).join('');
+const stopAll = pile([-88, -80], 8); // every mask stops some
+const stopMore = pile([-96, -84, -76], 9); // a surgical, carbon or N95 mask stops more
+const stopMost = pile([-100, -92, -72, -108], 10); // a fitted N95 stops most
+const through = (y: number, i: number) => dot(front + 7, y, i) + dot(front + 14, y - 5, i + 1);
+const thruOne = through(-82, 10);
+const thruMore = through(-90, 10) + through(-76, 11);
+const arrow = (d: string, head: string, cls = '') => `<path class="mk-leak ${cls}" d="${d}"/><path class="mk-leak mk-leak--head ${cls}" d="${head}"/>`;
+const leakNose =
+  arrow(`M${gapNose.x - 30},${gapNose.y - 16} C${gapNose.x - 16},${gapNose.y - 24} ${gapNose.x - 3},${gapNose.y - 18} ${gapNose.x + 1},${gapNose.y + 1}`, `M${gapNose.x - 6},${gapNose.y - 5} L${gapNose.x + 1.5},${gapNose.y + 3} L${gapNose.x + 6},${gapNose.y - 7}`) +
+  dot(gapNose.x - 26, gapNose.y - 25, 11) + dot(gapNose.x - 12, gapNose.y - 28, 12) + dot(gapNose.x + 4, gapNose.y - 24, 13);
+const leakCheek =
+  arrow(`M${gapCheek.x + 26},${gapCheek.y + 40} C${gapCheek.x + 28},${gapCheek.y + 22} ${gapCheek.x + 18},${gapCheek.y + 8} ${gapCheek.x + 3},${gapCheek.y + 4}`, `M${gapCheek.x + 10},${gapCheek.y - 2} L${gapCheek.x + 2},${gapCheek.y + 4} L${gapCheek.x + 8},${gapCheek.y + 12}`, 'mk-leak--on-head') +
+  dot(gapCheek.x + 34, gapCheek.y + 34, 12) + dot(gapCheek.x + 30, gapCheek.y + 18, 13) + dot(gapCheek.x + 16, gapCheek.y + 18, 14);
+
+// Past the mask: the airway, cut out of the head as on the body figure. Whatever got through is
+// drawn inside it, on its way down the throat.
+const AIRWAY = 'M24,-86 C40,-91 58,-85 62,-66 C64,-52 66,-38 67,-5';
+const L = (x: number, y: number) => F({ x, y });
+const inRings = [L(37, -88.5), L(53, -84), L(62.5, -68), L(64.5, -48), L(66, -26)].map((p, i) => ring(p.x, p.y, 12 + i)).join('');
+const c = [L(24, -86), L(40, -91), L(56, -86), L(61, -70)];
+const inRibbon = airRibbon(`M${c[0].x},${c[0].y} C${c[1].x},${c[1].y} ${c[2].x},${c[2].y} ${c[3].x},${c[3].y}`, upp, { weight: 1.1, cls: 'sa-draw', attrs: ' pathLength="1" style="--i:9"' });
+const inDots = (pts: [number, number][], i0: number) => pts.map(([x, y], i) => dot(L(x, y).x, L(x, y).y, i0 + i)).join('');
+
+const head = `<g transform="translate(${TX} 0) scale(${K})">`;
+const scene = [
+  `<rect class="a-plane" x="0" y="${VB.y}" width="${VB.w}" height="${VB.h}"/>`,
+  a.defs + a.cores,
+  // the tailpipe, cropped by the edge of the picture
+  `<path class="a-metal-s" stroke-width="15" d="M-12,${PIPE.y + 7} L${PIPE.x - 5},${PIPE.y + 1}"/><circle class="a-exh" cx="${PIPE.x - 1}" cy="${PIPE.y}" r="5.5"/>`,
+  `<g class="a-figure">${head}${maskHead()}<path class="a-bg-s" stroke-width="7" d="${AIRWAY}"/></g>${MASKS.map((m) => `<g class="${on(m)}">${head}${maskOn(m)}</g></g>`).join('')}</g>`,
+  `<g class="tm-lane tm-lane--dot">${loose}${stopAll}${inDots([[66, -18]], 15)}<g class="${on('surgical', 'carbon', 'n95')}">${stopMore}</g><g class="${on('n95')}">${stopMost}${thruOne}</g><g class="${on('cloth')}">${thruMore}${through(-84, 12)}${inDots([[55, -86], [64.5, -40]], 14)}</g><g class="${on('cloth', 'surgical', 'carbon')}">${leakNose}${leakCheek}${inDots([[44, -90], [63, -60]], 13)}</g></g>`,
+  `<g class="tm-lane tm-lane--ring">${ringLanes}${inRings}</g>`,
+  `<g class="tm-lane tm-lane--ribbon">${ribbons}${inRibbon}</g>`,
+].join('');
+const alt = [art.mask.alt[locale], art.alt2.plain[locale]].join(locale === 'en' ? ' ' : '');
+---
+
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--mask', cls].filter(Boolean).join(' ')} data-mask={mask}>
+  {says && (
+    <div slot="before" class="mk-says" aria-live="polite">
+      {MASKS.map((m) => (
+        <p class:list={['mk-t', `mk-on-${m}`]} data-mask-says={m}><b>{art.mask.names[m][locale]}</b>{art.mask.says[m][locale]}</p>
+      ))}
+    </div>
+  )}
+  <Fragment set:html={scene} />
+</SceneFrame>

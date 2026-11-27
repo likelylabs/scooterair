@@ -1,0 +1,147 @@
+---
+/**
+ * 404 — the page for an address the site does not have.
+ *
+ * GitHub Pages serves this one file (dist/404.html, or <base>/404.html under a project path)
+ * for EVERY missing address, whatever the path, so:
+ *   - every link here is absolute and base-aware (href()): the page may be served at
+ *     /scooterair/en/no/such/page/, where a relative link would point nowhere;
+ *   - the language cannot be read from a path at build time, so the page carries both, Chinese
+ *     first. A small script puts English first (and sets lang) when the missing address is
+ *     under /en/, and shows the address that was asked for. Without JavaScript both stay readable.
+ * Not in the sitemap (Astro leaves 404 out) and noindex.
+ * Copy: src/i18n/pages/not-found.ts.
+ */
+import Base from '@/layouts/Base.astro';
+import { href, locales, type Locale } from '@/i18n';
+import notFound from '@/i18n/pages/not-found';
+import { localize } from '@/i18n/pages/_copy';
+
+const order = ['home', 'film', 'electric', 'questions', 'estimate', 'act', 'evidence', 'about'] as const;
+const paths: Record<(typeof order)[number], string> = {
+  home: '/',
+  film: '/90/',
+  electric: '/electric/',
+  questions: '/questions/',
+  estimate: '/estimate/',
+  act: '/act/',
+  evidence: '/evidence/',
+  about: '/about/#report',
+};
+const blocks = locales.map((locale: Locale) => ({ locale, t: localize(notFound, locale), lang: locale === 'en' ? 'en' : 'zh-Hant-TW' }));
+const zh = blocks.find((b) => b.locale === 'zh-TW')!.t;
+const enPrefix = href('/', 'en');
+---
+
+<Base locale="zh-TW" title={`${zh.meta.title} · ${localize(notFound, 'en').meta.title}`} description={zh.meta.description} noindex alternates={false}>
+  <div class="nf container container--wide" data-en-prefix={enPrefix}>
+    {
+      blocks.map(({ locale, t, lang }, i) => (
+        <section class="nf__block" lang={lang} data-locale={locale} aria-labelledby={`nf-${locale}`}>
+          <p class="eyebrow">{t.eyebrow}</p>
+          {i === 0 ? (
+            <h1 id={`nf-${locale}`} class="display nf__title">
+              {t.title}
+            </h1>
+          ) : (
+            <h2 id={`nf-${locale}`} class="h1 nf__title">
+              {t.title}
+            </h2>
+          )}
+          <p class="lead">{t.body}</p>
+          <p class="nf__address" hidden>
+            {t.address}
+            <code data-nf-path />
+          </p>
+          <ul class="nf__routes">
+            {order.map((k) => (
+              <li>
+                <a href={href(paths[k], locale)}>{t.routes[k]}</a>
+              </li>
+            ))}
+          </ul>
+          <p class="nf__other">
+            <a href={href('/', locale === 'en' ? 'zh-TW' : 'en')} lang={locale === 'en' ? 'zh-Hant-TW' : 'en'}>
+              {t.other}
+            </a>
+          </p>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector('.nf');
+    if (!root) return;
+    var path = location.pathname;
+    // the address that was asked for, as text (never markup)
+    root.querySelectorAll('[data-nf-path]').forEach(function (el) {
+      el.textContent = decodeURI(path);
+      el.parentNode.hidden = false;
+    });
+    // under /en/: English first, and the document says so
+    if (path.indexOf(root.getAttribute('data-en-prefix')) === 0) {
+      var en = root.querySelector('[data-locale="en"]');
+      var zh = root.querySelector('[data-locale="zh-TW"]');
+      if (en && zh) {
+        root.insertBefore(en, zh);
+        document.documentElement.lang = 'en';
+        // keep one h1, on the block that now comes first
+        var swap = function (from, tag) {
+          var h = from.querySelector('.nf__title');
+          var n = document.createElement(tag);
+          n.id = h.id;
+          n.className = (tag === 'h1' ? 'display' : 'h1') + ' nf__title';
+          n.textContent = h.textContent;
+          h.replaceWith(n);
+        };
+        swap(en, 'h1');
+        swap(zh, 'h2');
+        document.title = en.querySelector('.nf__title').textContent + ' — ' + document.title.split(' — ').pop();
+      }
+    }
+  })();
+</script>
+
+<style>
+  .nf {
+    display: grid;
+    gap: var(--sp-7);
+    padding-block: var(--sp-7) var(--sp-8);
+  }
+  .nf__block + .nf__block {
+    border-block-start: 2px solid var(--line);
+    padding-block-start: var(--sp-6);
+  }
+  .nf__title {
+    margin-block: var(--sp-2) var(--sp-4);
+  }
+  .nf__address {
+    color: var(--ink-2);
+  }
+  /* the address on a line of its own, free to break anywhere (it is one long word) */
+  .nf__address code {
+    display: block;
+    font-size: 0.95em;
+    overflow-wrap: anywhere;
+  }
+  .nf__routes {
+    display: grid;
+    gap: var(--tap-gap, 0.5rem);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nf__routes a,
+  .nf__other a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 3rem);
+    font-weight: var(--fw-bold);
+  }
+  .nf__other {
+    margin-block-start: var(--sp-4);
+  }
+</style>

@@ -1,0 +1,52 @@
+---
+/**
+ * FixButton — the 修好它 button of G11. Put it in the same <Screen> as
+ * <TenScooters> (the `controls` slot). It is a checkbox drawn as a 48 px
+ * button, so it works with the keyboard and without scripting: checked, the
+ * big cloud in the picture shrinks to a wisp (art.css reads the checkbox with
+ * :has(); a small script also sets data-fixed on the Screen and dispatches
+ * `sa:fix` ({ fixed }) for browsers and hosts that want it).
+ *
+ * Props
+ *   locale  Locale
+ *   label   the words on the button (default 修好它 / Fix it)
+ *   undo    the words once it is pressed (default 再看一次修之前)
+ *   fixed   start pressed (default false)
+ *   class
+ *
+ *   <FixButton slot="controls" locale={locale} />
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+
+interface Props {
+  locale: Locale;
+  label?: string;
+  undo?: string;
+  fixed?: boolean;
+  class?: string;
+}
+const { locale, fixed = false, class: cls } = Astro.props;
+const label = Astro.props.label ?? art.ten.fix[locale];
+const undo = Astro.props.undo ?? art.ten.undo[locale];
+---
+
+<label class:list={['fixbtn', cls]}>
+  <input type="checkbox" class="fixbtn__box" data-fix checked={fixed} />
+  <span class="fixbtn__face">
+    <svg class="fixbtn__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3.5a5 5 0 0 0-4.6 6.9L3.6 16.7a2.1 2.1 0 1 0 3 3l6.3-6.3a5 5 0 0 0 6.6-6.1l-3.1 3.1-2.6-.7-.7-2.6 3.1-3.1a5 5 0 0 0-1.7-.5Z" /></svg>
+    <span class="fixbtn__do">{label}</span>
+    <span class="fixbtn__undo">{undo}</span>
+  </span>
+</label>
+
+<script>
+  document.addEventListener('change', (e) => {
+    const box = e.target as HTMLInputElement;
+    if (!box.matches?.('input[data-fix]')) return;
+    const scope = box.closest<HTMLElement>('[data-pick-scope]') ?? (box.closest('.fixbtn')!.parentElement as HTMLElement);
+    scope.toggleAttribute('data-fixed', box.checked);
+    box.dispatchEvent(new CustomEvent('sa:fix', { bubbles: true, detail: { fixed: box.checked } }));
+  });
+</script>

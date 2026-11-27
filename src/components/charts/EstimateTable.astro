@@ -1,0 +1,101 @@
+---
+/**
+ * EstimateTable — the numbers of /estimate/#numbers (docs/redesign-brief.md 7.2, item 1).
+ *
+ * One table: three scenarios × carbon monoxide, benzene and PM2.5. Each cell is 約 A 到 B with
+ * its unit and the 推估 chip; each pollutant's heading row says what the street already holds
+ * (with its own chip) and how far to trust the estimate. Carbon monoxide also prints the total
+ * (含街上原本就有的). PM2.5 carries its sentence: much less than the street already holds.
+ *
+ * It is laid out for a phone: two columns, grouped by pollutant, so nothing scrolls sideways
+ * at 320px and nothing is abbreviated. Ultrafine particles are NOT a row of empty cells: the
+ * page prints K2 and K3 as sentences after the table.
+ *
+ * Props
+ *   locale   Locale
+ *   zhuyin   true prints 苯（ㄅㄣˇ） (first use on the page). Default true
+ *   id, class
+ *
+ *   <EstimateTable locale={locale} id="numbers-table" />
+ *
+ * The same figures as records, for the CSV and JSON downloads: estimateRecords() in
+ * ./core/estimateCharts.
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { est, estimateText } from '@/data/estimate';
+import { estText } from '@/i18n/ui';
+import { chipHtml } from './core/html';
+import { estimateTable } from './core/estimateCharts';
+import { chartText, fill } from './strings';
+
+interface Props {
+  locale: Locale;
+  zhuyin?: boolean;
+  id?: string;
+  class?: string;
+}
+const { locale, zhuyin = true, id, class: cls } = Astro.props;
+const groups = estimateTable(locale, { zhuyin });
+const T = chartText.bands;
+const colon = locale === 'en' ? ': ' : '：';
+---
+
+<div id={id} class:list={['hc', 'hc-etable-wrap', cls]} data-chart="estimate-table">
+  <table class="hc-etable">
+    <caption>{fill(T.tableCaption, locale, { stamp: est.meta.stamp[locale] })}<span class="hc-etable__meta">{est.meta.appliesTo[locale]}</span></caption>
+    <thead>
+      <tr>
+        <th scope="col">{T.scenarioHead[locale]}</th>
+        <th scope="col">{estimateText.addedByPack[locale]}</th>
+      </tr>
+    </thead>
+    {
+      groups.map((g) => (
+        <tbody>
+          <tr class="hc-etable__group">
+            <th colspan="2" scope="rowgroup">
+              <span class="hc-etable__name">
+                {g.name}
+                <small>{g.unit}</small>
+              </span>
+              <span class="hc-etable__meta">
+                <span>{T.streetLine[locale].replace('{v}', g.street.text)}</span>
+                <Fragment set:html={chipHtml(g.street.kind, locale)} />
+              </span>
+              <span class="hc-etable__meta">
+                <span>
+                  {estText.confidence[locale]}
+                  {colon}
+                  <strong>{g.confidence.word}</strong>
+                </span>
+              </span>
+            </th>
+          </tr>
+          {g.rows.map((r) => (
+            <tr data-slot={r.slot}>
+              <th scope="row">
+                <span class="hc-etable__scn">{r.name}</span>
+                <span class="hc-etable__count">{r.count}</span>
+              </th>
+              <td>
+                <span class="hc-etable__v">
+                  <span>{r.added}</span>
+                  <Fragment set:html={chipHtml('estimate', locale)} />
+                </span>
+                {r.total && <span class="hc-etable__total">{T.totalLine[locale].replace('{v}', r.total)}</span>}
+              </td>
+            </tr>
+          ))}
+          <tr class="hc-etable__note">
+            <td colspan="2">
+              {g.note}
+              {g.note && (locale === 'en' ? ' ' : '')}
+              {g.confidence.why}
+            </td>
+          </tr>
+        </tbody>
+      ))
+    }
+  </table>
+</div>

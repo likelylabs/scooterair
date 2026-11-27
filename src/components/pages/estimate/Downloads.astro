@@ -1,0 +1,87 @@
+---
+/**
+ * Downloads — the numbers table of /estimate/#numbers as CSV and JSON (brief 7.2 item 1).
+ * Built at build time from lane D's estimateRecords() (which reads src/data/estimate.ts): the low
+ * and the high end of every range, never the middle value. The files are data: links with a
+ * download name, so they work without JavaScript and need no extra route.
+ *
+ * Props
+ *   locale   Locale
+ *   labels   { title, csv, json, note }
+ */
+import type { Locale } from '@/i18n';
+import { estimateRecords } from '@/components/charts/core/estimateCharts';
+import { est } from '@/data/estimate';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+  labels: { title: string; csv: string; json: string; note: string };
+}
+const { labels } = Astro.props;
+const records = estimateRecords();
+const cols = Object.keys(records[0] ?? {}) as (keyof (typeof records)[number])[];
+const cell = (v: unknown) => (v === undefined || v === null ? '' : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+// a byte-order mark first, so Excel on a Taiwanese Windows reads the file as UTF-8 (µg/m³, not Âµg/mÂ³)
+const csv = '\uFEFF' + [cols.join(','), ...records.map((r) => cols.map((c) => cell(r[c])).join(','))].join('\n') + '\n';
+const json = JSON.stringify(
+  {
+    estimate: `${est.meta.version} ${est.meta.date}`,
+    appliesTo: est.meta.appliesTo.en,
+    note: 'Added by the pack (and, for carbon monoxide, the total with what the street already holds). Low and high ends of the modelled range only.',
+    records,
+  },
+  null,
+  2,
+);
+const file = `scooterair-estimate-${est.meta.version}-${est.meta.date}`;
+const uri = (type: string, body: string) => `data:${type};charset=utf-8,${encodeURIComponent(body)}`;
+---
+
+<div class="dl">
+  <p class="dl__title">{labels.title}</p>
+  <div class="dl__links">
+    <a href={uri('text/csv', csv)} download={`${file}.csv`} type="text/csv"><Icon name="arrow-down" size="1.1em" />{labels.csv}</a>
+    <a href={uri('application/json', json)} download={`${file}.json`} type="application/json"><Icon name="arrow-down" size="1.1em" />{labels.json}</a>
+  </div>
+  <p class="dl__note">{labels.note}</p>
+</div>
+
+<style>
+  .dl {
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .dl p,
+  .dl div {
+    margin: 0;
+  }
+  .dl__title {
+    font-weight: var(--fw-bold);
+  }
+  .dl__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tap-gap, 0.5rem) var(--sp-3);
+  }
+  .dl__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-block-size: var(--tap, 3rem);
+    padding-inline: var(--sp-4);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    color: var(--ink);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-btn, 1.0625rem);
+    text-decoration: none;
+  }
+  .dl__links a:hover {
+    background: var(--bg-sunken);
+  }
+  .dl__note {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+</style>

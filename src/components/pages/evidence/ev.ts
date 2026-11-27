@@ -5,9 +5,7 @@
 //   /evidence/#link-1 … #link-7     one section per link of the chain
 //   /evidence/#<fact id>            every fact, e.g. /evidence/#teds13-mc-co-share
 //   /evidence/#data-<series id>     every chart dataset, e.g. /evidence/#data-wu2021-station-correlation
-//   /evidence/#<gap id>             every recorded gap, e.g. /evidence/#gap-pedestrian-red-light-exposure
 //   /sources/#<source id>           every source (what citation markers link to)
-//   /sources/#<gap id>              gaps are bibliography entries too
 
 import type { Locale } from '@/i18n';
 import { readerText, evidenceBadge, type EvidenceKind } from '@/i18n/ui';
@@ -16,11 +14,8 @@ import {
   claimRuleList,
   facts,
   factList,
-  gapList,
-  gaps,
   getSource,
   localizeFact,
-  localizeGap,
   localizeSeries,
   readLevelLabels,
   seriesList,
@@ -28,7 +23,6 @@ import {
   sourceIds,
   type ChainLink,
   type FactId,
-  type GapId,
   type LocalizedFact,
   type LocalizedSeries,
   type SeriesId,
@@ -71,18 +65,6 @@ export function ls(id: SeriesId, locale: Locale): LocalizedSeries {
   };
 }
 
-export function lg(id: GapId, locale: Locale) {
-  const g = localizeGap(id, locale);
-  return {
-    ...g,
-    title: readerText(g.title),
-    statement: readerText(g.statement),
-    whyItMatters: readerText(g.whyItMatters),
-    wouldClose: readerText(g.wouldClose),
-    whoCouldMeasure: g.whoCouldMeasure ? readerText(g.whoCouldMeasure) : undefined,
-  };
-}
-
 /** Badge props for a fact, from its registry evidence type and confidence. */
 export const factBadge = (id: FactId) => evidenceBadge(facts[id].evidence, facts[id].confidence);
 export const kindOf = (e: Parameters<typeof evidenceBadge>[0]): EvidenceKind => evidenceBadge(e).kind;
@@ -98,8 +80,6 @@ export function seriesSources(id: SeriesId): SourceId[] {
   return [...out];
 }
 
-/** Gap number in the #gaps list (1-based, registry order). */
-export const gapN = (id: GapId) => gapList.findIndex((g) => g.id === id) + 1;
 
 /** Locale-aware number. */
 export const num = (locale: Locale, v: number, digits = 2) => new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: digits }).format(v);
@@ -135,11 +115,10 @@ export const casePanelFacts: FactId[] = ['tsai2026-three-scooter-case'];
 export const casePanelSeries: SeriesId[] = ['tsai2026-three-scooter-case'];
 
 /**
- * Rows not printed as they stand because their wording breaks a binding correction (2027 is
- * "nothing confirmed", never "nothing announced"). /evidence/ keeps the anchor with a note, so
- * links from other pages still land; /sources/ shows the same note instead of the statement.
+ * R14: the never-smoker lung cancer figures appear only in #not-used. Pointers to them elsewhere
+ * (link 5's "also used" list, /sources/) carry a number-free label and no statement.
  */
-export const withheld: FactId[] = ['econ-no-2027-programme'];
+export const neverSmokerFacts: FactId[] = ['tseng2019-never-smokers', 'huang2021-never-smoker-lung-cancer'];
 
 /** Where a fact's full row is: '#not-used', or link n. */
 export function homeOf(id: FactId): 'not-used' | ChainLink | null {
@@ -151,25 +130,26 @@ export function homeOf(id: FactId): 'not-used' | ChainLink | null {
 // Chain-wide counts
 // ---------------------------------------------------------------------------------------
 
+/** Everything the registry holds (the same counts /about/ prints), with the on-chain share of the facts. */
 export function totals() {
   const linked = factList.filter((f) => f.chainLink !== null);
   return {
-    facts: linked.length,
-    series: seriesList.filter((s) => s.chainLink !== null).length,
-    gaps: gapList.length,
+    facts: factList.length,
+    chained: linked.length,
+    context: factList.length - linked.length,
+    series: seriesList.length,
     sources: sourceIds.length,
     rules: claimRuleList.filter((r) => r.kind === 'do-not-claim').length,
   };
 }
 
 // ---------------------------------------------------------------------------------------
-// Which links, facts, series, gaps and rules rely on each source (for /sources/)
+// Which links, facts, series and rules rely on each source (for /sources/)
 // ---------------------------------------------------------------------------------------
 
 export interface SourceUse {
   facts: FactId[];
   series: SeriesId[];
-  gaps: GapId[];
   rules: string[];
   links: ChainLink[];
 }
@@ -177,7 +157,7 @@ export interface SourceUse {
 let usesCache: Map<SourceId, SourceUse> | null = null;
 export function sourceUses(): Map<SourceId, SourceUse> {
   if (usesCache) return usesCache;
-  const m = new Map<SourceId, SourceUse>(sourceIds.map((id) => [id, { facts: [], series: [], gaps: [], rules: [], links: [] }]));
+  const m = new Map<SourceId, SourceUse>(sourceIds.map((id) => [id, { facts: [], series: [], rules: [], links: [] }]));
   const addLink = (u: SourceUse, l: ChainLink | null | undefined) => {
     if (l && !u.links.includes(l)) u.links.push(l);
   };
@@ -195,13 +175,6 @@ export function sourceUses(): Map<SourceId, SourceUse> {
       if (!u.series.includes(s.id)) u.series.push(s.id);
       addLink(u, s.chainLink);
       for (const l of s.alsoLinks ?? []) addLink(u, l);
-    }
-  }
-  for (const g of gapList) {
-    for (const src of (gaps[g.id] as { sources?: SourceId[] }).sources ?? []) {
-      const u = m.get(src)!;
-      u.gaps.push(g.id);
-      addLink(u, g.chainLink);
     }
   }
   for (const r of claimRuleList) {

@@ -1,0 +1,918 @@
+{
+ "key": "emission-rates",
+ "checkedOn": "2026-11-26",
+ "summary": "Per in-use petrol scooter (100-150 cc four-stroke), warm idle, fleet-weighted: fuel about 120 g/h (80-180), CO about 21 g/h (8-48), CO2 about 340 g/h (200-550), THC about 2.4 g/h (0.5-10), NOx about 0.5 g/h (0.05-2), benzene about 0.07 g/h (0.01-0.3). Per 90-second red light: about 3 g fuel and 0.5 g CO per scooter (0.2-1.2). Technology split for CO at 120 g/h fuel: phase 6-7 about 11 g/h (assumed), phase 5 28, phase 4 and older 40, failing scooter 90. Two-strokes (2% of fleet): HC about 19 g/h, CO about 34 g/h, low confidence. Derived by carbon balance on measured Taiwanese idle readings (Yilan 2014-15, n=5,164) times an idle fuel flow cross-checked against Vietnamese laboratory data and engine physics; checked against Hanoi idle laboratory rates and Taiwanese bench and tunnel fuel-based factors.",
+ "findings": [
+  {
+   "id": "yilan-2017-idle-by-phase",
+   "claim": "Mean measured idle exhaust readings of in-use four-stroke scooters at periodic inspection in Yilan County (2014-2015 data, n=5,164), by emission phase: CO falls from 3.04% (phase 1) to 1.45% (phase 5), HC from 545-748 ppm to 367 ppm; CO2 rises from 9.0% to 10.8%.",
+   "values": {
+    "unit": "CO %, CO2 %, HC ppm (inspection analyser basis), group means",
+    "phase5_2007-07_to_2016": {
+     "N": 1263,
+     "CO_pct": 1.449,
+     "CO2_pct": 10.789,
+     "HC_ppm": 367.08
+    },
+    "phase4_2004_to_2007-06": {
+     "N": 2062,
+     "CO_pct": 1.797,
+     "CO2_pct": 10.013,
+     "HC_ppm": 400.81
+    },
+    "phase3_1998_to_2003": {
+     "N": 1440,
+     "CO_pct": 2.047,
+     "CO2_pct": 9.88,
+     "HC_ppm": 525.97
+    },
+    "phase2_1991_to_1997": {
+     "N": 381,
+     "CO_pct": 2.535,
+     "CO2_pct": 9.583,
+     "HC_ppm": 747.51
+    },
+    "phase1_1988_to_1991": {
+     "N": 18,
+     "CO_pct": 3.039,
+     "CO2_pct": 9.011,
+     "HC_ppm": 544.78
+    }
+   },
+   "measured": "Idle CO, CO2 and HC readings from Taiwan's periodic inspection analysers, Yilan County inspection records of 2014 and 2015, four-stroke motorcycles only, grouped by emission phase (期程別), by displacement (49/90/125/150 cc), by brand and by mileage band. The paper's purpose was a 'combustion efficiency' index CO2/(CO+CO2) but its SPSS appendix tables print the group means.",
+   "place_year": "Yilan County, Taiwan; inspection data 2014-2015; paper December 2017",
+   "citation": "Cheng Y-H, Lin Y-F, Wu Y-P, Chang P-H, Chuang M-Y (2017). 四行程機車排氣檢定排放測定參數之變異數分析及以迴歸分析建立燃燒效率模式 [Variance analysis of measurement parameters of exhaust test for four-cycle motorcycles and regression analysis of combustion efficiency model]. 國立宜蘭大學工程學刊 (Bulletin of College of Engineering, National Ilan University) 12: 33-76. DOI 10.6176/BCE.201712_(12).0003",
+   "url": "https://lic.niu.edu.tw/var/file/10/1010/img/6/161991667.pdf",
+   "verified": true,
+   "readLevel": "full text downloaded; the numbers sit in SPSS output tables that are images, which I rendered and read (pdf pages 40, 41, 42, 43, 44 = journal pp. 72-76)",
+   "quote_or_table": "Appendix Table A24 homogeneous-subset (Duncan) table for CO: period 5 N=1263 1.449; 4 N=2062 1.797; 3 N=1440 2.047; 2 N=381 2.535; 1 N=18 3.039. Table A26 CO2: 5 -> 10.789; 4 -> 10.013; 3 -> 9.880; 2 -> 9.583; 1 -> 9.011. Table A28 HC: 5 -> 367.08; 4 -> 400.81; 3 -> 525.97; 1 -> 544.78; 2 -> 747.51 (harmonic-mean n = 83.124). Period definitions in section 2 (item 7): phase 5 = 2007-07-01 to 2016-12-31, phase 4 = 2004-01-01 to 2007-06-30, phase 3 = 1998-2003, phase 2 = 1991-07 to 1997, phase 1 = 1988-07 to 1991-06.",
+   "applicability": "THE best Taiwanese idle-reading source found. Caveats: (1) one county, 2014-15, so phase 5 here means 2007-2010 builds aged 5-8 years, not today's 2011-2016 builds aged 10-15; phases 6 and 7 (2017+) are absent. (2) Only scooters that came for inspection; non-attenders are probably dirtier. (3) Duncan table lists group means; the sample sums CO+CO2 to about 12% (stoichiometric about 14.5%), i.e. mild tailpipe dilution, so the CONCENTRATIONS are not exhaust-undiluted values; ratios (CO/CO2) are unaffected, which is why I use a carbon balance. (4) HC unit is the inspection analyser's ppm, assumed n-hexane-equivalent NDIR (not verified, see assumptions)."
+  },
+  {
+   "id": "yilan-2017-idle-by-displacement",
+   "claim": "In the same Yilan data, 125 cc four-strokes (59% of the sample) idle at a mean 1.970% CO and 10.21% CO2; 90 cc 1.545% CO; 150 cc 1.712%; 49 cc 1.956%. Displacement makes little difference to CO; 49 cc scooters have far higher HC.",
+   "values": {
+    "unit": "CO %, CO2 %",
+    "125cc": {
+     "N": 3084,
+     "CO_pct": 1.97,
+     "CO2_pct": 10.21
+    },
+    "90cc": {
+     "N": 1516,
+     "CO_pct": 1.545,
+     "CO2_pct": 10.22
+    },
+    "150cc": {
+     "N": 245,
+     "CO_pct": 1.712,
+     "CO2_pct": 10.06
+    },
+    "49cc": {
+     "N": 374,
+     "CO_pct": 1.956,
+     "CO2_pct": 9.13
+    },
+    "HC_note": "Table A16 Games-Howell: 49 cc HC is about 667-706 ppm higher than 90/125/150 cc; 125 vs 150 and 90 differ by under 40 ppm (not significant)."
+   },
+   "measured": "As above, grouped by displacement.",
+   "place_year": "Yilan County, Taiwan; 2014-2015",
+   "citation": "Cheng et al. 2017 (as above).",
+   "url": "https://lic.niu.edu.tw/var/file/10/1010/img/6/161991667.pdf",
+   "verified": true,
+   "readLevel": "full text; image tables read (pdf pages 32, 33, 34 = journal pp. 64-66)",
+   "quote_or_table": "Table A12 (Duncan, CO): 90 cc N=1516 1.545; 150 cc N=245 1.712; 49 cc N=374 1.956; 125 cc N=3084 1.970. Table A14 (Scheffe, CO2): 49 cc 9.13; 150 cc 10.06; 125 cc 10.21; 90 cc 10.22.",
+   "applicability": "Supports pooling 100-150 cc scooters: displacement is not a driver of idle CO or HC concentration across 90-150 cc, so the 125 cc fuel rate is a fair proxy for the 100-150 cc fleet. Mixed phases in each cell."
+  },
+  {
+   "id": "moenv-2025-hc-fail-tail",
+   "claim": "Nationally in 2025 the scooters that failed the idle test on HC (12,280 tests) averaged 5,823 ppm HC; after repair the re-test passes (11,097) averaged 1,951 ppm. A small tail is 10-20 times dirtier on HC than the Yilan mean.",
+   "values": {
+    "unit": "ppm HC",
+    "failed_n": 12280,
+    "failed_mean_ppm": 5823,
+    "retest_pass_n": 11097,
+    "retest_pass_mean_ppm": 1951,
+    "HC_reduction_rate_pct": 66.49,
+    "city_range_of_failed_mean_ppm": "3,227 (Lienchiang, n=6) to 6,623 (Taitung); big cities 5,281-6,519"
+   },
+   "measured": "Mean idle HC of tests that failed on HC and of the passing re-tests, all Taiwanese counties, 1 Jan - 31 Dec 2025. Table title HC減量統計表. The table does not define whether failure means HC-limit failure; I infer it.",
+   "place_year": "Taiwan, 2025 (prepared 2026-01-03)",
+   "citation": "Ministry of Environment (環境部), 移動污染源管制網, 統計分析查詢-HC減量統計表 (各縣市機車排氣定檢HC減量統計表), 114.01.01-114.12.31",
+   "url": "https://mobile.moenv.gov.tw/Motor/ReportNew/Unit_HC_Report.aspx?YearMonth=2025/12",
+   "verified": true,
+   "readLevel": "page opened; national row read",
+   "quote_or_table": "全國平均 | 12,280 | 5,823 | 11,097 | 1,951 | 66.49%. Note 2: HC減量率 = (不合格HC平均值 - 複驗合格HC平均值) / 不合格HC平均值.",
+   "applicability": "Describes the dirty tail, not the typical scooter. 12,280 HC-failing tests are only 0.15% of 8.29 million inspections, so on this table HC failure is rare (most of the 318,267 failures must be CO failures; consistent with Lin 2006: CO failures about 4x HC failures). Re-test passers at 1,951 ppm exceed the 1,000 ppm limit for post-2017 builds, so older limits (1,600-9,000) apply to them."
+  },
+  {
+   "id": "moenv-2025-fail-by-age-counts",
+   "claim": "Inspection counts by scooter age in 2025: 8.29 million tests; ages 5-8 (builds 2017-2020, phase 6) 2.83 million; ages 9-17 (builds ~2008-2016, phase 5) 3.90 million; ages 18-20+ (builds 2007 and earlier) 1.55 million.",
+   "values": {
+    "unit": "tests, 2025",
+    "by_age": {
+     "5": 788084,
+     "6": 597071,
+     "7": 688424,
+     "8": 753910,
+     "9": 633822,
+     "10": 556491,
+     "11": 514317,
+     "12": 451251,
+     "13": 412723,
+     "14": 367356,
+     "15": 293326,
+     "16": 308646,
+     "17": 366715,
+     "18": 293318,
+     "19": 238223,
+     "20+": 1023211
+    },
+    "total": 8292331,
+    "failure_rate_pct_selected": {
+     "5": 2.92,
+     "9": 4.53,
+     "15": 2.41,
+     "17": 5.32,
+     "20+": 5.58,
+     "all": 3.84
+    }
+   },
+   "measured": "Number of periodic inspection tests and failures by vehicle age (by manufacture date), all Taiwan, 2025.",
+   "place_year": "Taiwan, 2025",
+   "citation": "Ministry of Environment (環境部), 機車排氣定檢機車車齡不合格率統計表, 114.01.01-114.12.31 (prepared 115.01.03)",
+   "url": "https://mobile.moenv.gov.tw/Motor/ReportNew/TestNotOKByCarAge.aspx?YearMonth=2025/12",
+   "verified": true,
+   "readLevel": "page opened; all rows read",
+   "quote_or_table": "合計 | 318,267 | 8,292,331 | 3.84%; 20(含以上) | 57,126 | 1,023,211 | 5.58%",
+   "applicability": "Used only to build the phase mix of the in-use fleet (see derivation fleet-mix). Failure rates are flat at 2.4-3.8% for ages 10-16, so there is no strong sign that phase 5 scooters deteriorate sharply with age on the idle test."
+  },
+  {
+   "id": "moenv-idle-limits-inuse",
+   "claim": "In-use idle limits (CO % / HC ppm): pre-2004 builds 4.5 / 9000; 2004 builds 3.5 / 2000; from July 2007 3.5 / 1600; from 2017 2.0 / 1000.",
+   "values": {
+    "unit": "CO %, HC ppm",
+    "pre-2004": [
+     4.5,
+     9000
+    ],
+    "2004-2007": [
+     3.5,
+     2000
+    ],
+    "2007-07": [
+     3.5,
+     1600
+    ],
+    "2017+": [
+     2.0,
+     1000
+    ]
+   },
+   "measured": "Legal pass/fail limits at idle for motorcycles under 700 cc.",
+   "place_year": "Taiwan; gazette 30 June 2023",
+   "citation": "Ministry of Environment / Executive Yuan Gazette vol. 29 no. 121 (30 June 2023), 移動污染源空氣污染物排放標準 Article 6",
+   "url": "https://gazette.nat.gov.tw/EG_FileManager/eguploadpub/eg029121/ch07/type1/gov60/num36/Eg.pdf",
+   "verified": false,
+   "readLevel": "NOT re-opened in this run; taken from research/redlight/idle-emissions.json, where a verifier read the gazette PDF",
+   "quote_or_table": "See idle-emissions.json id moenv-idle-limits-inuse.",
+   "applicability": "Upper bounds for pass/fail. The Yilan means (1.4-3.0% CO) sit at or below 40-85% of these limits, so limits are NOT a good estimate of typical idle readings; they are useful as a sanity ceiling."
+  },
+  {
+   "id": "nguyen-2021-hanoi-idle",
+   "claim": "Five motorcycle models common in Hanoi, tested in a laboratory, averaged 60.9 g/h CO, 10.3 g/h HC, 1.8 g/h NOx and 534.3 g/h CO2 at steady idle while burning about 180 g/h of fuel.",
+   "values": {
+    "unit": "g/h",
+    "CO": 60.9,
+    "HC": 10.3,
+    "NOx": 1.8,
+    "CO2": 534.3,
+    "fuel": 180,
+    "derived_per_g_fuel": {
+     "CO": 0.338,
+     "HC": 0.057,
+     "NOx": 0.01,
+     "CO2": 2.97
+    }
+   },
+   "measured": "Instantaneous emission and fuel-consumption rates at idle, unsteady (warm-up) and steady stages, five models, laboratory with CVS (abbreviation list names CVT, TWC, CVS, IR sensor); the models' engine sizes, fuel systems and mileage are not in the abstract.",
+   "place_year": "Hanoi, Vietnam; paper 2021 (fleet year 2018)",
+   "citation": "Nguyen Y-L T, Le A T, Nguyen Duc K, et al. (2021). A study on emission and fuel consumption of motorcycles in idle mode and the impacts on air quality in Hanoi, Vietnam. International Journal of Urban Sciences 25(4): 522-541. DOI 10.1080/12265934.2020.1871059",
+   "url": "https://doi.org/10.1080/12265934.2020.1871059",
+   "verified": true,
+   "readLevel": "abstract only (retrieved through the OpenAlex API); full text blocked (tandfonline 403, ResearchGate 403)",
+   "quote_or_table": "'The average idling emissions of pollutants CO, CO2, HC and NOx were 60.9, 534.3, 10.3 and 1.8 g/h, respectively. The average fuel loss during idling is around 180 g/h.'",
+   "applicability": "Only direct idle rate set found for a small-motorcycle fleet. Not Taiwan: Vietnamese scooters are very similar in size (110-125 cc, CVT) but older and a different standards mix. The 180 g/h fuel figure is about twice the Vietnamese 2025 figure from the same group (84 g/h), so treat it as the HIGH end for fuel; its CO/fuel ratio (0.34 g/g) is close to the Taiwanese carbon-balance value for phases 2-4 (0.30-0.41), which is the useful cross-check. Its HC/fuel (0.057 g/g) is the high end of everything else found."
+  },
+  {
+   "id": "nguyen-2025-idle-fuel",
+   "claim": "15 Vietnamese motorcycles (0-15 years old, carburetted and fuel-injected) burned 0.141 g of fuel in the first 5 s of idle and 0.703 g in 30 s, i.e. 0.028 g/s (about 100 g/h) at first, falling to about 81 g/h for seconds 5-30; a restart costs 0.069 g.",
+   "values": {
+    "unit": "g",
+    "fuel_5s": 0.141,
+    "fuel_30s": 0.703,
+    "rate_first_5s_g_per_s": 0.028,
+    "restart_g": 0.069,
+    "derived_g_per_h": {
+     "mean_over_30s": 84,
+     "first_5s": 101,
+     "seconds_5_to_30": 81
+    },
+    "breakeven_s": 14
+   },
+   "measured": "Idle fuel consumption versus idle duration, controlled conditions, 15 motorcycles; no pollutant data.",
+   "place_year": "Vietnam; 2025",
+   "citation": "Nguyen Y-L T, Than Thi H Y, Nguyen Duc K, Le A T, et al. (2025). Analyzing fuel consumption characteristics of idle and re-start options for motorcycles at intersections in Vietnam. Journal of the Chinese Institute of Engineers 49(1): 112-127. DOI 10.1080/02533839.2025.2531199",
+   "url": "https://doi.org/10.1080/02533839.2025.2531199",
+   "verified": true,
+   "readLevel": "abstract only (OpenAlex API); full text blocked (tandfonline 403)",
+   "quote_or_table": "'On average, idling FC is 0.141 +/- 0.005 g for 5 s and 0.703 +/- 0.026 g for 30 s. During the first 5 s of idling, the FC rate is 0.028 +/- 0.001 g/s, then gradually decreases.'",
+   "applicability": "Second independent idle fuel figure, from the same Hanoi group but a different 15-bike sample with a spread of ages and fuel systems. The rate declines as the engine warms, and a red-light idle (60-90 s, warm) may be lower than the 30-s mean here. Gives the LOW end of fuel (about 80 g/h). The factor-of-two disagreement with the 180 g/h of the 2021 paper is unresolved without the full texts."
+  },
+  {
+   "id": "delta-2008-idle-fuel",
+   "claim": "A Taiwanese foundation project (2008) states that a car burns about 0.1 g/s of gasoline at idle and a motorcycle about 0.05 g/s (180 g/h).",
+   "values": {
+    "unit": "g/s",
+    "motorcycle": 0.05,
+    "car": 0.1,
+    "derived_motorcycle_g_per_h": 180
+   },
+   "measured": "Idle fuel use of cars and motorcycles; the page gives no method, vehicle count or engine sizes.",
+   "place_year": "Taiwan; 2008",
+   "citation": "台達電子文教基金會 (Delta Electronics Foundation), 車輛怠速測試執行計畫",
+   "url": "https://foundation.deltaww.com/publications/3/155",
+   "verified": true,
+   "readLevel": "web page opened; sentence found; no method given",
+   "quote_or_table": "汽車怠速每秒消耗0.1克左右的汽油 ... 機車為0.05克左右",
+   "applicability": "Taiwanese, but a rounded programme statement, not a data table; low weight. Coincides with the Hanoi 180 g/h, so the two together form the upper cluster of fuel rates (but 0.05 g/s may simply be a round number)."
+  },
+  {
+   "id": "taichung-idle-fuel-secondary",
+   "claim": "A Taichung paper is reported to have measured idle fuel use of a 100 cc four-stroke fuel-injected motorcycle at 1.55 g/min (93 g/h).",
+   "values": {
+    "unit": "g/min",
+    "value": 1.55,
+    "derived_g_per_h": 93
+   },
+   "measured": "Not known: reported only through a web-search summary of a ResearchGate listing.",
+   "place_year": "Taichung, Taiwan; year not seen",
+   "citation": "機車怠速引發之碳排放量相關問題探討 (以台中市為例) [Problems of carbon emission caused by motorcycle idling, Taichung as example]; authors and journal not seen",
+   "url": "https://www.researchgate.net/publication/279289678_jichedaisuyinfazhitanpaifangliangxiangguanwentitantaoyitaizhongshiweili",
+   "verified": false,
+   "readLevel": "secondary: search-engine summary only; ResearchGate returned 403",
+   "quote_or_table": "not seen",
+   "applicability": "If confirmed it is a Taiwanese FI scooter measurement (the right kind), and it lands in the low-middle of the range (93 g/h). Do NOT publish the number until the paper is opened."
+  },
+  {
+   "id": "multicity-idle-fuel-secondary",
+   "claim": "A multi-city idling survey of 346 in-use vehicles is reported to give 0.14 L/h mean idle fuel consumption for motorcycles (about 104 g/h).",
+   "values": {
+    "unit": "L/h",
+    "value": 0.14,
+    "derived_g_per_h_at_0.74kgL": 104
+   },
+   "measured": "Unknown (search summary only).",
+   "place_year": "Not known; the title 'Evaluation of Idling Fuel Consumption of Vehicles Across Different Cities'",
+   "citation": "Evaluation of Idling Fuel Consumption of Vehicles Across Different Cities (authors/year not seen)",
+   "url": "https://www.researchgate.net/publication/318788877_Evaluation_of_Idling_Fuel_Consumption_of_Vehicles_Across_Different_Cities",
+   "verified": false,
+   "readLevel": "secondary: search summary; ResearchGate 403; OpenAlex search did not return it",
+   "quote_or_table": "not seen",
+   "applicability": "Same magnitude as the Vietnamese 2025 figure and the Taichung figure; not usable as a citation until opened."
+  },
+  {
+   "id": "yao-2008-idle-bench",
+   "claim": "A new 125 cc four-stroke carburetted engine WITHOUT a catalyst, run cold-start at 1,718 rpm idle on a Taiwanese engine dynamometer, emitted 533-581 g CO, 29.9-31.9 g THC and 0.41-0.54 g NOx per litre of fuel; benzene 764-918 mg and toluene 529-1011 mg per litre of fuel.",
+   "values": {
+    "unit": "g per L fuel",
+    "CO": [
+     533,
+     581
+    ],
+    "THC": [
+     29.9,
+     31.9
+    ],
+    "NOx": [
+     0.41,
+     0.54
+    ],
+    "benzene_mg_per_L": {
+     "30vol%_aromatics": 918,
+     "20vol%_aromatics": 764
+    },
+    "toluene_mg_per_L": {
+     "30vol%": 1011,
+     "20vol%": 529
+    },
+    "idle_rpm": "1718 +/- 105",
+    "derived_per_g_fuel_at_0.74kgL": {
+     "CO": [
+      0.72,
+      0.79
+     ],
+     "THC": [
+      0.04,
+      0.043
+     ],
+     "NOx": [
+      0.0006,
+      0.0007
+     ]
+    },
+    "share_of_ECE_cycle_mass_emission_in_idle_pct": "10-12",
+    "cruise_CO_g_per_L": [
+     175,
+     244
+    ]
+   },
+   "measured": "Fuel-based emission factors at idle and at two cruising speeds for blends of Taiwanese refinery gasoline (aromatics 21-29 vol%, sulfur 40-150 ppm); 5 min per test.",
+   "place_year": "National Cheng Kung University, Tainan, Taiwan; paper 2008",
+   "citation": "Yao Y-C, Tsai J-H, Chang A-L, Jeng F-T (2008). Effects of sulfur and aromatic contents in gasoline on motorcycle emissions. Atmospheric Environment 42: 6560-6564. DOI 10.1016/j.atmosenv.2008.04.031",
+   "url": "https://scholars.lib.ntu.edu.tw/bitstreams/b3c5056c-1d88-476f-b5d3-3241ec7cdc55/download",
+   "verified": true,
+   "readLevel": "full text (publisher PDF copy in NTU scholars repository); figure values from text and Table 1",
+   "quote_or_table": "Section 3.1: 'The CO emission factors ranged from 533 to 581 g L-1-fuel ... The THC emission factors ranged from 29.9 to 31.9 g L-1-fuel ... NOx ... 0.48-0.41 and 0.54-0.48 g L-1-fuel'. Section 2: 'displacement of 125 cm3 ... without catalytic converters. A carburetor ... 1718 +/- 105 rpm ... for idle'. Table 1: benzene idle 918 (30 vol% aromatics) and 764 (20 vol%) mg/L-fuel.",
+   "applicability": "The only Taiwan-made measurement found of idle emissions per litre for a 125 cc scooter-class engine. It is a bench engine, cold start, non-catalyst, carburetted - the DIRTY end, representing old phase 1-3 scooters. Its CO of 0.72-0.79 g/g fuel (about 6% CO in the exhaust) is the same as the 'failing scooter' carbon-balance case (6.5% CO gives 0.76 g/g). Also the only source for aromatics at idle: benzene is about 3% of THC mass."
+  },
+  {
+   "id": "tsai-2018-fuel-based-ef",
+   "claim": "Taiwanese phase V in-use four-stroke scooters (chassis dynamometer, ECE cycle) emit 84.3 g CO, 29.4 g HC, 8.0 g NOx and 2098 g CO2 per litre of fuel; phase IV and III are +48%/+156% in CO and +9%/+84% in HC; fuel economy 34.7, 32.6, 29.5 km/L for phases V, IV, III.",
+   "values": {
+    "unit": "g per L fuel (cycle, not idle)",
+    "phaseV": {
+     "CO": 84.3,
+     "HC": 29.4,
+     "NOx": 8.0,
+     "CO2": 2098
+    },
+    "relative_to_V": {
+     "IV": {
+      "CO": "+48%",
+      "HC": "+9%",
+      "NOx": "-17%"
+     },
+     "III": {
+      "CO": "+156%",
+      "HC": "+84%",
+      "NOx": "-30%"
+     }
+    },
+    "fuel_economy_km_per_L": {
+     "V": 34.7,
+     "IV": 32.6,
+     "III": 29.5
+    },
+    "derived_per_g_fuel_at_0.74": {
+     "CO": 0.114,
+     "HC": 0.04,
+     "NOx": 0.0108,
+     "CO2": 2.835
+    }
+   },
+   "measured": "Fuel-based emission factors from in-use four-stroke motorcycles, chassis dynamometer.",
+   "place_year": "Taiwan; paper 2018",
+   "citation": "Tsai J-H, Yao Y-C, Huang P-H, Chiang H-L (2018). Fuel Economy and Volatile Organic Compound Exhaust Emission for Motorcycles with Various Running Mileages. Aerosol and Air Quality Research 18(12): 3056-3067. DOI 10.4209/aaqr.2018.07.0264",
+   "url": "https://doi.org/10.4209/aaqr.2018.07.0264",
+   "verified": true,
+   "readLevel": "abstract only (OpenAlex API); aaqr.org PDF 403",
+   "quote_or_table": "'For regulation phase V motorcycles, the average emission factor was 84.3 +/- 40.9 g L-1 for CO, 29.4 +/- 13.1 g L-1 for HC, 8.0 +/- 2.3 g L-1 for NOx, and 2098 +/- 109 g L-1 for CO2.'",
+   "applicability": "Driving-cycle values, not idle. Used as a cross-check on the fuel-based scale: driving CO is about 0.11 g/g for phase V versus 0.23 g/g in the Yilan idle carbon balance for phase 5, i.e. idle is leaner on combustion quality than the cycle by about 2x, which is plausible for carburetted idle and consistent with Yao 2008 (idle CO about 3x cruise CO per litre). Gives the NOx scale (about 0.01 g/g) and CO2 scale (2.8 g/g); idle NOx is much lower than cycle NOx (Yao 2008: 0.001 g/g)."
+  },
+  {
+   "id": "ting-2023-mc-fcef",
+   "claim": "In a Taipei tunnel regression, motorcycles emitted 0.209 kg CO and 2.698 kg CO2 per kg of fuel (about half the traffic was motorcycles).",
+   "values": {
+    "unit": "kg per kg fuel",
+    "CO": 0.209,
+    "CO2": 2.698,
+    "error_CO": 0.018,
+    "error_CO2": 0.036
+   },
+   "measured": "Fuel-based emission factors of motorcycles regressed from tunnel in/out concentrations, driving conditions.",
+   "place_year": "Ziqiang tunnel, Taipei; paper 2023",
+   "citation": "Ting Y-C, Chang P-K, Hung P-C, Chou C C-K, Chi K-H, Hsiao T-C (2023). Characterizing emission factors and oxidative potential of motorcycle emissions in a real-world tunnel environment. Environmental Research 234: 116601. DOI 10.1016/j.envres.2023.116601",
+   "url": "https://doi.org/10.1016/j.envres.2023.116601",
+   "verified": false,
+   "readLevel": "not re-opened by this run; values from research/papers/ting-2023-envres.json (an earlier agent's full-text read, Table 3, page 7)",
+   "quote_or_table": "Table 3 (Ziqiang): CO MC 0.209 +/- 0.018 kg/kg-fuel; CO2 MC 2.698 +/- 0.036 (mc-ldv-hdv-co-fcef, mc-co2 in the paper JSON)",
+   "applicability": "Real-world Taiwanese fleet-average (the actual mix of phases on the road, mostly moving). Its CO/fuel of 0.21 g/g sits between phase V cycle (0.11) and the idle carbon balance for the whole fleet (0.18 central), and CO2 2.70 g/g matches. A good anchor that the fleet-mean CO/fuel ratio of 0.15-0.25 is the right order of magnitude."
+  },
+  {
+   "id": "vojtisek-lom-2020-idle-flow",
+   "claim": "Exhaust flow of a four-stroke CVT motorcycle at idle was about 30 L/min (the paper's 'very low flow rate').",
+   "values": {
+    "unit": "L/min",
+    "idle_exhaust_flow": 30,
+    "also": "about 20 L/min of exhaust available at idle for the moped (50 cc) sampling line"
+   },
+   "measured": "Bench-versus-Mini-PEMS comparison on three four-stroke CVT vehicles (a 50 cc moped and two 'medium performance' motorcycles); Test 5 of WMTC type; reference conditions of the 30 L/min not stated.",
+   "place_year": "Czech Republic / JRC Italy; 2020",
+   "citation": "Vojtisek-Lom M, Zardini A A, Pechout M, Dittrich L, Forni F, Montigny F, Carriero M, Giechaskiel B, Martini G (2020). A miniature Portable Emissions Measurement System (PEMS) for real-driving monitoring of motorcycles. Atmospheric Measurement Techniques 13: 5827-5843. DOI 10.5194/amt-13-5827-2020",
+   "url": "https://amt.copernicus.org/articles/13/5827/2020/",
+   "verified": true,
+   "readLevel": "open-access HTML opened; sentence found; Table 1 (engine sizes) is an image I could not read",
+   "quote_or_table": "Section 3.1.2: 'The largest deviations occurred during idle (very low flow rate approx 30 L min-1)'",
+   "applicability": "Independent magnitude check on exhaust volume: my engine-physics estimate for a 125 cc scooter is 18-41 L/min (at 0 degC), central 24, consistent. Vehicle size not known, reference temperature not stated, so only a check."
+  },
+  {
+   "id": "idle-rpm-adv150",
+   "claim": "Idle speed of a Taiwanese-market Honda ADV150 (150 cc fuel-injected scooter) is 1,700 +/- 100 rpm; the Taiwan test engine of Yao 2008 idled at 1,718 +/- 105 rpm.",
+   "values": {
+    "unit": "rpm",
+    "ADV150": "1700 +/- 100",
+    "Yao2008_125cc_bench": "1718 +/- 105"
+   },
+   "measured": "Service specification (third-party transcription of the Chinese owner's manual).",
+   "place_year": "Taiwan; manual year not stated",
+   "citation": "HackMD transcription 'ADV150 Owner's Manual' (Weed-M0CHI), 耗材規格 table; and Yao et al. 2008 (above)",
+   "url": "https://hackmd.io/@Weed-M0CHI/ADV150Owner%E2%80%99sManual",
+   "verified": true,
+   "readLevel": "page opened; line found; it is a user's transcription, not Honda's PDF",
+   "quote_or_table": "怠速轉速： 1,700 ± 100 rpm",
+   "applicability": "Input to the engine-physics fuel estimate (assumption: 1,500-1,900 rpm for the 100-150 cc fleet)."
+  },
+  {
+   "id": "gantina-2024-idle-supra",
+   "claim": "A 2009 Honda Supra X 125 (Indonesia) idled at 3.55% CO and 696 ppm HC on an engine test (cited second-hand in an Indonesian remote-sensing paper).",
+   "values": {
+    "unit": "% / ppm",
+    "CO_pct": 3.55,
+    "HC_ppm": 696
+   },
+   "measured": "Idle exhaust of one 125 cc motorcycle, reported in the literature review of the roadside remote-sensing paper (its ref [30]); the remote-sensing results themselves are in motion (median CO 1.42%, HC 1,499 ppm, 1,012 vehicles, 21.8 km/h).",
+   "place_year": "Indonesia; reference year 2009; paper 2024",
+   "citation": "Gantina T M, Lestari P, Arrohman M K, Mahalana A, Dallmann T (2024). Measurement of motorcycle exhaust emissions on urban roads using remote sensing. E3S Web of Conferences 485: 06009. DOI 10.1051/e3sconf/202448506009",
+   "url": "https://www.e3s-conferences.org/articles/e3sconf/pdf/2024/15/e3sconf_etmc2024_06009.pdf",
+   "verified": false,
+   "readLevel": "paper PDF opened and text read, but the idle figures are quoted from another study, not opened",
+   "quote_or_table": "Discussion: 'HC emissions at idle were 696 ppm ... CO emissions at idle were 3.55%'",
+   "applicability": "Same order as the Yilan carburetted-era phase 1-3 means (2.0-3.0% CO, 530-750 ppm HC). Supplementary only."
+  },
+  {
+   "id": "platt-lin-two-stroke-secondary",
+   "claim": "Two-stroke scooters idle at much higher HC: Taiwan EPA data (2017) reported by the Taipei Times give 5,431 ppm HC for two-strokes, about 20 times four-strokes; central-Taiwan inspection data 1996-2002 gave about 10 times.",
+   "values": {
+    "unit": "ppm HC",
+    "two_stroke_mean": 5431,
+    "ratio_to_four_stroke": "about 20 (newspaper), about 10 (Lin 2006)",
+    "two_stroke_limit_pre2004": 9000
+   },
+   "measured": "Inspection readings; the newspaper does not say idle or average, but Taiwan's inspection is idle-only.",
+   "place_year": "Taiwan; EPA data 2017 (article 12 June 2018); Lin et al. 1996-2002",
+   "citation": "'Scooter owners decry plan to tighten emission limits', Taipei Times / Liberty Times, 12 June 2018; Lin C-W, Lu S-J, Lin K-S (2006) Science of the Total Environment 368: 435-443 (via research/redlight/idle-emissions.json)",
+   "url": "https://news.ltn.com.tw/amp/news/focus/breakingnews/2455079",
+   "verified": true,
+   "readLevel": "article opened and sentence found (newspaper, secondary to EPA); Lin 2006 abstract-level from repo",
+   "quote_or_table": "'two-stroke engines emit hydrocarbons in concentrations of 5,431 parts per million'",
+   "applicability": "Only anchor for two-stroke idle HC. No two-stroke idle mass rate or fuel rate was found; the two-stroke numbers below are my arithmetic with assumptions. Two-strokes are about 280,000 of 14.66 million registered (2%)."
+  },
+  {
+   "id": "moenv-failure-cause-lin2006",
+   "claim": "At inspection, failures due to CO are about four times as frequent as failures due to HC (central Taiwan 1996-2002).",
+   "values": {
+    "CO_to_HC_failure_ratio": "about 4"
+   },
+   "measured": "I/M records.",
+   "place_year": "Central Air Quality Basin, Taiwan, 1996-2002",
+   "citation": "Lin C-W, Lu S-J, Lin K-S (2006). Test emission characteristics of motorcycles in Central Taiwan. Science of the Total Environment 368(2-3): 435-443.",
+   "url": "https://doi.org/10.1016/j.scitotenv.2006.03.032",
+   "verified": false,
+   "readLevel": "not re-opened; repo idle-emissions.json (abstract-level)",
+   "quote_or_table": "See repo id lin-2006-im-data.",
+   "applicability": "Consistent with the 2025 national table above (12,280 HC fails against 318,267 total)."
+  }
+ ],
+ "derivations": [
+  {
+   "id": "carbon-balance-method",
+   "description": "Route 2: emission per gram of fuel from the idle exhaust composition by carbon balance; independent of exhaust dilution and of the tailpipe flow.",
+   "formula": "Per g fuel: n_C = w_C/12 mol C (w_C = 0.86 g C/g fuel). Carbon in exhaust: x_CO2 + x_CO + x_HC(C-atoms). Species mass per g fuel = n_C * (x_i / sum_C) * M_i. x_HC(C) = k * HC_ppm * 1e-6, k = ppm C1 per ppm n-hexane-equivalent (3 to 6; central 4.5). HC mass uses CH1.85 = 13.85 g per mol C. Then multiply by the fuel flow F (g/h).",
+   "assumptions_used": [
+    "w_C=0.86 (0.85-0.87)",
+    "k=4.5 (3-6)",
+    "inspection HC is NDIR n-hexane-equivalent (UNVERIFIED)"
+   ],
+   "note": "HC from an NDIR hexane-equivalent reading is a lower bound for total hydrocarbon (NDIR is blind to part of the olefin/aromatic/light fraction); the dynamometer THC (FID) factors of Yao 2008 and Tsai 2018 are 3-4x higher per g fuel."
+  },
+  {
+   "id": "carbon-balance-results",
+   "description": "Carbon-balance results by phase, using Yilan group means (phase 1-5) and stated assumptions (phase 6-7, high emitter).",
+   "table": {
+    "phase5_Yilan_means": {
+     "CO_pct": 1.449,
+     "CO2_pct": 10.789,
+     "HC_ppm": 367.08,
+     "CO_g_per_g_fuel": 0.234,
+     "CO2_g_per_g_fuel": 2.74,
+     "HC_g_per_g_fuel_k4.5": 0.0132,
+     "at_120_g_h": {
+      "CO": 28.1,
+      "CO2": 329,
+      "HC": 1.6
+     }
+    },
+    "phase4_Yilan_means": {
+     "CO_pct": 1.797,
+     "CO2_pct": 10.013,
+     "HC_ppm": 400.81,
+     "CO_g_per_g_fuel": 0.301,
+     "CO2_g_per_g_fuel": 2.63,
+     "HC_g_per_g_fuel_k4.5": 0.0149,
+     "at_120_g_h": {
+      "CO": 36.1,
+      "CO2": 316,
+      "HC": 1.8
+     }
+    },
+    "phase3_Yilan_means": {
+     "CO_pct": 2.047,
+     "CO2_pct": 9.88,
+     "HC_ppm": 525.97,
+     "CO_g_per_g_fuel": 0.338,
+     "CO2_g_per_g_fuel": 2.56,
+     "HC_g_per_g_fuel_k4.5": 0.0193,
+     "at_120_g_h": {
+      "CO": 40.5,
+      "CO2": 307,
+      "HC": 2.3
+     }
+    },
+    "phase2_Yilan_means": {
+     "CO_pct": 2.535,
+     "CO2_pct": 9.583,
+     "HC_ppm": 747.51,
+     "CO_g_per_g_fuel": 0.408,
+     "CO2_g_per_g_fuel": 2.43,
+     "HC_g_per_g_fuel_k4.5": 0.0268,
+     "at_120_g_h": {
+      "CO": 49.0,
+      "CO2": 291,
+      "HC": 3.2
+     }
+    },
+    "phase1_Yilan_means_n18": {
+     "CO_pct": 3.039,
+     "CO2_pct": 9.011,
+     "HC_ppm": 544.78,
+     "CO_g_per_g_fuel": 0.496,
+     "CO2_g_per_g_fuel": 2.31,
+     "HC_g_per_g_fuel_k4.5": 0.0198,
+     "at_120_g_h": {
+      "CO": 59.5,
+      "CO2": 277,
+      "HC": 2.4
+     }
+    },
+    "ASSUMED_phase6_7_closed_loop_FI_TWC_idle": {
+     "CO_pct": "0.6 (range 0.2-1.0) ASSUMPTION",
+     "CO2_pct": 12.5,
+     "HC_ppm": "150 (60-250) ASSUMPTION",
+     "CO_g_per_g_fuel": "0.091 (0.030-0.153)",
+     "CO2_g_per_g_fuel": 2.99,
+     "HC_g_per_g_fuel_k4.5": 0.0051,
+     "at_120_g_h": {
+      "CO": 11.0,
+      "CO2": 359,
+      "HC": 0.6
+     }
+    },
+    "failing_high_emitter_6.5pct_CO": {
+     "CO_pct": 6.5,
+     "CO2_pct": 8.0,
+     "HC_ppm": 5823,
+     "CO_g_per_g_fuel": 0.762,
+     "at_120_g_h": {
+      "CO": 91.4,
+      "CO2": 177,
+      "HC": 18.2
+     },
+     "basis": "CO 6.36-6.94% from the deteriorated phase IV scooters of Tsai 2026 (repo tsai-2026-phase4-vs-7), HC 5,823 ppm = MOENV 2025 failed-HC mean"
+    }
+   },
+   "note": "Phase 6-7 rows are NOT measured: no Taiwanese idle reading for 2017+ scooters was found. The assumption rests on the in-use limit (2.0% CO, 1000 ppm HC) being a ceiling and on closed-loop fuel injection with a three-way catalyst normally idling well below it. A published idle CO of 0.1-0.5% for such vehicles is common knowledge but I did not find a citable Taiwanese or small-bike source."
+  },
+  {
+   "id": "idle-fuel-flow",
+   "description": "Idle fuel flow for a 100-150 cc scooter, from five routes.",
+   "table": [
+    {
+     "source": "Nguyen 2025 (15 MCs, VN, mean 0-30 s)",
+     "g_per_h": 84,
+     "L_per_h_at_0.74": 0.114,
+     "quality": "abstract, controlled test; falling with time"
+    },
+    {
+     "source": "Nguyen 2025 first 5 s",
+     "g_per_h": 101,
+     "L_per_h_at_0.74": 0.136,
+     "quality": "abstract"
+    },
+    {
+     "source": "Taichung 100 cc FI 1.55 g/min (secondary)",
+     "g_per_h": 93,
+     "L_per_h_at_0.74": 0.126,
+     "quality": "unverified"
+    },
+    {
+     "source": "Multi-city survey 0.14 L/h (secondary)",
+     "g_per_h": 104,
+     "L_per_h_at_0.74": 0.14,
+     "quality": "unverified"
+    },
+    {
+     "source": "Engine physics: 125 cc, 1700 rpm, VE 0.20-0.35, AFR 13.5-14.7 (assumptions)",
+     "g_per_h": "101-193 (central 137 at VE 0.27; 120 at VE about 0.24)",
+     "quality": "my arithmetic"
+    },
+    {
+     "source": "Hanoi lab 2021 (5 models)",
+     "g_per_h": 180,
+     "L_per_h_at_0.74": 0.243,
+     "quality": "abstract"
+    },
+    {
+     "source": "Delta Foundation 2008 (0.05 g/s)",
+     "g_per_h": 180,
+     "L_per_h_at_0.74": 0.243,
+     "quality": "rounded programme statement"
+    }
+   ],
+   "engine_physics": "air g/min = 0.125 L x (rpm/2) x 1.17 g/L x VE; fuel = air/AFR. At 1700 rpm: 106 L/min swept x 1.17 = 124 g/min x VE(0.20-0.35) = 24.9-43.5 g/min air; /14.7-13.5 = 1.7-3.2 g/min fuel = 101-193 g/h. Volumetric efficiency at idle (throttle nearly closed) of 0.20-0.35 is an assumption, not a cited figure.",
+   "chosen": {
+    "central_g_per_h": 120,
+    "low_g_per_h": 80,
+    "high_g_per_h": 180,
+    "central_L_per_h": 0.162,
+    "central_mL_per_min": 2.7,
+    "basis": "geometric centre of the two clusters (about 80-105 and 180) and of the engine-physics range; the whole span of the sources is covered. If the Taichung 1.55 g/min is confirmed (93 g/h) the central would drop to about 100 g/h."
+   },
+   "note": "Idle fuel flow is the biggest single uncertainty (factor 2.2 between low and high) and is as large as the phase-to-phase differences in CO."
+  },
+  {
+   "id": "direct-concentration-x-flow-check",
+   "description": "Route 2 variant: concentration times exhaust flow, without the carbon balance, for phase 5.",
+   "arithmetic": "Exhaust flow at 0 degC for 120 g/h fuel and AFR 14.2: air 28.4 g/min + fuel 2.0 g/min = 30.4 g/min / 1.28 g/L = 24 L/min (of the order of the 30 L/min measured by Vojtisek-Lom 2020). CO 1.449% x 24 L/min = 0.348 L/min x 28/22.414 = 0.435 g/min = 26 g/h.",
+   "result_g_per_h": 26,
+   "comparison": "Carbon balance gave 28 g/h (the 2 g/h difference is the 16% tailpipe dilution seen in CO+CO2 = 12.2% against 14.5%). The two methods agree to 8%, as they should since both use the same fuel flow."
+  },
+  {
+   "id": "route1-vs-route2-crosscheck",
+   "description": "Route 3: do the direct (route 1) and inspection-derived (route 2) CO, CO2, HC per gram of fuel agree?",
+   "table": [
+    {
+     "set": "Hanoi lab idle (route 1)",
+     "CO_g_per_g": 0.338,
+     "CO2_g_per_g": 2.97,
+     "HC_g_per_g": 0.057,
+     "NOx_g_per_g": 0.01
+    },
+    {
+     "set": "Yilan phase 2-4 means, carbon balance (route 2)",
+     "CO_g_per_g": "0.30-0.41",
+     "CO2_g_per_g": "2.4-2.6",
+     "HC_g_per_g": "0.015-0.027 (NDIR, k 4.5)"
+    },
+    {
+     "set": "Yilan phase 5 mean, carbon balance (route 2)",
+     "CO_g_per_g": 0.234,
+     "CO2_g_per_g": 2.74,
+     "HC_g_per_g": 0.013
+    },
+    {
+     "set": "Yao 2008 cold carburetted idle, bench (route 1)",
+     "CO_g_per_g": "0.72-0.79",
+     "HC_g_per_g": "0.040-0.043",
+     "NOx_g_per_g": 0.0006
+    },
+    {
+     "set": "Tsai 2018 phase V, drive cycle (reference)",
+     "CO_g_per_g": 0.114,
+     "HC_g_per_g": 0.04,
+     "NOx_g_per_g": 0.011,
+     "CO2_g_per_g": 2.84
+    },
+    {
+     "set": "Ting 2023 tunnel, motorcycle fleet (reference)",
+     "CO_g_per_g": 0.209,
+     "CO2_g_per_g": 2.7
+    }
+   ],
+   "verdict": "CO per g fuel: Hanoi 0.34 is inside the Yilan phase 2-4 range 0.30-0.41; the Taiwanese fleet of today (more fuel-injected and catalysed than Yilan 2014-15) should be lower than Hanoi, and phase 5 at 0.23 fits that. CO2 per g agrees within 10% across all four sets. HC is the weak point: NDIR-based inspection HC gives 0.01-0.03 g/g while FID-based bench and lab sets give 0.04-0.06; I therefore set the central HC at 0.02 g/g and the range 0.006-0.057 g/g. NOx at idle is small and scattered (0.0006 to 0.010 g/g)."
+  },
+  {
+   "id": "fleet-mix",
+   "description": "Phase mix of the gasoline four-stroke scooters in use, from the 2025 inspection age table plus registrations.",
+   "arithmetic": "Inspected 2025: age 5-8 (phase 6, builds 2017-2020) 2,827,489 = 34.1%; age 9-17 (phase 5, builds 2008-2016) 3,904,647 = 47.1%; age 18-20+ (phase 4 and earlier) 1,554,752 = 18.8% (sum 8,286,888 of 8,292,331, the rest 'other'). Notified four-strokes aged 5+ were 9,879,780 (repo moenv-inspection-2025), so scaled: phase 6 about 3.37 M, phase 5 about 4.65 M, phase 4 and earlier about 1.86 M. Under-5-year-old (phase 7, builds 2021+) gasoline scooters = 14.66 M registered (2024) - 9.88 M - 0.28 M two-strokes - 0.77 M electric = about 3.7 M (registrations include scooters no longer used, so this is an upper bound). Fleet total about 13.6 M: phase 7 27%, phase 6 25%, phase 5 34%, phase 4 and earlier 14%.",
+   "weights_used": {
+    "phase_le4": 0.14,
+    "phase5": 0.34,
+    "phase6": 0.25,
+    "phase7": 0.27
+   },
+   "caveat": "Registered, not kilometre-weighted. Scooters at a city red light skew newer (older scooters are used less and in more rural areas), so the real kerb mix is probably cleaner than this; the high-emitter tail is probably also under-represented."
+  },
+  {
+   "id": "fleet-weighted-idle-rates",
+   "description": "Per-scooter idle emission rates averaged over the in-use fleet, central with low-high.",
+   "table": {
+    "fuel_g_per_h": {
+     "central": 120,
+     "low": 80,
+     "high": 180
+    },
+    "CO_g_per_h": {
+     "central": 21,
+     "low": 8,
+     "high": 48,
+     "arithmetic": "central: 120 x (0.14x0.33 + 0.34x0.234 + 0.52x0.10) = 120 x 0.178 = 21; low: 80 x (0.14x0.234 + 0.34x0.153 + 0.52x0.03) = 80 x 0.100 = 8; high: 180 x (0.14x0.41 + 0.34x0.378 + 0.52x0.153) = 180 x 0.266 = 48"
+    },
+    "CO2_g_per_h": {
+     "central": 340,
+     "low": 200,
+     "high": 550,
+     "arithmetic": "120 x 2.85 g/g (weighted); low 80 x 2.5; high 180 x 3.07; Hanoi measured 534 at 180 g/h"
+    },
+    "THC_g_per_h": {
+     "central": 2.4,
+     "low": 0.5,
+     "high": 10,
+     "arithmetic": "120 x 0.02 g/g; low 80 x 0.006; high 180 x 0.057 (Hanoi); NDIR-route fleet value would be about 1.1 g/h"
+    },
+    "NOx_g_per_h": {
+     "central": 0.5,
+     "low": 0.05,
+     "high": 2.0,
+     "arithmetic": "0.0006-0.010 g/g x 80-180 g/h; Hanoi 1.8 g/h; Yao 2008 non-catalyst carburetted 0.08 g/h; no Taiwanese FI-with-catalyst idle NOx found (LOW CONFIDENCE)"
+    },
+    "benzene_g_per_h": {
+     "central": 0.07,
+     "low": 0.01,
+     "high": 0.3,
+     "arithmetic": "3% of THC mass (Yao 2008 idle: 918 mg per 31 g THC) x 2.4 g/h; high 3% x 10"
+    }
+   },
+   "per_90s_red_light_per_scooter": {
+    "fuel_g": 3.0,
+    "CO_g": 0.54,
+    "CO_g_range": [
+     0.2,
+     1.2
+    ],
+    "CO2_g": 8.6,
+    "THC_g": 0.06,
+    "NOx_g": 0.0125
+   },
+   "per_phase_at_120_g_h": {
+    "phase7_and_6_assumed": {
+     "CO": 11,
+     "CO_range": [
+      2.4,
+      27
+     ]
+    },
+    "phase5": {
+     "CO": 28,
+     "CO_range": [
+      12,
+      68
+     ]
+    },
+    "phase4_and_earlier": {
+     "CO": 40,
+     "CO_range": [
+      19,
+      90
+     ]
+    },
+    "failing_high_emitter": {
+     "CO": 91,
+     "CO_range": [
+      60,
+      140
+     ]
+    }
+   },
+   "note": "These are warm-idle rates for a mid-trip scooter at a red light; a scooter that has just been started cold idles richer (CO x1.1-1.5, HC x1.2-2.8 per cycle; Yao 2009 repo id yao-2009-cold-start). Idle-stop scooters (at least 50% of engine families since 2021) emit nothing while stopped if the rider leaves it on; not modelled here."
+  },
+  {
+   "id": "two-stroke-estimate",
+   "description": "Idle rates of the remaining two-stroke scooters (about 280,000 registered, about 2% of the fleet). LOW CONFIDENCE, assumption-derived.",
+   "arithmetic": "HC: 5,431 ppm (EPA via Taipei Times) x k 3-6 = 1.6-3.3% C-atoms; with CO+CO2 of 9-11% the carbon fraction as HC is 15-23%; HC mass = 0.15-0.23 g/g fuel (central 0.19). Fuel flow assumed 60-150 g/h (central 100; small displacement, similar to four-stroke; oil in the mixture adds a little). HC = 19 g/h (9-34). CO: assumed 0.34 g/g (same as phase 3; no two-stroke CO reading was opened) = 34 g/h (15-60).",
+   "result": {
+    "fuel_g_per_h": {
+     "central": 100,
+     "low": 60,
+     "high": 150
+    },
+    "HC_g_per_h": {
+     "central": 19,
+     "low": 9,
+     "high": 34
+    },
+    "CO_g_per_h": {
+     "central": 34,
+     "low": 15,
+     "high": 60
+    },
+    "CO2_g_per_h": "about 200-300 (carbon not in HC/CO)"
+   },
+   "note": "A two-stroke is one scooter in fifty, but emits roughly 8 times the THC of the average four-stroke and about 1.5x the CO. Per kerb pack of 20 scooters the expected number of two-strokes is 0.4."
+  }
+ ],
+ "assumptions": [
+  {
+   "id": "A-density",
+   "text": "Gasoline density 0.74 kg/L (0.72-0.775)",
+   "basis": "typical for 92/95 RON unleaded; CNS 12614 limits not opened",
+   "effect": "converts per-litre factors to per-gram; +/-4%"
+  },
+  {
+   "id": "A-carbon",
+   "text": "Carbon mass fraction of gasoline 0.86 (0.85-0.87)",
+   "basis": "textbook value; consistent with CO2 factor 2,098 g/L of Tsai 2018 (2.84 g/g)",
+   "effect": "+/-1.5%"
+  },
+  {
+   "id": "A-hc-basis",
+   "text": "Taiwan inspection HC is NDIR in ppm n-hexane-equivalent, ppmC1 = k x ppm with k 3-6 (central 4.5)",
+   "basis": "standard practice for idle inspection analysers; the Taipei/Taichung SOP (opened only in search summary) says 60 cm probe, 10-s average, validity by CO2 and CO+CO2 but gives no unit; NOT verified for Taiwan",
+   "effect": "HC only; CO and CO2 unaffected"
+  },
+  {
+   "id": "A-idle-rpm",
+   "text": "Idle 1,500-1,900 rpm, central 1,700",
+   "basis": "ADV150 manual 1,700 +/- 100; Yao 2008 bench 1,718 +/- 105",
+   "effect": "fuel flow +/-12%"
+  },
+  {
+   "id": "A-VE",
+   "text": "Volumetric efficiency at idle 0.20-0.35",
+   "basis": "throttled idle, my assumption; no citation",
+   "effect": "engine-physics fuel range 101-193 g/h"
+  },
+  {
+   "id": "A-afr",
+   "text": "Idle air-fuel ratio 13.5-14.7",
+   "basis": "rich carburetted to stoichiometric closed-loop; assumption",
+   "effect": "+/-9%"
+  },
+  {
+   "id": "A-fuel",
+   "text": "Idle fuel flow 120 g/h central, 80-180",
+   "basis": "see derivation idle-fuel-flow",
+   "effect": "all g/h scale 1:1"
+  },
+  {
+   "id": "A-phase67",
+   "text": "Idle CO of 2017+ scooters 0.6% (0.2-1.0%), HC 150 ppm (60-250), CO2 12.5%",
+   "basis": "closed-loop FI with TWC, below the 2.0%/1000 ppm limit; no Taiwanese reading found",
+   "effect": "fleet CO central falls from about 30 to 21 g/h with this assumption; the single largest assumption-driven term"
+  },
+  {
+   "id": "A-fleetmix",
+   "text": "Fleet phase mix 14% / 34% / 25% / 27% (<=4, 5, 6, 7)",
+   "basis": "derived above from MOENV 2025 age counts and registrations; registered, not use-weighted",
+   "effect": "modest"
+  },
+  {
+   "id": "A-twostroke",
+   "text": "Two-stroke idle fuel 60-150 g/h and CO/fuel 0.34",
+   "basis": "similar to small four-stroke; assumed",
+   "effect": "CO and fuel of two-strokes uncertain by 2x"
+  }
+ ],
+ "holes": [
+  "No Taiwanese direct measurement of idle emission RATE (g/h) for a scooter was found. The fuel-flow range (80-180 g/h) rests on two Vietnamese laboratory sets (which disagree by 2.1x) plus a Taiwanese 2008 foundation statement and an unverified Taichung 1.55 g/min.",
+  "No idle reading (CO %, HC ppm) for phase 6 and 7 scooters (2017 onward, now over half of the fleet). The central CO for them (0.6%) is an assumption; if it were 0.3% fleet CO drops to about 17 g/h, if 1.0% it rises to about 26 g/h.",
+  "The Yilan means are one county and 2014-15; the national MOENV inspection database holds the answer (per-test CO and HC by build year) but only an aggregate failure and HC-reduction report is public. The 'HC減量' table is the only measured-concentration statistic found (failed and re-test means). Nothing on mean CO nationally.",
+  "The New Taipei EPB inspection statistics (105年12月 and 107年度, 862,812 records) reportedly list mean CO and HC by age for two- and four-strokes; I could not open them (HTTP 400). A search summary quoted 4-stroke CO 0.7-1.7% and HC 189-304 ppm for ages 5-13, which would be LOWER than Yilan; unverified.",
+  "HC measurement basis of Taiwan's inspection (NDIR hexane-equivalent) not confirmed; HC mass is uncertain by 3x between the NDIR route (0.01 g/g) and FID bench data (0.04 g/g).",
+  "Idle NOx for FI-with-catalyst scooters not found; the NOx range spans 40x.",
+  "Two-stroke idle fuel flow and CO not found at all; HC rests on a newspaper's 5,431 ppm.",
+  "Warm versus cold idle: all sources mix them (inspection warm; Yao 2008 cold; Hanoi both stages). A mid-trip red-light idle is warm; the cold-start premium is documented only for whole cycles.",
+  "Particle number and PM2.5 idle emission rates are outside this task (only Chien & Huang 2010: 2.07e4 #/cm3 diluted, repo).",
+  "Idle-stop uptake in practice (how many riders leave the system on) is unknown; the rates above apply to a scooter whose engine is running.",
+  "Rich-idle choke or poorly adjusted idle-mixture screws on carburetted scooters cause the high-CO tail; its share of the kerb fleet is unknown."
+ ],
+ "needsManualFetch": [
+  "https://www.epd.ntpc.gov.tw/UploadFile/InformationDisclosure/20170825142322780601.pdf (New Taipei EPB, inspection-station CO/HC by age, Dec 2016; HTTP 400 to automated fetch)",
+  "https://www.epd.ntpc.gov.tw/UploadFile/StaData/20190726092113042252.pdf (New Taipei EPB, 107年度 inspection statistics, 862,812 records; HTTP 400)",
+  "https://www.tandfonline.com/doi/full/10.1080/12265934.2020.1871059 (Nguyen 2021 Hanoi idle; full text, 403): per-model engine size, fuel system, mileage and the unsteady-idle model",
+  "https://www.tandfonline.com/doi/abs/10.1080/02533839.2025.2531199 (Nguyen 2025 idle vs restart; 403): per-bike fuel, fuel-injection vs carburetor split, to resolve the 84 vs 180 g/h disagreement",
+  "https://aaqr.org/articles/aaqr-18-07-oa-0264.pdf and https://doi.org/10.4209/aaqr.2016.04.0155 (Tsai 2018 and 2017; 403): tables of CO, HC per phase and idle share, number of scooters",
+  "https://www.researchgate.net/publication/279289678_jichedaisuyinfazhitanpaifangliangxiangguanwentitantaoyitaizhongshiweili (Taichung idle carbon paper; 403): the 1.55 g/min",
+  "https://www.researchgate.net/publication/318788877_Evaluation_of_Idling_Fuel_Consumption_of_Vehicles_Across_Different_Cities (0.14 L/h motorcycle idle fuel; 403)",
+  "https://iptek.its.ac.id/index.php/jps/article/download/3299/2586 (Indonesian dynamometer study of 20 motorcycles, idle CO2 0.16, CO 0.03, HC 0.002 g/s per a search summary; host not resolvable from the session network, would need to be allowed)",
+  "https://people.dyu.edu.tw/paper/344710_c.pdf and https://people.dyu.edu.tw/paper/9314395_c.pdf (Dayeh University papers on Yun-Chia-Nan basin inspection data incl. two-stroke CO and HC means; HTTP 503)",
+  "https://theicct.org/wp-content/uploads/2021/06/managing_motorcycles.pdf and https://theicct.org/sites/default/files/publications/twothree_wheelers_2007.pdf (403); ICCT consultant report https://theicct.org/?p=92722 reportedly gives idle CO 4-5% and HC 14,000-16,000 ppm for an unnamed bike",
+  "https://doi.org/10.1007/s40825-026-00286-x (Dhital 2026 idle-stop real-world tailpipe; Springer login redirect)",
+  "https://doi.org/10.1016/j.rineng.2026.112353 (Tsai 2026 Taichung driving pattern with idle share and CO; not opened)",
+  "https://www.sciencedirect.com/science/article/abs/pii/S1361920920308683 (Lijewski 2021 start-stop 125 cc scooter, 403) and S1361920918309222 (Naples RDE scooter, 403)",
+  "https://saemobilus.sae.org/papers/exhaust-emissions-characteristics-scooters-real-world-taiwan-2013-32-9050 (SAE, Taiwan scooters real world; paywall)",
+  "Taipei/Taichung motorcycle exhaust test SOP (https://www.laws.taipei.gov.tw/lawatt/Law/附錄二、機車排氣檢驗標準作業程序.pdf redirects to a malformed URL; Taichung copy 503): analyser type and HC unit",
+  "CNS 12614 (unleaded gasoline, density limits) from BSMI or CPC safety data sheet",
+  "Transport Research Institute (IOT/運研所) 2012-2014 on-road PEMS motorcycle energy report quoted in news (idle-stop saves 20-25%): report not located"
+ ]
+}

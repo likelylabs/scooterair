@@ -1,0 +1,3196 @@
+{
+ "title": "ScooterAir kerbside exposure at a 90-s red light — ESTIMATE (推估), not a measurement",
+ "generated": "2026-11-26",
+ "model": "model.mjs (method of record: corrected source-dispersion Monte Carlo)",
+ "reproduce": "node model.mjs --write  (estimate(call) with the recorded call reproduces each scenario exactly in Node/V8)",
+ "conventions": {
+  "low": "P5",
+  "central": "P50",
+  "high": "P95",
+  "mean": "arithmetic mean",
+  "heights_m": [
+   0.6,
+   1,
+   1.5
+  ],
+  "increment": "above urban background",
+  "molarVolume_L": 24.45,
+  "published": "only CO, benzene and PM2.5 increments at 1.5 m, rounded to 1 significant figure, as ranges; particle number, height ratios and time series are recorded but NOT published"
+ },
+ "inputs": {
+  "fuelFlow_gph": {
+   "dist": "ln",
+   "low": 80,
+   "central": 120,
+   "high": 200,
+   "unit": "g fuel/h per idling scooter (fleet-scale)",
+   "status": "S/D",
+   "source": "Nguyen et al. 2025 J Chin Inst Eng doi:10.1080/02533839.2025.2531199 (84-101 g/h, abstract); Nguyen et al. 2021 Int J Urban Sci doi:10.1080/12265934.2020.1871059 (180 g/h, abstract; its own carbon balance implies ~210 g/h); engine-physics 101-193 g/h"
+  },
+  "fuelScatter_sd": {
+   "dist": "fix",
+   "central": 0.2,
+   "unit": "lognormal sigma, scooter-to-scooter",
+   "status": "A",
+   "source": "ASSUMPTION: 90-150 cc, 1500-1900 rpm idle spread"
+  },
+  "moenvCObins": {
+   "dist": "fix",
+   "status": "V",
+   "unit": "inspection tests per idle-CO bin (% CO)",
+   "central": [
+    [
+     0,
+     1,
+     6769973
+    ],
+    [
+     1,
+     2,
+     1042630
+    ],
+    [
+     2,
+     3,
+     650643
+    ],
+    [
+     3,
+     4,
+     342331
+    ],
+    [
+     4,
+     5,
+     121532
+    ],
+    [
+     5,
+     6,
+     57596
+    ],
+    [
+     6,
+     7,
+     35469
+    ],
+    [
+     7,
+     8,
+     21826
+    ],
+    [
+     8,
+     9,
+     12560
+    ],
+    [
+     9,
+     10,
+     12597
+    ]
+   ],
+   "source": "MOENV 各縣市機車排氣定檢CO檢測值統計表 114年 (2025), national row, n = 9,067,160 tests; https://mobile.moenv.gov.tw/Motor/ReportNew/Unit_CO_Report.aspx?YearMonth=2025/12 (opened by critic-inputs and gap-answers-c). Per test incl. retests; scooters >= 5 y old only"
+  },
+  "firstBinMean_pct": {
+   "dist": "u",
+   "low": 0.3,
+   "high": 0.7,
+   "unit": "% CO, mean within the 0-1 % bin",
+   "status": "A",
+   "source": "ASSUMPTION (bin holds 75 % of tests; no finer split published)"
+  },
+  "newShare": {
+   "dist": "u",
+   "low": 0.25,
+   "high": 0.45,
+   "unit": "share of idling kerb fleet < 5 y old (not inspected)",
+   "status": "D/A",
+   "source": "Phase 7 ~27 % of registered fleet (inputs-emission-rates.json); kerb fleet assumed newer"
+  },
+  "newCO_pct": {
+   "dist": "u",
+   "low": 0.05,
+   "high": 0.6,
+   "unit": "% CO at idle, new FI+catalyst scooter (then x0.5-1.5 per scooter)",
+   "status": "A",
+   "source": "ASSUMPTION: no Taiwanese reading; below 2.0 % in-use limit for 2017+ build (MOENV gazette 2023-06-30)"
+  },
+  "newTHCscale": {
+   "dist": "u",
+   "low": 0.3,
+   "high": 1,
+   "unit": "THC multiplier for new scooters vs inspected fleet",
+   "status": "A",
+   "source": "ASSUMPTION (critic-inputs: new scooters were given clean CO but old-fleet THC)"
+  },
+  "carbonSum_pct": {
+   "dist": "u",
+   "low": 11.5,
+   "high": 12.5,
+   "unit": "% CO+CO2 in analyser sample",
+   "status": "V",
+   "source": "Cheng et al. 2017 Bull Coll Eng NIU 12:33-76, Yilan inspection means CO+CO2 12.0-12.2 % (via inputs-emission-rates.json)"
+  },
+  "carbonFrac": {
+   "dist": "fix",
+   "central": 0.86,
+   "unit": "g C per g fuel",
+   "status": "A",
+   "source": "textbook gasoline 0.85-0.87"
+  },
+  "thcPerFuel": {
+   "dist": "ln",
+   "low": 0.008,
+   "central": 0.025,
+   "high": 0.06,
+   "unit": "g THC per g fuel, ordinary four-stroke (FID-equivalent)",
+   "status": "D/V/S",
+   "source": "NDIR inspection route 0.006-0.027 (under-reads aromatics); Yao et al. 2008 Atmos Environ 42:6560 bench idle FID 0.040-0.043 (V); Hanoi lab 0.057 (abstract)"
+  },
+  "thcScatter_sd": {
+   "dist": "fix",
+   "central": 0.5,
+   "unit": "lognormal sigma (mean-corrected)",
+   "status": "A",
+   "source": "ASSUMPTION"
+  },
+  "hcHigh4sShare": {
+   "dist": "u",
+   "low": 0.002,
+   "high": 0.01,
+   "unit": "share of four-strokes that are HC high emitters",
+   "status": "V/A",
+   "source": "MOENV 2025 HC table: 12,280 HC failures in 8.29 M tests = 0.15 % (V, critic-inputs); up to 1 % allowed for uninspected/borderline (A)"
+  },
+  "hcHighPerFuel": {
+   "dist": "u",
+   "low": 0.1,
+   "high": 0.22,
+   "unit": "g THC per g fuel, HC high emitter / two-stroke",
+   "status": "D",
+   "source": "carbon balance on 5,431 ppm two-stroke (Taipei Times 2018, S) and failed-HC mean 5,823 ppm (MOENV 2025, V) at 3-6 ppmC per ppm hexane"
+  },
+  "benzeneFracTHC": {
+   "dist": "tri",
+   "low": 0.012,
+   "central": 0.027,
+   "high": 0.05,
+   "unit": "g benzene per g THC, four-stroke",
+   "status": "V/S/A",
+   "source": "Yao 2008 Table 1 idle benzene 764-918 mg/L vs THC 30-32 g/L = 2.5-3.0 % (V); Tsai et al. 2018 catalysed Taiwanese scooters ~2-3 % (chart reading, S); TEDS inventory 0.77 % (biased low: evaporative HC in denominator, S); Stockwell 2016 ACP 16:11043 one pre-service Nepali bike, BTEX-based (V, split assumed)"
+  },
+  "benzeneFrac2s": {
+   "dist": "u",
+   "low": 0.01,
+   "high": 0.03,
+   "unit": "g benzene per g THC, two-stroke",
+   "status": "A",
+   "source": "ASSUMPTION: scavenged fuel; Taiwan gasoline benzene cap 0.9 % v/v (~1 % m/m)"
+  },
+  "pnPerKgFuel": {
+   "dist": "ln",
+   "low": 3500000000000,
+   "central": 52000000000000,
+   "high": 780000000000000,
+   "unit": "solid particles > 23 nm per kg fuel",
+   "status": "D/S",
+   "source": "Kontses et al. 2020 Environ Res 182:109071 WMTC 2e11-3e12 /km (V) x 46.9 km/kg; idle factor ~15 each way (inputs-speciation-particles.json); Chien & Huang 2010 idle/30 km/h (abstract)"
+  },
+  "pnTotalFactor": {
+   "dist": "u",
+   "low": 1.3,
+   "high": 2,
+   "unit": "total / solid >23 nm (10-23 nm added; volatile nucleation NOT included)",
+   "status": "V/A",
+   "source": "Kontses 2020: 10-23 nm adds 25-67 %"
+  },
+  "pnScatter_sd": {
+   "dist": "fix",
+   "central": 0.7,
+   "unit": "lognormal sigma (mean-corrected)",
+   "status": "A",
+   "source": "ASSUMPTION"
+  },
+  "pn2StrokeFactor": {
+   "dist": "u",
+   "low": 5,
+   "high": 15,
+   "unit": "two-stroke PN multiplier",
+   "status": "V",
+   "source": "Kontses 2020; Chirico et al. 2014 ACPD 14:16591 (~10x)"
+  },
+  "twoStrokeShare": {
+   "dist": "u",
+   "low": 0.01,
+   "high": 0.03,
+   "unit": "share of idling scooters that are two-stroke",
+   "status": "S/A",
+   "source": "~280,000 of ~14 M registered (inputs-emission-rates.json); kerb share assumed"
+  },
+  "pmPerKgFuel": {
+   "dist": "ln",
+   "low": 0.05,
+   "central": 0.25,
+   "high": 1.3,
+   "unit": "g PM2.5 per kg fuel, ordinary scooter",
+   "status": "A/V",
+   "source": "ASSUMPTION centred between Euro 3 cycle 0.03-0.10 (Kontses 2020, derived) and Nepal serviced idle 0.71 (Jayarathne et al. 2018 ACP 18:2259, V). Ting 2023 tunnel 0.013 +- 0.143 g/kg NOT used (indistinguishable from zero)"
+  },
+  "pmSmokerShare": {
+   "dist": "u",
+   "low": 0.01,
+   "high": 0.04,
+   "unit": "share of oil-burning smokers (incl. two-strokes)",
+   "status": "A",
+   "source": "ASSUMPTION"
+  },
+  "pmSmokerPerKg": {
+   "dist": "u",
+   "low": 2,
+   "high": 9,
+   "unit": "g PM2.5 per kg fuel, smoker",
+   "status": "V/A",
+   "source": "Jayarathne 2018: Nepal pre-service idle 8.81 +- 1.33 g/kg (V) as top"
+  },
+  "slotArea_m2": {
+   "dist": "u",
+   "low": 2.2,
+   "high": 3.2,
+   "unit": "m2 of stop box per scooter",
+   "status": "S",
+   "source": "Chang & Chang 2014 交通學報 14(1), reviewing 許添本 & 王義川 2001"
+  },
+  "lateralPitch_m": {
+   "dist": "u",
+   "low": 0.9,
+   "high": 1.2,
+   "unit": "m between scooter centrelines",
+   "status": "S/A",
+   "source": "scooter width 0.8 m (Chang & Chang 2014) + gap (A)"
+  },
+  "boxDepth_m": {
+   "dist": "u",
+   "low": 2.5,
+   "high": 6,
+   "unit": "m stop-box depth",
+   "status": "V",
+   "source": "道路交通標誌標線號誌設置規則 art. 174-2"
+  },
+  "boxWidth_m": {
+   "dist": "u",
+   "low": 6,
+   "high": 10,
+   "unit": "m stop-box width (2-3 lanes)",
+   "status": "A",
+   "source": "ASSUMPTION: no width in art. 174-2; lanes 3-4 m (IOT-113-TB006)"
+  },
+  "queueLaneWidth_m": {
+   "dist": "u",
+   "low": 3,
+   "high": 5,
+   "unit": "m width of overflow queue behind the box",
+   "status": "A",
+   "source": "ASSUMPTION (Lan & Chang 2015: short wide queues)"
+  },
+  "offFrac": {
+   "dist": "u",
+   "low": 0,
+   "high": 0.2,
+   "unit": "share of queued engines switched off",
+   "status": "A",
+   "source": "ASSUMPTION (no observation)"
+  },
+  "presentAtOnset": {
+   "dist": "u",
+   "low": 0.1,
+   "high": 0.4,
+   "unit": "share of end-of-red queue already stopped at red onset",
+   "status": "A",
+   "source": "ASSUMPTION"
+  },
+  "arrivalWindow_s": {
+   "dist": "u",
+   "low": 45,
+   "high": 85,
+   "unit": "s over which the rest arrive (uniform)",
+   "status": "A",
+   "source": "ASSUMPTION; main-road red 80-83 s (IOT-113-TB006 Table 2.2.4-2)"
+  },
+  "redLength_s": {
+   "dist": "fix",
+   "central": 90,
+   "unit": "s",
+   "status": "given",
+   "source": "task definition"
+  },
+  "sourceHeight_m": {
+   "dist": "u",
+   "low": 0.3,
+   "high": 0.5,
+   "unit": "m tailpipe height",
+   "status": "V/S",
+   "source": "IOT-113-TB006 sec 4.2.2 uses 0.5 m; 0.3-0.5 m scene file"
+  },
+  "receptorAlong_m": {
+   "dist": "u",
+   "low": 0,
+   "high": 1,
+   "unit": "fraction: pedestrian position from back of box (0) to 1 m past stop line (1)",
+   "status": "A",
+   "source": "ASSUMPTION"
+  },
+  "windSpeed_ms": {
+   "dist": "ln",
+   "low": 0.3,
+   "central": 0.8,
+   "high": 2,
+   "unit": "m/s scalar speed at ~1.5 m, 90-s mean",
+   "status": "A",
+   "source": "ASSUMPTION: 0.2-0.6 x CWA 1991-2020 station means (Taipei 2.6, Taichung 1.5, Kaohsiung 2.1 m/s, V); IOT on-site July 2024 0.4-3.6 m/s (V)"
+  },
+  "windDir_deg": {
+   "dist": "u",
+   "low": 0,
+   "high": 360,
+   "unit": "deg",
+   "status": "A",
+   "source": "ASSUMPTION: uniform (channelling tested, small effect)"
+  },
+  "iv": {
+   "dist": "u",
+   "low": 0.3,
+   "high": 0.6,
+   "unit": "sigma_v/U",
+   "status": "V/A",
+   "source": "CAL3QHC default sigma_theta 25 deg -> 0.44 (EPA-454/R-92-006, V)"
+  },
+  "sv0": {
+   "dist": "u",
+   "low": 0.2,
+   "high": 0.5,
+   "unit": "m/s floor on sigma_v",
+   "status": "V/A",
+   "source": "AERMOD minimum sigma_v 0.2 m/s; light-wind ~0.5 (EPA-454/B-26-003 sec 5, V)"
+  },
+  "iw": {
+   "dist": "u",
+   "low": 0.2,
+   "high": 0.35,
+   "unit": "sigma_w/U",
+   "status": "A",
+   "source": "ASSUMPTION: neutral surface layer"
+  },
+  "sw0": {
+   "dist": "u",
+   "low": 0.1,
+   "high": 0.3,
+   "unit": "m/s floor on sigma_w (traffic, engine heat)",
+   "status": "A",
+   "source": "ASSUMPTION (OSPM: traffic-produced turbulence in calm)"
+  },
+  "sy0": {
+   "dist": "u",
+   "low": 0.3,
+   "high": 1,
+   "unit": "m initial lateral spread",
+   "status": "A",
+   "source": "ASSUMPTION: scooter+rider size; no wake for idling queues (CAL3QHC, V)"
+  },
+  "sz0": {
+   "dist": "u",
+   "low": 0.2,
+   "high": 0.8,
+   "unit": "m initial vertical spread",
+   "status": "A",
+   "source": "ASSUMPTION (unmeasured; controls height ratio)"
+  },
+  "buoyF": {
+   "dist": "u",
+   "low": 0.0007,
+   "high": 0.0025,
+   "unit": "m4/s3 buoyancy flux",
+   "status": "D/A",
+   "source": "Briggs, 0.3-0.6 L/s at 150-350 C (A)"
+  },
+  "buoyMult": {
+   "dist": "u",
+   "low": 0,
+   "high": 1,
+   "unit": "multiplier on Briggs rise",
+   "status": "A",
+   "source": "ASSUMPTION"
+  },
+  "bgCO_ppm": {
+   "dist": "ln",
+   "low": 0.15,
+   "central": 0.35,
+   "high": 0.9,
+   "unit": "ppm",
+   "status": "V",
+   "source": "MOENV 2025 annual report Table 3-23: general stations 0.24, traffic stations 0.54 ppm; IOT nearby station hourly 0.03-0.90"
+  },
+  "bgBenzene_ppb": {
+   "dist": "ln",
+   "low": 0.5,
+   "central": 1.5,
+   "high": 4,
+   "unit": "ppb",
+   "status": "S",
+   "source": "Re-sourced (C6). Taiwan HAP network national annual mean ~0.5 ppbv, urban > non-urban (NCKU thesis via search excerpt, S, needsManualFetch); Bangkok kerb 2-3 ppb (V via repo); Kaohsiung 2.8-4.8 ppb (S). Wide on purpose"
+  },
+  "bgPN_cm3": {
+   "dist": "ln",
+   "low": 7000,
+   "central": 14000,
+   "high": 30000,
+   "unit": "/cm3",
+   "status": "V/S",
+   "source": "Cheung et al. 2013 ACP 13:8935 Taipei 13,900 (V); Abdillah 2024 roadside 25,000-38,000 (abstract)"
+  },
+  "bgPM25_ugm3": {
+   "dist": "ln",
+   "low": 6,
+   "central": 14,
+   "high": 35,
+   "unit": "ug/m3",
+   "status": "V",
+   "source": "MOENV 2025 annual mean 13.4 (traffic 15.4); IOT kerb July 2024 4-14"
+  }
+ },
+ "fleet": {
+  "fleetMeanCO_gph": {
+   "low": 8.32385,
+   "central": 15.3722,
+   "high": 27.0611,
+   "mean": 16.2682
+  },
+  "fleetMeanTHC_gph": {
+   "low": 1.09077,
+   "central": 3.09884,
+   "high": 8.7417,
+   "mean": 3.75386
+  },
+  "fleetMeanBenzene_mgph": {
+   "low": 27.8802,
+   "central": 84.2573,
+   "high": 261.572,
+   "mean": 107.24
+  },
+  "benzeneOverCO_massRatio": {
+   "low": 0.00182434,
+   "central": 0.00555794,
+   "high": 0.0168831,
+   "mean": 0.00694358
+  }
+ },
+ "scenarios": [
+  {
+   "key": "few",
+   "label": "A few scooters (2-5)",
+   "zh": "少數幾輛（2–5 輛）",
+   "basis": "IOT quiet junction 819 motorcycles/h (12-h hourly mean) -> ~3-10 per approach per red; nearest 2-4 m",
+   "call": {
+    "scooters": [
+     2,
+     5
+    ],
+    "nearest": [
+     2,
+     4
+    ],
+    "windSpeed": null,
+    "windFrom": "any",
+    "n": 30000,
+    "seed": 20261126,
+    "overrides": {}
+   },
+   "result": {
+    "inputs": {
+     "scooters": [
+      2,
+      5
+     ],
+     "nearest": [
+      2,
+      4
+     ],
+     "windSpeed": null,
+     "windFrom": "any",
+     "n": 30000,
+     "seed": 20261126,
+     "overrides": {}
+    },
+    "units": {
+     "co": "ppm",
+     "benzene": "ppb",
+     "thc": "ppmC",
+     "particleNumber": "particles/cm3 (solid + 10-23 nm; LOWER BOUND)",
+     "pm25": "ug/m3"
+    },
+    "co": {
+     "unit": "ppm",
+     "increment": {
+      "h0.6": {
+       "low": 0.00898665,
+       "central": 0.0752097,
+       "high": 0.441195,
+       "mean": 0.131898
+      },
+      "h1.0": {
+       "low": 0.00811315,
+       "central": 0.0683704,
+       "high": 0.392886,
+       "mean": 0.117906
+      },
+      "h1.5": {
+       "low": 0.00657188,
+       "central": 0.0564698,
+       "high": 0.316135,
+       "mean": 0.0954916
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.013248,
+       "central": 0.109308,
+       "high": 0.606464,
+       "mean": 0.184238
+      },
+      "h1.0": {
+       "low": 0.0118134,
+       "central": 0.0988103,
+       "high": 0.540661,
+       "mean": 0.16512
+      },
+      "h1.5": {
+       "low": 0.00953562,
+       "central": 0.0820291,
+       "high": 0.438716,
+       "mean": 0.134376
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.203018,
+       "central": 0.473645,
+       "high": 1.10584,
+       "mean": 0.54121
+      },
+      "h1.0": {
+       "low": 0.198927,
+       "central": 0.462645,
+       "high": 1.07046,
+       "mean": 0.527218
+      },
+      "h1.5": {
+       "low": 0.192744,
+       "central": 0.444433,
+       "high": 1.01903,
+       "mean": 0.504804
+      }
+     },
+     "mgm3": {
+      "h0.6": {
+       "low": 0.0102951,
+       "central": 0.0861605,
+       "high": 0.505434,
+       "mean": 0.151103
+      },
+      "h1.0": {
+       "low": 0.00929445,
+       "central": 0.0783254,
+       "high": 0.450092,
+       "mean": 0.135073
+      },
+      "h1.5": {
+       "low": 0.00752877,
+       "central": 0.0646919,
+       "high": 0.362166,
+       "mean": 0.109395
+      }
+     }
+    },
+    "thc": {
+     "unit": "ppmC",
+     "increment": {
+      "h0.6": {
+       "low": 0.00402548,
+       "central": 0.0340526,
+       "high": 0.206444,
+       "mean": 0.061279
+      },
+      "h1.0": {
+       "low": 0.00363176,
+       "central": 0.0307976,
+       "high": 0.184129,
+       "mean": 0.0548029
+      },
+      "h1.5": {
+       "low": 0.00295421,
+       "central": 0.0252148,
+       "high": 0.149173,
+       "mean": 0.0444196
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.00575868,
+       "central": 0.0486432,
+       "high": 0.283808,
+       "mean": 0.0854927
+      },
+      "h1.0": {
+       "low": 0.00524037,
+       "central": 0.0438946,
+       "high": 0.25348,
+       "mean": 0.0766528
+      },
+      "h1.5": {
+       "low": 0.00425664,
+       "central": 0.0361458,
+       "high": 0.205871,
+       "mean": 0.0624313
+      }
+     },
+     "total": {}
+    },
+    "benzene": {
+     "unit": "ppb",
+     "increment": {
+      "h0.6": {
+       "low": 0.0194727,
+       "central": 0.169932,
+       "high": 1.05622,
+       "mean": 0.311266
+      },
+      "h1.0": {
+       "low": 0.0176694,
+       "central": 0.153815,
+       "high": 0.933522,
+       "mean": 0.278267
+      },
+      "h1.5": {
+       "low": 0.0143478,
+       "central": 0.126011,
+       "high": 0.757485,
+       "mean": 0.225394
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.0281848,
+       "central": 0.242026,
+       "high": 1.47004,
+       "mean": 0.43395
+      },
+      "h1.0": {
+       "low": 0.0255072,
+       "central": 0.21982,
+       "high": 1.31472,
+       "mean": 0.388936
+      },
+      "h1.5": {
+       "low": 0.0207971,
+       "central": 0.181024,
+       "high": 1.06283,
+       "mean": 0.316576
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.704854,
+       "central": 1.8082,
+       "high": 4.699,
+       "mean": 2.14806
+      },
+      "h1.0": {
+       "low": 0.695791,
+       "central": 1.77948,
+       "high": 4.64107,
+       "mean": 2.11506
+      },
+      "h1.5": {
+       "low": 0.674267,
+       "central": 1.73128,
+       "high": 4.53938,
+       "mean": 2.06219
+      }
+     },
+     "ugm3": {
+      "h0.6": {
+       "low": 0.0622091,
+       "central": 0.542878,
+       "high": 3.3743,
+       "mean": 0.994397
+      },
+      "h1.0": {
+       "low": 0.0564481,
+       "central": 0.49139,
+       "high": 2.98231,
+       "mean": 0.888974
+      },
+      "h1.5": {
+       "low": 0.0458367,
+       "central": 0.402566,
+       "high": 2.41992,
+       "mean": 0.720064
+      }
+     }
+    },
+    "particleNumber": {
+     "unit": "particles/cm3 (solid + 10-23 nm; LOWER BOUND)",
+     "increment": {
+      "h0.6": {
+       "low": 2.3835,
+       "central": 67.9823,
+       "high": 1627.72,
+       "mean": 421.824
+      },
+      "h1.0": {
+       "low": 2.17253,
+       "central": 61.4244,
+       "high": 1480.46,
+       "mean": 377.55
+      },
+      "h1.5": {
+       "low": 1.77256,
+       "central": 50.1959,
+       "high": 1208.57,
+       "mean": 306.303
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 3.51132,
+       "central": 96.7216,
+       "high": 2271.38,
+       "mean": 586.585
+      },
+      "h1.0": {
+       "low": 3.18013,
+       "central": 87.4202,
+       "high": 2064.64,
+       "mean": 526.319
+      },
+      "h1.5": {
+       "low": 2.61128,
+       "central": 71.2356,
+       "high": 1683.75,
+       "mean": 429.127
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 6944.12,
+       "central": 14366.5,
+       "high": 29698.7,
+       "mean": 15839.4
+      },
+      "h1.0": {
+       "low": 6927.47,
+       "central": 14331.1,
+       "high": 29603.2,
+       "mean": 15795.2
+      },
+      "h1.5": {
+       "low": 6901.96,
+       "central": 14280.2,
+       "high": 29466.4,
+       "mean": 15723.9
+      }
+     }
+    },
+    "pm25": {
+     "unit": "ug/m3",
+     "increment": {
+      "h0.6": {
+       "low": 0.022221,
+       "central": 0.239977,
+       "high": 2.45406,
+       "mean": 0.630269
+      },
+      "h1.0": {
+       "low": 0.0200459,
+       "central": 0.217547,
+       "high": 2.21016,
+       "mean": 0.563845
+      },
+      "h1.5": {
+       "low": 0.0162831,
+       "central": 0.178785,
+       "high": 1.81112,
+       "mean": 0.457353
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.0321794,
+       "central": 0.343733,
+       "high": 3.45236,
+       "mean": 0.879524
+      },
+      "h1.0": {
+       "low": 0.0289469,
+       "central": 0.30935,
+       "high": 3.11292,
+       "mean": 0.789026
+      },
+      "h1.5": {
+       "low": 0.0232429,
+       "central": 0.254913,
+       "high": 2.57392,
+       "mean": 0.64329
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 6.28711,
+       "central": 14.5721,
+       "high": 34.8559,
+       "mean": 16.7494
+      },
+      "h1.0": {
+       "low": 6.25685,
+       "central": 14.5178,
+       "high": 34.7355,
+       "mean": 16.683
+      },
+      "h1.5": {
+       "low": 6.19279,
+       "central": 14.4126,
+       "high": 34.6152,
+       "mean": 16.5765
+      }
+     }
+    },
+    "heightRatio": {
+     "pushchair0p6_over_adult1p5": {
+      "low": 1.1,
+      "central": 1.30075,
+      "high": 1.90079,
+      "mean": null
+     },
+     "child1p0_over_adult1p5": {
+      "low": 1.06539,
+      "central": 1.19026,
+      "high": 1.52809,
+      "mean": null
+     },
+     "published": false
+    },
+    "timeSeriesCO": {
+     "t_s": [
+      0,
+      5,
+      10,
+      20,
+      30,
+      45,
+      60,
+      75,
+      90
+     ],
+     "note": "CO increment at top height; mean shape set by the assumed arrival law; ILLUSTRATIVE ONLY, not published as a curve",
+     "normalisedMedian": [
+      0,
+      0,
+      0.338584,
+      0.536862,
+      0.684834,
+      0.925276,
+      1,
+      1,
+      1
+     ],
+     "absolute": [
+      {
+       "low": 0,
+       "central": 0,
+       "high": 0,
+       "mean": 0
+      },
+      {
+       "low": 0,
+       "central": 0,
+       "high": 0.0928329,
+       "mean": 0.0197461
+      },
+      {
+       "low": 0,
+       "central": 0.0189299,
+       "high": 0.206538,
+       "mean": 0.0502935
+      },
+      {
+       "low": 0.000130217,
+       "central": 0.032768,
+       "high": 0.268289,
+       "mean": 0.0706392
+      },
+      {
+       "low": 0.00194653,
+       "central": 0.0418451,
+       "high": 0.305879,
+       "mean": 0.0832591
+      },
+      {
+       "low": 0.00424564,
+       "central": 0.0563628,
+       "high": 0.360895,
+       "mean": 0.103109
+      },
+      {
+       "low": 0.00691741,
+       "central": 0.0706188,
+       "high": 0.407335,
+       "mean": 0.121025
+      },
+      {
+       "low": 0.00892343,
+       "central": 0.0793256,
+       "high": 0.432339,
+       "mean": 0.131397
+      },
+      {
+       "low": 0.00966676,
+       "central": 0.0826437,
+       "high": 0.440566,
+       "mean": 0.135114
+      }
+     ],
+     "published": false
+    }
+   },
+   "windFromPack": {
+    "call": {
+     "scooters": [
+      2,
+      5
+     ],
+     "nearest": [
+      2,
+      4
+     ],
+     "windSpeed": null,
+     "windFrom": "pack",
+     "n": 15000,
+     "seed": 99,
+     "overrides": {}
+    },
+    "co": {
+     "unit": "ppm",
+     "increment": {
+      "h0.6": {
+       "low": 0.0177227,
+       "central": 0.11498,
+       "high": 0.606075,
+       "mean": 0.189856
+      },
+      "h1.0": {
+       "low": 0.0162222,
+       "central": 0.104371,
+       "high": 0.537748,
+       "mean": 0.168806
+      },
+      "h1.5": {
+       "low": 0.013248,
+       "central": 0.0856387,
+       "high": 0.425286,
+       "mean": 0.135241
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.0275198,
+       "central": 0.167451,
+       "high": 0.808615,
+       "mean": 0.263038
+      },
+      "h1.0": {
+       "low": 0.0249746,
+       "central": 0.150892,
+       "high": 0.711785,
+       "mean": 0.234627
+      },
+      "h1.5": {
+       "low": 0.0203553,
+       "central": 0.123578,
+       "high": 0.571297,
+       "mean": 0.189151
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.22739,
+       "central": 0.5137,
+       "high": 1.2277,
+       "mean": 0.596282
+      },
+      "h1.0": {
+       "low": 0.223209,
+       "central": 0.499676,
+       "high": 1.16351,
+       "mean": 0.575232
+      },
+      "h1.5": {
+       "low": 0.212931,
+       "central": 0.475268,
+       "high": 1.0889,
+       "mean": 0.541667
+      }
+     },
+     "mgm3": {
+      "h0.6": {
+       "low": 0.0203032,
+       "central": 0.131721,
+       "high": 0.694322,
+       "mean": 0.2175
+      },
+      "h1.0": {
+       "low": 0.0185843,
+       "central": 0.119568,
+       "high": 0.616046,
+       "mean": 0.193385
+      },
+      "h1.5": {
+       "low": 0.015177,
+       "central": 0.098108,
+       "high": 0.487209,
+       "mean": 0.154932
+      }
+     }
+    },
+    "benzene": {
+     "unit": "ppb",
+     "increment": {
+      "h0.6": {
+       "low": 0.0399535,
+       "central": 0.259939,
+       "high": 1.46257,
+       "mean": 0.444801
+      },
+      "h1.0": {
+       "low": 0.0365303,
+       "central": 0.235516,
+       "high": 1.30686,
+       "mean": 0.395421
+      },
+      "h1.5": {
+       "low": 0.0302887,
+       "central": 0.192282,
+       "high": 1.02747,
+       "mean": 0.316753
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.0604367,
+       "central": 0.374448,
+       "high": 1.9682,
+       "mean": 0.615781
+      },
+      "h1.0": {
+       "low": 0.0553927,
+       "central": 0.337337,
+       "high": 1.75315,
+       "mean": 0.549147
+      },
+      "h1.5": {
+       "low": 0.0455703,
+       "central": 0.277219,
+       "high": 1.38574,
+       "mean": 0.442494
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.751953,
+       "central": 1.92878,
+       "high": 4.88174,
+       "mean": 2.26066
+      },
+      "h1.0": {
+       "low": 0.735811,
+       "central": 1.88501,
+       "high": 4.78407,
+       "mean": 2.21128
+      },
+      "h1.5": {
+       "low": 0.708725,
+       "central": 1.81412,
+       "high": 4.61355,
+       "mean": 2.13261
+      }
+     },
+     "ugm3": {
+      "h0.6": {
+       "low": 0.127639,
+       "central": 0.830422,
+       "high": 4.67246,
+       "mean": 1.421
+      },
+      "h1.0": {
+       "low": 0.116703,
+       "central": 0.752398,
+       "high": 4.17499,
+       "mean": 1.26324
+      },
+      "h1.5": {
+       "low": 0.0967629,
+       "central": 0.614279,
+       "high": 3.28244,
+       "mean": 1.01193
+      }
+     }
+    }
+   },
+   "publish": {
+    "co_ppm": {
+     "low": 0.007,
+     "central": 0.06,
+     "high": 0.3
+    },
+    "benzene_ppb": {
+     "low": 0.01,
+     "central": 0.1,
+     "high": 0.8
+    },
+    "pm25_ugm3": {
+     "low": 0.02,
+     "central": 0.2,
+     "high": 2
+    },
+    "particleNumber": "not estimated (no idle emission measurement; volatile nucleation excluded) / 未推估",
+    "height": "not estimated as a number; same or higher at 0.6-1.0 m (borrowed evidence) / 未推估",
+    "label": "Estimate, not a measurement / 推估值，非實測"
+   }
+  },
+  {
+   "key": "dozen",
+   "label": "A dozen or so (8-20)",
+   "zh": "十來輛（8–20 輛）",
+   "basis": "scene file 8 (4-13) within 10 m; partly filled stop box",
+   "call": {
+    "scooters": [
+     8,
+     20
+    ],
+    "nearest": [
+     0.7,
+     3
+    ],
+    "windSpeed": null,
+    "windFrom": "any",
+    "n": 30000,
+    "seed": 20261126,
+    "overrides": {}
+   },
+   "result": {
+    "inputs": {
+     "scooters": [
+      8,
+      20
+     ],
+     "nearest": [
+      0.7,
+      3
+     ],
+     "windSpeed": null,
+     "windFrom": "any",
+     "n": 30000,
+     "seed": 20261126,
+     "overrides": {}
+    },
+    "units": {
+     "co": "ppm",
+     "benzene": "ppb",
+     "thc": "ppmC",
+     "particleNumber": "particles/cm3 (solid + 10-23 nm; LOWER BOUND)",
+     "pm25": "ug/m3"
+    },
+    "co": {
+     "unit": "ppm",
+     "increment": {
+      "h0.6": {
+       "low": 0.0815324,
+       "central": 0.43577,
+       "high": 1.75446,
+       "mean": 0.620668
+      },
+      "h1.0": {
+       "low": 0.0702455,
+       "central": 0.378463,
+       "high": 1.44784,
+       "mean": 0.524571
+      },
+      "h1.5": {
+       "low": 0.0526417,
+       "central": 0.288516,
+       "high": 1.03965,
+       "mean": 0.388393
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.114478,
+       "central": 0.602969,
+       "high": 2.24523,
+       "mean": 0.82302
+      },
+      "h1.0": {
+       "low": 0.0986792,
+       "central": 0.528247,
+       "high": 1.88285,
+       "mean": 0.706014
+      },
+      "h1.5": {
+       "low": 0.0745579,
+       "central": 0.411734,
+       "high": 1.40208,
+       "mean": 0.537492
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.351389,
+       "central": 0.861883,
+       "high": 2.23912,
+       "mean": 1.02729
+      },
+      "h1.0": {
+       "low": 0.333566,
+       "central": 0.80074,
+       "high": 1.93693,
+       "mean": 0.931191
+      },
+      "h1.5": {
+       "low": 0.302015,
+       "central": 0.704487,
+       "high": 1.58717,
+       "mean": 0.795014
+      }
+     },
+     "mgm3": {
+      "h0.6": {
+       "low": 0.0934037,
+       "central": 0.499219,
+       "high": 2.00992,
+       "mean": 0.711039
+      },
+      "h1.0": {
+       "low": 0.0804734,
+       "central": 0.433569,
+       "high": 1.65865,
+       "mean": 0.60095
+      },
+      "h1.5": {
+       "low": 0.0603065,
+       "central": 0.330524,
+       "high": 1.19103,
+       "mean": 0.444945
+      }
+     }
+    },
+    "thc": {
+     "unit": "ppmC",
+     "increment": {
+      "h0.6": {
+       "low": 0.0298421,
+       "central": 0.18445,
+       "high": 0.883949,
+       "mean": 0.288072
+      },
+      "h1.0": {
+       "low": 0.0255637,
+       "central": 0.159338,
+       "high": 0.737442,
+       "mean": 0.24326
+      },
+      "h1.5": {
+       "low": 0.0189911,
+       "central": 0.120219,
+       "high": 0.539025,
+       "mean": 0.179734
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.0412162,
+       "central": 0.251554,
+       "high": 1.14535,
+       "mean": 0.381338
+      },
+      "h1.0": {
+       "low": 0.0355871,
+       "central": 0.219165,
+       "high": 0.971204,
+       "mean": 0.32695
+      },
+      "h1.5": {
+       "low": 0.0266797,
+       "central": 0.169858,
+       "high": 0.733405,
+       "mean": 0.248542
+      }
+     },
+     "total": {}
+    },
+    "benzene": {
+     "unit": "ppb",
+     "increment": {
+      "h0.6": {
+       "low": 0.139054,
+       "central": 0.913627,
+       "high": 4.5749,
+       "mean": 1.45852
+      },
+      "h1.0": {
+       "low": 0.12089,
+       "central": 0.789269,
+       "high": 3.81003,
+       "mean": 1.23188
+      },
+      "h1.5": {
+       "low": 0.0898339,
+       "central": 0.596255,
+       "high": 2.77535,
+       "mean": 0.910238
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.193048,
+       "central": 1.24699,
+       "high": 5.97216,
+       "mean": 1.93065
+      },
+      "h1.0": {
+       "low": 0.16663,
+       "central": 1.08647,
+       "high": 5.06124,
+       "mean": 1.65561
+      },
+      "h1.5": {
+       "low": 0.124558,
+       "central": 0.835275,
+       "high": 3.83351,
+       "mean": 1.25875
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 1.07548,
+       "central": 2.74715,
+       "high": 7.27081,
+       "mean": 3.28913
+      },
+      "h1.0": {
+       "low": 1.0277,
+       "central": 2.59344,
+       "high": 6.6666,
+       "mean": 3.06249
+      },
+      "h1.5": {
+       "low": 0.940733,
+       "central": 2.35173,
+       "high": 5.85095,
+       "mean": 2.74085
+      }
+     },
+     "ugm3": {
+      "h0.6": {
+       "low": 0.444235,
+       "central": 2.91875,
+       "high": 14.6154,
+       "mean": 4.6595
+      },
+      "h1.0": {
+       "low": 0.386206,
+       "central": 2.52147,
+       "high": 12.1718,
+       "mean": 3.93546
+      },
+      "h1.5": {
+       "low": 0.286991,
+       "central": 1.90484,
+       "high": 8.86637,
+       "mean": 2.90792
+      }
+     }
+    },
+    "particleNumber": {
+     "unit": "particles/cm3 (solid + 10-23 nm; LOWER BOUND)",
+     "increment": {
+      "h0.6": {
+       "low": 16.6705,
+       "central": 375.789,
+       "high": 7751.08,
+       "mean": 2078.35
+      },
+      "h1.0": {
+       "low": 14.4791,
+       "central": 323.5,
+       "high": 6620.45,
+       "mean": 1765.88
+      },
+      "h1.5": {
+       "low": 10.662,
+       "central": 244.844,
+       "high": 4917.25,
+       "mean": 1317
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 22.9708,
+       "central": 511.702,
+       "high": 10463.7,
+       "mean": 2769.97
+      },
+      "h1.0": {
+       "low": 19.905,
+       "central": 443.889,
+       "high": 8909.58,
+       "mean": 2388.04
+      },
+      "h1.5": {
+       "low": 15.0414,
+       "central": 341.056,
+       "high": 6818.21,
+       "mean": 1829.92
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 7472.22,
+       "central": 15360.3,
+       "high": 33117.6,
+       "mean": 17534.2
+      },
+      "h1.0": {
+       "low": 7410.99,
+       "central": 15200.9,
+       "high": 32467.2,
+       "mean": 17221.7
+      },
+      "h1.5": {
+       "low": 7291.36,
+       "central": 14957.4,
+       "high": 31529.6,
+       "mean": 16772.8
+      }
+     }
+    },
+    "pm25": {
+     "unit": "ug/m3",
+     "increment": {
+      "h0.6": {
+       "low": 0.146575,
+       "central": 1.41726,
+       "high": 10.7495,
+       "mean": 2.98407
+      },
+      "h1.0": {
+       "low": 0.126684,
+       "central": 1.22624,
+       "high": 9.1191,
+       "mean": 2.52187
+      },
+      "h1.5": {
+       "low": 0.0939416,
+       "central": 0.929943,
+       "high": 6.73546,
+       "mean": 1.86392
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.200897,
+       "central": 1.96297,
+       "high": 13.958,
+       "mean": 3.94674
+      },
+      "h1.0": {
+       "low": 0.173744,
+       "central": 1.71821,
+       "high": 11.9136,
+       "mean": 3.38521
+      },
+      "h1.5": {
+       "low": 0.13067,
+       "central": 1.33023,
+       "high": 8.96283,
+       "mean": 2.57345
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 7.35124,
+       "central": 16.8112,
+       "high": 39.2881,
+       "mean": 19.2248
+      },
+      "h1.0": {
+       "low": 7.23559,
+       "central": 16.4599,
+       "high": 38.1069,
+       "mean": 18.7626
+      },
+      "h1.5": {
+       "low": 6.9893,
+       "central": 15.93,
+       "high": 36.701,
+       "mean": 18.1047
+      }
+     }
+    },
+    "heightRatio": {
+     "pushchair0p6_over_adult1p5": {
+      "low": 1.15628,
+      "central": 1.44827,
+      "high": 2.52883,
+      "mean": 1.61354
+     },
+     "child1p0_over_adult1p5": {
+      "low": 1.10158,
+      "central": 1.27648,
+      "high": 1.81847,
+      "mean": 1.34904
+     },
+     "published": false
+    },
+    "timeSeriesCO": {
+     "t_s": [
+      0,
+      5,
+      10,
+      20,
+      30,
+      45,
+      60,
+      75,
+      90
+     ],
+     "note": "CO increment at top height; mean shape set by the assumed arrival law; ILLUSTRATIVE ONLY, not published as a curve",
+     "normalisedMedian": [
+      0,
+      0.219806,
+      0.400488,
+      0.531026,
+      0.643237,
+      0.811164,
+      0.958356,
+      1,
+      1
+     ],
+     "absolute": [
+      {
+       "low": 0,
+       "central": 0,
+       "high": 0,
+       "mean": 0
+      },
+      {
+       "low": 0,
+       "central": 0.0674041,
+       "high": 0.521582,
+       "mean": 0.13802
+      },
+      {
+       "low": 0.0141663,
+       "central": 0.13981,
+       "high": 0.734888,
+       "mean": 0.228776
+      },
+      {
+       "low": 0.0261539,
+       "central": 0.190314,
+       "high": 0.868992,
+       "mean": 0.287868
+      },
+      {
+       "low": 0.0359645,
+       "central": 0.234321,
+       "high": 0.981557,
+       "mean": 0.338193
+      },
+      {
+       "low": 0.0513864,
+       "central": 0.30026,
+       "high": 1.13976,
+       "mean": 0.413455
+      },
+      {
+       "low": 0.0648534,
+       "central": 0.362668,
+       "high": 1.28982,
+       "mean": 0.483046
+      },
+      {
+       "low": 0.072995,
+       "central": 0.400299,
+       "high": 1.3759,
+       "mean": 0.52479
+      },
+      {
+       "low": 0.0748222,
+       "central": 0.415384,
+       "high": 1.41025,
+       "mean": 0.541109
+      }
+     ],
+     "published": false
+    }
+   },
+   "windFromPack": {
+    "call": {
+     "scooters": [
+      8,
+      20
+     ],
+     "nearest": [
+      0.7,
+      3
+     ],
+     "windSpeed": null,
+     "windFrom": "pack",
+     "n": 15000,
+     "seed": 99,
+     "overrides": {}
+    },
+    "co": {
+     "unit": "ppm",
+     "increment": {
+      "h0.6": {
+       "low": 0.168116,
+       "central": 0.604198,
+       "high": 2.12752,
+       "mean": 0.824407
+      },
+      "h1.0": {
+       "low": 0.148123,
+       "central": 0.526024,
+       "high": 1.7597,
+       "mean": 0.695388
+      },
+      "h1.5": {
+       "low": 0.114741,
+       "central": 0.399875,
+       "high": 1.24827,
+       "mean": 0.509443
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.241579,
+       "central": 0.827079,
+       "high": 2.67847,
+       "mean": 1.07483
+      },
+      "h1.0": {
+       "low": 0.213337,
+       "central": 0.722847,
+       "high": 2.23797,
+       "mean": 0.919349
+      },
+      "h1.5": {
+       "low": 0.164587,
+       "central": 0.560671,
+       "high": 1.65231,
+       "mean": 0.692206
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.462292,
+       "central": 1.033,
+       "high": 2.62254,
+       "mean": 1.233
+      },
+      "h1.0": {
+       "low": 0.43352,
+       "central": 0.951316,
+       "high": 2.25574,
+       "mean": 1.10398
+      },
+      "h1.5": {
+       "low": 0.382526,
+       "central": 0.815895,
+       "high": 1.78329,
+       "mean": 0.918035
+      }
+     },
+     "mgm3": {
+      "h0.6": {
+       "low": 0.192595,
+       "central": 0.692171,
+       "high": 2.43729,
+       "mean": 0.944443
+      },
+      "h1.0": {
+       "low": 0.16969,
+       "central": 0.602615,
+       "high": 2.01592,
+       "mean": 0.796638
+      },
+      "h1.5": {
+       "low": 0.131448,
+       "central": 0.458098,
+       "high": 1.43002,
+       "mean": 0.58362
+      }
+     }
+    },
+    "benzene": {
+     "unit": "ppb",
+     "increment": {
+      "h0.6": {
+       "low": 0.26258,
+       "central": 1.2607,
+       "high": 5.62037,
+       "mean": 1.91623
+      },
+      "h1.0": {
+       "low": 0.231383,
+       "central": 1.0878,
+       "high": 4.62923,
+       "mean": 1.61693
+      },
+      "h1.5": {
+       "low": 0.175209,
+       "central": 0.815917,
+       "high": 3.34992,
+       "mean": 1.18479
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.365912,
+       "central": 1.67593,
+       "high": 7.26341,
+       "mean": 2.50433
+      },
+      "h1.0": {
+       "low": 0.324552,
+       "central": 1.45963,
+       "high": 6.07715,
+       "mean": 2.14288
+      },
+      "h1.5": {
+       "low": 0.248406,
+       "central": 1.11341,
+       "high": 4.50174,
+       "mean": 1.61385
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 1.25595,
+       "central": 3.11975,
+       "high": 8.17001,
+       "mean": 3.73704
+      },
+      "h1.0": {
+       "low": 1.19422,
+       "central": 2.92215,
+       "high": 7.38916,
+       "mean": 3.43773
+      },
+      "h1.5": {
+       "low": 1.08278,
+       "central": 2.60389,
+       "high": 6.23778,
+       "mean": 3.00559
+      }
+     },
+     "ugm3": {
+      "h0.6": {
+       "low": 0.838859,
+       "central": 4.02754,
+       "high": 17.9553,
+       "mean": 6.12176
+      },
+      "h1.0": {
+       "low": 0.739195,
+       "central": 3.47517,
+       "high": 14.7889,
+       "mean": 5.16558
+      },
+      "h1.5": {
+       "low": 0.559736,
+       "central": 2.6066,
+       "high": 10.7019,
+       "mean": 3.78501
+      }
+     }
+    }
+   },
+   "publish": {
+    "co_ppm": {
+     "low": 0.05,
+     "central": 0.3,
+     "high": 1
+    },
+    "benzene_ppb": {
+     "low": 0.09,
+     "central": 0.6,
+     "high": 3
+    },
+    "pm25_ugm3": {
+     "low": 0.09,
+     "central": 0.9,
+     "high": 7
+    },
+    "particleNumber": "not estimated (no idle emission measurement; volatile nucleation excluded) / 未推估",
+    "height": "not estimated as a number; same or higher at 0.6-1.0 m (borrowed evidence) / 未推估",
+    "label": "Estimate, not a measurement / 推估值，非實測"
+   }
+  },
+  {
+   "key": "fullbox",
+   "label": "Full stop box (25-45)",
+   "zh": "停等區滿（25–45 輛）",
+   "basis": "IOT busiest Kaohsiung approach ~1,500 motorcycles/h -> ~34 per 83-s red; Lan & Chang 2015 Table V/VI 27 per 80 s",
+   "call": {
+    "scooters": [
+     25,
+     45
+    ],
+    "nearest": [
+     0.3,
+     1.5
+    ],
+    "windSpeed": null,
+    "windFrom": "any",
+    "n": 30000,
+    "seed": 20261126,
+    "overrides": {}
+   },
+   "result": {
+    "inputs": {
+     "scooters": [
+      25,
+      45
+     ],
+     "nearest": [
+      0.3,
+      1.5
+     ],
+     "windSpeed": null,
+     "windFrom": "any",
+     "n": 30000,
+     "seed": 20261126,
+     "overrides": {}
+    },
+    "units": {
+     "co": "ppm",
+     "benzene": "ppb",
+     "thc": "ppmC",
+     "particleNumber": "particles/cm3 (solid + 10-23 nm; LOWER BOUND)",
+     "pm25": "ug/m3"
+    },
+    "co": {
+     "unit": "ppm",
+     "increment": {
+      "h0.6": {
+       "low": 0.201816,
+       "central": 0.914239,
+       "high": 3.28114,
+       "mean": 1.23579
+      },
+      "h1.0": {
+       "low": 0.164196,
+       "central": 0.759267,
+       "high": 2.53039,
+       "mean": 0.984582
+      },
+      "h1.5": {
+       "low": 0.113983,
+       "central": 0.540295,
+       "high": 1.68628,
+       "mean": 0.675506
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.251343,
+       "central": 1.13755,
+       "high": 3.81393,
+       "mean": 1.48513
+      },
+      "h1.0": {
+       "low": 0.204213,
+       "central": 0.960484,
+       "high": 3.02385,
+       "mean": 1.21094
+      },
+      "h1.5": {
+       "low": 0.146106,
+       "central": 0.706086,
+       "high": 2.1269,
+       "mean": 0.86738
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.514086,
+       "central": 1.33667,
+       "high": 3.71297,
+       "mean": 1.64235
+      },
+      "h1.0": {
+       "low": 0.465484,
+       "central": 1.18044,
+       "high": 2.98113,
+       "mean": 1.39114
+      },
+      "h1.5": {
+       "low": 0.401166,
+       "central": 0.954619,
+       "high": 2.18124,
+       "mean": 1.08207
+      }
+     },
+     "mgm3": {
+      "h0.6": {
+       "low": 0.231201,
+       "central": 1.04736,
+       "high": 3.75888,
+       "mean": 1.41572
+      },
+      "h1.0": {
+       "low": 0.188103,
+       "central": 0.869819,
+       "high": 2.89882,
+       "mean": 1.12794
+      },
+      "h1.5": {
+       "low": 0.130579,
+       "central": 0.618963,
+       "high": 1.93181,
+       "mean": 0.773862
+      }
+     }
+    },
+    "thc": {
+     "unit": "ppmC",
+     "increment": {
+      "h0.6": {
+       "low": 0.0704889,
+       "central": 0.384304,
+       "high": 1.70002,
+       "mean": 0.57482
+      },
+      "h1.0": {
+       "low": 0.0571081,
+       "central": 0.315373,
+       "high": 1.33051,
+       "mean": 0.456987
+      },
+      "h1.5": {
+       "low": 0.0393059,
+       "central": 0.221163,
+       "high": 0.904739,
+       "mean": 0.31259
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.0873493,
+       "central": 0.47234,
+       "high": 2.01435,
+       "mean": 0.690429
+      },
+      "h1.0": {
+       "low": 0.0714581,
+       "central": 0.393208,
+       "high": 1.62654,
+       "mean": 0.561837
+      },
+      "h1.5": {
+       "low": 0.0506841,
+       "central": 0.285835,
+       "high": 1.14696,
+       "mean": 0.401406
+      }
+     },
+     "total": {}
+    },
+    "benzene": {
+     "unit": "ppb",
+     "increment": {
+      "h0.6": {
+       "low": 0.334859,
+       "central": 1.90007,
+       "high": 8.9084,
+       "mean": 2.92689
+      },
+      "h1.0": {
+       "low": 0.270707,
+       "central": 1.55591,
+       "high": 7.02614,
+       "mean": 2.32915
+      },
+      "h1.5": {
+       "low": 0.184635,
+       "central": 1.08725,
+       "high": 4.73629,
+       "mean": 1.59428
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.409633,
+       "central": 2.32339,
+       "high": 10.5425,
+       "mean": 3.51745
+      },
+      "h1.0": {
+       "low": 0.337327,
+       "central": 1.945,
+       "high": 8.53287,
+       "mean": 2.86472
+      },
+      "h1.5": {
+       "low": 0.237889,
+       "central": 1.402,
+       "high": 6.07252,
+       "mean": 2.04782
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 1.42218,
+       "central": 3.80279,
+       "high": 11.1037,
+       "mean": 4.74459
+      },
+      "h1.0": {
+       "low": 1.31461,
+       "central": 3.4326,
+       "high": 9.38024,
+       "mean": 4.14686
+      },
+      "h1.5": {
+       "low": 1.15057,
+       "central": 2.90815,
+       "high": 7.40033,
+       "mean": 3.41199
+      }
+     },
+     "ugm3": {
+      "h0.6": {
+       "low": 1.06977,
+       "central": 6.07012,
+       "high": 28.4595,
+       "mean": 9.35047
+      },
+      "h1.0": {
+       "low": 0.864822,
+       "central": 4.97065,
+       "high": 22.4463,
+       "mean": 7.44089
+      },
+      "h1.5": {
+       "low": 0.589851,
+       "central": 3.47342,
+       "high": 15.1309,
+       "mean": 5.09323
+      }
+     }
+    },
+    "particleNumber": {
+     "unit": "particles/cm3 (solid + 10-23 nm; LOWER BOUND)",
+     "increment": {
+      "h0.6": {
+       "low": 38.2285,
+       "central": 783.218,
+       "high": 15854,
+       "mean": 4353.56
+      },
+      "h1.0": {
+       "low": 30.9455,
+       "central": 637.715,
+       "high": 12605.9,
+       "mean": 3448.87
+      },
+      "h1.5": {
+       "low": 21.4027,
+       "central": 444.146,
+       "high": 8807.38,
+       "mean": 2354.99
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 47.5325,
+       "central": 960.094,
+       "high": 19247.5,
+       "mean": 5219.99
+      },
+      "h1.0": {
+       "low": 38.9869,
+       "central": 795.404,
+       "high": 15670.5,
+       "mean": 4237.07
+      },
+      "h1.5": {
+       "low": 27.5738,
+       "central": 577.452,
+       "high": 11225.5,
+       "mean": 3025.04
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 7795.4,
+       "central": 16359.4,
+       "high": 38211.8,
+       "mean": 19810.4
+      },
+      "h1.0": {
+       "low": 7657.03,
+       "central": 16061.8,
+       "high": 36141.2,
+       "mean": 18905.7
+      },
+      "h1.5": {
+       "low": 7467.32,
+       "central": 15575.8,
+       "high": 33693.1,
+       "mean": 17811.8
+      }
+     }
+    },
+    "pm25": {
+     "unit": "ug/m3",
+     "increment": {
+      "h0.6": {
+       "low": 0.375512,
+       "central": 3.01751,
+       "high": 20.4374,
+       "mean": 5.94013
+      },
+      "h1.0": {
+       "low": 0.303405,
+       "central": 2.48357,
+       "high": 16.1675,
+       "mean": 4.72127
+      },
+      "h1.5": {
+       "low": 0.207196,
+       "central": 1.76478,
+       "high": 10.8844,
+       "mean": 3.22376
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.470194,
+       "central": 3.76153,
+       "high": 24.0184,
+       "mean": 7.13007
+      },
+      "h1.0": {
+       "low": 0.382856,
+       "central": 3.16719,
+       "high": 19.4806,
+       "mean": 5.80177
+      },
+      "h1.5": {
+       "low": 0.272889,
+       "central": 2.34242,
+       "high": 13.7935,
+       "mean": 4.13997
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 8.26552,
+       "central": 19.0619,
+       "high": 45.6313,
+       "mean": 22.1462
+      },
+      "h1.0": {
+       "low": 8.00978,
+       "central": 18.2679,
+       "high": 42.4345,
+       "mean": 20.9274
+      },
+      "h1.5": {
+       "low": 7.58929,
+       "central": 17.107,
+       "high": 38.7016,
+       "mean": 19.4299
+      }
+     }
+    },
+    "heightRatio": {
+     "pushchair0p6_over_adult1p5": {
+      "low": 1.21182,
+      "central": 1.61652,
+      "high": 3.33332,
+      "mean": 1.89579
+     },
+     "child1p0_over_adult1p5": {
+      "low": 1.13686,
+      "central": 1.36659,
+      "high": 2.09513,
+      "mean": 1.46631
+     },
+     "published": false
+    },
+    "timeSeriesCO": {
+     "t_s": [
+      0,
+      5,
+      10,
+      20,
+      30,
+      45,
+      60,
+      75,
+      90
+     ],
+     "note": "CO increment at top height; mean shape set by the assumed arrival law; ILLUSTRATIVE ONLY, not published as a curve",
+     "normalisedMedian": [
+      0,
+      0.358695,
+      0.57689,
+      0.675154,
+      0.741692,
+      0.84464,
+      0.936037,
+      0.989912,
+      1
+     ],
+     "absolute": [
+      {
+       "low": 0,
+       "central": 0,
+       "high": 0,
+       "mean": 0
+      },
+      {
+       "low": 0.0206588,
+       "central": 0.202093,
+       "high": 0.985621,
+       "mean": 0.316624
+      },
+      {
+       "low": 0.0604975,
+       "central": 0.354729,
+       "high": 1.36865,
+       "mean": 0.490656
+      },
+      {
+       "low": 0.0785962,
+       "central": 0.428706,
+       "high": 1.53788,
+       "mean": 0.571865
+      },
+      {
+       "low": 0.0952078,
+       "central": 0.482768,
+       "high": 1.63547,
+       "mean": 0.627026
+      },
+      {
+       "low": 0.114801,
+       "central": 0.563314,
+       "high": 1.80158,
+       "mean": 0.712185
+      },
+      {
+       "low": 0.133176,
+       "central": 0.637349,
+       "high": 1.96385,
+       "mean": 0.793202
+      },
+      {
+       "low": 0.143636,
+       "central": 0.688216,
+       "high": 2.08289,
+       "mean": 0.847672
+      },
+      {
+       "low": 0.147217,
+       "central": 0.716112,
+       "high": 2.15326,
+       "mean": 0.879074
+      }
+     ],
+     "published": false
+    }
+   },
+   "windFromPack": {
+    "call": {
+     "scooters": [
+      25,
+      45
+     ],
+     "nearest": [
+      0.3,
+      1.5
+     ],
+     "windSpeed": null,
+     "windFrom": "pack",
+     "n": 15000,
+     "seed": 99,
+     "overrides": {}
+    },
+    "co": {
+     "unit": "ppm",
+     "increment": {
+      "h0.6": {
+       "low": 0.349358,
+       "central": 1.14289,
+       "high": 3.75358,
+       "mean": 1.49099
+      },
+      "h1.0": {
+       "low": 0.296776,
+       "central": 0.947583,
+       "high": 2.93863,
+       "mean": 1.19736
+      },
+      "h1.5": {
+       "low": 0.212058,
+       "central": 0.670855,
+       "high": 1.93875,
+       "mean": 0.819211
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.432955,
+       "central": 1.38818,
+       "high": 4.33247,
+       "mean": 1.76201
+      },
+      "h1.0": {
+       "low": 0.373503,
+       "central": 1.171,
+       "high": 3.46187,
+       "mean": 1.44289
+      },
+      "h1.5": {
+       "low": 0.268939,
+       "central": 0.850773,
+       "high": 2.35458,
+       "mean": 1.02569
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 0.671077,
+       "central": 1.56221,
+       "high": 4.17829,
+       "mean": 1.89708
+      },
+      "h1.0": {
+       "low": 0.607876,
+       "central": 1.36973,
+       "high": 3.38095,
+       "mean": 1.60345
+      },
+      "h1.5": {
+       "low": 0.504679,
+       "central": 1.08825,
+       "high": 2.40442,
+       "mean": 1.2253
+      }
+     },
+     "mgm3": {
+      "h0.6": {
+       "low": 0.400225,
+       "central": 1.30929,
+       "high": 4.30011,
+       "mean": 1.70808
+      },
+      "h1.0": {
+       "low": 0.339987,
+       "central": 1.08555,
+       "high": 3.3665,
+       "mean": 1.3717
+      },
+      "h1.5": {
+       "low": 0.242935,
+       "central": 0.768534,
+       "high": 2.22104,
+       "mean": 0.938491
+      }
+     }
+    },
+    "benzene": {
+     "unit": "ppb",
+     "increment": {
+      "h0.6": {
+       "low": 0.543413,
+       "central": 2.40155,
+       "high": 10.2865,
+       "mean": 3.5387
+      },
+      "h1.0": {
+       "low": 0.457721,
+       "central": 1.97393,
+       "high": 8.06154,
+       "mean": 2.83549
+      },
+      "h1.5": {
+       "low": 0.320758,
+       "central": 1.38475,
+       "high": 5.36521,
+       "mean": 1.92958
+      }
+     },
+     "endOfRed": {
+      "h0.6": {
+       "low": 0.661254,
+       "central": 2.86578,
+       "high": 11.9029,
+       "mean": 4.17587
+      },
+      "h1.0": {
+       "low": 0.556712,
+       "central": 2.39806,
+       "high": 9.53925,
+       "mean": 3.41089
+      },
+      "h1.5": {
+       "low": 0.397859,
+       "central": 1.73347,
+       "high": 6.64849,
+       "mean": 2.41171
+      }
+     },
+     "total": {
+      "h0.6": {
+       "low": 1.69898,
+       "central": 4.2886,
+       "high": 12.4779,
+       "mean": 5.36689
+      },
+      "h1.0": {
+       "low": 1.55798,
+       "central": 3.81985,
+       "high": 10.419,
+       "mean": 4.66368
+      },
+      "h1.5": {
+       "low": 1.33968,
+       "central": 3.19933,
+       "high": 8.02514,
+       "mean": 3.75777
+      }
+     },
+     "ugm3": {
+      "h0.6": {
+       "low": 1.73603,
+       "central": 7.67218,
+       "high": 32.8622,
+       "mean": 11.305
+      },
+      "h1.0": {
+       "low": 1.46227,
+       "central": 6.30608,
+       "high": 25.7541,
+       "mean": 9.0585
+      },
+      "h1.5": {
+       "low": 1.02472,
+       "central": 4.42383,
+       "high": 17.1401,
+       "mean": 6.16439
+      }
+     }
+    }
+   },
+   "publish": {
+    "co_ppm": {
+     "low": 0.1,
+     "central": 0.5,
+     "high": 2
+    },
+    "benzene_ppb": {
+     "low": 0.2,
+     "central": 1,
+     "high": 5
+    },
+    "pm25_ugm3": {
+     "low": 0.2,
+     "central": 2,
+     "high": 10
+    },
+    "particleNumber": "not estimated (no idle emission measurement; volatile nucleation excluded) / 未推估",
+    "height": "not estimated as a number; same or higher at 0.6-1.0 m (borrowed evidence) / 未推估",
+    "label": "Estimate, not a measurement / 推估值，非實測"
+   }
+  }
+ ],
+ "validation": {
+  "baseline": {
+   "max1minIncrement_ppm": {
+    "low": 1.02844,
+    "central": 1.99395,
+    "high": 4.0142,
+    "mean": 2.17189
+   },
+   "shareAtOrBelow1p2": 0.1
+  },
+  "siteWind": {
+   "max1minIncrement_ppm": {
+    "low": 0.760069,
+    "central": 1.45305,
+    "high": 3.07849,
+    "mean": 1.68669
+   },
+   "shareAtOrBelow1p2": 0.295
+  },
+  "acrossCrosswalk": {
+   "max1minIncrement_ppm": {
+    "low": 0.509623,
+    "central": 0.956316,
+    "high": 1.85846,
+    "mean": 1.05859
+   },
+   "shareAtOrBelow1p2": 0.685
+  },
+  "both": {
+   "max1minIncrement_ppm": {
+    "low": 0.423374,
+    "central": 0.831911,
+    "high": 1.75169,
+    "mean": 0.942971
+   },
+   "shareAtOrBelow1p2": 0.74
+  },
+  "persistentDirection": {
+   "max1minIncrement_ppm": {
+    "low": 1.05287,
+    "central": 1.88807,
+    "high": 4.04163,
+    "mean": 2.10908
+   },
+   "shareAtOrBelow1p2": 0.11
+  },
+  "bothPersistent": {
+   "max1minIncrement_ppm": {
+    "low": 0.396463,
+    "central": 0.758837,
+    "high": 1.69049,
+    "mean": 0.884815
+   },
+   "shareAtOrBelow1p2": 0.795
+  }
+ },
+ "sensitivity": [
+  {
+   "input": "baseline",
+   "lowCase": 0.287004,
+   "highCase": null
+  },
+  {
+   "input": "fuelFlow_gph",
+   "lowValue": 80,
+   "highValue": 200,
+   "lowCase": 0.192183,
+   "highCase": 0.480457
+  },
+  {
+   "input": "sz0",
+   "lowValue": 0.2,
+   "highValue": 0.8,
+   "lowCase": 0.27702,
+   "highCase": 0.293516
+  },
+  {
+   "input": "sw0",
+   "lowValue": 0.1,
+   "highValue": 0.3,
+   "lowCase": 0.299541,
+   "highCase": 0.270058
+  },
+  {
+   "input": "sy0",
+   "lowValue": 0.3,
+   "highValue": 1,
+   "lowCase": 0.28464,
+   "highCase": 0.290698
+  },
+  {
+   "input": "iv",
+   "lowValue": 0.3,
+   "highValue": 0.6,
+   "lowCase": 0.274065,
+   "highCase": 0.289589
+  },
+  {
+   "input": "sv0",
+   "lowValue": 0.2,
+   "highValue": 0.5,
+   "lowCase": 0.271374,
+   "highCase": 0.276585
+  },
+  {
+   "input": "newShare",
+   "lowValue": 0.25,
+   "highValue": 0.45,
+   "lowCase": 0.328521,
+   "highCase": 0.259429
+  },
+  {
+   "input": "thcPerFuel",
+   "lowValue": 0.008,
+   "highValue": 0.06,
+   "lowCase": 0.287004,
+   "highCase": 0.287004
+  },
+  {
+   "input": "carbonSum_pct",
+   "lowValue": 11.5,
+   "highValue": 12.5,
+   "lowCase": 0.298645,
+   "highCase": 0.274753
+  },
+  {
+   "input": "firstBinMean_pct",
+   "lowValue": 0.3,
+   "highValue": 0.7,
+   "lowCase": 0.236872,
+   "highCase": 0.336274
+  },
+  {
+   "input": "windSpeed_ms",
+   "lowValue": 0.3,
+   "highValue": 2,
+   "lowCase": 0.467056,
+   "highCase": 0.10821
+  },
+  {
+   "input": "scooters",
+   "lowValue": 8,
+   "highValue": 20,
+   "lowCase": 0.17862,
+   "highCase": 0.373402
+  },
+  {
+   "input": "nearest_m",
+   "lowValue": 0.7,
+   "highValue": 3,
+   "lowCase": 0.371292,
+   "highCase": 0.211746
+  },
+  {
+   "input": "windFrom pack (vs any)",
+   "lowCase": null,
+   "highCase": 0.403229
+  },
+  {
+   "input": "no meander (sv0 0.05, iv 0.2)",
+   "lowCase": 0.0690824,
+   "highCase": null
+  },
+  {
+   "input": "no buoyant rise",
+   "lowCase": null,
+   "highCase": 0.281556
+  }
+ ],
+ "interactiveBounds": {
+  "scooters": [
+   1,
+   60
+  ],
+  "nearest_m": [
+   0.3,
+   5
+  ],
+  "windSpeed_ms": [
+   0.3,
+   3
+  ],
+  "windFrom": [
+   "any",
+   "pack"
+  ],
+  "note": "outside these bounds the kernel or the scene layout is not supported; heights other than 1.5 m are computed but not published"
+ },
+ "testCases": [
+  {
+   "call": {
+    "scooters": 1,
+    "nearest": 2,
+    "windSpeed": 1,
+    "n": 2000,
+    "seed": 1
+   },
+   "co": {
+    "h0.6": {
+     "low": 0,
+     "central": 0.0457107,
+     "high": 0.428785,
+     "mean": 0.111529
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 0.0372194,
+     "high": 0.346908,
+     "mean": 0.0889092
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 0.0244751,
+     "high": 0.215409,
+     "mean": 0.0570449
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0,
+     "central": 0.120328,
+     "high": 0.965696,
+     "mean": 0.261551
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 0.0962194,
+     "high": 0.754501,
+     "mean": 0.208153
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 0.0634558,
+     "high": 0.512991,
+     "mean": 0.133727
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0,
+     "central": 0.181819,
+     "high": 2.08949,
+     "mean": 0.52667
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 0.144981,
+     "high": 1.66791,
+     "mean": 0.422472
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 0.0954202,
+     "high": 0.986848,
+     "mean": 0.275479
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 0,
+     "central": 42.1351,
+     "high": 1243.73,
+     "mean": 349.502
+    },
+    "h1.0": {
+     "low": 0,
+     "central": 34.3781,
+     "high": 957.747,
+     "mean": 278.118
+    },
+    "h1.5": {
+     "low": 0,
+     "central": 22.444,
+     "high": 607.625,
+     "mean": 178.787
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 10,
+    "nearest": 1,
+    "windSpeed": 0.5,
+    "n": 2000,
+    "seed": 2
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.204477,
+     "central": 0.704284,
+     "high": 2.52292,
+     "mean": 0.941985
+    },
+    "h1.0": {
+     "low": 0.182256,
+     "central": 0.598861,
+     "high": 2.04543,
+     "mean": 0.782924
+    },
+    "h1.5": {
+     "low": 0.136664,
+     "central": 0.423194,
+     "high": 1.3209,
+     "mean": 0.541828
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.307606,
+     "central": 1.54711,
+     "high": 6.56823,
+     "mean": 2.24965
+    },
+    "h1.0": {
+     "low": 0.272973,
+     "central": 1.31333,
+     "high": 5.44374,
+     "mean": 1.86615
+    },
+    "h1.5": {
+     "low": 0.204259,
+     "central": 0.920721,
+     "high": 3.49663,
+     "mean": 1.28142
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.312291,
+     "central": 2.5144,
+     "high": 15.8706,
+     "mean": 4.52167
+    },
+    "h1.0": {
+     "low": 0.277548,
+     "central": 2.14842,
+     "high": 12.7892,
+     "mean": 3.73895
+    },
+    "h1.5": {
+     "low": 0.203207,
+     "central": 1.4823,
+     "high": 8.7384,
+     "mean": 2.56675
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 34.9159,
+     "central": 668.892,
+     "high": 12957.4,
+     "mean": 3425.28
+    },
+    "h1.0": {
+     "low": 29.1988,
+     "central": 565.171,
+     "high": 10205.4,
+     "mean": 2837.89
+    },
+    "h1.5": {
+     "low": 20.8205,
+     "central": 411.348,
+     "high": 7145.68,
+     "mean": 1929.21
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 30,
+    "nearest": 1,
+    "windSpeed": 0.5,
+    "n": 2000,
+    "seed": 3
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.373349,
+     "central": 1.08235,
+     "high": 3.38878,
+     "mean": 1.3881
+    },
+    "h1.0": {
+     "low": 0.341185,
+     "central": 0.938441,
+     "high": 2.73926,
+     "mean": 1.1723
+    },
+    "h1.5": {
+     "low": 0.27796,
+     "central": 0.706523,
+     "high": 1.8842,
+     "mean": 0.852344
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.545579,
+     "central": 2.24157,
+     "high": 8.83505,
+     "mean": 3.09767
+    },
+    "h1.0": {
+     "low": 0.480178,
+     "central": 1.93038,
+     "high": 7.19874,
+     "mean": 2.62623
+    },
+    "h1.5": {
+     "low": 0.374129,
+     "central": 1.45071,
+     "high": 5.28039,
+     "mean": 1.91911
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.614883,
+     "central": 3.80122,
+     "high": 22.058,
+     "mean": 6.65366
+    },
+    "h1.0": {
+     "low": 0.539066,
+     "central": 3.3181,
+     "high": 18.452,
+     "mean": 5.62604
+    },
+    "h1.5": {
+     "low": 0.413232,
+     "central": 2.50437,
+     "high": 12.9314,
+     "mean": 4.06782
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 50.2567,
+     "central": 896.108,
+     "high": 19166.2,
+     "mean": 4339.76
+    },
+    "h1.0": {
+     "low": 44.302,
+     "central": 775.102,
+     "high": 16260.6,
+     "mean": 3676.3
+    },
+    "h1.5": {
+     "low": 32.9326,
+     "central": 581.929,
+     "high": 10429.5,
+     "mean": 2676.81
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 30,
+    "nearest": 1,
+    "windSpeed": 2.5,
+    "n": 2000,
+    "seed": 4
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.0688097,
+     "central": 0.314667,
+     "high": 1.38389,
+     "mean": 0.464671
+    },
+    "h1.0": {
+     "low": 0.0544784,
+     "central": 0.234524,
+     "high": 1.01952,
+     "mean": 0.343258
+    },
+    "h1.5": {
+     "low": 0.0367201,
+     "central": 0.149447,
+     "high": 0.651025,
+     "mean": 0.214786
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.114685,
+     "central": 0.689358,
+     "high": 3.32366,
+     "mean": 1.09837
+    },
+    "h1.0": {
+     "low": 0.0893531,
+     "central": 0.499585,
+     "high": 2.56106,
+     "mean": 0.809987
+    },
+    "h1.5": {
+     "low": 0.0570363,
+     "central": 0.3056,
+     "high": 1.57782,
+     "mean": 0.502899
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.137261,
+     "central": 1.0489,
+     "high": 8.54073,
+     "mean": 2.30446
+    },
+    "h1.0": {
+     "low": 0.0992951,
+     "central": 0.794933,
+     "high": 6.29872,
+     "mean": 1.69353
+    },
+    "h1.5": {
+     "low": 0.0616002,
+     "central": 0.506857,
+     "high": 3.72633,
+     "mean": 1.04259
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 13.0399,
+     "central": 285.899,
+     "high": 5875.22,
+     "mean": 1605.47
+    },
+    "h1.0": {
+     "low": 9.86719,
+     "central": 212.411,
+     "high": 4252.61,
+     "mean": 1181.17
+    },
+    "h1.5": {
+     "low": 6.17509,
+     "central": 135.653,
+     "high": 2697.6,
+     "mean": 727.364
+    }
+   }
+  },
+  {
+   "call": {
+    "scooters": 60,
+    "nearest": 0.3,
+    "windSpeed": null,
+    "windFrom": "pack",
+    "n": 2000,
+    "seed": 5
+   },
+   "co": {
+    "h0.6": {
+     "low": 0.456037,
+     "central": 1.51933,
+     "high": 5.26703,
+     "mean": 2.01229
+    },
+    "h1.0": {
+     "low": 0.366091,
+     "central": 1.20425,
+     "high": 3.7905,
+     "mean": 1.51123
+    },
+    "h1.5": {
+     "low": 0.243865,
+     "central": 0.790092,
+     "high": 2.32568,
+     "mean": 0.963064
+    }
+   },
+   "benzene": {
+    "h0.6": {
+     "low": 0.697616,
+     "central": 3.13282,
+     "high": 14.6526,
+     "mean": 4.93946
+    },
+    "h1.0": {
+     "low": 0.569438,
+     "central": 2.4263,
+     "high": 10.1541,
+     "mean": 3.70131
+    },
+    "h1.5": {
+     "low": 0.374752,
+     "central": 1.59827,
+     "high": 6.44284,
+     "mean": 2.34298
+    }
+   },
+   "pm25": {
+    "h0.6": {
+     "low": 0.742339,
+     "central": 4.96845,
+     "high": 33.2323,
+     "mean": 9.76766
+    },
+    "h1.0": {
+     "low": 0.603636,
+     "central": 3.77257,
+     "high": 24.5419,
+     "mean": 7.29752
+    },
+    "h1.5": {
+     "low": 0.372321,
+     "central": 2.44772,
+     "high": 15.6825,
+     "mean": 4.59966
+    }
+   },
+   "particleNumber": {
+    "h0.6": {
+     "low": 72.95,
+     "central": 1234.6,
+     "high": 25672.5,
+     "mean": 6733.65
+    },
+    "h1.0": {
+     "low": 59.711,
+     "central": 977.915,
+     "high": 18220.2,
+     "mean": 4945.38
+    },
+    "h1.5": {
+     "low": 40.4472,
+     "central": 632.741,
+     "high": 10446.8,
+     "mean": 3034.68
+    }
+   }
+  }
+ ],
+ "crossModel": {
+  "note": "medians of CO increment, 90-s mean, ~1.5 m, ppm, as published by each model before/after critique corrections",
+  "sourceDispersionOriginal": {
+   "few": 0.033,
+   "dozen": 0.18,
+   "fullbox": 0.36
+  },
+  "massBalanceBoxHeadline": {
+   "light": 0.25,
+   "typical": 0.82,
+   "heavy": 1.8,
+   "status": "upper bound only; IOT replica with corrected queue over-predicts 3-20x"
+  },
+  "massBalanceBoxCriticAdjusted": {
+   "light": 0.1,
+   "typical": "0.3-0.4",
+   "heavy": "0.6-0.8"
+  },
+  "empiricalRouteA": {
+   "typical35queued": 0.2,
+   "heavy70queued": 0.35,
+   "status": "IOT low-cost sensors; only 1 of 4 sites resolves an increment"
+  },
+  "empiricalRouteB": {
+   "typical35queued": 1.1,
+   "status": "assumption-driven; not used"
+  }
+ }
+}

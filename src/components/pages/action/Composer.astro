@@ -26,6 +26,8 @@ interface Field {
   key: string;
   label: string;
   hint?: string;
+  /** the HTML autocomplete token for the reader's own details ('name', 'address-level1', 'email'…); default 'off' */
+  autocomplete?: string;
 }
 interface Props {
   locale: Locale;
@@ -55,11 +57,19 @@ const tpl = JSON.stringify({ subject: subject ?? '', body, blank, subjectLabel: 
       <fieldset class="composer__fields" data-js-only>
         {labels.fields && <legend class="composer__legend">{labels.fields}</legend>}
         {fields.map((f) => (
-          <label class="composer__field">
-            <span class="composer__label">{f.label}</span>
-            {f.hint && <span class="composer__hint">{f.hint}</span>}
-            <input type="text" name={f.key} data-field={f.key} autocomplete="off" lang={locale === 'en' ? 'en' : 'zh-Hant-TW'} />
-          </label>
+          <div class="composer__field">
+            <label class="composer__label" for={`${id}-${f.key}`}>{f.label}</label>
+            {f.hint && <span class="composer__hint" id={`${id}-${f.key}-hint`}>{f.hint}</span>}
+            <input
+              type="text"
+              id={`${id}-${f.key}`}
+              name={f.key}
+              data-field={f.key}
+              autocomplete={f.autocomplete ?? 'off'}
+              aria-describedby={f.hint ? `${id}-${f.key}-hint` : undefined}
+              lang={locale === 'en' ? 'en' : 'zh-Hant-TW'}
+            />
+          </div>
         ))}
       </fieldset>
     )
@@ -107,6 +117,7 @@ const tpl = JSON.stringify({ subject: subject ?? '', body, blank, subjectLabel: 
       const subject = tpl.subject ? `${tpl.subjectLabel}${fillTpl(tpl.subject, vals, tpl.blank)}\n\n` : '';
       const text = subject + fillTpl(tpl.body, vals, tpl.blank);
       let ok = false;
+      const prev = document.activeElement as HTMLElement | null;
       try {
         await navigator.clipboard.writeText(text);
         ok = true;
@@ -124,8 +135,11 @@ const tpl = JSON.stringify({ subject: subject ?? '', body, blank, subjectLabel: 
           ok = false;
         }
         ta.remove();
+        prev?.focus({ preventScroll: true });
       }
-      status.textContent = ok ? status.dataset.copied! : status.dataset.failed!;
+      // clear first, so a second copy is announced again
+      status.textContent = '';
+      requestAnimationFrame(() => (status.textContent = ok ? status.dataset.copied! : status.dataset.failed!));
     });
   }
 </script>
@@ -180,7 +194,7 @@ const tpl = JSON.stringify({ subject: subject ?? '', body, blank, subjectLabel: 
     padding: var(--sp-4);
     display: grid;
     gap: 0.8em;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-base);
     line-height: var(--lh-body);
     overflow-wrap: anywhere;
   }

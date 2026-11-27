@@ -27,8 +27,40 @@ export interface ChartTable {
 export interface LegendItem {
   label: string;
   tone: Tone;
-  /** rect = bars/areas, line = lines, dot = points, light = a tint of the tone, dash = a dashed line, ring = hollow points (targets) */
-  shape?: 'rect' | 'line' | 'dot' | 'light' | 'dash' | 'ring';
+  /**
+   * rect = bars/areas, line = lines, dot = points, light = a pale tint with an outline (things
+   * not counted), dash = a dashed line, ring = hollow points (targets), hollow = an outlined
+   * empty square (cells drawn hollow), slash / dotted = a filled square with a surface-coloured
+   * stroke or dot in it (the second and third parts of a waffle, told apart without colour)
+   */
+  shape?: 'rect' | 'line' | 'dot' | 'light' | 'dash' | 'ring' | 'hollow' | 'slash' | 'dotted';
+  /** with shape 'line' or 'dash': the marker drawn on the line's points, so series differ by shape as well as colour */
+  marker?: Marker;
+}
+
+/**
+ * Point markers. Charts with more than one series give each series its own, in this order,
+ * so no series is told apart by colour alone (in greyscale print, for colour-blind readers,
+ * in forced-colours mode), and the legend key repeats the marker.
+ */
+export type Marker = 'circle' | 'square' | 'triangle' | 'diamond';
+export const MARKERS: Marker[] = ['circle', 'square', 'triangle', 'diamond'];
+
+/**
+ * A marker centred on (x, y); x may be a percentage. `r` is the radius of the equivalent
+ * circle: the other shapes are sized to look the same weight.
+ */
+export function marker(shape: Marker, cls: string, x: string | number, y: number, r: number): string {
+  if (shape === 'circle') return `<circle class="${cls}" cx="${x}" cy="${r2(y)}" r="${r}"/>`;
+  const s = r2(r * 0.9);
+  const t = r2(r * 1.25);
+  const d =
+    shape === 'square'
+      ? `M${-s},${-s}H${s}V${s}H${-s}Z`
+      : shape === 'triangle'
+        ? `M0,${-t}L${r2(t * 1.05)},${r2(t * 0.8)}H${r2(-t * 1.05)}Z`
+        : `M0,${-t}L${t},0L0,${t}L${-t},0Z`;
+  return `<svg x="${x}" y="${r2(y)}" width="1" height="1" overflow="visible"><path class="${cls}" d="${d}"/></svg>`;
 }
 
 export interface ChartRender {
@@ -43,6 +75,8 @@ export interface ChartRender {
   /** px reserved beside the plot for labels that hang outside it */
   padLeft?: number;
   padRight?: number;
+  /** px reserved on the right on wide charts, where series names follow the end values (.c-endname) */
+  padRightWide?: number;
   legend?: LegendItem[];
   table: ChartTable;
   /** crosshair data for line-type charts: x positions in % and one text per position */
@@ -76,6 +110,17 @@ export function fmt(locale: Locale, v: number, decimals = 0): string {
 export function fmtCompact(locale: Locale, v: number): string {
   if (Math.abs(v) < 10000) return fmt(locale, v);
   return new Intl.NumberFormat(locale === 'zh-TW' ? 'zh-TW' : 'en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(v);
+}
+
+/**
+ * A data-table header with its unit: 「PM2.5（µg/m³）」, "PM2.5 (µg/m³)". Nothing is added when
+ * the label already names the unit, so a header never reads 「一氧化碳（%） (%)」.
+ */
+export function withUnit(locale: Locale, label: string, unit?: string): string {
+  if (!unit) return label;
+  const u = unit.trim();
+  if (!u || label.includes(`(${u})`) || label.includes(`（${u}）`) || label.endsWith(u)) return label;
+  return locale === 'zh-TW' ? `${label}（${u}）` : `${label} (${u})`;
 }
 
 /** A typographic minus, not a hyphen. */
@@ -136,7 +181,7 @@ export function labelTokens(text: string): string[] {
 }
 
 /** How many lines the shared charts let a label take before the rest stays on the last line. */
-export const LABEL_LINES = 4;
+export const LABEL_LINES = 6;
 
 /**
  * Break a label into lines that fit `maxEm`, at most `maxLines` of them (default 2, as it has
@@ -225,6 +270,25 @@ export function niceScale(lo: number, hi: number, count = 4): { min: number; max
   return { min, max, ticks };
 }
 
+/**
+ * The type sizes the SVG charts are laid out for, in px. 14 is the site's floor for anything a
+ * reader can see (docs/redesign-brief.md 6.1): no chart text is set below it, at any width.
+ * charts.css sets the same sizes; a renderer that measures text passes these to px().
+ */
+export const FS = { label: 14, value: 15, small: 14 } as const;
+
+/**
+ * A hover readout: 「不合格率 2025：3.78%」 / "Failure rate 2025: 3.78%". Chinese takes the
+ * full-width colon; a percent sign sits against its number in both languages, any other unit
+ * after a space.
+ */
+export function tip(locale: Locale, label: string, value: string, unit?: string): string {
+  const u = unit ? (unit.trim() === '%' ? (value.trim().endsWith('%') ? '' : '%') : ` ${unit.trim()}`) : '';
+  return `${label}${locale === 'zh-TW' ? '：' : ': '}${value}${u}`.replace(/\s+/g, ' ').trim();
+}
+/** The separator between two parts of a readout's label: 「新北市・燃油」 / "New Taipei · petrol". */
+export const tipDot = (locale: Locale) => (locale === 'zh-TW' ? '・' : ' · ');
+
 /** A number with a typographic minus, for values that can be negative. */
 export const fmtSigned = (locale: Locale, v: number, decimals = 0) => (v < 0 ? MINUS : '') + fmt(locale, Math.abs(v), decimals);
 
@@ -285,14 +349,64 @@ export interface ChartHtmlOptions {
   id: string;
 }
 
+/**
+ * A table cell that holds a figure (a number, perhaps with a sign, currency, unit or a short
+ * flag such as *), as opposed to words. Figures are right-aligned and never wrap; words (notes,
+ * names, flags spelled out) wrap like any text.
+ */
+export function isFigure(cell: string): boolean {
+  const c = cell.trim();
+  if (c === '' || /^[–—-]$/.test(c)) return true; // "no value" sits in the figure column
+  if (!/\d/.test(c)) return false;
+  // what is left once the figure itself is taken out: at most a short unit or flag
+  const rest = [...c.replace(/(NT|US)?\$|[\d.,\s%‰+−\-–—~～×*≈<>≤≥()（）約]/g, '')];
+  const cjk = rest.filter((ch) => ch.codePointAt(0)! >= 0x2e80).length;
+  return cjk <= 2 && rest.length - cjk <= 6;
+}
+
+/** Word columns (not figures, not the first) whose every cell is short: they are set unbroken. */
+export function shortColumns(t: ChartTable, figureCol: boolean[]): boolean[] {
+  return t.head.map((h, i) => i > 0 && !figureCol[i] && em(h) <= 7 && t.rows.every((row) => em(row[i] ?? '') <= 7));
+}
+
+/**
+ * The "view data table" toggle and its table: the accessible twin of every chart. Shared by the
+ * SVG charts (chartHtml) and the HTML charts (core/html.ts), so every table on the site behaves
+ * the same: a 48px toggle named after its chart, a caption, figures right-aligned, a scroll box
+ * that takes keyboard focus.
+ */
+export function tableHtml(t: ChartTable, o: Pick<ChartHtmlOptions, 'title' | 'tableLabel'>, open = false): string {
+  // a column of figures is right-aligned and never wraps; a column of words (notes) wraps
+  const figureCol = t.head.map((_, i) => i > 0 && t.rows.filter((row) => isFigure(row[i] ?? '')).length * 2 >= t.rows.length);
+  // a column of short words (實測, 推估) keeps each on one line instead of breaking it a character at a time
+  const shortCol = shortColumns(t, figureCol);
+  const colClass = (i: number, c?: string) => (figureCol[i] && (c === undefined || isFigure(c)) ? ' class="num"' : shortCol[i] ? ' class="nw"' : '');
+  // Every toggle, table and scroll box is named after its chart: a screen-reader user moving by
+  // table or by control hears which chart it belongs to, not 43 identical "view data table"s.
+  // The box scrolls sideways on a phone, so it takes keyboard focus (Safari does not give it);
+  // it is a named group, not a region, so a page of 40 charts does not get 40 landmarks.
+  const name = o.title ? `${o.tableLabel}${/[⺀-￿]/.test(o.tableLabel) ? '：' : ': '}${o.title}` : o.tableLabel;
+  const table = `<details class="chart__data"${open ? ' open' : ''}><summary>${TABLE_ICON}<span>${esc(o.tableLabel)}</span>${
+    o.title ? `<span class="vh">${esc(name.slice(o.tableLabel.length))}</span>` : ''
+  }</summary><div class="chart__table" tabindex="0" role="group" aria-label="${esc(name)}"><table>${
+    t.caption || o.title ? `<caption class="${t.caption ? 'chart__caption' : 'vh'}">${esc(t.caption ?? o.title)}</caption>` : ''
+  }<thead><tr>${t.head
+    .map((h, i) => `<th scope="col"${colClass(i)}>${esc(h)}</th>`)
+    .join('')}</tr></thead><tbody>${t.rows
+    .map((row) => `<tr>${row.map((c, i) => (i ? `<td${colClass(i, c)}>${esc(c)}</td>` : `<th scope="row">${esc(c)}</th>`)).join('')}</tr>`)
+    .join('')}</tbody></table></div></details>`;
+  return table;
+}
+
+
 /** The complete inner HTML of a chart: legend, plot, data table. */
 export function chartHtml(r: ChartRender, o: ChartHtmlOptions): string {
   const legend = r.legend?.length
     ? `<ul class="chart__legend">${r.legend
-        .map((l) => `<li><span class="chart__key chart__key--${l.shape ?? 'rect'} c-key-${l.tone}"></span>${esc(l.label)}</li>`)
+        .map((l) => `<li><span class="chart__key chart__key--${l.shape ?? 'rect'} c-key-${l.tone}"${l.marker ? ` data-marker="${l.marker}"` : ''}></span>${esc(l.label)}</li>`)
         .join('')}</ul>`
     : '';
-  const pad = `padding-inline:${r.padLeft ?? 0}px ${r.padRight ?? 0}px`;
+  const pad = `padding-inline:${r.padLeft ?? 0}px ${r.padRight ?? 0}px${r.padRightWide ? `;--pad-wide:${Math.ceil(r.padRightWide)}px` : ''}`;
   const size = r.viewBox
     ? `viewBox="${r.viewBox}" style="max-inline-size:${r.maxWidth ?? '100%'}"`
     : `width="100%" height="${r.height}"`;
@@ -301,11 +415,6 @@ export function chartHtml(r: ChartRender, o: ChartHtmlOptions): string {
   const svg = `<svg class="chart__svg${r.viewBox ? ' chart__svg--picture' : ''}" ${size} role="img" aria-labelledby="${labelled}" focusable="false"><title id="${o.id}-t">${esc(o.title)}</title>${
     o.desc ? `<desc id="${o.id}-d">${esc(o.desc)}</desc>` : ''
   }${r.body}</svg>`;
-  const t = r.table;
-  const table = `<details class="chart__data"><summary>${TABLE_ICON}<span>${esc(o.tableLabel)}</span></summary><div class="chart__table"><table>${
-    t.caption ? `<caption>${esc(t.caption)}</caption>` : ''
-  }<thead><tr>${t.head.map((h, i) => `<th scope="col"${i ? ' class="num"' : ''}>${esc(h)}</th>`).join('')}</tr></thead><tbody>${t.rows
-    .map((row) => `<tr>${row.map((c, i) => (i ? `<td class="num">${esc(c)}</td>` : `<th scope="row">${esc(c)}</th>`)).join('')}</tr>`)
-    .join('')}</tbody></table></div></details>`;
+  const table = tableHtml(r.table, o);
   return `${legend}<div class="chart__plot" style="${pad}"${hover}>${svg}</div>${table}`;
 }

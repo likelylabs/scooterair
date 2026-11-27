@@ -1,0 +1,34 @@
+---
+/**
+ * WordHelp — one short line that explains the hard words a page uses (brief 6.6: gloss at
+ * first use), placed under the page title so it comes before the first use.
+ *
+ *   <WordHelp locale={locale} words={['pm25', 'ufp']} />
+ */
+import type { Locale } from '@/i18n';
+import { words as W, type WordId } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  words: WordId[];
+}
+const { locale, words } = Astro.props;
+const sep = locale === 'en' ? '. ' : '。';
+---
+
+{words.length > 0 && (
+  <p class="word-help" role="note"><b>{W.label[locale]}</b>{locale === 'en' ? ': ' : '：'}{words.map((w) => W[w][locale]).join(sep)}{locale === 'en' ? '.' : '。'}</p>
+)}
+
+<style>
+  .word-help {
+    margin: 0;
+    max-inline-size: 40em;
+    font-size: var(--fs-base);
+    line-height: 1.6;
+    color: var(--ink-2, var(--ink));
+  }
+  .word-help b {
+    font-weight: var(--fw-bold);
+  }
+</style>

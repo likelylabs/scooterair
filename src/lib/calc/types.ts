@@ -115,6 +115,7 @@ export const messageCodes = [
   'electricity-review',
   'unconfirmed',
   'stale-data',
+  'range',
 ] as const;
 export type MessageCode = (typeof messageCodes)[number];
 
@@ -122,6 +123,11 @@ export interface Message {
   code: MessageCode;
   severity: Severity;
   text: L10n;
+  /**
+   * When the message is a list (one deadline rule per line, for example): the items alone, so a
+   * page can show them as a list. `text` always holds the whole message, items included.
+   */
+  items?: L10n[];
   /** Ledger line or input ids this message is about. */
   about?: string[];
   /** For ambiguity / sensitivity messages: the NTD at stake. */
@@ -213,6 +219,8 @@ export const exclusionReasons = [
   'ambiguous',
   'requirement-not-met',
   'model-unknown',
+  /** The buyer did not give an answer the rule needs (an age for an age band): not counted, and not refused. */
+  'needs-answer',
 ] as const;
 export type ExclusionReason = (typeof exclusionReasons)[number];
 

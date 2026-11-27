@@ -15,283 +15,11 @@
       "reviewedOn": "2026-11-25"
     },
     {
-      "id": "ui.ui.scene.altRed",
-      "rule": "no-arcade-or-idling-measurements",
-      "locale": "zh-TW",
-      "reason": "Alt text from blueprint 4.10: 怠速 describes what the drawn scooters are doing. No idle emission figure is cited, and the same sentence says the layer's density has not been measured.",
-      "reviewedBy": "system (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.items.one-red-light.caveat",
-      "rule": "associations-not-causes-tw",
-      "reason": "The caveat denies causation (「有關」，不是「造成」 / association, not cause): it is the rule's own point, and the word appears only to be ruled out.",
-      "reviewedBy": "system (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.items.electric.caveat",
-      "rule": "ev-emissions-not-zero",
-      "reason": "Says 這不是零污染 / this is NOT zero pollution, then limits zero to this scooter's exhaust at the crossing, exactly as the rule asks (blueprint 3.11).",
-      "reviewedBy": "system (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.items.electric.caveat",
-      "rule": "r8-zero-only-own-exhaust",
-      "reason": "Zero is applied only to the scooter's own exhaust and the sentence states the crossing is not zero pollution (R8).",
-      "reviewedBy": "system (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "art.art.cycle.idle",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Label of the signal-cycle strip (blueprint V14, verbatim): 怠速 / Idling names the red phase as time spent standing beside the pack. No idle emission figure is given; the strip's own tag says scooters in Taiwan have not been measured.",
-      "reviewedBy": "system (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.prologue.deck",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Prologue deck (blueprint 3.1, verbatim): 怠速 / idles describes the scene the reader knows. It cites no measurement and the sentence goes on to ask what has and has not been measured.",
-      "reviewedBy": "system (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link2.body.1",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Blueprint 3.4 / R1 wording: 怠速 / idling names the anti-idling rule and what it covers (vehicles waiting over three minutes). No idle emission figure is cited and nothing is called legal or illegal.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link2.caveat",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "States that the idle emission rate has NOT been measured or published for Taiwan: the gap the rule protects, not a measurement.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link3.deck",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Blueprint 3.5 deck: 怠速 describes the scene the question is about, and the same deck says nobody in Taiwan has measured it. No figure is cited.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link5.deck",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Blueprint 3.7 deck: says NO study has looked at a few minutes beside idling scooters. The word appears only in stating the gap.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.green.body.0",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Blueprint 3.9: says idling may NOT be the worst moment (the signal-cycle studies abroad). No Taiwanese idle measurement is cited or implied.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.connect.reveal",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "The site's own inference (blueprint 3.10), opened with 我們的推論, closed by default and badged as inference; it says nobody has measured it directly and cites no idle figure.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link5.ladder.s1",
-      "rule": "r2-pm25-health-all-sources",
-      "reason": "The sentence itself says the PM2.5 is from all sources (所有來源 / from all sources), and the ladder card prints the all-sources scope tag beside it, as R2 requires.",
-      "reviewedBy": "home workstream",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link5.ladder.s3",
-      "rule": "r2-pm25-health-all-sources",
-      "reason": "The next sentence says 算的是所有來源的 PM2.5 / This counts PM2.5 from every source, and the card carries the all-sources scope tag: R2 satisfied.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link5.ruler.text",
-      "rule": "associations-not-causes-tw",
-      "reason": "The 'mind the ruler' callout from blueprint 3.7 rules causation OUT: 「有關」，不是「造成」 / association, not cause. The word appears only to be denied.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link5.walk.label",
-      "rule": "do-not-discourage-exercise",
-      "reason": "Label of the callout that tells readers to KEEP walking (這不是叫你不要走路 / This is not a reason to stop walking): the opposite of what the rule forbids.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link5.caveat",
-      "rule": "hei-is-association-no-lung-function",
-      "locale": "zh-TW",
-      "reason": "Says exactly what the rule requires: the HEI review itself did not assess causality (blueprint 3.7 caveat). It makes no claim about lung function.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.connect.notSaying.1",
-      "rule": "gasoline-exhaust-is-2b",
-      "reason": "An item in the 「我們沒有說」 / 'what we are not saying' box: the site states it does NOT claim scooter exhaust is Group 1. Rendered as a list of things not said.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.connect.notSaying.2",
-      "rule": "scooter-pm25-small-fumes-large",
-      "reason": "An item in the 「我們沒有說」 box: the site says it does NOT claim scooters are a main PM2.5 source.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.connect.notSaying.2",
-      "rule": "no-scooters-main-source",
-      "reason": "An item in the 「我們沒有說」 box: the site says it does NOT claim scooters are a main PM2.5 source.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.connect.notSaying.3",
-      "rule": "smell-is-not-dose",
-      "locale": "en",
-      "reason": "An item in the 'what we are not saying' box: the site says it does NOT claim a stronger smell means more harm.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.connect.notSaying.4",
-      "rule": "associations-not-causes-tw",
-      "reason": "An item in the 「我們沒有說」 box: the site says it does NOT claim any Taiwanese health finding was caused by scooters.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link7.body.0",
-      "rule": "ev-emissions-not-zero",
-      "reason": "Blueprint 3.11: 這不是零污染 / This is NOT zero pollution, then limits zero to this scooter's exhaust at the crossing and lists what remains (tyres, brakes, road dust, generation, other traffic).",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "home.link7.body.0",
-      "rule": "r8-zero-only-own-exhaust",
-      "reason": "Uses zero only for this scooter's own exhaust at the crossing and says the crossing is not zero (cars and buses still running), as R8 asks.",
-      "reviewedBy": "home workstream (blueprint text)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.smell.more.iarc.caption",
-      "rule": "gasoline-exhaust-is-2b",
-      "reason": "States the rule itself: gasoline engine exhaust as a whole is Group 2B, NOT Group 1, and the site will not call it Group 1 (blueprint 3.6 / V28). Group names are filled from the registry.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.beside-me.measured.2.text",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "怠速 / idling names what the scooters are doing (R1 wording from blueprint 3.4: what the idling rule covers, with no legal/illegal claim). No Taiwanese idle emission figure or arcade comparison is cited; the sentence states the absence of such measurements or the scope of the rule.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.beside-me.notShown.3.text",
-      "rule": "no-arcade-or-idling-measurements",
-      "locale": "zh-TW",
-      "reason": "怠速 / idling names what the scooters are doing (the gap: no published Taiwanese idle emission rate, followed by who could measure it). No Taiwanese idle emission figure or arcade comparison is cited; the sentence states the absence of such measurements or the scope of the rule.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.beside-me.more.limits.title",
-      "rule": "no-arcade-or-idling-measurements",
-      "locale": "zh-TW",
-      "reason": "怠速 / idling names what the scooters are doing (the periodic inspection is an idle test; the figure shows legal pass limits, captioned as not actual emissions). No Taiwanese idle emission figure or arcade comparison is cited; the sentence states the absence of such measurements or the scope of the rule.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.how-much.measured.0.text",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "怠速 / idling names what the scooters are doing (the central gap: nobody has measured what pedestrians beside idling scooters breathe). No Taiwanese idle emission figure or arcade comparison is cited; the sentence states the absence of such measurements or the scope of the rule.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.one-red-light.measured.0.text",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "怠速 / idling names what the scooters are doing (the gap: no study of a few minutes beside idling scooters). No Taiwanese idle emission figure or arcade comparison is cited; the sentence states the absence of such measurements or the scope of the rule.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.one-red-light.measured.1.text",
-      "rule": "associations-not-causes-tw",
-      "locale": "en",
-      "reason": "\"death from all causes\" is the epidemiological outcome name (all-cause mortality); the sentence itself says \"association\" and makes no causal claim.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.one-red-light.measured.2.text",
-      "rule": "associations-not-causes-tw",
-      "reason": "The sentence says the studies show association, NOT cause (有關，不是造成): the rule's own point; 造成 / cause appears only to be ruled out.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.one-red-light.figure.ruler",
-      "rule": "associations-not-causes-tw",
-      "reason": "Blueprint 3.7 honesty statement, verbatim in substance: what the studies show is association, NOT cause, and the site will not mix the two words.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.one-red-light.figure.stops.hourBody",
-      "rule": "r2-pm25-health-all-sources",
-      "reason": "R2 satisfied in the same sentence: \"PM2.5（所有來源）\" / \"PM2.5 from all sources\"; the time-ladder card also prints the all-sources scope tag.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.one-red-light.figure.stops.yearsBody",
-      "rule": "r2-pm25-health-all-sources",
-      "reason": "R2 satisfied in the same sentence: \"PM2.5（所有來源）\" / \"from all sources\"; the card also prints the all-sources scope tag.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.one-red-light.keepWalking.label",
-      "rule": "do-not-discourage-exercise",
-      "reason": "The label says the opposite of the forbidden claim: this is NOT a reason to stop walking (blueprint 3.7 callout); the body says keep walking.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.my-child.measured.1.text",
-      "rule": "no-taiwan-child-height-data",
-      "reason": "Written exactly as the rule asks: most studies 5–15%; 59% is one US roadside PM2.5 study; 44% is the \"up to\" value of one UK experiment on fine particles; one found no consistent difference and one was lower; none in Taiwan (corrections brief b). No Taiwanese figure is cited.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "questions.pages.my-child.more.stroller.desc",
-      "rule": "no-taiwan-child-height-data",
-      "reason": "Screen-reader description of V29 in the rule's own wording: 44% is \"up to\", one study each for 59%, no consistent difference and 5% lower; none in Taiwan.",
-      "reviewedBy": "questions workstream (Q1)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
       "id": "evidence.link5.ruler",
       "rule": "associations-not-causes-tw",
-      "reason": "The honesty statement for link 5 (blueprint 3.7 wording): it says the studies show association, NOT cause; the word appears only to be ruled out.",
-      "reviewedBy": "Q2 evidence builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
+      "reason": "The honesty statement for link 5: it says the TAIWANESE studies show association, not cause. 'Cause' appears otherwise only for the three international statements that use causal wording themselves (HEI SR17 'sufficient evidence for a causal relationship', ATS 'a cause of childhood asthma', AHA 'consistent with a causal relationship'; facts hei-sr17-asthma-exacerbation, ats-2020-childhood-asthma, aha-2010-pm25-cardiovascular), each said to mean air or traffic pollution in general, not scooters.",
+      "reviewedBy": "Q2 evidence builder; reworded by evidence-pages fixer (needs editor countersign)",
+      "reviewedOn": "2026-11-26"
     },
     {
       "id": "evidence.notUsed.items.neverSmokers.actually",
@@ -329,42 +57,6 @@
       "id": "evidence.notUsed.items.target2035.actually",
       "rule": "no-gas-scooter-ban",
       "reason": "States the targets are sales targets and NOT a ban on gasoline scooters, which is what the rule requires.",
-      "reviewedBy": "Q2 evidence builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "evidence.notClaimed.five.1",
-      "rule": "gasoline-exhaust-is-2b",
-      "reason": "One of the five refused sentences (blueprint 3.10 我們沒有說), rendered struck through in NotClaimedList with the rule's own reason beside it.",
-      "reviewedBy": "Q2 evidence builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "evidence.notClaimed.five.2",
-      "rule": "scooter-pm25-small-fumes-large",
-      "reason": "One of the five refused sentences (blueprint 3.10 我們沒有說), rendered struck through with the claims policy's reason.",
-      "reviewedBy": "Q2 evidence builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "evidence.notClaimed.five.2",
-      "rule": "no-scooters-main-source",
-      "reason": "One of the five refused sentences (blueprint 3.10 我們沒有說), rendered struck through with the claims policy's reason.",
-      "reviewedBy": "Q2 evidence builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "evidence.notClaimed.five.3",
-      "rule": "smell-is-not-dose",
-      "locale": "en",
-      "reason": "One of the five refused sentences (blueprint 3.10 我們沒有說), rendered struck through with the claims policy's reason.",
-      "reviewedBy": "Q2 evidence builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "evidence.notClaimed.five.4",
-      "rule": "associations-not-causes-tw",
-      "reason": "One of the five refused sentences (blueprint 3.10 我們沒有說): the site will NOT say a Taiwanese health finding was caused by scooters; rendered struck through.",
       "reviewedBy": "Q2 evidence builder (needs editor countersign)",
       "reviewedOn": "2026-11-25"
     },
@@ -455,33 +147,10 @@
       "reviewedOn": "2026-11-25"
     },
     {
-      "id": "act.roles.walk.a5Why",
-      "rule": "r2-pm25-health-all-sources",
-      "locale": "zh-TW",
-      "reason": "R2 is met in the same sentence: 「所有來源的 PM2.5」. The sentence states an association (有關) from mj-cohort-mortality-guo2021, used as the registry caveat itself asks: not to tell people to stop walking.",
-      "reviewedBy": "P action builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
       "id": "act.letter.body",
       "rule": "voice-nin",
       "locale": "zh-TW",
       "reason": "A letter a reader sends to a city councillor: 您 is the register a constituent uses to an elected official. Site copy addressed to the reader still uses 你.",
-      "reviewedBy": "P action builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "unmeasured.ask.body",
-      "rule": "voice-nin",
-      "locale": "zh-TW",
-      "reason": "Blueprint 4.4 request text, verbatim (「您好」): a letter a resident sends to a government bureau, in the register used to officials. Site copy addressed to the reader still uses 你.",
-      "reviewedBy": "P action builder (needs editor countersign)",
-      "reviewedOn": "2026-11-25"
-    },
-    {
-      "id": "unmeasured.hero.deck",
-      "rule": "no-arcade-or-idling-measurements",
-      "reason": "Blueprint 3.5 Link 3 deck verbatim. 怠速 describes the scene (scooters idling at a red light) and the sentence states the gap; it cites no Taiwanese idle emission rate and no arcade measurement.",
       "reviewedBy": "P action builder (needs editor countersign)",
       "reviewedOn": "2026-11-25"
     },
@@ -492,6 +161,122 @@
       "reason": "Blueprint 4.3 page lead, verbatim: it says going electric is NOT necessarily cheaper (「不一定比較省」), which is exactly what the rule asks the site to say; the match is on the negated phrase.",
       "reviewedBy": "electric workstream (E)",
       "reviewedOn": "2026-11-25"
+    },
+    {
+      "id": "ui.chain.summary.2.text",
+      "rule": "iot-results-are-modelled",
+      "locale": "zh-TW",
+      "reason": "Brief 7.3 wording: 運研所量過等候區（實測）. The waiting-area readings are field sensor readings (the rule itself says so); the line says nothing about the modelled scenarios.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "about.corrections.claims.iot-94",
+      "rule": "brief-no-distance-rule",
+      "locale": "zh-TW",
+      "reason": "A claim the site used to make, printed in the corrections log as the thing we no longer say, with the correction beside it.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "about.corrections.claims.idling-legal",
+      "rule": "brief-idling-legal",
+      "locale": "en",
+      "reason": "A claim the site used to make, printed in the corrections log as the thing we no longer say, with the correction beside it.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "act.walk.keepWalkingWhy",
+      "rule": "r2-pm25-health-all-sources",
+      "locale": "zh-TW",
+      "reason": "The sentence says 所有來源的 PM2.5 in brackets, which is what the rule asks for.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.1.no",
+      "rule": "gasoline-exhaust-is-2b",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.2.no",
+      "rule": "scooter-pm25-small-fumes-large",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.2.no",
+      "rule": "no-scooters-main-source",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.3.no",
+      "rule": "smell-is-not-dose",
+      "locale": "en",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.5.no",
+      "rule": "brief-no-long-limits",
+      "locale": "zh-TW",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.6.no",
+      "rule": "delivery-workers-not-poisoned",
+      "locale": "en",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.6.no",
+      "rule": "brief-no-poisoning",
+      "locale": "en",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.14.no",
+      "rule": "brief-masks-useless",
+      "locale": "en",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "evidence.notClaimed.items.14.no",
+      "rule": "brief-masks-carbon-blocks",
+      "locale": "en",
+      "reason": "Struck through on /evidence/ under 我們不會說的話 / What we will not say, with what we say instead beside it: the sentence is quoted only to be refused.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "home.s2.body",
+      "rule": "associations-not-causes-tw",
+      "locale": "en",
+      "reason": "Brief screen 2 wording: benzene is an IARC Group 1 carcinogen, a causal classification of the substance; the rule is about Taiwanese association studies of traffic, which this sentence does not cite.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "home.s3.sheet.care",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Brief screen 3 requires this line about the three-minute idling rule. It cites the rule, not a measured idle emission rate or an arcade comparison.",
+      "reviewedBy": "lane K (integrator)",
+      "reviewedOn": "2026-11-26"
     }
   ],
   "inlineCopyAllowed": [

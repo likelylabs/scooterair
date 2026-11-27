@@ -23,7 +23,12 @@
 //  - a fact or series without `chainLink` (unless its topic has a default), or a bad chain link
 //  - a `research` reference 'papers/<file>#<finding>' or 'redlight/<file>#<finding>' that does not
 //    exist or whose verdict is not CONFIRMED, CORRECTED or ADDED
-//  - evidence gaps: bad chain link, missing fields, unknown facts/series/sources, bad dates
+//  - the estimate (src/data/estimate.ts): any slot that differs from research/estimate/results.json
+//    (published 1 s.f. values, 1 d.p. totals, the emission-per-red arithmetic, the cross-check,
+//    the inputs the recipe prints) or from the registry fact that backs a measured value
+//  - answers (src/data/answers.ts): a malformed former-gap id, unknown fact, slot or source; missing chip without a
+//    K sentence; one answer per former gap
+//  - 'masks/VERIFIED#<id>' research references that are not in research/masks/VERIFIED.json
 
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -33,14 +38,15 @@ process.removeAllListeners('warning'); // silence the type-stripping Experimenta
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const load = (p) => import(pathToFileURL(resolve(root, p)).href);
 
-let types, sourcesMod, factsMod, seriesMod, policyMod, gapsMod;
+let types, sourcesMod, factsMod, seriesMod, policyMod, estimateMod, answersMod;
 try {
   types = await load('src/data/types.ts');
   sourcesMod = await load('src/data/sources.ts');
   factsMod = await load('src/data/facts.ts');
   seriesMod = await load('src/data/series.ts');
   policyMod = await load('src/data/claims-policy.ts');
-  gapsMod = await load('src/data/gaps.ts');
+  estimateMod = await load('src/data/estimate.ts');
+  answersMod = await load('src/data/answers.ts');
 } catch (err) {
   console.error('\n✖ check-data: could not load src/data (syntax error, duplicate id or bad import?)\n');
   console.error(err);
@@ -55,7 +61,6 @@ const warn = (where, msg) => warnings.push(`${where}: ${msg}`);
 const { sources, sourceKinds, readLevels } = sourcesMod;
 const { factGroups, facts, topicLabels, topicDefaultChainLink } = factsMod;
 const { series, pointFlags, seriesTopicDefaultChainLink } = seriesMod;
-const { gaps } = gapsMod;
 const CHAIN_LINKS = new Set(types.chainLinks);
 const { claimRules } = policyMod;
 const CONFIDENCES = new Set(types.confidences);
@@ -142,8 +147,13 @@ function walkL10n(where, obj, path = '', opts = {}) {
 const FINDING_VERDICTS = new Set(['CONFIRMED', 'CORRECTED', 'ADDED']);
 const { readFileSync: readFs, existsSync: existsFs } = await import('node:fs');
 const jsonCache = new Map();
+let masksVerified;
 function checkResearchRefs(where, research) {
   if (typeof research !== 'string') return;
+  for (const m of research.matchAll(/\bmasks\/VERIFIED#([a-z0-9-]+)/g)) {
+    masksVerified ??= JSON.parse(readFs(resolve(root, 'research/masks/VERIFIED.json'), 'utf8'));
+    if (!masksVerified.facts.some((f) => f.id === m[1])) err(where, `research/masks/VERIFIED.json has no fact "${m[1]}"`);
+  }
   for (const m of research.matchAll(/\b(papers|redlight)\/([a-z0-9-]+)#([A-Za-z0-9._-]+)/g)) {
     const [, dir, file, id] = m;
     const key = `${dir}/${file}`;
@@ -246,6 +256,15 @@ for (const [topic, group] of Object.entries(factGroups)) {
     for (const dep of f.derivedFrom ?? []) {
       if (!factIds.has(dep)) err(w, `derivedFrom references unknown fact "${dep}"`);
       if (dep === id) err(w, 'derivedFrom references itself');
+      // types.ts: a derived figure is only as well checked as its weakest input.
+      if (f.confidence === 'verified' && facts[dep]?.confidence === 'secondary') {
+        err(w, `confidence 'verified' but input "${dep}" is 'secondary'; a derived fact with any secondary input is 'secondary'`);
+      }
+    }
+    // Pages reuse statements on their own (study panels, share links, /about/), so a statement
+    // must name its study instead of pointing back at "the same study" row above it.
+    if (/^(?:在|依)?同一/.test(f.statement?.['zh-TW'] ?? '') || /^(?:In |When |Comparing [^,]* in )?the same (?:study|model|tunnel|simulation|cohort|Taipei study|modelled)/i.test(f.statement?.en ?? '')) {
+      warn(w, 'statement opens with "the same study/model…" (同一…); name the study so it stands alone where it is reused');
     }
     if (!f.data || typeof f.data !== 'object') err(w, 'missing data object');
     for (const [k, d] of Object.entries(f.data ?? {})) {
@@ -349,24 +368,7 @@ for (let i = 1; i <= 16; i++) {
   if (!Object.values(claimRules).some((r) => r.blueprintRule === `R${i}`)) err(`claims policy`, `blueprint copy rule R${i} has no claim rule (set blueprintRule on one)`);
 }
 
-// ---------------------------------------------------------------------------
-// Evidence gaps
-// ---------------------------------------------------------------------------
-
 const seriesIds = new Set(Object.keys(series));
-for (const [id, g] of Object.entries(gaps)) {
-  const w = `gap ${id}`;
-  if (!ID_RE.test(id) || !id.startsWith('gap-')) err(w, "id must be kebab-case and start with 'gap-'");
-  if (!CHAIN_LINKS.has(g.chainLink)) err(w, `chainLink must be 1-7, got ${g.chainLink}`);
-  for (const key of ['title', 'statement', 'whyItMatters', 'wouldClose']) checkL10n(`${w}.${key}`, g[key]);
-  checkL10n(`${w}.whoCouldMeasure`, g.whoCouldMeasure);
-  if (g.sources) citeSources(w, g.sources, { required: false });
-  for (const fid of g.closest?.facts ?? []) if (!factIds.has(fid)) err(w, `closest.facts references unknown fact "${fid}"`);
-  for (const sid of g.closest?.series ?? []) if (!seriesIds.has(sid)) err(w, `closest.series references unknown series "${sid}"`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(g.searchedOn ?? '')) err(w, 'searchedOn must be yyyy-mm-dd');
-  if (!g.research) err(w, 'missing research reference');
-  checkResearchRefs(w, g.research);
-}
 
 // ---------------------------------------------------------------------------
 // Economics dataset (src/data/econ): the calculator's inputs
@@ -583,6 +585,211 @@ if (econ) {
   TAI_WARN_SCOPE = false;
 }
 
+/** Reader-voice checks for blocks above the reader-voice section; run there. */
+const deferredVoice = [];
+
+// ---------------------------------------------------------------------------
+// The estimate (src/data/estimate.ts) against research/estimate/results.json and the registry
+// ---------------------------------------------------------------------------
+// estimate.ts holds literal published values so client scripts stay small. This block re-reads
+// the signed results file and fails if any slot differs from what the science team published.
+
+{
+  const E = estimateMod;
+  const est = E.est;
+  const R = JSON.parse(readFs(resolve(root, 'research/estimate/results.json'), 'utf8'));
+  const METHOD = readFs(resolve(root, 'research/estimate/METHOD.md'), 'utf8');
+  const w = (slot) => `estimate ${slot}`;
+  const near = (a, b, tol = 1e-9) => typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) <= tol * Math.max(1, Math.abs(b));
+  const sf = (x, n = 1) => Number(Number(x).toPrecision(n));
+  const dp = (x, n = 1) => Number(Number(x).toFixed(n));
+  const same = (slot, got, want) => {
+    if (!near(got, want)) err(w(slot), `is ${got} but results.json gives ${want}`);
+  };
+  const H = 'h1.5';
+  if (R.generated !== est.meta.date) err(w('meta.date'), `is ${est.meta.date} but results.json was generated ${R.generated}`);
+  if (R.conventions?.published && !/1 significant figure/.test(R.conventions.published)) warn(w('meta'), 'results.json no longer says values are published to 1 significant figure; re-check the rounding');
+  for (const key of E.scenarioKeys) {
+    const sc = est.scn[key];
+    const r = R.scenarios.find((x) => x.key === sc.resultsKey);
+    if (!r) {
+      err(w(`scn.${key}`), `results.json has no scenario "${sc.resultsKey}"`);
+      continue;
+    }
+    if (r.call.n !== est.meta.runs || r.call.seed !== est.meta.seed) err(w(`scn.${key}`), `results.json call n/seed ${r.call.n}/${r.call.seed} differ from meta ${est.meta.runs}/${est.meta.seed}`);
+    same(`scn.${key}.count.lo`, sc.count.lo, r.call.scooters[0]);
+    same(`scn.${key}.count.hi`, sc.count.hi, r.call.scooters[1]);
+    same(`scn.${key}.nearest_m.lo`, sc.nearest_m.lo, r.call.nearest[0]);
+    same(`scn.${key}.nearest_m.hi`, sc.nearest_m.hi, r.call.nearest[1]);
+    if (!(sc.drawn >= sc.count.lo && sc.drawn <= sc.count.hi)) err(w(`scn.${key}.drawn`), `${sc.drawn} is outside the count ${sc.count.lo}–${sc.count.hi}`);
+    const pub = { co: r.publish.co_ppm, benzene: r.publish.benzene_ppb, pm25: r.publish.pm25_ugm3 };
+    for (const p of ['co', 'benzene', 'pm25']) {
+      const a = est[p][key].add;
+      same(`${p}.${key}.add.lo`, a.lo, pub[p].low);
+      same(`${p}.${key}.add.mid`, a.mid, pub[p].central);
+      same(`${p}.${key}.add.hi`, a.hi, pub[p].high);
+      // and the published value is the raw increment at 1.5 m rounded to 1 s.f.
+      const raw = r.result[p].increment[H];
+      for (const [k, rk] of [['lo', 'low'], ['mid', 'central'], ['hi', 'high']]) {
+        if (!near(sf(raw[rk]), pub[p][rk])) err(w(`${p}.${key}.add.${k}`), `results.json publish block ${pub[p][rk]} is not raw ${raw[rk]} at 1 s.f.`);
+      }
+    }
+    const tot = r.result.co.total[H];
+    same(`co.${key}.total.lo`, est.co[key].total.lo, dp(tot.low));
+    same(`co.${key}.total.mid`, est.co[key].total.mid, dp(tot.central));
+    same(`co.${key}.total.hi`, est.co[key].total.hi, dp(tot.high));
+  }
+  // emission per scooter and per red
+  const fm = R.fleet.fleetMeanCO_gph;
+  const g = est.emit.co;
+  same('emit.co.gPerHour.lo', g.gPerHour.lo, Math.round(fm.low));
+  same('emit.co.gPerHour.mid', g.gPerHour.mid, Math.round(fm.central));
+  same('emit.co.gPerHour.hi', g.gPerHour.hi, Math.round(fm.high));
+  const reds = g.perRedSum.reds;
+  if (reds !== 3600 / est.signal.redLength_s) err(w('emit.co.perRedSum.reds'), `${reds} is not 3600 ÷ ${est.signal.redLength_s}`);
+  const mv = R.conventions.molarVolume_L;
+  if (!near(g.perRedSum.molarVolume_L, mv)) err(w('emit.co.perRedSum.molarVolume_L'), `${g.perRedSum.molarVolume_L} but results.json uses ${mv}`);
+  for (const [k, rk] of [['lo', 'low'], ['mid', 'central'], ['hi', 'high']]) {
+    const grams = fm[rk] / reds;
+    const litres = (grams / g.perRedSum.molarMass_g) * mv;
+    const cans = litres / (g.perRedSum.canMl / 1000);
+    same(`emit.co.perRed_g.${k}`, g.perRed_g[k], sf(grams));
+    same(`emit.co.perRed_L.${k}`, g.perRed_L[k], sf(litres, 2));
+    same(`emit.co.perRedSum.exactCans.${k}`, g.perRedSum.exactCans[k], dp(cans, 2));
+    same(`emit.co.perRed_can.${k}`, g.perRed_can[k], Math.round(cans * 2) / 2);
+  }
+  const bz = R.fleet.fleetMeanBenzene_mgph;
+  same('emit.benzene_mgPerHour.lo', est.emit.benzene_mgPerHour.lo, sf(bz.low));
+  same('emit.benzene_mgPerHour.mid', est.emit.benzene_mgPerHour.mid, sf(bz.central));
+  same('emit.benzene_mgPerHour.hi', est.emit.benzene_mgPerHour.hi, sf(bz.high));
+  // cross-check against the IOT anchor (METHOD §6, results.json validation.both)
+  const both = R.validation.both.max1minIncrement_ppm;
+  same('xcheck.iot.model.lo', est.xcheck.iot.model.lo, dp(both.low));
+  same('xcheck.iot.model.mid', est.xcheck.iot.model.mid, dp(both.central));
+  same('xcheck.iot.model.hi', est.xcheck.iot.model.hi, dp(both.high));
+  const obs = est.xcheck.iot.observed;
+  if (!METHOD.includes(`${obs.lo}–${obs.hi} ppm`)) err(w('xcheck.iot.observed'), `METHOD.md does not state the observed rise as ${obs.lo}–${obs.hi} ppm`);
+  const ratio = R.validation.baseline.max1minIncrement_ppm.central / both.central;
+  if (Math.round(ratio) !== est.xcheck.iot.pedestrianOverSensor) err(w('xcheck.iot.pedestrianOverSensor'), `${est.xcheck.iot.pedestrianOverSensor} but results.json gives about ${ratio.toFixed(2)}`);
+  // reference values recorded in results.json → inputs
+  const inp = R.inputs;
+  const bgSrc = inp.bgCO_ppm.source;
+  const mGen = bgSrc.match(/general stations ([\d.]+)/);
+  const mTraf = bgSrc.match(/traffic stations ([\d.]+)/);
+  if (!mGen || !near(Number(mGen[1]), est.bg.co.general.value)) err(w('bg.co.general'), `${est.bg.co.general.value} does not match results.json inputs.bgCO_ppm.source (${bgSrc})`);
+  if (!mTraf || !near(Number(mTraf[1]), est.bg.co.traffic.value)) err(w('bg.co.traffic'), `${est.bg.co.traffic.value} does not match results.json inputs.bgCO_ppm.source (${bgSrc})`);
+  if (!new RegExp(`annual mean ${est.bg.pm25.value}\\b`).test(inp.bgPM25_ugm3.source)) err(w('bg.pm25'), `${est.bg.pm25.value} does not match results.json inputs.bgPM25_ugm3.source`);
+  same('bg.benzene.lo', est.bg.benzene.lo, inp.bgBenzene_ppb.low);
+  same('bg.benzene.hi', est.bg.benzene.hi, inp.bgBenzene_ppb.high);
+  for (const [slot, key] of [['recipe.fuelFlow_gph', 'fuelFlow_gph'], ['recipe.windSpeed_ms', 'windSpeed_ms']]) {
+    const v = slot.split('.').reduce((o, k) => o[k], est);
+    same(`${slot}.lo`, v.lo, inp[key].low);
+    same(`${slot}.mid`, v.mid, inp[key].central);
+    same(`${slot}.hi`, v.hi, inp[key].high);
+  }
+  const binTotal = inp.moenvCObins.central.reduce((n, b) => n + b[2], 0);
+  if (!(est.recipe.inspectionReadings >= binTotal && est.recipe.inspectionReadings - binTotal <= 10)) err(w('recipe.inspectionReadings'), `${est.recipe.inspectionReadings} does not match the ${binTotal} readings in results.json bins`);
+  const b = est.recipe.busiest;
+  if (Math.round(b.perHourAllApproaches / 4) !== b.perApproachHour) err(w('recipe.busiest.perApproachHour'), `${b.perApproachHour} is not ${b.perHourAllApproaches} ÷ 4`);
+  if (Math.floor((b.perApproachHour * b.redSeconds) / 3600) !== b.perRed) err(w('recipe.busiest.perRed'), `${b.perRed} is not ${b.perApproachHour} × ${b.redSeconds} ÷ 3600`);
+  // WHO conversion
+  const factor = 28.01 / mv;
+  if (!near(est.who.mgPerPpm, Number(factor.toFixed(3)))) err(w('who.mgPerPpm'), `${est.who.mgPerPpm} but 28.01 ÷ ${mv} = ${factor.toFixed(4)}`);
+  if (!near(est.who.co15min_ppm.exact, dp(est.who.co15min_mg.value / est.who.mgPerPpm))) err(w('who.co15min_ppm.exact'), `${est.who.co15min_ppm.exact} is not ${est.who.co15min_mg.value} ÷ ${est.who.mgPerPpm}`);
+  if (est.who.co15min_ppm.value !== Math.round(est.who.co15min_ppm.exact)) err(w('who.co15min_ppm'), 'printed value is not the exact value rounded');
+  // every value backed by a registry fact equals the fact's datum
+  const fd = (id, key) => {
+    const f = facts[id];
+    if (!f) {
+      err(w(id), `refers to unknown fact "${id}"`);
+      return NaN;
+    }
+    const d = f.data?.[key];
+    if (!d) err(w(id), `fact ${id} has no datum "${key}"`);
+    return d?.value;
+  };
+  const eq = (slot, got, id, key) => {
+    const want = fd(id, key);
+    if (!near(got, want)) err(w(slot), `is ${got} but fact ${id}.data.${key} is ${want}`);
+  };
+  eq('bg.co.traffic', est.bg.co.traffic.value, 'moenv-co-stations-2025', 'coTraffic');
+  eq('bg.co.general', est.bg.co.general.value, 'moenv-co-stations-2025', 'coGeneral');
+  eq('bg.pm25', est.bg.pm25.value, 'moenv-co-stations-2025', 'pm25General');
+  eq('meas.iot.sites', est.meas.iot.sites.value, 'iot-study-design', 'intersections');
+  const peaks = est.meas.iot.co.peaks;
+  eq('meas.iot.co.peaks[0]', peaks[0], 'iot-waiting-area-co-2024', 'hsrPeak');
+  eq('meas.iot.co.peaks[1]', peaks[1], 'iot-waiting-area-co-2024', 'qixianPeak');
+  eq('meas.iot.co.peaks[2]', peaks[2], 'iot-waiting-area-co-2024', 'mingchengPeak');
+  if (peaks.length !== est.meas.iot.co.peakSites) err(w('meas.iot.co.peakSites'), `${est.meas.iot.co.peakSites} but ${peaks.length} peaks`);
+  eq('meas.iot.pm25.lo', est.meas.iot.pm25.lo, 'iot-waiting-area-pm25-2024', 'hsrLow');
+  eq('meas.iot.pm25.hi', est.meas.iot.pm25.hi, 'iot-waiting-area-pm25-2024', 'hsrHigh');
+  eq('meas.taipei.co.roadside', est.meas.taipei.co.roadside.value, 'taipei-roadside-co-2024', 'coTraffic');
+  eq('who.co15min_mg', est.who.co15min_mg.value, 'who-no2-co-guideline', 'co15min');
+  eq('child.airPerKg.lo', est.child.airPerKg.lo, 'child-air-per-kg', 'ratioLow');
+  eq('child.airPerKg.hi', est.child.airPerKg.hi, 'child-air-per-kg', 'ratioHigh');
+  for (const k of ['scooter', 'walking', 'bus', 'car']) eq(`commute.pm25.${k}`, est.commute.pm25[k], 'commute-scooter-vs-subway-chuang2020', k);
+  eq('commute.pm25.metro', est.commute.pm25.metro, 'commute-scooter-vs-subway-chuang2020', 'subway');
+  // ranges printed rounded outward to the nearest 5 must contain the fact's range
+  const outward5 = (slot, r, id, loKey, hiKey) => {
+    const lo = fd(id, loKey);
+    const hi = fd(id, hiKey);
+    if (r.lo !== Math.floor(lo / 5) * 5 || r.hi !== Math.ceil(hi / 5) * 5) err(w(slot), `${r.lo}–${r.hi} is not fact ${id} (${lo}–${hi}) rounded outward to 5`);
+  };
+  outward5('signal.pedWait', est.signal.pedWait, 'iot-pedestrian-wait', 'low', 'high');
+  outward5('inspect.top10share', est.inspect.top10share, 'inspection-top-tenth-co-share', 'shareLow', 'shareHigh');
+  // every slot resolves to a finite, ordered range, and prints as 約 A 到 B
+  for (const slot of E.estimateRangeSlots) {
+    let r;
+    try {
+      r = E.estRange(slot);
+    } catch (e) {
+      err(w(slot), e.message);
+      continue;
+    }
+    if (!Number.isFinite(r.lo) || !Number.isFinite(r.hi) || r.lo > r.hi) err(w(slot), `bad range ${r.lo}–${r.hi}`);
+    if (r.mid !== undefined && !(r.mid >= r.lo && r.mid <= r.hi)) err(w(slot), `mid ${r.mid} outside ${r.lo}–${r.hi}`);
+    if (r.factId && !factIds.has(r.factId)) err(w(slot), `factId "${r.factId}" is not a fact`);
+    const zh = E.formatEstimate(slot, 'zh-TW').text;
+    const en = E.formatEstimate(slot, 'en').text;
+    if (!/約/.test(zh) || !/到/.test(zh)) err(w(slot), `zh text "${zh}" lacks 約 or 到`);
+    if (!/about/.test(en) || !/ to /.test(en)) err(w(slot), `en text "${en}" lacks "about" or "to"`);
+  }
+  for (const id of E.estimateSourceIds) citeSources(`estimate sources`, [id]);
+  walkL10n('estimate', est);
+  walkL10n('estimateText', E.estimateText);
+  deferredVoice.push(['estimateText', E.estimateText]);
+}
+
+// ---------------------------------------------------------------------------
+// Answers (src/data/answers.ts): the former gaps, answered
+// ---------------------------------------------------------------------------
+
+{
+  const { answers, kSentenceIds } = answersMod;
+  const slots = new Set(estimateMod.estimateRangeSlots);
+  const seenGap = new Map();
+  for (const [id, a] of Object.entries(answers)) {
+    const w = `answer ${id}`;
+    if (!ID_RE.test(id) || !id.startsWith('answer-')) err(w, "id must be kebab-case and start with 'answer-'");
+    if (!/^gap-[a-z0-9-]+$/.test(a.formerGap)) err(w, `formerGap "${a.formerGap}" must be the old gap id (gap-…)`);
+    if (seenGap.has(a.formerGap)) err(w, `formerGap "${a.formerGap}" already answered by ${seenGap.get(a.formerGap)}`);
+    seenGap.set(a.formerGap, id);
+    if (!CHAIN_LINKS.has(a.chainLink)) err(w, `chainLink must be 1-7, got ${a.chainLink}`);
+    for (const key of ['question', 'answer', 'basis', 'caveat']) checkL10n(`${w}.${key}`, a[key]);
+    if (!a.chips.length && !a.kSentence) err(w, 'no chip and no K sentence (brief 7.2 gives a chip to every answer except where a K sentence stands in)');
+    for (const c of a.chips) if (!types.readerKinds.includes(c.kind)) err(w, `unknown chip "${c.kind}"`);
+    if (a.kSentence && !kSentenceIds.includes(a.kSentence)) err(w, `unknown K sentence "${a.kSentence}"`);
+    for (const f of a.facts) if (!factIds.has(f)) err(w, `unknown fact "${f}"`);
+    for (const s of a.slots ?? []) if (!slots.has(s)) err(w, `unknown estimate slot "${s}"`);
+    if (a.sources) citeSources(w, a.sources, { required: false });
+    if (!a.facts.length && !a.sources?.length) err(w, 'needs facts or sources');
+    if (a.chips.some((c) => c.kind === 'estimate') && !a.anchor) err(w, 'an estimate answer needs an /estimate/ anchor');
+    if (/沒人量過|最髒|違規|合法|愈|車流廢氣|車隊/.test(a.answer['zh-TW'] + a.caveat['zh-TW'])) err(w, 'zh-TW uses a banned word (brief 6.6)');
+    deferredVoice.push([w, { question: a.question, answer: a.answer, basis: a.basis, caveat: a.caveat }]);
+  }
+  if (seenGap.size !== 13) err('answers', `brief 7.2 lists thirteen former gaps; ${seenGap.size} have an answer`);
+}
+
 // ---------------------------------------------------------------------------
 // Coverage
 // ---------------------------------------------------------------------------
@@ -593,12 +800,11 @@ for (const [id, n] of cited) if (n === 0) err(`source ${id}`, 'is not cited by a
 for (const [id, f] of Object.entries(facts)) walkL10n(`fact ${id}`, f);
 for (const [id, s] of Object.entries(series)) walkL10n(`series ${id}`, s);
 for (const [id, r] of Object.entries(claimRules)) walkL10n(`claim rule ${id}`, r);
-for (const [id, g] of Object.entries(gaps)) walkL10n(`gap ${id}`, g);
 
 // ---------------------------------------------------------------------------
 // Reader voice: no editor instructions in reader-facing text
 // ---------------------------------------------------------------------------
-// Pages print facts' captions, statements and caveats, series text and gap text to readers.
+// Pages print facts' captions, statements and caveats, series text and answers to readers.
 // Instructions to editors ("never write…", "不可說成…", "只能用在證據頁…") belong in
 // `editorNote` (never rendered) or in claims-policy.ts. A reader-facing caveat states the limit
 // of the evidence in plain words a reader can use.
@@ -663,7 +869,6 @@ function walkReaderVoice(where, obj, report = err) {
 }
 for (const [id, f] of Object.entries(facts)) walkReaderVoice(`fact ${id}`, f);
 for (const [id, s] of Object.entries(series)) walkReaderVoice(`series ${id}`, s);
-for (const [id, g] of Object.entries(gaps)) walkReaderVoice(`gap ${id}`, g);
 for (const [l, lab] of Object.entries(types.chainLinkLabels)) walkReaderVoice(`chainLinkLabels.${l}`, lab);
 walkReaderVoice('confidenceLabels', types.confidenceLabels);
 walkReaderVoice('evidenceLabels', types.evidenceLabels);
@@ -673,9 +878,8 @@ for (const [id, f] of Object.entries(facts)) {
   if (!f.caveat) err(`fact ${id}`, 'every fact needs a reader-facing caveat: one short, true statement of its scope or limit');
   if (f.editorNote !== undefined && (typeof f.editorNote !== 'string' || !f.editorNote.trim())) err(`fact ${id}`, 'editorNote must be a non-empty string');
 }
-for (const [id, g] of Object.entries(gaps)) {
-  if (!g.whoCouldMeasure) err(`gap ${id}`, 'every gap needs whoCouldMeasure (the site\'s proposal: which body, with what instrument or study)');
-}
+
+for (const [where, obj] of deferredVoice) walkReaderVoice(where, obj);
 
 // Dedupe messages produced by both the targeted checks and the sweep.
 const uniq = (a) => [...new Set(a)];
@@ -690,13 +894,12 @@ const count = (list, key) => list.reduce((m, x) => ((m[x[key]] = (m[x[key]] ?? 0
 const factArr = Object.values(facts);
 const seriesArr = Object.values(series);
 const seriesResolved = seriesMod.seriesList;
-const gapArr = Object.values(gaps);
 const summary = [
   `sources ${sourceIds.size} ${JSON.stringify(count(Object.values(sources), 'readLevel'))}`,
   `facts ${factArr.length} ${JSON.stringify(count(factArr, 'confidence'))} ${JSON.stringify(count(factArr, 'evidence'))}`,
   `facts by chain link ${JSON.stringify(count(factArr, 'chainLink'))}`,
   `series ${seriesArr.length} ${JSON.stringify(count(seriesArr, 'confidence'))} by chain link ${JSON.stringify(count(seriesResolved, 'chainLink'))}`,
-  `gaps ${gapArr.length} by chain link ${JSON.stringify(count(gapArr, 'chainLink'))}`,
+  `answers ${Object.keys(answersMod.answers).length} (the former gaps, brief 7.2)`,
   `claim rules ${Object.keys(claimRules).length}`,
 ].join('\n  ');
 

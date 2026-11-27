@@ -1,0 +1,186 @@
+---
+/**
+ * HeroStreet — G1 (the street at a red light) and G14 (the same street with
+ * the pedestrian signal green and every scooter electric). Brief 3.2 screens
+ * 1 and 15, 5.2.
+ *
+ * A 4:5 picture. An older woman, a parent with a pushchair and a schoolchild
+ * in a yellow cap wait at the kerb, drawn in front of the wash so each is
+ * recognisable. Beside them the pack: exactly est.scn.dozen.drawn scooters,
+ * three rows deep, paler with distance, one front-row rider with a face. The
+ * signal shows the countdown.
+ *
+ * phase="red"    petrol scooters; the three layers of air.ts for the dozen
+ *                scenario. On arrival the scooters roll in and settle one
+ *                after another, each with its dark core, and the chip counts
+ *                to the number drawn (under 4 s). Then it rests.
+ * phase="green"  electric scooters: no layer B, no cores; the street's own
+ *                sparse air, grey dots at the tyres and one car's small core
+ *                stay. The child steps onto the crossing. Nothing to play.
+ *
+ * Props
+ *   locale   Locale
+ *   phase    'red' (default) | 'green'
+ *   led      the number on the signal at red (default: est.signal.redLength_s)
+ *   counter  the chip 機車 16 輛 (default true at red; never shown at green)
+ *   tag      false (default; <Screen illustration> prints it) | 'street'
+ *   id, class
+ *
+ *   <HeroStreet slot="picture" locale={locale} />
+ *   <HeroStreet slot="picture" locale={locale} phase="green" />
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art, fill } from '@/i18n/art';
+import { est } from '@/data/estimate';
+import SceneFrame from './SceneFrame.astro';
+import SceneLabel from './SceneLabel.astro';
+import { air, type Box } from './air';
+import { AIR_EXTRA } from './air-slots';
+import { CAR_TAILPIPE, artId, car, figureBoxes, person } from './parts';
+import { SIGNAL_HEAD, indexSources, pedSignal, pickSources, placed, put, shopfronts, tailOf, tyreOf, withoutSources, type Placed } from './kit';
+import { sceneAlt } from './scene';
+
+interface Props {
+  locale: Locale;
+  phase?: 'red' | 'green';
+  led?: number;
+  counter?: boolean;
+  tag?: false | 'street';
+  id?: string;
+  class?: string;
+}
+const { locale, phase = 'red', tag = false, id, class: cls } = Astro.props;
+const red = phase === 'red';
+const led = Astro.props.led ?? est.signal.redLength_s;
+const counter = red && (Astro.props.counter ?? true);
+const kind = red ? 'gas' : 'electric';
+const drawn = est.scn.dozen.drawn;
+
+const VB: Box = { x: 0, y: -690, w: 720, h: 900 };
+const FAR = -296; // where the far pavement meets the shopfronts
+const KERB = 250; // right edge of the pavement the people stand on
+
+// The pack: three rows, back row first. Each row is the same drawing, smaller and paler with
+// distance, and stands higher in the picture, so every scooter can be counted.
+const ROWS: { row: 1 | 2 | 3; s: number; lift: number; x0: number; pitch: number; count: number }[] = [
+  { row: 3, s: 0.8, lift: 216, x0: 282, pitch: 62, count: 6 },
+  { row: 2, s: 0.9, lift: 112, x0: 272, pitch: 60, count: 6 },
+  { row: 1, s: 1, lift: 0, x0: 270, pitch: 93, count: 4 },
+];
+const pack: Placed[] = ROWS.flatMap((r) => Array.from({ length: r.count }, (_, i) => ({ x: r.x0 + i * r.pitch, lift: r.lift, s: r.s, row: r.row })));
+if (pack.length !== drawn) throw new Error(`HeroStreet draws ${pack.length} scooters but est.scn.dozen.drawn is ${drawn}: change ROWS`);
+// order of arrival: the front row first, nearest the people first
+const arrival = pack.map((_, i) => i).sort((p, q) => (pack[p].row !== pack[q].row ? pack[p].row - pack[q].row : pack[p].x - pack[q].x));
+const turn = new Map(arrival.map((idx, k) => [idx, k]));
+const faceIdx = pack.findIndex((q) => q.row === 1); // the nearest front-row rider has a face
+
+const people = { elder: 40, parent: 100, child: 222 };
+const childKind = red ? 'schoolchild-cover' : 'schoolchild-step';
+const SIG = { x: 28, y: -656, scale: 2.9 };
+const sigBox: Box = { x: SIG.x - 8, y: SIG.y - 8, w: SIGNAL_HEAD.w * SIG.scale + 16, h: SIGNAL_HEAD.h * SIG.scale + 16 };
+const carAt = { x: 372, y: FAR + 4, s: 0.6 };
+// under the rider with a face, pointing up at him (not under the empty road between scooters)
+const labelAt = { x: pack[faceIdx].x + 40, y: 30 };
+
+const a = air({
+  frame: VB,
+  seed: 9,
+  id: artId('air'),
+  scenario: 'dozen',
+  extra: AIR_EXTRA,
+  kerb: red ? { x0: 14, x1: KERB + 12, sourceX: pack[faceIdx].x + 4 } : undefined,
+  // the far rows keep one ring, a few dots and one ribbon each: sixteen full clusters would bury the pack
+  tailpipes: red ? pack.map((q) => ({ ...tailOf(q), ...(q.row === 1 ? {} : { rings: 1, dots: 3, ribbons: 1 }) })) : [],
+  tyres: red ? [] : pack.filter((q) => q.row === 1).map(tyreOf),
+  cars: red ? [] : [{ x: carAt.x + CAR_TAILPIPE.x * carAt.s, y: carAt.y + CAR_TAILPIPE.y * carAt.s, dir: 1, scale: 1.2 }],
+  avoid: [
+    sigBox,
+    ...figureBoxes('elder-woman', people.elder),
+    ...figureBoxes('stroller', people.parent),
+    ...figureBoxes(childKind, people.child),
+    // faces in the front row, the label and the chip
+    ...pack.filter((q) => q.row === 1).flatMap((q) => figureBoxes('scooter', q.x, 0, 1, 'head')),
+    { x: labelAt.x - 70, y: labelAt.y - 6, w: 150, h: 50 },
+    { x: 500, y: -690, w: 220, h: 80 },
+  ],
+});
+
+const street = [
+  shopfronts({ x0: -10, x1: 730, base: FAR, top: -690, bay: 236, shift: 150 }),
+  // the roadway with its far kerb line
+  `<rect class="a-road" x="-10" y="${FAR}" width="740" height="${VB.y + VB.h - FAR + 4}"/>`,
+  `<path class="a-line" d="M-10,${FAR}H730"/>`,
+  // the corner the people stand on, and the crossing in front of them
+  `<path class="a-kerb" d="M-10,${FAR + 40}H${KERB - 30}Q${KERB},${FAR + 40} ${KERB},${FAR + 70}V24H-10Z"/>`,
+  `<path class="a-paint" d="${[56, 104, 152].map((y) => `M22,${y}H${KERB + 86}V${y + 26}H22Z`).join('')}"/>`,
+  // lane lines between the rows
+  `<path class="a-paint" opacity="0.7" d="M${KERB + 30},-66H730V-59H${KERB + 30}ZM${KERB + 30},-176H730V-170H${KERB + 30}Z"/>`,
+].join('');
+const signal = pedSignal({ ...SIG, state: red ? 'red' : 'green', count: red ? led : undefined, poleTo: FAR + 62 });
+const carArt = red ? '' : put(carAt.x, carAt.y, car(), { s: carAt.s, cls: 'a-row-2' });
+
+/** One scooter, wrapped so CSS can roll it in without touching the transform that places it. */
+const sc = (i: number) => `<g class="hero-sc" style="--i:${turn.get(i)}">${placed(pack[i], kind, { face: i === faceIdx, cls: 'a-figure' })}</g>`;
+// each tailpipe's core and cluster arrive with its scooter: give them the same turn
+const withTurn = (html: string) => indexSources(html).replace(/style="--i:(\d+)"/g, (_m, i: string) => `style="--i:${turn.get(+i)}"`);
+const cores = withTurn(a.cores);
+const clusters = withTurn(a.marks);
+// A row and its exhaust. The front row's dark patches lie behind its scooters, so the nearest
+// silhouettes stay whole; the far rows' patches lie low in front of them, at the wheels. Each
+// tailpipe's ribbons, rings and dots are drawn over its row, where they blow onto the scooter behind.
+const rowArt = (row: 1 | 2 | 3) => {
+  const mine = (i: number) => pack[i].row === row;
+  const scooters = pack.map((q, i) => (q.row === row ? sc(i) : '')).join('');
+  const patches = pickSources(cores, mine);
+  return (row === 1 ? patches + scooters : scooters + patches) + pickSources(clusters, mine);
+};
+const folk = [
+  put(people.elder, 0, person('elder-woman'), { cls: 'a-figure' }),
+  put(people.parent, 0, person('stroller'), { cls: 'a-figure' }),
+  put(people.child, red ? 0 : 4, person(childKind), { cls: 'a-figure' }),
+].join('');
+
+const alt = red
+  ? sceneAlt(locale, fill(art.hero.altRed, locale, { count: led, n: drawn }), { scenario: 'dozen', count: est.scn.dozen.count })
+  : sceneAlt(locale, fill(art.hero.altGreen, locale, { n: drawn }), { kind: 'electric' });
+---
+
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive={red} id={id} class={['scene--hero', `scene--hero-${phase}`, cls].filter(Boolean).join(' ')} data-hero-count={red ? drawn : undefined}>
+  <Fragment set:html={a.defs + street + signal + carArt + a.wash + pickSources(a.cores, () => false) + withoutSources(a.marks) + (red ? '' : a.cores) + rowArt(3) + rowArt(2) + rowArt(1) + folk} />
+  {red && <SceneLabel slot="labels" box={VB} x={labelAt.x} y={labelAt.y} anchor="center top" plate class="hero-waiting">{art.words.waitingUp[locale]}</SceneLabel>}
+  {counter && (
+    <SceneLabel slot="labels" box={VB} x={704} y={-672} anchor="end top" plate class="hero-count">
+      <span data-hero-counter data-template={art.hero.counter[locale]}>{fill(art.hero.counter, locale, { n: drawn })}</span>
+    </SceneLabel>
+  )}
+</SceneFrame>
+
+{red && (
+  <script>
+    // The chip counts the scooters as they stop: one step per scooter, in time with art.css (.hero-sc).
+    document.addEventListener('sa:arrive', (e) => {
+      const fig = e.target as HTMLElement;
+      const out = fig.querySelector<HTMLElement>('[data-hero-counter]');
+      const total = Number(fig.dataset.heroCount);
+      if (!out || !total) return;
+      const tpl = out.dataset.template ?? '{n}';
+      const stepMs = Number(getComputedStyle(fig).getPropertyValue('--hero-step').replace('ms', '')) || 150;
+      let n = 0;
+      const show = () => (out.textContent = tpl.replace('{n}', String(n)));
+      show();
+      const t = setInterval(() => {
+        n += 1;
+        show();
+        if (n >= total) clearInterval(t);
+      }, stepMs);
+      // the reader switches animation off mid-count: finish at once
+      document.addEventListener('sa:motion', (m) => {
+        if ((m as CustomEvent<{ on: boolean }>).detail.on) return;
+        clearInterval(t);
+        n = total;
+        show();
+      }, { once: true });
+    });
+  </script>
+)}

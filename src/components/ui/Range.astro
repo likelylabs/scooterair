@@ -9,11 +9,10 @@
  *   name   field name (defaults to id)
  *   label  visible label
  *   min, max, step   numbers
- *   value  starting number. Leave it out to start empty: the box is blank (showing
- *          `placeholder`), the slider's thumb is hollow and parked at `min` until the
- *          reader sets a number, and the box submits no value. Clearing the box
- *          returns to that state.
- *   placeholder  shown in the empty number box (e.g. "300")
+ *   value  starting number (required). A control never opens empty (brief 5.4, 7.7): there is
+ *          no blank number box and no hollow thumb. If the reader clears the box, the slider
+ *          keeps the last number until they type a new one.
+ *   placeholder  shown in the number box only while the reader has cleared it
  *   unit   unit shown after the number box ("公里/月")
  *   hint   helper text under the label
  */
@@ -24,23 +23,28 @@ interface Props {
   min: number;
   max: number;
   step?: number;
-  value?: number;
+  value: number;
   placeholder?: string;
   unit?: string;
   hint?: string;
   class?: string;
 }
 const { id, name = id, label, min, max, step = 1, value, placeholder, unit, hint, class: cls } = Astro.props;
-const empty = value === undefined || value === null || Number.isNaN(value);
+let start = value;
+if (start === undefined || start === null || Number.isNaN(start)) {
+  // never a blank control: fall back to the minimum and say so in the build log
+  console.warn(`[Range ${id}] no starting value was passed; using min (${min}). Pass \`value\`.`);
+  start = min;
+}
 ---
 
-<div class:list={['field', 'range', empty && 'range--empty', cls]} data-range>
+<div class:list={['field', 'range', cls]} data-range>
   <label class="field__label" for={id}>{label}</label>
   {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
   <div class="range__row">
-    <input class="range__slider" type="range" min={min} max={max} step={step} value={empty ? min : value} aria-label={label} tabindex="-1" data-js-only />
+    <input class="range__slider" type="range" min={min} max={max} step={step} value={start} aria-label={label} tabindex="-1" data-js-only />
     <span class="range__num">
-      <input id={id} name={name} type="number" inputmode="decimal" min={min} max={max} step={step} value={empty ? undefined : value} placeholder={placeholder} aria-describedby={hint ? `${id}-hint` : undefined} />
+      <input id={id} name={name} type="number" inputmode="decimal" min={min} max={max} step={step} value={start} placeholder={placeholder} aria-describedby={hint ? `${id}-hint` : undefined} />
       {unit && <span class="range__unit">{unit}</span>}
     </span>
   </div>
@@ -91,13 +95,6 @@ const empty = value === undefined || value === null || Number.isNaN(value);
     background: var(--ink);
     box-shadow: 0 0 0 2px var(--ink);
   }
-  /* no value yet: a hollow thumb, so the slider does not claim a number nobody chose */
-  .range--empty .range__slider::-webkit-slider-thumb {
-    background: var(--bg);
-  }
-  .range--empty .range__slider::-moz-range-thumb {
-    background: var(--bg);
-  }
   .range__num {
     display: inline-flex;
     align-items: center;
@@ -130,17 +127,14 @@ const empty = value === undefined || value === null || Number.isNaN(value);
     if (!slider || !number) return;
     slider.addEventListener('input', () => {
       number.value = slider.value;
-      root.classList.remove('range--empty');
       number.dispatchEvent(new Event('input', { bubbles: true }));
     });
+    // while the box is cleared the slider keeps its last number: it never shows an empty state
     const sync = () => {
-      // an empty box is a state of its own: hollow thumb, parked at the minimum
-      const blank = number.value === '';
-      root.classList.toggle('range--empty', blank);
-      slider.value = blank ? slider.min : number.value;
+      if (number.value !== '') slider.value = number.value;
     };
     number.addEventListener('input', sync);
     // a value restored by the browser (back button, autofill) or set by a script before this ran
-    if (number.value !== '' || root.classList.contains('range--empty')) sync();
+    sync();
   });
 </script>

@@ -1,103 +1,105 @@
 ---
 /**
- * ApproachPlan — the plan of one approach to the crossing (blueprint V6).
- * The same crossing as StreetScene, from above, traffic running left to
- * right: stop box (2.5–6 m deep by rule) → stop line → crosswalk → 50 cm or
- * more → two-stage turn box, with the corner where the yellow cap waits at
- * the bottom right. Each gasoline scooter carries one exhaust-coloured mark,
- * at its tail, and nothing else in the drawing is exhaust-coloured.
+ * ApproachPlan — G3: the junction from above (brief 3.2 screen 3, 5.2).
+ * Rebuilt; it replaces the old plan of the approach.
  *
- * What the reader should take from it: the rules allow tailpipes this close
- * to where people walk. The geometry and its sources are documented in
- * plan.ts.
+ * Stop line, crossing, turn box and kerb in road-paint colours; scooters as
+ * capsules with a helmet; the people who wait at the end of the crossing. The
+ * turn-box scooters have their tails toward the crossing, and each tail has
+ * its dark core, reaching across the gap. A dimension line names the gap with
+ * a large number (HTML). A side inset shows a tailpipe under a dashed
+ * one-metre line. On arrival the cores slide across the gap once.
+ *
+ * Both numbers come from the registry unless the host passes its own words:
+ *   gap     `marking-rules-turn-box` → 50 公分以上
+ *   height  `iot-exhaust-height-assumption` → 排氣管約 50 公分
  *
  * Props
- *   locale   Locale
- *   kind     'gas' (default) | 'electric'
- *   labels   zone names and the two dimensions (default true)
- *   caption  the line under the drawing; default: "50 cm is the minimum the
- *            rule sets…". Pass false to drop it.
- *   class    extra class
+ *   locale       Locale
+ *   gapLabel     the words on the dimension line (default from the registry)
+ *   heightLabel  the words at the inset's tailpipe (default from the registry)
+ *   inset        the side view with the one-metre line (default true)
+ *   labels       name the crossing, the turn box and the people (default true)
+ *   tag          false (default; <Screen illustration> prints it) | 'street'
+ *   id, class
+ *
+ *   <ApproachPlan slot="picture" locale={locale} />
  */
 import '@/styles/art.css';
 import type { Locale } from '@/i18n';
-import { art } from '@/i18n/art';
-import { planSvg } from './plan';
+import { art, fill } from '@/i18n/art';
+import { est } from '@/data/estimate';
+import { fact } from '@/data/facts';
+import SceneFrame from './SceneFrame.astro';
+import SceneLabel from './SceneLabel.astro';
+import { air } from './air';
+import { AIR_EXTRA } from './air-slots';
+import { TAILPIPE, artId, scooter } from './parts';
+import { PLAN3, planView } from './plan-view';
+import { sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
-  kind?: 'gas' | 'electric';
+  gapLabel?: string;
+  heightLabel?: string;
+  inset?: boolean;
   labels?: boolean;
-  caption?: string | false;
+  tag?: false | 'street';
+  id?: string;
   class?: string;
+  /** @deprecated ignored: the old plan's props, kept so pages that still pass them build. Remove with those pages (phase 3). */
+  kind?: 'gas' | 'electric';
+  /** @deprecated ignored (see `kind`). */
+  caption?: string | false;
 }
-const { locale, kind = 'gas', labels = true, class: cls } = Astro.props;
-const caption = Astro.props.caption ?? art.plan.caption[locale];
-const plan = planSvg({ locale, kind, labels });
+const { locale, inset = true, labels = true, tag = false, id, class: cls } = Astro.props;
+const cm = (factId: string, key: string): number => {
+  const v = (fact(factId as Parameters<typeof fact>[0]).data as Record<string, { value: number; unit: string }>)[key];
+  if (!v || v.unit !== 'metres') throw new Error(`ApproachPlan: ${factId}.${key} is not a length in metres`);
+  return Math.round(v.value * 100);
+};
+const gapLabel = Astro.props.gapLabel ?? fill(art.plan3.gap, locale, { cm: cm('marking-rules-turn-box', 'turnBoxGap') });
+const heightLabel = Astro.props.heightLabel ?? fill(art.plan3.height, locale, { cm: cm('iot-exhaust-height-assumption', 'exhaustHeight') });
+
+const VB = PLAN3.box;
+const T = PLAN3.turnBox;
+const plan = planView();
+const a = air({
+  frame: VB,
+  seed: 14,
+  id: artId('air'),
+  scenario: 'dozen',
+  extra: AIR_EXTRA,
+  kerb: { x0: plan.people.x, x1: plan.people.x + plan.people.w, ground: plan.people.y + plan.people.h, top: plan.people.h, sourceX: T.x0 + 18, sourceY: T.y1 - 20 },
+  tailpipes: plan.tailpipes,
+  avoid: [...plan.avoid, ...(inset ? [{ x: VB.x, y: 0, w: VB.w, h: PLAN3.centre - 40 }] : [])],
+});
+
+// the inset: the tail of a scooter from the side, 1.5 times the plan's scale, under a dashed one-metre line
+const IN = { x: VB.x + 14, y: 14, w: VB.w - 28, h: PLAN3.centre - 66, k: 1.2 };
+const ground = IN.y + IN.h - 16;
+const scX = IN.x + IN.w - 184 * IN.k - 22;
+const pipe = { x: scX + TAILPIPE.x * IN.k, y: ground + TAILPIPE.y * IN.k };
+const insetArt = inset
+  ? `<g class="plan3-inset"><rect class="plan3-inset-bg" x="${IN.x}" y="${IN.y}" width="${IN.w}" height="${IN.h}" rx="14"/>` +
+    `<clipPath id="${artId('pin')}-c"><rect x="${IN.x}" y="${IN.y}" width="${IN.w}" height="${IN.h}" rx="14"/></clipPath>` +
+    `<path class="a-line" stroke-width="2.5" d="M${IN.x + 12},${ground}H${IN.x + IN.w - 12}"/>` +
+    `<g transform="translate(${scX} ${ground}) scale(${IN.k})">${scooter({ kind: 'gas', rider: true })}</g>` +
+    `<path class="hs-metre" stroke-width="2.6" d="M${IN.x + 14},${ground - 100 * IN.k}H${IN.x + IN.w - 14}"/>` +
+    `<circle class="hs-pipe" stroke-width="4" cx="${pipe.x + 3}" cy="${pipe.y - 3}" r="15"/><path class="a-leader" stroke-width="2.5" d="M${pipe.x - 16},${pipe.y - 3}h-26"/></g>`
+  : '';
+const scene = a.defs + plan.ground + a.wash + `<g class="plan3-slide">${a.cores}</g>` + a.marks + plan.figures + plan.dimension + insetArt;
+const alt = sceneAlt(locale, fill(art.plan3.alt, locale, { gap: gapLabel, height: heightLabel }), { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<div class:list={['plan', cls]}>
-  <svg class="plan__svg" viewBox={plan.viewBox} role="img" aria-label={art.plan.alt[locale]} focusable="false" set:html={plan.body} />
-  <p class="plan__foot">
-    {kind === 'gas' && (
-      <span class="plan__key"><svg viewBox="0 0 30 14" width="30" height="14" aria-hidden="true"><circle class="a-exh" cx="24" cy="7" r="5" /><path class="a-ribbon-s" d="M19,7 q-5,-4 -9,0 t-8,0" /></svg>{art.plan.tails[locale]}</span>
-    )}
-    {caption && <span>{caption}</span>}
-    <span class="plan__tag">{art.illustration[locale]}</span>
-  </p>
-</div>
-
-<style>
-  .plan {
-    container-type: inline-size;
-    display: grid;
-    gap: var(--sp-2);
-  }
-  .plan__svg {
-    display: block;
-    inline-size: 100%;
-    block-size: auto;
-  }
-  /* drawing units are 2 cm; these steps keep in-plan text near 12–13px */
-  .plan :global(.plan-t) {
-    font-size: 27px;
-  }
-  .plan :global(.plan-t--strong) {
-    font-size: 29px;
-    font-weight: 900;
-  }
-  @container (min-width: 34rem) {
-    .plan :global(.plan-t) {
-      font-size: 19px;
-    }
-    .plan :global(.plan-t--strong) {
-      font-size: 21px;
-    }
-  }
-  @container (min-width: 52rem) {
-    .plan :global(.plan-t) {
-      font-size: 14px;
-    }
-    .plan :global(.plan-t--strong) {
-      font-size: 16px;
-    }
-  }
-  .plan__foot {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-4);
-    font-size: var(--fs-xs);
-    line-height: var(--lh-snug);
-    color: var(--ink-2);
-  }
-  .plan__key {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    font-weight: var(--fw-bold);
-    color: var(--ink);
-  }
-  .plan__tag {
-    color: var(--ink-3);
-  }
-</style>
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift arrive id={id} class={['scene--plan', cls].filter(Boolean).join(' ')}>
+  <Fragment set:html={scene} />
+  <Fragment slot="labels">
+    <SceneLabel box={VB} x={VB.x + VB.w - 16} y={T.y0 - 46} anchor="end bottom" max={96} plate class="plan3-gap">{gapLabel}</SceneLabel>
+    {labels && <SceneLabel box={VB} x={PLAN3.crossing[0] + 76} y={PLAN3.centre + 118} anchor="center middle" plate>{art.plan3.crossing[locale]}</SceneLabel>}
+    {labels && <SceneLabel box={VB} x={(T.x0 + T.x1) / 2} y={PLAN3.kerb + 14} anchor="center top" plate>{art.plan3.turnBox[locale]}</SceneLabel>}
+    {labels && <SceneLabel box={VB} x={plan.people.x - 10} y={plan.people.y + 62} anchor="end middle" plate max={30}>{art.plan3.waiting[locale]}</SceneLabel>}
+    {inset && <SceneLabel box={VB} x={IN.x + 16} y={ground - 100 * IN.k - 6} anchor="start bottom">{art.words.oneMetre[locale]}</SceneLabel>}
+    {inset && <SceneLabel box={VB} x={pipe.x - 48} y={pipe.y + 12} anchor="end bottom" max={56} class="hs-pipe-label">{heightLabel}</SceneLabel>}
+  </Fragment>
+</SceneFrame>

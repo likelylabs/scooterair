@@ -1,0 +1,43 @@
+---
+/**
+ * BodyPins — the sentences behind the numbered pins of <BodyFigure>, as a list
+ * under the picture. It is the whole content without scripting (each pin in
+ * the picture links to its sentence); with scripting, the sentence of the pin
+ * the reader tapped is marked.
+ *
+ * Props
+ *   locale  Locale
+ *   items   { pin: 'nose' | 'lungs' | 'blood'; text: string }[] — in the same
+ *           order as BodyFigure's `pins`. The host writes the sentences and
+ *           leaves out a pin whose registry fact is not verified.
+ *   idPrefix  default 'body-pin' (ids: body-pin-nose …)
+ *   class
+ *
+ *   <BodyPins locale={locale} items={pins.map((pin) => ({ pin, text: t.s6.pins[pin][locale] }))} />
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { airGlyph, type AirMark } from './air';
+import type { BodyPin } from './parts';
+
+interface Props {
+  locale: Locale;
+  items: { pin: BodyPin; text: string }[];
+  idPrefix?: string;
+  class?: string;
+}
+const { items, idPrefix = 'body-pin', class: cls } = Astro.props;
+const kindOf: Record<BodyPin, AirMark> = { nose: 'ribbon', lungs: 'dot', blood: 'ring' };
+---
+
+<ol class:list={['body-pins', cls]}>
+  {
+    items.map((it, i) => (
+      <li class="body-pins__item" id={`${idPrefix}-${it.pin}`} data-pin-item={it.pin}>
+        <span class="body-pins__n" aria-hidden="true">{i + 1}</span>
+        <svg class="air-glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={airGlyph(kindOf[it.pin])} />
+        <span class="body-pins__text">{it.text}</span>
+      </li>
+    ))
+  }
+</ol>

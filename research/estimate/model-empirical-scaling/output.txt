@@ -1,0 +1,156 @@
+ScooterAir kerb exposure, 90-s red light: EMPIRICAL SCALING (no dispersion model)
+Monte Carlo draws: 200000. Percentiles shown: P5  P50  P95.  25 C, 1 atm.
+
+INPUT TABLE
+  anchor  Mingcheng 1st/Minzu 1st (Kaohsiung): kerb 1-min max 1.3 ppm; station bg 0.1-0.5; peak mc/h 8194-9572; weight 0.4 [v] max ~1.3 ppm 11 Jul after crosswalk setback; Aiguo station 8-11 Jul hourly 0.08-0.52; peak mc/h 204.85/0.025 am, 239.31/0.025 pm; 12-h mean 5,974/h (62% motorcycles)
+  anchor  Qixian 1st/Minzu 2nd (Kaohsiung): kerb 1-min max 0.62 ppm; station bg 0.05-0.45; peak mc/h 6138-6338; weight 0.25 [v] max 0.62 ppm ~08:00 5 Jul; Aiguo 1-5 Jul hourly 0.03-0.28 (sec 3.2.1) but text of 3.3.2 says station figure mostly 0.4-1 ppm, so bg sampled 0.05-0.45
+  anchor  Zhongzheng 2nd/Minzu 2nd (Kaohsiung): kerb 1-min max 0.5 ppm; station bg 0.05-0.45; peak mc/h 5875-6431; weight 0.2 [v] max 0.5 ppm 08:00 3 Jul; same station caveat
+  anchor  HSR Rd/Chongxin Rd (Kaohsiung, quiet): kerb 1-min max 0.5 ppm; station bg 0.15-0.45; peak mc/h 1620-1640; weight 0.15 [v] max 0.5 ppm 19:13 5 Jul; Zuoying hourly 0.09-0.56 (max 0.55 at 08:00 same day)
+  approachShare u   0.2-0.35 - [A] A: share of junction motorcycles on the approach whose queue sits beside the sensor/pedestrian; 4-arm junction, main road somewhat above 1/4
+  redAnchor     tri 83 (70-110) s [s] Hung P-Y et al., MOTC Institute of Transportation, IOT-113-TB006 (Dec 2025), https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/ (PDF read in full text) Table 2.2.4-2 (main-road red ~80-83 s, other approaches 95-130 s; phase assignment inferred by scene agent)
+  floorDelta    fix 0.02 ppm [A] A: minimum excess used when station bg ~ kerb max (sensor noise floor order 0.02-0.05 ppm)
+  b             u   0.6-1 - [A] A: C proportional to N^b; b<1 because scooters further back in a long queue contribute less. Anchors span N~10-60 and do not pin b
+  fTyp          ln  0.5 (0.3-0.85) - [A] A: typical peak-hour red / 48-h maximum minute. Basis: the max is the top of ~100 peak-hour reds over two days; 1-min kerb CO variability GSD ~1.5-2 gives max/median ~2-4 (assumption; no IOT percentile data in text)
+  a90           tri 0.77 (0.55-1) - [A] A: 90-s red mean / most-loaded 1-min. Uniform arrivals and C~N(t)^b give 0.77 at b=0.85 (my arithmetic); 1.0 if queue is full from the start; 0.55 if the IOT maximum minute was a green pull-away
+  prox          ln  1.3 (1-2.2) - [A] Standing at the kerb edge beside the stop box vs IOT sensor 1.0-1.5 m from the crosswalk line: exp(k*dd), k 0.02-0.4 /m (Kenagy et al. 2016 AQAH 9:589, NO2, verified by sister agent), dd 0.5-2 m (A)
+  sensorGain    ln  1 (0.75-1.6) - [A] A: true/indicated for low-cost electrochemical CO near 0.5 ppm (calibrated at ITRI per IOT; error not stated). Skewed high because 1-min sampling and sensor response (t90 tens of s) clip short peaks
+  dTS           u   0.2-0.4 ppm [v] traffic-station minus urban-station annual mean CO: MOENV 2025 0.54 - 0.24 = 0.30 (Table 3-23, verified); Taipei City 2024 traffic 0.80 - general 0.49 = 0.31 (gap-answers-c, verified by that agent); Horiba-class analysers
+  pkB           ln  2 (1.3-3.5) - [A] A: weekday peak-hour / annual-mean road increment. Basis: Ting 2023 Taipei tunnel weekday peak ~6,500 veh/h vs 40,500/day (3.8x the 24-h mean flow, verified in repo extraction), damped by better daytime mixing
+  hgtB          ln  1.25 (1-1.6) - [A] A: 1.2-1.5 m breathing height vs station inlet (heights not obtained, typically several m). Basis: Goel & Kumar 2016, particle number ~40% lower at 4.7 m than near ground at a junction (repo, secondary)
+  isecB         ln  1.5 (1-2.5) - [A] A: beside the stop box during a red vs a station a few m back from a mid-block kerb. Basis: exp(k*dd), k 0.02-0.4 /m (Kenagy 2016), dd 1-4 m; upper end bounded by red/green UFP 3.5x (Wang 2008 JAWMA 58:1449, abstract)
+  NrefB         ln  35 (22-50) scooters [A] A: traffic stations treated as a typical busy arterial (same N as the typical scenario); station traffic counts not obtained
+  wA            fix 0.5 - [A] A: mixture weight of route A (IOT kerb sensors) vs route B (stations). Equal: A is at the right spot but low-cost and implausibly low against B and Hanoi; B is reference-grade but needs three assumed factors
+  rBenz         ln  0.0035 (0.001-0.01) g/g [s] benzene/CO mass. inputs-emission-rates.json 0.07/21 g/h = 0.33% (Yao et al. 2008 Atmos Environ 42:6560 benzene ~3% of THC, verified); inputs-speciation-particles.json 0.5% (0.06-1.0%); low ~0.085% = Taiwan inventory benzene 0.77% of MC HC (Tsai 2023, secondary) x HC/CO 0.11
+  rTHC          ln  0.12 (0.04-0.33) g/g [s] THC/CO mass: 2.4/21 = 0.11 (emission-rates file, Yilan inspection + bench); 10.3/60.9 = 0.17 Hanoi lab (Nguyen 2021 abstract); Tsai 2018 cycle 0.25-0.35 (abstract); NDIR basis of inspection HC unverified
+  rPNscoot      ln  200000000000 (10000000000-600000000000) #/g CO [s] solid PN(>23 nm)/CO for scooter exhaust: 5.2e13 #/kg fuel (Kontses 2020 Environ Res 182:109071 WMTC per-km x 46.9 km/kg) / 250 g CO/kg; inputs-speciation-particles.json (weakest ratio). hi raised from 3e11 to 6e11 to cover sub-23 nm (+25-67%, Kontses) and 2% two-strokes (~10x PN)
+  rPNamb        ln  50000 (25000-100000) #/cm3 per ppm CO [s] Taiwan ambient all-traffic ratio: (roadside 25,000-38,000 [Abdillah 2024 AAQR, abstract only] - Taipei background 13,900 [Cheung 2013 ACP 13:8935, verified]) / (traffic-station CO 0.54 - general 0.24 = 0.30 ppm [MOENV 2025 annual report Table 3-23, verified]) = 3.7e4-8e4; widened
+  rPMscoot      ln  0.001 (0.0001-0.008) g/g [s] PM2.5/CO mass, scooter exhaust: Nepal idle 0.089-1.14% (Jayarathne 2018 ACP 18:2259, old carburetted, oil-dominated, verified); Ting 2023 Taipei tunnel MC 0.013 g/kg / 209 g/kg = 0.006% (driving, uncertainty 10x value); speciation central 0.3/250 = 0.12%
+  rPMamb        ln  6.7 (3-12) ug/m3 per ppm CO [s] Taiwan ambient all-traffic ratio: PM2.5 traffic stations 15.4 - all stations 13.4 = 2.0 ug/m3 over 0.30 ppm CO (MOENV 2025 annual report, verified by scene agent); includes diesel, non-exhaust, siting
+  bgCO          u   0.24-0.6 ppm [v] MOENV 2025 annual means: general 0.24, traffic stations 0.54 (2024 0.61); peak-hour Kaohsiung station hourly 0.03-0.90 (IOT). Verified
+  bgBenz        ln  2.5 (1.2-4.5) ppb [s] Taipei ambient benzene 2.54 ppb (Wu et al. 2021 TRD 91:102696, repo extraction, secondary)
+  bgPN          ln  13900 (7000-25000) #/cm3 [v] Taipei urban background 13,900 (Cheung et al. 2013, verified); 7,000 cyclonic period; 25,000 lower end of Taiwan roadside
+  bgPM          ln  13.4 (6-30) ug/m3 [v] MOENV 2025 annual mean PM2.5 13.4 all stations; IOT kerb summer 4-14; winter episodes higher
+  scenario light    N(end-of-red queue on approach) 5 (3-9); IOT quiet junction 819 mc/h 12-h mean, peak 1,620/h -> 3-10 per approach per 83 s red
+  scenario typical  N(end-of-red queue on approach) 35 (22-50); IOT busy Kaohsiung junctions 3,989-5,974 mc/h (12-h mean), 5,875-9,572 peak -> 25-60 per approach per red; gap-answers-a 30-37
+  scenario heavy    N(end-of-red queue on approach) 70 (50-103); Lan & Chang 2015 IEEE T-ITS Table V: 103 queued at one red on a 4-lane approach (16 in the box); Mingcheng pm peak 9,572/h -> ~60
+
+CALIBRATION FROM IOT ANCHORS (first 50,000 draws)
+  Mingcheng 1st/Minzu 1st (Kaohs excess              0.820      1.00      1.18  ppm
+     queued scooters N on approach                    42.4      58.8      79.3  scooters
+     ppm per queued scooter (b=1)                    0.012     0.017     0.025  ppm/scooter
+  Qixian 1st/Minzu 2nd (Kaohsiun excess              0.190     0.371     0.550  ppm
+     queued scooters N on approach                    30.0      41.4      55.2  scooters
+     ppm per queued scooter (b=1)                   4.3e-3    8.9e-3     0.015  ppm/scooter
+  Zhongzheng 2nd/Minzu 2nd (Kaoh excess              0.070     0.250     0.429  ppm
+     queued scooters N on approach                    29.5      40.8      54.6  scooters
+     ppm per queued scooter (b=1)                   1.7e-3    6.1e-3     0.012  ppm/scooter
+  HSR Rd/Chongxin Rd (Kaohsiung, excess              0.065     0.201     0.335  ppm
+     queued scooters N on approach                    7.85      10.8      14.4  scooters
+     ppm per queued scooter (b=1)                   5.9e-3     0.018     0.035  ppm/scooter
+  pooled yield k (ppm per N^b, at max minute)        0.011     0.024     0.050  ppm/N^b
+
+RESULTS: INCREMENT above urban station level, person at the kerb beside the stop box, 1.2-1.5 m height, mean over a 90-s red
+
+[Light: a handful of scooters (quiet junction)]
+  queued scooters on the approach (input)             2.89      5.01      8.65  scooters
+  CO route A only (IOT kerb sensors)                 0.015     0.043     0.119  ppm
+  CO route B only (traffic stations scaled)          0.082     0.234     0.638  ppm
+  CO, typical red (A/B mixture)                      0.019     0.100     0.516  ppm
+  CO, typical red                                    0.021     0.114     0.591  mg/m3
+  CO, worst red of two days (f=1)                    0.042     0.178      1.14  ppm
+  benzene                                            0.051     0.401      3.10  ug/m3
+  benzene                                            0.016     0.126     0.971  ppb
+  total hydrocarbons (low confidence)                 1.81      13.8       101  ug/m3
+  total hydrocarbons (CH1.85 basis)                 3.2e-3     0.024     0.178  ppmC
+  UFP number: all local traffic (ambient ratio)        804      5007    3.0e+4  #/cm3
+  UFP number: scooter exhaust only (emis. ratio)      1.56      22.8       333  #/cm3
+  PM2.5: all local traffic (ambient ratio)           0.107     0.669      4.08  ug/m3
+  PM2.5: scooter exhaust only (emis. ratio)         7.0e-3     0.115      1.86  ug/m3
+  TOTALS (increment + urban background)
+  CO total                                           0.322     0.560     0.967  ppm
+  benzene total                                       1.45      2.75      5.23  ppb
+  UFP number total (all-traffic route)              1.1e+4    2.1e+4    4.8e+4  #/cm3
+  PM2.5 total (all-traffic route)                     6.86      14.7      31.4  ug/m3
+  SANITY
+  implied dilution of raw exhaust (nearest<=12)     1.5e+5    7.2e+5    3.6e+6  x
+  implied ventilation flow Q/C                        40.0       254      1665  m3/s
+
+[Typical busy arterial (peak hour)]
+  queued scooters on the approach (input)             23.2      35.0      52.7  scooters
+  CO route A only (IOT kerb sensors)                 0.080     0.202     0.508  ppm
+  CO route B only (traffic stations scaled)          0.444      1.10      2.74  ppm
+  CO, typical red (A/B mixture)                      0.098     0.476      2.24  ppm
+  CO, typical red                                    0.112     0.545      2.56  mg/m3
+  CO, worst red of two days (f=1)                    0.222     0.826      5.00  ppm
+  benzene                                            0.255      1.89      13.8  ug/m3
+  benzene                                            0.080     0.593      4.33  ppb
+  total hydrocarbons (low confidence)                 9.24      64.9       454  ug/m3
+  total hydrocarbons (CH1.85 basis)                  0.016     0.114     0.800  ppmC
+  UFP number: all local traffic (ambient ratio)       4106    2.4e+4    1.3e+5  #/cm3
+  UFP number: scooter exhaust only (emis. ratio)      7.71       108      1506  #/cm3
+  PM2.5: all local traffic (ambient ratio)           0.547      3.18      18.1  ug/m3
+  PM2.5: scooter exhaust only (emis. ratio)          0.034     0.543      8.50  ug/m3
+  TOTALS (increment + urban background)
+  CO total                                           0.447     0.908      2.66  ppm
+  benzene total                                       1.72      3.44      7.62  ppb
+  UFP number total (all-traffic route)              1.6e+4    4.0e+4    1.5e+5  #/cm3
+  PM2.5 total (all-traffic route)                     8.50      18.6      39.9  ug/m3
+  SANITY
+  implied dilution of raw exhaust (nearest<=12)     7.8e+4    3.7e+5    1.8e+6  x
+  implied ventilation flow Q/C                        61.6       376      2343  m3/s
+
+[Heavy: full stop box, oversaturated approach]
+  queued scooters on the approach (input)             48.8      70.0       100  scooters
+  CO route A only (IOT kerb sensors)                 0.140     0.351     0.881  ppm
+  CO route B only (traffic stations scaled)          0.780      1.92      4.78  ppm
+  CO, typical red (A/B mixture)                      0.172     0.833      3.88  ppm
+  CO, typical red                                    0.197     0.955      4.45  mg/m3
+  CO, worst red of two days (f=1)                    0.390      1.44      8.68  ppm
+  benzene                                            0.445      3.31      24.2  ug/m3
+  benzene                                            0.139      1.04      7.59  ppb
+  total hydrocarbons (low confidence)                 16.1       114       785  ug/m3
+  total hydrocarbons (CH1.85 basis)                  0.028     0.200      1.39  ppmC
+  UFP number: all local traffic (ambient ratio)       7199    4.2e+4    2.3e+5  #/cm3
+  UFP number: scooter exhaust only (emis. ratio)      13.6       188      2629  #/cm3
+  PM2.5: all local traffic (ambient ratio)           0.956      5.54      31.5  ug/m3
+  PM2.5: scooter exhaust only (emis. ratio)          0.061     0.945      14.8  ug/m3
+  TOTALS (increment + urban background)
+  CO total                                           0.545      1.26      4.31  ppm
+  benzene total                                       1.90      3.95      10.6  ppb
+  UFP number total (all-traffic route)              2.0e+4    5.7e+4    2.5e+5  #/cm3
+  PM2.5 total (all-traffic route)                     9.49      21.7      50.7  ug/m3
+  SANITY
+  implied dilution of raw exhaust (nearest<=12)     4.5e+4    2.1e+5    1.0e+6  x
+  implied ventilation flow Q/C                        70.8       430      2685  m3/s
+
+VALIDATION
+  leave-one-out: Mingcheng 1st/Minzu 1st (Kaohsiung)      observed max 1.3 ppm; predicted 0.785 (0.728-0.850) ppm  ratio 0.604
+  leave-one-out: Qixian 1st/Minzu 2nd (Kaohsiung)         observed max 0.62 ppm; predicted 0.785 (0.777-0.794) ppm  ratio 1.27
+  leave-one-out: Zhongzheng 2nd/Minzu 2nd (Kaohsiung)     observed max 0.5 ppm; predicted 0.819 (0.813-0.826) ppm  ratio 1.64
+  leave-one-out: HSR Rd/Chongxin Rd (Kaohsiung, quiet)    observed max 0.5 ppm; predicted 0.461 (0.423-0.512) ppm  ratio 0.922
+  Hanoi 2006 walking CO (GM 5.1, mean 8.5 ppm; bg 1-2 A) / fleet CO-per-km ratio 2-4 (Vietnam 12.09 vs Taiwan MC 4.33 g/km = 2.8): Taiwan-equivalent along-road increment 1.77 (1.10-2.83) ppm
+  Box model like-for-like: its 8 scooters are those within ~10 m, i.e. the front of a typical queue; compare with typical-scenario worst red above
+  MOENV traffic-station annual-mean road increment: 0.54 - 0.24 = 0.30 ppm (station inlet several m up / back from the kerb)
+  Near-field box model (inputs-near-field-dispersion.json): 3 (1-13) ppm for 8 scooters, 21 g/h, U 0.8 m/s, H 2 m, ell 7 m
+  route A for 8 queued scooters: 0.062 (0.025-0.153) ppm  -> box model / this = 48.2
+  Raw exhaust: 1.45% CO = 14,500 ppm (Yilan phase-5 mean). Moving-car tailpipe->3 m dilution ~6,000 (Wang 2015 AMT 8:3263): one direct plume hit = ~2.4 ppm instantaneous.
+  Other species vs measured anchors (typical scenario, increments; see methods note):
+    benzene +0.593 (0.080-4.33) ppb  vs Taipei scooter-lane commuters +1.7 ppb over ambient (Wu 2021, secondary); Bangkok kerb 2-3 ppb total; Hanoi roadside 12.8 ppb total
+    UFP total 4.0e+4 (1.6e+4-1.5e+5) /cm3  vs Taiwan roadside 25,000-38,000 (abstract); Corpus Christi junction mean 66,000; UK pull-away peaks 70,000-540,000
+    PM2.5 +3.18 (0.547-18.1) ug/m3  vs IOT kerb 4-14 total (no visible traffic signal); NTU thesis stopped 14.2 vs moving 12.5 (+1.7)
+
+DIMENSIONAL / UNIT CHECKS
+  1 ppm CO = 1.146 mg/m3 (WHO uses 1.165 at 20 C); 1 ppb benzene = 3.195 ug/m3
+  PN: 0.5 ppm CO = 5.73e-4 g/m3 x 2e11 #/g = 115 #/cm3 (scooter solid PN route)
+  Mass balance: plausible junction ventilation U*W*H = (0.3-2 m/s)*(20-60 m)*(5-20 m) = 30-2,400 m3/s; implied Q/C above should fall inside
+  Per red, typical: 35.0 scooters x 0.54 g CO (0.2-1.2) = 18.9 g CO emitted beside the pedestrian
+
+BUILD-UP ACROSS THE RED (SCHEMATIC, from the arrival assumption only; NOT calibrated by any time-resolved measurement)
+  C(t)/C(end of red), uniform arrivals, queue empty at onset, b=0.8: 0s:0.00  15s:0.24  30s:0.42  45s:0.57  60s:0.72  75s:0.86  90s:1.00
+  mean over red / end-of-red = 1/(1+b) = 0.56; plus a pull-away spike at green (not quantified: no scooter modal data).
+
+REFERENCE VALUES (for comparison only; averaging times differ)
+  CO: WHO 15-min 100 mg/m3 (87 ppm), 1-h 35 mg/m3 (31 ppm); Taiwan 1-h 31 ppm (amended 2024-09-30)
+  Benzene 1-h: TCEQ ESL 170 ug/m3 (54 ppb); OEHHA acute REL 27 ug/m3 (secondary)
+  UFP: WHO good practice "high" >20,000 /cm3 (1-h), >10,000 (24-h)
+  PM2.5: WHO 24-h 15 ug/m3; Taiwan 24-h 30 ug/m3 (a 90-s increment is not comparable to these)

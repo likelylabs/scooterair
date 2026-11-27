@@ -1,0 +1,926 @@
+---
+/**
+ * /estimate/ — 怎麼算的 / How we worked it out (redesign brief 7.2). Replaces /unmeasured/.
+ *
+ *   top        the answer first: the two-row number box, 這是推估，不是實測 + K1, then G5
+ *              (MeasuredVsEstimate) with its sheet (#how-est); the jump list
+ *   #numbers   the 3 × 3 table (EstimateTable), K2 + K3 for ultrafine particles, the bands
+ *              (EstimateBands) and CSV / JSON downloads
+ *   #recipe    the flow (G15), each input with its range, chip and source, the per-scooter result,
+ *              the per-red sum and the can
+ *   #count     the three scenarios, the busiest junction's sum, the pedestrian wait
+ *   #check     the cross-check against the institute's sensors, worded truthfully (4.5); PM2.5;
+ *              Taipei's roadside stations; benzene as a check of scale only
+ *   #range     what moves the answer (METHOD §7) and confidence by pollutant
+ *   #drawing   the drawing rule of 5.1 in four sentences, the switchable kerb picture, the two patches
+ *   #limits    METHOD §8 in plain bullets, K4
+ *   #answers   the thirteen former gaps as AnswerCards (K6 on the pull-away card)
+ *   #measure   (also #ask) K1, the measurement plan, the letter, the promise
+ *   #version   推估 v1・2026-11-26 and the change log
+ *
+ * Every number comes from src/data/estimate.ts, the registry, the drawing rule (air-slots.ts) or
+ * lane D's chart models. Copy: src/i18n/pages/estimate.ts; the estimate's own wording is lane A's
+ * (estimateText); the K sentences are lane B's (kSentences).
+ */
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import ScenarioSwitch from '@/components/ui/ScenarioSwitch.astro';
+import Icon from '@/components/ui/Icon.astro';
+import MeasuredVsEstimate from '@/components/charts/MeasuredVsEstimate.astro';
+import EstimateTable from '@/components/charts/EstimateTable.astro';
+import EstimateBands from '@/components/charts/EstimateBands.astro';
+import WorkingSum from '@/components/charts/WorkingSum.astro';
+import ChartTable from '@/components/charts/ChartTable.astro';
+import { mveModel } from '@/components/charts/core/estimateCharts';
+import { workingBusiest, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
+import KerbScene from '@/components/art/KerbScene.astro';
+import AirRange from '@/components/art/AirRange.astro';
+import AirKey from '@/components/art/AirKey.astro';
+import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
+import { AIR_RULE } from '@/components/art/air-slots';
+import Composer from '@/components/pages/action/Composer.astro';
+import AnswerCard from '@/components/pages/evidence/AnswerCard.astro';
+import { lf, sourceShort } from '@/components/pages/evidence/ev';
+import NumberBox from '@/components/pages/estimate/NumberBox.astro';
+import SpreadBars from '@/components/pages/estimate/SpreadBars.astro';
+import Downloads from '@/components/pages/estimate/Downloads.astro';
+import { href, localeFromParam, localeStaticPaths } from '@/i18n';
+import { estText, kSentences } from '@/i18n/ui';
+import { answerList, facts, type SourceId } from '@/data';
+import { est, estimateText, formatEstimate, scenarioKeys } from '@/data/estimate';
+import estimateCopy from '@/i18n/pages/estimate';
+import { chipWhere } from '@/i18n/ui';
+import { fill, localize } from '@/i18n/pages/_copy';
+
+export const getStaticPaths = localeStaticPaths;
+const locale = localeFromParam(Astro.params.lang);
+const en = locale === 'en';
+const t = localize(estimateCopy, locale);
+const colon = en ? ': ' : '：';
+const nf = (n: number, d = 2) => new Intl.NumberFormat(en ? 'en' : 'zh-TW', { maximumFractionDigits: d }).format(n);
+const D = (id: keyof typeof facts, key: string) => (facts[id].data as Record<string, { value: number }>)[key].value;
+
+// ---- the top --------------------------------------------------------------------------------
+const year = (id: keyof typeof facts) => (facts[id].period['zh-TW'].match(/\d{4}/) ?? [''])[0];
+const bgYear = year('moenv-co-stations-2025');
+const sheetMeasured = fill(t.sheet.measured, {
+  year: bgYear,
+  bg: nf(est.bg.co.traffic.shown),
+  sites: est.meas.iot.co.peakSites,
+  peaks: est.meas.iot.co.peaks.map((p) => nf(p)).join(en ? ', ' : '、'),
+});
+const sheetTitle = fill(t.fmt.sheetTitle, { v: formatEstimate('co.dozen.total', locale).text });
+const mve = mveModel(locale);
+const toc = (['numbers', 'recipe', 'count', 'check', 'range', 'drawing', 'limits', 'answers', 'measure'] as const).map((id) => ({
+  id,
+  label: id === 'answers' ? fill(t.toc.answers, { n: answerList.length }) : t.toc[id],
+}));
+
+// ---- #recipe --------------------------------------------------------------------------------
+const srcLink = (id: SourceId) => ({ href: href(`/sources/#${id}`, locale), label: sourceShort(id, locale) });
+const nearestText = (s: (typeof scenarioKeys)[number]) =>
+  fill(t.fmt.metres, { lo: nf(est.scn[s].nearest_m.lo), hi: nf(est.scn[s].nearest_m.hi) });
+const inputs = [
+  {
+    key: 'readings',
+    name: t.recipe.inputs.readings.name,
+    value: fill(t.recipe.inputs.readings.value, { n: nf(est.recipe.inspectionReadings, 0) }),
+    chip: { kind: 'official' as const, where: chipWhere.taiwan[locale] },
+    note: fill(t.recipe.inputs.readings.note, { year: year('inspection-2025') }),
+    sources: ['moenv-co-inspection-2025'] as SourceId[],
+  },
+  {
+    key: 'fuel',
+    name: t.recipe.inputs.fuel.name,
+    value: fill(t.recipe.inputs.fuel.value, { lo: nf(est.recipe.fuelFlow_gph.lo), hi: nf(est.recipe.fuelFlow_gph.hi) }),
+    chip: { kind: 'study' as const, where: chipWhere.abroad[locale] },
+    note: t.recipe.inputs.fuel.note,
+    sources: ['nguyen-2025-jcie', 'nguyen-2021-ijus'] as SourceId[],
+  },
+  {
+    key: 'wind',
+    name: t.recipe.inputs.wind.name,
+    est: est.recipe.windSpeed_ms,
+    note: t.recipe.inputs.wind.note,
+    sources: ['cwa-climate-means-1991-2020', 'iot-2025-intersection-air-quality'] as SourceId[],
+  },
+  {
+    key: 'near',
+    name: t.recipe.inputs.near.name,
+    rows: scenarioKeys.map((s) => ({ name: est.scn[s].name[locale], value: nearestText(s) })),
+    chip: { kind: 'estimate' as const },
+    note: t.recipe.inputs.near.note,
+    sources: ['moj-road-marking-rules'] as SourceId[],
+  },
+];
+const perRedNote = fill(t.recipe.perRedNote, { reds: est.emit.co.perRedSum.reds, red: est.signal.redLength_s, ml: est.emit.co.perRedSum.canMl });
+
+// ---- #count ---------------------------------------------------------------------------------
+const scnCards = scenarioKeys.map((s) => ({
+  s,
+  name: est.scn[s].name[locale],
+  count: fill(t.count.count, { lo: est.scn[s].count.lo, hi: est.scn[s].count.hi }),
+  nearest: fill(t.count.nearest, { lo: nf(est.scn[s].nearest_m.lo), hi: nf(est.scn[s].nearest_m.hi) }),
+  basis: est.scn[s].basis[locale],
+}));
+const wait = fill(t.count.wait, { lo: est.signal.pedWait.lo, hi: est.signal.pedWait.hi, red: est.signal.redLength_s });
+
+// ---- #check ---------------------------------------------------------------------------------
+const iot = lf('iot-study-design', locale);
+const checkLead = fill(t.check.lead, { place: iot.place, sites: est.meas.iot.sites.value, hours: D('iot-study-design', 'hoursEach') });
+// A's cross-check paragraph, one sentence per line, so the measured rise and our working never share a sentence
+const crossSentences = estimateText.crossCheck[locale].split(en ? /(?<=\.)\s+/ : /(?<=。)/).filter(Boolean);
+const observed = fill(t.fmt.ppmRange, { lo: nf(est.xcheck.iot.observed.lo), hi: nf(est.xcheck.iot.observed.hi) });
+const pmMeasured = fill(t.check.pmMeasured, { lo: est.meas.iot.pm25.lo, hi: est.meas.iot.pm25.hi });
+// printed to two decimals, as the station report gives it (0.80)
+const taipei = fill(t.check.taipei, { year: est.meas.taipei.co.year, v: new Intl.NumberFormat(en ? 'en' : 'zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(est.meas.taipei.co.roadside.value) });
+
+// ---- #range ---------------------------------------------------------------------------------
+const confidence = (['co', 'benzene', 'pm25'] as const).map((p) => ({ p, name: t.range.pollutants[p], word: est.confidence[p].word[locale], why: est.confidence[p].why[locale], level: est.confidence[p].level }));
+
+// ---- #drawing -------------------------------------------------------------------------------
+const drawingRules = t.drawing.rules.map((r) =>
+  fill(r, {
+    patch: AIR_RULE.patchPx,
+    rings: AIR_RULE.streetRings,
+    dots: AIR_RULE.streetDots,
+    few: est.scn.few.name[locale],
+    dozen: est.scn.dozen.name[locale],
+    full: est.scn.full.name[locale],
+    a: AIR_RULE.extra.few,
+    b: AIR_RULE.extra.dozen,
+    c: AIR_RULE.extra.full,
+    lo: AIR_RULE.range.dozen.lo.rings,
+    hi: AIR_RULE.range.dozen.hi.rings,
+  }),
+);
+const drawingHow = fill(t.drawing.how, { rings: AIR_RULE.streetRings });
+
+// ---- #answers -------------------------------------------------------------------------------
+// K sentences already printed elsewhere on this page are not repeated on a card: K1 (top and
+// #measure), K4 (#limits). K6 lives only on the pull-away card. K5 is not allowed on this page.
+const answerK = ['K6'] as const;
+
+// ---- #measure -------------------------------------------------------------------------------
+const letterBody = fill(t.measure.body, {
+  sites: est.meas.iot.sites.value,
+  red: est.signal.redLength_s,
+  coAdd: (en ? ' ' : '') + formatEstimate('co.dozen.add', locale).text,
+});
+const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.meta.version ? est.meta.date : '' }));
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description} share="how-much">
+  <!-- ===================================================== THE ANSWER FIRST -->
+  <Section id="top" pad="normal" width="wide" class="es-hero">
+    <p class="eyebrow">{t.hero.eyebrow}</p>
+    <h1 class="display es-title"><Phrased text={t.hero.title} /></h1>
+    <p class="es-lead">{t.hero.lead}</p>
+
+    <NumberBox locale={locale} title={t.hero.boxTitle} sheet="how-est" />
+    <p class="es-where es-note">{est.meta.appliesTo[locale]}</p>
+
+    <div class="es-k">
+      <p class="es-k__strong">{t.hero.notMeasured}</p>
+      <p class="es-k__body">{kSentences.K1[locale]}</p>
+    </div>
+
+    <p class="es-chartlead">{t.hero.chartLead}</p>
+    <MeasuredVsEstimate locale={locale} sheet="how-est" table={false} />
+
+    <HowSheet id="how-est" locale={locale} kind="estimate" title={sheetTitle} pollutant="co" anchor="check" facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']}>
+      <p slot="block1">{sheetMeasured}</p>
+      <WorkingSum slot="block2" {...workingKerbFlow(locale)} />
+      <Fragment slot="block3">
+        <p>{t.sheet.care}</p>
+        <p>{estimateText.whoAveraging[locale]}</p>
+      </Fragment>
+      <ChartTable table={mve.table} caption={mve.title} />
+    </HowSheet>
+
+    <nav class="es-toc" aria-labelledby="es-toc-t">
+      <h2 class="es-toc__t" id="es-toc-t">{t.hero.tocLabel}</h2>
+      <ol>
+        {toc.map((x, i) => (
+          <li><a href={`#${x.id}`}><span class="es-toc__n" aria-hidden="true">{i + 1}</span>{x.label}</a></li>
+        ))}
+      </ol>
+    </nav>
+  </Section>
+
+  <!-- ===================================================== 1 NUMBERS -->
+  <Section id="numbers" eyebrow={t.numbers.eyebrow} title={t.numbers.title} lead={t.numbers.lead} width="wide" tone="sunken" rule>
+    <p class="es-p es-gloss">{est.meta.gloss[locale]}</p>
+    <EstimateTable locale={locale} id="numbers-table" />
+    <div class="es-ufp">
+      <h3 class="es-h3"><Phrased text={t.numbers.ultrafineTitle} /></h3>
+      <p class="es-p">{kSentences.K2[locale]}{en ? ' ' : ''}{kSentences.K3[locale]}</p>
+      <p class="es-p">{t.numbers.ultrafineWhy}</p>
+    </div>
+
+    <details class="es-more">
+      <summary><span>{t.numbers.chartTitle}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <div class="es-more__body">
+        <EstimateBands locale={locale} zhuyin table={false} />
+      </div>
+    </details>
+
+    <Downloads locale={locale} labels={{ title: t.numbers.downloads, csv: t.numbers.csv, json: t.numbers.json, note: t.numbers.downloadNote }} />
+  </Section>
+
+  <!-- ===================================================== 2 RECIPE -->
+  <Section fold id="recipe" eyebrow={t.recipe.eyebrow} title={t.recipe.title} lead={fill(t.recipe.lead, { runs: nf(est.meta.runs, 0) })} width="wide" rule>
+    <h3 class="es-h3"><Phrased text={t.recipe.flowTitle} /></h3>
+    <WorkingSum {...workingKerbFlow(locale)} />
+
+    <h3 class="es-h3"><Phrased text={t.recipe.inputsTitle} /></h3>
+    <ol class="es-inputs">
+      {inputs.map((x) => (
+        <li class="es-input" id={`input-${x.key}`}>
+          <p class="es-input__name">{x.name}</p>
+          <div class="es-input__val">
+            {x.rows ? (
+              <Fragment>
+                <dl class="es-input__rows">
+                  {x.rows.map((r) => <div><dt>{r.name}</dt><dd>{r.value}</dd></div>)}
+                </dl>
+                {x.chip && <KindChip locale={locale} kind={x.chip.kind} />}
+              </Fragment>
+            ) : x.est ? (
+              <EstimateValue locale={locale} slotId={`recipe.windSpeed_ms` as never} value={x.est} unitStyle="words" anchor="recipe" />
+            ) : (
+              <Fragment>
+                <span class="es-input__num">{x.value}</span>
+                {x.chip && <KindChip locale={locale} kind={x.chip.kind} where={'where' in x.chip ? x.chip.where : undefined} />}
+              </Fragment>
+            )}
+          </div>
+          <p class="es-input__note">{x.note}</p>
+          <div class="es-input__src">
+            <span>{t.recipe.source}{colon}</span>
+            {x.sources.map((s) => <a href={srcLink(s).href}>{srcLink(s).label}</a>)}
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="es-result">
+      <h3 class="es-h3"><Phrased text={t.recipe.resultTitle} /></h3>
+      <EstimateValue locale={locale} slotId="emit.co.gPerHour" unitStyle="words" size="lg" anchor="recipe" />
+      <h3 class="es-h3"><Phrased text={t.recipe.perRedTitle} /></h3>
+      <p class="es-p">{perRedNote}</p>
+      <WorkingSum {...workingPerRed(locale)} />
+      <WorkingSum {...workingPerRedCan(locale)} />
+    </div>
+  </Section>
+
+  <!-- ===================================================== 3 COUNT -->
+  <Section fold id="count" eyebrow={t.count.eyebrow} title={t.count.title} lead={t.count.lead} width="wide" tone="sunken" rule>
+    <ol class="es-scn">
+      {scnCards.map((c) => (
+        <li class:list={['es-scn__card', c.s === 'dozen' && 'es-scn__card--main']}>
+          <p class="es-scn__name">{c.name}</p>
+          <p class="es-scn__count">{c.count}</p>
+          <p class="es-scn__near es-note">{c.nearest}</p>
+          <p class="es-scn__basis es-note">{c.basis}</p>
+        </li>
+      ))}
+    </ol>
+    <h3 class="es-h3"><Phrased text={t.count.busiestTitle} /></h3>
+    <WorkingSum {...workingBusiest(locale)} />
+    <p class="es-p es-quietp">{t.count.busiestNote}</p>
+    <div class="es-withchip"><p class="es-p">{wait}</p><KindChip locale={locale} kind="official" where={chipWhere.taiwan[locale]} /></div>
+  </Section>
+
+  <!-- ===================================================== 4 CHECK -->
+  <Section id="check" eyebrow={t.check.eyebrow} title={t.check.title} lead={checkLead} width="wide" rule>
+    <h3 class="es-h3"><Phrased text={t.check.coTitle} /></h3>
+    <div class="es-pair">
+      <div class="es-pair__cell">
+        <p class="es-pair__label">{t.check.observed}</p>
+        <div class="es-pair__val"><span class="es-pair__num">{observed}</span> <KindChip locale={locale} kind="measured" where={chipWhere.taiwan[locale]} /></div>
+      </div>
+      <div class="es-pair__cell es-pair__cell--est">
+        <p class="es-pair__label">{t.check.model}</p>
+        <div class="es-pair__val"><EstimateValue locale={locale} slotId="xcheck.iot.model" anchor="check" /></div>
+      </div>
+    </div>
+    <ul class="es-sentences">
+      {crossSentences.map((s) => <li>{s}</li>)}
+    </ul>
+
+    <h3 class="es-h3"><Phrased text={t.check.pmTitle} /></h3>
+    <div class="es-withchip"><p class="es-p">{pmMeasured}</p><KindChip locale={locale} kind="measured" where={chipWhere.taiwan[locale]} /></div>
+    <p class="es-p">{t.check.pmOurs}</p>
+
+    <h3 class="es-h3"><Phrased text={t.check.taipeiTitle} /></h3>
+    <div class="es-withchip"><p class="es-p">{taipei}</p><KindChip locale={locale} kind="measured" where={chipWhere.taiwan[locale]} /></div>
+    <div class="es-inline">
+      <p class="es-p">{t.check.taipeiOurs}</p>
+      <EstimateValue locale={locale} slotId="co.dozen.total" anchor="check" />
+    </div>
+    <p class="es-p">{t.check.taipeiSame}</p>
+
+    <h3 class="es-h3"><Phrased text={t.check.benzeneTitle} /></h3>
+    <p class="es-p">{t.check.benzene}</p>
+  </Section>
+
+  <!-- ===================================================== 5 RANGE -->
+  <Section fold id="range" eyebrow={t.range.eyebrow} title={t.range.title} lead={t.range.lead} width="wide" tone="sunken" rule>
+    <SpreadBars locale={locale} labels={t.range.spread} times={t.range.times} caption={t.range.spreadCaption} />
+    <h3 class="es-h3"><Phrased text={t.range.confidenceTitle} /></h3>
+    <dl class="es-conf">
+      {confidence.map((c) => (
+        <div class:list={['es-conf__row', `es-conf__row--${c.level}`]}>
+          <dt><span class="es-conf__name">{c.name}</span> <span class="es-conf__word">{estText.confidence[locale]}{colon}{c.word}</span></dt>
+          <dd>{c.why}</dd>
+        </div>
+      ))}
+    </dl>
+  </Section>
+
+  <!-- ===================================================== 6 DRAWING -->
+  <Section fold id="drawing" eyebrow={t.drawing.eyebrow} title={t.drawing.title} lead={t.drawing.lead} width="wide" rule>
+    <ol class="es-rules">
+      {drawingRules.map((r) => <li>{r}</li>)}
+    </ol>
+    <p class="es-p es-quietp">{drawingHow}</p>
+
+    <div class="es-draw" data-pick-scope data-pick-scenario="dozen">
+      <div class="es-draw__pic">
+        <KerbScene locale={locale} tag="street" />
+      </div>
+      <div class="es-draw__side">
+        <p class="es-p es-draw__try">{t.drawing.tryIt}</p>
+        <ScenarioSwitch locale={locale} />
+        <div class="es-draw__nums">
+          {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} anchor="numbers" data-when-scenario={s} data-say />)}
+        </div>
+        <p class="es-h4">{t.drawing.keyTitle}</p>
+        <AirKey locale={locale} />
+      </div>
+    </div>
+
+    <h3 class="es-h3"><Phrased text={t.drawing.rangeTitle} /></h3>
+    <AirRange locale={locale} scenario="dozen" />
+  </Section>
+
+  <!-- ===================================================== 7 LIMITS -->
+  <Section fold id="limits" eyebrow={t.limits.eyebrow} title={t.limits.title} lead={t.limits.lead} width="wide" tone="sunken" rule>
+    <ul class="es-limits">
+      {estimateText.limits.map((l) => <li>{l[locale]}</li>)}
+      <li>{t.limits.more}</li>
+    </ul>
+    <h3 class="es-h3"><Phrased text={t.limits.heightTitle} /></h3>
+    <p class="es-p">{kSentences.K4[locale]}</p>
+    <p class="es-p">{t.limits.health}</p>
+    <div><a class="es-inlink" href={href('/evidence/#link-5', locale)}>{t.limits.healthLink}<Icon name="arrow-right" size="1em" /></a></div>
+  </Section>
+
+  <!-- ===================================================== 8 ANSWERS -->
+  <Section fold id="answers" eyebrow={t.answers.eyebrow} title={fill(t.answers.title, { n: answerList.length })} lead={t.answers.lead} width="wide" rule>
+    <div class="es-answers">
+      {answerList.map((a) => <AnswerCard locale={locale} id={a.id} on="estimate" k={[...answerK]} />)}
+    </div>
+  </Section>
+
+  <!-- ===================================================== 9 MEASURE -->
+  <Section id="measure" eyebrow={t.measure.eyebrow} title={t.measure.title} width="wide" tone="sunken" rule>
+    <span id="ask" class="es-ask" aria-hidden="true"></span>
+    <p class="es-p es-k__body">{kSentences.K1[locale]}</p>
+    <p class="es-p">{t.measure.lead}</p>
+    <p class="es-promise">{t.measure.promise}</p>
+    <p class="es-p es-quietp">{t.measure.replace}</p>
+
+    <h3 class="es-h3"><Phrased text={t.measure.planTitle} /></h3>
+    <MeasurementDiagram locale={locale} level={4} />
+
+    <h3 class="es-h3" id="letter"><Phrased text={t.measure.letterTitle} /></h3>
+    <p class="es-p">{t.measure.letterLead}</p>
+    <noscript><p class="es-p es-noscript">{t.measure.noScript}</p></noscript>
+    <Composer
+      locale={locale}
+      id="measure-letter"
+      title={t.measure.letterName}
+      fields={[
+        { key: 'agency', label: t.measure.agency, hint: t.measure.agencyHint, autocomplete: 'off' },
+        { key: 'place', label: t.measure.place, hint: t.measure.placeHint, autocomplete: 'off' },
+        { key: 'sender', label: t.measure.sender, autocomplete: 'name' },
+        { key: 'address', label: t.measure.address, autocomplete: 'address-level2' },
+        { key: 'contact', label: t.measure.contact, autocomplete: 'email' },
+      ]}
+      subject={t.measure.subject}
+      body={letterBody}
+      labels={{ ...t.measure.composer, fields: t.measure.fields }}
+    />
+
+    <h3 class="es-h3"><Phrased text={t.measure.toWhomTitle} /></h3>
+    <p class="es-p">{t.measure.toWhom}</p>
+    <div class="es-btns">
+      <a class="es-btn" href={href('/print/brief/', locale)}>{t.measure.brief}<Icon name="arrow-right" size="1.05em" /></a>
+      <a class="es-btn es-btn--quiet" href={href('/act/', locale)}>{t.measure.act}<Icon name="arrow-right" size="1.05em" /></a>
+    </div>
+  </Section>
+
+  <!-- ===================================================== VERSION -->
+  <Section id="version" title={t.version.title} width="wide" pad="tight">
+    <p class="es-p es-stamp">{fill(t.version.current, { stamp: est.meta.stamp[locale] })}</p>
+    <ul class="es-log">
+      {versionLog.map((l) => <li><b>{l.version}・{l.date}</b>{colon}{l.text}</li>)}
+    </ul>
+  </Section>
+</Base>
+
+<style>
+  .es-hero :global(.display) {
+    margin-block: var(--sp-2) var(--sp-4);
+  }
+  .es-title {
+    max-inline-size: 22ch;
+  }
+  .es-lead {
+    max-inline-size: 40rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    margin-block: 0 var(--sp-5);
+  }
+  .es-where {
+    margin-block: var(--sp-2) 0;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .es-k {
+    margin-block: var(--sp-5);
+    padding: var(--sp-3) var(--sp-4);
+    border-inline-start: 4px solid var(--estimate);
+    background: var(--estimate-wash);
+    border-radius: 0 var(--radius-2) var(--radius-2) 0;
+    max-inline-size: 40rem;
+  }
+  .es-k p {
+    margin: 0;
+  }
+  .es-k__strong {
+    font-weight: var(--fw-black);
+    font-size: var(--fs-md);
+    color: var(--estimate-ink);
+  }
+  .es-k__body {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+  .es-chartlead {
+    font-weight: var(--fw-bold);
+    margin-block: var(--sp-6) var(--sp-3);
+  }
+  .es-toc {
+    margin-block-start: var(--sp-6);
+    padding: var(--sp-4);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+  }
+  .es-toc__t {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .es-toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--tap-gap) var(--sp-5);
+  }
+  @media (min-width: 40em) {
+    .es-toc ol {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .es-toc a {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-block-size: var(--tap);
+    padding-block: var(--sp-1);
+    border-block-end: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+  }
+  .es-toc a:hover {
+    color: var(--accent);
+  }
+  .es-toc__n {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .es-p {
+    margin-block: var(--sp-3);
+    max-inline-size: 42rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .es-quietp {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .es-gloss {
+    font-weight: var(--fw-bold);
+  }
+  .es-h3 {
+    margin-block: var(--sp-7) var(--sp-3);
+    font-size: var(--fs-lg);
+    line-height: var(--lh-heading, 1.35);
+    text-wrap: balance;
+  }
+  .es-h4 {
+    margin-block: var(--sp-4) var(--sp-2);
+    font-weight: var(--fw-bold);
+  }
+  .es-ufp {
+    margin-block: var(--sp-6);
+  }
+  .es-ufp .es-h3 {
+    margin-block-start: 0;
+  }
+  .es-more {
+    margin-block: var(--sp-5);
+    border-block: 1px solid var(--line-strong);
+  }
+  .es-more > summary {
+    min-block-size: var(--tap);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-btn);
+    color: var(--accent);
+    cursor: pointer;
+    list-style: none;
+  }
+  .es-more > summary::-webkit-details-marker {
+    display: none;
+  }
+  .es-more[open] > summary :global(svg) {
+    transform: rotate(180deg);
+  }
+  .es-more__body {
+    padding-block: var(--sp-3) var(--sp-5);
+  }
+
+  .es-inputs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+  .es-input {
+    display: grid;
+    gap: var(--sp-2);
+    align-content: start;
+    padding: var(--sp-4);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .es-input p {
+    margin: 0;
+  }
+  .es-input__name {
+    font-weight: var(--fw-black);
+    font-size: var(--fs-md);
+    line-height: var(--lh-heading, 1.35);
+  }
+  .es-input__val {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+  .es-input__num {
+    font-weight: var(--fw-black);
+    font-size: var(--fs-md);
+    font-variant-numeric: tabular-nums;
+  }
+  .es-input__note {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+  }
+  .es-input__src {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tap-gap) var(--sp-3);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .es-input__rows {
+    margin: 0;
+    display: grid;
+    gap: var(--sp-1);
+    inline-size: 100%;
+  }
+  .es-input__rows div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    border-block-end: 1px dotted var(--line-strong);
+    padding-block: var(--sp-1);
+  }
+  .es-input__rows dt {
+    font-weight: var(--fw-bold);
+  }
+  .es-input__rows dd {
+    margin: 0;
+    font-weight: var(--fw-black);
+    font-variant-numeric: tabular-nums;
+  }
+  .es-input__src a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+  }
+  .es-result {
+    margin-block-start: var(--sp-5);
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .es-result > :global(.est) {
+    justify-self: start;
+  }
+  .es-result .es-h3 {
+    margin-block: var(--sp-5) 0;
+  }
+
+  .es-scn {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .es-scn__card {
+    display: grid;
+    gap: var(--sp-1);
+    align-content: start;
+    padding: var(--sp-4);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .es-scn__card--main {
+    border: 2px solid var(--ink);
+  }
+  .es-scn__card p {
+    margin: 0;
+  }
+  .es-scn__name {
+    font-weight: var(--fw-black);
+    font-size: var(--fs-lg);
+  }
+  .es-scn__count {
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-md);
+    font-variant-numeric: tabular-nums;
+  }
+  .es-scn__near {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .es-scn__basis {
+    margin-block-start: var(--sp-2) !important;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+  }
+  .es-withchip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--sp-3);
+    max-inline-size: 42rem;
+  }
+  .es-withchip .es-p {
+    margin-block: var(--sp-2);
+  }
+
+  .es-pair {
+    display: grid;
+    gap: var(--sp-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+  .es-pair__cell {
+    display: grid;
+    gap: var(--sp-2);
+    align-content: start;
+    padding: var(--sp-4);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+  }
+  .es-pair__cell--est {
+    border: 2px dashed var(--estimate);
+  }
+  .es-pair__cell p {
+    margin: 0;
+  }
+  .es-pair__label {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-read);
+  }
+  .es-pair__val {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+  .es-pair__num {
+    font-weight: var(--fw-black);
+    font-size: var(--fs-lg);
+    font-variant-numeric: tabular-nums;
+  }
+  .es-sentences {
+    margin-block: var(--sp-4);
+    padding-inline-start: 1.2em;
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 42rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .es-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
+  }
+  .es-inline .es-p {
+    margin-block: var(--sp-1);
+  }
+
+  .es-conf {
+    margin: 0;
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .es-conf__row {
+    padding: var(--sp-3) var(--sp-4);
+    border-inline-start: 4px solid var(--ink);
+    background: var(--surface);
+    border-radius: 0 var(--radius-2) var(--radius-2) 0;
+  }
+  .es-conf__row--low {
+    border-inline-start-style: dashed;
+  }
+  .es-conf dt {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-3);
+    align-items: baseline;
+  }
+  .es-conf__name {
+    font-weight: var(--fw-black);
+    font-size: var(--fs-md);
+  }
+  .es-conf__word {
+    font-weight: var(--fw-bold);
+  }
+  .es-conf dd {
+    margin: var(--sp-1) 0 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+
+  .es-rules {
+    margin: 0;
+    padding-inline-start: 1.4em;
+    display: grid;
+    gap: var(--sp-3);
+    max-inline-size: 42rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .es-draw {
+    margin-block: var(--sp-5);
+    display: grid;
+    gap: var(--sp-4);
+  }
+  @media (min-width: 56em) {
+    .es-draw {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  .es-draw__pic {
+    max-inline-size: 32rem;
+  }
+  .es-draw__side {
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+  }
+  .es-draw__try {
+    margin: 0;
+    font-weight: var(--fw-bold);
+  }
+  .es-draw__nums {
+    min-block-size: var(--tap);
+  }
+
+  .es-limits {
+    margin: 0;
+    padding-inline-start: 1.2em;
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 42rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .es-inlink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+  }
+
+  .es-answers {
+    display: grid;
+    gap: var(--sp-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+  }
+
+  .es-ask {
+    display: block;
+    scroll-margin-block-start: calc(var(--header-h, 48px) + var(--sp-4));
+  }
+  .es-promise {
+    margin-block: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    font-weight: var(--fw-black);
+    font-size: var(--fs-md);
+    line-height: var(--lh-read);
+    max-inline-size: 42rem;
+  }
+  .es-noscript {
+    padding: var(--sp-3);
+    border-inline-start: 4px solid var(--ink);
+  }
+  .es-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-block: var(--sp-4);
+  }
+  .es-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-block-size: var(--tap);
+    padding-inline: var(--sp-4);
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-btn);
+    text-decoration: none;
+  }
+  .es-btn--quiet {
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+  }
+  .es-stamp {
+    font-weight: var(--fw-bold);
+  }
+  .es-log {
+    margin: 0;
+    padding-inline-start: 1.2em;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+  }
+</style>

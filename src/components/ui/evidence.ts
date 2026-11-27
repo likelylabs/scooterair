@@ -1,6 +1,7 @@
 /**
- * Shared drawing data for the eight evidence badges, so EvidenceBadge, the
- * chain components and the share-card generator all draw the same glyphs.
+ * Shared drawing data for the FINER registry badges (/evidence/ and /sources/ only), so
+ * EvidenceBadge, the chain components and the share-card generator all draw the same glyphs.
+ * The five reader chips every other page uses are in ./kinds.ts (brief 4.1).
  * Plain data, no Astro: loadable from Node scripts.
  *
  * Icons are 16 × 16, stroke-only, `currentColor`. Each kind has its own
@@ -8,7 +9,8 @@
  *   measured-tw    crosshair            official-tw   columned building
  *   modelled-tw    a curve on two axes  international globe
  *   market-tw      price tag            derived       + − × = (sums)
- *   inference      dashed arrow         gap           two hollow ends, nothing between
+ *   inference      dashed arrow         gap           two hollow ends (deprecated)
+ *   estimate       hatched, dashed dot
  */
 import type { EvidenceKind } from '../../i18n/ui.ts';
 
@@ -19,6 +21,8 @@ export const evidenceIcons: Record<EvidenceKind, string> = {
   international: '<circle cx="8" cy="8" r="6.2"/><ellipse cx="8" cy="8" rx="2.7" ry="6.2"/><path d="M1.8 8h12.4"/>',
   'market-tw': '<path d="M2.4 8.4V2.8h5.4l6 6-5.4 5.4z"/><circle cx="5.5" cy="5.9" r="0.9"/>',
   derived: '<path d="M2.6 4.8h4M4.6 2.8v4M9.6 4.8h4M2.6 11.6h4M9.6 10.4h4M9.6 12.8h4"/>',
+  // the site's own estimate: the hatched, dashed dot of the 推估 chip (kinds.ts), as strokes
+  estimate: '<circle cx="8" cy="8" r="6.2" stroke-dasharray="2.3 1.95"/><path d="M3.5 9.6 9.6 3.5M4.6 11.4l6.8-6.8M6.4 12.5l6.1-6.1" stroke-width="1.3"/>',
   inference: '<path stroke-dasharray="2.2 2.4" d="M1.5 8h9"/><path d="M9.5 4.5 13.5 8l-4 3.5"/>',
   gap: '<circle cx="3.5" cy="8" r="2.3"/><circle cx="12.5" cy="8" r="2.3"/>',
 };

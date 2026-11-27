@@ -56,6 +56,12 @@ export interface SnapshotLine {
   to: ISODate;
   quota: QuotaStatus;
   asOf: ISODate;
+  /**
+   * false when the quota is a published cap ('limited') whose remaining count nobody checked:
+   * that is not evidence that places are left, so the city is not shown as "places left".
+   * (Missing in older snapshots: read as true.)
+   */
+  remainingSeen?: boolean;
 }
 
 export interface CitySnapshot {
@@ -95,6 +101,14 @@ export interface CityState {
   /** `asOf` is more than STALE_DAYS before `date`: say that it may have changed. */
   stale: boolean;
   quotaText?: L10n;
+  /**
+   * The last day the city's own money accepts purchases, while it is open. It can be earlier than
+   * the central deadline (Keelung and Kinmen: 30 November 2026), so copy must say this date for
+   * the city's money, not 31 December.
+   */
+  until?: ISODate;
+  /** The city publishes a cap on places but how many remain was never checked (they may be gone). */
+  unchecked?: boolean;
 }
 
 export interface MoneyState {
@@ -105,6 +119,10 @@ export interface MoneyState {
   filingDeadline: ISODate;
   /** Whole days from `date` to the purchase deadline (0 on the last day; 0 after it). */
   daysLeft: number;
+  /** The city's own purchase deadline when a city is chosen and its money is open (see CityState.until). */
+  cityDeadline?: ISODate;
+  /** Whole days from `date` to cityDeadline (0 on the last day). */
+  cityDaysLeft?: number;
   /** Whole days since the purchase deadline (0 until it has passed). */
   daysSince: number;
   /** Between the purchase deadline and the filing deadline: buyers can still file. */
@@ -168,7 +186,7 @@ export function moneySnapshot(data: EconDataset, builtOn: ISODate = todayInTaipe
     const seen = new Set<string>();
     const lines: SnapshotLine[] = [];
     for (const p of own) {
-      const line: SnapshotLine = { general: isGeneral(p), from: p.validFrom, to: p.validTo, quota: p.quota.status, asOf: p.quota.asOf };
+      const line: SnapshotLine = { general: isGeneral(p), from: p.validFrom, to: p.validTo, quota: p.quota.status, asOf: p.quota.asOf, remainingSeen: !(p.quota.status === 'limited' && p.quota.remaining === undefined) };
       const key = JSON.stringify(line);
       if (!seen.has(key)) seen.add(key), lines.push(line);
     }
@@ -224,13 +242,27 @@ export function cityMoney(id: JurisdictionId, date: ISODate, snap: MoneySnapshot
   }
   const general = open.filter((l) => l.general);
   const pool = general.length ? general : open;
-  // a line marked exhausted that is still in `open` had not run out yet on `date`
-  const known = pool.filter((l) => KNOWN_OPEN.includes(l.quota) || l.quota === 'exhausted');
+  // a line marked exhausted that is still in `open` had not run out yet on `date`; a published cap
+  // whose remaining count was never checked says nothing about whether places are left
+  const seen = (l: SnapshotLine) => l.remainingSeen !== false;
+  const known = pool.filter((l) => (KNOWN_OPEN.includes(l.quota) && seen(l)) || l.quota === 'exhausted');
   const deciding = known.length ? known : pool;
   // the oldest observation among the lines we rely on: the claim is only as fresh as that
   const asOf = earliest(deciding.map((l) => l.asOf));
   const status: CityMoney = known.length === 0 ? 'unpublished' : general.length ? 'available' : 'restricted';
-  return { ...base, status, asOf, nearly: deciding.some((l) => l.quota === 'nearly-exhausted'), stale: stale(asOf), quotaText: status === 'available' && general.length ? c.quotaText : undefined };
+  // the city's own last purchase day among the lines still open (Keelung, Kinmen: 30 November)
+  const until = latest(open.map((l) => l.to));
+  const unchecked = known.length === 0 && pool.some((l) => !seen(l));
+  return {
+    ...base,
+    status,
+    asOf,
+    nearly: deciding.some((l) => l.quota === 'nearly-exhausted'),
+    stale: stale(asOf),
+    quotaText: status === 'available' && general.length ? c.quotaText : undefined,
+    until,
+    ...(unchecked ? { unchecked } : {}),
+  };
 }
 
 /** Phase from the date alone: what Base's pre-paint script computes. Keep the two in step. */
@@ -254,6 +286,7 @@ export function moneyState(date: ISODate, city: JurisdictionId | null | undefine
     deadline: snap.yearEnd,
     filingDeadline: snap.filingEnd,
     daysLeft: before ? daysBetween(date, snap.yearEnd) : 0,
+    ...(cityState?.until && phase === 'A' ? { cityDeadline: cityState.until, cityDaysLeft: Math.max(0, daysBetween(date, cityState.until)) } : {}),
     daysSince: before ? 0 : daysBetween(snap.yearEnd, date),
     filingOpen: !before && cmp(date, snap.filingEnd) <= 0,
     nothingConfirmed: !snap.next.confirmed,
@@ -264,8 +297,9 @@ export function moneyState(date: ISODate, city: JurisdictionId | null | undefine
 }
 
 /** The four tile-map states (V41) plus 'unpublished', from a city's money status. */
-export type TileState = 'available' | 'restricted' | 'unpublished' | 'exhausted' | 'unknown';
-export const tileState = (status: CityMoney): TileState => (status === 'ended' ? 'exhausted' : status);
+export type TileState = 'available' | 'restricted' | 'unpublished' | 'exhausted' | 'ended' | 'unknown';
+/** One legend for the whole site (brief 7.7): 還有名額 · 有條件 · 剩多少名額沒公布 · 已用完 · 已截止 · 今年補助查不到，請打電話問. */
+export const tileState = (status: CityMoney): TileState => status;
 
 /** The pre-paint script Base inlines: sets <html data-money-phase>. Mirrors moneyPhase(). */
 export function prePaintScript(snap: Pick<MoneySnapshot, 'yearEnd' | 'filingEnd' | 'next'>): string {

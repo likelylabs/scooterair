@@ -27,6 +27,17 @@ export function sgn(locale: Locale, v: number, d = 1): string {
   return (v < 0 ? MINUS : v > 0 ? '+' : '') + s;
 }
 /** Number with up to d decimals, trailing zeros dropped. */
+/**
+ * A table whose last column holds notes: kept only when every row has one. Otherwise the column is
+ * dropped and each note goes in brackets after its row's label, so no cell is left empty.
+ */
+function noteColumn(head: string[], rows: string[][], locale: Locale): { head: string[]; rows: string[][] } {
+  const last = head.length - 1;
+  if (rows.every((r) => r[last])) return { head, rows };
+  const [o, c] = locale === 'en' ? [' (', ')'] : ['（', '）'];
+  return { head: head.slice(0, last), rows: rows.map((r) => [r[0] + (r[last] ? `${o}${r[last]}${c}` : ''), ...r.slice(1, last)]) };
+}
+
 export const nf = (locale: Locale, v: number, d = 2) => new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-TW', { maximumFractionDigits: d }).format(v);
 
 /** A clean step for ticks between min and max. */
@@ -156,7 +167,7 @@ export function renderSigned(p: SignedProps): ChartRender {
   let i = 0;
   groups.forEach((g) =>
     g.rows.forEach((r) => {
-      rows.push([g.label ? `${g.label} · ${r.label}` : r.label, valueText(r), (p.notes?.[i] ?? []).join('、')]);
+      rows.push([g.label ? `${g.label} · ${r.label}` : r.label, valueText(r), (p.notes?.[i] ?? []).join(locale === 'en' ? ', ' : '、')]);
       i++;
     }),
   );
@@ -165,7 +176,7 @@ export function renderSigned(p: SignedProps): ChartRender {
     body: o.join(''),
     height: h + 4,
     legend: p.legend,
-    table: { head: [p.categoryLabel, p.valueLabel, p.noteLabel], rows },
+    table: noteColumn([p.categoryLabel, p.valueLabel, p.noteLabel], rows, locale),
   };
 }
 
@@ -293,7 +304,7 @@ export function renderSpans(p: SpanProps): ChartRender {
   const body: string[] = [];
   let y = (p.marks?.length ?? 0) > 0 ? 24 : 6;
   rows.forEach((r) => {
-    const lines = wrapLabel(r.label, (MIN_W - valW - 8) / 14, 3);
+    const lines = wrapLabel(r.label, (MIN_W - valW - 8) / 14, 4);
     const cy = y + lines.length * LINE + 12;
     const tone = r.tone ?? 'exhaust';
     let g = `<g class="c-row" data-tip="${esc(`${r.label}: ${vt(r)}`)}">`;
@@ -329,17 +340,18 @@ export function renderSpans(p: SpanProps): ChartRender {
     kind: 'evc-span',
     body: o.join(''),
     height: axisY + 26,
-    table: {
-      head: [p.categoryLabel, p.valueLabel, ...(p.noteLabel ? [p.noteLabel] : [])],
-      rows: rows.map((r) => [r.label, vt(r), ...(p.noteLabel ? [r.note ?? ''] : [])]),
-    },
+    table: p.noteLabel
+      ? noteColumn([p.categoryLabel, p.valueLabel, p.noteLabel], rows.map((r) => [r.label, vt(r), r.note ?? '']), locale)
+      : { head: [p.categoryLabel, p.valueLabel], rows: rows.map((r) => [r.label, vt(r)]) },
   };
 }
 
 // ---------------------------------------------------------------------------------------
 // A true time axis: observed series as solid lines (breaking where a year has no verified
-// figure), targets as a dashed line through hollow points. Years are spaced by their value,
-// not by their order, so 2013 → 2016 → 2019 → 2021 is drawn as it happened.
+// figure), each with its own point shape, targets as a dashed line through hollow points.
+// Years are spaced by their value, not by their order, so 2013 → 2016 → 2019 → 2021 is drawn
+// as it happened. (The shared renderLine now has a value x-scale too, but names its lines only
+// in wide containers; this one keeps a key with the real marks at every width.)
 // ---------------------------------------------------------------------------------------
 
 export interface TimeSeries {
@@ -347,6 +359,25 @@ export interface TimeSeries {
   tone: Tone;
   points: { x: number; y: number | null }[];
   target?: boolean;
+  /** the point mark of an observed series; each series gets its own, so lines are told apart without colour */
+  marker?: TimeMarker;
+}
+export type TimeMarker = 'circle' | 'square' | 'diamond' | 'triangle';
+export const TIME_MARKERS: TimeMarker[] = ['circle', 'square', 'diamond', 'triangle'];
+
+/** A point mark centred on (x, y), drawn in a zero-size nested svg so x can be a percentage. */
+function timeMark(shape: TimeMarker | 'ring', tone: Tone, x: string | number, y: number): string {
+  const inner =
+    shape === 'ring'
+      ? `<circle class="c-cap c-stroke-${tone}" r="5" fill="var(--here, var(--bg))"/>`
+      : shape === 'square'
+        ? `<rect class="c-fill-${tone}" x="-4.25" y="-4.25" width="8.5" height="8.5"/>`
+        : shape === 'diamond'
+          ? `<path class="c-fill-${tone}" d="M0,-6L6,0L0,6L-6,0Z"/>`
+          : shape === 'triangle'
+            ? `<path class="c-fill-${tone}" d="M0,-5.5L5.5,4.5L-5.5,4.5Z"/>`
+            : `<circle class="c-dot c-fill-${tone}" r="4.5"/>`;
+  return `<svg x="${x}" y="${r2(y)}" width="1" height="1" overflow="visible">${inner}</svg>`;
 }
 export interface TimeProps {
   locale: Locale;
@@ -407,15 +438,10 @@ export function renderTime(p: TimeProps): ChartRender {
   o.push(`<svg class="c-stretch" x="0" y="0" width="100%" height="${TOP + H}" viewBox="0 0 1000 ${TOP + H}" preserveAspectRatio="none">${paths.join('')}</svg>`);
   // points and end labels (pushed apart so they never collide)
   const endLabels: { y: number; text: string; x: number; anchor: string }[] = [];
+  const shapeOf = (s: TimeSeries): TimeMarker | 'ring' => (s.target ? 'ring' : s.marker ?? 'circle');
   series.forEach((s) => {
     const shown = s.points.filter((q): q is { x: number; y: number } => q.y !== null);
-    shown.forEach((q) => {
-      o.push(
-        s.target
-          ? `<circle class="c-cap c-stroke-${s.tone}" cx="${xp(q.x)}%" cy="${yp(q.y)}" r="5" fill="var(--here, var(--bg))"/>`
-          : `<circle class="c-dot c-fill-${s.tone}" cx="${xp(q.x)}%" cy="${yp(q.y)}" r="4"/>`,
-      );
-    });
+    shown.forEach((q) => o.push(timeMark(shapeOf(s), s.tone, `${xp(q.x)}%`, yp(q.y))));
     if (s.target) {
       shown.forEach((q) => o.push(text('c-value c-value--sm', `${xp(q.x)}%`, yp(q.y) - 10, `${f(q.y)}`, `text-anchor="${xp(q.x) > 92 ? 'end' : 'middle'}"`)));
     } else if (shown.length) {
@@ -436,18 +462,37 @@ export function renderTime(p: TimeProps): ChartRender {
     });
   }
   endLabels.forEach((e) => o.push(text('c-value c-value--sm', `${e.x}%`, e.y, e.text, `text-anchor="${e.anchor}" dx="${e.anchor === 'start' ? 2 : e.anchor === 'end' ? -2 : 0}"`)));
+  // The key, drawn under the axis with the very marks the lines use (stroke, dash and point
+  // shape), so each line can be told apart in greyscale and with red-green colour blindness.
+  let keyY = TOP + H + 28 + 10;
+  if (series.length > 1) {
+    series.forEach((s) => {
+      const lines = wrapLabel(s.label, (MIN_W - 46 - 36) / 14, 3);
+      const cy = keyY + 9;
+      o.push(`<line class="c-line c-stroke-${s.tone}" x1="0" x2="28" y1="${cy}" y2="${cy}"${s.target ? ' stroke-dasharray="6 4"' : ''}/>`);
+      o.push(timeMark(shapeOf(s), s.tone, 14, cy));
+      lines.forEach((ln, k) => o.push(text('c-label', 36, keyY + 14 + k * LINE, ln)));
+      keyY += lines.length * LINE + 8;
+    });
+  }
   const head = [p.xLabel, ...series.map((s) => s.label)];
+  // a year a line has no point for says why, in words, never a lone dash
+  const zh = p.locale !== 'en';
+  const lastSeen = (s: (typeof series)[number]) => Math.max(...s.points.filter((q) => q.y !== null && q.y !== undefined).map((q) => q.x));
+  const blank = (s: (typeof series)[number], x: number) =>
+    s.target ? (zh ? '這年沒有目標' : 'no target for this year') : x > lastSeen(s) ? (zh ? '還沒到這一年' : 'year not reached yet') : zh ? '這年沒有統計' : 'not counted that year';
   const rows = xs.map((x) => [String(x), ...series.map((s) => {
     const v = s.points.find((q) => q.x === x)?.y;
-    return v === undefined || v === null ? '–' : f(v);
+    return v === undefined || v === null ? blank(s, x) : f(v);
   })]);
   return {
     kind: 'evc-time',
     body: o.join(''),
-    height: TOP + H + 28,
+    height: series.length > 1 ? keyY : TOP + H + 28,
     padLeft: 40,
     padRight: 6,
-    legend: series.map((s) => ({ label: s.label, tone: s.tone, shape: s.target ? 'dot' : 'line' })),
+    // the key is in the drawing (above), with the real marks; a separate legend would repeat it with other glyphs
+    legend: undefined,
     table: { head: head.map((h, i) => (i ? `${h} (${unit})` : h)), rows },
   };
 }
@@ -458,7 +503,8 @@ export function renderTime(p: TimeProps): ChartRender {
 
 export interface OdourRow {
   label: string;
-  marks: { low: number; high?: number; source: string; tone: Tone }[];
+  /** each source has its own mark shape as well as its colour (circle or square), matching its legend key */
+  marks: { low: number; high?: number; source: string; tone: Tone; shape?: 'circle' | 'square' }[];
   none?: string;
 }
 export interface OdourProps {
@@ -480,11 +526,17 @@ export function renderOdour(p: OdourProps): ChartRender {
   const f = (v: number) => nf(locale, v, v < 0.01 ? 4 : v < 1 ? 2 : 1);
   const o: string[] = [];
   const body: string[] = [];
-  o.push(`<rect class="c-track" x="0" y="0" width="${xp(1)}%" height="20" rx="3"/>`);
-  o.push(text('c-tick', 0, 14, p.ppbLabel, 'dx="6"'));
-  o.push(`<rect class="c-track" x="${xp(1)}%" y="0" width="${r2(100 - xp(1))}%" height="20" rx="3"/>`);
-  o.push(text('c-tick', `${xp(1)}%`, 14, p.ppmLabel, 'dx="6"'));
-  let y = 30;
+  // a band label may carry '|' line breaks: the ppm band is only 40% of the width, and on a
+  // 320 px phone at the largest text size one line of English does not fit in it
+  const ppb = p.ppbLabel.split('|');
+  const ppm = p.ppmLabel.split('|');
+  const bandLines = Math.max(ppb.length, ppm.length);
+  const trackH = 20 + (bandLines - 1) * 16;
+  o.push(`<rect class="c-track" x="0" y="0" width="${xp(1)}%" height="${trackH}" rx="3"/>`);
+  ppb.forEach((ln, k) => o.push(text('c-tick', 0, 14 + k * 16, ln, 'dx="6"')));
+  o.push(`<rect class="c-track" x="${xp(1)}%" y="0" width="${r2(100 - xp(1))}%" height="${trackH}" rx="3"/>`);
+  ppm.forEach((ln, k) => o.push(text('c-tick', `${xp(1)}%`, 14 + k * 16, ln, 'dx="6"')));
+  let y = trackH + 10;
   rows.forEach((r) => {
     const lines = wrapLabel(r.label, MIN_W / 14);
     const cy = y + lines.length * LINE + 12;
@@ -498,11 +550,13 @@ export function renderOdour(p: OdourProps): ChartRender {
     }
     r.marks.forEach((m, k) => {
       const dy = r.marks.length > 1 ? (k === 0 ? -4 : 4) : 0;
+      const shape = m.shape ?? 'circle';
       if (m.high !== undefined && m.high > m.low) {
         g += `<rect class="c-fill-${m.tone} c-mark" x="${xp(m.low)}%" y="${cy + dy - 3}" width="${r2(xp(m.high) - xp(m.low))}%" height="6" rx="3"/>`;
-        g += `<circle class="c-dot c-fill-${m.tone}" cx="${xp(m.low)}%" cy="${cy + dy}" r="4.5"/>`;
+        g += timeMark(shape, m.tone, `${xp(m.low)}%`, cy + dy);
+        if (shape !== 'circle') g += timeMark(shape, m.tone, `${xp(m.high)}%`, cy + dy);
       } else {
-        g += `<circle class="c-dot c-fill-${m.tone} c-mark" cx="${xp(m.low)}%" cy="${cy + dy}" r="5.5"/>`;
+        g += timeMark(shape, m.tone, `${xp(m.low)}%`, cy + dy);
       }
     });
     body.push(g + '</g>');
@@ -511,7 +565,7 @@ export function renderOdour(p: OdourProps): ChartRender {
   const axisY = y;
   [0.001, 0.01, 0.1, 1, 10, 100].forEach((t, i, arr) => {
     const x = xp(t);
-    o.push(`<line class="c-grid" x1="${x}%" x2="${x}%" y1="24" y2="${axisY}"/>`);
+    o.push(`<line class="c-grid" x1="${x}%" x2="${x}%" y1="${trackH + 4}" y2="${axisY}"/>`);
     o.push(text('c-tick', `${x}%`, axisY + 17, nf(locale, t, 3), `text-anchor="${i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle'}"`));
   });
   o.push(...body);

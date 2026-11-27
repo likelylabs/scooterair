@@ -1,0 +1,40 @@
+---
+/**
+ * Air — the air rule as a component, for use INSIDE an <svg>.
+ *
+ * Two ways to use it.
+ *
+ * 1. A picture with nothing to interleave (a patch, a key, a plain backdrop):
+ *    pass the options of air() and it prints everything in order.
+ *
+ *      <svg viewBox="0 0 360 340"><Air frame={{ x: 0, y: 0, w: 360, h: 340 }} /></svg>
+ *
+ * 2. A scene with figures: call air() once in the scene's frontmatter, then
+ *    print each layer where it belongs, so the wash and the cores go behind
+ *    the people.
+ *
+ *      const a = air({ frame: VB, id: artId('air'), kerb, extra: AIR_EXTRA, scenario: 'all', tailpipes, avoid });
+ *      <Air layers={a} layer="defs" /> … street … <Air layers={a} layer="wash" /> … far rows …
+ *      <Air layers={a} layer="cores" /><Air layers={a} layer="marks" /> … people …
+ *
+ * Props
+ *   layers  the result of air(), when the scene has already called it
+ *   layer   'all' (default) | 'defs' | 'wash' | 'cores' | 'marks'
+ *   …       otherwise every option of air() except `id` (made here). A kerb
+ *           zone gets `extra` from the estimate by itself.
+ */
+import '@/styles/art.css';
+import { air, type AirLayers, type AirOptions } from './air';
+import { AIR_EXTRA } from './air-slots';
+import { artId } from './parts';
+
+type Props = Partial<Omit<AirOptions, 'id'>> & { layers?: AirLayers; layer?: 'all' | 'defs' | 'wash' | 'cores' | 'marks' };
+const { layers, layer = 'all', ...opts } = Astro.props;
+let a = layers;
+if (!a) {
+  if (!opts.frame) throw new Error('<Air>: pass either `layers` (the result of air()) or `frame` and the other options of air()');
+  a = air({ ...(opts as Omit<AirOptions, 'id'>), id: artId('air'), extra: opts.extra ?? (opts.kerb ? AIR_EXTRA : undefined) });
+}
+---
+
+<Fragment set:html={a[layer]} />

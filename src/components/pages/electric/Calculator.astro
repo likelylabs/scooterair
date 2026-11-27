@@ -21,7 +21,7 @@ import RadioGroup from '@/components/ui/RadioGroup.astro';
 import Range from '@/components/ui/Range.astro';
 import Callout from '@/components/ui/Callout.astro';
 import electric from '@/i18n/pages/electric';
-import { localize } from '@/i18n/pages/_copy';
+import { fill, localize } from '@/i18n/pages/_copy';
 import { readerText } from '@/i18n/ui';
 import { econData } from '@/data/econ';
 import ElectricResult from './ElectricResult.astro';
@@ -30,13 +30,21 @@ interface Props {
   locale: Locale;
   cfg: Record<string, unknown>;
   today: string;
+  /** the same places as the #status select (question 1 mirrors it) */
+  cityOptions: { value: string; label: string }[];
+  /** the worked result the calculator opens on (brief 7.7): the place, the distance, and the old scooter assumed when there is one to scrap */
+  defaults: { county: string; km: number; scrap: { engine: 'four-stroke' | 'two-stroke'; builtOn: string } };
 }
-const { locale, cfg, today } = Astro.props;
+const { locale, cfg, today, cityOptions, defaults } = Astro.props;
+const [defYear, defMonth] = defaults.scrap.builtOn.split('-');
 const T = localize(electric, locale);
 const C = T.calc;
 const year = Number(today.slice(0, 4));
 const years = Array.from({ length: 45 }, (_, i) => String(year - i));
 const months = Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1).padStart(2, '0'), label: locale === 'en' ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i] : String(i + 1) }));
+// the build month cannot be later than this month (the engine refuses a scooter built after today)
+const thisMonth = today.slice(0, 7);
+const kmMax = 3000;
 const flagKeys = ['childUnder12', 'schoolChild', 'deliveryRider', 'indigenous', 'medicalWorker', 'neighbourhoodWatch', 'disasterAffected', 'remoteDistrict', 'previousLocalSubsidy', 'foreignNational'] as const;
 const evOptions = [
   { value: '', label: C.advanced.evAuto },
@@ -59,25 +67,25 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
   </div>
 
   <form class="el-form" data-js-only onsubmit="return false" aria-describedby="el-calc-lead" novalidate>
-    <fieldset class="el-q">
-      <legend class="el-q__n"><span class="el-num" aria-hidden="true">1</span>{C.q1}</legend>
-      <p class="el-q__city"><output data-el-cityname for="el-city"></output> <a href="#status">{C.q1Change}</a></p>
-      <p class="el-hint">{C.q1Hint}</p>
-    </fieldset>
+    <!-- Each question's visible number and wording is a picture of its control's own label
+         (aria-hidden), so a screen reader hears the question once, from the control itself. -->
+    <div class="el-q">
+      <p class="el-q__n" aria-hidden="true"><span class="el-num">1</span>{C.q1}</p>
+      <Select id="el-city-q" label={C.q1} options={cityOptions} value={defaults.county} hint={C.q1Hint} class="el-vh-label" data-el-cityq />
+    </div>
 
-    <fieldset class="el-q">
-      <legend class="el-q__n"><span class="el-num" aria-hidden="true">2</span>{C.q2.legend}</legend>
-      <p class="el-hint">{C.q2.hint}</p>
-      <RadioGroup name="el-scrap" legend={C.q2.legend} options={[{ value: 'no', label: C.q2.no }, { value: 'yes', label: C.q2.yes }]} value="no" class="el-vh-legend" />
-      <div class="el-sub" data-el-if="scrap" hidden>
+    <div class="el-q">
+      <p class="el-q__n" aria-hidden="true"><span class="el-num">2</span>{C.q2.legend}</p>
+      <RadioGroup name="el-scrap" legend={C.q2.legend} hint={C.q2.hint} options={[{ value: 'no', label: C.q2.no }, { value: 'yes', label: C.q2.yes }]} value="yes" class="el-vh-legend" />
+      <div class="el-sub" data-el-if="scrap">
         <div class="el-pair">
-          <Select id="el-year" label={C.q2.year} options={years.map((y) => ({ value: y, label: y }))} value={String(year - 12)} />
-          <Select id="el-month" label={C.q2.month} options={months} value="06" />
+          <Select id="el-year" label={C.q2.year} options={years.map((y) => ({ value: y, label: y }))} value={defYear} />
+          <Select id="el-month" label={C.q2.month} options={months} value={defMonth} data-el-thismonth={thisMonth} />
         </div>
         <p class="el-hint">{C.q2.builtHint}</p>
-        <RadioGroup name="el-engine" legend={C.q2.engine} options={[{ value: 'four-stroke', label: C.q2.fourStroke }, { value: 'two-stroke', label: C.q2.twoStroke }]} value="four-stroke" hint={C.q2.engineHint} />
+        <RadioGroup name="el-engine" legend={C.q2.engine} options={[{ value: 'four-stroke', label: C.q2.fourStroke }, { value: 'two-stroke', label: C.q2.twoStroke }]} value={defaults.scrap.engine} hint={C.q2.engineHint} />
       </div>
-    </fieldset>
+    </div>
 
     <fieldset class="el-q">
       <legend class="el-q__n"><span class="el-num" aria-hidden="true">3</span>{C.q3.legend}</legend>
@@ -87,7 +95,7 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
           <li data-flag={k} hidden>
             <label class="el-check">
               <input type="checkbox" name={`el-${k}`} value="1" data-el-flag={k} />
-              <span data-template={k === 'remoteDistrict' ? C.q3.flags[k] : undefined}>{C.q3.flags[k]}</span>
+              <span data-template={k === 'remoteDistrict' ? C.q3.flags[k] : undefined}>{k === 'remoteDistrict' ? '' : C.q3.flags[k]}</span>
             </label>
           </li>
         ))}
@@ -102,15 +110,18 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
       </div>
     </fieldset>
 
-    <fieldset class="el-q">
-      <legend class="el-q__n"><span class="el-num" aria-hidden="true">4</span>{C.q4.label}</legend>
-      <Range id="el-km" label={C.q4.label} min={50} max={3000} step={50} value={400} unit={C.q4.unit} hint={C.q4.hint} class="el-vh-label" />
-    </fieldset>
+    <div class="el-q">
+      <p class="el-q__n" aria-hidden="true"><span class="el-num">4</span>{C.q4.label}</p>
+      <Range id="el-km" label={C.q4.label} min={50} max={kmMax} step={50} value={defaults.km} unit={C.q4.unit} hint={C.q4.hint} class="el-vh-label" />
+      <p class="el-error" id="el-km-error" data-el-error="monthlyKm" data-error={C.q4.error} hidden></p>
+      <p class="el-hint" id="el-km-over" data-el-over={kmMax} hidden>{fill(C.q4.overMax, { max: kmMax.toLocaleString(locale === 'en' ? 'en-GB' : 'zh-TW') })}</p>
+      <p class="el-hint" id="el-km-under" data-el-under={50} hidden>{fill(C.q4.underMin, { min: 50 })}</p>
+    </div>
 
-    <fieldset class="el-q">
-      <legend class="el-q__n"><span class="el-num" aria-hidden="true">5</span>{C.q5.legend}</legend>
+    <div class="el-q">
+      <p class="el-q__n" aria-hidden="true"><span class="el-num">5</span>{C.q5.legend}</p>
       <RadioGroup name="el-charge" legend={C.q5.legend} options={[{ value: 'no', label: C.q5.no }, { value: 'yes', label: C.q5.yes }]} value="no" hint={C.q5.noHint} class="el-vh-legend" />
-      <p class="el-hint el-nosocket" data-el-if="nosocket">{C.q5.noSocket} <a href="#no-socket">→</a></p>
+      <p class="el-hint el-nosocket" data-el-if="nosocket">{C.q5.noSocket} <a href="#no-socket">{C.q5.noSocketLink}</a></p>
       <RadioGroup
         name="el-power"
         variant="stack"
@@ -130,25 +141,34 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
           { value: 'heavy', label: C.q5.heavy, hint: C.q5.heavyHint },
           { value: 'any', label: C.q5.light, hint: C.q5.lightHint },
         ]}
-        value="heavy"
+        value="any"
       />
-    </fieldset>
+    </div>
 
     <details class="el-adv">
       <summary>{C.advanced.summary}</summary>
       <div class="el-adv__body">
-        <Select id="el-ev" label={C.advanced.ev} options={evOptions} value="" />
-        <Select id="el-gas" label={C.advanced.gas} options={gasOptions} value="" />
+        <Select id="el-ev" label={C.advanced.ev} options={evOptions} value="" aria-describedby="el-ev-chosen" />
+        <p class="el-hint el-chosen" id="el-ev-chosen" data-el-chosen="el-ev" data-template={C.advanced.chosen} aria-live="polite"></p>
+        <Select id="el-gas" label={C.advanced.gas} options={gasOptions} value="" aria-describedby="el-gas-chosen" />
+        <p class="el-hint el-chosen" id="el-gas-chosen" data-el-chosen="el-gas" data-template={C.advanced.chosen} aria-live="polite"></p>
         <p class="el-hint">{C.advanced.note}</p>
       </div>
     </details>
   </form>
+
+  <!-- the answer so far, kept in view while the reader answers (updated by calc.client.ts) -->
+  <div class="el-bar" data-el-bar data-js-only>
+    <p class="el-bar__label">{C.bar.label}</p>
+    <p class="el-bar__text" data-el-bar-text>{C.bar.empty}</p>
+    <a class="el-bar__see" href="#result" data-el-bar-see hidden>{C.bar.see}</a>
+  </div>
 </div>
 
 <section id="result" class="el-live" aria-labelledby="result-title" data-js-only>
   <h2 id="result-title" class="el-live__title">{T.result.title}</h2>
-  <p class="el-live__placeholder" data-el-placeholder>{T.result.placeholder}</p>
-  <p class="el-live__status" data-el-status role="status" aria-live="polite"></p>
+  <p class="el-live__placeholder" data-el-placeholder hidden>{T.result.placeholder}</p>
+  <p class="el-live__status" data-el-status role="status" aria-live="polite" aria-atomic="true"></p>
   <ElectricResult id="el-live" locale={locale} hidden />
 </section>
 
@@ -229,20 +249,58 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
     padding: 0;
     margin: 0;
     display: grid;
-    gap: var(--sp-1);
+    gap: 0.5rem;
   }
+  /* The whole row is the target (at least 48 px, brief 6.3): the native box is kept for the
+     keyboard and screen readers but drawn by the label, so a 22 px box is not the thing to hit. */
   .el-check {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--sp-3);
     min-block-size: var(--tap);
+    padding-inline-start: 2.6rem;
     cursor: pointer;
   }
   .el-check input {
-    inline-size: 1.35rem;
-    block-size: 1.35rem;
-    flex: none;
-    accent-color: var(--accent);
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block: 0;
+    inline-size: 2.6rem;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .el-check::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.35rem;
+    inset-block-start: 50%;
+    translate: 0 -50%;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    background: var(--surface);
+  }
+  .el-check:has(input:checked)::before {
+    background: var(--ink);
+  }
+  .el-check:has(input:checked)::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.85rem;
+    inset-block-start: 50%;
+    inline-size: 0.5rem;
+    block-size: 0.9rem;
+    border: solid var(--bg);
+    border-width: 0 3px 3px 0;
+    translate: 0 -62%;
+    rotate: 45deg;
+  }
+  .el-check:has(input:focus-visible)::before {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
   }
   .el-age {
     display: grid;
@@ -281,8 +339,109 @@ const gasOptions = [{ value: '', label: C.advanced.gasAuto }, ...econData.gasMod
   .el-adv__body :global(select) {
     max-inline-size: 100%;
   }
-  .el-nosocket[hidden] {
+  .el-nosocket[hidden],
+  .el-error[hidden],
+  [data-el-over][hidden] {
     display: none;
+  }
+  .el-error {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--signal-red-ink);
+    border-inline-start: var(--rule-paint) solid var(--signal-red);
+    padding-inline-start: var(--sp-3);
+  }
+  .el-form :global([aria-invalid='true']) {
+    border-color: var(--signal-red) !important;
+    outline: 2px solid var(--signal-red);
+    outline-offset: 1px;
+  }
+  .el-chosen:empty {
+    display: none;
+  }
+  /* the answer so far: a one-line bar that stays at the bottom of the screen while the questions
+     are in view, so every change visibly does something */
+  .el-bar {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
+    margin-block-start: var(--sp-6);
+    margin-inline: calc(-1 * var(--sp-2));
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface);
+    border: var(--rule-paint) solid var(--ink);
+    box-shadow: 0 -0.25rem 1rem rgb(0 0 0 / 0.12);
+  }
+  .el-bar__label {
+    grid-column: 1 / -1;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .el-bar__text {
+    font-weight: var(--fw-black);
+    line-height: var(--lh-snug);
+    min-inline-size: 0;
+  }
+  .el-bar__see {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    padding-inline: var(--sp-3);
+    background: var(--ink);
+    color: var(--surface);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .el-bar__see[hidden] {
+    display: none;
+  }
+  .el-bar[data-flash] {
+    animation: el-flash 0.9s var(--ease-out);
+  }
+  @keyframes el-flash {
+    from {
+      background: var(--clean-wash, var(--exhaust-wash));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .el-bar[data-flash] {
+      animation: none;
+    }
+  }
+  /* on a narrow screen the bar stacks (label, answer, button at full width) and the button may
+     wrap, so the answer never squeezes into a few letters a line */
+  @media (max-width: 30em) {
+    .el-bar {
+      grid-template-columns: minmax(0, 1fr);
+      padding: var(--sp-2) var(--sp-3);
+      gap: var(--sp-1);
+    }
+    .el-bar__see {
+      justify-content: center;
+      white-space: normal;
+      text-align: center;
+    }
+  }
+  /* with large text a fixed bar would cover the questions: it stays in the flow instead */
+  :global(html[data-text='lg']) .el-bar,
+  :global(html[data-text='xl']) .el-bar {
+    position: static;
+  }
+  /* focused fields and anchors land above the bar, not under it */
+  :global(html:has(.el-bar)) {
+    scroll-padding-block-end: 8rem;
+  }
+  /* on a phone the on-screen keyboard takes the bottom of the screen: step aside while typing */
+  @media (max-width: 40em) {
+    .el-calc:has(input[type='number']:focus) .el-bar {
+      position: static;
+    }
   }
   :global(.el-vh-legend legend),
   :global(.el-vh-label > label),

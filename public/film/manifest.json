@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hash": "cac776d102575fa2",
+  "width": 1080,
+  "height": 1920,
+  "fps": 25,
+  "duration": 121.8,
+  "asOf": "2026-11-25",
+  "files": {
+    "zh-TW": {
+      "file": "scooterair-film-zh.mp4",
+      "bytes": 18016914,
+      "sha256": "93b9d7cf3175bc40d61dbc3ecf5d57d52e332fceab8bd31c4cf1202ba39c9c94",
+      "frames": 3046
+    },
+    "en": {
+      "file": "scooterair-film-en.mp4",
+      "bytes": 17989824,
+      "sha256": "e0bb5e6283db738cb1cb3aca7159f561a174a6f9871529639dd434f1dbe4ee8f",
+      "frames": 3046
+    }
+  }
+}

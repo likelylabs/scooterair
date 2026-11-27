@@ -19,7 +19,9 @@ export const t = (zh: string, en: string): L10n => ({ 'zh-TW': zh, en });
  * How well the figure was checked against its source during research.
  * Nothing tagged UNVERIFIED in the research files is allowed into the registry.
  *  - verified:  during research the source itself was opened (the document, page, dataset or,
- *               for some papers, the abstract) and the figure was located in it.
+ *               for some papers, the abstract) and the figure was located in it. For evidence
+ *               'derived', it means every input in `derivedFrom` is itself verified; a derived
+ *               fact with any secondary input is 'secondary'.
  *  - secondary: the figure was seen only in a reputable report of the source (usually a news
  *               report of an official figure), or is our arithmetic on such figures. The caveat
  *               always says what it rests on.
@@ -35,22 +37,25 @@ export type Confidence = (typeof confidences)[number];
  *  - international: evidence from outside Taiwan (WHO, IARC, HEI, and single non-Taiwan studies;
  *                   the statement wording says which, so a single study is never presented as consensus)
  *  - derived:       our own arithmetic on cited figures (the fact lists its inputs in `derivedFrom`)
- *  - market-tw:     prices and terms published by Taiwanese manufacturers, dealers or energy
- *                   operators (scooter prices, battery plans, pump prices)
+ *  - market-tw:     figures published by Taiwanese manufacturers, dealers, energy operators or
+ *                   industry associations (scooter prices, battery plans, pump prices, company
+ *                   results, association sales tallies), as opposed to government statistics
  */
-export const evidenceTypes = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived', 'market-tw'] as const;
+export const evidenceTypes = ['measured-tw', 'official-tw', 'modelled-tw', 'international', 'derived', 'market-tw', 'estimate'] as const;
 export type Evidence = (typeof evidenceTypes)[number];
+// - estimate:      the site's own signed kerbside estimate (research/estimate/, src/data/estimate.ts)
+//                  or an answer worked out from it. Always shown with a range and its working.
 
 export const confidenceLabels: Record<Confidence, { label: L10n; description: L10n }> = {
   verified: {
     label: t('已查證', 'Verified'),
     description: t(
-      '查證時開啟了來源本身（文件、網頁、資料，部分論文為摘要），並在其中找到這個數字。',
-      'During our research the source itself was opened (the document, page, dataset or, for some papers, the abstract) and the figure was found in it.',
+      '查證時開啟了來源本身（文件、網頁、資料，部分論文為摘要），並在其中找到這個數字。標著「本站計算」的數字，指的是計算用到的每個數字都這樣查證過。',
+      'During our research the source itself was opened (the document, page, dataset or, for some papers, the abstract) and the figure was found in it. For a figure marked "Our arithmetic", it means every number the arithmetic uses was checked this way.',
     ),
   },
   secondary: {
-    label: t('次級來源', 'Secondary'),
+    label: t('只在轉述中看到', 'Second-hand'),
     description: t(
       '這個數字只在可靠的轉述中看到，例如媒體報導的官方統計，沒有在原始來源中找到；附註會說明依據。',
       'The figure was seen only in a reputable report of the source, such as a news report of an official statistic, not in the source itself; the note says what it rests on.',
@@ -68,8 +73,8 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
     description: t('台灣政府公布的統計、排放清冊、標準或政策目標。', 'Statistics, inventories, standards or policy targets published by the Taiwanese government.'),
   },
   'modelled-tw': {
-    label: t('台灣模式推估', 'Modelled for Taiwan'),
-    description: t('以電腦模式或推估方法針對台灣計算，並非直接量測。', 'Calculated for Taiwan with a computer model or estimation method, not measured directly.'),
+    label: t('台灣模式研究', 'Modelled for Taiwan'),
+    description: t('以電腦模式或推估方法針對台灣計算，並非直接量測。', 'Calculated for Taiwan with a computer model or estimation method rather than read directly off an instrument.'),
   },
   international: {
     label: t('國際證據', 'International evidence'),
@@ -80,10 +85,125 @@ export const evidenceLabels: Record<Evidence, { label: L10n; description: L10n }
     description: t('由本站根據引用的數字自行計算，計算所用的數字均附出處。', 'Our own arithmetic on cited figures; every input is itself cited.'),
   },
   'market-tw': {
-    label: t('市場公開價格', 'Published prices'),
-    description: t('台灣的車廠、經銷商或能源業者公布的售價、優惠與資費。', 'Prices, offers and plan terms published by Taiwanese manufacturers, dealers or energy operators.'),
+    label: t('業者公布資料', 'Industry figures'),
+    description: t(
+      '台灣的車廠、經銷商、能源業者或產業團體公布的售價、優惠、資費、銷售與營運數字，不是政府統計。',
+      'Prices, offers, plan terms, sales and company figures published by Taiwanese manufacturers, dealers, energy operators or industry associations; not government statistics.',
+    ),
+  },
+  estimate: {
+    label: t('本站推估', 'Our estimate'),
+    description: t(
+      '我們用有出處的數字算出來的，不是量的，所以一定附範圍和算法。',
+      'Worked out by us from sourced figures rather than read off an instrument, so it always comes with a range and the working.',
+    ),
   },
 };
+
+// ---------------------------------------------------------------------------
+// The five reader chips (brief section 4.1)
+// ---------------------------------------------------------------------------
+
+/**
+ * What a reader sees beside every number: exactly one of five chips. They differ by word and
+ * shape (drawn by the KindChip component), not only by colour.
+ *  - measured  實測     solid dot       someone took an instrument and read it (Taiwan or abroad)
+ *  - estimate  推估     hatched dot     worked out by this site; always a range and the working
+ *  - official  官方     solid square    a rule, a standard, a government statistic, a WHO guideline value
+ *  - study     研究     open book       a published study: cohort, experiment, model
+ *  - derived   本站計算 plus sign       our own sums on sourced figures; all money
+ */
+export const readerKinds = ['measured', 'estimate', 'official', 'study', 'derived'] as const;
+export type ReaderKind = (typeof readerKinds)[number];
+
+export const readerKindLabels: Record<ReaderKind, { label: L10n; meaning: L10n; shape: 'dot' | 'hatched-dot' | 'square' | 'book' | 'plus' }> = {
+  measured: {
+    label: t('實測', 'Measured'),
+    meaning: t('有人拿儀器量到的。', 'Someone took an instrument and measured it.'),
+    shape: 'dot',
+  },
+  estimate: {
+    label: t('推估', 'Estimate'),
+    meaning: t('我們算出來的，一定附範圍和算法。', 'We worked it out; it always comes with a range and the working.'),
+    shape: 'hatched-dot',
+  },
+  official: {
+    label: t('官方', 'Official'),
+    meaning: t('法規、標準，或政府的統計。', 'A rule, a standard or a government statistic.'),
+    shape: 'square',
+  },
+  study: {
+    label: t('研究', 'Study'),
+    meaning: t('發表過的研究：長期追蹤、實驗、模式。', 'A published study: long-term follow-up, an experiment or a model.'),
+    shape: 'book',
+  },
+  derived: {
+    label: t('本站計算', 'Our arithmetic'),
+    meaning: t('我們拿有出處的數字做的加減乘除。', 'Our own sums on figures that have a source.'),
+    shape: 'plus',
+  },
+};
+
+/** Where a measured or study figure comes from, written after the chip: 實測・台灣, 研究・國外. */
+export const readerPlaceLabels = {
+  tw: t('台灣', 'Taiwan'),
+  abroad: t('國外', 'abroad'),
+  international: t('國際', 'international'),
+  twModel: t('台灣模式', 'Taiwan model'),
+} as const;
+export type ReaderPlace = keyof typeof readerPlaceLabels;
+
+/** Default chip for each registry evidence type. A fact may override it with `readerKind`. */
+export const evidenceReaderKind: Record<Evidence, ReaderKind> = {
+  'measured-tw': 'measured',
+  'official-tw': 'official',
+  'modelled-tw': 'study',
+  international: 'study',
+  derived: 'derived',
+  'market-tw': 'derived',
+  estimate: 'estimate',
+};
+
+/** Default place qualifier for each evidence type (undefined: the chip stands alone). */
+export const evidenceReaderPlace: Partial<Record<Evidence, ReaderPlace>> = {
+  'measured-tw': 'tw',
+  'modelled-tw': 'twModel',
+  international: 'abroad',
+};
+
+/**
+ * The chip for anything with an `evidence` type. Pass the fact (or any object with `evidence`
+ * and an optional `readerKind` override) so WHO guideline values read 官方 and instrument
+ * readings abroad read 實測, as the registry marks them.
+ *
+ *   readerKind(fact('who-no2-co-guideline'))   // 'official'
+ *   readerKind('international')                 // 'study'
+ */
+export function readerKind(x: Evidence | { evidence: Evidence; readerKind?: ReaderKind }): ReaderKind {
+  if (typeof x === 'string') return evidenceReaderKind[x];
+  return x.readerKind ?? evidenceReaderKind[x.evidence];
+}
+
+/** The place qualifier after the chip, or undefined. Facts may override with `readerPlace`. */
+export function readerPlace(x: Evidence | { evidence: Evidence; readerKind?: ReaderKind; readerPlace?: ReaderPlace | null }): ReaderPlace | undefined {
+  if (typeof x === 'string') return evidenceReaderPlace[x];
+  if (x.readerPlace === null) return undefined;
+  if (x.readerPlace) return x.readerPlace;
+  const kind = readerKind(x);
+  if (kind === 'official' || kind === 'derived' || kind === 'estimate') return undefined;
+  return evidenceReaderPlace[x.evidence];
+}
+
+/** Chip text with its qualifier: '實測・台灣', 'Study · abroad', '推估'. */
+export function readerChipText(
+  x: Evidence | { evidence: Evidence; readerKind?: ReaderKind; readerPlace?: ReaderPlace | null },
+  locale: Locale,
+): string {
+  const label = readerKindLabels[readerKind(x)].label[locale];
+  const place = readerPlace(x);
+  if (!place) return label;
+  return locale === 'zh-TW' ? `${label}・${readerPlaceLabels[place][locale]}` : `${label} · ${readerPlaceLabels[place][locale]}`;
+}
 
 // ---------------------------------------------------------------------------
 // The chain of evidence
@@ -102,13 +222,13 @@ export const chainLinks = [1, 2, 3, 4, 5, 6, 7] as const;
 export type ChainLink = (typeof chainLinks)[number];
 
 export const chainLinkLabels: Record<ChainLink, { short: L10n; question: L10n }> = {
-  1: { short: t('排氣管排出什麼', 'What comes out of the tailpipe'), question: t('燃油機車的排氣管排出哪些污染物？', 'What does a gasoline scooter\'s tailpipe emit?') },
+  1: { short: t('排氣管排出什麼', 'What comes out of the tailpipe'), question: t('燃油機車的排氣管排出哪些污染物？', 'What does a petrol scooter\'s tailpipe emit?') },
   2: { short: t('在哪裡排出', 'Where it comes out'), question: t('廢氣在什麼高度、什麼位置排出，離行人多近？', 'At what height and where is it emitted, and how close to people on foot?') },
   3: { short: t('街上的人吸進什麼', 'What people on the street breathe'), question: t('走在街上、站在路口的人實際吸進了什麼？', 'What do people walking and waiting at the kerb actually breathe?') },
   4: { short: t('這些物質有什麼作用', 'What those compounds do'), question: t('廢氣中的物質對人體有什麼危害？聞得到又代表什麼？', 'What can these compounds do to the body, and what does the smell tell you?') },
   5: { short: t('吸入交通廢氣的人怎麼了', 'What happens to people who breathe traffic exhaust'), question: t('研究在吸入交通廢氣的人身上看到了什麼？', 'What have studies seen in people who breathe traffic exhaust?') },
   6: { short: t('誰離得最近', 'Who is closest to it'), question: t('誰離排氣管最近？誰最容易受到影響？', 'Who is closest to the tailpipes, and who is most susceptible?') },
-  7: { short: t('可以斬斷的一環', 'The link you can break'), question: t('換成更乾淨的機車或電動機車，能斬斷哪一環？', 'What would cleaner or electric scooters remove from the chain?') },
+  7: { short: t('可以切斷的一環', 'The link you can break'), question: t('換成更乾淨的機車或電動機車，能切斷哪一環？', 'What would cleaner or electric scooters remove from the chain?') },
 };
 
 // ---------------------------------------------------------------------------

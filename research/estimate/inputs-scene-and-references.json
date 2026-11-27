@@ -1,0 +1,806 @@
+{
+ "key": "scene-and-references",
+ "checkedOn": "2026-11-26",
+ "summary": "Part A (scene): arithmetic on IOT 2024 counts and signal plans gives about 3 scooters queued at the end of an average ~83 s red on one approach of the busiest IOT junction, about 6-7 in a normal peak on a main-road approach plus about 3 in the two-stage turn box (typical about 8 idling within 10 m), and about 27 (up to ~100 across a 4-lane approach) at an oversaturated peak (Lan & Chang field data). Stop box 2.5-6 m deep, 3.2-3.5 m per lane, 2.2-3.2 m2 per scooter; stop line to crosswalk 2-3 m (>=1 m), turn box rear edge >=0.5 m, and Taiwanese surveys report that most scooters do not stop behind the stop line. Nearest exhaust to a person at the kerb: ~3 m (low), ~1.5 m (typical), ~0.7 m (heavy); tailpipe 0.5 m high, level with a pram. Part B (references): WHO 2021 CO 15-min 100, 1-h 35, 8-h 10 mg/m3 (valid, not re-evaluated) and 24-h 4 mg/m3; Taiwan 2024 standards CO 31 ppm (1 h) and 9 ppm (8 h), PM2.5 30 (24 h) and 12 (annual) -- the latter differs from older 35/15; no benzene or UFP standard in Taiwan; traffic stations average 0.54 ppm CO (2025), kerb 1-min peaks 0.5-1.3 ppm; benzene limit EU 5 -> 3.4 ug/m3 annual, WHO reference 1.7, short-term 1-h values OEHHA 27, TCEQ ESL 170 ug/m3, ATSDR 14-day MRL 9 ppb; Taipei ambient benzene ~2.5 ppb, scooter-lane commuters ~4 ppb; UFP WHO 'high' >10,000 (24 h) or >20,000 /cm3 (1 h), Taipei urban background mean 13,900, Taiwan roadside 25,000-38,000 /cm3. Most reference levels are daily or annual and are not fair comparators for a 90 s exposure; fair ones are CO 15-min/1-h, benzene 1-h, UFP 1-h and measured Taiwanese kerb data (B16).",
+ "findings": [
+  {
+   "id": "A01-law-stopbox-depth",
+   "part": "A-scene",
+   "claim": "The scooter stop box (機慢車停等區線) is a white rectangle 2.5-6 m deep, placed behind the stop line, only on roads with speed limit <= 60 km/h and signalised junctions; it is for scooters other than large heavy motorcycles. The rule sets no width.",
+   "values": {
+    "depth_m": "2.5 to 6",
+    "speed_limit_condition": "<= 60 km/h",
+    "width": "not specified in this rule"
+   },
+   "measured": "Legal marking specification (design rule), not a measurement.",
+   "place_year": "Taiwan, version of 2026-03-11",
+   "citation": "道路交通標誌標線號誌設置規則 (Ministry of Transportation and Communications; version dated 民國115年3月11日 = 2026-03-11 on 全國法規資料庫, read 2026-11-26), art. 174-2",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=K0040014",
+   "verified": true,
+   "quote": "機慢車停等區線 ... 縱深長度為二點五公尺至六公尺 ... 本標線視需要設置於行車速限每小時六十公里以下之道路，且設有行車管制號誌路口之停止線後方。",
+   "applicability": "Fixes the box depth that bounds how many scooters can stand in front of the queue. Width is by lane(s), so use lane width (see A09)."
+  },
+  {
+   "id": "A02-law-stopline-to-crosswalk",
+   "part": "A-scene",
+   "claim": "Where a stop line and a crosswalk are both marked, the clear distance between them is 2-3 m and never less than 1 m. Sleeper-pattern crosswalks are drawn 3-5 m back from the cross street's kerb line.",
+   "values": {
+    "stop_line_to_crosswalk_m": "2 to 3 (minimum 1)",
+    "crosswalk_to_cross_street_edge_m": "3 to 5 (principle)"
+   },
+   "measured": "Legal marking specification.",
+   "place_year": "Taiwan, version of 2026-03-11",
+   "citation": "道路交通標誌標線號誌設置規則 (Ministry of Transportation and Communications; version dated 民國115年3月11日 = 2026-03-11 on 全國法規資料庫, read 2026-11-26), art. 170 and art. 185",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=K0040014",
+   "verified": true,
+   "quote": "與行人穿越道線同時設置者，兩者淨距為二公尺至三公尺。但受實際情形限制，得酌予調整，其淨距不得少於一公尺。 (art. 170); 本標線與橫交路口路面邊緣間距以三至五公尺為原則 (art. 185)",
+   "applicability": "A scooter stopped correctly at the stop line has its exhaust about 2-3 m (>=1 m) from the crosswalk edge where pedestrians wait; scooters that creep forward (A10) are closer."
+  },
+  {
+   "id": "A03-law-turnbox-clearance",
+   "part": "A-scene",
+   "claim": "The two-stage turn box (機慢車左(右)轉待轉區) must have its rear edge at least 0.5 m from the crosswalk line (adjustable if pedestrian safety is not affected); its front edge may not extend past the cross street's pavement edge.",
+   "values": {
+    "rear_edge_to_crosswalk_m": ">= 0.5"
+   },
+   "measured": "Legal marking specification.",
+   "place_year": "Taiwan, version of 2026-03-11",
+   "citation": "道路交通標誌標線號誌設置規則 (Ministry of Transportation and Communications; version dated 民國115年3月11日 = 2026-03-11 on 全國法規資料庫, read 2026-11-26), art. 191",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=K0040014",
+   "verified": true,
+   "quote": "待轉區後緣應與行人穿越道線間隔五十公分以上。但不影響行人穿越安全時，得依實際情形酌予調整。",
+   "applicability": "Defines the closest legal approach of idling turn-box scooters to the crosswalk (0.5 m). The nearest-exhaust distance in the heavy scenario is built on this."
+  },
+  {
+   "id": "A04-iot-counts",
+   "part": "A-scene",
+   "claim": "Mean 12-hour (07:00-19:00) motorcycle counts per junction (all four approaches, both directions) at three of the six year-2 IOT junctions.",
+   "values": {
+    "Mingcheng 1st / Minzu 1st (Kaohsiung)": {
+     "motorcycles_per_12h": 5974.2,
+     "share_pct": 62
+    },
+    "Boai 2nd / Mingcheng 2nd (Kaohsiung)": {
+     "motorcycles_per_12h": 4810.7,
+     "share_pct": 59.3
+    },
+    "Gaotie / Chongxin (Kaohsiung Zuoying)": {
+     "motorcycles_per_12h": 818.7,
+     "share_pct": 42.1
+    },
+    "PCU_per_hour": "1,596 (quietest, Gaotie/Chongxin) vs 6,784 (busiest, Mingcheng 1st)"
+   },
+   "measured": "Video counts, 48 h per junction, four approaches, by vehicle type.",
+   "place_year": "Kaohsiung and New Taipei, July 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, et al. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2). 交通部運輸研究所 (MOTC Institute of Transportation), IOT-113-TB006 (114-084-6228), Dec 2025. Sec. 3.1.2 and 3.4",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "明誠一路/民族一路路口每日 12 小時平均之車流量為...機車為 5,974.21 輛次...機車車種比例為最高的 62%; ... 博愛二路及明誠二路口 ... 機車 4,810.7 輛次 ... 59.3%",
+   "applicability": "Raw material for scooters-per-red-phase (A15). The report gives junction totals, not per-approach splits: per-approach figures below assume an even four-way split (assumption)."
+  },
+  {
+   "id": "A05-iot-signal-plan-table",
+   "part": "A-scene",
+   "claim": "Signal plan for Qixian 1st Rd / Minzu 2nd Rd, Kaohsiung (the arterial junction chosen for the cycle-length test): cycle 180 s at 07-09 h and 16-19 h, 150 s at 09-16 h. Phase 1 (the 90 s / 63 s green, taken to be the Minzu 2nd main-road through phase) lasts 97 s (180 s cycle) or 70 s (150 s cycle) including yellow and all-red, so that approach is red for 83 s or 80 s.",
+   "values": {
+    "cycle_s": "150 or 180",
+    "phase1_green_yellow_allred_s": "90+4+3 (180 s cycle); 63+4+3 (150 s cycle)",
+    "phase2_s": "16+4+3 (180) or 13+4+3 (150)",
+    "phase3_s": "5+0+0",
+    "phase4_s": "48+3+4",
+    "derived_red_main_road_s": "83 (180 s cycle); 80 (150 s cycle)",
+    "derived_red_other_approaches_s": "cycle minus own phase: roughly 95-130 s (depends on which phases serve which approach)"
+   },
+   "measured": "Municipal signal timing plan (Kaohsiung Transportation Bureau).",
+   "place_year": "Kaohsiung, 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, et al. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2). 交通部運輸研究所 (MOTC Institute of Transportation), IOT-113-TB006 (114-084-6228), Dec 2025. Table 2.2.4-2 (p.2-34)",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "7 180 90 4 3 16 4 3 5 0 0 48 3 4 ... 9 150 63 4 3 13 4 3 5 0 0 48 3 4 (時相一 綠燈 黃燈 全紅; 資料來源：高雄市政府交通局)",
+   "applicability": "Which phase serves which approach is in a phase diagram image I could not machine-read, so the main-road red of 80-83 s is an inference (phase 1 has the longest green). Red of 80-130 s brackets the 90 s used for the page; a 90 s red is a normal, not a long, red on a Taiwanese arterial."
+  },
+  {
+   "id": "A06-iot-signal-cycles-other",
+   "part": "A-scene",
+   "claim": "Other cycle lengths on file from the same report: 120 s (34 s pedestrian green), 150 s (38 s pedestrian green), 180 s, 200 s; the main text names 150 s and 180 s as the two cycles at the time-plan junction.",
+   "values": {
+    "cycles_s": "120, 150, 180, 200"
+   },
+   "measured": "Signal timing plans.",
+   "place_year": "Kaohsiung / New Taipei, 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, et al. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2). 交通部運輸研究所 (MOTC Institute of Transportation), IOT-113-TB006 (114-084-6228), Dec 2025. Sec. 2.2.4 and 3.1.3 (timing diagrams are images, Fig. 3.1.3-1 to 3.1.3-6)",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "該路口現有時制計畫(表 2.2.4-2、圖 2.2.4-7)包含 150 秒和 180 秒 2 種週期",
+   "applicability": "Cycle 120-200 s implies red phases of roughly 60-150 s per approach; no per-approach red table is printed in the text, only images."
+  },
+  {
+   "id": "A07-iot-geometry",
+   "part": "A-scene",
+   "claim": "Geometry of the surveyed junctions: total road widths 15-50 m (lane counts 2-8); at Mingcheng 1st / Minzu 1st the crosswalk was set back so that the end of the scooter turn box lies 8 m from the front of the crosswalk and the end of the bicycle lane 6 m.",
+   "values": {
+    "road_width_m": {
+     "Gaotie Rd": 15,
+     "Chongxin Rd": 5,
+     "Mingcheng 1st": 20,
+     "Minzu 1st": 30,
+     "Boai 2nd": 25,
+     "Mingcheng 2nd": 20,
+     "Qixian 1st": 20,
+     "Minzu 2nd": "45-50",
+     "Xianmin Blvd": 30,
+     "Minquan Rd": 30,
+     "Zhongzheng 2nd": 25
+    },
+    "setback_site": {
+     "turn_box_end_to_crosswalk_m": 8,
+     "bike_lane_end_to_crosswalk_m": 6
+    }
+   },
+   "measured": "Site survey / photographs.",
+   "place_year": "Kaohsiung and New Taipei, July 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, et al. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2). 交通部運輸研究所 (MOTC Institute of Transportation), IOT-113-TB006 (114-084-6228), Dec 2025. Sec. 3.1.4 and Table 3.1.4-1",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "機車待轉格末端距離行人穿越道線前端 8 公尺，中間設置有自行車道，自行車道末端距離行人穿越道線前端 6 公尺",
+   "applicability": "At junctions with 6-8 lanes the scooter kerb lane is one of several; a pedestrian at the corner has a scooter lane at the kerb and mixed lanes beyond. The setback site shows that 6-10 m separation is a real, tested design (IOT modelled only small CO changes from it, roughly -5% to +2.5% depending on site and receptor)."
+  },
+  {
+   "id": "A08-iot-sensor-and-model-geometry",
+   "part": "A-scene",
+   "claim": "IOT measured with micro-sensors 1.0-1.5 m from the crosswalk line at 1.2-1.5 m inlet height, and modelled traffic emission sources with a tailpipe height of 0.5 m, receptors at 1.5 m, idling represented with the 5 km/h national emission factor, and seven source paths per approach including 'turn-box waiting' (待轉格停等).",
+   "values": {
+    "sensor_distance_from_crosswalk_m": "1.0 to 1.5",
+    "inlet_height_m": "1.2 to 1.5",
+    "modelled_tailpipe_height_m": 0.5,
+    "receptor_height_m": 1.5,
+    "idle_emission_factor_speed_kmh": 5,
+    "source_paths_per_approach": 7
+   },
+   "measured": "Study design.",
+   "place_year": "Taiwan, 2023-2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, et al. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2). 交通部運輸研究所 (MOTC Institute of Transportation), IOT-113-TB006 (114-084-6228), Dec 2025. Sec. 2.2.3, 4.2.1, 4.2.2",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "採以微型感測監測儀器架設於路口行穿線旁 1.0 至 1.5 公尺處...進氣口架設離地高 1.2 至 1.5 公尺處; 高度參考汽車、機車排氣管的離地高度設定為 0.5m; 怠速模式使用車速為 5km/hr 之排放係數進行換算",
+   "applicability": "Gives defensible exhaust height (0.5 m) and breathing height (1.2-1.5 m; 1.5 m in model) for the estimate. A pram seat is 0.55-0.85 m (Sharma & Kumar 2018 review, repo research/papers), i.e. level with the tailpipes."
+  },
+  {
+   "id": "A09-review-lane-and-stopbox-dimensions",
+   "part": "A-scene",
+   "claim": "Design dimensions recommended in Taiwanese scooter engineering studies: scooter lane 1.5 m standard (1.2 m minimum), mixed lane at least 3.5 m; scooter width 0.8 m; scooter queue length allowed 2.5 m per scooter; stop box minimum 2.5 m deep x 3.2 m wide, enlarged in steps of 2 m depth / 1.6 m width; turn box also 2.5 m x 3.2 m basic.",
+   "values": {
+    "scooter_lane_width_m": "1.5 (min 1.2)",
+    "mixed_lane_min_m": 3.5,
+    "scooter_width_m": 0.8,
+    "queue_length_per_scooter_m": 2.5,
+    "stop_box_min_depth_x_width_m": "2.5 x 3.2",
+    "turn_box_basic_depth_x_width_m": "2.5 x 3.2"
+   },
+   "measured": "Review of Taiwanese design studies (許添本 1998, 許添本&王義川 2001, 蘇昭銘 2000, 許添本&陳柏君 2000).",
+   "place_year": "Taiwan, studies 1998-2012, review 2014",
+   "citation": "張勝雄 Chang S-H, 張耕碩 Chang K-S (2014). 臺灣機車交通工程設計之回顧與檢討 (A Critical Review on Traffic Engineering Designs for Motorcycles in Taiwan). 交通學報 Journal of Traffic Science 14(1):59-80. Sec. 3.1.1, 3.2 and Table 6",
+   "url": "https://ts.cpu.edu.tw/var/file/20/1020/attach/87/pta_24337_9386910_46324.pdf",
+   "verified": true,
+   "quote": "車道寬以 1.5 公尺為原則，至少 1.2 公尺，長度按紅燈期間到達機車數計算，每輛機車以 2.5 公尺計 ... 考慮機車車身及設留淨空以深度 2.5 公尺、寬度 3.2 公尺為基本 ... 一般機車寬度（0.8 公尺）",
+   "applicability": "I opened the review; the figures are the review's reports of earlier primary studies, which I did not open (secondary). They give the footprint arithmetic in A12."
+  },
+  {
+   "id": "A10-review-stopbox-space-per-scooter-and-creep",
+   "part": "A-scene",
+   "claim": "Observed behaviour at Taiwanese stop boxes: a scooter rider wants on average about 3.2 m2 of waiting space (net area of a stopped scooter 2.2 m2); scooters concentrate forward and sideways, most do not stop behind the stop line, and where a turn box exists they stop on the crosswalk between the turn box and the stop line; riders keep to the kerb side.",
+   "values": {
+    "net_area_per_scooter_m2": 2.2,
+    "desired_area_per_scooter_m2_mean": 3.2,
+    "crosswalk_intrusion": "most scooters do not stop behind the stop line"
+   },
+   "measured": "Video surveys at signalised Taiwanese intersections (許添本 & 王義川 2001, as reported in the review).",
+   "place_year": "Taiwan, ~2000, review 2014",
+   "citation": "張勝雄 Chang S-H, 張耕碩 Chang K-S (2014). 臺灣機車交通工程設計之回顧與檢討 (A Critical Review on Traffic Engineering Designs for Motorcycles in Taiwan). 交通學報 Journal of Traffic Science 14(1):59-80. Sec. 2.2.1",
+   "url": "https://ts.cpu.edu.tw/var/file/20/1020/attach/87/pta_24337_9386910_46324.pdf",
+   "verified": true,
+   "quote": "機車駕駛者所需求之停等空間可能會超過單一機車停止時所占用之淨面積 2.2 平方公尺，平均約 3.2 平方公尺。 ... 停止線對機車限制小，即代表大多數機車並不會停止於停止線後方，在路口設置待轉區時，機車會停等於待轉區與停止線之間的行穿線上",
+   "applicability": "THE evidence that the nearest exhaust to a pedestrian can be well inside the legal 2-3 m (scooters on the crosswalk). Density 1 scooter per 2.2-3.2 m2 is the packing used in A12. Dated (~2000 fleet and behaviour)."
+  },
+  {
+   "id": "A11-review-turnbox-counts",
+   "part": "A-scene",
+   "claim": "Two-stage left-turn box occupancy at two Taipei approaches (Heping E Rd - Xinsheng S Rd): 2.7 scooters per signal cycle (west approach) vs 9.6 per cycle (north approach). Design guidance triggers a protected scooter left-turn treatment at 6 left-turning scooters per cycle or 200 per peak hour.",
+   "values": {
+    "west_approach_per_cycle": 2.7,
+    "north_approach_per_cycle": 9.6,
+    "design_trigger_per_cycle": 6,
+    "design_trigger_per_peak_hour": 200
+   },
+   "measured": "Video survey of turn boxes (許添本 & 陳柏君 2000, as reported in the review).",
+   "place_year": "Taipei, ~2000",
+   "citation": "張勝雄 Chang S-H, 張耕碩 Chang K-S (2014). 臺灣機車交通工程設計之回顧與檢討 (A Critical Review on Traffic Engineering Designs for Motorcycles in Taiwan). 交通學報 Journal of Traffic Science 14(1):59-80. Sec. 2.2.2 and Sec. 3.2 (許添本、陳柏君 2000, 運輸計劃季刊)",
+   "url": "https://ts.cpu.edu.tw/var/file/20/1020/attach/87/pta_24337_9386910_46324.pdf",
+   "verified": true,
+   "quote": "平均左轉機車輛（西向 2.7 輛/週期、北向 9.6 輛/週期）; 以左轉機車數每號誌周期內 6 輛機車或每尖峰小時左轉機車 200 輛為區分",
+   "applicability": "Only published per-cycle scooter count in a Taiwanese turn box that I found; two sites, 25 years old. The turn box sits 0.5-0.8 m from the crosswalk so it dominates the nearest-source distance for pedestrians."
+  },
+  {
+   "id": "A12-lan-chang-queue-counts",
+   "part": "A-scene",
+   "claim": "Heavy-scooter field site: at the end of red on a four-lane arterial approach with a scooter waiting area (stop box), the stop queue held 103 scooters (16 in the scooter waiting area, 3 / 7 / 31 / 46 in lanes 1-4) plus 28 cars; actual queue lengths 40-64 m; clearance 14-17 s per lane.",
+   "values": {
+    "scooters_in_waiting_area": 16,
+    "scooters_lane1": 3,
+    "scooters_lane2": 7,
+    "scooters_lane3": 31,
+    "scooters_lane4_kerb_side_with_box_access": 46,
+    "cars_total": 28,
+    "actual_queue_length_m": "64, 60, 60, 40 (lanes 1-4)",
+    "queue_clearance_s": "16, 14, 17, 16"
+   },
+   "measured": "Video of a four-lane arterial approach, per-second counts, field validation of a queue model.",
+   "place_year": "study by Lan (Taiwan-trained) and Chang (Univ. of Maryland), supported by Science Council of Taiwan grant 101-2917-I-564-070; data Nov 2013; the paper does not name the city",
+   "citation": "Lan C-L, Chang G-L (2015). A Traffic Signal Optimization Model for Intersections Experiencing Heavy Scooter-Vehicle Mixed Traffic Flows. IEEE Trans. Intelligent Transportation Systems (accepted 12 Nov 2014; volume/pages not printed in the copy I read), doi:10.1109/TITS.2014.2376292. Table V (page 11, read from the page image) and Fig. 12-13",
+   "url": "https://attap.umd.edu/wp-content/uploads/2022/05/A-Traffic-Signal-Optimization-Model-for-Intersections-Experiencing-Heavy-Scooter-Vehicle-Mixed-Traffic-Flows.pdf",
+   "verified": true,
+   "quote": "Table V 'Number of Vehicles and Queue Length Prior to the Discharge Process': Scooters (veh): waiting area 16; lane 1: 3; lane 2: 7; lane 3: 31; lane 4: 46. Cars (veh): 0, 9, 8, 7, 4. Actual queue length (m): N.A., 64, 60, 60, 40.",
+   "applicability": "The heavy end: roughly 100 scooters queued at one red, 16 inside the stop box and ~46 along the side of the road where the box is. It is a peak, oversaturated approach: ~25 scooters per lane is not typical (A15). The paper names no city, so 'Taiwan' is inferred from the funding grant and the authors' background - label as 'a field study by Taiwan-supported researchers', not 'Taipei'."
+  },
+  {
+   "id": "A13-lan-chang-approach-volumes",
+   "part": "A-scene",
+   "claim": "Scooter approach volumes at a heavy-scooter test intersection in a Taiwan-supported study, 17:00-18:00 on 2013-11-07: 190/781/232 scooters (left/through/right) westbound, 56/584/76 eastbound, 136/548/85 southbound, 171/605/495 northbound; total 3,959 scooters of 5,876 vehicles (67%); cycle 140 s with green splits 60/30/50 s.",
+   "values": {
+    "westbound_scooters_per_h": {
+     "left": 190,
+     "through": 781,
+     "right": 232,
+     "sum": 1203
+    },
+    "eastbound": {
+     "left": 56,
+     "through": 584,
+     "right": 76,
+     "sum": 716
+    },
+    "southbound": {
+     "left": 136,
+     "through": 548,
+     "right": 85,
+     "sum": 769
+    },
+    "northbound": {
+     "left": 171,
+     "through": 605,
+     "right": 495,
+     "sum": 1271
+    },
+    "total_scooters": 3959,
+    "scooter_share_pct": 67.4,
+    "cycle_s": 140,
+    "greens_s": "60, 30, 50"
+   },
+   "measured": "Video traffic counts by approach and movement.",
+   "place_year": "Same study as A12 (Nov 2013 peak hour)",
+   "citation": "Lan C-L, Chang G-L (2015). A Traffic Signal Optimization Model for Intersections Experiencing Heavy Scooter-Vehicle Mixed Traffic Flows. IEEE Trans. Intelligent Transportation Systems (accepted 12 Nov 2014; volume/pages not printed in the copy I read), doi:10.1109/TITS.2014.2376292. Table VI and Table VII (page 11)",
+   "url": "https://attap.umd.edu/wp-content/uploads/2022/05/A-Traffic-Signal-Optimization-Model-for-Intersections-Experiencing-Heavy-Scooter-Vehicle-Mixed-Traffic-Flows.pdf",
+   "verified": true,
+   "quote": "Table VI: Westbound Left 190 Through 781 Right 232 (scooters) ... Total 3,959 scooters, 1,800 cars, 117 buses, 5,876; Table VII original timing: cycle 140, phase 1 60, phase 2 30, phase 3 50.",
+   "applicability": "Upper bound for arrivals: 1,203 scooters/h on one approach x ~80 s red / 3600 = ~27 scooters per red (A15), the same order as the A12 stop box plus kerb lane. Heavy-peak, not average."
+  },
+  {
+   "id": "A14-idle-off-and-idle-stop-evidence",
+   "part": "A-scene",
+   "claim": "No Taiwanese observation of what fraction of scooters switch off at a red light was found. What exists: (a) a stated-preference study of Taiwanese riders (Jou, Hensher, Wu, Liu 2011, Transp. Plann. Technol. 34(5):487-495) using the theory of planned behaviour, with no percentage in the abstract; a search snippet reported a mean willingness to switch off of 82 s (not verified by me); (b) IOT's earlier experiment (reported in 2021 news) found switching off during a red saves about 26% of fuel and advised switching off only if the red exceeds about 20 s; (c) a 2015 news item said idle-stop motorcycles were 'few' among 13.68 million motorcycles. No fleet share of idle-stop scooters was found.",
+   "values": {
+    "observed_switch_off_fraction": "not found",
+    "stated_willingness_to_switch_off_s": "82 (secondary, snippet only)",
+    "IOT_recommended_switch_off_threshold_s": "about 20 (news report)",
+    "fuel_saving_pct": "about 26 (news report)",
+    "idle_stop_fleet_share": "not found; 'few' (2015 news)"
+   },
+   "measured": "Stated preference / experiment / news.",
+   "place_year": "Taiwan, 2011-2021",
+   "citation": "Jou R-C, Hensher DA, Wu Y-C, Liu J-L (2011) A study of motorcyclist's idling stop behavior at red lights. Transportation Planning and Technology 34(5):487-495, doi:10.1080/03081060.2011.586118 (abstract only, via IDEAS/RePEc); 蘇銘翰 (2021-10-05) 等 99 秒紅燈機車要不要熄火？交通部運研所給答案, 自由時報汽車頻道; 自由時報 (2015) 強制機車紅燈百秒熄火 (via search snippets)",
+   "url": "https://ideas.repec.org/a/taf/transp/v34y2011i5p487-495.html ; https://auto.ltn.com.tw/news/18695/2",
+   "verified": false,
+   "quote": "Abstract (IDEAS): examines 'whether Taiwanese motorcyclists turn off their engines when stopped at red lights' using the theory of planned behavior (no percentage). LTN: 總油耗可以節省 26% 之多 / 最好是紅燈秒數超過 20 秒再熄火.",
+   "applicability": "Supports only the statement that nobody has published the observed share. The scenarios use an explicit ASSUMPTION (A17): 0% (heavy), 10% (typical), 30% (low) of queued scooters switch off during a ~90 s red. The IOT report page for the 2018 study '機車兩段式左轉停等紅燈怠速熄火改善空污集中之研析' was not found online."
+  },
+  {
+   "id": "A15-derived-scooters-per-red",
+   "part": "A-scene",
+   "kind": "derived",
+   "claim": "Scooters queued at the end of a red phase on one approach = arrival rate (scooters per hour on the approach) x red duration / 3600, assuming uniform arrivals and that every scooter arriving in red joins the queue.",
+   "values": {
+    "arithmetic": [
+     "IOT busiest junction (Mingcheng 1st / Minzu 1st): 5,974.2 motorcycles per 12 h = 497.9/h for the junction = 124.5/h per approach if split evenly (ASSUMPTION: equal four-way split).",
+     "IOT Boai 2nd / Mingcheng 2nd: 4,810.7/12/4 = 100.2/h per approach. IOT quietest (Gaotie/Chongxin): 818.7/12/4 = 17.1/h per approach.",
+     "Red 83 s (A05): 124.5 x 83/3600 = 2.9 scooters; at 80 s: 2.8; at 130 s: 4.5; quiet junction: 17.1 x 83/3600 = 0.4.",
+     "Peak-hour factor 1.5 (ASSUMPTION, range 1.2-2.0: IOT gives 12-h means and separate morning/evening peaks only as figures) and arterial-over-average share 1.5 (ASSUMPTION, range 1-2: the 30 m Minzu 1st carries more than the 20 m Mingcheng 1st): 124.5 x 2.25 = 280/h x 83/3600 = 6.5 scooters (range about 3 to 13).",
+     "Add turn-box occupants 2.7-9.6 per cycle (A11), say 3 typical: about 9-10 scooters within ~10 m of a corner at a busy arterial junction.",
+     "Heavy peak, Lan & Chang approach: 1,203 scooters/h x 80 s/3600 = 26.7 (all movements); field stop queue 103 across 4 lanes (A12)."
+    ],
+    "result_per_approach_per_red": {
+     "low": "~3 (all-day mean, busiest IOT junction, 80-83 s red)",
+     "typical": "~6-7 on the approach plus ~3 in the turn box = ~9-10",
+     "heavy": "~27 per approach in a 1,200/h peak; up to ~100 across a 4-lane approach at an oversaturated site"
+    }
+   },
+   "measured": "Arithmetic on A04, A05, A11, A13.",
+   "place_year": "derived",
+   "citation": "Derived from IOT-113-TB006 (A04, A05), Chang & Chang 2014 (A11), Lan & Chang 2015 (A12, A13)",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": false,
+   "quote": "n/a (derived)",
+   "applicability": "Per-approach split, peak factor and arterial factor are assumptions. The IOT junction counts are 12-hour means for the whole junction; they imply the queue at the end of an average red is only 3 scooters, much less than the 'pack of 20-30' of the popular image. Large queues need a peak hour on a strongly scooter-loaded arterial. No published queue count per red for a typical Taiwanese junction was found (hole)."
+  },
+  {
+   "id": "A16-derived-stopbox-footprint",
+   "part": "A-scene",
+   "kind": "derived",
+   "claim": "Stop box area and capacity from the dimensions on file: depth 2.5-6 m (A01) x width of one lane (3.2-3.5 m, A09) up to a full four-lane approach (14 m) at 2.2-3.2 m2 per scooter (A10).",
+   "values": {
+    "arithmetic": [
+     "3.2 m x 2.5 m = 8 m2 -> 2.5 (at 3.2 m2 each) to 3.6 (2.2 m2) scooters",
+     "3.5 m x 4 m = 14 m2 -> 4.4 to 6.4 scooters",
+     "3.5 m x 6 m = 21 m2 -> 6.6 to 9.5 scooters",
+     "14 m x 4 m = 56 m2 -> 17.5 to 25 scooters; 14 m x 6 m = 84 m2 -> 26 to 38 scooters",
+     "Lan & Chang observed 16 scooters in the stop box of a four-lane approach (A12), consistent with a partly used 56 m2 box"
+    ],
+    "density_scooters_per_m2": "0.31 to 0.45 (1 per 3.2 to 2.2 m2)"
+   },
+   "measured": "Arithmetic.",
+   "place_year": "derived",
+   "citation": "Derived from A01, A09, A10, A12",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=K0040014",
+   "verified": false,
+   "quote": "n/a (derived)",
+   "applicability": "Box capacity is not the limit at an average junction (queue of 3-7 fits in one lane's box); it matters only in the heavy case."
+  },
+  {
+   "id": "A17-assumption-idle-off-fraction",
+   "part": "A-scene",
+   "kind": "assumption",
+   "claim": "ASSUMPTION: the fraction of queued scooters that switch off for a ~90 s red is 30% (low scenario), 10% (typical), 0% (heavy). Idle-stop-equipped scooters (engine stops itself when stationary) are assumed to be a small share of the fleet (<=5%, range 0-10%) and are not separated out.",
+   "values": {
+    "switch_off_fraction": {
+     "low": 0.3,
+     "typical": 0.1,
+     "heavy": 0.0
+    },
+    "idle_stop_fleet_share_assumed": "<= 0.05 (range 0-0.10)"
+   },
+   "measured": "Assumption.",
+   "place_year": "n/a",
+   "citation": "Basis: no observation exists (A14); IOT advice to switch off above ~20 s of red and stated willingness (A14) argue for a non-zero value; common sight of riders idling argues against a large one.",
+   "url": "",
+   "verified": false,
+   "quote": "n/a",
+   "applicability": "Treat as a labelled assumption with low-high 0-30%. It moves the idling count by at most 30%, much less than the arrival uncertainty."
+  },
+  {
+   "id": "A18-scenarios",
+   "part": "A-scene",
+   "kind": "derived",
+   "claim": "Three scenarios for the scene around a person at the kerb beside the stop box and crosswalk, to hand to the dispersion/box model.",
+   "values": {
+    "low": {
+     "description": "Off-peak or side street; one lane; riders obey stop line; some switch off.",
+     "scooters_queued_within_10m": 3,
+     "fraction_switched_off": 0.3,
+     "idling_scooters": 2,
+     "occupied_area_m2": 8,
+     "area_basis": "one-lane stop box 3.2 m x 2.5 m (A01, A09)",
+     "nearest_exhaust_to_adult_nose_m": "3 (range 2-4): front scooter at the stop line, 2-3 m from the crosswalk edge (A02) plus lateral offset",
+     "nearest_exhaust_to_pushchair_m": "3 (same; horizontal)",
+     "exhaust_height_m": 0.5,
+     "red_duration_s": 90,
+     "turn_box_present": false
+    },
+    "typical": {
+     "description": "Busy arterial junction in a normal peak: ~6-7 queued on the approach plus ~3 in the turn box.",
+     "scooters_queued_within_10m": 9,
+     "fraction_switched_off": 0.1,
+     "idling_scooters": 8,
+     "idling_range": "4-13",
+     "occupied_area_m2": "14-21 (one-lane box 3.5 m x 4-6 m) plus turn box 8 m2",
+     "area_basis": "A09/A16",
+     "nearest_exhaust_to_adult_nose_m": "1.5 (range 0.5-3): creep onto the crosswalk is common (A10); turn-box rear edge >= 0.5 m (A03)",
+     "nearest_exhaust_to_pushchair_m": "1.5 (range 0.5-3); pushchair seat 0.55-0.85 m is level with a 0.5 m tailpipe, so the vertical offset adds ~0.1-0.3 m",
+     "exhaust_height_m": 0.5,
+     "red_duration_s": 90,
+     "turn_box_present": true
+    },
+    "heavy": {
+     "description": "Peak hour at an oversaturated scooter-dominated approach (Lan & Chang site): full-width stop box and kerb-lane queue.",
+     "scooters_queued_within_10m": 27,
+     "scooters_queued_basis": "16 in stop box + ~11 in the kerb-lane queue within 10 m (46 scooters over ~40 m of queue, A12)",
+     "fraction_switched_off": 0.0,
+     "idling_scooters": 27,
+     "idling_range": "20-40",
+     "occupied_area_m2": "56 (14 m x 4 m four-lane box) plus kerb-lane queue ~25 m2",
+     "area_basis": "A16, A12",
+     "nearest_exhaust_to_adult_nose_m": "0.7 (range 0.3-1.5): scooters on the crosswalk, kerb-side lane, scooter width 0.8 m (A09, A10)",
+     "nearest_exhaust_to_pushchair_m": "0.7 (range 0.3-1.5)",
+     "exhaust_height_m": 0.5,
+     "red_duration_s": 90,
+     "turn_box_present": true
+    }
+   },
+   "measured": "Scenario definition from A01-A17.",
+   "place_year": "derived",
+   "citation": "See A01-A17",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": false,
+   "quote": "n/a (derived)",
+   "applicability": "Every number is traceable to a finding or to a labelled assumption. 'Typical' is built from IOT 2024 counts and two 25-year-old turn-box counts, and the 'heavy' case is a single oversaturated site; present 'low-typical-heavy' as a range, not a statistic of Taiwanese junctions. The pedestrian-to-exhaust distances are reasoned from marking rules and one behavioural study, not measured."
+  },
+  {
+   "id": "B01-who-2021-co",
+   "part": "B-reference",
+   "claim": "WHO 2021 carbon monoxide guideline values by averaging time: 24-hour 4 mg/m3 (new in 2021, 99th percentile of daily values, i.e. 3-4 exceedance days a year); the 8-hour 10, 1-hour 35 and 15-minute 100 mg/m3 values were not re-evaluated in 2021 and 'remain valid' (they come from WHO's earlier indoor/Europe guidelines).",
+   "values": {
+    "24-hour_mg_m3": 4,
+    "8-hour_mg_m3": 10,
+    "1-hour_mg_m3": 35,
+    "15-minute_mg_m3": 100,
+    "as_ppm_using_WHO_factor_1ppm=1.165mg_m3_at_20C": {
+     "24-hour": 3.4,
+     "8-hour": 8.6,
+     "1-hour": 30.0,
+     "15-minute": 85.8
+    }
+   },
+   "measured": "Health-based guideline values (MI hospital admissions for the 24-h value; COHb criteria for short values).",
+   "place_year": "WHO, 2021",
+   "citation": "WHO global air quality guidelines: particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon monoxide. Geneva: World Health Organization; 2021. ISBN 9789240034228. Table 0.2, Table 3.23-3.25 (pp. 133-135 of the printed book). Read in a 300-page copy of the WHO PDF hosted on a third-party site; the WHO press note (Table 1) gives the same 24-h value.",
+   "url": "https://www.who.int/publications/i/item/9789240034228 (full PDF mirror read: https://assets-global.website-files.com/61822390f9078179b84556a4/61afe06d1187005644448835_WHO-2021-AQ-Guidelines.pdf)",
+   "verified": true,
+   "quote": "Table 3.25. Air quality guidelines for nitrogen dioxide, sulfur dioxide and carbon monoxide (for short averaging times) that remain valid: CO, mg/m3 8-hour 10; 1-hour 35; 15-minute 100. Table 3.23: AQG level 4 (24-hour, 99th percentile). 'Conversion factors: at 20 °C and 1013 hPa, 1 ppm = 1.165 mg/m3'.",
+   "applicability": "FAIR for a 90 s exposure: the 15-minute value (100 mg/m3 = 86 ppm) is the closest averaging time; a 90 s peak diluted into 15 min contributes 10% of the peak. A 1-minute kerb peak of ~1 ppm is ~1% of it. NOT FAIR: 24-hour (4 mg/m3 = 3.4 ppm) and 8-hour values are daily-dose protections; a 90 s exposure cannot exceed them in the arithmetic sense and exceeding them is not the question. Use the 24-h value only to say 'the daily guideline is 3.4 ppm, ordinary traffic-station annual means are 0.5 ppm'."
+  },
+  {
+   "id": "B02-taiwan-ambient-standards",
+   "part": "B-reference",
+   "claim": "Taiwan's Air Quality Standards as amended 2024-09-30 and printed in the MOENV 2025 annual report: CO 1-hour 31 ppm, 8-hour 9 ppm; PM2.5 24-hour 30 ug/m3, annual 12 ug/m3; PM10 24-h 75, annual 30; NO2 1-hour 0.100 ppm, annual 0.021 ppm. There is NO ambient benzene standard and no particle-number standard in the table.",
+   "values": {
+    "CO_1h_ppm": 31,
+    "CO_8h_ppm": 9,
+    "CO_in_mg_m3_at_20C": {
+     "1h": 36.1,
+     "8h": 10.5
+    },
+    "PM2.5_24h_ug_m3": 30,
+    "PM2.5_annual_ug_m3": 12,
+    "benzene": "none in the table",
+    "UFP_number": "none in the table"
+   },
+   "measured": "Legal standards.",
+   "place_year": "Taiwan, amended 2024-09-30; AQI thresholds tightened from 2025",
+   "citation": "環境部 MOENV. 114年空氣品質監測年報 / Air Quality Annual Report of R.O.C. (Taiwan), 2025. Table 2-2 (p.2-3)",
+   "url": "https://service.moenv.gov.tw/File/Get/moenv/zh-tw/VKuWKdIp1pJZHmU",
+   "verified": true,
+   "quote": "環境部於 113 年 9 月 30 日修正發布空氣品質標準 ... 粒徑小於 2.5 微米之懸浮微粒(PM2.5) 24 小時值 30 μg/m3 年平均 12 μg/m3 ... 一氧化碳(CO) 小時平均值 31 ppm 8 小時平均值 9 ppm",
+   "applicability": "IMPORTANT correction for the site: the PM2.5 24-h standard is now 30 (not the older 35) and annual 12 (not 15). Taiwan's CO 1-h and 8-h standards are about equal to WHO's 35 and 10 mg/m3; they are daily-exposure standards, not 90 s criteria. Fair: only the CO 1-h standard (31 ppm) as an outer bound. Check repo src/data for the older 35/15 PM2.5 values."
+  },
+  {
+   "id": "B03-moenv-co-pm25-annual-2025",
+   "part": "B-reference",
+   "claim": "2025 annual means at Taiwan's MOENV stations: CO traffic stations (6) 0.54 ppm, general stations 0.24 ppm, park stations 0.15 ppm, all stations 0.26 +/- 0.10 ppm; trend at traffic stations 0.98 ppm (2016) to 0.54 (2025), 0.61 in 2024. PM2.5 all stations 13.4 +/- 3.2 ug/m3; traffic stations 15.4; park 6.6.",
+   "values": {
+    "CO_traffic_ppm": {
+     "2024": 0.61,
+     "2025": 0.54
+    },
+    "CO_general_ppm": 0.24,
+    "CO_all_stations_ppm": 0.26,
+    "PM2.5_all_ug_m3": 13.4,
+    "PM2.5_traffic_ug_m3": 15.4,
+    "PM2.5_park_ug_m3": 6.6,
+    "NMHC_traffic_ppmC": 0.17,
+    "THC_traffic_ppmC": 2.28
+   },
+   "measured": "Regulatory station annual means of hourly data (NDIR for CO; BAM/manual for PM2.5).",
+   "place_year": "Taiwan, 2025 (and 2024)",
+   "citation": "環境部 MOENV. 114年空氣品質監測年報 / Air Quality Annual Report of R.O.C. (Taiwan), 2025. Table 3-6, Table 3-20, Table 3-23, summary p.iii",
+   "url": "https://service.moenv.gov.tw/File/Get/moenv/zh-tw/VKuWKdIp1pJZHmU",
+   "verified": true,
+   "quote": "一氧化碳(CO)：以交通測站年平均濃度 0.54 ppm 最高、公園測站 0.15 ppm 最低 ... PM2.5 年平均 13.4±3.2 μg/m3 ... 以交通測站年平均濃度 15.4 μg/m3 最高",
+   "applicability": "Annual means only; the report prints no hourly maxima (hole). Station inlets are elevated and away from the stop line, so these are a floor for kerb air, not the kerb itself (Wu 2021: BTEX at stations r<=0.38 with street level)."
+  },
+  {
+   "id": "B04-iot-station-hourly-and-kerb-co",
+   "part": "B-reference",
+   "claim": "Hourly CO at the stations near the IOT junctions in July 2024 spanned 0.03-0.90 ppm (Banqiao 0.16-0.90; Zuoying 0.09-0.56; Aiguo 0.03-0.28 and 0.08-0.52). 1-minute CO at the pedestrian waiting zones peaked at about 0.5-0.62 ppm at three Kaohsiung junctions and about 1.3 ppm at Mingcheng 1st / Minzu 1st after the crosswalk setback (11 July).",
+   "values": {
+    "station_hourly_ppm": "0.03 to 0.90",
+    "kerb_1min_peaks_ppm": "0.5, 0.5, 0.62, ~1.3"
+   },
+   "measured": "Micro-sensor (electrochemical) at 1.2-1.5 m, 1.0-1.5 m from the crosswalk line, 1-min records; station NDIR hourly.",
+   "place_year": "Kaohsiung and New Taipei, July 2024",
+   "citation": "Hung P-Y (洪珮瑜), Chen K-N, Su C-T, et al. 路口交通環境特性對空氣品質影響及改善指引之研訂(2/2). 交通部運輸研究所 (MOTC Institute of Transportation), IOT-113-TB006 (114-084-6228), Dec 2025. Sec. 3.2.1 (p.3-44) and Sec. 3.3.2 (p.3-60 to 3-65)",
+   "url": "https://www.iot.gov.tw/uploads/column_entry_file/file/697879c4085777f955e15ddf/%E8%B7%AF%E5%8F%A3%E4%BA%A4%E9%80%9A%E7%92%B0%E5%A2%83%E7%89%B9%E6%80%A7%E5%B0%8D%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E5%BD%B1%E9%9F%BF%E5%8F%8A%E6%94%B9%E5%96%84%E6%8C%87%E5%BC%95%E4%B9%8B%E7%A0%94%E8%A8%82_2.2_.pdf",
+   "verified": true,
+   "quote": "環境部板橋空品監測站 7 月 8 日至 7 月 12 日之小時平均值介於 0.16ppm 至 0.90ppm ... 在 7 月 5 日的 19 點 13 分達到 0.5ppm ... 在 7 月 5 日的上午 8 點左右達到 0.62ppm ... 最大值也出現 7 月 11 日退縮後所測得之 1.3ppm 左右",
+   "applicability": "The only Taiwanese measured kerb CO anchor: kerb 1-minute peaks of ~0.5-1.3 ppm are 1-2 x the hourly station range. Sensors sit beside the crosswalk, not beside a pack of idling scooters, so an estimate for a person 1-2 m from 10-30 idling scooters can legitimately exceed them; it should not exceed them by orders of magnitude without a stated reason. Low-cost sensor: a 0.5 ppm peak is near its resolution."
+  },
+  {
+   "id": "B05-who-2021-pm25",
+   "part": "B-reference",
+   "claim": "WHO 2021 PM2.5 guideline: 24-hour 15 ug/m3 (99th percentile) and annual 5 ug/m3. Taiwan's own 2024 standard: 24-h 30, annual 12.",
+   "values": {
+    "WHO_24h_ug_m3": 15,
+    "WHO_annual_ug_m3": 5,
+    "Taiwan_24h_ug_m3": 30,
+    "Taiwan_annual_ug_m3": 12
+   },
+   "measured": "Health-based guideline.",
+   "place_year": "WHO 2021; Taiwan 2024",
+   "citation": "WHO global air quality guidelines: particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon monoxide. Geneva: World Health Organization; 2021. ISBN 9789240034228. Table 3.24; WHO press information note Table 1 (read separately at Swiss TPH mirror)",
+   "url": "https://www.who.int/publications/i/item/9789240034228",
+   "verified": true,
+   "quote": "Table 3.24: PM2.5, ug/m3 Annual ... 5; 24-hour (a) ... 15 (a: 99th percentile, i.e. 3-4 exceedance days per year)",
+   "applicability": "NOT FAIR for 90 s: the 24-h value is a daily mean. PM2.5 mass is a poor discriminator for scooter exhaust (scooters ~1% of TEDS PM2.5) and IOT waiting-zone PM2.5 was 4-14 ug/m3, near background (finding B03). Fair use: 'PM2.5 beside idling scooters is within the range people breathe anywhere in Taipei (walking median 42.7 in Chuang 2020)'. Riders in the 2019 MOENV Taipei commute study had a peak of 201 ug/m3 near turn boxes/old vehicles (quoted in the IOT report p.1-2, underlying study not opened)."
+  },
+  {
+   "id": "B06-who-ufp-good-practice",
+   "part": "B-reference",
+   "claim": "WHO 2021 good-practice statement 3 on ultrafine particles: low particle number concentration (PNC) can be considered < 1,000 particles/cm3 (24-hour mean); high PNC > 10,000 particles/cm3 (24-hour mean) or > 20,000 particles/cm3 (1-hour mean). The rationale calls 10,000 /cm3 'typical urban background' and 20,000 /cm3 'levels found usually in all urban microenvironments'. These are NOT guideline levels.",
+   "values": {
+    "low_24h_per_cm3": "< 1,000",
+    "high_24h_per_cm3": "> 10,000",
+    "high_1h_per_cm3": "> 20,000",
+    "size_range": "lower limit <= 10 nm, no upper limit"
+   },
+   "measured": "Expert-judgement good practice statement.",
+   "place_year": "WHO, 2021",
+   "citation": "WHO global air quality guidelines: particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon monoxide. Geneva: World Health Organization; 2021. ISBN 9789240034228. Table 0.3 (p. xxvi) and Sec. 4.3.2-4.3.3 (pp. 152-153)",
+   "url": "https://www.who.int/publications/i/item/9789240034228 (mirror: https://assets-global.website-files.com/61822390f9078179b84556a4/61afe06d1187005644448835_WHO-2021-AQ-Guidelines.pdf)",
+   "verified": true,
+   "quote": "Distinguish between low and high PNC to guide decisions on the priorities of UFP source emission control. Low PNC can be considered < 1 000 particles/cm3 (24-hour mean). High PNC can be considered > 10 000 particles/cm3 (24-hour mean) or 20 000 particles/cm3 (1-hour mean).",
+   "applicability": "The nearest fair comparator for a short PNC estimate is the 1-hour high threshold of 20,000 /cm3, with the caveat that a 90 s kerb mean is much shorter than 1 hour. Measurement window matters: WHO counts >= 10 nm; many Taiwanese studies start at 10-20 nm (Cheung 2013: 10-429 nm; Chang & Hsiao 2026 model: 20-100 nm only)."
+  },
+  {
+   "id": "B07-taipei-urban-background-pnc",
+   "part": "B-reference",
+   "claim": "Taipei urban site (rooftop observatory, TARO), July 2012: mean total particle number (10-429 nm) 13,900 /cm3 (median 8,400; SD 13,100; n=603 hourly values), 17,100 on non-typhoon days and 7,000 in the cyclonic period; ultrafine (<=100 nm) = 91% of the number; peaks at traffic hours.",
+   "values": {
+    "mean_per_cm3": 13900,
+    "median_per_cm3": 8400,
+    "sd": 13100,
+    "non_cyclonic_mean": 17100,
+    "cyclonic_mean": 7000,
+    "ufp_fraction": 0.91
+   },
+   "measured": "SMPS particle number 10-429 nm, hourly, top floor of a building (not at kerb).",
+   "place_year": "Taipei, 4-29 July 2012",
+   "citation": "Cheung HC, Chou CC-K, Huang W, Tsai C-Y (2013). Characterization of ultrafine particle number concentration and new particle formation in an urban environment of Taipei, Taiwan. Atmos. Chem. Phys. 13:8935-8946, doi:10.5194/acp-13-8935-2013",
+   "url": "https://acp.copernicus.org/articles/13/8935/2013/acp-13-8935-2013.pdf",
+   "verified": true,
+   "quote": "Table 1, whole period 4-29 Jul 2012: Ntotal average 13.9 x 10^3, median 8.4 x 10^3, S.D. 13.1 x 10^3, n = 603 (cm-3)",
+   "applicability": "Urban-background anchor for Taipei: ~10-17 thousand /cm3, matching WHO's 'typical urban background' 10,000. Includes photochemical nucleation in daytime, so roadside is not simply additive. 2012 fleet."
+  },
+  {
+   "id": "B08-taiwan-roadside-pnc",
+   "part": "B-reference",
+   "claim": "Roadside UFP number at an urban industrial-park area in Taiwan (six-week seasonal campaigns): industrial roadside 38,000 +/- 9,000 /cm3, residential roadside 25,000 +/- 8,000, urban background 23,000 +/- 9,000; the authors state these exceed the WHO 2021 'high' level.",
+   "values": {
+    "industrial_roadside_per_cm3": "38,000 +/- 9,000",
+    "residential_roadside_per_cm3": "25,000 +/- 8,000",
+    "urban_background_per_cm3": "23,000 +/- 9,000",
+    "BC_ng_m3": "2,500 / 1,900 / 1,400"
+   },
+   "measured": "Fixed-site UFP number (instrument and size range not in the abstract) and black carbon, seasonal campaigns.",
+   "place_year": "Taiwan (urban industrial park area; city not in abstract), published 2024",
+   "citation": "Abdillah SFI, You S-J, Wang Y-F (2024). Characterizing Traffic-Related Ultrafine Particles in Roadside Microenvironments: Spatiotemporal Insights from Industrial Parks. Aerosol Air Qual. Res. 24(5):230295, doi:10.4209/aaqr.230295",
+   "url": "https://doi.org/10.4209/aaqr.230295",
+   "verified": false,
+   "quote": "Abstract (read via OpenAlex): 'IN (38,000 +/- 9,000 # cm-3 and 2,500 +/- 600 ng m-3) > RS (25,000 +/- 8,000 # cm-3 and 1,900 +/- 300 ng m-3) > UB (23,000 +/- 9,000 # cm-3 and 1,400 +/- 300 ng m-3)'",
+   "applicability": "Fixed roadside sites, not a signal stop; time-mean of a whole campaign. Gives the Taiwanese roadside ordinary level: tens of thousands per cm3. A pack of idling scooters adds on top, but Chien & Huang 2010 found idle PN no higher than moving (repo). Publisher page blocked (403): abstract only, hence verified=false."
+  },
+  {
+   "id": "B09-benzene-eu-limit",
+   "part": "B-reference",
+   "claim": "EU benzene limit value, annual mean (calendar year): 5 ug/m3 (Directive 2008/50/EC, in force to 2030), tightened to 3.4 ug/m3 from 1 January 2030 (Directive (EU) 2024/2881, Annex I Table 1); WHO-aligned 2030 'indicative' reference 1.7 ug/m3. Carbon monoxide EU 8-h limit 10 mg/m3, 24-h 4 mg/m3 from 2030.",
+   "values": {
+    "annual_limit_ug_m3_until_2030": 5,
+    "annual_limit_ug_m3_from_2030": 3.4,
+    "WHO_indicative_ug_m3": 1.7,
+    "ppb_equivalents_25C": {
+     "5": 1.6,
+     "3.4": 1.1,
+     "1.7": 0.53
+    }
+   },
+   "measured": "Legal limit (annual mean).",
+   "place_year": "EU, 2008 and 2024",
+   "citation": "Directive 2008/50/EC Annex XI; Directive (EU) 2024/2881 of 23 Oct 2024, Annex I Section 1 Table 1 and Annex I Section 2",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008L0050 ; https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L2881",
+   "verified": true,
+   "quote": "2008/50: 'Benzene Calendar year 5 ug/m3'; 2024/2881 Table 1 (to be attained by 1 January 2030): 'Benzene Calendar year 3,4 ug/m3'; Annex I Section 2: 'Benzene 1,7 ug/m3'",
+   "applicability": "NOT FAIR for a 90 s exposure: an annual-average limit is a lifetime-risk benchmark; a 90 s peak above it says nothing about breaching it. Fair use only as 'ambient benzene in European cities is regulated to ~1.1-1.6 ppb annual average; Taipei ambient is ~2.5 ppb (B12)'. Do not compute '90 s dose as a fraction of the annual limit' without saying that benzene has no safe level (WHO)."
+  },
+  {
+   "id": "B10-benzene-who-reference",
+   "part": "B-reference",
+   "claim": "WHO benzene reference value for lifetime exposure 1.7 ug/m3 (at excess lifetime leukaemia risk of 1 in 100,000, from a WHO unit risk of about 6 x 10^-6 per ug/m3, WHO Air Quality Guidelines for Europe, 2000). WHO says no safe level of exposure can be recommended.",
+   "values": {
+    "reference_ug_m3_1_in_100000": 1.7,
+    "unit_risk_per_ug_m3_WHO_2000": "6e-6 (from memory of WHO 2000; not opened)",
+    "TCEQ_unit_risk_per_ug_m3": "2.2e-6 (opened, B13)",
+    "EU_annual_limit": "5 ug/m3 (B09)"
+   },
+   "measured": "Cancer risk assessment, lifetime average.",
+   "place_year": "WHO 2000 / 2021 reference",
+   "citation": "WHO Regional Office for Europe (2000). Air Quality Guidelines for Europe, 2nd ed., ch. 5.2 Benzene (WHO Regional Publications European Series No. 91); the 1.7 ug/m3 reference value as restated by IRCELINE (Belgian Interregional Environment Agency), 'What are the guidelines drafted by the World Health Organisation?'",
+   "url": "https://www.irceline.be/en/documentation/faq/what-are-the-guidelines-drafted-by-the-world-health-organisation",
+   "verified": false,
+   "quote": "IRCELINE table: 'Benzene reference value calendar year 1.7 ug/m3' (2005 and 2021 columns). WHO 2000 chapter itself not opened (euro.who.int not reachable from this session).",
+   "applicability": "Lifetime-average risk benchmark: NOT a short-term comparator. The WHO unit risk (about 6e-6 per ug/m3) is per lifetime of continuous exposure; for 90 s a day for 70 years the average is 1/960 of the peak. Verify the WHO numbers against the primary chapter (needsManualFetch)."
+  },
+  {
+   "id": "B11-benzene-short-term-values",
+   "part": "B-reference",
+   "claim": "Short-term benzene reference values from agencies: ATSDR provisional acute-duration (1-14 days) inhalation MRL 0.009 ppm (9 ppb, 0.03 mg/m3); Texas TCEQ acute 1-hour ReV 580 ug/m3 (180 ppb) and 1-hour short-term ESL 170 ug/m3 (54 ppb), 24-hour ReV 320 ug/m3 (100 ppb); California OEHHA acute 1-hour REL 27 ug/m3 (about 8 ppb). All three rest on the same kind of evidence: depressed lymphocyte counts / immune function in mice (Rozen 1984; OEHHA: developmental haematotoxicity in fetal/neonatal mice).",
+   "values": {
+    "ATSDR_acute_MRL_ppb": 9,
+    "ATSDR_basis": "LOAEL 10.2 ppm mice, 6 h/d x 6 d, human-equivalent 2.55 ppm, UF 300",
+    "TCEQ_acute_ReV_1h_ug_m3": 580,
+    "TCEQ_acute_ESL_1h_ug_m3": 170,
+    "TCEQ_acute_ReV_24h_ug_m3": 320,
+    "OEHHA_acute_REL_1h_ug_m3": 27,
+    "OEHHA_REL_in_ppb_25C": 8.5,
+    "90s_equivalent": "a 90 s mean of C contributes C x 90/3600 = C/40 to a 1-hour mean"
+   },
+   "measured": "Health-based acute reference values derived from animal studies with uncertainty factors.",
+   "place_year": "ATSDR draft profile Oct 2024 (MRL unchanged from 2007 final); TCEQ DSD 2007, rev. 2015; OEHHA 2014",
+   "citation": "ATSDR (2024) Toxicological Profile for Benzene, Draft for Public Comment, Oct 2024, Table 1-1 and MRL worksheet; TCEQ (2015) Benzene Development Support Document, Table 1 and Sec. 3.1.7; OEHHA (2014) Acute, 8-hour and chronic RELs for benzene (notice of adoption, as summarised by search results)",
+   "url": "https://www.atsdr.cdc.gov/toxprofiles/tp3.pdf ; https://www.tceq.texas.gov/downloads/toxicology/dsd/final/benzene.pdf ; https://oehha.ca.gov/air/crnr/notice-adoption-revised-reference-exposure-levels-benzene",
+   "verified": true,
+   "quote": "ATSDR: 'Provisional MRL: 0.009 ppm (0.03 mg/m3); Critical Effect: Hematological/Immunological; Reference: Rozen et al. 1984; Uncertainty Factor: 300'. TCEQ Table 1: 'acute ESL [1 h] (HQ = 0.3) 170 ug/m3 (54 ppb); acute ReV [1 h] (HQ = 1.0) 580 ug/m3 (180 ppb); acute ReV [24 h] 320 ug/m3 (100 ppb)'. OEHHA value 27 ug/m3 only from search-result text (site blocks automated access).",
+   "applicability": "FAIR (closest available) comparison for a 90 s benzene estimate: the 1-hour values (OEHHA 27, TCEQ ESL 170 ug/m3), after converting the 90 s peak to a 1-hour average (divide by 40 if the person stands there once). A 90 s peak at 100 ppb benzene would be a 1-h-average contribution of 2.5 ppb. NOT FAIR: comparing a 90 s peak with the ATSDR 14-day MRL, or with annual limits. ATSDR's MRL is a screening value 'without appreciable risk'; exceeding it does not mean harm. ATSDR figure is from a DRAFT profile (2024)."
+  },
+  {
+   "id": "B12-taipei-ambient-benzene",
+   "part": "B-reference",
+   "claim": "Taipei ambient and commuter-level benzene: the Wu et al. 2021 health-impact model used an ambient benzene background of 2.54 ppb (study median at Wanhua PAMS times 0.90 indoor/outdoor factor; about 8 ug/m3). On-road time-integrated benzene averaged about 2.6 ppb for cyclists and about 4.2 ppb for electric-scooter riders (chart readings, Fig. 2; means; total BTEX 20.07 and 33.96 ppb), morning rush about 1.9x afternoon. Station-vs-street BTEX correlation r = -0.01 to 0.38.",
+   "values": {
+    "ambient_background_ppb": 2.54,
+    "cyclist_benzene_ppb_chart": 2.6,
+    "electric_scooter_rider_benzene_ppb_chart": 4.2,
+    "total_BTEX_ppb": {
+     "cyclists": 20.07,
+     "scooter_riders": 33.96
+    },
+    "rush_to_non_rush_ratio": 1.9,
+    "in_ug_m3_at_25C": {
+     "2.54ppb": 8.1,
+     "4.2ppb": 13.4
+    }
+   },
+   "measured": "Personal time-integrated BTEX sampling along commuter routes plus Wanhua PAMS.",
+   "place_year": "Taipei, 2017-2019 (published 2021)",
+   "citation": "Wu T-G, Chang J-C, Huang S-H, Lin W-Y, Chan C-C, Wu C-F (2021). Exposures and health impact for bicycle and electric scooter commuters in Taipei. Transp. Res. D 91:102696, doi:10.1016/j.trd.2021.102696 (figures as extracted from the full text by an earlier checker, repo research/papers/wu-2021-trd.json; not re-opened by me)",
+   "url": "https://doi.org/10.1016/j.trd.2021.102696",
+   "verified": false,
+   "quote": "Repo extraction: 'backgrounds 13.46 ug/m3 PM2.5 and 2.54 ppb benzene'; 'The average exposures of total BTEX and PM2.5 were 20.07 ppb and 23.27 ug/m3 for the cyclists and 33.96 ppb and 27.65 ug/m3 for the motorcyclists'; benzene species means read from Fig. 2.",
+   "applicability": "Closest Taiwanese street-level benzene numbers: 2.5-4 ppb typical, over time-integrated commutes (tens of minutes), mixed traffic, electric scooters (no own exhaust). A kerb estimate for the 90 s red must be read against this: the background already is 2.5-4 ppb benzene, so any scooter increment of a few ppb is the same order as ordinary Taipei street air; a 10x claim would need a reason."
+  },
+  {
+   "id": "B13-benzene-pams-risk",
+   "part": "B-reference",
+   "claim": "Taiwan PAMS network review 2006-2024 (nine sites): aromatics and alkenes fell 47-82%; benzene excess cancer risk 2.2e-6 to 7.8e-6 across sites and periods (urban Wanhua and Tucheng high from traffic; industrial Xiaogang 6.2e-6 before 2010, 3.2e-6 since 2020). Concentration values not in the abstract.",
+   "values": {
+    "benzene_excess_cancer_risk_range": "2.2e-6 to 7.8e-6",
+    "benzene_decline": "aromatics -47% to -82%",
+    "hole": "annual benzene ppb by site not retrieved (MDPI blocked)"
+   },
+   "measured": "Hourly PAMS VOC data, risk assessment.",
+   "place_year": "Taiwan, 2006-2024 (published 2026-02-10)",
+   "citation": "Hsieh Y-H, Brimblecombe P, Lai Y-T (2026). Long-Term Change in Volatile Organic Compounds in Taiwan (2006-2024) - An Analytical Review. Environments 13(2):94, doi:10.3390/environments13020094 (abstract via Crossref)",
+   "url": "https://doi.org/10.3390/environments13020094",
+   "verified": false,
+   "quote": "Crossref abstract: 'Benzene posed cancer risks (range 2.2 x 10-6 - 7.8 x 10-6) across sites and periods'",
+   "applicability": "Shows Taiwanese urban benzene has fallen and is of the order 1 ppb (risk ~5e-6 / WHO unit risk 6e-6 per ug/m3 -> ~1 ug/m3 -> ~0.3 ppb; this inference depends on which unit risk the authors used, so treat as order of magnitude only). Fetch the full text to get annual ppb at Wanhua and Tucheng (needsManualFetch)."
+  },
+  {
+   "id": "B14-taiwan-no-benzene-standard",
+   "part": "B-reference",
+   "claim": "Taiwan's Air Quality Standards (MOENV, amended 2024-09-30) have no benzene entry; benzene is monitored at PAMS sites as a toxic VOC but is not regulated by an ambient standard.",
+   "values": {
+    "standard_exists": false
+   },
+   "measured": "Absence in table.",
+   "place_year": "Taiwan, 2024-2025",
+   "citation": "環境部 MOENV. 114年空氣品質監測年報 / Air Quality Annual Report of R.O.C. (Taiwan), 2025. Table 2-2",
+   "url": "https://service.moenv.gov.tw/File/Get/moenv/zh-tw/VKuWKdIp1pJZHmU",
+   "verified": true,
+   "quote": "Table 2-2 lists PM10, PM2.5, SO2, NO2, CO, O3 and Pb only.",
+   "applicability": "Do not say 'above the Taiwan standard' for benzene. The honest comparison is the EU limit (B09) and agency short-term values (B11)."
+  },
+  {
+   "id": "B15-odour-thresholds",
+   "part": "B-reference",
+   "claim": "Odour detection thresholds (triangle odour bag method, panel): acrolein 0.0036 ppm, acetaldehyde 0.0015, styrene 0.035, ethylbenzene 0.17, toluene 0.33, formaldehyde 0.50, isopentane 1.3, benzene 2.7, 2-methylpentane 7.0 ppm. CO is odourless.",
+   "values": {
+    "acetaldehyde_ppm": 0.0015,
+    "acrolein_ppm": 0.0036,
+    "styrene_ppm": 0.035,
+    "ethylbenzene_ppm": 0.17,
+    "toluene_ppm": 0.33,
+    "formaldehyde_ppm": 0.5,
+    "isopentane_ppm": 1.3,
+    "benzene_ppm": 2.7,
+    "two_methylpentane_ppm": 7.0,
+    "benzene_other_sources_ppm": "1.5 (EPA/ATSDR) to 97 (AIHA) per repo facts"
+   },
+   "measured": "Human panel, triangle odour bag, single compounds in clean air.",
+   "place_year": "Japan, 1976-1988 experiments (Nagata, JESC)",
+   "citation": "Nagata Y. Measurement of Odor Threshold by Triangle Odor Bag Method, Japan Environmental Sanitation Center (Ministry of the Environment, Japan, publication)",
+   "url": "https://www.env.go.jp/content/900450144.pdf",
+   "verified": true,
+   "quote": "Table: Formaldehyde 0.50; Acetaldehyde 0.0015; Acrolein 0.0036; Isopentane 1.3; 2-Methylpentane 7.0; Benzene 2.7; Toluene 0.33; Styrene 0.035; Ethylbenzene 0.17 (ppm, v/v)",
+   "applicability": "Use to say what the smell is NOT: a smell of exhaust at the kerb implies tens to hundreds of ppb of aldehydes or low-ppm hydrocarbons, but benzene itself (2.7 ppm = 2,700 ppb) would be far above any ambient benzene estimate; so the smell does not measure benzene or CO. Orders of magnitude only; person-to-person variation 10x."
+  },
+  {
+   "id": "B16-fairness-of-comparisons",
+   "part": "B-reference",
+   "kind": "derived",
+   "claim": "Which comparisons are fair for a 90-second exposure, and which are not.",
+   "values": {
+    "fair": [
+     "CO: WHO 15-minute guideline 100 mg/m3 (86 ppm) and 1-hour 35 mg/m3 (30 ppm); Taiwan 1-hour standard 31 ppm. Convert a 90 s peak into a 15-min average by multiplying by 0.1 (or a 1-h average by 0.025).",
+     "CO: measured Taiwanese kerb 1-minute peaks 0.5-1.3 ppm and hourly station 0.03-0.90 ppm (IOT, July 2024), as the empirical anchor.",
+     "Benzene: 1-hour acute values (OEHHA REL 27 ug/m3; TCEQ ESL 170 ug/m3) after dividing the 90 s peak by 40; plus the ambient/commuter benzene already present (Taipei 2.5-4 ppb).",
+     "UFP: the WHO 1-hour 'high' threshold 20,000 /cm3 and measured Taiwanese roadside means 25,000-38,000 /cm3 as the comparator (noting differing size windows).",
+     "PM2.5: Taipei sidewalk/walking personal readings (median 40; walking mean 42.7) and station annual means 13-15, to show how a scooter pack compares with ordinary street air."
+    ],
+    "not_fair": [
+     "WHO 24-hour or 8-hour CO guidelines and Taiwan's 8-hour standard: these are daily doses; 90 s cannot be compared as a ratio.",
+     "Annual-mean standards or guidelines for benzene (EU 5 -> 3.4 ug/m3, WHO 1.7 ug/m3) and PM2.5 (WHO 5, Taiwan 12), and unit-risk calculations: they describe lifetime-average exposure. A 90 s peak above an annual limit is not a breach.",
+     "ATSDR 1-14 day acute MRL (9 ppb) or the TCEQ 24-hour ReV against a 90 s peak: duration mismatch.",
+     "WHO UFP 24-hour 'low' (<1,000) and 'high' (>10,000) thresholds against a 90 s kerb count.",
+     "Odour thresholds against toxic dose: smell is not a measure of CO or benzene."
+    ],
+    "unit_conversions": {
+     "CO_WHO": "1 ppm = 1.165 mg/m3 at 20 C (WHO 2021 p.130); 1 ppm = 1.145 at 25 C",
+     "benzene_25C": "1 ppb = 3.19 ug/m3",
+     "90s_into_15min": 0.1,
+     "90s_into_1h": 0.025
+    }
+   },
+   "measured": "Reasoned from B01-B15.",
+   "place_year": "derived",
+   "citation": "See B01-B15",
+   "url": "",
+   "verified": false,
+   "quote": "n/a (derived)",
+   "applicability": "Make the page say plainly: the estimate is a short peak, the benchmarks are mostly daily/annual, so the right message is 'where it sits among things you know', not 'above/below the limit'."
+  }
+ ],
+ "holes": [
+  "No published count of scooters queued per red phase for a typical Taiwanese junction was found; the typical case is arithmetic from IOT 12-h junction counts with assumed split, peak and arterial factors (A15).",
+  "IOT-113-TB006 gives junction totals only; per-approach, per-minute and per-cycle counts (including two-stage turn-box waiting counts) are in video-derived appendices or figures not extracted from the PDF text. Phase diagrams (Fig. 2.2.4-7, 3.1.3-1 to 3.1.3-6) are images; red duration per approach is inferred.",
+  "No observed fraction of Taiwanese riders who switch off at a red light and no fleet share of idle-stop scooters were found; both are assumptions (A14, A17). The 2018 IOT report on two-stage-left-turn idle switch-off could not be located.",
+  "No Taiwanese measurement of the distance between waiting pedestrians and idling scooters; the 0.3-3 m range rests on marking rules (A02, A03) and a ~2000 behavioural study (A10).",
+  "Stop-box and turn-box occupancy studies (許添本 1998, 2000, 2001; 游恕信 2012 thesis; 運輸計劃季刊 37(3):263-284 (2008) on stop-queue discharge and capacity) were not opened; their numbers are used only as reported by the 2014 review.",
+  "Motorcycle passenger-car-equivalent and saturation-flow values for Taiwan not retrieved (Lan & Chang paper argues PCE methods overstate queue length).",
+  "Lane widths of Taiwanese urban roads (市區道路及附屬工程設計規範) were not checked; the 設置規則 sets stop box depth and clearances but not lane or box widths. Used 3.2-3.5 m from the review.",
+  "No hourly maxima or percentile distribution for CO at Taiwanese traffic/general stations in 2024-2025 (the annual report prints annual means; the MOENV open-data API needs a key). Only annual means and July 2024 hourly ranges at three stations are available.",
+  "Annual benzene (ppb) at Taiwanese PAMS traffic/urban sites and any roadside benzene by signal phase not retrieved; Hsieh 2026 full text blocked.",
+  "WHO benzene unit risk (6e-6 per ug/m3) and 1.7 ug/m3 reference not read in the WHO 2000 primary chapter; OEHHA acute REL 27 ug/m3 not read on the OEHHA site. Both are second-hand here.",
+  "Taiwanese kerb-side UFP number during a red light does not exist; only fixed roadside means (B08) and urban background (B07). PM2.5 and CO at the kerb by signal phase: not reported by IOT in the text read."
+ ],
+ "needsManualFetch": [
+  "https://www.ncbi.nlm.nih.gov/books/NBK574591/ (WHO 2021 AQG, NCBI Bookshelf; bot-check blocked) - confirm Table 3.25 and the UFP statements against the official PDF (I read a third-party copy of the WHO PDF)",
+  "https://iris.who.int/items/5b0ca7ab-830a-44b8-b99f-4ee743b4d7b2 (official WHO IRIS PDF; the automated download returned only 8 pages)",
+  "https://www.ncbi.nlm.nih.gov/books/NBK138699/ (WHO Guidelines for Indoor Air Quality: Selected Pollutants, 2010; bot-check) - origin of CO 15-min/1-h/8-h and benzene 1.7 ug/m3 text",
+  "WHO Regional Office for Europe (2000) Air Quality Guidelines for Europe 2nd ed., ch. 5.2 Benzene and 5.5 Carbon monoxide (euro.who.int PDF links not reachable from this session)",
+  "https://oehha.ca.gov/air/crnr/notice-adoption-revised-reference-exposure-levels-benzene and https://calenviroscreen.oehha.ca.gov/sites/default/files/media/downloads/crnr/benzenerelsjune2014.pdf (OEHHA acute REL 27 ug/m3; Incapsula block)",
+  "https://www.mdpi.com/2076-3298/13/2/94 (Hsieh, Brimblecombe, Lai 2026: PAMS benzene concentrations; MDPI 403)",
+  "https://www.mdpi.com/2073-4433/11/9/1015 (Tsai et al. 2020, Tainan roadside VOC; MDPI 403) and https://aaqr.org/articles/aaqr-23-05-oa-0295 (Abdillah et al. 2024 full text: sites, instrument, size range)",
+  "https://www.airitilibrary.com/Article/Detail/10177159-200809-37-3-263-284-a (運輸計劃季刊 37(3) 2008, 停等機車紓解與容量; 403)",
+  "https://tdr.lib.ntu.edu.tw/handle/123456789/48938 (NTU thesis on optimal motorcycle stop-box length; request rejected by WAF)",
+  "https://ir.lib.nycu.edu.tw/bitstream/11536/50042/1/250301.pdf, .../38624/1/250101.pdf, .../59113/3/651803.pdf (NYCU theses on stop-box use, 游恕信 2012; the repository links returned 404 - search the NYCU thesis system by title)",
+  "https://ideas.repec.org/a/taf/transp/v34y2011i5p487-495.html -> publisher full text of Jou, Hensher, Wu, Liu 2011 (idle stop behaviour at red lights; paywalled) for the stated switch-off percentages",
+  "IOT 2018 report 機車兩段式左轉停等紅燈怠速熄火改善空污集中之研析 (交通部運輸研究所, 2018): find on https://www.iot.gov.tw research report database",
+  "MOENV air quality open data (https://data.moenv.gov.tw) for hourly CO at Datong, Yonghe, Sanchong, Zhongli, Fuxing, Fengshan traffic stations 2024-2025 (API key required)"
+ ]
+}

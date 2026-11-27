@@ -8,17 +8,17 @@ import { age, builtBy, fixed, flag, heavy, lightOrSmall, lowIncome, quota, scrap
 
 const PAYER = t('臺南市政府環境保護局', 'Tainan City Environmental Protection Bureau');
 const SRC = ['tainan-epb-2026-programme'] as const;
-const STATUS_2027 = t('方案至115年12月31日（受理至116年1月10日），未見116年方案。', 'The programme ends on 31 December 2026 (claims to 10 January 2027); no 2027 programme seen.');
-const APPLY = t('購車與舊車報廢須在115年12月31日前完成，新車領牌與舊車回收、線上申請至116年1月10日；領牌3年內不得過戶或遷出台南市。', 'Buy and cancel the old plate by 31 December 2026; register the new scooter, recycle the old one and apply online by 10 January 2027. No transfer or move out of Tainan for 3 years after registration.');
+const STATUS_2027 = t('方案至 2026 年 12 月 31 日（受理至 2027 年 1 月 10 日），未見 2027 年方案。', 'The programme ends on 31 December 2026 (claims to 10 January 2027); no 2027 programme seen.');
+const APPLY = t('購車與要報廢機車的報廢須在 2026 年 12 月 31 日前完成，新車領牌與要報廢機車的回收、線上申請至 2027 年 1 月 10 日；領牌3年內不得過戶或遷出台南市。', 'Buy and cancel the old plate by 31 December 2026; register the new scooter, recycle the old one and apply online by 10 January 2027. No transfer or move out of Tainan for 3 years after registration.');
 const budget = quota('unknown', '2026-11-25', t('總預算5,830萬500元，用罄即停止；是否已用完無法查證。', 'Total budget NT$58,300,500, stopped when used up; whether it has run out could not be checked.'), { total: 58300500 });
 
 const resident: Condition = { kind: 'residency' };
 const oldLocal: Condition = { kind: 'scrap-registered-locally' };
 const GENERAL = '車籍與戶籍都在台南市且未遷出；租賃或共享用途、公部門與車商不適用。';
 const GENERAL_EN = 'Vehicle and household registration both in Tainan with no move-out; rental or sharing use, public bodies and dealers are excluded.';
-const OLD = '舊車為民國104年12月31日以前出廠的燃油機車，須先在環境部媒合平臺申請台南市減碳獎勵金（台南市額度用完時可直接申請）。';
-const OLD_EN = 'The old scooter is a gasoline scooter built by 31 December 2015; first apply on the MOENV platform for the Tainan carbon reward (if Tainan\'s allocation is used up you may apply directly).';
-const REMOTE = '偏遠地區（左鎮區、楠西區、南化區、龍崎區）：車籍與戶籍在114年7月1日以前即設於該區且未變更。';
+const OLD = '要報廢的機車須是 2015 年（民國 104 年）12 月 31 日以前出廠的燃油機車，須先在環境部媒合平臺申請台南市減碳獎勵金（台南市額度用完時可直接申請）。';
+const OLD_EN = 'The scooter you scrap must be a gasoline scooter built by 31 December 2015; first apply on the MOENV platform for the Tainan carbon reward (if Tainan\'s allocation is used up you may apply directly).';
+const REMOTE = '偏遠地區（左鎮區、楠西區、南化區、龍崎區）：車籍與戶籍在 2025 年 7 月 1 日以前即設於該區且未變更。';
 const REMOTE_EN = 'Remote districts (Zuozhen, Nanxi, Nanhua, Longqi): vehicle and household registered there since 1 July 2025 or earlier.';
 const LOW = '檢附列有全戶成員、申請日有效的中（低）收入戶證明。';
 const LOW_EN = 'With a (middle-)low income certificate listing all household members, valid on the application date.';
@@ -126,14 +126,14 @@ export const tainanProgrammes: Programme[] = [
     'tn-project-delivery',
     ['台南市貼心專案：外送員', 'Tainan support project: delivery rider'],
     [flag('deliveryRider')],
-    ['自發票日往前1年起至115年12月31日止，完成外送接單至少100筆。', 'At least 100 completed delivery orders from one year before the invoice date to 31 December 2026.'],
+    ['自發票日往前1年起至 2026 年 12 月 31 日止，完成外送接單至少100筆。', 'At least 100 completed delivery orders from one year before the invoice date to 31 December 2026.'],
     'tn-topup-projects-3000',
   ),
   project(
     'tn-project-disaster',
     ['台南市貼心專案：天然災害災損戶', 'Tainan support project: disaster-affected household'],
     [flag('disasterAffected')],
-    ['2025年起至方案結束符合天然災害救助資格並檢附證明；已申請機車維修補助者不適用。', 'Eligible for natural-disaster aid from 2025 to the end of the programme, with proof; not if a scooter-repair subsidy was claimed.'],
+    ['2025 年起至方案結束符合天然災害救助資格並檢附證明；已申請機車維修補助者不適用。', 'Eligible for natural-disaster aid from 2025 to the end of the programme, with proof; not if a scooter-repair subsidy was claimed.'],
     'tn-topup-projects-3000',
   ),
 ];

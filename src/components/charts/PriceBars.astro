@@ -1,0 +1,56 @@
+---
+/**
+ * PriceBars — G12 (docs/redesign-brief.md 3.2 screen 12): what you pay for a 125 cc petrol
+ * scooter and for an electric one, two bars to one scale. What came off each list price is a
+ * dashed extension out to the list price; one bracket between the bars carries the difference
+ * (green when the electric scooter costs less, ochre when it costs more).
+ *
+ * Give it one of lane I's buy cases, or the two sides yourself:
+ *
+ *   const c = homeMoney().buy['new-taipei'].yes;
+ *   <PriceBars locale={locale} case={c} plate={plateName(c.plate, locale)} id="price-bars" />
+ *
+ * Props
+ *   locale    Locale
+ *   case      a BuyCase from src/lib/home-money.ts (electric, gasoline: name, listPrice, net, lines)
+ *   plate     the electric scooter's plate class in words: plateName(case.plate, locale)
+ *   petrol, electric   instead of `case`: { net, list, name?, label?, offWhat? }
+ *   sameBand  a difference up to this many NT$ reads "about the same" (default 1,000)
+ *   table     false leaves out the "view data table" toggle. Default true
+ *   id, class
+ *
+ * To redraw it in the browser when the reader changes county or the scrapping answer:
+ *
+ *   import { updateHtmlChart } from '@/components/charts/core/html';
+ *   import { priceBarsFromCase, renderPriceBars } from '@/components/charts/core/priceBars';
+ *   updateHtmlChart(el, renderPriceBars(priceBarsFromCase(buyCase(county, scrap), locale, plate)));
+ *
+ * The wrapper carries data-verdict="cheaper | about-same | dearer" inside (.hc-price).
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { priceBarsFromCase, priceBarsTitle, renderPriceBars, type BuyCaseLike, type PriceSide } from './core/priceBars';
+
+interface Props {
+  locale: Locale;
+  case?: BuyCaseLike;
+  plate?: string;
+  petrol?: PriceSide;
+  electric?: PriceSide;
+  sameBand?: number;
+  table?: boolean;
+  id?: string;
+  class?: string;
+}
+const { locale, case: c, plate, petrol, electric, sameBand, table, id, class: cls } = Astro.props;
+if (!c && !(petrol && electric)) throw new Error('PriceBars: pass `case` (a BuyCase from src/lib/home-money.ts) or both `petrol` and `electric`.');
+const props = c ? priceBarsFromCase(c, locale, plate, { sameBand, table }) : { locale, petrol: petrol!, electric: electric!, plate, sameBand, table };
+for (const [k, s] of Object.entries({ petrol: props.petrol, electric: props.electric }))
+  if (!Number.isFinite(s.net) || !Number.isFinite(s.list) || s.net <= 0) throw new Error(`PriceBars: the ${k} side has no price (net ${s.net}, list ${s.list}). A chart is never drawn empty.`);
+---
+
+<div id={id} class:list={['chart', 'hc', 'hc-pricebars', cls]} data-chart="price-bars" data-grow="" role="group" aria-label={priceBarsTitle(locale)} set:html={renderPriceBars(props)} />
+
+<script>
+  import './core/grow';
+</script>

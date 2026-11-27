@@ -72,7 +72,7 @@ export const pageLinks = (locale: Locale) => ({
   closer: href('/electric/#closer', locale),
   noSocket: href('/electric/#no-socket', locale),
   act: href('/act/', locale),
-  actKeep: href('/act/#keep', locale),
+  actKeep: href('/act/#ride', locale),
   actPolicy: href('/act/#policy', locale),
 });
 
@@ -87,7 +87,7 @@ const ym = (years: number, monthShift = 0) => {
 /** The oldest build date any programme in the data still treats as a two-stroke era scooter. */
 const twoStrokeYear = Math.min(...data.programmes.flatMap((p) => p.conditions.flatMap((c) => (c.kind === 'scrap-built' && c.onOrBefore ? [Number(c.onOrBefore.slice(0, 4))] : [])))) - 1;
 
-export type ExampleKey = 'judge' | 'ntpc' | 'taitung' | 'low' | 'close' | 'parent' | 'delivery';
+export type ExampleKey = 'judge' | 'ntpc' | 'yilan' | 'low' | 'close' | 'parent' | 'delivery';
 interface Spec {
   key: ExampleKey;
   answers: Omit<Answers, 'date'>;
@@ -100,7 +100,7 @@ const specs: Spec[] = [
   // the blueprint's rider judge: a nine-year-old 125cc, about 400 km, nowhere to charge
   { key: 'judge', answers: { jurisdiction: 'kaohsiung', scrap: { engine: 'four-stroke', builtOn: ym(10, 3) }, household: {}, monthlyKm: 400, plate: 'heavy', power: 'subscription' }, charge: false, who: { year: ym(10, 3).slice(0, 4), km: 400 } },
   { key: 'ntpc', answers: { jurisdiction: 'new-taipei', scrap: null, household: {}, monthlyKm: 300, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 300 } },
-  { key: 'taitung', answers: { jurisdiction: 'taitung', scrap: null, household: {}, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 500 } },
+  { key: 'yilan', answers: { jurisdiction: 'yilan', scrap: null, household: {}, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 500 } },
   { key: 'low', answers: { jurisdiction: 'taipei', scrap: { engine: 'four-stroke', builtOn: ym(14, -6) }, household: {}, monthlyKm: 200, plate: 'heavy', power: 'subscription' }, charge: false, who: { year: ym(14, -6).slice(0, 4), km: 200 } },
   { key: 'close', answers: { jurisdiction: 'taipei', scrap: null, household: {}, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { km: 500 } },
   { key: 'parent', answers: { jurisdiction: 'taipei', scrap: { engine: 'two-stroke', builtOn: `${twoStrokeYear}-06` }, household: { childUnder12: true }, monthlyKm: 500, plate: 'heavy', power: 'subscription' }, charge: false, who: { year: twoStrokeYear, km: 500 } },
@@ -258,7 +258,7 @@ export function runningTables(locale: Locale) {
 // ---------------------------------------------------------------------------------------------
 // registry facts the page states, with citations
 
-export const factIds = ['econ-petrol-price-smoothing', 'econ-petrol-cost-per-km', 'econ-swap-vs-petrol-low-mileage', 'econ-home-charging-cost-per-km', 'econ-motc-annual-spend', 'econ-fixed-fees', 'econ-gogoro-network', 'econ-ev-brand-share-2026-07', 'econ-no-2027-programme', 'econ-ev-entry-prices', 'econ-gas-cheapest-125', 'econ-central-subsidy-2026', 'econ-moenv-scrap-reward-2026', 'econ-kaohsiung-budget-exhausted'] as const satisfies readonly FactId[];
+export const factIds = ['econ-petrol-price-smoothing', 'econ-petrol-cost-per-km', 'econ-swap-vs-petrol-low-mileage', 'econ-home-charging-cost-per-km', 'econ-motc-annual-spend', 'econ-fixed-fees', 'econ-gogoro-network', 'econ-gogoro-finances-2026', 'econ-ev-brand-share-2026-07', 'econ-no-2027-programme', 'econ-ev-entry-prices', 'econ-gas-cheapest-125', 'econ-central-subsidy-2026', 'econ-moenv-scrap-reward-2026', 'econ-kaohsiung-budget-exhausted'] as const satisfies readonly FactId[];
 export const seriesIds = ['econ-monthly-energy-cost-by-mileage', 'econ-motc-spend-by-class'] as const satisfies readonly SeriesId[];
 
 export const F = (id: (typeof factIds)[number], locale: Locale) => {
@@ -279,6 +279,8 @@ export function surveyChart(locale: Locale) {
 const amountText = (p: Programme, locale: Locale) => {
   const C = localize(electric, locale).cities;
   const a = p.amount;
+  // a programme whose amount is not published is entered as 0: say so in words, never 「0 元」
+  if (a.kind === 'fixed' && a.value === 0) return C.amountUnknown;
   if (a.kind === 'fixed') return a.isMaximum ? fill(C.upTo, { amount: money(locale, a.value) }) : money(locale, a.value);
   if (a.kind === 'per-battery') return fill(C.perBattery, { single: money(locale, a.single), double: money(locale, a.double) });
   return fill(C.goodsTax, { amount: money(locale, a.max) });
@@ -287,13 +289,25 @@ const amountText = (p: Programme, locale: Locale) => {
 export function cityDetails(locale: Locale) {
   const C = localize(electric, locale).cities;
   const ids = Object.keys(data.jurisdictions) as JurisdictionId[];
+  const day = (iso: string) => formatDate(iso, locale, true);
+  // the date a reader must act by, said for what it is: a purchase deadline, a scrapping deadline,
+  // or a listed date the rule behind it is not confirmed for (nothing is confirmed after 2026)
+  const when = (p: Programme): string => {
+    const excluded = p.calculator !== true && p.calculator.reason === 'unverified';
+    if (excluded) return ''; // its dates were never sourced
+    if (p.kind === 'recycling-bonus') return fill(C.toScrap, { date: day(p.validTo) });
+    if (p.confirmedThrough && p.confirmedThrough < p.validTo) return fill(C.toListed, { listed: day(p.validTo), confirmed: day(p.confirmedThrough) });
+    return fill(C.to, { date: day(p.validTo) });
+  };
   const line = (p: Programme) => ({
     name: readerText(p.name[locale]),
     amount: amountText(p, locale),
     side: p.side,
     quota: readerText(p.quota.text[locale]),
-    to: formatDate(p.validTo, locale, true),
+    to: day(p.validTo),
+    when: when(p),
     counted: p.calculator === true,
+    excluded: p.calculator === true ? '' : readerText(p.calculator.excluded[locale]),
     secondary: p.confidence === 'secondary',
     condition: readerText(p.conditionText[locale]),
   });
@@ -337,10 +351,14 @@ export function flagsByCity(): Record<string, string[]> {
   };
   const out: Record<string, string[]> = {};
   const central = new Set<string>();
-  data.programmes.filter((p) => p.jurisdiction === 'central').forEach((p) => walk(p.conditions, central));
-  for (const id of Object.keys(data.jurisdictions)) {
+  // only programmes the calculator counts: a question that cannot change the result is not asked
+  const counted = data.programmes.filter((p) => p.calculator === true);
+  counted.filter((p) => p.jurisdiction === 'central').forEach((p) => walk(p.conditions, central));
+  for (const id of Object.keys(data.jurisdictions) as JurisdictionId[]) {
     const s = new Set(central);
-    data.programmes.filter((p) => p.jurisdiction === id).forEach((p) => walk(p.conditions, s));
+    counted.filter((p) => p.jurisdiction === id).forEach((p) => walk(p.conditions, s));
+    // "I live in {district}" needs the district names
+    if (!data.jurisdictions[id].remoteDistricts) s.delete('remoteDistrict');
     out[id] = [...s];
   }
   return out;

@@ -1,0 +1,85 @@
+---
+/**
+ * CommuteBars — the five commute bars of /questions/rider/ (brief 7.5): mean personal PM2.5
+ * over one morning commute hour in Taipei, by way of travelling (Chuang et al. 2020, slot
+ * `commute.pm25.*`). Measured values: solid ink bars, each with its figure beside its name.
+ * Labelled 平均・各種來源・早上一小時. Nothing here ranks riders as "the most": the page says in
+ * words that scooter and walking did not differ significantly.
+ *
+ * Built like lane D's HTML charts (src/components/charts/core/html.ts): words and numbers are
+ * HTML text in rem, only the bars are SVG, the wrapper carries data-chart and starts with a
+ * sentence that states the finding, and the data table is the chart's twin.
+ *
+ * Props
+ *   locale  Locale
+ *   id, class
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { esc, htmlChart, pc } from '@/components/charts/core/html';
+import { est } from '@/data/estimate';
+import questions from '@/i18n/pages/questions';
+import { fill } from '@/i18n/pages/_copy';
+import { questionNumbers } from './q';
+
+interface Props {
+  locale: Locale;
+  id?: string;
+  class?: string;
+}
+const { locale, id, class: cls } = Astro.props;
+const T = questions.rider.s2.chart;
+const nums = questionNumbers(locale);
+const modes = ['scooter', 'walking', 'bus', 'car', 'metro'] as const;
+const rows = modes
+  .map((m) => ({ key: m, label: T.modes[m][locale], value: est.commute.pm25[m], text: nums[m] }))
+  .sort((a, b) => b.value - a.value);
+if (rows.some((r) => !Number.isFinite(r.value) || r.value <= 0)) throw new Error('CommuteBars: a commute figure is missing. A chart is never drawn empty.');
+const max = Math.max(...rows.map((r) => r.value));
+const H = 18;
+const body =
+  `<p class="hc-commute__sub">${esc(T.sub[locale])}<span class="hc-commute__unit">${esc(T.unitLine[locale])}</span></p>` +
+  `<div class="hc-rows">` +
+  rows
+    .map(
+      (r) =>
+        `<div class="hc-row" data-series="${r.key}">` +
+        `<div class="hc-row__head"><span class="hc-row__label">${esc(r.label)}</span><span class="hc-row__value">${esc(r.text)}</span></div>` +
+        `<svg class="hc-plot hc-plot--flush" width="100%" height="${H}" aria-hidden="true" focusable="false">` +
+        `<rect class="hc-solid hc-g" data-mark="${r.key}" x="0" y="0" width="${pc((r.value / max) * 100)}" height="${H}" rx="3"/><rect class="hc-solid hc-g" x="0" y="0" width="4" height="${H}"/>` +
+        `<line class="hc-base" x1="0" x2="0" y1="-3" y2="${H + 3}"/></svg></div>`,
+    )
+    .join('') +
+  `</div>`;
+const summary = fill(T.summary[locale], { rows: rows.map((r) => fill(T.row[locale], { mode: r.label, value: r.text })).join(locale === 'en' ? '; ' : '、') });
+const table = { head: [T.tableMode[locale], T.tableValue[locale]], rows: rows.map((r) => [r.label, r.text]) };
+---
+
+<div id={id} class:list={['chart', 'hc', 'hc-commute', cls]} data-chart="commute-bars" data-fact="commute-scooter-vs-subway-chuang2020" data-grow="" role="group" aria-label={T.title[locale]}>
+  <p class="hc-commute__title">{T.title[locale]}</p>
+  <Fragment set:html={htmlChart({ summary, body, table, title: T.title[locale], locale })} />
+</div>
+
+<script>
+  import '@/components/charts/core/grow';
+</script>
+
+<style>
+  .hc-commute__title {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-black);
+    line-height: 1.35;
+  }
+  .hc-commute :global(.hc-commute__sub) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 var(--sp-3);
+    margin-block-start: -0.4rem;
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+  .hc-commute :global(.hc-commute__unit) {
+    white-space: nowrap;
+  }
+</style>

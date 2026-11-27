@@ -1,0 +1,143 @@
+---
+/**
+ * KindChip — what stands behind a number (brief 4.1). Every number a reader sees carries exactly
+ * one of five chips, told apart by word AND shape, never by colour alone:
+ *
+ *   measured   實測      solid dot, filled chip      有人拿儀器量到的
+ *   estimate   推估      hatched dot, dashed edge    我們算出來的；一定附範圍和算法
+ *   official   官方      solid square                法規、標準，或政府的統計
+ *   study      研究      open book                   發表過的研究
+ *   derived    本站計算   plus sign                   有出處的數字做的加減乘除
+ *   market     業者公布   price tag                   a seller's own price, on money pages only
+ *
+ * The ids and words are the registry's (`ReaderKind` and `readerKindLabels` in src/data/types.ts,
+ * read through `chips` in src/i18n/ui.ts); never type a chip's name in a page.
+ * An ESTIMATED NUMBER is not printed with this component: use <EstimateValue>, which adds the
+ * range, 約 and the tap-through. This chip prints `data-chip`, never `data-kind`.
+ *
+ * Props
+ *   locale  Locale
+ *   kind    a chip id, or a registry evidence id (`fact.evidence`: the registry's default chip)
+ *   of      instead of `kind`: a registry fact (anything with `evidence`). Uses the registry's
+ *           readerKind() and readerPlace(), so a WHO guideline value reads 官方 and a reading
+ *           taken abroad reads 實測・國外, as the registry marks them
+ *   where   words after a middle dot — 研究・台灣, 實測・國外 (see `chipWhere` in ui.ts).
+ *           With `of`, the registry's place is used unless you pass this
+ *   fact    id (or ids) of the registry fact(s) this chip stands for: printed as `data-fact`,
+ *           which the site check reads to make sure a fact marked `requiresCaveat` has its caveat
+ *           in a sheet on the page. With `of`, the fact's own id is printed by itself
+ *   size    'md' (default, 15 px) | 'sm' (14 px, the floor)
+ *
+ *   <KindChip locale={locale} of={fact('commute-scooter-vs-subway-chuang2020')} />     實測・台灣
+ *   <KindChip locale={locale} kind="study" where={chipWhere.longTermAllTraffic[locale]} />
+ */
+import type { Locale } from '@/i18n';
+import { readerKind, readerPlace, readerPlaceLabels, type Evidence, type ReaderKind, type ReaderPlace } from '@/data/types';
+import { chipKindOf, chips } from '@/i18n/ui';
+import { chipGlyphSvg } from './kinds';
+
+interface Props {
+  locale: Locale;
+  kind?: string;
+  of?: { evidence: Evidence; readerKind?: ReaderKind; readerPlace?: ReaderPlace | null; id?: string };
+  fact?: string | string[];
+  where?: string;
+  size?: 'md' | 'sm';
+  class?: string;
+}
+const { locale, of, size = 'md', class: cls } = Astro.props;
+if (!of && !Astro.props.kind) throw new Error('KindChip: pass `kind` or `of`.');
+const kind = of ? readerKind(of) : chipKindOf(Astro.props.kind!);
+const place = of ? readerPlace(of) : undefined;
+const where = Astro.props.where ?? (place ? readerPlaceLabels[place][locale] : undefined);
+// the dot stays with the chip's word, so a chip that must wrap breaks after it, never inside a phrase
+const dot = locale === 'en' ? ' · ' : '・';
+const factIds = [...new Set([of?.id, ...[Astro.props.fact ?? []].flat()].filter(Boolean))].join(' ') || undefined;
+---
+
+<span class:list={['chip', `chip--${kind}`, size === 'sm' && 'chip--sm', cls]} data-chip={kind} data-fact={factIds}>
+  <Fragment set:html={chipGlyphSvg(kind)} />
+  <span class="chip__text"><span class="chip__label">{chips[kind].label[locale]}{where && dot}</span>{where && <span class="chip__where">{where}</span>}</span>
+</span>
+
+<style>
+  .chip {
+    --b: 2px;
+    display: inline-flex;
+    /* a chip on two lines (研究・長期・所有車輛 beside a button at 320 px): the glyph sits on the
+       first line and the lines get room between them */
+    align-items: flex-start;
+    gap: 0.35em;
+    max-inline-size: 100%;
+    padding: 0.14em 0.6em 0.14em 0.45em;
+    border: var(--b) solid var(--ink);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.45;
+    vertical-align: middle;
+    text-decoration: none;
+  }
+  .chip--sm {
+    font-size: var(--fs-xs);
+  }
+  .chip :global(.chip-glyph) {
+    flex: none;
+    inline-size: 1em;
+    block-size: 1em;
+    /* centred on the first line: (line-height − 1em) / 2 */
+    margin-block-start: 0.225em;
+  }
+  /* the word and the place are two pieces that each stay whole: a long chip wraps between them
+     (Study · / long-term, all traffic), never in the middle of 「所有車輛」 or "long-term" */
+  .chip__text {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 0.15em;
+    min-inline-size: 0;
+  }
+  .chip__text:lang(en) {
+    column-gap: 0.3em;
+  }
+  .chip__label {
+    white-space: nowrap;
+  }
+  .chip__where {
+    font-weight: var(--fw-medium);
+    white-space: nowrap;
+  }
+  /* measured: the one filled chip — a reading is the most solid thing on the page */
+  .chip--measured {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  /* estimate: dashed ochre edge on an ochre wash */
+  .chip--estimate {
+    border-style: dashed;
+    border-color: var(--estimate);
+    background: var(--estimate-wash);
+    color: var(--estimate-ink);
+  }
+  /* prices: a thin edge on a tinted ground; never on an air number */
+  .chip--market {
+    --b: 1.5px;
+    border-color: var(--line-strong);
+    background: var(--bg-sunken);
+    padding-block: calc(0.14em + 0.5px);
+  }
+  @media (forced-colors: active) {
+    .chip {
+      border-color: CanvasText;
+    }
+  }
+  @media print {
+    .chip--measured,
+    .chip--estimate {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>

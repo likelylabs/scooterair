@@ -1,0 +1,102 @@
+---
+/**
+ * TailpipeMarks — G2: one scooter, three kinds of mark (brief 3.2 screen 2, 5.2).
+ *
+ * One petrol scooter from the side, engine running. Three kinds of mark leave
+ * the tailpipe, each in its own lane: ribbons (what you can smell) drift up to
+ * the nose of a small head in profile; rings (carbon monoxide) go straight back; dots (particles) stay low.
+ * This is where the reader learns the three marks every other picture uses, so
+ * the street's own sparse air is left out here: nothing competes with the lanes.
+ *
+ * The names of the three marks are not printed in the picture: put <AirKey tap>
+ * under it (the Screen's `controls` slot). Tapping a key item sets
+ * data-pick-mark on the Screen and this picture lights that lane.
+ *
+ * Props
+ *   locale  Locale
+ *   can     draw the drinks can (default: true when the `chip` slot is filled)
+ *   tag     false (default; <Screen illustration> prints it) | 'street'
+ *   id, class
+ * Slot
+ *   chip    the number chip (HTML from the host: an <EstimateValue>). It sits in
+ *           a row above the drawing, beside the drinks can, in normal flow, so
+ *           it can grow with 字大 without covering the picture
+ *
+ *   <TailpipeMarks slot="picture" locale={locale}><EstimateValue slot="chip" … /></TailpipeMarks>
+ *   <AirKey slot="controls" locale={locale} tap />
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art } from '@/i18n/art';
+import SceneFrame from './SceneFrame.astro';
+import { air, airDot, airRibbon, airRing, airWisp, unitsPerPx, type Box } from './air';
+import { CAN, MASK_FACE, TAILPIPE, artId, drinksCan, maskHead, rng, scooter } from './parts';
+import { put } from './kit';
+import { sceneAlt } from './scene';
+
+interface Props {
+  locale: Locale;
+  can?: boolean;
+  tag?: false | 'street';
+  id?: string;
+  class?: string;
+}
+const { locale, tag = false, id, class: cls } = Astro.props;
+const hasChip = Astro.slots.has('chip');
+const can = Astro.props.can ?? hasChip;
+
+const VB: Box = { x: -200, y: -226, w: 390, h: 311 };
+const upp = unitsPerPx(VB.w);
+const at = { x: 4, y: 0 };
+const M = { x: at.x + TAILPIPE.x, y: TAILPIPE.y }; // the tailpipe mouth
+const HEAD = { x: -112, y: -118, s: 0.46 }; // a small head in profile, looking back at the scooter: the one who smells it
+const NOSE = { x: HEAD.x - MASK_FACE.nose.x * HEAD.s + 3, y: HEAD.y + MASK_FACE.nose.y * HEAD.s };
+const r = rng(20);
+
+// only the dark core here: the lanes below are placed one mark at a time
+const a = air({ frame: VB, id: artId('air'), noStreetAir: true, tailpipes: [{ ...M, rings: 0, dots: 0, ribbons: 0 }] });
+
+/** A mark that travels out from the mouth on arrival: it starts part of the way back toward it. */
+const go = (i: number, x: number, y: number) => ` style="--i:${i};--dx:${((M.x - x) * 0.55).toFixed(1)}px;--dy:${((M.y - y) * 0.55).toFixed(1)}px"`;
+
+// ribbons: up and back to the nose
+const ribbons = [-7, 0, 7, 14]
+  .map((dy, i) => airRibbon(airWisp(M.x - 4, M.y - 3 - i * 1.5, NOSE.x + 2 + (i % 2) * 4, NOSE.y + dy, upp), upp, { weight: i === 1 ? 1.15 : 0.95, cls: 'sa-draw', attrs: ` pathLength="1" style="--i:${i * 2}"` }))
+  .join('');
+// rings: straight back, spreading as they go
+const rings = Array.from({ length: 13 }, (_, i) => {
+  const u = (i + 0.5) / 13;
+  const x = M.x - 14 - u * 180;
+  const y = M.y - 4 - u * 30 + (((i * 7) % 5) / 4 - 0.5) * (8 + u * 46);
+  return airRing(x, y, upp, { size: r(), cls: 'sa-go', attrs: go(i, x, y) });
+}).join('');
+// dots: low, along the ground
+const dots = Array.from({ length: 26 }, (_, i) => {
+  const u = (i + 0.5) / 26;
+  const x = M.x - 8 - u * 190 + (r() - 0.5) * 6;
+  const y = -4 - (((i * 5) % 7) / 6) * (7 + u * 16);
+  return airDot(x, y, upp, { size: 0.5 + r() * 0.5, cls: 'sa-go', attrs: go(Math.round(i * 0.5), x, y) });
+}).join('');
+
+const scene = [
+  `<rect class="a-plane" x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${-VB.y}"/>`,
+  `<rect class="a-road" x="${VB.x}" y="0" width="${VB.w}" height="${VB.y + VB.h}"/>`,
+  `<path class="a-line" d="M${VB.x},0H${VB.x + VB.w}"/>`,
+  a.defs + a.cores,
+  `<g class="tm-lane tm-lane--dot">${dots}</g>`,
+  `<g class="tm-lane tm-lane--ring">${rings}</g>`,
+  `<g class="tm-lane tm-lane--ribbon">${put(HEAD.x, HEAD.y, maskHead(), { s: HEAD.s, flip: true, cls: 'a-figure' })}${ribbons}</g>`,
+  put(at.x, at.y, scooter({ kind: 'gas', rider: true }), { cls: 'a-figure' }),
+].join('');
+const alt = sceneAlt(locale, art.tailpipe.alt[locale], { kind: 'plain' });
+---
+
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--tailpipe', cls].filter(Boolean).join(' ')}>
+  {(hasChip || can) && (
+    <div slot="before" class="tm-head">
+      {can && <svg class="tm-can" viewBox={`0 ${-CAN.h - 4} ${CAN.w} ${CAN.h + 6}`} aria-hidden="true" focusable="false" set:html={drinksCan()} />}
+      {hasChip && <div class="tm-chip"><slot name="chip" /></div>}
+    </div>
+  )}
+  <Fragment set:html={scene} />
+</SceneFrame>

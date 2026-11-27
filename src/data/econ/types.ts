@@ -344,6 +344,11 @@ export interface DealerPromo extends Provenance {
    * reports the amount as possible upside for a buyer with nothing to scrap.
    */
   ambiguousScrap?: boolean;
+  /**
+   * Places where the offer is not available (Yamaha's November offers: physical dealers on Taiwan's
+   * main island only, so not Kinmen, Penghu or Lienchiang), with the reason shown to the reader.
+   */
+  notIn?: { jurisdictions: JurisdictionId[]; why: L10n };
   conditionText: L10n;
 }
 
@@ -393,6 +398,12 @@ export interface EvModel {
    */
   comparableTo125: 'yes' | 'no' | 'unverified';
   performance: Provenance & { text: L10n };
+  /**
+   * How far it goes on one full charge, as the maker states it (km), with the conditions of that
+   * figure in `text`. Only where the research has a sourced figure. The engine warns when a
+   * home-charging scooter's average day (monthlyKm ÷ 30) is longer than this.
+   */
+  range?: Provenance & { km: number; text: L10n };
   calculator: true | { excluded: L10n };
   note?: L10n;
 }
@@ -423,7 +434,14 @@ export interface EnergyPlan extends Provenance {
   setupFee?: Num;
   /** The setup fee is charged again when the contract is renewed after `lockInMonths`. */
   setupFeeRenews?: boolean;
+  /** Contract length in months, when the operator states one (also the setup-fee period). */
   lockInMonths?: number;
+  /**
+   * The contract in one short phrase that is true of this plan: its length when the operator states
+   * one, or that the operator does not state it (never "no contract" unless there is none).
+   * Agrees with `lockInMonths` (the engine tests hold the two together).
+   */
+  contract: L10n;
   terms: L10n;
   calculator: true | { excluded: L10n };
 }

@@ -1,13 +1,13 @@
 ---
 /**
- * FactList — the five-column evidence table for one link: a header row (shown from 60em,
- * where the rows line up as columns), the first `visible` rows, and the rest behind a native
+ * FactList — the five-column evidence table for one link: a header row (shown when the list is
+ * 56rem wide, where the rows line up as columns), the first `visible` rows, and the rest behind a native
  * <details> so a phone reader is not handed forty rows at once. A link to any row inside the
  * closed part opens it (native in current browsers; a small script covers the rest).
  *
  * Props
  *   locale   Locale
- *   ids      FactId[] in the order to show (strongest first)
+ *   ids      FactId[] in the order to show (by kind of evidence; see src/data/chain.ts)
  *   link     chain link number, for the "show the rest" label
  *   visible  rows shown before the fold (default 6)
  */
@@ -56,13 +56,17 @@ const rest = ids.slice(visible);
     padding: 0;
     margin: 0;
   }
+  /* the header shows exactly when the rows line up as columns: same 56rem container width (FactRow) */
+  .flist {
+    container: flist / inline-size;
+  }
   .flist__head {
     display: none;
   }
-  @media (min-width: 60em) {
+  @container flist (min-width: 56rem) {
     .flist__head {
       display: grid;
-      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 0.9fr) minmax(0, 2fr);
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(7.5rem, 0.9fr) minmax(0, 2fr);
       gap: var(--sp-5);
       padding-block: var(--sp-2);
       padding-inline-end: var(--sp-6);

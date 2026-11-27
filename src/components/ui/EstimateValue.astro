@@ -1,0 +1,189 @@
+---
+/**
+ * EstimateValue — an estimated number, printed by the rules of brief 4.2:
+ *
+ *   約 0.05 到 1 ppm  [推估]  →
+ *
+ *   1. always a range, starting with 約 — never a midpoint, never "±"
+ *   2. the 推估 chip on the same line as the number
+ *   3. the science team's rounding: the text comes from formatEstimate() in
+ *      src/data/estimate.ts, which adds no digit and prints 0 for a low end under 0.01
+ *   4. number and chip are ONE control, at least 48 px tall, that opens the sheet behind it
+ *
+ * It takes a SLOT ID, never a typed number. An unknown slot throws, so the build fails (brief 3.3).
+ *
+ * Props
+ *   locale     Locale
+ *   slotId     the slot in src/data/estimate.ts: 'co.dozen.add', 'emit.co.perRed_can' …
+ *              (`EstimateRangeSlot`; the attribute is not called `slot` because Astro owns that word)
+ *   value      only for a range that is not a listed slot: the EstRange object itself, from
+ *              src/data/estimate.ts (hoursPerYear(4)); `slotId` is then its name for data-slot
+ *   unitStyle  'symbol' (default: ppm, ppb, µg/m³ beside the number) | 'words' (微克／立方公尺)
+ *   label      what it is the amount of, inside the control: 這排機車多出來
+ *              (estimateText.addedByPack). What the pack adds is ALWAYS worded 多出來 / added (rule 5)
+ *   sheet      id of a <HowSheet> on this page ('how-4'): the control opens it.
+ *              Without one, the control links to /estimate/#anchor
+ *   anchor     section of /estimate/ with the full working (default: the slot's own, else 'numbers')
+ *   size       'md' (default) | 'lg' (the big figure, 40–56 px)
+ *   …rest      passed to the root: data-when-scenario="few", id, class
+ *
+ *   <EstimateValue locale={locale} slotId="co.dozen.add" label={estimateText.addedByPack[locale]} sheet="how-4" />
+ *
+ * Only a value whose kind is `estimate` may be printed with this component (a measured range or
+ * our arithmetic takes plain text and its own <KindChip>); anything else throws.
+ *
+ * The root is `<a data-kind="estimate">`: acceptance check 4 looks for 約, a range, the chip and
+ * a way to /estimate/ inside every such element. `data-how` always holds the /estimate/ address,
+ * also when the link itself opens a sheet on the page.
+ * The same words without markup (alt text, cards, the film): formatEstimate(slot, locale).text.
+ */
+import { href as link, type Locale } from '@/i18n';
+import { formatEstimate, type EstRange, type EstimateRangeSlot } from '@/data/estimate';
+import { how } from '@/i18n/ui';
+import Icon from './Icon.astro';
+import KindChip from './KindChip.astro';
+
+interface Props {
+  locale: Locale;
+  slotId: EstimateRangeSlot | (string & {});
+  value?: EstRange;
+  unitStyle?: 'symbol' | 'words';
+  label?: string;
+  sheet?: string;
+  anchor?: string;
+  size?: 'md' | 'lg';
+  class?: string;
+  [key: string]: unknown;
+}
+const { locale, slotId, value, unitStyle = 'symbol', label, sheet, size = 'md', class: cls, ...rest } = Astro.props;
+delete (rest as Record<string, unknown>).anchor;
+if (!slotId) throw new Error('EstimateValue: pass `slotId` (a slot of src/data/estimate.ts).');
+let f;
+try {
+  f = formatEstimate(value ?? (slotId as EstimateRangeSlot), locale, { unitStyle });
+} catch (e) {
+  throw new Error(`EstimateValue "${slotId}": ${(e as Error).message}`);
+}
+if (f.kind !== 'estimate') throw new Error(`EstimateValue "${slotId}": this value is "${f.kind}", not an estimate. Print it as text with <KindChip kind="${f.kind}" />.`);
+// the words around the two numbers, taken from the formatter's own phrase (約 … 到 … / … 到約 …)
+const iLo = f.textNoUnit.indexOf(f.lo);
+const iHi = f.textNoUnit.lastIndexOf(f.hi);
+if (iLo < 0 || iHi < iLo + f.lo.length) throw new Error(`EstimateValue "${slotId}": cannot lay out "${f.textNoUnit}".`);
+const lead = f.textNoUnit.slice(0, iLo).trim();
+const mid = f.textNoUnit.slice(iLo + f.lo.length, iHi).trim();
+const anchor = Astro.props.anchor ?? f.anchor ?? 'numbers';
+const full = link(`/estimate/#${anchor}`, locale);
+const target = sheet ? `#${sheet}` : full;
+---
+
+<a class:list={['est', `est--${size}`, cls]} href={target} data-kind="estimate" data-slot={slotId} data-how={full} data-sheet-open={sheet} {...rest}>
+  {/* a real space after each part (the label, the phrase, the chip): flex lays the parts out, the
+      spaces keep them separate words for a screen reader, a copy-paste and the site check */}
+  {label && <Fragment><span class="est__label">{label}</span>{' '}</Fragment>}
+  <span class="est__line">
+    {/* one text run with real spaces, so it reads, copies and underlines as one phrase */}
+    <span class="est__value">{lead && <Fragment><span class="est__word">{lead}</span>{' '}</Fragment>}<span class="est__n">{f.lo}</span>{' '}<span class="est__word">{mid}</span>{' '}<span class="est__end"><span class="est__n">{f.hi}</span>{f.unit && <Fragment>{f.unit === '%' ? '' : ' '}<span class="est__unit">{f.unit}</span></Fragment>}</span></span>
+    {' '}
+    <span class="est__tail">
+      <KindChip locale={locale} kind="estimate" />
+      <span class="est__go" aria-hidden="true"><Icon name="arrow-right" size="1em" /></span>
+    </span>
+  </span>
+  {' '}
+  <span class="vh">{how.button[locale]}</span>
+</a>
+
+<style>
+  .est {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.1em;
+    max-inline-size: 100%;
+    min-block-size: var(--tap);
+    padding: 0.2em 0.5em;
+    margin-inline: -0.5em;
+    border-radius: var(--radius-2);
+    color: var(--ink);
+    font-size: var(--fs-base);
+    line-height: 1.35;
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  .est:hover {
+    background: var(--estimate-wash);
+    color: var(--ink);
+  }
+  .est__label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--ink-2);
+  }
+  .est__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25em 0.55em;
+  }
+  .est__value {
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums lining-nums;
+    /* the dashed ochre underline says two things at once: an estimate, and something to press */
+    text-decoration: underline dashed var(--estimate);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+  .est__n {
+    white-space: nowrap;
+  }
+  /* the last number and its unit never part: "1 ppm" breaks before the 1, not after it */
+  .est__end {
+    white-space: nowrap;
+  }
+  /* the chip and the arrow travel together: the arrow never drops to a line of its own */
+  .est__tail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    white-space: nowrap;
+  }
+  .est__go {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.5em;
+    block-size: 1.5em;
+    border-radius: 50%;
+    background: var(--estimate-wash);
+    color: var(--estimate-ink);
+    font-size: var(--fs-sm);
+  }
+  .est:hover .est__go {
+    background: var(--estimate-ink);
+    color: var(--estimate-wash);
+  }
+
+  /* the big figure: numbers at 40–56 px, the words and the unit at body size */
+  .est--lg .est__value {
+    font-size: var(--fs-base);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.5em;
+  }
+  .est--lg .est__n {
+    font-family: var(--font-heading);
+    font-size: var(--fs-figure);
+    font-weight: var(--fw-black);
+    font-stretch: 84%;
+    line-height: 1.05;
+  }
+  .est--lg {
+    padding-block: 0.35em 0.6em;
+  }
+  @media (forced-colors: active) {
+    .est__value {
+      text-decoration-color: LinkText;
+    }
+    .est__go {
+      border: 1px solid LinkText;
+    }
+  }
+</style>

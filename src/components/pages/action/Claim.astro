@@ -17,7 +17,7 @@
  */
 import type { Locale } from '@/i18n';
 import type { EvidenceKind } from '@/i18n/ui';
-import type { FactId, GapId } from '@/data';
+import type { FactId } from '@/data';
 import Cite from '@/components/ui/Cite.astro';
 import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
 import { badgesFor, lf, requiredCaveats, sourcesOf } from './ev';
@@ -26,23 +26,20 @@ interface Props {
   locale: Locale;
   text?: string;
   facts?: readonly FactId[];
-  gaps?: readonly GapId[];
   badge?: EvidenceKind | EvidenceKind[];
   caveats?: boolean;
   as?: 'p' | 'li' | 'div';
   size?: 'md' | 'sm';
   class?: string;
 }
-const { locale, facts = [], gaps = [], caveats = true, as = 'p', size = 'md', class: cls } = Astro.props;
+const { locale, facts = [], caveats = true, as = 'p', size = 'md', class: cls } = Astro.props;
 const text = Astro.props.text ?? (facts[0] ? lf(facts[0], locale).statement : '');
-const cites = sourcesOf(facts, gaps);
+const cites = sourcesOf(facts);
 const kinds = Astro.props.badge
   ? (Array.isArray(Astro.props.badge) ? Astro.props.badge : [Astro.props.badge]).map((k) => ({ kind: k, secondary: false }))
   : facts.length
     ? badgesFor(facts)
-    : gaps.length
-      ? [{ kind: 'gap' as EvidenceKind, secondary: false }]
-      : [];
+    : [];
 const notes = caveats ? requiredCaveats(facts, locale) : [];
 const noteLabel = locale === 'en' ? 'Read with this:' : '要一起看：';
 const Tag = as;

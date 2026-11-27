@@ -1,0 +1,255 @@
+{
+ "key": "verify",
+ "date": "2026-11-26",
+ "file": "/home/user/scooterair/research/masks/VERIFIED.json",
+ "method": "Verifier re-opened every source used in 'facts' on 2026-11-26 and read the figures in the source (PMC full text, official pages, NIOSH PDF text extracted with pdftotext, University of Iowa repository abstract for Clinger 2019 since the publisher returned 403). DOIs checked against Crossref.",
+ "facts": [
+  {
+   "id": "mask-niosh-no-gas",
+   "statementEn": "The US occupational-safety institute NIOSH states that even N95-type respirators do not protect against gases such as carbon monoxide, or vapours such as petrol and solvents: they are particle filters. Surgical and cloth masks are also particle and droplet barriers with no gas-absorbing layer, so they cannot do better.",
+   "statementZh": "美國職業安全衛生研究所（NIOSH）明白表示：連N95這類口罩都擋不住一氧化碳等氣體，也擋不住汽油、溶劑的蒸氣，因為它們只過濾微粒。醫用口罩和布口罩同樣只擋微粒和飛沫，沒有吸附氣體的材料，所以也擋不住。",
+   "value": "N95-type filtering facepiece respirators: no protection against gases or vapours (qualitative)",
+   "evidenceType": "international",
+   "confidence": "verified",
+   "caveatEn": "This is an official statement about what the filter is, not a measurement on a Taiwan street. The part about surgical and cloth masks is our reasoning from it. Special full-face gas masks with a canister do exist for carbon monoxide; no everyday mask is one.",
+   "caveatZh": "這是官方說明口罩材料的性質，不是在台灣街頭量測的結果。醫用口罩、布口罩的部分是我們依此推論。工業用的全面罩防毒面具加濾罐可以處理一氧化碳，但日常口罩都不是這種。",
+   "citation": "CDC/NIOSH. Filtering Facepiece Respirators (updated 2026-10-28); CDC/NIOSH. Wildland Fire Smoke (2026-07-16); NIOSH. Respirator Selection Guide for the Construction Industry, DHHS (NIOSH) Publication 2022-123 (2022). Supporting: NIOSH Pocket Guide to Chemical Hazards, Carbon monoxide.",
+   "url": "https://www.cdc.gov/niosh/ppe/respirators/ffr.html",
+   "doi": "",
+   "whereInSource": "FFR page: 'FFRs do not provide protection against gases or vapors.' Wildfire page: 'Filtering facepiece respirators (FFRs) do not protect against gases, such as carbon monoxide.' Pub 2022-123 p.1: 'They do not protect against gases (e.g., carbon monoxide, methane) and vapors (e.g., gasoline, organic solvents)'. Pocket Guide CO entry, respirator recommendations: air-purifying option is only a full-facepiece gas mask with canister (APF 50, up to 1200 ppm)."
+  },
+  {
+   "id": "mask-carbon-breakthrough",
+   "statementEn": "Disposable masks with a thin activated-carbon layer soak up some solvent vapour for a short time. In a US lab test, two unapproved carbon masks let half the vapour through in under 10 minutes; one NIOSH-approved model lasted about 2 to 4 hours on acetone. All three failed against ammonia within about 10 minutes, and humid air cut the time by up to 70%.",
+   "statementZh": "拋棄式活性碳口罩只有薄薄一層碳，能短時間吸附一些溶劑蒸氣。美國實驗室測試：兩款未經認證的活性碳口罩，不到10分鐘就有一半蒸氣穿透；一款經NIOSH認證的口罩對丙酮可撐約2到4小時。三款對氨氣都在約10分鐘內失效，空氣潮濕時時間最多縮短70%。",
+   "value": "Unapproved: <10 min to 50% breakthrough (all vapours); approved 3M 8514: acetone 121 min (15 ppm), 233 min (50 ppm); ammonia <7 min at 50 ppm, 10 min at 15 ppm; high humidity up to -70%",
+   "evidenceType": "international",
+   "confidence": "verified",
+   "caveatEn": "Lab test of three mask models with acetone, perchloroethylene and ammonia, not benzene or real exhaust. Carbon does not hold carbon monoxide, so the carbon layer does nothing for it. Taiwan's humid air makes the carbon run out faster.",
+   "caveatZh": "這是三款口罩在實驗室用丙酮、四氯乙烯和氨氣測的，不是用苯或真正的廢氣。活性碳抓不住一氧化碳，對它沒有作用。台灣空氣潮濕，碳層會更快失效。",
+   "citation": "Clinger JC, O'Shaughnessy PT. Breakthrough analysis for filtering facepiece respirators impregnated with activated carbon. J Occup Environ Hyg 2019;16(7):423-431.",
+   "url": "https://iro.uiowa.edu/esploro/outputs/journalArticle/Breakthrough-analysis-for-filtering-facepiece-respirators/9983997362402771",
+   "doi": "10.1080/15459624.2019.1594838",
+   "whereInSource": "Abstract: 'The non-approved dual-use dust masks were ineffective for all vapors and offered less than 10 min of protection before 50% breakthrough occurred.' '...121 min and 233 min for acetone at 15 ppm and 50 ppm...' 'ammonia, with breakthrough time less than 7 min at 50 ppm and 10 min at 15 ppm.' 'High relative humidity reduced breakthrough times by up to 70%.' (Publisher page 403; abstract read on University of Iowa repository.)"
+  },
+  {
+   "id": "mask-carbon-mol-2005",
+   "statementEn": "When Taiwan's Ministry of Labor safety institute tested 10 disposable activated-carbon masks, none met the national standard (CNS 14756) of 15 minutes' protection against organic solvent vapour; some let vapour through almost at once. A proper carbon cartridge lasted over 300 minutes.",
+   "statementZh": "勞動部勞工安全衛生研究所測試10款拋棄式活性碳口罩，沒有一款達到國家標準（CNS 14756）要求的防護有機溶劑蒸氣15分鐘，有的幾乎馬上就穿透；正式的活性碳濾罐則可撐300分鐘以上。",
+   "value": "0 of 10 met 15 min (2 flat carbon masks, 8 cup-type R95 masks with carbon); cartridges >300 min",
+   "evidenceType": "official-tw",
+   "confidence": "verified",
+   "caveatEn": "This test is from 2005 and the vapour used is not named in the press release; today's products may differ. It says nothing about carbon monoxide, which carbon does not hold.",
+   "caveatZh": "這是2005年的測試，新聞稿沒寫用哪種蒸氣，現在市售產品可能不同。它沒有測一氧化碳，而活性碳本來就抓不住一氧化碳。",
+   "citation": "勞動部（原勞委會）勞工安全衛生研究所新聞稿，2005-07-26：市售活性碳口罩防護效果測試。",
+   "url": "https://www.mol.gov.tw/1607/1632/1640/14091/post",
+   "doi": "",
+   "whereInSource": "Press release body: '包括2款拋棄式平面活性碳口罩，及8款拋棄式杯型附加活性碳之R95防塵口罩'; '就國家標準要能防護15分鐘來看'; '沒有一款所測定之拋棄式口罩符合國家標準的要求'; 濾罐 '防護時間可超過300分鐘'."
+  },
+  {
+   "id": "mask-asworn-vandersande",
+   "statementEn": "Worn by real people, a surgical mask cut fine and ultrafine particles (0.02 to 1 micrometre) by a median factor of about 4, so roughly a quarter still got in; a cloth mask by about 2.5 (about 40% got in). An FFP2 respirator (European N95) did about 25 times better in adults, but much less well on children.",
+   "statementZh": "真人實際配戴時，醫用口罩對0.02到1微米的細微粒，中位數只降到約四分之一（約四分之一還是吸進去）；布口罩只降到約2.5分之一（約四成吸進去）。成人戴FFP2（歐規N95）好約25倍，但小孩戴效果差很多。",
+   "value": "Median protection factor at rest: surgical adults 4.1, children 3.2; tea-cloth adults 2.5, children 2.2; FFP2 adults 113 (IQR 26-210), children 18 (IQR 6.1-165)",
+   "evidenceType": "international",
+   "confidence": "verified",
+   "caveatEn": "One brand of each (3M 1818 surgical, 3M 1872V FFP2, a home-made tea-cloth mask), tested in the Netherlands with candle smoke, not exhaust, and only down to 20 nm; many exhaust particles are smaller. The FFP2 figure varied widely between people.",
+   "caveatZh": "每種只測一個品牌（3M 1818醫用、3M 1872V FFP2、自製布口罩），在荷蘭用蠟燭煙測，不是廢氣，而且只量到20奈米，廢氣裡很多微粒更小。FFP2的效果因人差異很大。",
+   "citation": "van der Sande M, Teunis P, Sabel R. Professional and home-made face masks reduce exposure to respiratory infections among the general population. PLoS ONE 2008;3(7):e2618.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2440799",
+   "doi": "10.1371/journal.pone.0002618",
+   "whereInSource": "Table 1, 'No activity' column (median, IQR); Methods: Portacount 0.02-1 um, candle-lit room >=10,000 particles/cm3, 28 adults and 11 children aged 5-11."
+  },
+  {
+   "id": "mask-ilosh-taiwan",
+   "statementEn": "In a Taiwan Ministry of Labor institute test on 70 adults, an ordinary medical mask as worn gave an average protection score of 2.3, against 12.2 for a headband N95; double medical masks 3.3. Only 1 of 70 people could get a proper seal with an ear-loop N95.",
+   "statementZh": "勞動部勞動及職業安全衛生研究所找70位成人實測：一般醫用口罩的平均防護效果只有2.3，頭帶式N95是12.2，戴兩層醫用口罩是3.3。70人中只有1人戴耳掛式N95能通過密合度測試。",
+   "value": "Mean protection: headband N95 12.2; ear-loop N95 5.2; double medical mask 3.3; ordinary medical mask 2.3; medical mask with support frame 1.7; 1/70 passed fit test with ear-loop N95",
+   "evidenceType": "official-tw",
+   "confidence": "verified",
+   "caveatEn": "The press release does not say how the score was measured or which particle sizes were used, so read it as a comparison between masks, not as a percentage.",
+   "caveatZh": "新聞稿沒有說明分數怎麼量、用多大的微粒，所以只能拿來比較不同口罩，不能當成百分比。",
+   "citation": "勞動部勞動及職業安全衛生研究所，謹慎使用耳掛式N95口罩，2023-08-22（111年度「新型口罩防護性能測試及探討」研究）。",
+   "url": "https://www.mol.gov.tw/1607/1632/1640/62131/",
+   "doi": "",
+   "whereInSource": "Press release: '共有年齡在20至65歲之間的70位受測者參與，平均防護效果依序為：頭帶式N95口罩、耳掛式N95口罩、雙層醫用口罩、一般醫用口罩、一般醫用口罩內加支撐架，分別為12.2、5.2、3.3、2.3、1.7'; '70位受測者配戴耳掛式N95口罩...只有1位通過密合度測試'."
+  },
+  {
+   "id": "mask-ultrafine-su",
+   "statementEn": "Against ultrafine particles (10 to 200 nanometres, the size range of most exhaust particles), a surgical mask worn the usual way on a model head stopped about 60% of the smallest and about 30% of the largest; a cloth mask stopped about 20% on average. An N95 worn without fit-testing stopped about 84% on average.",
+   "statementZh": "對超細微粒（10到200奈米，正是廢氣微粒大多數的大小），醫用口罩照一般方式戴在假人頭上，最小的約擋六成、較大的只擋約三成；布口罩平均只擋約兩成。沒做密合測試的N95平均約擋八成四。",
+   "value": "As-worn mask efficiency: surgical ~0.6 at 10 nm to ~0.3 at 200 nm; cloth average 0.2 (<0.4 throughout); N95 unfitted average 0.84; flow 15 L/min",
+   "evidenceType": "international",
+   "confidence": "verified",
+   "caveatEn": "Manikin test in the US with salt particles and gentle breathing (15 litres a minute); one model of each mask. Walking or breathing harder usually means more leakage.",
+   "caveatZh": "這是美國用假人頭和鹽粒子、輕鬆呼吸（每分鐘15公升）的測試，每種口罩只測一款。走路或呼吸變快時，通常漏得更多。",
+   "citation": "Su W-C, Lee J, Xi J, Zhang K. Investigation of mask efficiency for loose-fitting masks against ultrafine particles and effect on airway deposition efficiency. Aerosol Air Qual Res 2021;22:210228.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9355369",
+   "doi": "10.4209/aaqr.210228",
+   "whereInSource": "Abstract and Results (mask efficiency vs particle size figures): cloth 'generally less than 0.4'; surgical ~0.6 at 10 nm to ~0.3 at 200 nm; N95 average 0.84; Methods: ear-loops worn as the public would, no fit test, 15 L/min."
+  },
+  {
+   "id": "mask-fit-cherrie",
+   "statementEn": "Nine masks sold in Beijing as 'anti-PM2.5' mostly had good filter material, yet on volunteers breathing diesel exhaust, 3% to 68% of the soot still leaked in, mainly around the edges. Only one of four masks kept leakage under 10%.",
+   "statementZh": "北京販售的九款「防PM2.5」口罩，濾材本身多半不錯；但志願者戴著呼吸柴油廢氣時，仍有3%到68%的黑碳微粒從邊緣漏進來。四款中只有一款漏進量低於10%。",
+   "value": "Total inward leakage of black carbon: 3-68% (sedentary), 7-66% (active); best mask 3M 9322 median 1.8%; material penetration 0.26-29%",
+   "evidenceType": "international",
+   "confidence": "verified",
+   "caveatEn": "Tested on 10 volunteers in a UK chamber with diesel exhaust; four mask models only. A good filter number on the box does not mean good protection on your face.",
+   "caveatZh": "這是在英國實驗艙讓10位志願者呼吸柴油廢氣測的，只測四款。包裝上濾材效率高，不代表戴在臉上就有同樣效果。",
+   "citation": "Cherrie JW, Apsley A, Cowie H, et al. Effectiveness of face masks used to protect Beijing residents against particulate air pollution. Occup Environ Med 2018;75(6):446-452.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5969371/",
+   "doi": "10.1136/oemed-2017-104765",
+   "whereInSource": "Abstract Results: 'the average total inward leakage (TIL) of BC ranged from 3% to 68% in the sedentary tests and from 7% to 66% in the active tests. Only one mask type tested showed an average TIL of less than 10%'; Conclusions: '...primarily due to poor facial fit.'"
+  },
+  {
+   "id": "mask-cloth-rengasamy",
+   "statementEn": "In NIOSH lab tests, cloth masks and common fabrics let 40% to 90% of salt particles around 75 nanometres pass straight through the material, compared with about 0.1% for N95 filter material.",
+   "statementZh": "NIOSH實驗室測試：布口罩和常見布料，讓約75奈米的鹽粒子有40%到90%直接穿過布料；N95濾材只穿過約0.1%。",
+   "value": "Fabric/cloth mask penetration 40-90% (polydisperse NaCl, CMD 75 nm, 5.5 cm/s); N95 media 0.12%",
+   "evidenceType": "international",
+   "confidence": "verified",
+   "caveatEn": "This tests the cloth itself, flat in a holder, with no leakage at the edges; worn on a face it can only be worse.",
+   "caveatZh": "這是把布平放測材料本身，沒有邊緣漏氣；真正戴在臉上只會更差。",
+   "citation": "Rengasamy S, Eimer B, Shaffer RE. Simple respiratory protection: evaluation of the filtration performance of cloth masks and common fabric materials against 20-1000 nm size particles. Ann Occup Hyg 2010;54(7):789-798.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7314261",
+   "doi": "10.1093/annhyg/meq044",
+   "whereInSource": "Abstract: '40-90% instantaneous penetration levels against polydisperse NaCl aerosols'; Methods: '75 +/- 20 nm count median diameter', 33 and 99 L/min; Results: 'N95 filter media controls showed 0.12%'."
+  },
+  {
+   "id": "mask-respirator-benefit-langrish",
+   "statementEn": "Masks are not useless for particles: in a Beijing trial, 98 heart patients who walked wearing a well-fitting respirator (3M 8812) had slightly lower blood pressure and less strain on the heart than when they walked without one.",
+   "statementZh": "口罩對微粒並非沒用：北京一項試驗中，98位心臟病患者戴貼合的防塵口罩（3M 8812）走路時，血壓略低、心臟負擔較小，比不戴時好一些。",
+   "value": "Mean arterial pressure 93 vs 96 mmHg (p=0.025); max ST depression -142 vs -156 uV (p=0.046); HF HRV 54 vs 40 ms2 (p=0.005)",
+   "evidenceType": "international",
+   "confidence": "verified",
+   "caveatEn": "This was a dust respirator, not a surgical mask, and the effects were small and short-term. Patients knew whether they wore a mask (no dummy mask), and it does nothing for gases.",
+   "caveatZh": "這是防塵口罩，不是醫用口罩，效果小而且只看短期。受試者知道自己有沒有戴（沒有假口罩對照），而且對氣體沒有作用。",
+   "citation": "Langrish JP, Li X, Wang S, et al. Reducing personal exposure to particulate air pollution improves cardiovascular health in patients with coronary heart disease. Environ Health Perspect 2012;120(3):367-372.",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3295351/",
+   "doi": "10.1289/ehp.1103898",
+   "whereInSource": "Abstract Methods ('open randomized crossover trial, 98 patients'), Results (MAP 93 vs 96 mmHg p=0.025; ST -142 vs -156 uV p=0.046; HF power 54 vs 40 msec2 p=0.005); Methods name 3M 8812; Discussion notes no sham mask."
+  }
+ ],
+ "supportingVerified": [
+  {
+   "claim": "Face-seal leakage exceeds filter penetration: N95 ~7x at 0.04 um, ~10x at 0.1 um, ~20x at 1 um; surgical mask 4.8-5.8x.",
+   "citation": "Grinshpun SA et al. J Occup Environ Hyg 2009;6(10):593-603",
+   "doi": "10.1080/15459620903120086",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7196699",
+   "verified": true,
+   "where": "Abstract; 25 subjects, NaCl 0.03-1 um"
+  },
+  {
+   "claim": "Surgical masks: quantitative fit factors 2.5-9.6; all 20 subjects failed unassisted qualitative fit test; 'None of these surgical masks exhibited adequate filter performance and facial fit characteristics.'",
+   "citation": "Oberg T, Brosseau LM. Am J Infect Control 2008;36(4):276-282",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7115281",
+   "verified": true,
+   "where": "Abstract. NOTE: researcher's filter-penetration range 4-90% not confirmed; Results gives 0-84%. Do not quote a filter range from this paper."
+  },
+  {
+   "claim": "Carbon-loaded nonwoven (RK-270/C), cyclohexane 20-120 ppm: 100% breakthrough ~8.5 to ~6.0 min; 50% ~1.9 to ~1.1 min; at 70% RH (81 ppm) 8.2 min.",
+   "citation": "Okrasa M et al. IJERPH 2019;16(11):1973",
+   "doi": "10.3390/ijerph16111973",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6603930/",
+   "verified": true,
+   "where": "Abstract and breakthrough results; flat material sample, not a finished mask; abstract and text disagree on humidity percentage so quote minutes only."
+  },
+  {
+   "claim": "HPA (2023-11-28): at AQI red, choose CNS 15980 anti-haze PM2.5 masks or CNS 14756 activated-carbon disposable dust masks, and check the seal.",
+   "citation": "國民健康署，任何類型口罩，都能防範空氣污染嗎？",
+   "url": "https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=127&pid=17424",
+   "verified": true,
+   "where": "Body text: '例如「防霾（PM2.5）口罩」（符合CNS15980）或「附加活性碳拋棄式防塵口罩」（符合CNS14756）'; '應同時檢查口罩與臉部四周是否貼合'. Use for context: the site must not contradict official advice bluntly; carbon masks are recommended officially, but their gas capacity is limited (Clinger, MOL 2005)."
+  },
+  {
+   "claim": "Taiwan FDA: medical masks are for droplet/infection protection; TN95-grade medical masks filter over 95% of dust. No gas claim.",
+   "citation": "食藥署 藥物食品安全週報 第975期, 2024-05-24",
+   "url": "https://www.fda.gov.tw/TC/PublishOtherEpaperContent.aspx?id=1510&tid=4753",
+   "verified": true,
+   "where": "'醫用口罩若宣稱符合TN95等級，則表示能過濾環境中95%以上的粉塵。' Absence of a gas claim is not itself evidence; use only to show stated purpose."
+  }
+ ],
+ "rejected": [
+  "Khayan et al. 2019 (J Toxicol): CO reduced from 3.40 to 0.10 ppm by carbon-mask material. Rejected: n=7, unusual method for CO, single roadside site, and inconsistent with activated carbon's negligible capacity for CO at ambient conditions (NIOSH lists only canister gas masks for CO). Do not cite as evidence that masks remove CO.",
+  "Oberg & Brosseau 2008 filter penetration '4-90% (hospital 4-37%, dental 53-90%)': not confirmed on re-reading (Results state 0-84%). Only the fit-factor figures are kept.",
+  "HPA 2015 'surgical masks reach 70-80% filtering' and Kaohsiung leaflet 30-70%: filter-material claims with no method, not protection as worn. Not to be repeated.",
+  "BSMI 2025 market test (10/10 anti-haze masks passed) and Consumers' Foundation 2021 (6/20 below 80%): bench filter tests, not as-worn; the latter only via a TVBS report. Not used as protection facts.",
+  "Taiwan FDA statement on activated-carbon masks quoted by TVBS Health: secondary; FDA original not opened. Not used.",
+  "Neupane PR et al. 2023 Kathmandu manikin (N95 70%, surgical 39%, cloth 13%): rig not fully sealed, optical counters cannot see ultrafine particles, ambient PM only. Not used.",
+  "Neupane BB et al. 2019 PeerJ: settled-particle microscopy with no airflow or fit; cannot assess ultrafine. Not used.",
+  "Goh et al. 2019 children's N95 fit (106/106): industry-funded, one valved product, comfort/fit study; not needed. El Khayri 2025 thesis: abstract only, no figures. He et al. 2014: no figures on page. Not used.",
+  "Langrish 2009 (healthy volunteers) and NIOSH 2010 CO escape-mask letter, Balanay & Oh 2021 cartridges: not re-opened by the verifier; not needed for the site.",
+  "Chuang et al. 2020 Taipei commuters: PM2.5 measured outside the respirator, so it shows nothing about inhaled dose; must not be presented as evidence that masks do or do not work.",
+  "Lee et al. 2025 Taipei commuters: abstract-level page only, mask type not given. Not used.",
+  "Hsu et al. 2021 Taiwan mask-wearing observation (42%/58%): COVID-era, mask type not recorded, not re-opened. Context only, not a registry fact.",
+  "Shakya 2017, Pacitto 2019, Huang & Morawska 2019, Vietnam motorcyclist and Tehran studies, Steinle 2018: only search-snippet numbers, never opened. Excluded.",
+  "No source was found that measured NO2 or benzene penetration through a commercial mask; the site must not claim a measured figure for these. The 'no gas protection' statement rests on what the filter is plus NIOSH's statement."
+ ],
+ "warningEn": "A surgical mask won't protect you from scooter exhaust\nExhaust is full of gases like carbon monoxide and benzene, and ordinary masks do not stop gases. Even for the tiny soot particles, surgical and cloth masks let a lot leak in around the edges. Keep wearing a mask against colds and flu, but against exhaust the best protection is standing further back from the scooters.",
+ "warningZh": "醫用口罩擋不住機車廢氣\n廢氣裡有一氧化碳、苯等氣體，一般口罩擋不住氣體。就算是細小的黑煙微粒，醫用口罩和布口罩的邊緣也會漏進很多。口罩防感冒、流感還是有用，但要避開廢氣，最好的辦法是離機車遠一點。",
+ "tableRows": [
+  {
+   "maskEn": "Cloth mask",
+   "maskZh": "布口罩",
+   "gases": "None",
+   "ultrafine": "Very little (most passes through the cloth and around the edges)",
+   "pm25": "A little, leaks a lot",
+   "basis": "mask-niosh-no-gas (gases, by reasoning: no sorbent); mask-cloth-rengasamy (40-90% through fabric at ~75 nm); mask-ultrafine-su (avg 0.2 as worn); mask-asworn-vandersande (PF 2.5, 0.02-1 um)"
+  },
+  {
+   "maskEn": "Surgical / medical mask",
+   "maskZh": "醫用口罩",
+   "gases": "None",
+   "ultrafine": "Some, leaks at the edges",
+   "pm25": "Some, leaks at the edges",
+   "basis": "mask-niosh-no-gas (gases, by reasoning: particle/droplet barrier, no sorbent); mask-ultrafine-su (0.6 at 10 nm to 0.3 at 200 nm as worn); mask-asworn-vandersande (PF ~4, about a quarter gets in); mask-ilosh-taiwan (score 2.3 vs 12.2 for headband N95)"
+  },
+  {
+   "maskEn": "Activated-carbon mask",
+   "maskZh": "活性碳口罩",
+   "gases": "Carbon monoxide: none. Benzene and other vapours: a little, briefly (often minutes)",
+   "ultrafine": "Same as the mask it is built on (surgical-type: some, leaks at the edges)",
+   "pm25": "Same as the mask it is built on (surgical-type: some, leaks at the edges)",
+   "basis": "mask-carbon-breakthrough (unapproved <10 min; approved up to hours for acetone; humidity -70%); mask-carbon-mol-2005 (0/10 met 15 min); mask-niosh-no-gas (CO needs a canister gas mask); particle columns follow mask-asworn-vandersande / mask-ultrafine-su because Clinger's mask A was a surgical-type mask with a carbon dusting"
+  },
+  {
+   "maskEn": "Fitted N95 / FFP2 respirator",
+   "maskZh": "貼合的N95／FFP2口罩",
+   "gases": "None",
+   "ultrafine": "Most, if it fits",
+   "pm25": "Most, if it fits",
+   "basis": "mask-niosh-no-gas (gases); mask-asworn-vandersande (adult FFP2 median PF 113, wide range; children 18); mask-fit-cherrie (best mask median leakage 1.8%, others up to 68%); mask-ilosh-taiwan (1/70 sealed an ear-loop N95; headband type far better); mask-ultrafine-su (unfitted N95 0.84)"
+  }
+ ],
+ "mustNotSay": [
+  "Masks are useless / do nothing (they matter for infection, and a fitted respirator does cut particle exposure).",
+  "Surgical masks filter 70-80% (or any filter-material percentage) of pollution, presented as protection as worn.",
+  "Activated-carbon masks block exhaust, carbon monoxide, or 'toxic gas'.",
+  "Activated-carbon masks do nothing for any vapour (they adsorb some organic vapour briefly; HPA officially recommends CNS 14756 carbon masks).",
+  "N95/FFP2 masks protect against exhaust gases, CO, NOx or benzene.",
+  "No filter of any kind can remove carbon monoxide (canister gas masks exist; say 'no everyday mask').",
+  "An N95 filters 95% of what you breathe (95% is a filter-material rating; as worn depends on fit; ear-loop N95s rarely seal).",
+  "A measured figure for NO2 or benzene passing through a mask (no such source was verified).",
+  "That the 2005 Ministry of Labor result describes products on sale today, without giving its date.",
+  "That the ILOSH scores are percentages.",
+  "That Chuang 2020 shows masks fail (PM2.5 was measured outside the mask).",
+  "Khayan 2019's claim that carbon masks reduce CO by 97%.",
+  "That masks harm health or increase exposure.",
+  "Specific advice to put N95s on children (not verified for this site; children got much less protection in van der Sande 2008)."
+ ],
+ "whatDoesHelp": "What helps most is distance: stop a few metres back from the waiting scooters rather than beside or behind them, avoid standing in the cloud at the front of the pack, and support fewer petrol engines on the road; a well-fitted N95/FFP2 respirator can cut the particles you breathe, but no everyday mask stops the gases.",
+ "needsManualFetch": [
+  "https://www.tandfonline.com/doi/full/10.1080/15459624.2019.1594838 (403; abstract read at iro.uiowa.edu instead)",
+  "https://www.mdpi.com/1660-4601/16/11/1973 (403; read on PMC6603930)",
+  "https://pubmed.ncbi.nlm.nih.gov/30985259/ (cookie wall)",
+  "CNS 14756 / 14774 / 15980 scope clauses on cnsonline.com.tw (paywalled)",
+  "Taiwan FDA original statement on activated-carbon masks (seen only via TVBS)",
+  "ILOSH 111年度「新型口罩防護性能測試及探討」full report (method, aerosol, unit of the protection score)"
+ ],
+ "gaps": [
+  "No study of NO2 or benzene penetration through a commercial mask was verified.",
+  "No Taiwan survey of mask type worn by pedestrians or scooter riders.",
+  "No biomarker (COHb, urinary benzene metabolite) study in mask wearers."
+ ]
+}

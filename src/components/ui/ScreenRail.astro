@@ -1,0 +1,173 @@
+---
+/**
+ * ScreenRail — the 32 px strip under the header on a page made of <Screen>s (brief 3.1):
+ *
+ *   ● 紅燈｜排出什麼　　　　2 / 15
+ *   ▬▬▬▬▬▬▭▭▭▭▭▭▭▭▭▭▭▭▭▭▭▭▭▭▭▭
+ *
+ * A signal lamp, the phase in words (never colour alone), the chapter's name, `n / total` and
+ * a thin progress bar. Red while a red screen is in view, green for the green ones.
+ * NO SECONDS: it marks the place in the story; it is not a timer. Replaces CountdownRail.astro.
+ *
+ * It reads the page's <Screen> articles ([data-screen] with data-n, data-chapter, data-phase)
+ * and follows the one crossing a line a third of the way down the viewport. It is not a control:
+ * nothing to press, nothing announced while the reader scrolls. Without JavaScript it is hidden,
+ * and each Screen shows its own place line instead.
+ *
+ * Props
+ *   locale   Locale
+ *   chapter  name of the first screen (what the rail shows before the reader scrolls)
+ *   total    number of screens (default 15)
+ *   phase    phase of the first screen (default 'red')
+ *
+ *   <Base …>
+ *     <ScreenRail slot="rail" locale={locale} chapter={t.s1.chapter} />
+ */
+import type { Locale } from '@/i18n';
+import { screenText, t as fill } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  chapter: string;
+  total?: number;
+  phase?: 'red' | 'green';
+  class?: string;
+}
+const { locale, chapter, total = 15, phase = 'red', class: cls } = Astro.props;
+const words = { red: screenText.red[locale], green: screenText.green[locale], position: screenText.position[locale] };
+---
+
+<div class:list={['screen-rail', cls]} data-screen-rail data-js-only data-phase={phase} data-words={JSON.stringify(words)} role="region" aria-label={screenText.railLabel[locale]}>
+  <div class="container screen-rail__row">
+    <span class="screen-rail__lamp" aria-hidden="true"></span>
+    <span class="screen-rail__phase" data-rail-phase>{words[phase]}</span>
+    <span class="screen-rail__sep" aria-hidden="true"></span>
+    <span class="screen-rail__name" data-rail-name>{chapter}</span>
+    <span class="screen-rail__pos" data-rail-pos>{fill(screenText.position, locale, { n: 1, total })}</span>
+  </div>
+  <div class="screen-rail__bar" aria-hidden="true"><span class="screen-rail__fill" data-rail-fill style={`inline-size:${(100 / total).toFixed(2)}%`}></span></div>
+</div>
+
+<style>
+  .screen-rail {
+    --lamp: var(--signal-red);
+    --word: var(--signal-red-ink);
+    position: sticky;
+    inset-block-start: calc(var(--header-h) + 1px); /* the header's hairline */
+    z-index: 40;
+    background: var(--bg);
+    border-block-end: 1px solid var(--line);
+  }
+  .screen-rail[data-phase='green'] {
+    --lamp: var(--clean);
+    --word: var(--clean-ink);
+  }
+  .screen-rail__row {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    block-size: var(--rail-h);
+    /* 15 px, growing with 字大 only as far as the width allows (16 px at 320, 18 px at 360, all of
+       特大 from 390), never under the 14 px floor: at 特大 on a 320 px phone a 19-letter English
+       chapter name was cut to "The light tur…". The floor is in px: rem would grow with 字大 */
+    font-size: clamp(14px, 5vw, var(--fs-sm));
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .screen-rail__lamp {
+    flex: none;
+    inline-size: 0.75em;
+    block-size: 0.75em;
+    border-radius: 50%;
+    background: var(--lamp);
+    transition: background-color var(--dur-2) var(--ease-out);
+  }
+  .screen-rail__phase {
+    flex: none;
+    color: var(--word);
+  }
+  /* a drawn rule, not a ｜ glyph: as text it would have to pass 4.5:1 (site check 14) and it is only a divider */
+  .screen-rail__sep {
+    flex: none;
+    block-size: 1.1em;
+    margin-inline: 0.3em;
+    border-inline-start: 1px solid var(--line-strong); /* a border, so it survives forced colours */
+  }
+  .screen-rail__name {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--ink);
+  }
+  .screen-rail__pos {
+    flex: none;
+    margin-inline-start: auto;
+    padding-inline-start: 0.75em;
+    color: var(--ink-2);
+    font-weight: var(--fw-medium);
+    font-variant-numeric: tabular-nums;
+  }
+  .screen-rail__bar {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: -1px;
+    block-size: 3px;
+    background: var(--line);
+  }
+  .screen-rail__fill {
+    display: block;
+    block-size: 100%;
+    background: var(--lamp);
+    transition:
+      inline-size var(--dur-2) var(--ease-out),
+      background-color var(--dur-2) var(--ease-out);
+  }
+  @media (forced-colors: active) {
+    .screen-rail__lamp,
+    .screen-rail__fill {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
+    .screen-rail__bar {
+      background: Canvas;
+      border-block-start: 1px solid CanvasText;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-screen-rail]').forEach((rail) => {
+    const screens = [...document.querySelectorAll<HTMLElement>('[data-screen]')];
+    if (!screens.length) return;
+    const words = JSON.parse(rail.dataset.words ?? '{}') as { red: string; green: string; position: string };
+    const phaseEl = rail.querySelector<HTMLElement>('[data-rail-phase]')!;
+    const nameEl = rail.querySelector<HTMLElement>('[data-rail-name]')!;
+    const posEl = rail.querySelector<HTMLElement>('[data-rail-pos]')!;
+    const fill = rail.querySelector<HTMLElement>('[data-rail-fill]')!;
+    const total = screens.length;
+    let shown = -1;
+
+    const show = (i: number) => {
+      if (i === shown) return;
+      shown = i;
+      const s = screens[i];
+      const phase = s.dataset.phase === 'green' ? 'green' : 'red';
+      rail.dataset.phase = phase;
+      phaseEl.textContent = words[phase];
+      nameEl.textContent = s.dataset.chapter ?? '';
+      posEl.textContent = words.position.replace('{n}', String(i + 1)).replace('{total}', String(total));
+      fill.style.inlineSize = `${(((i + 1) / total) * 100).toFixed(2)}%`;
+    };
+
+    // The current screen is the one crossing a line a third of the way down the viewport.
+    // Between two screens nothing crosses it, and the rail keeps the last one.
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) show(screens.indexOf(e.target as HTMLElement));
+      },
+      { rootMargin: '-34% 0px -65% 0px' },
+    );
+    screens.forEach((s) => io.observe(s));
+  });
+</script>

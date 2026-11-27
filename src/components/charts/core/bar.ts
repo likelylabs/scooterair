@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
+import { MIN_W, type ChartRender, type Tone, esc, fmtSigned, hbar, hbarFrom, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit, tip } from './shared';
 
 export interface BarDatum {
   label: string;
@@ -82,7 +82,7 @@ export function renderBar(p: BarChartProps): ChartRender {
     const rowH = labelH + 4 + BAR + 16;
     const t: Tone = emphasis && !d.highlight ? 'neutral' : (d.tone ?? tone);
     const strong = !emphasis || d.highlight;
-    let g = `<g class="c-row" data-tip="${esc(`${d.label}: ${values[i]}${unit ? ' ' + unit : ''}`)}">`;
+    let g = `<g class="c-row" data-tip="${esc(tip(locale, d.label, values[i], unit))}">`;
     g += `<rect class="c-hit" x="0" y="${y}" width="100%" height="${rowH - 6}"/>`;
     lines.forEach((ln, k) => {
       g += text(strong ? 'c-label' : 'c-label c-dim', 0, y + 14 + k * LINE, ln);
@@ -115,7 +115,7 @@ export function renderBar(p: BarChartProps): ChartRender {
   }
   // the unit sits in the top right corner unless the reference label needs that corner
   const refEnd = reference ? (pctN(reference.value, max, min) / 100) * MIN_W + 3 : 0;
-  if (unit && (!(reference && unitOnLeft) || MIN_W - refEnd > px(unit, 12) + 14)) o.push(text('c-tick', '100%', 13, unit, 'text-anchor="end"'));
+  if (unit && (!(reference && unitOnLeft) || MIN_W - refEnd > px(unit, 14) + 14)) o.push(text('c-tick', '100%', 13, unit, 'text-anchor="end"'));
   o.push(...rows);
 
   return {
@@ -123,7 +123,7 @@ export function renderBar(p: BarChartProps): ChartRender {
     body: o.join(''),
     height,
     table: {
-      head: [p.categoryLabel, unit ? `${p.valueLabel} (${unit})` : p.valueLabel],
+      head: [p.categoryLabel, withUnit(locale, p.valueLabel, unit)],
       rows: [...data.map((d, i) => [d.label, values[i]]), ...(reference ? [[reference.label, fmtSigned(locale, reference.value, decimals)]] : [])],
     },
   };

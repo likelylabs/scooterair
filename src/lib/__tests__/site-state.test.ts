@@ -70,7 +70,7 @@ test('a city whose own window closes early: ended from the next day', () => {
   const s = cityMoney('keelung', '2026-12-01', snap);
   assert.equal(s.status, 'ended');
   assert.equal(s.asOf, '2026-11-30');
-  assert.equal(tileState(s.status), 'exhausted');
+  assert.equal(tileState(s.status), 'ended'); // brief 7.7: 已截止 is its own chip
 });
 
 test('after the deadline: B for filers, then C with a count of days without a programme', () => {

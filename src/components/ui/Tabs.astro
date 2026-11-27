@@ -35,7 +35,32 @@ const { label, class: cls } = Astro.props;
     margin-block-end: var(--sp-5);
     overflow-x: auto;
     border-block-end: 1px solid var(--line-strong);
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+  /* with large text, or on a narrow phone, the tabs wrap onto more lines instead of scrolling sideways */
+  html[data-text='lg'] .tabs__list,
+  html[data-text='xl'] .tabs__list {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  /* more tabs off either edge (set by the script): fade that edge so the strip visibly continues */
+  .tabs__list[data-more~='end'] {
+    mask-image: linear-gradient(to left, transparent, #000 3rem);
+  }
+  .tabs__list[data-more~='start'] {
+    mask-image: linear-gradient(to right, transparent, #000 3rem);
+  }
+  .tabs__list[data-more~='start'][data-more~='end'] {
+    mask-image: linear-gradient(to right, transparent, #000 3rem calc(100% - 3rem), transparent);
+  }
+  .tabs__count {
+    margin-block: calc(var(--sp-5) * -1 + var(--sp-1)) var(--sp-4);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
   }
   .tabs__tab {
     flex: none;
@@ -59,6 +84,15 @@ const { label, class: cls } = Astro.props;
   }
   .tabs__tab:focus-visible {
     outline-offset: -3px;
+  }
+  /* High Contrast drops the colour difference: mark the selected tab in system colours */
+  @media (forced-colors: active) {
+    .tabs__tab[aria-selected='true'] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+      border-block-end-color: CanvasText;
+    }
   }
   /* no-JS: stacked panels with visible headings */
   .tabpanel + .tabpanel {
@@ -122,9 +156,34 @@ const { label, class: cls } = Astro.props;
         e.preventDefault();
         select((next + tabs.length) % tabs.length, true);
       });
-      this.prepend(list);
+      // where the strip scrolls, say so: an edge fade, and "2 / 7" under it, so a reader on a
+      // phone can tell more tabs exist past the edge
+      const count = document.createElement('p');
+      count.className = 'tabs__count';
+      count.setAttribute('aria-hidden', 'true'); // the tab list already announces "tab 2 of 7"
+      const edges = () => {
+        const more = [list.scrollLeft > 2 && 'start', list.scrollLeft + list.clientWidth < list.scrollWidth - 2 && 'end'].filter(Boolean).join(' ');
+        if (more) list.dataset.more = more;
+        else delete list.dataset.more;
+        count.hidden = list.scrollWidth <= list.clientWidth + 2;
+      };
+      list.addEventListener('scroll', edges, { passive: true });
+      new ResizeObserver(edges).observe(list);
+      const select0 = select;
+      const selectCounted = (index: number, focus = false) => {
+        select0(index, focus);
+        count.textContent = `${index + 1} / ${tabs.length}`;
+        // bring the selected tab into the strip, sideways only (never scroll the page)
+        const t = tabs[index];
+        if (t.offsetLeft < list.scrollLeft) list.scrollLeft = t.offsetLeft;
+        else if (t.offsetLeft + t.offsetWidth > list.scrollLeft + list.clientWidth) list.scrollLeft = t.offsetLeft + t.offsetWidth - list.clientWidth;
+        edges();
+      };
+      tabs.forEach((tab, i) => tab.addEventListener('click', () => selectCounted(i)));
+      list.addEventListener('keydown', () => requestAnimationFrame(() => selectCounted(Math.max(0, tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true')))));
+      this.prepend(list, count);
       this.dataset.enhanced = '';
-      select(fromHash >= 0 ? fromHash : 0);
+      selectCounted(fromHash >= 0 ? fromHash : 0);
     }
   }
   if (!customElements.get('sa-tabs')) customElements.define('sa-tabs', SaTabs);

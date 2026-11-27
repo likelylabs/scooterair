@@ -1,27 +1,46 @@
 ---
+import { absUrl } from '../lib/abs-url.ts';
 /**
- * Redirect — a static redirect page for a route that has moved (a meta refresh,
- * a canonical link and a plain link for readers without either). Static hosting
- * has no server redirects, so this is the redirect.
+ * Redirect — a static redirect page for a route that has moved. Static hosting has no server
+ * redirects, so this page is the redirect: a meta refresh, a canonical link to the new home,
+ * `noindex`, and a plain link for a reader whose browser follows neither.
+ *
+ * It carries the address's #fragment across, so an old deep link still lands on its section:
+ * /unmeasured/#ask → /estimate/#measure. The script runs before the meta refresh fires; without
+ * JavaScript the reader lands at the top of the new page (give the target a safety-net anchor
+ * for the fragments that matter).
  *
  * Props
- *   locale  Locale
- *   to      locale-neutral path of the new home, e.g. '/questions/' (goes through href())
- *   label   link text shown to a reader whose browser does not follow the refresh
+ *   locale   Locale
+ *   to       locale-neutral path of the new home, e.g. '/estimate/' (goes through href()).
+ *            It may carry a default fragment: '/electric/#result'
+ *   label    link text, shown to a reader whose browser does not follow the refresh
+ *   hashMap  old fragment → new fragment, without '#': { ask: 'measure' }.
+ *            A fragment not in the map is carried over unchanged
+ *   share    optional share-card id: the page keeps its old og:image / og:title, so a link to the
+ *            old address shared in LINE or Facebook still shows its picture (brief 7.5)
  *
- *   src/pages/[...lang]/problem.astro → <Redirect locale={locale} to="/questions/" label={…} />
+ *   src/pages/[...lang]/unmeasured.astro →
+ *     <Redirect locale={locale} to="/estimate/" label={t.moved} hashMap={{ ask: 'measure' }} />
  */
-import { href, htmlLang, type Locale } from '@/i18n';
+import { asset, href, htmlLang, type Locale } from '@/i18n';
 import { site } from '@/i18n/ui';
+import { shareCard, shareCardContent, type ShareCardId } from '@/lib/share-cards';
 
 interface Props {
   locale: Locale;
   to: string;
   label: string;
+  hashMap?: Record<string, string>;
+  share?: ShareCardId;
 }
-const { locale, to, label } = Astro.props;
+const { locale, to, label, hashMap = {}, share } = Astro.props;
+const card = share ? shareCard(share, locale) : null;
+const cardText = share ? shareCardContent(share, locale) : null;
 const target = href(to, locale);
-const abs = new URL(target, Astro.site).href;
+const abs = absUrl(target, Astro.site);
+// Three lines, inline, before anything else can navigate: append location.hash (through the map).
+const carry = `(function(){var h=location.hash.slice(1),m=${JSON.stringify(hashMap).replace(/</g, '\\u003c')};if(h)location.replace(${JSON.stringify(target.split('#')[0])}+'#'+(Object.prototype.hasOwnProperty.call(m,h)?m[h]:h))})()`;
 ---
 
 <!doctype html>
@@ -32,7 +51,21 @@ const abs = new URL(target, Astro.site).href;
     <title>{label} — {site.name[locale]}</title>
     <meta name="robots" content="noindex" />
     <link rel="canonical" href={abs} />
+    <script is:inline set:html={carry} />
     <meta http-equiv="refresh" content={`0; url=${target}`} />
+    {card && cardText && (
+      <Fragment>
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={site.name[locale]} />
+        <meta property="og:title" content={cardText.title.replaceAll('|', '')} />
+        <meta property="og:url" content={abs} />
+        <meta property="og:image" content={absUrl(asset(card.wide), Astro.site)} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={card.alt} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Fragment>
+    )}
   </head>
   <body>
     <p><a href={target}>{label}</a></p>

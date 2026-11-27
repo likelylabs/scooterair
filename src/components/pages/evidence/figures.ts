@@ -16,7 +16,7 @@ import { renderStacked } from '@/components/charts/core/stacked';
 import { renderLine } from '@/components/charts/core/line';
 import { renderWaffle } from '@/components/charts/core/waffle';
 import { renderBeforeAfter } from '@/components/charts/core/beforeAfter';
-import { renderIntervals, renderOdour, renderSigned, renderSpans, renderTime, sgn, type SignedRow } from './charts';
+import { TIME_MARKERS, renderIntervals, renderOdour, renderSigned, renderSpans, renderTime, sgn, type SignedRow } from './charts';
 import { ls } from './ev';
 import type { Localized } from '@/i18n/pages/_copy';
 import type evidenceCopy from '@/i18n/pages/evidence';
@@ -42,7 +42,12 @@ export interface SeriesView {
   notes: string[];
 }
 
-const TONES: Tone[] = ['exhaust', 'blue', 'violet', 'magenta', 'lime', 'neutral'];
+/**
+ * Series colours in order. Blue and violet collapse to one blue under red-green colour blindness,
+ * and lime and the exhaust orange to one olive, so neither pair is ever a neighbour here: the
+ * first four (the most any evidence chart uses) stay apart for deuteranopes and protanopes.
+ */
+const TONES: Tone[] = ['exhaust', 'blue', 'magenta', 'neutral', 'lime', 'violet'];
 const u = (s: LS | DS, locale: Locale) => readerText(unitLabel(s.unit, locale));
 const cat = (s: LS, key: string | number) => s.categories.find((c) => c.key === String(key))?.label ?? String(key);
 const pt = (d: DS, key: string | number) => d.points.find((p) => String(p.x) === String(key));
@@ -91,6 +96,37 @@ function fullTable(s: LS, locale: Locale, T: T) {
   };
 }
 
+/** The plotted values in one sentence ("label value; label value…"), from a chart's own data table. */
+function dataSummary(render: ChartRender, locale: Locale, max = 10): string {
+  const t = render.table;
+  if (!t || !t.rows.length) return '';
+  const en = locale === 'en';
+  const head = t.head.slice(1);
+  const cell = (row: string[]) =>
+    row.length === 2
+      ? `${row[0]} ${row[1]}`
+      : `${row[0]}${en ? ': ' : '：'}${row
+          .slice(1)
+          .map((c, i) => (c ? `${head[i] ?? ''} ${c}`.trim() : ''))
+          .filter(Boolean)
+          .join(en ? ', ' : '，')}`;
+  const rows = t.rows.slice(0, max).map(cell);
+  const more = t.rows.length > max ? (en ? '; and more in the data table.' : '；其餘見資料表。') : en ? '.' : '。';
+  return rows.join(en ? '; ' : '；') + more;
+}
+
+/** The same table turned round: one row per dataset, one column per category (unit in the corner). */
+function plansTable(s: LS, locale: Locale) {
+  const f = (v: number) => new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 3 }).format(v);
+  return {
+    head: [u(s, locale), ...keys(s).map((k) => cat(s, k))],
+    rows: s.datasets.map((d) => [d.label, ...keys(s).map((k) => {
+      const p = pt(d, k);
+      return !p || p.y === null ? '–' : f(p.y);
+    })]),
+  };
+}
+
 function bars(s: LS, d: DS, locale: Locale, T: T, extra: { tone?: Tone; highlight?: string[]; decimals?: number; label?: (k: string, p: PT | undefined) => string } = {}): ChartRender {
   const ks = keys(s).filter((k) => pt(d, k)?.y !== null && pt(d, k) !== undefined);
   const vals = ks.map((k) => pt(d, k)!.y as number);
@@ -126,7 +162,8 @@ function signedFromSeries(s: LS, locale: Locale, T: T, by: 'dataset' | 'category
   const anyHollow = groups.some((g) => g.rows.some((r) => r.hollow));
   const anySig = groups.some((g) => g.rows.some((r) => r.suffix));
   const legend = [
-    ...(anyHollow ? [{ label: T.chart.filled, tone: 'exhaust' as Tone, shape: 'rect' as const }, { label: opts.hollowFlag === 'model-check-failed' ? T.chart.hollowModel : T.chart.hollowNs, tone: 'neutral' as Tone, shape: 'light' as const }] : []),
+    // 'light' is drawn on this page as an outline in the series tone (EvChart), like the hollow bars it explains
+    ...(anyHollow ? [{ label: T.chart.filled, tone: 'exhaust' as Tone, shape: 'rect' as const }, { label: opts.hollowFlag === 'model-check-failed' ? T.chart.hollowModel : T.chart.hollowNs, tone: 'exhaust' as Tone, shape: 'light' as const }] : []),
   ];
   const vals = groups.flatMap((g) => g.rows.map((r) => r.value)).filter((v): v is number => v !== null);
   return {
@@ -165,7 +202,7 @@ function intervalsFromSeries(s: LS, locale: Locale, T: T, reference: { value: nu
       s.id === 'chuang2020-effects-per-iqr'
         ? [
             { label: T.chart.sigFilled, tone: 'exhaust', shape: 'dot' },
-            { label: T.chart.sigHollow, tone: 'neutral', shape: 'dot' },
+            { label: T.chart.sigHollow, tone: 'neutral', shape: 'ring' },
           ]
         : undefined,
     categoryLabel: T.chart.category,
@@ -176,12 +213,14 @@ function intervalsFromSeries(s: LS, locale: Locale, T: T, reference: { value: nu
 }
 
 function timeFromSeries(s: LS, locale: Locale, T: T, tones: Record<string, Tone>, yMax?: number) {
+  let observed = 0;
   return renderTime({
     locale,
     series: s.datasets.map((d, i) => ({
       label: d.label,
       tone: tones[d.key] ?? TONES[i % TONES.length],
       target: d.kind === 'target',
+      marker: d.kind === 'target' ? undefined : TIME_MARKERS[observed++ % TIME_MARKERS.length],
       points: d.points.map((p) => ({ x: Number(p.x), y: p.y })),
     })),
     unit: u(s, locale),
@@ -195,7 +234,14 @@ function timeFromSeries(s: LS, locale: Locale, T: T, tones: Record<string, Tone>
 export function seriesView(id: SeriesId, locale: Locale, T: T): SeriesView {
   const s = ls(id, locale);
   const notes = pointNotes(s, locale);
-  const one = (render: ChartRender, label?: string): Panel => ({ render, title: label ? `${s.title} · ${label}` : s.title, desc: s.description, label });
+  // A screen reader hears what this panel shows: the dataset's description only where it covers
+  // the whole figure (one panel), then the plotted values themselves, read from the panel's table.
+  const one = (render: ChartRender, label?: string): Panel => ({
+    render,
+    title: label ? `${s.title} · ${label}` : s.title,
+    desc: [label ? `${label}${locale === 'en' ? ': ' : '：'}` : s.description, dataSummary(render, locale)].filter(Boolean).join(locale === 'en' ? ' ' : ''),
+    label,
+  });
   const out = (panels: Panel[], extra: Partial<SeriesView> = {}): SeriesView => ({ s, panels, notes, ...extra });
 
   switch (id) {
@@ -220,9 +266,11 @@ export function seriesView(id: SeriesId, locale: Locale, T: T): SeriesView {
       return out([{ render, title: T.v5.chartTitle, desc: T.v5.desc }]);
     }
     case 'teds13-motorcycle-tonnes':
-    case 'econ-monthly-energy-cost-by-mileage':
     case 'fleet-stock':
       return out([], { table: { ...fullTable(s, locale, T), note: T.chart.asTable } });
+    case 'econ-monthly-energy-cost-by-mileage':
+      // eleven plans by five distances: one plan per row, so a phone gets five narrow columns, not eleven wide ones
+      return out([], { table: { ...plansTable(s, locale), note: T.chart.asTable } });
     case 'scooter-emission-standard-phases': {
       const d = s.datasets[0];
       return out([], { table: { head: [T.chart.date, s.datasets[0].label], rows: d.points.map((p) => [String(p.x), T.chart.phase.replace('{n}', String(p.y))]) } });
@@ -310,7 +358,8 @@ export function seriesView(id: SeriesId, locale: Locale, T: T): SeriesView {
     }
     case 'tsai2023-benzene-by-class':
     case 'tsai2023-hc-by-class':
-      return out([one(timeFromSeries(s, locale, T, { motorcycles: 'exhaust', gasoline: 'blue', diesel: 'violet' }))]);
+      // blue and violet merge under red-green colour blindness; magenta stays apart from both neighbours
+      return out([one(timeFromSeries(s, locale, T, { motorcycles: 'exhaust', gasoline: 'blue', diesel: 'magenta' }))]);
     case 'ev-share-new-registrations':
       return out([one(timeFromSeries(s, locale, T, { actual: 'clean', target: 'neutral' }, 100))]);
     case 'new-registrations-electric-vs-gasoline': {
@@ -431,16 +480,17 @@ export function seriesView(id: SeriesId, locale: Locale, T: T): SeriesView {
               const b = pt(epa, k);
               const marks = [
                 ...(a && a.y !== null ? [{ low: a.y, source: nag.label, tone: 'exhaust' as Tone }] : []),
-                ...(b && b.y !== null ? [{ low: b.low ?? b.y, high: b.high, source: epa.label, tone: 'blue' as Tone }] : []),
+                ...(b && b.y !== null ? [{ low: b.low ?? b.y, high: b.high, source: epa.label, tone: 'blue' as Tone, shape: 'square' as const }] : []),
               ];
               return { label: cat(s, k), marks, none: marks.length ? undefined : T.chart.noSmell };
             }),
             unit: u(s, locale),
             ppbLabel: T.chart.ppb,
             ppmLabel: T.chart.ppm,
+            // source told apart by shape as well as colour: circles for the Japanese method, squares for US EPA
             legend: [
               { label: nag.label, tone: 'exhaust', shape: 'dot' },
-              { label: epa.label, tone: 'blue', shape: 'dot' },
+              { label: epa.label, tone: 'blue', shape: 'rect' },
             ],
             categoryLabel: T.chart.category,
             valueLabel: u(s, locale),

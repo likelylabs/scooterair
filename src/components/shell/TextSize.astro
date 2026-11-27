@@ -1,0 +1,86 @@
+---
+/**
+ * TextSize — the 字大 button in the header (brief 6.4). One press steps the whole page's text:
+ * 標準 → 大 → 特大 → 標準 (root size 100% / 115% / 130%). The choice is remembered, and the
+ * script in Base.astro applies it before first paint. Three small bars under the glyphs show
+ * the step, so the state is visible without colour. The menu holds the same choice as three
+ * named buttons (Settings.astro).
+ *
+ * Hidden without JavaScript: the reader's own browser or phone text size still works, and so
+ * does zoom to 200%.
+ *
+ * Props
+ *   locale  Locale
+ */
+import type { Locale } from '@/i18n';
+import { settings, t as fill } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const names = { md: settings.textSizes.md[locale], lg: settings.textSizes.lg[locale], xl: settings.textSizes.xl[locale] };
+const [small, large] = [...settings.textSizeGlyphs[locale]];
+---
+
+<button
+  class="tool textsize"
+  type="button"
+  data-text-cycle
+  data-js-only
+  data-names={JSON.stringify(names)}
+  data-name-template={settings.textSizeNow[locale]}
+  aria-label={fill(settings.textSizeNow, locale, { size: names.md })}
+>
+  <span class="textsize__glyphs" aria-hidden="true"><span class="textsize__s">{small}</span><span class="textsize__l">{large}</span></span>
+  <span class="textsize__steps" aria-hidden="true"><i></i><i></i><i></i></span>
+</button>
+
+<style>
+  .textsize {
+    grid-template-rows: auto auto;
+    align-content: center;
+    row-gap: 3px;
+    padding-inline: 0.4rem;
+  }
+  .textsize__glyphs {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    line-height: 1;
+  }
+  .textsize__s {
+    font-size: 14px;
+    font-weight: var(--fw-bold);
+  }
+  .textsize__l {
+    font-size: 21px;
+    font-weight: var(--fw-black);
+  }
+  .textsize__steps {
+    display: flex;
+    gap: 3px;
+  }
+  .textsize__steps i {
+    inline-size: 9px;
+    block-size: 3px;
+    border-radius: 1px;
+    background: var(--ink);
+    opacity: 0.25;
+  }
+  .textsize__steps i:first-child,
+  :global(:root[data-text='lg']) .textsize__steps i:nth-child(2),
+  :global(:root[data-text='xl']) .textsize__steps i {
+    opacity: 1;
+  }
+  @media (forced-colors: active) {
+    .textsize__steps i {
+      forced-color-adjust: none;
+      background: ButtonText;
+    }
+  }
+</style>
+
+<script>
+  import './settings.client';
+</script>

@@ -1,0 +1,496 @@
+---
+/**
+ * ElectricOpening — the first screen of /electric/ (brief 7.7): a finished result before any
+ * input, in the form of home screens 12 and 13. Figure first, bars, working below; then each
+ * month. Three large questions refine it (有沒有舊車可以報廢？ · 停車的地方能充電嗎？ · 一個月騎多遠？)
+ * beside the county select. There is no empty state.
+ *
+ * Without JavaScript: the default county (新北市), with every scrapping answer, distance and
+ * charging answer printed as variants that the switches show (Segmented, :has()).
+ * With JavaScript (./opening.client.ts): the county select redraws the variants from the same
+ * table; ?county=&scrap=&km=(&charge=) from the home page set the answers and the line
+ * 「你在首頁選的：…」; the table true on the reader's day is used (a cached page is never stale).
+ * Each change is told to the detailed calculator below (event `el:open` on document).
+ *
+ * Props
+ *   locale  Locale
+ */
+import type { Locale } from '@/i18n';
+import Segmented from '@/components/ui/Segmented.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import electric from '@/i18n/pages/electric';
+import { fill, localize } from '@/i18n/pages/_copy';
+import { openingData } from './opening-data';
+import { buyHtml, caseText, monthHtml, monthLine, tableOn, type OpenText, type Scrap, type Charge } from './opening-view';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const T = localize(electric, locale).open as unknown as OpenText;
+const D = openingData(locale);
+const t = tableOn(D, D.built);
+const def = D.defaults;
+const scraps: Scrap[] = ['yes', 'no'];
+const charges: Charge[] = ['no', 'yes'];
+const countyName = D.counties.find((c) => c.id === def.county)!.name;
+const chosen = fill(T.chosenDefault, { case: caseText(D, T, def) });
+
+// The month card prints one set of bars per swap group (opening-view monthHtml): −1 (a scooter
+// that charges at home: the cheapest swap plans of any make) and one per swap-only scooter on
+// show. The set shown is the one whose group the buy card on show names (its hidden
+// [data-op-shows]), for the scrapping answer that is checked; the client redraws the buy card
+// per county, so this follows the county too. Without :has(), the any-make set shows.
+const groups = Math.max(0, ...D.tables.map((x) => x.swap.length));
+const swapCss =
+  '[data-op] .op-swap{display:none!important}' +
+  '@supports not selector(:has(*)){[data-op] .op-swap[data-op-sm="-1"]{display:grid!important}}' +
+  scraps
+    .flatMap((s) =>
+      [-1, ...Array.from({ length: groups }, (_, i) => i)].map(
+        (g) => `[data-op]:has([data-pick-input="scrap"][value="${s}"]:checked):has([data-op-buy="${s}"] [data-op-shows="${g}"]) .op-swap[data-op-sm="${g}"]{display:grid!important}`,
+      ),
+    )
+    .join('');
+---
+
+<style is:inline set:html={swapCss}></style>
+
+<div class="op" data-op data-pick-scope>
+  <p class="op-chosen" data-op-chosen aria-live="polite">{chosen}</p>
+
+  <div class="op-strip" data-op-strip>
+    {scraps.map((s) => <p data-when-scrap={s}>{D.words[t.buy[def.county][s].strip]}</p>)}
+  </div>
+
+  <div class="op-county">
+    <label class="op-label" for="op-county" data-js-only>{T.county}</label>
+    <select id="op-county" class="op-select" data-op-county data-js-only>
+      {D.counties.map((c) => <option value={c.id} selected={c.id === def.county}>{c.name}</option>)}
+    </select>
+    <p class="op-small op-nojs">{fill(T.countyStatic, { county: countyName })}</p>
+  </div>
+
+  <div class="op-grid">
+    <section class="op-card" aria-labelledby="op-buy-title">
+      <h2 id="op-buy-title" class="op-card__title">{T.buyTitle}</h2>
+      <Segmented name="scrap" legend={T.scrapLegend} value={def.scrap} options={[{ value: 'yes', label: T.scrapYes }, { value: 'no', label: T.scrapNo }]} />
+      <div class="op-buy">
+        {scraps.map((s) => <div class="op-variant" data-when-scrap={s} data-op-buy={s} set:html={buyHtml(D, T, t, def.county, s)} />)}
+      </div>
+      <p class="op-chip"><KindChip locale={locale} kind="derived" /> <span>{fill(T.chipChecked, { date: t.checked })}</span></p>
+    </section>
+
+    <section class="op-card" aria-labelledby="op-month-title">
+      <h2 id="op-month-title" class="op-card__title">{T.monthTitle}</h2>
+      <Segmented name="charge" legend={T.chargeLegend} value={def.charge} options={[{ value: 'no', label: T.chargeNo, sub: T.chargeNoSub }, { value: 'yes', label: T.chargeYes, sub: T.chargeYesSub }]} />
+      <Segmented name="km" legend={T.kmLegend} value={String(def.km)} columns={4} options={D.km.map((k) => ({ value: String(k), label: String(k), sub: T.kmSub }))} />
+      <div class="op-month">
+        {D.km.map((k) => <div class="op-variant" data-when-km={String(k)} data-op-month={k} set:html={monthHtml(D, T, t, k)} />)}
+      </div>
+      <div class="op-lines">
+        {scraps.flatMap((s) =>
+          D.km.flatMap((k) =>
+            charges.map((c) => (
+              <p class="op-line" data-when-scrap={s} data-when-km={String(k)} data-when-charge={c} data-op-line={`${s}-${k}-${c}`}>
+                {monthLine(D, T, t, { county: def.county, scrap: s, km: k, charge: c })}
+              </p>
+            )),
+          ),
+        )}
+        <p class="op-small" data-when-charge="yes">{T.beNote}</p>
+      </div>
+      <p class="op-chip"><KindChip locale={locale} kind="derived" /> <span>{fill(T.chipChecked, { date: t.checked })}</span></p>
+    </section>
+  </div>
+
+  <div class="op-actions">
+    <a class="op-more" href="#calc" data-op-more>
+      <span class="op-more__main">{T.more} <span aria-hidden="true">↓</span></span>
+      <span class="op-more__sub">{T.moreSub}</span>
+    </a>
+    <div class="op-links">
+      <a class="op-link" href="#examples">{T.examplesLink}</a>
+      <a class="op-link" href="#not-yet">{T.notNowLink}</a>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="op-data" set:html={JSON.stringify({ D, T })} />
+
+<script>
+  import './opening.client';
+</script>
+
+<style>
+  .op {
+    display: grid;
+    gap: var(--sp-5);
+    margin-block-start: var(--sp-4);
+  }
+  .op-chosen {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-read);
+    max-inline-size: 46rem;
+  }
+  .op-strip p {
+    display: block;
+    padding: var(--sp-3) var(--sp-4);
+    border-inline-start: var(--rule-paint) solid var(--exhaust);
+    background: var(--exhaust-wash);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    line-height: 1.5;
+    max-inline-size: 46rem;
+  }
+  .op-county {
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 24rem;
+  }
+  .op-label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .op-select {
+    min-block-size: var(--tap);
+    padding: 0 var(--sp-3);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-bold);
+  }
+  .op-nojs {
+    display: block;
+  }
+  :global(html.js) .op-nojs {
+    display: none;
+  }
+  .op-grid {
+    display: grid;
+    gap: var(--sp-5);
+    align-items: start;
+  }
+  @media (min-width: 56em) {
+    .op-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .op-card {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-5) var(--sp-4);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-3);
+    background: var(--surface);
+    min-inline-size: 0;
+  }
+  @media (min-width: 30em) {
+    .op-card {
+      padding: var(--sp-5);
+    }
+  }
+  /* grid children may shrink below their longest word (the card never pushes the page sideways) */
+  .op-card > :global(*),
+  .op-variant > :global(*) {
+    min-inline-size: 0;
+  }
+  .op-card__title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+  }
+  .op-variant {
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .op-card :global(.op-head) {
+    font-size: var(--fs-headline);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-headline, 1.28);
+    text-wrap: balance;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  /* Chinese breaks only between the phrases marked '|' in the copy; English breaks at its spaces */
+  .op-card :global(.op-head--phrased span) {
+    display: inline-block;
+    max-inline-size: 100%;
+  }
+  :global(html[lang='en']) .op-card :global(.op-head--phrased span) {
+    display: inline;
+  }
+  :global(html[lang='en']) .op-card :global(.op-head) {
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+  .op-card :global(.op-fig) {
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .op-card :global(.op-fig__who) {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .op-card :global(.op-fig__line) {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-black);
+    line-height: 1.1;
+  }
+  .op-card :global(.op-fig__n) {
+    font-size: var(--fs-figure);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .op-card :global(.op-fig--go .op-fig__line) {
+    color: var(--clean-ink);
+  }
+  .op-card :global(.op-fig--dear .op-fig__line) {
+    color: var(--exhaust-ink);
+  }
+  .op-card :global(.op-bars),
+  .op-card :global(.op-mbars) {
+    display: grid;
+    gap: var(--sp-3);
+  }
+  .op-card :global(.op-bar),
+  .op-card :global(.op-mbar) {
+    display: grid;
+    gap: var(--sp-1);
+  }
+  .op-card :global(.op-bar__label),
+  .op-card :global(.op-mbar__label) {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .op-card :global(.op-bar__track),
+  .op-card :global(.op-mbar__track) {
+    display: flex;
+    block-size: 1.75rem;
+  }
+  .op-card :global(.op-bar__fill),
+  .op-card :global(.op-mbar__fill) {
+    display: block;
+    block-size: 100%;
+    border-radius: var(--radius-1) 0 0 var(--radius-1);
+    background: var(--ink);
+    transform-origin: left center;
+  }
+  .op-card :global(.op-bar--petrol .op-bar__fill),
+  .op-card :global(.op-mbar--petrol .op-mbar__fill) {
+    background: var(--exhaust);
+  }
+  .op-card :global(.op-bar--ev .op-bar__fill),
+  .op-card :global(.op-mbar--home .op-mbar__fill) {
+    background: var(--clean);
+  }
+  .op-card :global(.op-bar__off) {
+    display: block;
+    block-size: 100%;
+    border: 2px dashed var(--clean-ink);
+    border-inline-start: 0;
+    border-radius: 0 var(--radius-1) var(--radius-1) 0;
+    background: repeating-linear-gradient(135deg, transparent 0 5px, var(--clean-wash) 5px 9px);
+  }
+  .op-card :global(.op-mbar__more) {
+    display: block;
+    block-size: 100%;
+    background: repeating-linear-gradient(135deg, var(--clean) 0 3px, transparent 3px 6px);
+    opacity: 0.6;
+  }
+  .op-card :global(.op-mbar--swap .op-mbar__track) {
+    block-size: 0.875rem;
+  }
+  .op-card :global(.op-mbar--swap .op-mbar__fill) {
+    background: var(--chart-swap);
+    border-radius: var(--radius-1);
+  }
+  .op-card :global(.op-mbar__sub) {
+    display: block;
+    font-weight: var(--fw-regular, 400);
+    color: var(--ink-2);
+  }
+  .op-card :global(.op-bar__value),
+  .op-card :global(.op-mbar__value) {
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.45;
+  }
+  .op-card :global(.op-bar__value b),
+  .op-card :global(.op-mbar__value b) {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-black);
+  }
+  .op-card :global(.op-bar__value span) {
+    color: var(--ink-2);
+  }
+  .op-card :global(.op-divider) {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-block-start: var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
+  }
+  .op-card :global(.op-divider)::after {
+    content: '';
+    flex: 1;
+    border-block-start: 1px dashed var(--line-strong);
+  }
+  .op-card :global(.op-body),
+  .op-line {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
+  .op-line {
+    font-weight: var(--fw-bold);
+  }
+  .op-lines {
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .op-small,
+  .op-card :global(.op-small) {
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .op-chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .op-card :global(.op-work) {
+    border-block-start: 1px solid var(--line);
+  }
+  .op-card :global(.op-work > summary) {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    list-style: none;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-btn);
+    cursor: pointer;
+  }
+  .op-card :global(.op-work > summary::-webkit-details-marker) {
+    display: none;
+  }
+  .op-card :global(.op-work > summary)::before {
+    content: '';
+    flex: none;
+    inline-size: 0.55em;
+    block-size: 0.55em;
+    border-inline-end: 2.5px solid currentColor;
+    border-block-end: 2.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .op-card :global(.op-work[open] > summary)::before {
+    transform: rotate(45deg);
+  }
+  .op-card :global(.op-work__body) {
+    display: grid;
+    gap: var(--sp-4);
+    padding-block: var(--sp-2) var(--sp-3);
+  }
+  .op-card :global(.op-work__title) {
+    display: grid;
+    font-weight: var(--fw-black);
+  }
+  .op-card :global(.op-work__title span) {
+    font-weight: var(--fw-regular);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .op-card :global(.op-work__lines) {
+    list-style: none;
+    padding: 0;
+    margin: var(--sp-2) 0 0;
+    display: grid;
+  }
+  .op-card :global(.op-work__lines li) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding-block: var(--sp-2);
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    line-height: 1.45;
+  }
+  .op-card :global(.op-work__lines .op-work__paid) {
+    font-weight: var(--fw-black);
+    font-size: var(--fs-base);
+    border-block-end: 0;
+    border-block-start: 2px solid var(--ink);
+  }
+  .op-card :global(.op-amt) {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .op-card :global(.op-upto) {
+    color: var(--ink-2);
+  }
+  .op-actions {
+    display: grid;
+    gap: var(--sp-3);
+    max-inline-size: 40rem;
+  }
+  .op-more {
+    display: grid;
+    gap: 0.15em;
+    min-block-size: var(--tap);
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--radius-3);
+    background: var(--go-ink-bg);
+    color: #fff;
+    text-decoration: none;
+  }
+  .op-more:hover {
+    filter: brightness(1.1);
+  }
+  .op-more__main {
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-black);
+  }
+  .op-more__sub {
+    font-size: var(--fs-sm);
+  }
+  .op-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tap-gap) var(--sp-4);
+  }
+  .op-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+  }
+  /* bars grow once when the opening first shows (brief 5.3); the resting state is the final state */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not([data-motion='off'])) .op-card :global(.op-bar__fill),
+    :global(html:not([data-motion='off'])) .op-card :global(.op-mbar__fill) {
+      animation: op-grow 0.9s var(--ease-out) both;
+    }
+  }
+  @keyframes op-grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+</style>

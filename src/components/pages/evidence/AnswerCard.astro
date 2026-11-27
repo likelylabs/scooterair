@@ -1,0 +1,184 @@
+---
+/**
+ * AnswerCard — one question the site used to list as a gap in the evidence, as "the answer we
+ * have now" (brief 5.4, 7.2 #answers, 7.3). Replaces GapCard.
+ *
+ *   the question (a heading) · its chip(s) · the answer · 根據 the basis in one line ·
+ *   要小心 its caveat · (optional) its K sentence · each estimated number as an EstimateValue
+ *   (約 A 到 B + 推估, a tap through to its working) · links to the working and the evidence
+ *
+ * The words are lane A's (src/data/answers.ts → localizeAnswer); the K sentence is lane B's
+ * (ui.ts → kSentences). A K sentence may only appear on the pages brief 7.1 lists, so the page
+ * says which ones it may print (`k`).
+ *
+ * Props
+ *   locale   Locale
+ *   id       AnswerId ('answer-idle-emission-rate')
+ *   level    heading level of the question (default 3)
+ *   k        K-sentence ids this page may print, e.g. ['K6']; the card prints its own only if listed
+ *   on       'estimate' | 'evidence' (default 'evidence'): which page the card sits on, so the
+ *            link to the working is '#recipe' on /estimate/ and '/estimate/#recipe' elsewhere
+ *   legacy   also carry the former gap's id as an anchor (old links to /evidence/#gap-… land here)
+ *   compact  drop the basis line (default false)
+ *
+ *   <AnswerCard locale={locale} id="answer-pull-away-spike" k={['K6']} on="estimate" />
+ */
+import type { Locale } from '@/i18n';
+import { href } from '@/i18n';
+import { kSentences } from '@/i18n/ui';
+import { localizeAnswer, type AnswerId, type KSentenceId } from '@/data/answers';
+import { estRange } from '@/data/estimate';
+import KindChip from '@/components/ui/KindChip.astro';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import Icon from '@/components/ui/Icon.astro';
+import evidenceCopy from '@/i18n/pages/evidence';
+import { fill, localize } from '@/i18n/pages/_copy';
+
+interface Props {
+  locale: Locale;
+  id: AnswerId;
+  level?: 2 | 3 | 4;
+  k?: KSentenceId[];
+  on?: 'estimate' | 'evidence';
+  legacy?: boolean;
+  compact?: boolean;
+  class?: string;
+}
+const { locale, id, level = 3, k = [], on = 'evidence', legacy = false, compact = false, class: cls } = Astro.props;
+const a = localizeAnswer(id, locale);
+const en = locale === 'en';
+const H = `h${level}` as 'h2' | 'h3' | 'h4';
+const W = {
+  basis: en ? 'Based on' : '根據',
+  care: en ? 'Be careful' : '要小心',
+  working: en ? 'See the working' : '看算法',
+  numbers: en ? 'The estimated numbers' : '推估的數字',
+};
+const colon = en ? ': ' : '：';
+const kText = a.kSentence && (k.includes(a.kSentence) || (a.kSentence === 'K5film' && k.includes('K5'))) ? kSentences[a.kSentence][locale] : undefined;
+// Estimated numbers the answer prints get their own tap-through (brief 4.2 rules 2 and 4).
+const estSlots = a.slots.filter((s) => estRange(s).kind === 'estimate');
+const working = a.anchor ? (on === 'estimate' ? `#${a.anchor}` : href(`/estimate/#${a.anchor}`, locale)) : undefined;
+const evidence = href(`/evidence/#link-${a.chainLink}`, locale);
+const TE = localize(evidenceCopy, locale);
+/** Names the topic of the link ("更多證據：排氣管排出什麼"), not its number. */
+const evidenceLabel = fill(TE.answerLink.label, { topic: TE.answerLink.topics[a.chainLink - 1] });
+---
+
+<article class:list={['ans', cls]} id={a.id} aria-labelledby={`${a.id}-q`} data-answer={a.id}>
+  {legacy && <span id={a.formerGap} class="ans__legacy" aria-hidden="true"></span>}
+  <H class="ans__q" id={`${a.id}-q`}>{a.question}</H>
+  {a.chips.length > 0 && (
+    <p class="ans__chips">
+      {a.chips.map((c) => <KindChip locale={locale} kind={c.kind} where={c.text.includes(en ? ' · ' : '・') ? c.text.split(en ? ' · ' : '・').slice(1).join(en ? ' · ' : '・') : undefined} />)}
+    </p>
+  )}
+  <p class="ans__a">{a.answer}</p>
+  {estSlots.length > 0 && (
+    <div class="ans__nums" role="group" aria-label={W.numbers}>
+      {estSlots.map((s) => <EstimateValue locale={locale} slotId={s} unitStyle="symbol" />)}
+    </div>
+  )}
+  <dl class="ans__dl">
+    {!compact && (
+      <div>
+        <dt>{W.basis}{colon}</dt>
+        <dd>{a.basis}</dd>
+      </div>
+    )}
+    <div>
+      <dt>{W.care}{colon}</dt>
+      <dd>{a.caveat}</dd>
+    </div>
+  </dl>
+  {kText && <p class="ans__k ans__note">{kText}</p>}
+  <div class="ans__links">
+    {working && <a href={working}>{W.working}<Icon name="arrow-right" size="1em" /></a>}
+    <a href={evidence}>{evidenceLabel}<Icon name="arrow-right" size="1em" /></a>
+  </div>
+</article>
+
+<style>
+  .ans {
+    position: relative;
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+    padding: var(--sp-4);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-2);
+    background: var(--surface);
+    scroll-margin-block-start: calc(var(--header-h, 48px) + var(--sp-4));
+  }
+  .ans__legacy {
+    position: absolute;
+    inset-block-start: 0;
+    scroll-margin-block-start: calc(var(--header-h, 48px) + var(--sp-4));
+  }
+  .ans__q {
+    margin: 0;
+    font-size: var(--fs-md);
+    line-height: var(--lh-heading, 1.35);
+    font-weight: var(--fw-black, 900);
+    text-wrap: balance;
+  }
+  .ans__chips {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+  .ans__a {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
+    color: var(--ink);
+  }
+  .ans__nums {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+  .ans__dl {
+    margin: 0;
+    display: grid;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read, 1.6);
+    color: var(--ink-2);
+  }
+  .ans__dl div {
+    display: block;
+  }
+  .ans__dl dt {
+    display: inline;
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+  }
+  .ans__dl dd {
+    display: inline;
+    margin: 0;
+  }
+  .ans__k {
+    margin: 0;
+    padding-inline-start: var(--sp-3);
+    border-inline-start: 3px solid var(--line-strong);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read, 1.6);
+    color: var(--ink-2);
+  }
+  .ans__links {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tap-gap, 0.5rem) var(--sp-4);
+  }
+  .ans__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-block-size: var(--tap, 3rem);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-btn, 1.0625rem);
+  }
+</style>

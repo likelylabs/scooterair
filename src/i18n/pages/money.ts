@@ -16,16 +16,16 @@ export default copy({
       en: '2026 subsidies end by 31 December at the latest. Choose your city or county to see whether places are left.',
     },
     'A-city-open': {
-      'zh-TW': '{city}：還有名額（{date}查）。最晚 12 月 31 日前買車、領牌。',
-      en: '{city}: places left (checked {date}). Buy and register by 31 December at the latest.',
+      'zh-TW': '{city}：還有名額（{date}查）。最晚 {cityDeadline}前買車、領牌。',
+      en: '{city}: places left (checked {date}). Buy and register by {cityDeadline} at the latest.',
     },
     'A-city-restricted': {
-      'zh-TW': '{city}：剩下的名額只限汰舊換新或特定身分（{date}查）。最晚 12 月 31 日前買車、領牌。',
-      en: '{city}: the places left are for scrap-and-replace or certain groups only (checked {date}). Buy and register by 31 December at the latest.',
+      'zh-TW': '{city}：剩下的名額只限汰舊換新或特定身分（{date}查）。最晚 {cityDeadline}前買車、領牌。',
+      en: '{city}: the places left are for scrap-and-replace or certain groups only (checked {date}). Buy and register by {cityDeadline} at the latest.',
     },
     'A-city-unpublished': {
-      'zh-TW': '{city}：方案還在進行，剩多少名額沒有公布（{date}查）。最晚 12 月 31 日前買車、領牌。',
-      en: '{city}: the programme is running; how many places remain has not been published (checked {date}). Buy and register by 31 December at the latest.',
+      'zh-TW': '{city}：方案還在進行，但剩多少名額沒有公布或沒有查證，可能已經沒了（{date}查）。最晚 {cityDeadline}前買車、領牌。',
+      en: '{city}: the programme is running, but how many places remain was not published or could not be checked, so they may be gone (checked {date}). Buy and register by {cityDeadline} at the latest.',
     },
     'A-city-exhausted': {
       'zh-TW': '{city}的補助已在 {date}用完。中央補助到 12 月 31 日。',
@@ -36,8 +36,8 @@ export default copy({
       en: '{city}’s subsidy closed on {date}. Central subsidies run to 31 December.',
     },
     'A-city-unknown': {
-      'zh-TW': '{city}：今年的補助我們查不到，請洽環保局。中央補助到 12 月 31 日。',
-      en: '{city}: we could not check this year’s subsidy; please ask the environmental bureau. Central subsidies run to 31 December.',
+      'zh-TW': '{city}：今年的補助我們查不到，請打電話問當地的環保局或縣市政府。中央補助到 12 月 31 日。',
+      en: '{city}: we could not check this year’s subsidy; please phone the local environmental bureau or county government. Central subsidies run to 31 December.',
     },
     B: {
       'zh-TW': '買車期限過了。12 月 31 日前買車的人，線上申請多半到 1 月 10 日。',
@@ -71,7 +71,7 @@ export default copy({
     label: { 'zh-TW': '補助時間軸', en: 'Subsidy timeline' },
     today: { 'zh-TW': '今天', en: 'Today' },
     purchaseDate: { 'zh-TW': '12/31', en: '31 Dec' },
-    purchase: { 'zh-TW': '買車、領牌的最後期限', en: 'Last day to buy and register' },
+    purchase: { 'zh-TW': '中央補助：買車、領牌的最後期限', en: 'Central subsidy: last day to buy and register' },
     filingDate: { 'zh-TW': '1/10', en: '10 Jan' },
     filing: { 'zh-TW': '線上申請截止（各縣市不同）', en: 'Online applications close (varies by city)' },
     nextDate: { 'zh-TW': '2027', en: '2027' },
@@ -80,5 +80,34 @@ export default copy({
     daysWithout: { 'zh-TW': '已經 {n} 天沒有定案', en: '{n} days with nothing confirmed' },
     past: { 'zh-TW': '已過', en: 'passed' },
     checked: { 'zh-TW': '{date}查', en: 'checked {date}' },
+  },
+  /**
+   * Home screens 12 and 13, the film's money beat and /electric/ (brief 7.7): the deadline strip,
+   * one sentence per state, chosen by stripKind() in src/lib/home-money.ts. Dates are filled with
+   * formatDate(): {subsidy} the last day the counted subsidies accept purchases, {promo} the last
+   * day of the petrol scooter's dealer offers, {year} the reader's year.
+   * 'nothing-confirmed' says 還沒有確定, never 未公布: a draft has been pre-announced (fact
+   * econ-no-2027-programme).
+   */
+  home: {
+    strip: {
+      'subsidy-and-promo': { 'zh-TW': '補助到 {subsidy}。燃油機車的促銷到 {promo}。', en: 'Subsidies end {subsidy}. Petrol-scooter promotions end {promo}.' },
+      subsidy: { 'zh-TW': '補助到 {subsidy}。', en: 'Subsidies end {subsidy}.' },
+      'nothing-confirmed': { 'zh-TW': '{year} 年的補助還沒有確定。下面先用沒有補助的價格算。', en: 'Nothing is confirmed yet for {year} subsidies. The sums below use prices with no subsidy.' },
+      'next-programme': { 'zh-TW': '補助到 {subsidy}。', en: 'Subsidies end {subsidy}.' },
+      'other-subsidy': {
+        'zh-TW': '最便宜的這一輛沒有算補助，它本來就便宜；別的車款不用報廢機車，也有新購補助，到 {subsidy}。',
+        en: 'No subsidy is counted for the cheapest model, which is cheap on its own; other models get a new-purchase subsidy even with nothing to scrap, until {subsidy}.',
+      },
+      'other-subsidy-and-promo': {
+        'zh-TW': '最便宜的這一輛沒有算補助，它本來就便宜；別的車款不用報廢機車，也有新購補助，到 {subsidy}。燃油機車的促銷到 {promo}。',
+        en: 'No subsidy is counted for the cheapest model, which is cheap on its own; other models get a new-purchase subsidy even with nothing to scrap, until {subsidy}. Petrol-scooter promotions end {promo}.',
+      },
+      'no-subsidy': { 'zh-TW': '這個條件下，沒有可以算進去的補助。下面用沒有補助的價格算。', en: 'On these terms no subsidy can be counted. The sums below use prices with no subsidy.' },
+    },
+    plate: {
+      light: { 'zh-TW': '綠牌', en: 'green plate' },
+      heavy: { 'zh-TW': '白牌', en: 'white plate' },
+    },
   },
 });

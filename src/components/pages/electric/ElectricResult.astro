@@ -28,7 +28,7 @@ interface Props {
   hidden?: boolean;
 }
 const { id, locale, rendered, city, hidden = false } = Astro.props;
-const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix: 'NT$', value: '', unit: '', note: '', deadlineHtml: '', nextHtml: '', bodyHtml: '' };
+const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix: 'NT$', value: '', unit: '', spoken: '', short: '', note: '', deadlineHtml: '', nextHtml: '', bodyHtml: '' };
 ---
 
 <div class="el-result" id={id} data-el-result data-city={city} hidden={hidden}>
@@ -85,9 +85,51 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
   .el-src {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 0.3em;
+    align-items: baseline;
+    gap: 0.15em 0.5em;
     margin-block-start: var(--sp-1);
     font-size: var(--fs-xs);
+    line-height: 1.9;
+  }
+  .el-src a,
+  .el-msg__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+  }
+  .el-src__sep {
+    margin-inline: 0.35em;
+    color: var(--ink-3);
+  }
+  .el-jump {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
+    font-size: var(--fs-sm);
+  }
+  .el-jump > span {
+    color: var(--ink-2);
+  }
+  .el-jump a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    font-weight: var(--fw-bold);
+  }
+  .el-row__more > summary {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .el-msg__items {
+    display: grid;
+    gap: var(--sp-1);
+    padding-inline-start: 1.1em;
+    margin: 0;
   }
   .el-src a,
   .el-msg a,
@@ -251,11 +293,48 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
     font-size: var(--fs-sm);
     font-variant-numeric: tabular-nums;
   }
+  /* the monthly table fits a 320px screen: fixed columns, numbers may wrap, and a scroll box as a
+     last resort (never the whole page) */
+  .el-mt__wrap {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
   .el-mt {
     inline-size: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     font-size: var(--fs-sm);
     margin-block: var(--sp-2);
+  }
+  .el-mt__c1 {
+    inline-size: 46%;
+  }
+  .el-mt th {
+    overflow-wrap: anywhere;
+  }
+  .el-mt__what {
+    display: grid;
+    gap: 0.1em;
+    margin-block-start: var(--sp-1);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    color: var(--ink-2);
+  }
+  .el-mt__note td {
+    background: var(--surface-2, var(--exhaust-wash));
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+  .el-mt__note p + p {
+    margin-block-start: var(--sp-1);
+  }
+  html.js .el-mt__note:not([data-open]) {
+    display: none;
+  }
+  .el-mt .el-avg th,
+  .el-mt .el-avg td {
+    font-weight: var(--fw-bold);
+    color: var(--ink-2);
   }
   .el-mt th,
   .el-mt td {
@@ -267,7 +346,6 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
   .el-mt .num {
     text-align: end;
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
   }
   .el-mt thead th {
     font-size: var(--fs-xs);
@@ -285,35 +363,39 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
   .el-range {
     display: block;
     font-size: var(--fs-xs);
-    color: var(--ink-3);
+    color: var(--ink-2);
     font-weight: var(--fw-regular);
   }
+  /* "?" opens the row's note; the visible circle is small, the tap area is 44px */
   .el-note {
-    display: inline-block;
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.6em;
+    block-size: 1.6em;
     margin-inline-start: 0.3em;
-  }
-  .el-note > summary {
-    min-block-size: 0;
-    display: inline-flex;
-    inline-size: 1.4em;
-    block-size: 1.4em;
-    justify-content: center;
+    padding: 0;
     border: 1px solid var(--line-strong);
     border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
     font-size: var(--fs-xs);
-    list-style: none;
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    vertical-align: 0.1em;
   }
-  .el-note > summary::-webkit-details-marker {
+  .el-note::after {
+    content: '';
+    position: absolute;
+    inset: calc((1.6em - 44px) / 2);
+  }
+  .el-note[aria-expanded='true'] {
+    background: var(--ink);
+    color: var(--surface);
+  }
+  html:not(.js) .el-note {
     display: none;
-  }
-  .el-note[open] {
-    display: block;
-  }
-  .el-note p {
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-regular);
-    color: var(--ink-2);
-    margin-block-start: var(--sp-1);
   }
   .el-plan {
     font-weight: var(--fw-bold);
@@ -383,6 +465,13 @@ const r: Rendered = rendered ?? { verdict: 'C', sentence: '', title: '', prefix:
   @media print {
     .el-result details:not([open]) > *:not(summary) {
       display: block;
+    }
+    html.js .el-mt__note:not([data-open]) {
+      display: table-row;
+    }
+    .el-note,
+    .el-jump {
+      display: none;
     }
   }
 </style>

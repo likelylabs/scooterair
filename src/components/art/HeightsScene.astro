@@ -1,0 +1,123 @@
+---
+/**
+ * HeightsScene — G8: who is closest (brief 3.2 screen 8, 5.2).
+ *
+ * A ruler in centimetres and four whole figures to scale on one ground line:
+ * a baby in a pushchair (the 55 to 85 cm band shaded), a schoolchild, an
+ * adult, and a rider seated on a scooter. A dashed line marks one metre: the
+ * tailpipe (on the 50 cm mark: `iot-exhaust-height-assumption`) and the baby
+ * are both under it. A breathing ring pulses at each
+ * nose, the child's and the baby's faster. The exhaust is drawn evenly from
+ * the ground to above the adult's head: no bands by height, because the
+ * estimate has no number for child height (brief 4.6).
+ *
+ * Props
+ *   locale   Locale
+ *   figures  which figures (default all four; drawn pushchair, adult, schoolchild, rider,
+ *            so the child stands next to the tailpipe):
+ *            'pushchair' | 'schoolchild' | 'adult' | 'rider'
+ *   band     shade the pushchair band (default true)
+ *   tag      false (default; <Screen illustration> prints it) | 'street'
+ *   id, class
+ *
+ *   <HeightsScene slot="picture" locale={locale} />
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import { art, fill } from '@/i18n/art';
+import { est } from '@/data/estimate';
+import SceneFrame from './SceneFrame.astro';
+import SceneLabel from './SceneLabel.astro';
+import { air, type Box } from './air';
+import { AIR_EXTRA } from './air-slots';
+import { MOUTH, RIDER_MOUTH, STROLLER_BAND, TAILPIPE, artId, breath, figureBoxes, person, scooter } from './parts';
+import { put } from './kit';
+import { sceneAlt } from './scene';
+
+type Who = 'pushchair' | 'schoolchild' | 'adult' | 'rider';
+interface Props {
+  locale: Locale;
+  figures?: Who[];
+  band?: boolean;
+  tag?: false | 'street';
+  id?: string;
+  class?: string;
+}
+const { locale, figures = ['pushchair', 'adult', 'schoolchild', 'rider'], band = true, tag = false, id, class: cls } = Astro.props;
+
+// x starts far enough left that the ruler's numbers and 「公分」 sit inside the picture at 320 px and 特大
+const VB: Box = { x: -100, y: -262, w: 584, h: 374 };
+const TOP = 180; // the ruler's last tick
+const RULER = 0;
+const X: Record<Who, number> = { pushchair: 4, schoolchild: 206, adult: 138, rider: 296 };
+const centre: Record<Who, number> = { pushchair: X.pushchair + 66, schoolchild: X.schoolchild + 2, adult: X.adult + 1, rider: X.rider + 104 };
+const has = (w: Who) => figures.includes(w);
+const pipe = { x: X.rider + TAILPIPE.x, y: TAILPIPE.y };
+
+const a = air({
+  frame: VB,
+  seed: 12,
+  id: artId('air'),
+  scenario: 'dozen',
+  extra: AIR_EXTRA,
+  // one even zone from the ground to above the adult's head, right across the picture
+  kerb: { x0: RULER + 6, x1: VB.x + VB.w - 8, top: 190, sourceX: has('rider') ? pipe.x : VB.x + VB.w },
+  tailpipes: has('rider') ? [pipe] : [],
+  avoid: [
+    ...(has('pushchair') ? figureBoxes('pushchair', X.pushchair) : []),
+    ...(has('schoolchild') ? figureBoxes('schoolchild', X.schoolchild) : []),
+    ...(has('adult') ? figureBoxes('adult', X.adult) : []),
+    ...(has('rider') ? figureBoxes('scooter', X.rider) : []),
+    { x: VB.x, y: -TOP - 14, w: RULER - VB.x + 4, h: TOP + 20 },
+    { x: VB.x, y: 0, w: VB.w, h: 90 },
+  ],
+});
+
+// the ruler: a tick every 10 cm, a long one every 50
+let ticks = '';
+for (let h = 0; h <= TOP; h += 10) ticks += `M${RULER},${-h}h${h % 50 === 0 ? -16 : -8}`;
+const ruler = `<path class="a-dim" d="M${RULER},0V${-TOP - 6}${ticks}"/>`;
+const nums = [0, 50, 100, 150];
+const metre = `<path class="hs-metre" d="M${RULER},-100H${VB.x + VB.w}"/>`;
+const bandArt =
+  band && has('pushchair')
+    ? `<rect class="hs-band" x="${RULER}" y="${-STROLLER_BAND.high}" width="${X.pushchair + 112 - RULER}" height="${STROLLER_BAND.high - STROLLER_BAND.low}"/>` +
+      `<path class="hs-band-edge" d="M${RULER},${-STROLLER_BAND.high}H${X.pushchair + 112}M${RULER},${-STROLLER_BAND.low}H${X.pushchair + 112}"/>`
+    : '';
+const nose: Record<Who, { x: number; y: number; cls: string }> = {
+  pushchair: { x: X.pushchair + MOUTH.pushchair.x + 6, y: MOUTH.pushchair.y - 2, cls: 'hs-breath--fast' },
+  schoolchild: { x: X.schoolchild + MOUTH.schoolchild.x * 1.11, y: MOUTH.schoolchild.y * 1.11, cls: 'hs-breath--fast' },
+  adult: { x: X.adult + MOUTH.adult.x + 3, y: MOUTH.adult.y, cls: '' },
+  rider: { x: X.rider + RIDER_MOUTH.x + 4, y: RIDER_MOUTH.y - 3, cls: '' },
+};
+const rings = figures.map((w) => `<g class="hs-breath ${nose[w].cls}">${breath(nose[w].x, nose[w].y, 9.5)}</g>`).join('');
+const draw: Record<Who, string> = {
+  pushchair: put(X.pushchair, 0, person('pushchair'), { cls: 'a-figure' }),
+  schoolchild: put(X.schoolchild, 0, person('schoolchild'), { cls: 'a-figure' }),
+  adult: put(X.adult, 0, person('adult'), { cls: 'a-figure' }),
+  rider: put(X.rider, 0, scooter({ kind: 'gas', rider: true, face: true }), { cls: 'a-figure' }),
+};
+const scene = [
+  `<rect class="a-plane" x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${-VB.y}"/>`,
+  `<rect class="a-road" x="${VB.x}" y="0" width="${VB.w}" height="${VB.y + VB.h}"/>`,
+  a.defs + a.wash + bandArt + metre + a.cores + a.marks + ruler,
+  figures.map((w) => draw[w]).join(''),
+  // the tailpipe sits on the ruler's 50 cm mark (registry: about 0.5 m); a dashed guide joins them
+  has('rider') ? `<path style="fill:none;stroke:var(--air-rib);stroke-width:2;stroke-dasharray:2 5;stroke-linecap:round" d="M${RULER},${pipe.y}H${pipe.x - 10}"/><path class="a-leader" d="M${pipe.x},${pipe.y + 8}V40"/><circle class="hs-pipe" cx="${pipe.x + 2}" cy="${pipe.y - 2}" r="9"/>` : '',
+  rings,
+].join('');
+const names: Record<Who, string> = { pushchair: art.heights.names.pushchair[locale], schoolchild: art.heights.names.schoolchild[locale], adult: art.heights.names.adult[locale], rider: art.heights.names.rider[locale] };
+const alt = sceneAlt(locale, fill(art.heights.alt, locale, { top: TOP, lo: STROLLER_BAND.low, hi: STROLLER_BAND.high }), { scenario: 'dozen', count: est.scn.dozen.count });
+---
+
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--heights', cls].filter(Boolean).join(' ')}>
+  <Fragment set:html={scene} />
+  <Fragment slot="labels">
+    {nums.map((n) => <SceneLabel box={VB} x={RULER - 20} y={-n} anchor="end middle" quiet class="hs-num">{n}</SceneLabel>)}
+    <SceneLabel box={VB} x={VB.x + 5} y={-TOP - 8} anchor="start bottom" quiet class="hs-num">{art.words.cm[locale]}</SceneLabel>
+    <SceneLabel box={VB} x={RULER + 6} y={-104} anchor="start bottom" class="hs-metre-label">{art.words.oneMetre[locale]}</SceneLabel>
+    {/* two rows, so five names fit side by side on a 320 px phone at the largest text size */}
+    {figures.map((w) => <SceneLabel box={VB} x={centre[w]} y={8} anchor="center top" class={w === 'adult' ? 'hs-row2' : undefined}>{names[w]}</SceneLabel>)}
+    {has('rider') && <SceneLabel box={VB} x={pipe.x} y={8} anchor="center top" class="hs-pipe-label hs-row2">{art.words.tailpipe[locale]}</SceneLabel>}
+  </Fragment>
+</SceneFrame>

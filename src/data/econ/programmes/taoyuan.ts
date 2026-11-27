@@ -7,8 +7,8 @@ import { age, builtBy, fixed, flag, quota, residency, scrap, t, twoStroke } from
 
 const PAYER = t('桃園市政府環境保護局', 'Taoyuan City Department of Environmental Protection');
 const SRC = ['taoyuan-epb-2026-programme'] as const;
-const STATUS_2027 = t('市府以問卷研擬116年方案，尚未公布。', 'The city is drafting a 2027 programme from a survey; nothing announced.');
-const APPLY = t('補助期間至115年12月31日，最晚116年1月10日前申請。', 'Purchases to 31 December 2026; apply by 10 January 2027 at the latest.');
+const STATUS_2027 = t('市府以問卷研擬 2027 年方案，尚未公布。', 'The city is drafting a 2027 programme from a survey; nothing announced.');
+const APPLY = t('補助期間至 2026 年 12 月 31 日，最晚 2027 年 1 月 10 日前申請。', 'Purchases to 31 December 2026; apply by 10 January 2027 at the latest.');
 // ty-eligibility: ROC nationals registered by 2024-12-31, or residence-permit holders living in
 // Taoyuan who meet the spouse-registration condition. We cannot test the second route, so for a
 // foreign national the lines are excluded as ambiguous (and the amount reported), not as "no".
@@ -22,12 +22,12 @@ const roc: Condition = {
 // roc is appended last to every line (in p() below), so a foreign buyer's other conditions are
 // tested first and only lines they would otherwise get are reported as ambiguous.
 const general: Condition[] = [residency(undefined, '2024-12-31'), age(18)];
-const GENERAL = '年滿18歲、113年12月31日前設籍桃園市（或持居留證並符合配偶設籍條件）。';
+const GENERAL = '年滿18歲、2024 年 12 月 31 日前設籍桃園市（或持居留證並符合配偶設籍條件）。';
 const GENERAL_EN = 'Aged 18+ and registered in Taoyuan by 31 December 2024 (or a residence-permit holder meeting the spouse rule).';
 const STACK_NOTE = t('桃園市公告沒有說明能否與中央補助併領；試算照其他縣市的做法同時計入中央補助，請向環保局確認。', 'The Taoyuan notice does not say whether its money stacks with central subsidies; like other cities we count both, so confirm with the bureau.');
-const generalQuota = quota('unknown', '2026-11-24', t('一般性補助共6,000名；線上系統無法開啟，剩餘名額不明。', '6,000 general places; the online system could not be opened, so remaining places are unknown.'), { total: 6000 });
+const generalQuota = quota('unknown', '2026-11-26', t('一般性補助共6,000名；我們打不開線上系統，還剩多少請上線上系統查，或打電話問環保局。', '6,000 general places; we could not open the online system, so check what is left there or phone the bureau.'), { total: 6000 });
 const projectQuota = (n: number, per = '') =>
-  quota('unknown', '2026-11-24', t(`名額${n.toLocaleString('en')}名${per}；剩餘名額不明。`, `${n.toLocaleString('en')} places${per ? ' per team' : ''}; remaining places unknown.`), { total: n });
+  quota('unknown', '2026-11-26', t(`名額${n.toLocaleString('en')}名${per}；還剩多少請打電話問環保局。`, `${n.toLocaleString('en')} places${per ? ' per team' : ''}; phone the bureau to ask what is left.`), { total: n });
 
 const p = (x: Partial<Programme> & Pick<Programme, 'id' | 'name' | 'amount' | 'conditions' | 'conditionText' | 'quota' | 'research'>): Programme => ({
   jurisdiction: 'taoyuan',
@@ -78,7 +78,7 @@ export const taoyuanProgrammes: Programme[] = [
     kind: 'purchase-subsidy',
     amount: fixed(12000, true),
     conditions: [...general, scrap, builtBy('2016-12-31')],
-    conditionText: t(`${GENERAL}汰換民國105年12月31日以前出廠的1至5期機車；公告只寫「最高12,000元」。`, `${GENERAL_EN} Scrap a phase 1–5 scooter built by 31 December 2016; the notice says only "up to NT$12,000".`),
+    conditionText: t(`${GENERAL}汰換 2016 年（民國 105 年）12 月 31 日以前出廠的1至5期機車；公告只寫「最高12,000元」。`, `${GENERAL_EN} Scrap a phase 1–5 scooter built by 31 December 2016; the notice says only "up to NT$12,000".`),
     exclusiveGroups: ['ty-base'],
     quota: generalQuota,
     research: ['taoyuan#ty-scrap-1to5', 'taoyuan#ty-quota'],
@@ -96,11 +96,11 @@ export const taoyuanProgrammes: Programme[] = [
   }),
   topup(
     'ty-lowincome-or-fuxing',
-    ['桃園市中低收入戶或復興區居民加碼', 'Taoyuan middle-low income or Fuxing District top-up'],
+    ['桃園市中低收入戶或復興區居民加碼', 'Taoyuan lower-middle-income or Fuxing District top-up'],
     10000,
     [{ kind: 'any-of', conditions: [{ kind: 'income', levels: ['middle-low'], ambiguous: ['low'] }, flag('remoteDistrict')] }],
-    ['中低收入戶或復興區居民。公告只寫「中低收入戶」，低收入戶是否適用請向環保局確認。', 'Middle-low income households or Fuxing District residents. The notice says only "middle-low income"; ask the bureau whether low-income households qualify.'],
-    quota('unknown', '2026-11-24', t('未公布名額。', 'No quota published.')),
+    ['中低收入戶或復興區居民。公告只寫「中低收入戶」，低收入戶是否適用請向環保局確認。', 'Middle-low income households or Fuxing District residents. The notice says only "lower-middle-income"; ask the bureau whether low-income households qualify.'],
+    quota('unknown', '2026-11-26', t('沒有公布名額；申請前請先打電話問環保局。', 'No number of places is published; phone the bureau before you apply.')),
     'ty-topup-lowincome-fuxing',
   ),
   topup('ty-child', ['桃園市婦幼E騎GO（育有0至12歲幼童）', 'Taoyuan family scheme (child aged 0–12)'], 6000, [flag('childUnder12')], ['育有0至12歲幼童的家庭。', 'A household raising a child aged 0–12.'], projectQuota(2500), 'ty-topup-women-children'),

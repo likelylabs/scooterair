@@ -1,0 +1,142 @@
+{
+ "scope": "gap-answers-c",
+ "writtenOn": "2026-11-26",
+ "note": "Best available answers for four gaps in src/data/gaps.ts. Every figure was either read in a source I opened (verified true) or derived by arithmetic shown here. WHO guideline values could not be opened at a primary source and are marked unverified.",
+ "answers": [
+  {
+   "gapId": "gap-electrification-street-air",
+   "question": "How much cleaner does street air get when scooters go electric?",
+   "kind": "estimate",
+   "bestAnswer": "Nobody has measured it on a Taiwanese street, but a Taiwan model (Liou and Wu 2021) estimates that switching every petrol scooter to an electric one would avoid about US$1.0 billion a year of health harm from air pollution (about NT$30 billion at 30 NT$ per US$), and an electric scooter has no tailpipe, so each swap removes that scooter's exhaust from the kerb where people wait.",
+   "bestAnswerZh": "還沒有人在台灣的街頭量過，但台灣的一項模型研究（Liou 與 Wu，2021）估計，如果把所有汽油機車都換成電動機車，每年可少掉約 10 億美元（約新台幣 300 億元）的空氣污染健康損失；而且電動機車沒有排氣管，換掉一輛，路口等待的人就少吸一輛的廢氣。",
+   "range": {
+    "health_benefit_usd_per_year": "1,008.83 million (health) of 1,104.85 million (health + greenhouse gas), for 100% of 785,567 50cc and 12,689,574 125cc scooters switched; the paper's conclusion separately says 2,153 million, which it does not reconcile",
+    "life_cycle_emission_factors_g_per_km": "50cc petrol vs electric: PM2.5 0.0067 vs 0.0007 (-90%), NOx 0.0790 vs 0.0150 (-81%), SOx 0.0126 vs 0.0079; 125cc: PM2.5 0.0068 vs 0.0009 (-87%), NOx 0.0950 vs 0.0210 (-78%), SOx 0.0153 vs 0.0109. SOx falls least because it comes from power stations",
+    "kerb_arithmetic": "At the kerb the electric scooter's tailpipe emission is zero, so exhaust from waiting scooters falls roughly in proportion to the electric share of those waiting (for example 1 in 4 electric means about 1/4 less scooter exhaust at that light, before wind and other traffic). This is arithmetic, not a measurement"
+   },
+   "basis": "Opened: Liou J-L, Wu P-I (2021) IJERPH 18(11):5537, a Taiwan benefit-transfer and impact-pathway model using Taiwan EPA CMAQ-DDM (2016 base year) and Taiwan GREET life-cycle factors; mortality only (about 98% of its health benefit); PM2.5 plus SOx and NOx as precursors. It is a regional (national average) result, not a kerb result. Measured before-and-after street data for scooter electrification were searched for in English and Chinese (Shenzhen motorbike restriction, Delhi, Kampala, Kenya, Hanoi, Chinese driving restrictions) and none was found; only policy announcements and models turned up. Related: Huang P-X (2025) NCCU master's thesis models general electric vehicles in Taiwan (PM2.5 deaths avoided 1,752 clean-power / 1,390 coal-power; NO2 6,644 / 4,776; ozone rises in cities) but the abstract never mentions scooters, so it is not used for scooters. The 2017 NTU/Academia Sinica CMAQ abstract for light-duty vehicles shows ozone can rise in central Taipei, so benefit is not equal for every pollutant.",
+   "sources": [
+    "Liou J-L, Wu P-I. Monetary Health Co-Benefits and GHG Emissions Reduction Benefits: Contribution from Private On-the-Road Transport. Int J Environ Res Public Health 2021;18(11):5537. doi:10.3390/ijerph18115537 https://pmc.ncbi.nlm.nih.gov/articles/PMC8196843 (opened; figures read; table values came through a page summariser, re-check the table before printing per-km numbers)",
+    "Huang P-X (2025) 電動車改善空氣品質對健康的影響與效益評估, NCCU master's thesis https://thesis.lib.nccu.edu.tw/detail/b0c383cef6a1c36eccf425b4717aba9c/ (abstract opened; general EVs, not scooters)",
+    "Weiss et al. 2015 review of e-two-wheelers (already in repo)"
+   ],
+   "verified": true,
+   "caveat": "It is a model of the whole country and of PM2.5, not a street measurement; electric scooters still shed tyre, brake and road dust, and the paper's own two totals disagree (US$1,105 million vs 2,153 million), so quote it as 'about a billion US dollars a year' and label it an estimate.",
+   "newVersusRepo": "research/redlight/long-term-traffic.json says no Taiwanese electrification health-benefit estimate was found. Liou and Wu 2021 is one; the site's 'no Taiwanese estimate' sentence should change."
+  },
+  {
+   "gapId": "gap-roadside-co-vs-who",
+   "question": "How does carbon monoxide at Taiwan's roadside stations compare with WHO guideline values?",
+   "kind": "measured-tw",
+   "bestAnswer": "At Taipei City's three roadside air stations the average carbon monoxide in 2024 was 0.8 ppm, about one-tenth of the WHO 8-hour value (10 mg/m3, about 8.7 ppm), and every hourly and 8-hour reading there met Taiwan's own limits (35 ppm and 9 ppm) in every year from 2014 to 2024, so ordinary busy-street air is far below the level carbon monoxide is known to harm; what a pack of idling scooters adds for a minute or two at the kerb is what the red-light estimate is for.",
+   "bestAnswerZh": "臺北市三個路邊（交通）測站 2024 年的一氧化碳平均只有 0.8 ppm，約是 WHO 8 小時指引值（10 毫克/立方公尺，約 8.7 ppm）的十分之一，而且 2014 到 2024 年每一年，這些測站的每小時與 8 小時濃度都達到台灣自己的標準（35 ppm 與 9 ppm）；所以一般繁忙街道的空氣，一氧化碳遠低於會傷身的程度，至於一群怠速機車在路口一兩分鐘多出多少，要看紅燈路邊的推估。",
+   "range": {
+    "taipei_traffic_station_annual_mean_ppm_by_year": {
+     "2014": 1.38,
+     "2015": 1.45,
+     "2016": 1.26,
+     "2017": 1.05,
+     "2018": 1.12,
+     "2019": 1.07,
+     "2020": 1.02,
+     "2021": 0.86,
+     "2022": 0.86,
+     "2023": 0.83,
+     "2024": 0.8
+    },
+    "taipei_general_station_2024_ppm": 0.49,
+    "station_values_2024": "traffic stations 承德 0.90 (highest), 向陽 0.67 (lowest), mean 0.80; citywide 12 stations 0.57 ppm",
+    "who_converted_to_ppm_at_25C_1atm": "24 h 4 mg/m3 = 3.5 ppm; 8 h 10 mg/m3 = 8.7 ppm; 1 h 35 mg/m3 = 30.6 ppm; 15 min 100 mg/m3 = 87 ppm (factor 28.01/24.45 = 1.146 mg/m3 per ppm)",
+    "taiwan_standards_ppm": "1 h 35 ppm (= 40 mg/m3), 8 h 9 ppm (= 10.3 mg/m3)",
+    "arithmetic": "0.80 ppm x 1.146 = 0.92 mg/m3 = 9% of 10 mg/m3 (8 h) and 23% of 4 mg/m3 (24 h); a yearly average is not the same averaging time as the WHO values, so this shows the level, not a compliance test"
+   },
+   "basis": "Opened and read the Taipei City Department of Environmental Protection annual report for 2024 (113年年報, May 2025, text extracted from PDF): Table 3-2-5 (annual mean CO by station type 2014-2024), section 2-2 (station means) and Tables 3-3-4/3-3-5 (100% compliance of traffic stations with the hourly 35 ppm and 8-hour 9 ppm limits every year). Traffic stations sample CO at an inlet 2.5 to 3.5 m above the ground (station-siting text). The WHO values are the 2021 Global Air Quality Guidelines (24 h 4 mg/m3; 8 h 10, 1 h 35, 15 min 100 mg/m3 retained from earlier guidance) but I could not open the WHO text itself (NCBI Bookshelf returned a bot check, WHO Q&A page confirms a 24-hour CO level exists but not its numbers), so the WHO numbers rest on an IQAir summary and the repo's earlier note.",
+   "sources": [
+    "臺北市政府環境保護局 空氣品質監測報告 113年年報 (2025-05) https://www.tldep.gov.taipei/Public/DownLoad/AnnualReport/113.pdf (opened; Table 3-2-5, p. 3-14; section 2-2 p. 2-13; Tables 3-3-4 and 3-3-5)",
+    "WHO global air quality guidelines 2021, ISBN 9789240034228, https://www.ncbi.nlm.nih.gov/books/NBK574594/ (NOT opened: bot check) ; summary https://www.iqair.com/af/newsroom/2021-who-air-quality-guidelines (secondary, not opened by me beyond search snippet); WHO Q&A https://www.who.int/news-room/q-a-detail/who-global-air-quality-guidelines (opened; confirms 24-hour CO level, gives no numbers)"
+   ],
+   "verified": true,
+   "caveat": "Station data are one-hour averages from a fixed inlet 2.5 to 3.5 m up beside a road in one city, so they say nothing about the short peak (the 15-minute WHO value) next to a pack of idling scooters at head or pram height, and the WHO figures themselves are not yet checked against the WHO text.",
+   "verifiedDetail": "Taipei data verified (read). WHO values unverified at primary source: verified flag applies to Taipei measurements only."
+  },
+  {
+   "gapId": "gap-high-emitter-share",
+   "question": "What share of scooter exhaust comes from the dirtiest scooters?",
+   "kind": "measured-tw",
+   "bestAnswer": "In Taiwan's 2025 exhaust tests of about 9 million scooter checks, the dirtiest 10% of readings carried about a third of all the carbon monoxide (roughly 30 to 45%) and the dirtiest 5% about a fifth to a quarter (20 to 27%), so a small minority of scooters gives off a large part of the exhaust.",
+   "bestAnswerZh": "2025 年全台約 900 萬筆機車排氣定期檢驗中，最髒的 10% 檢測讀數占了全部一氧化碳的三分之一左右（約 30% 到 45%），最髒的 5% 約占五分之一到四分之一（20% 到 27%）；也就是少數機車排出了很大一部分廢氣。",
+   "range": {
+    "MOENV_2025_CO_reading_counts_by_bin_percent_CO": {
+     "0.0-1.0": 6769973,
+     "1.1-2.0": 1042630,
+     "2.1-3.0": 650643,
+     "3.1-4.0": 342331,
+     "4.1-5.0": 121532,
+     "5.1-6.0": 57596,
+     "6.1-7.0": 35469,
+     "7.1-8.0": 21826,
+     "8.1-9.0": 12560,
+     "9.1-10.0": 12597,
+     "10.1+": 3,
+     "total": 9067160
+    },
+    "results_central_first_bin_mid_0.5pct": {
+     "mean_CO_pct": 1.02,
+     "top_1pct_of_readings_share_of_CO": "7%",
+     "top_2pct": "12%",
+     "top_5pct": "23%",
+     "top_10pct": "37%",
+     "readings_above_3.0pct (2.9% of readings)": "16% of CO",
+     "above_2.0pct (6.7% of readings)": "29%",
+     "above_5.0pct (0.9% of readings)": "6.7%"
+    },
+    "sensitivity_first_bin_mid_0.3_to_0.7": {
+     "top_5pct": "20 to 27%",
+     "top_10pct": "32 to 44%",
+     "above_3.0pct": "14 to 19%"
+    },
+    "cross_check": "failure rate 3.84% (318,267 of 8,292,331 tests, 2025). If a failing scooter idles at about 90 g/h CO (6.5% CO, repo input) and the fleet mean is about 21 g/h (estimate team input), failers carry 0.0384 x 90 / 21 = 16%, matching the 16% above 3.0% CO",
+    "arithmetic": "CO share of a group = sum(bin midpoint x readings) / sum over all bins; midpoints 1.5, 2.5 ... 9.5, last bin 10.5; first bin (0.0 to 1.0%) midpoint varied 0.3 to 0.7 because most readings sit there. Taking the top x% of readings by count from the highest bin down. Idle CO percentage is taken as proportional to CO emitted per gram of fuel, which holds approximately when total carbon in exhaust is roughly constant (CO+CO2 about 12 to 14%)"
+   },
+   "basis": "Opened the MOENV mobile-source control network table 各縣市機車排氣定檢CO檢測值統計表 (2025): national total of 9,067,160 idle CO readings by reading interval (counts only, no mean). I did the share arithmetic. Opened the MOENV failure-by-age table (318,267 failures of 8,292,331 tests, 3.84%). Also from MOENV 2025 HC table: scooters failing on HC (12,280 tests) averaged 5,823 ppm vs 1,951 ppm after repair. Two-strokes (about 2% of fleet) fail 8.4% and carry about 5,431 ppm HC (Taipei Times 2018, via repo). No Taiwanese roadside remote-sensing study of scooters exists in what I could find; elsewhere, Indonesian roadside remote sensing of 1,012 motorcycles reported only medians (CO 1.42%, HC 1,499 ppm) and no top-emitter share; car fleets (not scooters) show roughly 20% of vehicles giving about half of CO, HC and NO. Those car figures are not transferred.",
+   "sources": [
+    "環境部 移動污染源管制網 各縣市機車排氣定檢CO檢測值統計表 114年 https://mobile.moenv.gov.tw/Motor/ReportNew/Unit_CO_Report.aspx?YearMonth=2025/12 (opened; 合計 row read)",
+    "環境部 機車排氣定檢機車車齡不合格率統計表 114年 https://mobile.moenv.gov.tw/Motor/ReportNew/TestNotOKByCarAge.aspx?YearMonth=2025/12 (opened; 318,267 / 8,292,331 = 3.84%)",
+    "環境部 各縣市機車排氣定檢HC減量統計表 114年 https://mobile.moenv.gov.tw/Motor/ReportNew/Unit_HC_Report.aspx?YearMonth=2025/12 (opened; national row 12,280 / 5,823 / 11,097 / 1,951 / 66.49%)",
+    "Gantina et al. 2024 E3S Web Conf. 485:06009, roadside remote sensing of motorcycles, Indonesia https://www.e3s-conferences.org/10.1051/e3sconf/202448506009 (host returned 403; only search-result snippet seen)"
+   ],
+   "verified": true,
+   "caveat": "These are idle readings at inspection (not driving, and carbon monoxide only), counted per test not per scooter (retests of failed scooters are in the count), cover scooters whose owners turned up (about 83% of those called), and the share depends on an assumed mid-value for the cleanest group, hence the range."
+  },
+  {
+   "gapId": "gap-idling-rule-scooters",
+   "question": "Does Taiwan's anti-idling rule cover scooters waiting at a red light?",
+   "kind": "official",
+   "bestAnswer": "Taiwan's idling rule asks engines to be switched off only after more than three minutes of waiting, so a normal red light is shorter than it requires; the rule is written for 汽車, a word the Air Pollution Control Act defines to include motorcycles, and it has no exemption for scooters, but no official ruling has ever said whether a red light counts, and no city rule on scooters at red lights was found.",
+   "bestAnswerZh": "台灣的怠速規定要求引擎在「停車等候超過三分鐘」之後才要熄火，一般的紅燈比這短；規定寫的是「汽車」，而空氣污染防制法把機車算在汽車裡，條文也沒有排除機車，但是否把紅燈算進去，環境部從沒有正式說明，也沒有找到任何縣市對機車等紅燈另訂規定。",
+   "range": {
+    "law_text": "汽車停車怠速管理辦法 (amended 2019-01-25): art. 2 汽車 = vehicles moved by an engine, excluding electric vehicles; art. 3 vehicles stopped and idling more than 3 minutes must switch off in car parks, on roads (not expressways) and transfer places; art. 4 exemptions include item 5 (idling because of traffic control, congestion or accident on the road), item 6 (forecast maximum above 30 C), item 7 (any rain), item 8 (people boarding or alighting)",
+    "act": "空氣污染防制法 art. 3: 汽車 includes motorcycles (read by previous research team); art. 38 delegates the rule; art. 76 fine NT$1,500 to 60,000",
+    "history": "The earlier 2012 rule (機動車輛停車怠速管理辦法, in force 2012-03-01) fined 機器腳踏車 NT$1,500, rising to NT$15,000; the fine standard was repealed 2019-08-19. A June 2012 magazine report said 'Taiwan law does not require engines off at red lights'.",
+    "arithmetic": "A 90-second red is half of the 3-minute threshold"
+   },
+   "basis": "Opened the current rule text in full (law.moj.gov.tw O0020086), art. 38 of the Act, the revoked fine standard (O0020085, art. 2 item 1 motorcycle NT$1,500, revoked 民國108年8月19日) and a 2012 report (u-car). Searched for city ordinances, 函釋 and EPA statements on scooters and red lights in Chinese and English (Taipei, Taichung, Kaohsiung, New Taipei, Taipei Times, Focus Taiwan) and found none; Taichung and New Taipei merely republish the national rule. The reading 'scooters are covered by plain text' is mine, not an official position.",
+   "sources": [
+    "汽車停車怠速管理辦法 全國法規資料庫 https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=O0020086 (opened, all 5 articles read)",
+    "空氣污染防制法 art. 38 https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=O0020001&flno=38 (opened); art. 3 and 76 via https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=O0020001 (read by earlier research, repo policy-idling.json)",
+    "違反機動車輛停車怠速管理規定罰鍰標準 (廢止) https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=O0020085 (opened)",
+    "u-car 2012-06-01 https://news.u-car.com.tw/news/article/16191 (opened; secondary)"
+   ],
+   "verified": true,
+   "caveat": "This is a reading of the legal text, not an official interpretation; the site must still not say that red-light idling is legal or illegal, and enforcement against scooters was not found."
+  }
+ ],
+ "needsManualFetch": [
+  "https://www.ncbi.nlm.nih.gov/books/NBK574594/ (WHO global air quality guidelines 2021, CO table; bot check blocked it) or the WHO PDF https://iris.who.int/handle/10665/345329 : confirm CO 24 h 4, 8 h 10, 1 h 35, 15 min 100 mg/m3",
+  "https://data.moenv.gov.tw (MOENV open data) hourly CO at 交通測站 for the maximum one-hour and 8-hour values (the annual report only gives compliance, not peaks)",
+  "https://www.e3s-conferences.org/10.1051/e3sconf/202448506009 (Gantina 2024, motorcycle remote sensing; HTTP 403) for any percentile or top-emitter share",
+  "https://www.epd.ntpc.gov.tw/UploadFile/Journal/10810/knowledge1/20191024165853731176.pdf (New Taipei EPB idling leaflet; HTTP 400) to see whether it addresses motorcycles",
+  "https://www.thenewslens.com/article/86022 (HTTP 403) on scooter idling rule",
+  "MOENV air division or local EPB interpretation letters (函釋) on 汽車停車怠速管理辦法 and motorcycles; not found by web search, ask MOENV 空保處 directly"
+ ]
+}

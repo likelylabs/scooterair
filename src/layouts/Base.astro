@@ -1,4 +1,5 @@
 ---
+import { absUrl } from '../lib/abs-url.ts';
 /**
  * Base — the site shell every page renders into.
  *
@@ -16,14 +17,20 @@
  *   money        true on pages with date-dependent subsidy copy (home, /electric/,
  *                /act/): prints the date-state snapshot and loads its runtime once.
  *                See src/lib/site-state.ts
+ *   alternates   false on a page that has no twin in the other language at the same path
+ *                (the 404 page): leaves out the canonical link and the hreflang alternates
  *
- * Every page gets a three-line pre-paint script that sets <html data-money-phase>
- * from today's date, so [data-money-when] variants are right before first paint.
+ * Before first paint, one inline script puts the reader's settings on <html>:
+ *   data-theme="light|dark"   the stored theme (absent = follow the system)
+ *   data-text="lg|xl"         字大: root font-size 115% / 130% (absent = 標準, 100%)
+ *   data-motion="on|off"      the 動畫 switch, or "off" when the system asks for reduced motion
+ * and a second one sets <html data-money-phase> from today's date, so [data-money-when]
+ * variants are right. Without JavaScript none of these attributes exist.
  *
  * Slots
  *   default  page content, rendered inside <main id="main">
- *   rail     the countdown rail: <CountdownRail slot="rail" … />. It sits between the
- *            header and <main>, and is the only pinned element on the site
+ *   rail     the screen rail: <ScreenRail slot="rail" … />. It sits between the header
+ *            and <main>, and is the only pinned element on the site besides the header
  *   head     extra <head> tags
  *   credits  passed through to the footer credits line
  *
@@ -44,7 +51,7 @@ import cjkHeadlineUrl from '@/styles/fonts/noto-sans-tc-900-headline.woff2?url';
 // Keep the range in step with UNICODE_RANGE in scripts/display-font.mjs.
 const cjkHeadlineFace = `@font-face{font-family:'Noto Sans TC Headline';font-style:normal;font-weight:900;font-display:swap;src:url(${cjkHeadlineUrl}) format('woff2');unicode-range:U+00B7,U+2000-2BFF,U+2E80-FFEF}`;
 
-import { asset, htmlLang, locales, switchLocalePath, type Locale } from '@/i18n';
+import { asset, href, htmlLang, locales, switchLocalePath, type Locale } from '@/i18n';
 import { site, ui } from '@/i18n/ui';
 import Header from '@/components/shell/Header.astro';
 import Footer from '@/components/shell/Footer.astro';
@@ -61,20 +68,36 @@ interface Props {
   noindex?: boolean;
   home?: boolean;
   money?: boolean;
+  alternates?: boolean;
 }
 
-const { locale, title, description = site.description[locale], share = 'home', ogImage, noindex = false, home = false, money = false } = Astro.props;
+const { locale, title, description = site.description[locale], share = 'home', ogImage, noindex = false, home = false, money = false, alternates = true } = Astro.props;
+// a page with no twin at the same path (404) sends the language button to the other home page
+const switchTo = alternates ? undefined : href('/', locale === 'en' ? 'zh-TW' : 'en');
 const hasRail = Astro.slots.has('rail');
 const card = shareCard(share, locale);
 
 const siteName = site.name[locale];
 const fullTitle = home ? `${siteName} — ${site.tagline[locale]}` : `${title} — ${siteName}`;
-const abs = (p: string) => new URL(p, Astro.site).href;
+const abs = (p: string) => absUrl(p, Astro.site);
 const canonical = abs(Astro.url.pathname);
 const image = abs(asset(ogImage ?? card.wide));
 const square = ogImage ? null : abs(asset(card.square));
 const ogLocale = { 'zh-TW': 'zh_TW', en: 'en_US' } as const;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
+// Structured data: a WebSite node on the two home pages, so search shows the site's name
+// (行人呼吸 / ScooterAir) rather than the domain. Nothing else is claimed here.
+const ld = home
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: site.name[locale],
+      alternateName: site.altName[locale],
+      description,
+      inLanguage: htmlLang[locale],
+      url: canonical,
+    }).replace(/</g, '\\u003c')
+  : null;
 ---
 
 <!doctype html>
@@ -86,20 +109,30 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f5f3" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101416" />
     <script is:inline>
-      // Runs before first paint: apply a stored theme choice and flag JS support.
+      // Runs before first paint: flag JS support and apply the reader's stored settings
+      // (theme, text size, animation). See src/components/shell/settings.client.ts.
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
-        try {
-          var t = localStorage.getItem('sa-theme');
-          if (t === 'light' || t === 'dark') {
-            d.dataset.theme = t;
-            var c = t === 'dark' ? '#101416' : '#f3f5f3';
-            document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
-              m.content = c;
-            });
+        var get = function (k) {
+          try {
+            return localStorage.getItem(k);
+          } catch (e) {
+            return null;
           }
-        } catch (e) {}
+        };
+        var t = get('sa-theme');
+        if (t === 'light' || t === 'dark') {
+          d.dataset.theme = t;
+          var c = t === 'dark' ? '#101416' : '#f3f5f3';
+          document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+            m.content = c;
+          });
+        }
+        var s = get('sa-text');
+        if (s === 'lg' || s === 'xl') d.dataset.text = s;
+        var m = get('sa-motion');
+        d.dataset.motion = m === 'on' || m === 'off' ? m : window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'on';
       })();
     </script>
     <script is:inline set:html={prePaintScript(snapshot)} />
@@ -107,15 +140,20 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="canonical" href={canonical} />
-    {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(switchLocalePath(Astro.url.pathname, l))} />)}
-    <link rel="alternate" hreflang="x-default" href={abs(switchLocalePath(Astro.url.pathname, 'zh-TW'))} />
+    {alternates && (
+      <Fragment>
+        <link rel="canonical" href={canonical} />
+        {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(switchLocalePath(Astro.url.pathname, l))} />)}
+        <link rel="alternate" hreflang="x-default" href={abs(switchLocalePath(Astro.url.pathname, 'zh-TW'))} />
+      </Fragment>
+    )}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={home ? fullTitle : title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {/* a page with no address of its own (the 404 page, served for every missing address) has no og:url */}
+    {alternates && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={image} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -153,17 +191,18 @@ const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
       </Fragment>
     )}
     <link rel="sitemap" href={asset('/sitemap-index.xml')} />
+    {ld && <script type="application/ld+json" set:html={ld} />}
     <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#main">{ui.skipToContent[locale]}</a>
-    <Header locale={locale} />
+    <Header locale={locale} switchTo={switchTo} />
     <slot name="rail" />
     <main id="main" tabindex="-1">
       <slot />
     </main>
     {money && <MoneySnapshot />}
-    <Footer locale={locale}>
+    <Footer locale={locale} switchTo={switchTo}>
       {Astro.slots.has('credits') && <slot name="credits" slot="credits" />}
     </Footer>
   </body>

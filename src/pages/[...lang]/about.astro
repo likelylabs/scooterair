@@ -1,34 +1,33 @@
 ---
 /**
- * /about/ — 關於 / About (blueprint 4.9; Appendix B item 1).
+ * /about/ — 關於 / About (redesign brief 7.8).
  *
- *   #who          who made the site (components/pages/action/owner.ts)
- *   #what         what the site is and is not; the scene is illustration, the charts are data
- *   #method       how the evidence was gathered and checked, including the automated part
- *   #badges       the eight evidence badges and how each is drawn on the chain
- *   #rules        the wording rules, the promise to publish any result, what would change our mind
+ *   #who          who made the site (the owner's own words: components/pages/action/owner.ts)
+ *   #chips        the five chips, with their shapes (KindChip) and what each means
+ *   #estimate     K1; 本站沒有自己去量；我們推估，並把算法攤開; a link to /estimate/
+ *   #rules        the wording table and the editorial rules (brief 4.2, 4.6); the promise
+ *   #method       how the evidence was gathered and checked; the levels of checking
  *   #update       how subsidy figures date
- *   #report       how to report an error
- *   #corrections  the corrections log, linked from the footer
+ *   #report       error reports go to the owner's X account
+ *   #corrections  the corrections log, newest first, linked from the footer
  *
- * Copy: src/i18n/pages/about.ts. Counts, dates and the corrections' wording come from the data.
+ * Contact (beyond X), licence and funding sections are left out until the owner supplies them.
+ * Copy: src/i18n/pages/about.ts. Dates and the corrections' wording come from the data.
  */
 import Base from '@/layouts/Base.astro';
 import Section from '@/components/ui/Section.astro';
 import CompareTable from '@/components/ui/CompareTable.astro';
 import Details from '@/components/ui/Details.astro';
-import EvidenceLegend from '@/components/ui/EvidenceLegend.astro';
+import KindChip from '@/components/ui/KindChip.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Phrased from '@/components/ui/Phrased.astro';
-import PullQuote from '@/components/ui/PullQuote.astro';
-import StanceBox from '@/components/ui/StanceBox.astro';
 import Claim from '@/components/pages/action/Claim.astro';
 import { lf, rule } from '@/components/pages/action/ev';
 import { corrections } from '@/components/pages/action/corrections';
-import { OWNER, warnIfPlaceholder } from '@/components/pages/action/owner';
+import { OWNER } from '@/components/pages/action/owner';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { readerText } from '@/i18n/ui';
-import { confidenceLabels, factList, gapList, sourceIds, type FactId } from '@/data';
+import { chips, kSentences, readerText } from '@/i18n/ui';
+import { confidenceLabels, facts, readerKinds, type FactId } from '@/data';
 import { formatDate, snapshot, STALE_DAYS } from '@/lib/site-state.data';
 import about from '@/i18n/pages/about';
 import { fill, localize } from '@/i18n/pages/_copy';
@@ -36,28 +35,36 @@ import { fill, localize } from '@/i18n/pages/_copy';
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(about, locale);
-warnIfPlaceholder();
-
-const evidenceChecked = gapList.map((g) => g.searchedOn).sort().at(-1)!;
-const counts = { sources: sourceIds.length, facts: factList.length, gaps: gapList.length };
-const pm25 = lf('teds13-mc-pm25-share', locale);
 
 const claims = t.corrections.claims as Record<string, string>;
-const ownInstead = t.corrections.ownInstead as Record<string, string>;
-const ownWhy = t.corrections.ownWhy as Record<string, string>;
-const log = corrections.map((c) => {
-  if ('own' in c) return { key: c.key, date: c.date, said: claims[c.key], instead: ownInstead[c.key], why: ownWhy[c.key], facts: c.facts, own: true };
-  const r = rule(c.rule, locale);
-  const facts = (c.facts ?? r.facts) as FactId[];
-  return { key: c.key, date: c.date, said: claims[c.key], instead: r.instead ?? lf(facts[0], locale).statement, why: r.why, facts, own: false };
-});
+const wrongText = t.corrections.wrongText as Record<string, string>;
+const nowText = t.corrections.nowText as Record<string, string>;
+const D = (id: FactId, key: string) => (facts[id].data as Record<string, { value: number }>)[key].value;
+const pct = (v: number) => `${new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 2 }).format(v)}%`;
+// every number in the plain-words entries comes from the registry
+const tokens = {
+  pm25: lf('teds13-mc-pm25-share', locale).display,
+  per100: lf('fleet-density-per-100', locale).display,
+  y1: 'target2035'.slice('target'.length),
+  t1: pct(D('netzero-ev-sales-targets', 'target2035')),
+  y2: 'target2040'.slice('target'.length),
+  t2: pct(D('netzero-ev-sales-targets', 'target2040')),
+};
+const log = corrections
+  .map((c) => {
+    const facts = ('own' in c ? c.facts : (c.facts ?? rule(c.rule, locale).facts)) as FactId[];
+    return { key: c.key, date: c.date, said: claims[c.key], wrong: fill(wrongText[c.key], tokens), now: fill(nowText[c.key], tokens), facts, own: 'own' in c };
+  })
+  .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+/** The log grouped by date, newest first. */
+const days = [...new Set(log.map((e) => e.date))].map((date) => ({ date, items: log.filter((e) => e.date === date) }));
 ---
 
 <Base locale={locale} title={t.meta.title} description={t.meta.description} share="home">
   <Section id="about" pad="normal" width="wide" class="ab-hero">
     <p class="eyebrow">{t.hero.eyebrow}</p>
     <h1 class="display"><Phrased text={t.hero.title} /></h1>
-    <p class="lead">{t.hero.deck}</p>
+    <p class="ab-lead">{t.hero.deck}</p>
     <nav class="toc" aria-label={t.hero.toc}>
       <ul>
         {about.toc.map((x) => <li><a href={`#${x.id}`}>{x.label[locale]}</a></li>)}
@@ -75,49 +82,30 @@ const log = corrections.map((c) => {
     </div>
   </Section>
 
-  <!-- ===================================================== WHAT -->
-  <Section id="what" eyebrow={t.what.eyebrow} title={t.what.title} width="wide" rule>
-    <div class="isnot">
-      <div>
-        <h3 class="isnot__t">{t.what.isTitle}</h3>
-        <ul class="isnot__list isnot__list--is">{t.what.is.map((x) => <li>{x}</li>)}</ul>
-      </div>
-      <div>
-        <h3 class="isnot__t">{t.what.isNotTitle}</h3>
-        <ul class="isnot__list isnot__list--not">{t.what.isNot.map((x) => <li>{x}</li>)}</ul>
-      </div>
-    </div>
-    <p class="scene-rule">{t.what.scene}</p>
+  <!-- ===================================================== CHIPS -->
+  <Section id="chips" eyebrow={t.chips.eyebrow} title={t.chips.title} lead={t.chips.lead} width="wide" rule>
+    <dl class="chips">
+      {readerKinds.map((k) => (
+        <div class="chips__row">
+          <dt><KindChip locale={locale} kind={k} /></dt>
+          <dd>{chips[k].help[locale]}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="ab-p ab-quiet">{t.chips.market}</p>
   </Section>
 
-  <!-- ===================================================== METHOD -->
-  <Section id="method" eyebrow={t.method.eyebrow} title={t.method.title} width="wide" tone="sunken" rule>
+  <!-- ===================================================== ESTIMATE -->
+  <Section id="estimate" eyebrow={t.estimate.eyebrow} title={t.estimate.title} width="wide" tone="sunken" rule>
     <div class="prose">
-      <p>{t.method.p1}</p>
-      <p>{t.method.p2}</p>
-      <p>{t.method.p3}</p>
-      <p><b>{fill(t.method.counts, counts)}</b></p>
-      <p>{t.method.levels}</p>
-      <dl class="levels">
-        {(['verified', 'secondary'] as const).map((k) => (
-          <div>
-            <dt>{readerText(confidenceLabels[k].label[locale])}</dt>
-            <dd>{readerText(confidenceLabels[k].description[locale])}</dd>
-          </div>
-        ))}
-      </dl>
-      <p class="meta">{fill(t.method.checked, { evidence: formatDate(evidenceChecked, locale, true), money: formatDate(snapshot.checkedOn, locale, true) })}</p>
-      <p><a href={href('/sources/', locale)}>{t.method.sources}<Icon name="arrow-right" size="1.05em" /></a></p>
+      <p class="ab-p ab-k1">{kSentences.K1[locale]}</p>
+      <p class="ab-p">{t.estimate.p1}</p>
+      <div><a class="ab-btn" href={href('/estimate/', locale)}>{t.estimate.link}<Icon name="arrow-right" size="1.05em" /></a></div>
     </div>
-  </Section>
-
-  <!-- ===================================================== BADGES -->
-  <Section id="badges" eyebrow={t.badges.eyebrow} title={t.badges.title} lead={t.badges.lead} width="wide" rule>
-    <EvidenceLegend locale={locale} lines />
   </Section>
 
   <!-- ===================================================== RULES -->
-  <Section id="rules" eyebrow={t.rules.eyebrow} title={t.rules.title} lead={t.rules.lead} width="wide" tone="sunken" rule>
+  <Section id="rules" eyebrow={t.rules.eyebrow} title={t.rules.title} lead={t.rules.lead} width="wide" rule>
     <h3 class="rules__t">{t.rules.tableCaption}</h3>
     <CompareTable
       caption={t.rules.tableCaption}
@@ -128,60 +116,75 @@ const log = corrections.map((c) => {
       numeric={false}
     />
     <ol class="rules">
-      {t.rules.list.map((x, i) => (
-        <li>
-          {x}
-          {i === 3 && <Claim locale={locale} text={fill(t.rules.against, { share: pm25.display })} facts={['teds13-mc-pm25-share']} size="sm" />}
-        </li>
-      ))}
+      {t.rules.list.map((x) => <li>{x}</li>)}
     </ol>
     <h3 class="rules__t">{t.rules.promiseTitle}</h3>
-    <div class="promise">
-      <PullQuote tone="clean">{t.rules.pledge}</PullQuote>
-      <StanceBox locale={locale} kind="change-mind">{t.rules.changeMind}</StanceBox>
+    <p class="ab-p ab-pledge">{t.rules.pledge}</p>
+  </Section>
+
+  <!-- ===================================================== METHOD -->
+  <Section id="method" eyebrow={t.method.eyebrow} title={t.method.title} width="wide" tone="sunken" rule>
+    <div class="prose">
+      <p class="ab-p">{t.method.p1}</p>
+      <p class="ab-p">{t.method.p2}</p>
+      <p class="ab-p">{t.method.levels}</p>
+      <dl class="levels">
+        {(['verified', 'secondary'] as const).map((k) => (
+          <div>
+            <dt>{readerText(confidenceLabels[k].label[locale])}</dt>
+            <dd>{readerText(confidenceLabels[k].description[locale])}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="ab-quiet">{fill(t.method.checked, { money: formatDate(snapshot.checkedOn, locale, true) })}</p>
+      <div><a class="ab-btn" href={href('/sources/', locale)}>{t.method.sources}<Icon name="arrow-right" size="1.05em" /></a></div>
     </div>
   </Section>
 
   <!-- ===================================================== UPDATE -->
   <Section id="update" eyebrow={t.update.eyebrow} title={t.update.title} width="wide">
-    <p class="prose">{fill(t.update.body, { days: STALE_DAYS, deadline: formatDate(snapshot.yearEnd, locale, true) })}</p>
+    <p class="prose ab-p">{fill(t.update.body, { days: STALE_DAYS, deadline: formatDate(snapshot.yearEnd, locale, true) })}</p>
   </Section>
 
   <!-- ===================================================== REPORT -->
   <Section id="report" eyebrow={t.report.eyebrow} title={t.report.title} width="wide" tone="sunken" rule>
-    <p class="prose">{t.report.body}</p>
+    <p class="prose ab-p">{t.report.body}</p>
     <p class="contact">{t.report.contact}<a href={OWNER.url} rel="noopener">{OWNER.handle}</a></p>
   </Section>
 
   <!-- ===================================================== CORRECTIONS -->
   <Section id="corrections" eyebrow={t.corrections.eyebrow} title={t.corrections.title} lead={t.corrections.lead} width="wide" rule>
-    <ol class="log">
-      {
-        log.map((e) => (
-          <li class="log__item" id={`correction-${e.key}`}>
-            <p class="log__meta">
-              <time datetime={e.date}>{formatDate(e.date, locale, true)}</time>
-              {e.own && <span class="log__own">{t.corrections.ours}</span>}
-            </p>
-            <p class="log__said">
-              <span class="log__l">{t.corrections.said}</span>
-              <span class="vh">{t.corrections.saidSr}</span>
-              <s>{e.said}</s>
-            </p>
-            <p class="log__instead">
-              <span class="log__l">{t.corrections.instead}</span>
-              {e.instead}
-            </p>
-            <Details summary={`${t.corrections.why} · ${t.corrections.basis}`}>
-              <div class="log__why">
-                <p>{e.why}</p>
-                {e.facts.map((f) => <Claim locale={locale} facts={[f]} size="sm" />)}
-              </div>
-            </Details>
-          </li>
-        ))
-      }
-    </ol>
+    <div class="log">
+      {days.map((d) => (
+        <section class="log__day" aria-labelledby={`log-${d.date}`}>
+          <h3 class="log__date" id={`log-${d.date}`}><time datetime={d.date}>{formatDate(d.date, locale, true)}</time></h3>
+          <ol class="log__list">
+            {d.items.map((e) => (
+              <li class="log__item" id={`correction-${e.key}`}>
+                <p class="log__tag">{e.own ? t.corrections.ours : t.corrections.common}</p>
+                <div class="log__row log__said">
+                  <span class="log__label">{t.corrections.said}</span>
+                  <p><span class="vh">{t.corrections.saidSr}</span><s>{e.said}</s></p>
+                </div>
+                <div class="log__row log__wrong">
+                  <span class="log__label">{t.corrections.wrong}</span>
+                  <p>{e.wrong}</p>
+                </div>
+                <div class="log__row log__now">
+                  <span class="log__label">{t.corrections.now}</span>
+                  <p>{e.now}</p>
+                </div>
+                <Details summary={t.corrections.basis}>
+                  <div class="log__why">
+                    {e.facts.map((f) => <Claim locale={locale} facts={[f]} size="sm" />)}
+                  </div>
+                </Details>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </div>
   </Section>
 </Base>
 
@@ -189,22 +192,59 @@ const log = corrections.map((c) => {
   .ab-hero :global(.display) {
     margin-block: var(--sp-2) var(--sp-4);
   }
+  .ab-lead,
+  .ab-p {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
+    max-inline-size: 42rem;
+  }
+  .ab-lead {
+    margin: 0;
+  }
+  .ab-quiet {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .ab-k1 {
+    font-weight: var(--fw-bold);
+  }
+  .ab-pledge {
+    font-weight: var(--fw-bold);
+    padding-inline-start: var(--sp-3);
+    border-inline-start: 6px solid var(--clean);
+  }
+  .ab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-block-size: var(--tap, 3rem);
+    padding: 0 var(--sp-3);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2);
+    color: var(--ink);
+    font-size: var(--fs-btn, 1.0625rem);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+  }
+  .ab-btn:hover {
+    background: var(--bg-sunken);
+  }
   .toc ul {
     list-style: none;
     margin: var(--sp-5) 0 0;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--sp-2);
+    gap: var(--tap-gap, 0.5rem);
   }
   .toc a {
     display: inline-flex;
     align-items: center;
-    min-block-size: 44px;
-    padding: var(--sp-1) var(--sp-3);
+    min-block-size: var(--tap, 3rem);
+    padding: 0 var(--sp-3);
     border: 2px solid var(--line-strong);
     border-radius: var(--radius-pill);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-btn, 1.0625rem);
     font-weight: var(--fw-bold);
     color: var(--ink);
     text-decoration: none;
@@ -216,43 +256,52 @@ const log = corrections.map((c) => {
     border-block: 1px solid var(--line);
   }
   .maker__t {
+    margin: 0;
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     color: var(--ink-2);
   }
   .maker__body {
+    margin: 0;
     font-size: var(--fs-xl);
     font-weight: var(--fw-bold);
   }
   .maker__body a,
   .contact a {
-    display: inline-block;
-    padding-block: 0.6em;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap, 3rem);
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
   }
-  .isnot {
-    display: grid;
-    gap: var(--sp-5);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-  }
-  .isnot__t {
-    margin: 0 0 var(--sp-2);
-    font-size: var(--fs-lg);
-  }
-  .isnot__list {
+  .chips {
     margin: 0;
-    padding-inline-start: 1.3em;
     display: grid;
-    gap: var(--sp-2);
+    gap: var(--sp-3);
+    max-inline-size: 42rem;
   }
-  .isnot__list--not li::marker {
-    content: '× ';
-    color: var(--signal-red-ink);
+  .chips__row {
+    display: grid;
+    gap: var(--sp-1) var(--sp-4);
+    grid-template-columns: minmax(0, 1fr);
+    padding-block-end: var(--sp-3);
+    border-block-end: 1px solid var(--line);
   }
-  .scene-rule {
-    margin-block-start: var(--sp-5);
-    max-inline-size: 44rem;
-    padding-inline-start: var(--sp-3);
-    border-inline-start: var(--rule-paint) solid var(--ink);
+  @media (min-width: 36em) {
+    .chips__row {
+      grid-template-columns: 9rem minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+  .chips dt {
+    margin: 0;
+  }
+  .chips dd {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
   }
   .levels {
     display: grid;
@@ -270,14 +319,9 @@ const log = corrections.map((c) => {
     padding-inline-start: 1.5em;
     display: grid;
     gap: var(--sp-3);
-    max-inline-size: 44rem;
-  }
-  .rules li :global(.claim) {
-    margin-block-start: var(--sp-2);
-  }
-  .promise {
-    display: grid;
-    gap: var(--sp-5);
+    max-inline-size: 42rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
   }
   .rules__t {
     font-size: var(--fs-lg);
@@ -286,8 +330,18 @@ const log = corrections.map((c) => {
   .contact {
     margin-block-start: var(--sp-4);
     font-weight: var(--fw-bold);
+    font-size: var(--fs-base);
   }
   .log {
+    display: grid;
+    gap: var(--sp-6);
+  }
+  .log__date {
+    font-size: var(--fs-lg);
+    margin-block-end: var(--sp-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .log__list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -299,36 +353,38 @@ const log = corrections.map((c) => {
     gap: var(--sp-2);
     padding-block-start: var(--sp-3);
     border-block-start: 2px solid var(--line-strong);
+    scroll-margin-block-start: calc(var(--header-h, 4rem) + var(--sp-4));
   }
   .log__item p {
     margin: 0;
   }
-  .log__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
-    font-size: var(--fs-xs);
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
-  }
-  .log__own {
+  .log__tag {
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
+    color: var(--ink-2);
   }
-  .log__l {
+  .log__label {
     display: block;
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     color: var(--ink-2);
+  }
+  .log__row {
+    font-size: var(--fs-base);
+    line-height: var(--lh-read, 1.6);
   }
   .log__said s {
     text-decoration-thickness: 2px;
+    color: var(--ink-2);
   }
-  .log__instead {
+  .log__now {
+    padding-inline-start: var(--sp-3);
+    border-inline-start: 4px solid var(--clean);
     font-weight: var(--fw-bold);
   }
   .log__why {
     display: grid;
     gap: var(--sp-3);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-base);
   }
 </style>

@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n';
-import { MIN_W, type ChartRender, type Tone, axisBreak, esc, fmtSigned, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel } from './shared';
+import { MIN_W, type ChartRender, type Tone, axisBreak, esc, fmtSigned, niceMax, niceScale, pctN, px, text, LABEL_LINES, wrapLabel, withUnit, tip } from './shared';
 import { brokenVLine } from './bar';
 
 export interface RangeDatum {
@@ -68,7 +68,9 @@ export function renderRange(p: RangePlotProps): ChartRender {
   const at = (v: number) => +(inset + (pctN(v, max, min) * (100 - inset)) / 100).toFixed(2);
 
   const anyMid = data.some((d) => d.mid !== undefined);
-  const spanText = (d: RangeDatum) => `${f(d.min)}–${f(d.max)}`;
+  // a "range" whose two ends are the same figure is one value: it is printed once, as a dot
+  const point = (d: RangeDatum) => f(d.min) === f(d.max);
+  const spanText = (d: RangeDatum) => (point(d) ? f(d.min) : `${f(d.min)}–${f(d.max)}`);
   const valueText = (d: RangeDatum) => (d.mid !== undefined ? f(d.mid) : spanText(d));
   const valueW = Math.max(...data.map((d) => px(valueText(d), 15)));
   const o: string[] = [];
@@ -82,6 +84,13 @@ export function renderRange(p: RangePlotProps): ChartRender {
   /** where text sits, as [x0, x1, y0, y1] in px at the narrowest width: the reference line keeps clear of these */
   const boxes: [number, number, number, number][] = [];
 
+  // min and max are printed under the ends of the span, or once as "min–max" under its middle
+  // when any row's two would collide: one style for the whole chart, so no row looks different
+  const combined = data.some((d) => {
+    if (d.mid === undefined || f(d.min) === f(d.max)) return false;
+    const gapPx = ((at(d.max) - at(d.min)) / 100) * MIN_W;
+    return gapPx < (px(f(d.min), 14) + px(f(d.max), 14)) / 2 + 10;
+  });
   data.forEach((d) => {
     const lines = wrapLabel(d.label, (MIN_W - valueW - 14) / 14, LABEL_LINES);
     const labelH = lines.length * LINE;
@@ -89,9 +98,10 @@ export function renderRange(p: RangePlotProps): ChartRender {
     const t = d.tone ?? tone;
     const a = at(d.min);
     const b = at(d.max);
-    const hasMid = d.mid !== undefined;
-    const tip = hasMid ? `${d.label}: ${labels.mid ?? ''} ${f(d.mid as number)}, ${labels.min} ${f(d.min)}, ${labels.max} ${f(d.max)}${unit ? ' ' + unit : ''}` : `${d.label}: ${labels.min} ${f(d.min)}, ${labels.max} ${f(d.max)}${unit ? ' ' + unit : ''}`;
-    let g = `<g class="c-row" data-tip="${esc(tip.replace(/\s+/g, ' '))}">`;
+    const hasMid = d.mid !== undefined && !point(d);
+    const sep = locale === 'zh-TW' ? '、' : ', ';
+    const tipText = point(d) ? tip(locale, d.label, valueText(d), unit) : hasMid ? tip(locale, d.label, `${labels.mid ?? ''} ${f(d.mid as number)}${sep}${labels.min} ${f(d.min)}${sep}${labels.max} ${f(d.max)}`, unit) : tip(locale, d.label, `${labels.min} ${f(d.min)}${sep}${labels.max} ${f(d.max)}`, unit);
+    let g = `<g class="c-row" data-tip="${esc(tipText)}">`;
     g += `<rect class="c-hit" x="0" y="${y}" width="100%" height="${labelH + (hasMid ? 44 : 30)}"/>`;
     lines.forEach((ln, k) => {
       g += text('c-label', 0, y + 14 + k * LINE, ln);
@@ -100,21 +110,23 @@ export function renderRange(p: RangePlotProps): ChartRender {
     g += text('c-value', '100%', y + 14, valueText(d), 'text-anchor="end"');
     boxes.push([MIN_W - px(valueText(d), 15), MIN_W, y, y + LINE]);
     // the span and its end caps; then the mid dot with a surface ring, when there is a mid
-    g += `<line class="c-span c-stroke-${t}" x1="${a}%" x2="${b}%" y1="${cy}" y2="${cy}"/>`;
-    g += `<line class="c-cap c-stroke-${t}" x1="${a}%" x2="${a}%" y1="${cy - 6}" y2="${cy + 6}"/><line class="c-cap c-stroke-${t}" x1="${b}%" x2="${b}%" y1="${cy - 6}" y2="${cy + 6}"/>`;
+    if (point(d)) g += `<circle class="c-dot c-fill-${t} c-mark" cx="${a}%" cy="${cy}" r="6.5"/>`;
+    else {
+      g += `<line class="c-span c-stroke-${t}" x1="${a}%" x2="${b}%" y1="${cy}" y2="${cy}"/>`;
+      g += `<line class="c-cap c-stroke-${t}" x1="${a}%" x2="${a}%" y1="${cy - 6}" y2="${cy + 6}"/><line class="c-cap c-stroke-${t}" x1="${b}%" x2="${b}%" y1="${cy - 6}" y2="${cy + 6}"/>`;
+    }
     if (hasMid) {
       g += `<circle class="c-dot c-fill-${t} c-mark" cx="${at(d.mid as number)}%" cy="${cy}" r="6.5"/>`;
       // min / max under the ends; one combined label when they would collide
       const minT = f(d.min);
       const maxT = f(d.max);
-      const gapPx = ((b - a) / 100) * MIN_W;
       const under = (pos: number, label: string, anchor: string) => {
         g += text('c-tick', `${pos}%`, cy + 22, label, `text-anchor="${anchor}"`);
-        const w = px(label, 12);
+        const w = px(label, 14);
         const x = (pos / 100) * MIN_W;
         boxes.push([anchor === 'start' ? x : anchor === 'end' ? x - w : x - w / 2, anchor === 'start' ? x + w : anchor === 'end' ? x : x + w / 2, cy + 10, cy + 26]);
       };
-      if (gapPx < (px(minT, 12) + px(maxT, 12)) / 2 + 10) {
+      if (combined) {
         const mid = (a + b) / 2;
         under(mid, `${minT}–${maxT}`, mid < 12 ? 'start' : mid > 88 ? 'end' : 'middle');
       } else {
@@ -137,7 +149,7 @@ export function renderRange(p: RangePlotProps): ChartRender {
     ticks.forEach((t, i) => {
       const pos = at(t);
       const label = f(t);
-      const w = px(label, 12);
+      const w = px(label, 14);
       // drop a tick that would run into its neighbour at the narrowest width (the last one always stays)
       if (i < ticks.length - 1 && kept.some((k) => Math.abs(k.pos - pos) * (MIN_W / 100) < (k.w + w) / 2 + 8)) return;
       kept.push({ pos, w });
@@ -164,7 +176,7 @@ export function renderRange(p: RangePlotProps): ChartRender {
     body: o.join(''),
     height,
     table: {
-      head: [p.categoryLabel, ...cols].map((h, i) => (i && unit ? `${h} (${unit})` : h)),
+      head: [p.categoryLabel, ...cols].map((h, i) => (i ? withUnit(locale, h, unit) : h)),
       rows: data.map((d) => (anyMid ? [d.label, f(d.min), d.mid !== undefined ? f(d.mid) : '–', f(d.max)] : [d.label, f(d.min), f(d.max)])),
     },
   };

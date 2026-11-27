@@ -1,0 +1,128 @@
+{
+ "file": "/home/user/scooterair/research/masks/taiwan-context.json",
+ "summary": "Taiwan context, checked 2026-11-26. STRONGEST: (a) ILOSH 2023 fit trial: 70 people, only 1 passed a fit test on ear-loop N95; as-worn protection score 2.3 for ordinary medical mask vs 12.2 for headband N95 (units not defined on the page). (b) Chuang 2020 (already on site): the respirator-wearers wore a 3M 8812 and PM2.5 was measured OUTSIDE the mask, so the paper says nothing about what scooter-exposed walkers inhaled; no scooter rider was masked. (c) Health Promotion Administration (HPA) 2023 page 'Do all masks protect against air pollution? ' says no: it names only CNS 15980 PM2.5 masks and CNS 14756 activated-carbon dust masks, and does not name surgical masks. (d) BSMI 2025 market test: 10 masks sold as CNS 15980 PM2.5 masks all passed the quality tests, but 5 of 10 had wrong labels; this shows certified PM2.5 masks exist and a surgical mask is a different product. (e) Consumers' Foundation 2021: 6 of 20 masks below the 80% submicron efficiency required of medical masks (secondary source). CAUTION: an old HPA page (2015) said 'ordinary surgical masks reach 70-80% filtering' and a Kaohsiung leaflet citing HPA gave 30-70%; the lab figure is for filter material, not as worn. Do NOT repeat those numbers on the site. NOT FOUND: any survey of how many Taiwanese scooter riders or pedestrians wear masks outdoors (before or after 2020) or which type they wear; any survey of the belief that a surgical or carbon mask 'blocks exhaust'; any official Taiwanese statement that a medical mask does not stop PM2.5 or gases (HPA's wording is only that the recommended masks are CNS 15980 / CNS 14756). Only anecdotal and one 2021 observational study (central Taiwan, during COVID) were found. No Taiwan-lab paper on ultrafine or vehicle-exhaust mask filtration was opened. Many mask-effect results in this file are for particles in general, not exhaust, and nothing here addresses CO or hydrocarbons beyond the HPA carbon-mask line (see gases.json).",
+ "findings": [
+  {
+   "claim": "Taiwan labour-safety institute (ILOSH) trial: as worn by 70 people, an ordinary medical mask protected far less than a headband N95, and almost nobody could get an ear-loop N95 to seal.",
+   "figure": "Mean 'protection effect' (平均防護效果) in order: headband N95 12.2; ear-loop N95 5.2; double medical mask 3.3; ordinary medical mask 2.3; ordinary medical mask with a support frame 1.7. Only 1 of 70 passed the fit test on the ear-loop N95. Differences between groups were statistically significant.",
+   "tested": "Study 111 (2022) 'new mask protection performance test', 70 adults aged 20-65, five ways of wearing masks, tested on people as worn. The page does NOT define the unit of the score (fit factor or protection factor not stated), the test aerosol, or particle size, so it cannot be turned into a percent. The 1-of-70 fit test refers to ear-loop N95 per the page's opening paragraph.",
+   "citation": "勞動部勞動及職業安全衛生研究所 (ILOSH, Ministry of Labor), news release 謹慎使用耳掛式N95口罩, 2023-08-22",
+   "url": "https://www.mol.gov.tw/1607/1632/1640/62131/",
+   "verified": true,
+   "quote": "平均防護效果依序為：頭帶式N95口罩、耳掛式N95口罩、雙層醫用口罩、一般醫用口罩、一般醫用口罩內加支撐架，分別為12.2、5.2、3.3、2.3、1.7 ; 勞安所實際測試了70位受測者配戴耳掛式N95口罩的效果，結果發現只有1位通過密合度測試。",
+   "applicability": "Strong Taiwan-government source that an ordinary medical mask as actually worn gives only a small multiple of protection (2.3 vs 12.2 for a good N95). Say 'about a fifth of a well-fitted headband N95 on this scale', not a percentage. Not specific to exhaust; particle type not stated on the page. Primary ILOSH report (study 111) not opened; fetch it for units."
+  },
+  {
+   "claim": "What Chuang 2020 (Taipei commuters, already cited on the site) found for people wearing a respirator: PM2.5 was only measured outside the mask, so the study cannot show what a masked walker inhaled. Nobody in the scooter mode wore a mask.",
+   "figure": "Walking with facemask: PM2.5 outside the mask 43.1 +/- 20.7 ug/m3 (n=20, 1-h mean) vs walking without 42.7 +/- 22.6 and scooter 53.6 +/- 26.1. Respirator = 3M 8812 (authors say it 'theoretically' filters at least 95% of PM2.5). Raw SBP 116 vs 132 mmHg and urinary 8-OHdG 1.4 vs 2.9 ng/ml in masked vs unmasked walkers (different people, unadjusted). In Table 2 masked walkers still showed an 8-OHdG association of 2.3% (0.2, 4.4) per IQR PM2.5, with no significant BP or HR association.",
+   "tested": "120 healthy non-smoking Taipei adults aged 20-30, 720 one-hour measurements 0900-1000, 2017-2019, personal Grimm monitor outside the mask, as worn on people. Scooters were gasoline. Authors: 'we could only measure PM2.5 exposure levels around participants but not PM2.5 exposure levels in the facemasks'. Authors recommend rapid transit instead of scooters and say facemasks 'should be considered for walking commuters during rush hours'.",
+   "citation": "Chuang K-J, Lin L-Y, Ho K-F, Su C-T. Traffic-related PM2.5 exposure and its cardiovascular effects among healthy commuters in Taipei, Taiwan. Atmospheric Environment: X 2020. Read from the site's own checked registry research/papers/chuang-2020-aex.json (full text read 2026-11-25), not re-opened here.",
+   "url": "https://doi.org/10.1016/j.aeaoa.2020.100084",
+   "verified": true,
+   "quote": "we could only measure PM2.5 exposure levels around participants but not PM2.5 exposure levels in the facemasks (Section 4.1, p.4); Table 1: Walking with facemask 43.1 +/- 20.7; Model 7 8-OHdG 2.3*(0.2, 4.4)",
+   "applicability": "The site must NOT say this paper shows masks fail, nor that they work. It used a respirator (3M 8812), not a surgical mask, so it says nothing about surgical masks. It also shows mask wearers' small 8-OHdG association remained. Verified against the registry file, not re-read in the PDF in this session."
+  },
+  {
+   "claim": "Taiwan HPA (Health Promotion Administration, MOHW) answers 'Can any mask protect against air pollution?' with no: it points to CNS 15980 PM2.5 masks, and for gases to CNS 14756 disposable dust masks with activated carbon, only at AQI red.",
+   "figure": "Qualitative. Trigger: AQI red (151-200) when commuting or outdoors. Recommended: PM2.5 anti-haze masks (CNS 15980) and activated-carbon disposable dust masks (CNS 14756). Fit must be tight.",
+   "tested": "Official public advice, not an experiment. The fetch tool summary reported the page title as 任何類型口罩，都能防範空氣污染嗎？, published 2023/11/28 by the Community Health Division; the summariser did not give a verbatim quote, and a first fetch attempt on a second HPA page returned only navigation text.",
+   "citation": "國民健康署 (HPA), 任何類型口罩，都能防範空氣污染嗎？, 2023-11-28, citing the handbook 面對空氣污染 你所需要知道的事",
+   "url": "https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=127&pid=17424",
+   "verified": false,
+   "quote": "(no verbatim quote obtained; summary only. Please open and copy the sentence naming CNS 15980 and CNS 14756.)",
+   "applicability": "Useful as the official line that 'any mask' is not enough and that the recommended product is a certified PM2.5 mask, not a surgical one. It does not say surgical masks fail. Marked verified=false until the wording is copied by hand. The page recommends carbon masks for gases; gases.json shows the carbon in cheap masks saturates within minutes, and the site must not turn this HPA line into 'carbon masks stop exhaust'."
+  },
+  {
+   "claim": "Taiwan HPA/MOHW advice (2017, updated 2023) for poor air: wear a nationally certified mask that fits; a badly fitted mask protects less; no mention of surgical or N95 on the page.",
+   "figure": "Qualitative.",
+   "tested": "Official public advice. Page 'Red-alert in Yun-Chia-Nan: wear, adjust and seal masks'.",
+   "citation": "衛生福利部 (MOHW; content from HPA), 雲嘉南地區空氣品質紅色警示，口罩戴、調、密增加防護力, created 2017-10-30, updated 2023-07-05",
+   "url": "https://mohw.gov.tw/cp-2704-38008-1.html",
+   "verified": true,
+   "quote": "國民健康署建議國人選用有通過國家標準有品質的口罩，同時配戴防塵口罩時必須時時注意是否密合，不正確的佩帶口罩，其防護能力會隨之下降。",
+   "applicability": "Supports 'fit is half the protection'. Does not mention surgical or N95. Warns the page is sometimes cited for '30-70%' figures; that comes from a separate Kaohsiung leaflet."
+  },
+  {
+   "claim": "WARNING FOR THE SITE: an old official Taiwan page gave a high figure for surgical masks (70-80% filtering); a leaflet citing HPA gave 30-70%. These are filter-material numbers, not as-worn protection, and conflict with each other.",
+   "figure": "'一般外科用口罩可達70-80％之過濾效果' (HPA, 2015) and '30-70%' (Kaohsiung city leaflet citing HPA; leaflet itself not opened, search summary only).",
+   "tested": "No test method on the page; official advice text dated 2015-03-18.",
+   "citation": "國民健康署 via MOHW, 空氣污染嚴重，做好自我保護措施, 2015-03-18",
+   "url": "https://www.mohw.gov.tw/cp-16-20968-1.html",
+   "verified": true,
+   "quote": "建議外出可戴口罩（一般外科用口罩可達70-80％之過濾效果）。",
+   "applicability": "This is probably one source of the common belief that a surgical mask 'blocks pollution'. Official, 2015, no test method, and not about ultrafine particles or gases. The site should not cite it as a fact; correct it by pointing to the ILOSH as-worn result and Su et al. size-resolved data."
+  },
+  {
+   "claim": "Government market test of masks sold as 'anti-haze PM2.5' masks in Taiwan (2025): all 10 passed the performance tests, but 5 of 10 had incorrect labelling.",
+   "figure": "10 samples (incl. a carbon-layer cloth-style 3D mask at NT$6.68 and brand-name ones). Quality items passed: 10/10. Labelling non-compliant: 5/10 (items 1,5,6,7,8; e.g. missing filter-efficiency test method, grade, sterilisation info). CNS 15980 (2020 ed.) grades: protection effect A >=90%, B >=70%; filtration oil mist A >=95%, B >=70%; salt mist A >=95%, B >=80%; inhalation resistance A <=175 Pa.",
+   "tested": "Bureau of Standards, Metrology and Inspection (BSMI) 114年度 market purchase test, per CNS 15980 method A (submicron filtration, oil mist and salt mist). Lab filter test; not as worn.",
+   "citation": "經濟部標準檢驗局 (BSMI), 114年度「防霾 PM2.5 口罩」商品市場購樣檢測結果彙整表 (PDF, created 2026-03-09)",
+   "url": "https://kaohsiung.bsmi.gov.tw/wSite/public/Attachment/f1773042429641.pdf",
+   "verified": true,
+   "quote": "本次檢驗件數共 10 件，檢測結果為：(1)品質項目：全數符合規定 (2)中文標示查核結果：5 件(項次 1、5、6、7、8)不符合",
+   "applicability": "Read directly from the PDF text. Shows that only masks tested to CNS 15980 carry a PM2.5 claim in Taiwan, with graded filtration, and that the lab pass is for filter material on a headform-free bench; fit is not tested here. Supports pointing readers to CNS 15980/ N95 labels rather than 'any mask'. The sample is small, and the 'anti-haze' masks tested are a specific category."
+  },
+  {
+   "claim": "Consumers' Foundation (消基會) test 2021: 6 of 20 masks sold in Taipei had less than 80% submicron-particle efficiency, which is the minimum for medical masks in CNS 14774.",
+   "figure": "6 of 20 below 80%; 3 coloured masks contained lead (6-11 mg/kg in outer layer).",
+   "tested": "20 masks bought December 2020 in Taipei and New Taipei at hypermarkets, drugstore chains and online; PM2.5 filtration efficiency converted to submicron particle protection efficiency and judged against the CNS 14774 medical mask threshold of 80%. Particle size and test aerosol not stated in the article; this is a filter-material test, not as worn.",
+   "citation": "TVBS Health, 口罩檢驗報告出爐！3成口罩防護效率低, published 2021-01-18 (updated 2022-04-12), reporting 台灣消基會. Original press release not opened (the News Lens page returned 403; Taiwan News page was only a headline).",
+   "url": "https://health.tvbs.com.tw/nutrition/326753",
+   "verified": true,
+   "quote": "6 of 20 below threshold (the fetch tool's summary of the article; threshold wording: 次微米粒子防護效率為不得小於80％)",
+   "applicability": "Secondary report of a consumer test. Shows that even Taiwanese medical masks on sale sometimes fail the 80% filter minimum. Fetched through a summarising tool, so wording is a paraphrase; please copy the original quote by hand from the TVBS page or the foundation's release."
+  },
+  {
+   "claim": "Mask-wearing was already a daily habit for many in Taiwan before COVID, because of air pollution; during COVID in central Taiwan, observed mask-wearing was 42% overall in May 2020 and 58% in December 2020.",
+   "figure": "May 2020 (n=2,325): 42% overall, parks (open) about 22-25%, markets (semi-open) about 51-54%. Dec 2020 (n=1,809): 58% overall, parks about 35-36%, markets about 63-69%. The paper gives two different figures for some cells (Discussion vs Conclusions) and a conflict inside the text (27% vs 44% for Wenxin Park, Dec).",
+   "tested": "Observation of people in 3 parks and 5 markets in Taichung and Changhua, central Taiwan, 17-18 May and 28-29 Dec 2020. Counted whether a mask was worn; mask type not recorded.",
+   "citation": "Hsu K-W, Chao J-C, Hsu C-Y. Environmental Risk Perception and Preventive Behavior during the COVID-19 Pandemic in Central Taiwan. Int J Environ Res Public Health 2021;18(18):9920",
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8470211/",
+   "verified": true,
+   "quote": "wearing masks outside the home has long been a daily habit for many people in Taiwan (Abstract)",
+   "applicability": "Supports the claim that masks are common in Taiwan, but it is not a survey of scooter riders, was during the pandemic, and records no mask type. The pre-2020 baseline and motorcyclist rate were not found. Use only for the 'long a daily habit' sentence."
+  },
+  {
+   "claim": "Taiwan study before, during and after COVID of Taipei commuters: scooter riders had the highest personal PM2.5; the authors suggest masks may reduce exposure, but say evidence on this is still limited.",
+   "figure": "200 healthy adults, three periods, groups: subway, scooter, walking; PM2.5 highest in scooter group, lowest in subway; PM2.5-IL-6 / 8-OHdG links mostly significant outside the epidemic period but not significant for subway and walking commuters during the epidemic (when masks were legally required outdoors).",
+   "tested": "Personal PM2.5 monitors, sputum IL-6 and urinary 8-OHdG; masks not stratified by type; the abstract-level page did not give mask type or inside-mask measurements.",
+   "citation": "Lee YL, Chuang KJ, Hong GB, Chen HW, Chuang HC, Ezat WPS, Liu IJ. Atmospheric Environment 346:121080 (2025)",
+   "url": "https://hub.tmu.edu.tw/en/publications/personal-exposure-to-fine-particles-inflammation-and-oxidative-st/",
+   "verified": false,
+   "quote": "wearing masks during commuting could be one of the preventive measures to reduce air pollution exposure (abstract, per fetch summary; paraphrase risk)",
+   "applicability": "Only the abstract-level repository page was opened. It does not support the site's warning (it is mildly pro-mask) and must be treated honestly: it is evidence that masks may help in Taipei commuting, with the mask type undisclosed. Open the full text before using; the registry should also hold it so the warning is not one-sided."
+  },
+  {
+   "claim": "Size-resolved efficiency of loose-fitting masks against ultrafine particles (US study, not Taiwanese; included because it gives the as-worn figures for surgical vs N95 the Taiwan sources lack).",
+   "figure": "Surgical mask about 0.6 at 10 nm falling to about 0.3 at 200 nm; cloth mask generally below 0.4 (average 0.2); N95 worn without fit test 0.84 on average (vs 0.95 design value).",
+   "tested": "Two silicone manikin heads, NaCl 10-200 nm, steady 15 L/min, masks worn with ear loops and nose strip as in public use (no fit test), airway replica to about generation 6.",
+   "citation": "Su W-C, Lee J, Xi J, Zhang K. Investigation of Mask Efficiency for Loose-Fitting Masks against Ultrafine Particles and Effect on Airway Deposition Efficiency. Aerosol Air Qual Res 2021 (DOI 10.4209/aaqr.210228)",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9355369",
+   "verified": true,
+   "quote": "the highest value around 0.6 at 10 nm and the lowest value around 0.3 at 200 nm (Results, Fig. 5e); The mask efficiency of N95 was 0.84 on average for the particle size range studied (Fig. 5f); cloth mask 'generally less than 0.4' (Abstract)",
+   "applicability": "NaCl, a manikin, not exhaust, US authors. Most relevant to exhaust ultrafine particles (<100 nm). Another reviewer-level agent covers this paper in more depth; listed here only for cross-checking."
+  },
+  {
+   "claim": "Taiwan Ministry of Environment air-quality alert page: for the alert it recommends staying indoors for sensitive groups and wearing a mask if you must go out, without specifying a mask type.",
+   "figure": "Alert triggers: PM10 191 ug/m3, PM2.5 50.5 ug/m3 or O3 0.086 ppm (hourly).",
+   "tested": "Official advice page; no experiment.",
+   "citation": "環境部 (MOENV) Air Quality Monitoring Network, 空品防護公告",
+   "url": "https://airtw.moenv.gov.tw/cht/airprotect.aspx",
+   "verified": true,
+   "quote": "若有需要外出時，建議配戴口罩。",
+   "applicability": "This is the official wording that feeds the belief that 'a mask' is enough: no type given. It does not claim surgical masks stop PM2.5. No statement was found from MOENV that medical masks fail against PM2.5 or gases."
+  }
+ ],
+ "needsManualFetch": [
+  "https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=127&pid=17424 (returned 503 once; second fetch gave a summary only. Copy the exact CNS 15980 / CNS 14756 sentences)",
+  "https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=578&pid=14519&sid=14142 (HPA 'how to choose a mask for air pollution': only navigation text came back)",
+  "https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=578&pid=12214 (HPA air pollution self-protection kit; not opened)",
+  "https://www.thenewslens.com/article/146151 (403; Consumers' Foundation 2021 report) and the foundation's own press release",
+  "https://mdpi.com/2073-4433/12/3/396 (403; Atmosphere 2021, Taipei commuters, motorcycle median PM2.5 75 vs walking 40; check whether mask use was recorded)",
+  "https://doi.org/10.1016/j.atmosenv.2025.121080 (Lee et al. 2025 full text; only an abstract-level page was opened)",
+  "https://tdr.lib.ntu.edu.tw/handle/123456789/70985 (NTU 2018 thesis, motorcycle commuter exposure; full text is not public)",
+  "ILOSH study 111 'new mask protection performance test' report, to define the 12.2/5.2/3.3/2.3/1.7 unit and test aerosol",
+  "https://scholars.lib.ntu.edu.tw/bitstreams/fb3b5050-ed8a-4a11-a553-6d2e363a73cb/download (a 2000 NTU/ILOSH-type PDF; text could not be decoded by the fetch tool; run pdftotext)",
+  "https://health.udn.com/health/story/9684/3697173 (opened: Dr Su Yi-feng, Taipei City Hospital, 2019-03-14, says a medical mask blocks about 70% of PM2.5 in the lab but only 3-5 tenths as worn. This is a doctor's opinion in a magazine, not a study, so it is not listed as a finding)"
+ ]
+}

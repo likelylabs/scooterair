@@ -1,10 +1,10 @@
-// Helpers shared by workstream P (/unmeasured/, /act/, /about/ and the print pieces).
+// Helpers shared by workstream P (/act/, /about/ and the print pieces).
 // Everything these pages say about the world comes through here from the fact registry, so a
-// corrected fact corrects the page. Copy lives in src/i18n/pages/{unmeasured,act,about}.ts.
+// corrected fact corrects the page. Copy lives in src/i18n/pages/{act,about}.ts.
 
 import type { Locale } from '@/i18n';
 import { readerText, evidenceBadge, type EvidenceKind } from '@/i18n/ui';
-import { claimRules, facts, gaps, localizeFact, localizeGap, sourceIds, type ClaimRuleId, type FactId, type GapId, type SourceId } from '@/data';
+import { claimRules, facts, localizeFact, sourceIds, type ClaimRuleId, type FactId, type SourceId } from '@/data';
 
 /**
  * The number printed on a citation marker: the source's position in the bibliography
@@ -13,11 +13,10 @@ import { claimRules, facts, gaps, localizeFact, localizeGap, sourceIds, type Cla
  */
 export const citeN = (id: SourceId): number => sourceIds.indexOf(id) + 1;
 
-/** Unique sources behind facts, gaps and claim rules, in first-cited order. */
-export function sourcesOf(factIds: readonly FactId[] = [], gapIds: readonly GapId[] = []): { id: SourceId; n: number }[] {
+/** Unique sources behind facts, in first-cited order. */
+export function sourcesOf(factIds: readonly FactId[] = []): { id: SourceId; n: number }[] {
   const seen = new Set<SourceId>();
   for (const f of factIds) for (const s of facts[f].sources) seen.add(s);
-  for (const g of gapIds) for (const s of (gaps[g] as { sources?: SourceId[] }).sources ?? []) seen.add(s);
   return [...seen].map((id) => ({ id, n: citeN(id) }));
 }
 
@@ -25,19 +24,6 @@ export function sourcesOf(factIds: readonly FactId[] = [], gapIds: readonly GapI
 export function lf(id: FactId, locale: Locale) {
   const f = localizeFact(id, locale);
   return { ...f, statement: readerText(f.statement), caveat: f.caveat ? readerText(f.caveat) : undefined, place: readerText(f.place), period: readerText(f.period) };
-}
-
-/** A localized gap with reader-facing text. */
-export function lg(id: GapId, locale: Locale) {
-  const g = localizeGap(id, locale);
-  return {
-    ...g,
-    title: readerText(g.title),
-    statement: readerText(g.statement),
-    whyItMatters: readerText(g.whyItMatters),
-    wouldClose: readerText(g.wouldClose),
-    whoCouldMeasure: g.whoCouldMeasure ? readerText(g.whoCouldMeasure) : undefined,
-  };
 }
 
 /** Badge props for a fact, from its registry evidence type and confidence. */

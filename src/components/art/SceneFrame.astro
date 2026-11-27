@@ -1,0 +1,108 @@
+---
+/**
+ * SceneFrame — the frame every drawn scene shares: one <svg>, HTML words laid
+ * over it, and (when asked) the tag.
+ *
+ * Why it exists (redesign brief 3.1 and 5.1):
+ *  - one SVG per scene, no hidden second copy for another width;
+ *  - words in a picture are HTML over the SVG, never SVG <text>, never under
+ *    14 px, so they do not shrink with the drawing on a small phone;
+ *  - every scene's alt text says it is an illustration (the build stops if it
+ *    does not).
+ *
+ * Props
+ *   locale    Locale
+ *   box       the drawing's viewBox as { x, y, w, h } (scene units)
+ *   alt       the description. Must contain 示意圖 / "illustration". Build it
+ *             with sceneAlt() from ./scene.ts so it names the scenario and
+ *             ends with the shared sentence about what is and is not estimated.
+ *             That sentence is read out once per page: on later scenes of the
+ *             same page it is shortened to 「這是示意圖。」 (alt-once.client.ts).
+ *   tag       false (default) | 'street' | 'body'. On the home page
+ *             <Screen illustration> prints the tag, so leave this off there;
+ *             anywhere else (a question page, the poster, /estimate/) set it.
+ *   scenario  'few' | 'dozen' | 'full': sets data-air-scn on the <svg>, for a
+ *             scene drawn with air({ scenario: 'all' }) (see art.css)
+ *   drift     let the air marks drift a few pixels (class air--drift)
+ *   arrive    the scene has a one-time arrival to play (brief 5.3). Sets
+ *             data-arrive; arrive.client.ts and art.css do the rest. The
+ *             resting state is always the final state.
+ *   id, class passed to the <figure>; other data-* attributes too
+ *
+ * Slots
+ *   default   the drawing: SVG elements, placed inside the <svg>
+ *   labels    HTML words over the drawing: <SceneLabel> elements
+ *   before    HTML in a row above the drawing, in normal flow (a number chip
+ *             that must be free to grow with 字大)
+ *
+ * The tag, when asked for, is printed on a line of its own under the drawing,
+ * as <Screen illustration> prints it: it never covers a word of the picture.
+ *
+ *   <SceneFrame locale={locale} box={VB} alt={alt} scenario="dozen">
+ *     <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + people} />
+ *     <SceneLabel slot="labels" box={VB} x={300} y={-190}>他也在等</SceneLabel>
+ *   </SceneFrame>
+ */
+import '@/styles/art.css';
+import type { Locale } from '@/i18n';
+import IllustrationTag from '@/components/ui/IllustrationTag.astro';
+import { AIR, type AirScenario, type Box } from './air';
+import { assertSceneAlt, shortSceneAlt } from './scene';
+
+interface Props {
+  locale: Locale;
+  box: Box;
+  alt: string;
+  tag?: false | 'street' | 'body';
+  scenario?: AirScenario;
+  drift?: boolean;
+  arrive?: boolean;
+  id?: string;
+  class?: string;
+  [key: `data-${string}`]: string | number | boolean | undefined;
+}
+const { locale, box, alt, tag = false, scenario, drift = false, arrive = false, id, class: cls, ...rest } = Astro.props;
+assertSceneAlt(alt, locale);
+// the long closing sentence (estimate / street's own air) is read once per page: later scenes end
+// with the short 「這是示意圖。」 (still says 示意圖: check 17) — see ./alt-once.client.ts. The tag stays visible.
+const once = shortSceneAlt(alt, locale);
+const n = (v: number) => +v.toFixed(2);
+---
+
+<figure class:list={['scene', cls]} id={id} data-arrive={arrive ? '' : undefined} {...rest}>
+  {Astro.slots.has('before') && <div class="scene__before"><slot name="before" /></div>}
+  <div class="scene__canvas">
+    <svg
+      class:list={['scene__art', drift && 'air--drift']}
+      viewBox={`${n(box.x)} ${n(box.y)} ${n(box.w)} ${n(box.h)}`}
+      role="img"
+      aria-label={alt}
+      data-alt-note={once?.note}
+      data-alt-short={once?.short}
+      data-air-scn={scenario}
+      style={`--air-upp:${n(box.w / AIR.refWidth)}`}
+      focusable="false"
+    >
+      <slot />
+    </svg>
+    {Astro.slots.has('labels') && <div class="scene__labels"><slot name="labels" /></div>}
+  </div>
+  {tag && <p class="scene__tag"><IllustrationTag locale={locale} kind={tag} /></p>}
+</figure>
+{/* Before first paint: hold the parts that will arrive at their starting look, but only when
+    motion is welcome. If the script that plays the arrival never loads, show the resting state. */}
+{arrive && (
+  <script is:inline>
+    (function (s) {
+      var f = s.previousElementSibling, m = document.documentElement.dataset.motion;
+      if (!f || m === 'off' || (m !== 'on' && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+      f.classList.add('is-armed');
+      setTimeout(function () { if (!window.__saArt) f.classList.remove('is-armed'); }, 6000);
+    })(document.currentScript);
+  </script>
+)}
+
+<script>
+  import './arrive.client';
+  import './alt-once.client';
+</script>

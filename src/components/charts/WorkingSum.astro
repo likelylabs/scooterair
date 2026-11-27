@@ -1,0 +1,44 @@
+---
+/**
+ * WorkingSum — G15 (docs/redesign-brief.md 4.5): the working, drawn as boxes.
+ *
+ *   mode="sum"   boxes joined by operators, where the arithmetic really computes:
+ *                約 15 公克 ÷ 40 ＝ 約 0.4 公克
+ *   mode="flow"  boxes joined by arrows and NO operator signs, where it does not (the kerb
+ *                estimate is a simulation, not a multiplication)
+ *
+ * The result is in a dashed ochre box with the 推估 chip when it is an estimate, in a solid ink
+ * box with its chip otherwise. Stacked on a phone, left to right in a wide container.
+ *
+ * Use a preset, so no number is typed in a page (all read src/data/estimate.ts):
+ *
+ *   <WorkingSum {...workingPerRed(locale)} />              one scooter, one red, in grams
+ *   <WorkingSum {...workingPerRedCan(locale)} />           the same as a drinks can
+ *   <WorkingSum {...workingKerbFlow(locale)} />            how the kerb estimate is made (a flow)
+ *   <WorkingSum {...workingBusiest(locale)} />             scooters per red on the busiest road
+ *   <WorkingSum {...workingHoursPerYear(4, locale)} />     hours a year at red lights
+ *   <WorkingSum {...workingFromMoneySide(case.electric, locale)} />   list price − each line ＝ you pay
+ *
+ * or your own steps:
+ *
+ * Props
+ *   locale  Locale
+ *   mode    'sum' (default) | 'flow'
+ *   steps   { value: string; label?: string; op?: '+' | '−' | '×' | '÷'; chip?: ReaderKind }[]
+ *           `op` stands in front of its step (none on the first; ignored in a flow)
+ *   result  { value: string; label?: string; kind?: ReaderKind }
+ *   title   accessible name (default 算式 / The working)
+ *   id, class
+ *
+ * In the browser: el.innerHTML = renderWorkingSum(props) (./core/workingSum).
+ */
+import '@/styles/charts.css';
+import type { Locale } from '@/i18n';
+import { renderWorkingSum, workingSumTitle, type WorkingSumProps } from './core/workingSum';
+
+type Props = Omit<WorkingSumProps, 'locale'> & { locale: Locale; id?: string; class?: string };
+const { id, class: cls, ...props } = Astro.props;
+if (!props.steps?.length || !props.result?.value) throw new Error('WorkingSum: needs at least one step and a result.');
+---
+
+<div id={id} class:list={['hc', 'hc-working', cls]} data-chart="working" role="group" aria-label={props.title ?? workingSumTitle(props.locale)} set:html={renderWorkingSum(props as WorkingSumProps)} />

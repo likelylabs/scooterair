@@ -18,10 +18,15 @@
 //   - A leaf is { 'zh-TW': string, en: string }: both languages, always. Arrays and nested
 //     objects are fine; the string id is the module name plus the dotted path (arrays by index).
 //     Ids are stable: the allow-list is keyed by them, so renaming a key means re-reviewing it.
-//   - Take Traditional Chinese from the editorial blueprint verbatim where it supplies it.
-//     Reader-facing copy writes 台灣, uses 你 (never 您) and has no exclamation marks.
+//   - Take Traditional Chinese from docs/redesign-brief.md verbatim where it supplies it
+//     (sections 3.2, 7 and 12), and follow its vocabulary list (6.6). Reader-facing copy writes
+//     台灣, uses 你 (never 您) and has no exclamation marks.
+//   - Strings shared by more than one page are not retyped here: chip names, the K sentences
+//     (the only allowed "not yet measured" wording), the illustration tag, sheet and menu labels
+//     are in ../ui.ts; the estimate's own wording and numbers are in src/data/estimate.ts.
 //   - `{name}` marks a value filled at render time with fill(); numbers come from the fact
-//     registry or the calculator engine, never typed into a string.
+//     registry, the estimate (src/data/estimate.ts) or the calculator engine, never typed
+//     into a string.
 //   - Modules are loaded by plain Node in CI: use relative imports with the .ts extension, and
 //     import nothing from '@/…' or from ../index.ts. Files that start with `_` are helpers.
 //   - In the page:  const t = localize(home, locale);  then  {t.prologue.kicker}.

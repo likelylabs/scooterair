@@ -1,128 +1,227 @@
 ---
 /**
- * /questions/ — 路口的八個問題 / Eight questions at the crossing (blueprint 4.2).
- * The landing surface for search and LINE: eight questions in the reader's own words, each
- * with its one-sentence answer and evidence badge, in the order of the chain so that reading
- * down the list walks the argument. Then the two questions answered on other pages (the money,
- * the evidence) and the whole chain in seven lines.
+ * /questions/ — 路口的七個問題 / Seven questions at the crossing (redesign brief 7.5).
+ * A grid of seven picture cards, in the order the home page tells the story: each card is the
+ * question's own picture, the question and a one-line answer with its chip. No prose index.
+ * Two buttons under the grid lead to the working (/estimate/) and to the money (/electric/).
  *
- * Copy: src/i18n/pages/questions.ts. No calculator button here (R9): the money question is a
- * card that goes to /electric/.
+ * Copy: src/i18n/pages/questions.ts.
  */
 import Base from '@/layouts/Base.astro';
-import Section from '@/components/ui/Section.astro';
-import Card from '@/components/ui/Card.astro';
-import ChainStrip from '@/components/ui/ChainStrip.astro';
-import EvidenceBadge from '@/components/ui/EvidenceBadge.astro';
-import Icon from '@/components/ui/Icon.astro';
+import IllustrationTag from '@/components/ui/IllustrationTag.astro';
+import KindChip from '@/components/ui/KindChip.astro';
+import NextButton from '@/components/ui/NextButton.astro';
 import Phrased from '@/components/ui/Phrased.astro';
-import { chainOrder } from '@/components/pages/questions/q';
+import CardPicture from '@/components/pages/questions/CardPicture.astro';
+import { cardChip, filler, plain, questionHref, slugs } from '@/components/pages/questions/q';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
-import { chain, questions as qui } from '@/i18n/ui';
+import { colon, typeset } from '@/i18n/ui';
+import { fact } from '@/data/facts';
+import { readerKind, readerPlace, readerPlaceLabels } from '@/data/types';
 import questions from '@/i18n/pages/questions';
-import { fill, localize } from '@/i18n/pages/_copy';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
-const t = localize(questions, locale);
-const I = t.index;
-const plain = (s: string) => s.replaceAll('|', '');
-const items = chainOrder.map((slug) => ({
+const I = questions.index;
+const f = filler(locale);
+// The card's chip names the kind of answer; the fact itself, with its caveat and its sheet, is
+// on the question's own page, so the card does not print `data-fact`.
+const chipOf = (slug: (typeof slugs)[number]) => {
+  const c = cardChip[slug];
+  if (!c.fact) return { kind: c.kind, where: undefined };
+  const place = readerPlace(fact(c.fact));
+  return { kind: readerKind(fact(c.fact)), where: place ? readerPlaceLabels[place][locale] : undefined };
+};
+const cards = slugs.map((slug) => ({
   slug,
-  q: plain(t.items[slug].q),
-  answer: t.items[slug].answer,
-  badges: questions.items[slug].badges,
-  link: questions.items[slug].link,
-  eyebrow: fill(t.page.linkWithName, { n: questions.items[slug].link, name: chain.links[questions.items[slug].link - 1][locale] }),
+  q: typeset(questions.items[slug].q[locale], locale),
+  answer: f(questions.items[slug].card[locale]),
+  chip: chipOf(slug),
+  href: questionHref(slug, locale),
 }));
 ---
 
-<Base locale={locale} title={plain(I.title)} description={I.description} share="brief">
-  <header class="qi-head">
-    <div class="container container--prose qi-head__inner">
-      <h1 class="display qi-title"><Phrased text={I.title} /></h1>
-      <p class="lead">{I.lead}</p>
-    </div>
-  </header>
+<Base locale={locale} title={plain(I.title[locale])} description={I.description[locale]} share="brief">
+  <div class="qi">
+    <header class="qi-head">
+      <h1 class="qi-title"><Phrased text={I.title[locale]} locale={locale} /></h1>
+      <p class="qi-lead">{I.lead[locale]}</p>
+    </header>
 
-  <div class="container container--wide">
-    <ol class="qi-list" aria-label={plain(I.title)}>
-      {items.map((it) => (
-        <li>
-          <Card title={it.q} href={href(`/questions/${it.slug}/`, locale)} eyebrow={it.eyebrow} level={2}>
-            <p class="qi-answer"><span class="vh">{I.answerLabel}: </span>{it.answer}</p>
-            <Fragment slot="footer">{it.badges.map((k) => <EvidenceBadge locale={locale} kind={k} />)}</Fragment>
-          </Card>
-        </li>
-      ))}
+    <ol class="qi-grid" aria-label={I.listLabel[locale]}>
+      {
+        cards.map((c) => (
+          <li class="qi-card">
+            <div class="qi-card__pic" data-screen-picture>
+              <CardPicture locale={locale} slug={c.slug} />
+              <IllustrationTag locale={locale} kind={c.slug === 'one-red-light' ? 'body' : 'street'} />
+            </div>
+            <div class="qi-card__text">
+              <h2 class="qi-card__q">
+                <a href={c.href}><Phrased text={c.q} locale={locale} /></a>
+              </h2>
+              <p class="qi-card__a"><span class="vh">{I.answerLabel[locale]}{colon(locale)}</span>{c.answer}</p>
+              <p class="qi-card__chip"><KindChip locale={locale} kind={c.chip.kind} where={c.chip.where} size="sm" /></p>
+            </div>
+          </li>
+        ))
+      }
     </ol>
+
+    <nav class="qi-more" aria-labelledby="qi-more-h">
+      <h2 class="qi-more__title" id="qi-more-h">{I.more.title[locale]}</h2>
+      <NextButton href={href('/estimate/', locale)}>{I.more.estimate[locale]}</NextButton>
+      <NextButton href={href('/electric/', locale)} variant="primary">{I.more.electric[locale]}</NextButton>
+    </nav>
   </div>
-
-  <Section id="other" title={I.otherTitle} width="wide" pad="tight">
-    <div class="grid qi-other">
-      <Card title={I.afford.q} href={href('/electric/', locale)} eyebrow={I.afford.more} tone="sunken" level={3}>
-        <p>{I.afford.answer}</p>
-      </Card>
-      <Card title={I.evidence.q} href={href('/evidence/', locale)} eyebrow={I.evidence.more} tone="sunken" level={3}>
-        <p>{I.evidence.answer}</p>
-      </Card>
-    </div>
-  </Section>
-
-  <Section id="chain" title={I.chainTitle} lead={I.chainLead} width="prose" tone="sunken">
-    <ChainStrip locale={locale} />
-    <p class="qi-ask"><a href={href(qui.askMeasurePath, locale)}>{qui.askMeasure[locale]}<Icon name="arrow-right" size="1.05em" /></a></p>
-  </Section>
 </Base>
 
 <style>
-  .qi-head {
-    padding-block: clamp(1.5rem, 5vw, 3.5rem) var(--sp-6);
+  .qi {
+    inline-size: min(100% - 2 * var(--gutter), 72rem);
+    margin-inline: auto;
+    padding-block: var(--sp-4) var(--sp-7);
   }
-  .qi-head__inner {
+  .qi-head {
     display: grid;
-    gap: var(--sp-4);
+    gap: var(--sp-2);
+    padding-block-end: var(--sp-5);
   }
   .qi-title {
-    font-size: clamp(2.25rem, 9vw, 4rem);
-    line-height: 1.1;
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.6875rem, 7.5vw, 2.5rem);
+    font-weight: var(--fw-black);
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-wrap: balance;
   }
-  .qi-list {
+  .qi-lead {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+
+  .qi-grid {
     display: grid;
-    gap: var(--sp-4);
-    margin: 0 0 var(--sp-6);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+    margin: 0;
     padding: 0;
     list-style: none;
   }
-  @media (min-width: 48em) {
-    .qi-list {
+  @media (min-width: 44em) {
+    .qi-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--sp-5);
     }
   }
-  .qi-list > li {
+  @media (min-width: 68em) {
+    .qi-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* one card: the picture, then the question (the link, stretched over the whole card) */
+  .qi-card {
+    position: relative;
     display: grid;
+    grid-template-rows: auto 1fr;
+    min-inline-size: 0;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-3);
+    background: var(--surface);
+    overflow: hidden;
   }
-  .qi-answer {
-    line-height: 1.65;
+  .qi-card:hover {
+    background: var(--bg-sunken);
   }
-  .qi-other {
-    --min: 17rem;
+  .qi-card:focus-within {
+    outline: 3px solid var(--focus, var(--ink));
+    outline-offset: 3px;
   }
-  .qi-ask {
-    margin-block-start: var(--sp-5);
+  .qi-card__pic {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: end;
+    min-inline-size: 0;
+    border-block-end: 2px solid var(--ink);
+    background: var(--bg);
+    --here: var(--bg);
   }
-  .qi-ask a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3em;
-    min-block-size: 2.75rem;
-    font-weight: var(--fw-bold);
+  .qi-card__pic > :global(figure) {
+    inline-size: 100%;
+    margin: 0;
   }
-  /* Chinese titles wrap between phrases (after punctuation), never inside 「良好」 */
-  :is(.qi-list, .qi-other) :global(.card__title:lang(zh-Hant-TW)) {
-    word-break: keep-all;
-    overflow-wrap: anywhere;
+  .qi-card__pic > :global(.ill-tag) {
+    display: block;
+    padding: 0.2rem var(--sp-3);
+    border-radius: 0;
+    background: none;
+  }
+  .qi-card__text {
+    display: grid;
+    gap: var(--sp-2);
+    align-content: start;
+    padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  }
+  .qi-card__q {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: var(--fw-black);
+    line-height: 1.28;
+    letter-spacing: 0;
     text-wrap: balance;
+  }
+  .qi-card__q a {
+    /* the whole card is the target (::after), and the link itself is at least 48 px tall */
+    display: block;
+    min-block-size: var(--tap);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .qi-card__q a:focus-visible {
+    outline: none;
+  }
+  .qi-card__q a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .qi-card:hover .qi-card__q a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+  }
+  .qi-card__a {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+  .qi-card__chip {
+    margin: 0;
+  }
+
+  .qi-more {
+    display: grid;
+    gap: var(--tap-gap);
+    max-inline-size: 36rem;
+    margin-block-start: var(--sp-7);
+  }
+  .qi-more__title {
+    margin: 0 0 var(--sp-1);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+  }
+  @media (min-width: 44em) {
+    .qi-more {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-inline-size: none;
+    }
+    .qi-more__title {
+      grid-column: 1 / -1;
+    }
   }
 </style>

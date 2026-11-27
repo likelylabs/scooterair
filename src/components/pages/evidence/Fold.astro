@@ -1,0 +1,123 @@
+---
+/**
+ * Fold — a page block whose title is a 48 px button: tap it and the block opens. Used for the
+ * long reference blocks of /evidence/ so the page reads as seven short links first.
+ *
+ * The anchor (`id`) sits on the first thing INSIDE the fold, not on the <section>: a browser
+ * opens a closed <details> when the address points at something inside it, so a link to
+ * #method opens the block even with JavaScript off. With JavaScript, ui/Section's openFor()
+ * (data-section-fold) and the page's own script do the same and scroll to it.
+ *
+ * Props
+ *   id       the anchor (also used for the heading id: <id>-title)
+ *   title    the heading; may contain '|' phrase marks
+ *   lead     a short paragraph shown under the title, before the fold opens
+ *   count    words after the title, e.g. '15 句' (optional)
+ *   tone     'default' | 'sunken'
+ *   level    heading level (default 2)
+ * Slots
+ *   default  the folded content
+ */
+import Phrased from '@/components/ui/Phrased.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  lead?: string;
+  count?: string;
+  tone?: 'default' | 'sunken';
+  level?: 2 | 3;
+}
+const { id, title, lead, count, tone = 'default', level = 2 } = Astro.props;
+const H = `h${level}` as 'h2' | 'h3';
+---
+
+<section class:list={['evf', tone === 'sunken' && 'tone-sunken']} aria-labelledby={`${id}-title`}>
+  <div class="container">
+    <details class="evf__fold" data-section-fold data-ev-fold>
+      <summary class="evf__sum">
+        <span class="evf__head">
+          <H id={`${id}-title`} class="evf__title"><Phrased text={title} /></H>
+          {lead && <span class="evf__lead">{lead}</span>}
+        </span>
+        <span class="evf__btn" aria-hidden="true">
+          {count && <span class="evf__count">{count}</span>}
+          <svg class="evf__chev" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+        </span>
+      </summary>
+      <span id={id} class="evf__anchor" aria-hidden="true"></span>
+      <div class="evf__body">
+        <slot />
+      </div>
+    </details>
+  </div>
+</section>
+
+<style>
+  .evf {
+    padding-block: var(--sp-3);
+    border-block-start: 1px solid var(--line-strong);
+  }
+  .evf__sum {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-block-size: var(--tap, 3rem);
+    cursor: pointer;
+    list-style: none;
+  }
+  .evf__sum::-webkit-details-marker {
+    display: none;
+  }
+  .evf__head {
+    display: grid;
+    gap: var(--sp-1);
+    min-inline-size: 0;
+  }
+  .evf__title {
+    margin: 0;
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
+  }
+  .evf__lead {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-read);
+    color: var(--ink-2);
+    max-inline-size: 44rem;
+  }
+  .evf__btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-1);
+    min-inline-size: var(--tap, 3rem);
+    min-block-size: var(--tap, 3rem);
+    padding-inline: var(--sp-2);
+    border: 2px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+  }
+  .evf__chev {
+    flex: none;
+  }
+  .evf__fold[open] .evf__chev {
+    transform: rotate(180deg);
+  }
+  .evf__anchor {
+    display: block;
+    /* land with the title still in view above */
+    scroll-margin-block-start: calc(var(--header-h, 4rem) + 6rem);
+  }
+  .evf__body {
+    padding-block: var(--sp-4) var(--sp-3);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .evf__chev {
+      transition: transform 0.2s;
+    }
+  }
+</style>
