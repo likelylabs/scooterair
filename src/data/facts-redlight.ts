@@ -603,8 +603,8 @@ export const intersection = {
     confidence: 'verified',
     evidence: 'measured-tw',
     caveat: t(
-      '量的是路口所有來源的空氣，不只機車，也沒有分紅燈和綠燈。每個路口只量兩天，而且是在夏天；用的是小型感測器，不是標準儀器。最高的一分鐘約 1.3 ppm，遠低於世界衛生組織的 15 分鐘指引值。',
-      'All-source air at the junction, not scooters alone, and not split by red and green. Each junction was measured for two days, in summer, with small sensors rather than reference instruments. The highest minute, about 1.3 ppm, is far below the WHO 15-minute guideline.',
+      '量的是路口所有來源的空氣，不只機車，也沒有分紅燈和綠燈。每個路口只量兩天，而且是在夏天；用的是小型感測器，不是標準儀器。最高的一分鐘約 1.3 ppm；還沒攤成 15 分鐘的平均，就已遠低於世界衛生組織的 15 分鐘指引值。',
+      'All-source air at the junction, not scooters alone, and not split by red and green. Each junction was measured for two days, in summer, with small sensors rather than reference instruments. The highest minute, about 1.3 ppm, is far below the WHO 15-minute guideline even before averaging over 15 minutes.',
     ),
     requiresCaveat: true,
     chainLink: 3,

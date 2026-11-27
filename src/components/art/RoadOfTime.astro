@@ -8,8 +8,8 @@
  * pair of lungs; a calendar), a few words and a label chip. The words and the
  * chips are the host's (they carry study facts); the drawings are fixed.
  *
- * Under the road, the year strip: one small dot for every day of the year,
- * flowing into a bar measured in hours. It is drawn for 2, 4 and 6 red lights
+ * Under the road, the year strip: one bar measured in hours (no dots: the owner
+ * rejected marks that need a key, 2026-11-27). It is drawn for 2, 4 and 6 red lights
  * a day from time.hoursPerYear (src/data/estimate.ts), never typed, and is
  * never empty. Which one shows follows lane B's <Segmented name="reds"> in the
  * same Screen (values "2", "4", "6"); with no switch it shows `reds`.
@@ -29,7 +29,6 @@ import type { Locale } from '@/i18n';
 import { art, fill } from '@/i18n/art';
 import { defaultRedsPerDay, hoursPerYear, redsPerDayOptions, time } from '@/data/estimate';
 import KindChip from '@/components/ui/KindChip.astro';
-import { rng } from './parts';
 
 interface Post {
   when: string;
@@ -58,25 +57,15 @@ const icons = [
   board('<rect class="road-ink" x="14" y="14" width="44" height="38" rx="5"/><rect class="road-paper" x="18" y="24" width="36" height="24" rx="2"/><path class="road-ink-s" d="M24,10v8M48,10v8"/>' + [0, 1, 2].map((r) => [0, 1, 2, 3].map((c) => `<circle class="road-ink" cx="${23 + c * 8.7}" cy="${30 + r * 6.5}" r="1.9"/>`).join('')).join('')),
 ];
 
-/* ---- the year strip: 365 dots, then a bar in hours ------------------------------ */
-const DAYS = 365;
+/* ---- the year strip: a bar in hours --------------------------------------------- */
 const W = 360;
-const COLS = 61;
-const PITCH = 5.6;
 const AXIS = Math.ceil(time.span.hi / 12) * 12; // the bar's scale: whole half-days, enough for the longest case
-const bar = { x: 12, y: 56, w: W - 24, h: 18 };
+const bar = { x: 12, y: 4, w: W - 24, h: 18 };
 const xOf = (h: number) => bar.x + (h / AXIS) * bar.w;
-const r = rng(7);
-let dots = '';
-for (let d = 0; d < DAYS; d++) dots += `<circle cx="${(12 + (d % COLS) * PITCH + 1.6).toFixed(1)}" cy="${(8 + Math.floor(d / COLS) * PITCH).toFixed(1)}" r="1.7"/>`;
-// a few dots on their way down into the bar
-let falling = '';
-for (let k = 0; k < 9; k++) falling += `<circle cx="${(40 + r() * 280).toFixed(1)}" cy="${(40 + r() * 11).toFixed(1)}" r="1.7" opacity="${(0.9 - k * 0.06).toFixed(2)}"/>`;
 const strips = redsPerDayOptions.map((n) => {
   const h = hoursPerYear(n);
   const ticks = Array.from({ length: AXIS / 12 + 1 }, (_, i) => i * 12);
   const svg =
-    `<g class="road-days">${dots}${falling}</g>` +
     `<rect class="road-bar-track" x="${bar.x}" y="${bar.y}" width="${bar.w}" height="${bar.h}" rx="4"/>` +
     // solid to the low end, lighter on to the high end: the answer is a range
     `<rect class="road-bar" x="${bar.x}" y="${bar.y}" width="${(xOf(h.lo) - bar.x).toFixed(1)}" height="${bar.h}" rx="4"/>` +
@@ -109,11 +98,11 @@ const pct = (x: number) => `${((x / W) * 100).toFixed(2)}%`;
       strips.map((s) => (
         <div class:list={['road-v', s.n === reds && 'is-first']} data-when-reds={s.n}>
           <p class="road__sum">
-            <span>{fill(art.road.days, locale, { days: DAYS })}</span>
+            <span>{art.road.days[locale]}</span>
             <b>{fill(art.road.hours, locale, { lo: s.h.lo, hi: s.h.hi })}</b>
           </p>
           <div class="road__strip">
-            <svg viewBox={`0 0 ${W} 82`} role="img" aria-label={s.alt} focusable="false" set:html={s.svg} />
+            <svg viewBox={`0 0 ${W} 30`} role="img" aria-label={s.alt} focusable="false" set:html={s.svg} />
             <div class="road__ticks" aria-hidden="true">
               {s.ticks.filter((t) => t % 24 === 0).map((t) => <span style={`left:${pct(xOf(t))}`}>{t === 0 ? '0' : `${t} ${art.road.hourUnit[locale]}`}</span>)}
             </div>

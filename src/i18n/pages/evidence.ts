@@ -463,7 +463,7 @@ export default copy({
       },
       {
         no: { 'zh-TW': '拿比較長時間的空氣品質標準，或空氣品質指標的顏色，來比 90 秒。', en: 'Standards for longer averaging times, or air-quality-index colours, set against 90 seconds.' },
-        instead: { 'zh-TW': '只和世界衛生組織的 15 分鐘指引值比，而且說「低很多」。', en: 'Only the WHO 15-minute guideline, described as “far below”.' },
+        instead: { 'zh-TW': '只拿平均時間一樣的來比：90 秒的量要先換算成 15 分鐘的平均；「低很多」只用在等一個紅燈。', en: 'Only like with like: a 90-second level is first converted to a 15-minute average; “far below” is used only for one red light.' },
       },
       {
         no: { 'zh-TW': '拿吸菸、得到癌症的可能或毒性，來比等一個紅燈。', en: 'Comparing one red light with smoking, a chance of cancer or poisoning.' },
@@ -471,15 +471,15 @@ export default copy({
       },
       {
         no: { 'zh-TW': '紅燈等得越久，廢氣就一路往上加。', en: 'That exhaust keeps building up the longer the red lasts.' },
-        instead: { 'zh-TW': '本站只算 90 秒的平均，不畫紅燈裡怎麼變；綠燈起步那一陣也不印倍數。', en: 'This site gives a 90-second average only, draws no curve through the red, and prints no multiplier for the pull-away.' },
+        instead: { 'zh-TW': '本站的推估是 90 秒的平均；電腦算的一個紅燈，另外寫出一秒一秒的一陣一陣，但不畫成越來越多的曲線。綠燈起步那一陣也不印倍數。', en: 'Our estimate is a 90-second average; the simulated red light adds the second-by-second bursts but draws no rising curve. No multiplier for the pull-away.' },
       },
       {
         no: { 'zh-TW': '離機車遠幾步，就少吸一個固定的比例。', en: 'That stepping back a few paces cuts what you breathe by a fixed share.' },
         instead: { 'zh-TW': '離機車遠一點，通常比較淡；差多少要看風，所以不印數字。', en: 'Further from the scooters is usually thinner; how much depends on the wind, so we print no figure.' },
       },
       {
-        no: { 'zh-TW': '小孩高度的廢氣，是大人的幾倍。', en: 'A multiple for the air at a child’s height.' },
-        instead: { 'zh-TW': '矮的地方，廢氣一樣多或更多；照體重算，小孩吸進的空氣是大人的 1.5 到 2 倍。', en: 'Lower down the exhaust is the same or more; for their weight, children breathe 1.5 to 2 times the air an adult does.' },
+        no: { 'zh-TW': '國外量到的小孩高度倍數，或說每種風都一樣。', en: 'A child-height multiple measured abroad, or one said to hold in every wind.' },
+        instead: { 'zh-TW': '推估：風從機車吹來時，嬰兒車高度和大人鼻子差不多到兩倍；不是每種風都這樣。照體重算，小孩吸進的空氣是大人的 1.5 到 2 倍。', en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much; not in every wind. For their weight, children breathe 1.5 to 2 times the air an adult does.' },
       },
       {
         no: { 'zh-TW': '這排機車排出多少顆超細微粒。', en: 'A count of the ultrafine particles the pack gives off.' },

@@ -13,7 +13,9 @@
  *              Taipei's roadside stations; benzene as a check of scale only
  *   #range     what moves the answer (METHOD §7) and confidence by pollutant
  *   #drawing   the drawing rule of 5.1 in four sentences, the switchable kerb picture, the two patches
- *   #limits    METHOD §8 in plain bullets, K4
+ *   #simulation the signed 3-D simulation (research/simulation): statements.json `may` only,
+ *              charts SimCompare, SimSeconds, SimAbove
+ *   #limits    METHOD §8 in plain bullets, and statement 5 of the simulation for heights
  *   #answers   the thirteen former gaps as AnswerCards (K6 on the pull-away card)
  *   #measure   (also #ask) K1, the measurement plan, the letter, the promise
  *   #version   推估 v1・2026-11-26 and the change log
@@ -35,10 +37,13 @@ import EstimateTable from '@/components/charts/EstimateTable.astro';
 import EstimateBands from '@/components/charts/EstimateBands.astro';
 import WorkingSum from '@/components/charts/WorkingSum.astro';
 import ChartTable from '@/components/charts/ChartTable.astro';
+import SimCompare from '@/components/charts/SimCompare.astro';
+import SimSeconds from '@/components/charts/SimSeconds.astro';
+import SimAbove from '@/components/charts/SimAbove.astro';
+import SimText from '@/components/pages/estimate/SimText.astro';
 import { mveModel } from '@/components/charts/core/estimateCharts';
 import { workingBusiest, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
 import KerbScene from '@/components/art/KerbScene.astro';
-import AirRange from '@/components/art/AirRange.astro';
 import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
 import { AIR_RULE } from '@/components/art/air-slots';
 import Composer from '@/components/pages/action/Composer.astro';
@@ -51,6 +56,8 @@ import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { estText, kSentences } from '@/i18n/ui';
 import { answerList, facts, type SourceId } from '@/data';
 import { est, estimateText, formatEstimate, scenarioKeys } from '@/data/estimate';
+import { simData } from '@/data/simulation-data';
+import { sim } from '@/data/simulation';
 import estimateCopy from '@/i18n/pages/estimate';
 import { chipWhere } from '@/i18n/ui';
 import { fill, localize } from '@/i18n/pages/_copy';
@@ -74,7 +81,7 @@ const sheetMeasured = fill(t.sheet.measured, {
 });
 const sheetTitle = fill(t.fmt.sheetTitle, { v: formatEstimate('co.dozen.total', locale).text });
 const mve = mveModel(locale);
-const toc = (['numbers', 'recipe', 'count', 'check', 'range', 'drawing', 'limits', 'answers', 'measure'] as const).map((id) => ({
+const toc = (['numbers', 'simulation', 'recipe', 'count', 'check', 'range', 'drawing', 'limits', 'answers', 'measure'] as const).map((id) => ({
   id,
   label: id === 'answers' ? fill(t.toc.answers, { n: answerList.length }) : t.toc[id],
 }));
@@ -144,25 +151,20 @@ const confidence = (['co', 'benzene', 'pm25'] as const).map((p) => ({ p, name: t
 // ---- #drawing -------------------------------------------------------------------------------
 const drawingRules = t.drawing.rules.map((r) =>
   fill(r, {
-    patch: AIR_RULE.patchPx,
-    rings: AIR_RULE.streetRings,
-    dots: AIR_RULE.streetDots,
     few: est.scn.few.name[locale],
     dozen: est.scn.dozen.name[locale],
     full: est.scn.full.name[locale],
-    a: AIR_RULE.extra.few,
-    b: AIR_RULE.extra.dozen,
-    c: AIR_RULE.extra.full,
-    lo: AIR_RULE.range.dozen.lo.rings,
-    hi: AIR_RULE.range.dozen.hi.rings,
-    wash: AIR_RULE.washPercent.full,
+    a: AIR_RULE.fumePercent.few,
+    b: AIR_RULE.fumePercent.dozen,
+    c: AIR_RULE.fumePercent.full,
+    max: AIR_RULE.maxPercent,
   }),
 );
-const drawingHow = fill(t.drawing.how, { rings: AIR_RULE.streetRings });
+const drawingHow = fill(t.drawing.how, { steps: AIR_RULE.baseSteps, tint: AIR_RULE.tintPerStepPercent });
 
 // ---- #answers -------------------------------------------------------------------------------
 // K sentences already printed elsewhere on this page are not repeated on a card: K1 (top and
-// #measure), K4 (#limits). K6 lives only on the pull-away card. K5 is not allowed on this page.
+// #measure). K4 is no longer printed (the simulation answers it). K6 lives only on the pull-away card. K5 is not allowed on this page.
 const answerK = ['K6'] as const;
 
 // ---- #measure -------------------------------------------------------------------------------
@@ -171,7 +173,12 @@ const letterBody = fill(t.measure.body, {
   red: est.signal.redLength_s,
   coAdd: (en ? ' ' : '') + formatEstimate('co.dozen.add', locale).text,
 });
-const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.meta.version ? est.meta.date : '' }));
+const versionLog = t.version.log.map((l) => ({ ...l, date: 'date' in l && l.date ? l.date : l.version === est.meta.version ? est.meta.date : '' }));
+
+// ---- #simulation ------------------------------------------------------------------------------
+const S = t.simulation;
+// the full generated extract (research/simulation/site-extract.json), described as such on the page
+const simJson = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(simData, null, 2))}`;
 ---
 
 <Base locale={locale} title={t.meta.title} description={t.meta.description} share="how-much">
@@ -190,7 +197,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     </div>
 
     <p class="es-chartlead">{t.hero.chartLead}</p>
-    <MeasuredVsEstimate locale={locale} sheet="how-est" table={false} />
+    <MeasuredVsEstimate locale={locale} sheet="how-est" table={false} zoom={false} />
 
     <HowSheet id="how-est" locale={locale} kind="estimate" title={sheetTitle} pollutant="co" anchor="check" facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']}>
       <p slot="block1">{sheetMeasured}</p>
@@ -216,6 +223,7 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   <Section id="numbers" eyebrow={t.numbers.eyebrow} title={t.numbers.title} lead={t.numbers.lead} width="wide" tone="sunken" rule>
     <p class="es-p es-gloss">{est.meta.gloss[locale]}</p>
     <EstimateTable locale={locale} id="numbers-table" />
+    <p class="es-p es-gloss">{estimateText.upperIsTypical[locale]}</p>
     <p class="es-p es-gloss">{estimateText.unitsGloss[locale]}</p>
     <div class="es-ufp">
       <h3 class="es-h3"><Phrased text={t.numbers.ultrafineTitle} /></h3>
@@ -233,7 +241,78 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     <Downloads locale={locale} labels={{ title: t.numbers.downloads, csv: t.numbers.csv, json: t.numbers.json, note: t.numbers.downloadNote }} />
   </Section>
 
-  <!-- ===================================================== 2 RECIPE -->
+  <!-- ===================================================== 2 SIMULATION -->
+  <Section id="simulation" eyebrow={S.eyebrow} title={S.title} width="wide" rule>
+    <div class="es-sim__lead">
+      {S.lead.map((l) => <p class="es-p">{l}</p>)}
+      <ul class="es-limits">{S.cases.map((c) => <li>{c}</li>)}</ul>
+      <p class="es-p es-gloss">{S.gloss}</p>
+    </div>
+
+    <h3 class="es-h3"><Phrased text={S.askTitle} locale={locale} /></h3>
+    <div class="es-sim__lines">
+      {S.smell.map((l) => <p class="es-p">{l}</p>)}
+      <p class="es-p">{S.oneRed[0]}</p>
+      <SimText locale={locale} text={S.oneRed[1]} slots={{ range: 'sim.co.oneRed15' }} class="es-p" />
+      <p class="es-p">{fill(S.oneRed[2], { near: sim.co.nearTailpipeAbout })}</p>
+    </div>
+
+    <h3 class="es-h3"><Phrased text={S.compareTitle} locale={locale} /></h3>
+    <p class="es-p">{S.compareLead}</p>
+    <p class="es-p">{S.compareWhy}</p>
+    <SimCompare locale={locale} />
+    <div class="es-sim__lines">
+      <p class="es-p">{S.stay[0]}</p>
+      <SimText locale={locale} text={S.stay[1]} slots={{ range: 'sim.co.stay15' }} class="es-p" />
+      <p class="es-p">{S.stay[2]}</p>
+    </div>
+    <h3 class="es-h3"><Phrased text={S.pushchairTitle} locale={locale} /></h3>
+    <div class="es-sim__lines">
+      {S.pushchair.map((l) => <SimText locale={locale} text={l} slots={{ middle: 'sim.co.pushchairMiddle' }} class="es-p" />)}
+    </div>
+
+    <h3 class="es-h3"><Phrased text={S.burstsTitle} locale={locale} /></h3>
+    <SimSeconds locale={locale} />
+    <div class="es-sim__lines">
+      {S.bursts.map((l) => <SimText locale={locale} text={l} slots={{ usual: 'sim.co.burst1s', held: 'sim.co.burst1sHeld' }} class="es-p" />)}
+    </div>
+
+    <h3 class="es-h3"><Phrased text={S.heightTitle} locale={locale} /></h3>
+    <div class="es-sim__lines">
+      {S.height.map((l) => <p class="es-p">{l}</p>)}
+    </div>
+
+    <h3 class="es-h3"><Phrased text={S.aboveTitle} locale={locale} /></h3>
+    <SimAbove locale={locale} />
+    <div class="es-sim__lines">
+      {S.stayers.map((l) => <SimText locale={locale} text={l} slots={{ times: 'sim.benzene.stay1hTimes' }} class="es-p" />)}
+    </div>
+
+    <details class="es-more">
+      <summary><span>{S.sureTitle}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <div class="es-more__body"><ul class="es-limits">{S.sure.map((l) => <li>{l}</li>)}</ul></div>
+    </details>
+    <details class="es-more">
+      <summary><span>{S.notTitle}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <div class="es-more__body">
+        <div class="es-sim__lines">{S.enclosed.map((l) => <p class="es-p">{l}</p>)}</div>
+        <ul class="es-limits">{S.notList.map((l) => <li>{l}</li>)}</ul>
+      </div>
+    </details>
+    <details class="es-more">
+      <summary><span>{S.moreTitle}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <div class="es-more__body es-sim__lines">{S.arcade.map((l) => <SimText locale={locale} text={l} slots={{ range: 'sim.arcade.inside' }} class="es-p" />)}</div>
+    </details>
+    <details class="es-more">
+      <summary><span>{S.filesTitle}</span><Icon name="chevron-down" size="1.25rem" /></summary>
+      <div class="es-more__body">
+        <p class="es-p">{S.files}</p>
+        <p><a class="es-inlink" href={simJson} download={`scooterair-simulation-${simData.signed}.json`}>{S.json}<Icon name="arrow-right" size="1em" /></a></p>
+      </div>
+    </details>
+  </Section>
+
+  <!-- ===================================================== 3 RECIPE -->
   <Section fold id="recipe" eyebrow={t.recipe.eyebrow} title={t.recipe.title} lead={fill(t.recipe.lead, { runs: nf(est.meta.runs, 0) })} width="wide" rule>
     <h3 class="es-h3"><Phrased text={t.recipe.flowTitle} /></h3>
     <WorkingSum {...workingKerbFlow(locale)} />
@@ -359,13 +438,11 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
         <p class="es-p es-draw__try">{t.drawing.tryIt}</p>
         <ScenarioSwitch locale={locale} />
         <div class="es-draw__nums">
-          {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} anchor="numbers" class="est--ring" data-when-scenario={s} data-say />)}
+          {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} anchor="numbers" data-when-scenario={s} data-say />)}
         </div>
       </div>
     </div>
 
-    <h3 class="es-h3"><Phrased text={t.drawing.rangeTitle} /></h3>
-    <AirRange locale={locale} scenario="dozen" />
   </Section>
 
   <!-- ===================================================== 7 LIMITS -->
@@ -375,7 +452,8 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
       <li>{t.limits.more}</li>
     </ul>
     <h3 class="es-h3"><Phrased text={t.limits.heightTitle} /></h3>
-    <p class="es-p">{kSentences.K4[locale]}</p>
+    <p class="es-p">{t.limits.height}</p>
+    <div><a class="es-inlink" href="#simulation">{t.limits.heightLink}<Icon name="arrow-right" size="1em" /></a></div>
     <p class="es-p">{t.limits.health}</p>
     <div><a class="es-inlink" href={href('/evidence/#link-5', locale)}>{t.limits.healthLink}<Icon name="arrow-right" size="1em" /></a></div>
   </Section>
@@ -822,8 +900,8 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
   }
   /* the kerb drawing and its switch: the layout rule of the home page's screens (ui/Screen.astro).
      One column below 43em, the drawing as wide as the words under it. From 43em two columns,
-     drawing left (at most 55 % and 32rem, and narrow enough that the drawing, its key and tag
-     fit the window's height, never under 14rem), switch and figures right. --pic-ar is the kerb
+     drawing left (at most 55 % and 32rem, and narrow enough that the drawing and its tag
+     fit the window’s height, never under 14rem), switch and figures right. --pic-ar is the kerb
      drawing's width over its height (its viewBox, 450 × 425). */
   .es-draw {
     --pic-ar: 1.0588;
@@ -857,6 +935,19 @@ const versionLog = t.version.log.map((l) => ({ ...l, date: l.version === est.met
     min-block-size: var(--tap);
   }
 
+  .es-sim__lead,
+  .es-sim__lines {
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 40rem;
+  }
+  /* SimText prints its own <p class="es-p">, outside this file's scope */
+  .es-sim__lines :global(.es-p) {
+    margin: 0;
+    max-inline-size: 42rem;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+  }
   .es-limits {
     margin: 0;
     padding-inline-start: 1.2em;

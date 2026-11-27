@@ -52,6 +52,7 @@ export default copy({
 
   toc: {
     numbers: { 'zh-TW': '算出來的數字', en: 'The numbers' },
+    simulation: { 'zh-TW': '電腦算的一個紅燈', en: 'One red light, simulated' },
     recipe: { 'zh-TW': '怎麼算', en: 'How it is worked out' },
     count: { 'zh-TW': '旁邊停幾輛', en: 'How many scooters' },
     check: { 'zh-TW': '跟量到的對得起來嗎', en: 'Does it match the readings?' },
@@ -84,8 +85,114 @@ export default copy({
     },
   },
 
+  /** #simulation: the signed 3-D simulation (research/simulation), statements.json `may` only. */
+  simulation: {
+    eyebrow: { 'zh-TW': '2　電腦算的一個紅燈', en: '2 · One red light, simulated' },
+    title: { 'zh-TW': '我們用電腦，|把一個紅燈算了一遍', en: 'We simulated |one red light on a computer' },
+    lead: [
+      { 'zh-TW': '我們用電腦，把紅燈時路邊的風和廢氣，一秒一秒算出來。', en: 'On a computer, we worked out the wind and the exhaust at the kerb, second by second through a red light.' },
+      { 'zh-TW': '算進去的有：機車停在哪裡、排氣管朝哪裡、風從哪裡來。', en: 'We put in where the scooters stop, where the tailpipes point and where the wind comes from.' },
+      { 'zh-TW': '我們算了幾種情況，每種算一個紅燈：', en: 'We worked through a few cases, one red light each:' },
+    ],
+    cases: [
+      { 'zh-TW': '一般的街，風從機車吹向人行道', en: 'an ordinary street, with the wind from the scooters to the pavement' },
+      { 'zh-TW': '有騎樓的街，風很小', en: 'a street with an arcade, in light wind' },
+      { 'zh-TW': '一輛機車排氣管後面，幾乎沒風', en: 'right behind one tailpipe, in almost no wind' },
+    ],
+    gloss: { 'zh-TW': '推估：這是算的，不是量的，所以給一個範圍，也寫出它要在什麼情況下才成立。', en: 'Estimate: worked out, not read off an instrument, so we give a range and the conditions it needs.' },
+    askTitle: { 'zh-TW': '那麼臭，|超過指引值了嗎？', en: 'It smells awful. |Is it over the WHO guideline?' },
+    smell: [
+      { 'zh-TW': '推估：你聞到的臭味是真的。', en: 'Estimate: the smell you notice is real.' },
+      { 'zh-TW': '風從一群引擎沒熄火的機車吹向你時，紅燈大約一半到幾乎全部的時間，廢氣都濃到一般人聞得到。', en: 'When the wind blows to you from a group of scooters with their engines running, for about half to nearly all of the red, the exhaust is strong enough for most people to smell.' },
+      { 'zh-TW': '「聞得到」的標準，來自 1967 和 1970 年汽車廢氣研究的摘要。', en: 'What counts as ‘can smell it’ comes from abstracts of car-exhaust studies from 1967 and 1970.' },
+      { 'zh-TW': '一氧化碳沒有味道。你聞到的，是沒燒完、沒燒乾淨的汽油；它只要一點點（十億份空氣裡幾份），鼻子就聞得到。', en: 'Carbon monoxide has no smell. What you smell is petrol that did not burn, or did not burn cleanly; the nose picks it up at a tiny amount, a few parts in a billion.' },
+      { 'zh-TW': '所以很臭，不代表一氧化碳超過指引值。', en: 'So a strong smell does not mean carbon monoxide is over the guideline.' },
+    ],
+    oneRed: [
+      { 'zh-TW': '推估：在一般的街上等一個紅燈，身邊的一氧化碳會變多。', en: 'Estimate: waiting one red light on an ordinary street adds carbon monoxide around you.' },
+      { 'zh-TW': '攤成 15 分鐘的平均，多{range}，比世界衛生組織的 87 ppm 低很多。', en: 'Spread over 15 minutes, it adds {range}, far below the WHO value of 87 ppm.' },
+      { 'zh-TW': '排氣管正後方、幾乎沒風時，最多約 {near} ppm。', en: 'Right behind a tailpipe in almost no wind, it is up to about {near} ppm.' },
+    ],
+    compareTitle: { 'zh-TW': '都換成 15 分鐘的平均來比', en: 'All as 15-minute averages' },
+    compareLead: { 'zh-TW': '世界衛生組織的指引值看的是 15 分鐘的平均，所以下面每一列，都先換成 15 分鐘的平均。', en: 'The WHO guideline is about a 15-minute average, so every row below is first turned into a 15-minute average.' },
+    /** Why these are higher than section 1's 90-second estimate (a reader compares the two). */
+    compareWhy: { 'zh-TW': '這些數字比第 1 節的 90 秒推估多：這裡離機車只有半公尺、在小孩和嬰兒車的高度，也算了風一直從機車吹來的紅燈；第 1 節只算大人鼻子的高度。', en: 'These are higher than the 90-second estimate in section 1: here it is half a metre from the scooters, at child and pushchair height, and includes reds with the wind held from the scooters; section 1 is an adult’s nose height only.' },
+    stay: [
+      { 'zh-TW': '推估：就算每個紅燈都站在路邊、站滿 15 分鐘，風又一直從機車吹向你，', en: 'Estimate: even if you stand at the kerb through every red for 15 minutes, with the wind always blowing from the scooters to you,' },
+      { 'zh-TW': '一氧化碳的 15 分鐘平均是{range}，還是低於 87 ppm。', en: 'the 15-minute carbon monoxide average is {range}, still below 87 ppm.' },
+      { 'zh-TW': '這是小孩和嬰兒車的高度；膝蓋高的地方更多。我們只算了一個紅燈，15 分鐘是照它推出來的。風一直這樣吹，很少見。', en: 'This is at child and pushchair height; knee height gets more. We simulated one red; the 15 minutes are worked out from it. A wind that keeps blowing this way is rare.' },
+    ],
+    pushchairTitle: { 'zh-TW': '有一個例外', en: 'There is one exception' },
+    pushchair: [
+      { 'zh-TW': '推估：嬰兒車停在一輛機車排氣管的正後方，約半公尺。', en: 'Estimate: a pushchair stands half a metre directly behind one scooter’s tailpipe.' },
+      { 'zh-TW': '機車引擎沒熄火，幾乎沒有風，風向也不變。', en: 'The engine is running, there is almost no wind, and it does not change direction.' },
+      { 'zh-TW': '每個紅燈都停在那裡，連續 15 分鐘。', en: 'It stays there through every red for 15 minutes.' },
+      { 'zh-TW': '這時嬰兒車裡低低的地方（約 0.6 公尺），一氧化碳的 15 分鐘平均，可能超過 87 ppm。', en: 'Then, low in the pushchair (about 0.6 m), the 15-minute carbon monoxide average can pass 87 ppm.' },
+      { 'zh-TW': '這樣的 15 分鐘，每十次約有一到兩次；中間的情形是{middle}。', en: 'That happens in about 1 or 2 of 10 such 15-minute periods; the middle case is {middle}.' },
+      { 'zh-TW': '很弱的風剛好從那一邊吹來，大約一百個紅燈才有一次；要連續 15 分鐘，就更少了。', en: 'A very weak wind from that side comes in about 1 red in 100; for 15 minutes in a row it is rarer still.' },
+      { 'zh-TW': '往旁邊移開半公尺，或到小孩站著的高度，就沒有了。', en: 'Move half a metre to the side, or up to a standing child’s height, and it is gone.' },
+      { 'zh-TW': '這是我們最沒把握的結果：電腦裡的空氣比平常更靜，所以可能算高了。', en: 'This is our least certain result: the air in the model is stiller than usual, so it may be too high.' },
+    ],
+    burstsTitle: { 'zh-TW': '一陣一陣的', en: 'In bursts' },
+    bursts: [
+      { 'zh-TW': '推估：靠近排氣管時，一氧化碳是一陣一陣的。', en: 'Estimate: near a tailpipe, carbon monoxide comes in bursts.' },
+      { 'zh-TW': '半公尺處，最多的一秒通常是{usual}。', en: 'At half a metre, the highest second is usually {usual}.' },
+      { 'zh-TW': '風從機車吹來，或幾乎沒風時，可到{held}。', en: 'With the wind from the scooters, or almost no wind, it can reach {held}.' },
+      { 'zh-TW': '一秒的數字不太準，可能差到三倍；在嬰兒車的高度，可能還算低了。', en: 'One-second numbers are rough and could be off about three-fold; at pushchair height they are probably too low.' },
+      { 'zh-TW': '指引值看的是 15 分鐘的平均，所以一秒的量，不能拿來和它比。', en: 'The guideline is about a 15-minute average, so a one-second number cannot be set against it.' },
+    ],
+    heightTitle: { 'zh-TW': '嬰兒車的高度', en: 'Pushchair height' },
+    height: [
+      { 'zh-TW': '推估：風從機車吹來時，嬰兒車高度（約 0.7 公尺）的廢氣，和大人鼻子差不多到兩倍。', en: 'Estimate: with the wind from the scooters, exhaust at pushchair height (about 0.7 m) is between about the same as at an adult’s nose and about twice as much.' },
+      { 'zh-TW': '排氣管正後方、幾乎沒風時，差得更多。不是每種風都這樣。', en: 'Right behind a tailpipe in almost no wind the difference is bigger. Not in every wind.' },
+      { 'zh-TW': '這說的是那個高度的空氣，不是說小孩吸進的一氧化碳是大人的兩倍。', en: 'This is about the air at that height, not a claim that children breathe twice as much carbon monoxide.' },
+    ],
+    aboveTitle: { 'zh-TW': '臭味，和待一小時的人吸到的苯', en: 'The smell, and benzene for people who stay an hour' },
+    stayers: [
+      { 'zh-TW': '推估：在路口待上一小時的人，像攤販、交通警察、導護，如果風一直從機車吹來，', en: 'Estimate: for people who stay an hour at a junction, such as vendors, traffic officers and crossing guards, if the wind keeps blowing from the scooters,' },
+      { 'zh-TW': '苯（ㄅㄣˇ）的一小時平均，可能是美國加州 1 小時參考值的{times}。', en: 'the 1-hour benzene average can be {times} California’s 1-hour reference level.' },
+      { 'zh-TW': '這個參考值雖然叫 1 小時，是用 6 小時的資料訂的。機車廢氣裡有多少苯，我們不太確定，可能差到 5 到 10 倍。', en: 'That reference is called 1-hour but was set from 6-hour data. We are not sure how much benzene scooter exhaust holds; it could be off five- to ten-fold.' },
+      { 'zh-TW': '這不是在說等一個紅燈的人。', en: 'This is not about someone waiting one red.' },
+    ],
+    sureTitle: { 'zh-TW': '可以信多少', en: 'How sure' },
+    sure: [
+      { 'zh-TW': '每個數字的可信程度，都是低到中。', en: 'Every number has low to moderate confidence.' },
+      { 'zh-TW': '每種情況只算了一個紅燈。', en: 'Each case is one simulated red light.' },
+      { 'zh-TW': '一秒的數字不太準，可能差到三倍。', en: 'One-second numbers are rough, possibly off about three-fold.' },
+      { 'zh-TW': '引擎的熱、排氣的溫度和角度，都是假設的。', en: 'Engine heat, exhaust temperature and exhaust angle are assumptions.' },
+      { 'zh-TW': '風整個紅燈都從機車吹來，有多常見並不知道；最多大約八個紅燈有一個。站滿 15 分鐘都這樣，就更少了。', en: 'How often the wind blows from the scooters for a whole red is not known: at most about 1 red in 8. For 15 minutes in a row, rarer still.' },
+      { 'zh-TW': '嬰兒車停在排氣管正後方的那個結果，最沒把握。', en: 'The pushchair-behind-a-tailpipe result is the least certain.' },
+      { 'zh-TW': '電腦算的，沒有拿量到的來比對。', en: 'The simulation was not checked against readings.' },
+    ],
+    notTitle: { 'zh-TW': '沒有算的', en: 'Not simulated' },
+    enclosed: [
+      { 'zh-TW': '推估：一般來說，只有封閉的地方，才可能讓一氧化碳的 15 分鐘平均到指引值。', en: 'Estimate: generally, only enclosed places could bring the 15-minute carbon monoxide average up to the WHO value.' },
+      { 'zh-TW': '這是用空氣流量粗算的，不是一秒一秒算的。', en: 'This is a rough air-flow sum, not a second-by-second simulation.' },
+      { 'zh-TW': '例如地下停車場、地下道，或不太通風、有屋頂的候車區，裡面有幾十輛機車引擎沒熄火。', en: 'For example an underground car park, an underpass, or a stuffy covered waiting area with dozens of scooters idling.' },
+      { 'zh-TW': '這些地方我們沒有算，也沒有找到台灣在這些地方的量測。', en: 'We did not simulate these, and we found no Taiwanese measurement of them.' },
+    ],
+    notList: [
+      { 'zh-TW': '綠燈起步的那一陣。', en: 'The burst when the scooters pull away at green.' },
+      { 'zh-TW': '很多個紅燈連著會怎樣：15 分鐘和 1 小時的數字，是照一個紅燈推出來的。', en: 'What many reds in a row do: the 15-minute and 1-hour figures are worked out from one red.' },
+      { 'zh-TW': '微粒。', en: 'Particles.' },
+      { 'zh-TW': '兩邊有高樓的街：這次算得不夠準，所以不用。', en: 'A street between tall buildings: the result was not reliable enough, so we do not use it.' },
+      { 'zh-TW': '這不是健康評估，也不能拿來說會讓人生什麼病。', en: 'This is not a health assessment, and it shows no health effect.' },
+    ],
+    moreTitle: { 'zh-TW': '還算了什麼', en: 'What else we worked out' },
+    arcade: [
+      { 'zh-TW': '推估：風從機車吹向騎樓時，走進騎樓 1 到 3 公尺，一氧化碳比路邊少，平均是{range}，但不是乾淨的空氣。', en: 'Estimate: with the wind from the scooters toward an arcade, 1 to 3 metres inside it there is less carbon monoxide than at the kerb, {range} on average, but the air is not clean.' },
+      { 'zh-TW': '這只算了一個風很小的紅燈；很多個紅燈連著會怎樣，沒有算。', en: 'This is one light-wind red; many reds in a row were not simulated.' },
+    ],
+    filesTitle: { 'zh-TW': '數字的檔案', en: 'The numbers as a file' },
+    files: {
+      'zh-TW': '每個數字的範圍和條件，都在下面這個檔案裡。這是本站從簽核的報告取出來的完整摘錄，有些數字網頁上沒有印，因為只能和它的條件一起看。',
+      en: 'Every number’s range and conditions are in the file below. It is the full extract the site takes from the signed report; some numbers in it are not printed on these pages, because they only make sense with their conditions.',
+    },
+    json: { 'zh-TW': '下載完整的摘錄（JSON）', en: 'Download the full extract (JSON)' },
+  },
+
   recipe: {
-    eyebrow: { 'zh-TW': '2　算法', en: '2 · The working' },
+    eyebrow: { 'zh-TW': '3　算法', en: '3 · The working' },
     title: { 'zh-TW': '怎麼算', en: 'How it is worked out' },
     lead: {
       'zh-TW': '沒有人能在每個人的鼻子前面放一台儀器。所以我們用電腦把紅燈算一遍。機車停在哪裡、每輛排多少、風把廢氣吹到哪裡。每次換一種風、一批機車和一個站的位置。每種情況算 {runs} 次。',
@@ -136,7 +243,7 @@ export default copy({
   },
 
   count: {
-    eyebrow: { 'zh-TW': '3　幾輛', en: '3 · How many' },
+    eyebrow: { 'zh-TW': '4　幾輛', en: '4 · How many' },
     title: { 'zh-TW': '旁邊停幾輛', en: 'How many scooters are beside you' },
     lead: {
       'zh-TW': '三種情況，都是從運研所在路口錄影數的機車算出來的。',
@@ -156,7 +263,7 @@ export default copy({
   },
 
   check: {
-    eyebrow: { 'zh-TW': '4　對照', en: '4 · The cross-check' },
+    eyebrow: { 'zh-TW': '5　對照', en: '5 · The cross-check' },
     title: { 'zh-TW': '跟量到的對得起來嗎', en: 'Does it match what was measured?' },
     lead: {
       'zh-TW': '運研所（交通部運輸研究所）在{place}的 {sites} 個路口量空氣。儀器放在行人等候區，每個路口連續量 {hours} 小時。這是台灣在路口行人身邊量到的資料。',
@@ -192,7 +299,7 @@ export default copy({
   },
 
   range: {
-    eyebrow: { 'zh-TW': '5　範圍', en: '5 · The range' },
+    eyebrow: { 'zh-TW': '6　範圍', en: '6 · The range' },
     title: { 'zh-TW': '為什麼是一個範圍', en: 'Why the answer is a range' },
     lead: {
       'zh-TW': '同一個路口，每個紅燈都不一樣。下面是最會改變答案的五件事，以旁邊停了十來輛機車為例。每一件從最低調到最高，看答案差幾倍。',
@@ -219,7 +326,7 @@ export default copy({
   },
 
   drawing: {
-    eyebrow: { 'zh-TW': '6　圖', en: '6 · The pictures' },
+    eyebrow: { 'zh-TW': '7　圖', en: '7 · The pictures' },
     title: { 'zh-TW': '圖是怎麼畫的', en: 'How the pictures are drawn' },
     lead: {
       'zh-TW': '網站上的街景，都照同一個規則畫。圖上哪裡多、哪裡少，跟著推估走；你可以自己數。',
@@ -228,44 +335,49 @@ export default copy({
     rules: [
       {
         'zh-TW': '圖上只畫機車排的氣：一團淡淡的煙，從排氣管出來，貼著地面飄到等紅燈的人身上。街上原本就有的空氣不畫，寫在數字裡。',
-        en: 'The pictures draw only what the scooters give off: one soft plume that leaves the tailpipes, stays low and drifts onto the people waiting. The air the street already holds is not drawn; it is in the numbers.',
+        en: 'The pictures draw only what the scooters give off: a soft fume that leaves the tailpipes, stays low and drifts onto the people waiting. The air the street already holds is not drawn; it is in the numbers.',
       },
       {
-        'zh-TW': '人站的地方，煙裡的圈照推估畫：每 {patch} × {patch} 像素的一小格，{few}畫 {a} 個，{dozen}畫 {b} 個，{full}畫 {c} 個。',
-        en: 'Where people stand, the rings in the plume follow the estimate: in every {patch} × {patch} pixel patch, {a} for {few}, {b} for {dozen}, {c} for {full}.',
+        'zh-TW': '圖上沒有要對照圖例的記號。煙裡有什麼，用字寫在圖上：油氣聞得到，一氧化碳聞不到，微粒看不到。',
+        en: 'There are no symbols to look up in a key. What the fume holds is written on the picture in words: fuel vapour you can smell, carbon monoxide that has no smell, particles too small to see.',
       },
       {
-        'zh-TW': '煙的深淺只分三級：{few}、{dozen}、{full}。最深的時候，人站的地方平均也只蓋住 {wash}%。',
-        en: 'The plume has only three shades: {few}, {dozen} and {full}. Even at its darkest it covers, on average, {wash}% of the space where people stand.',
+        'zh-TW': '人站的地方，煙畫得多濃，照推估：{few}平均蓋住 {a}%，{dozen}蓋住 {b}%，{full}最多蓋住 {c}%。煙最深的一點也只蓋住 {max}%，後面的東西一樣看得到。煙畫在人的後面，不會蓋住臉。',
+        en: 'Where people stand, how thick the fume is drawn follows the estimate: on average it covers {a}% for {few}, {b}% for {dozen} and at most {c}% for {full}. Even its darkest point covers only {max}%, so what is behind it still shows. The fume is drawn behind the people, so it never covers a face.',
       },
       {
         'zh-TW': '排氣管後面那一團深色，是畫給眼睛看的。每根排氣管都一樣，不跟著推估變。',
         en: 'The dark patch behind each tailpipe is drawn for the eye: it is the same for every tailpipe and does not follow the estimate.',
       },
       {
-        'zh-TW': '推估是一個範圍，所以兩頭都畫給你看。下面的小格，先畫街上原本就有的 {rings} 個圈，再加上機車多出來的。十來輛的時候，一共從 {lo} 個到 {hi} 個圈。',
-        en: 'The estimate is a range, so both ends are drawn for you. Each small patch below holds the street’s own {rings} rings plus what the scooters add: for a dozen or so, {lo} to {hi} rings in all.',
+        'zh-TW': '推估是一個範圍，圖上畫的是中間的值。範圍有多大，請看上面「範圍」那一段。',
+        en: 'The estimate is a range, and the pictures draw its middle value. For how wide the range is, see the section on the range above.',
       },
     ],
     how: {
-      'zh-TW': '多畫幾個圈，是這樣算的：機車加上去的一氧化碳，除以街上原本就有的，再乘以 {rings}。然後四捨五入，最少 1 個。',
-      en: 'The extra rings are worked out like this: the carbon monoxide the scooters put in, divided by what the street already holds, times {rings}, rounded, and at least 1.',
+      'zh-TW': '煙要畫多濃，是這樣算的：機車加上去的一氧化碳，除以街上原本就有的，再乘以 {steps}，四捨五入，最少 1。每多 1，人站的地方平均多蓋住 {tint}%。',
+      en: 'How thick to draw the fume is worked out like this: the carbon monoxide the scooters put in, divided by what the street already holds, times {steps}, rounded, and at least 1. Each 1 adds {tint}% of cover, on average, where people stand.',
     },
     tryIt: { 'zh-TW': '換換看，圖會跟著變：', en: 'Try it, and the picture changes:' },
-    rangeTitle: { 'zh-TW': '範圍的兩頭', en: 'The two ends of the range' },
   },
 
   limits: {
-    eyebrow: { 'zh-TW': '7　限制', en: '7 · The limits' },
+    eyebrow: { 'zh-TW': '8　限制', en: '8 · The limits' },
     title: { 'zh-TW': '這個推估不能說什麼', en: 'What this estimate cannot tell you' },
     lead: {
       'zh-TW': '一個推估能說的有限。下面這些，它都回答不了：',
       en: 'An estimate can only say so much. It cannot answer any of these:',
     },
     more: {
-      'zh-TW': '不算綠燈起步的那一陣，也不算紅燈裡每一秒怎麼變。',
-      en: 'Not the burst when the scooters pull away at green, and not how the air changes second by second.',
+      'zh-TW': '不算綠燈起步的那一陣。',
+      en: 'Not the burst when the scooters pull away at green.',
     },
+    /** Statement 5 under heightTitle (replaces K4, which the simulation has answered). */
+    height: {
+      'zh-TW': '推估：風從機車吹來時，嬰兒車高度和大人鼻子差不多到兩倍；排氣管正後方、幾乎沒風時更多。不是每種風都這樣。',
+      en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much; more right behind a tailpipe in still air. Not in every wind.',
+    },
+    heightLink: { 'zh-TW': '看「電腦算的一個紅燈」', en: 'See ‘One red light, simulated’' },
     heightTitle: { 'zh-TW': '小孩和嬰兒車的|高度呢？', en: 'What about a child’s or a pushchair’s height?' },
     health: {
       'zh-TW': '想知道廢氣和身體的關係，請看證據頁「吸廢氣的人怎麼了」那一環。',
@@ -275,7 +387,7 @@ export default copy({
   },
 
   answers: {
-    eyebrow: { 'zh-TW': '8　答案', en: '8 · The answers' },
+    eyebrow: { 'zh-TW': '9　答案', en: '9 · The answers' },
     title: { 'zh-TW': '{n} 個問題，現在的答案', en: '{n} questions, and the answers we have now' },
     lead: {
       'zh-TW': '常被問的問題。每一題寫出是量到的、算的，還是研究的結論，也寫出要小心的地方。',
@@ -284,7 +396,7 @@ export default copy({
   },
 
   measure: {
-    eyebrow: { 'zh-TW': '9　實測', en: '9 · Measuring it' },
+    eyebrow: { 'zh-TW': '10　實測', en: '10 · Measuring it' },
     title: { 'zh-TW': '把推估換成實測', en: 'Turn the estimate into a measurement' },
     lead: {
       'zh-TW': '推估再仔細，也比不上真的去量。如果環保局或大學願意在路口量，下面是我們建議的量法。還有一封可以直接寄的信。',
@@ -353,6 +465,14 @@ export default copy({
         text: {
           'zh-TW': '第一版。三種情況、三種廢氣，算法和出處全部公開，並和運研所的量測對照。',
           en: 'First version. Three cases and three pollutants, with the working and sources in full, checked against the Institute of Transportation’s readings.',
+        },
+      },
+      {
+        version: { 'zh-TW': 'v1 補充', en: 'v1, addition' },
+        date: '2026-11-27',
+        text: {
+          'zh-TW': '加上「電腦算的一個紅燈」（推估）。90 秒的數字不變；範圍最高的數字，是一般紅燈裡偏高的那種，不是最糟的紅燈。',
+          en: 'Added ‘One red light, simulated’ (estimate). The 90-second figures are unchanged; the top of each range is a high but ordinary red, not the worst red.',
         },
       },
     ],

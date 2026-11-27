@@ -6,8 +6,8 @@
  *
  * Street scenes use 1 unit = 1 cm, the ground at y = 0, up negative.
  */
-import type { AirSource, Point } from './air.ts';
-import { LED_FIGURES, REAR_TYRE, RIDER_MOUTH, TAILPIPE, ledDigitRuns, ledDots, ledRuns, scooter, type ScooterKind } from './parts.ts';
+import type { AirSource } from './air.ts';
+import { LED_FIGURES, TAILPIPE, ledDigitRuns, ledDots, ledRuns, scooter, type ScooterKind } from './parts.ts';
 
 const n = (v: number) => +v.toFixed(1);
 
@@ -32,8 +32,6 @@ export interface Placed {
 export const ROW_CLASS = { 1: '', 2: 'a-row-2', 3: 'a-row-3' } as const;
 
 export const tailOf = (q: Placed): AirSource => ({ x: q.x + TAILPIPE.x * q.s, y: -q.lift + TAILPIPE.y * q.s, scale: q.s, row: q.row });
-export const tyreOf = (q: Placed): Point & { scale: number } => ({ x: q.x + REAR_TYRE.x * q.s, y: -q.lift, scale: q.s });
-export const riderNoseOf = (q: Placed): Point => ({ x: q.x + RIDER_MOUTH.x * q.s, y: -q.lift + RIDER_MOUTH.y * q.s });
 
 /** One scooter with its rider, placed. */
 export function placed(q: Placed, kind: ScooterKind, o: { face?: boolean; cls?: string; attrs?: string; rider?: boolean } = {}): string {

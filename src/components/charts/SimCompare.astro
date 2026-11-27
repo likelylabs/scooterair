@@ -1,0 +1,134 @@
+---
+/**
+ * SimCompare — chart (b) of the simulation: like with like. Carbon monoxide as 15-MINUTE averages
+ * (the WHO guideline's own averaging time) on one linear ppm axis, with the WHO 15-minute value
+ * drawn as a solid line through every row:
+ *
+ *   在一般的街上，等一個紅燈            約 0.1 到 4 ppm   ▨ (band)            |87
+ *   每個紅燈都站在路邊，站滿 15 分鐘     約 3 到 16 ppm      ▨▨▨ (band)        |87
+ *   嬰兒車在排氣管正後方半公尺          中間的情形約 35 到 56   ▨▨▨ ──────→ |87 →
+ *
+ * Rules it keeps (research/simulation/statements.json): no 1-, 10- or 90-second value; every
+ * estimate is a hatched band with a dashed edge (never a dot or a line, no middle mark); the
+ * pushchair row carries no number above 87 (its high end is an arrow with words); that row is
+ * told apart by the words 信心低, not by colour alone; the caption says 推估 and "one simulated
+ * red per case". Numbers come from src/data/simulation.ts via simCompareModel().
+ *
+ * Props
+ *   locale    Locale
+ *   sheet     id of a <HowSheet> on the page: each row opens it (full form). Without one, rows link
+ *             to /estimate/#simulation
+ *   compact   the home screen 5 form: short labels, one 推估 chip for the chart (in the caption) and
+ *             no row links (the screen's 怎麼知道的？ opens the sheet), so it fits the screen's height
+ *   table     false leaves out the data-table toggle (when the page prints ChartTable in its sheet)
+ *   id, class
+ *
+ * In the full form each row is `<a data-kind="estimate">`: 約, a range, the 推估 chip and a way to
+ * the working. Words that are not body text carry label / caption class names (check-site 11).
+ */
+import '@/styles/charts.css';
+import { href as link, type Locale } from '@/i18n';
+import { uid as makeId } from '@/components/uid';
+import { simCompareModel } from './core/simCharts';
+import { chipHtml, guides, hatchDef, pc } from './core/html';
+import { tableHtml } from './core/shared';
+import { chartText } from './strings';
+
+interface Props {
+  locale: Locale;
+  sheet?: string;
+  compact?: boolean;
+  table?: boolean;
+  id?: string;
+  class?: string;
+}
+const { locale, sheet, compact = false, table = true, id, class: cls } = Astro.props;
+const m = simCompareModel(locale);
+const u = makeId('simc');
+const H = compact ? 20 : 26;
+const x = (v: number) => (v / m.axis.max) * 100;
+const tickXs = m.axis.ticks.map(x);
+const whoX = x(m.who.value);
+const full = link('/estimate/#simulation', locale);
+const target = sheet ? `#${sheet}` : full;
+const rows = m.rows.map((r, i) => ({ ...r, label: compact ? m.short.rows[i].label : r.label, sub: compact ? m.short.rows[i].sub : r.sub, over: compact && r.over ? m.short.rows[i].over : r.over }));
+---
+
+<div id={id} class:list={['chart', 'hc', 'hc-sim', compact && 'hc--compact', cls]} data-chart="sim-compare" data-grow="" role="group" aria-label={m.title}>
+  <p class="vh" data-chart-summary>{m.summary}</p>
+  {!compact && <p class="hc-sim__label" aria-hidden="true">{m.title}</p>}
+  <ol class="hc-rows" role="list">
+    {
+      rows.map((r) => {
+        const head = (
+          <span class="hc-row__head">
+            <span class="hc-row__label">{r.label}</span>{' '}
+            <span class="hc-row__value hc-row__value--sm">
+              <span class="hc-row__n">{r.value}</span> <span class="hc-row__unit">{r.unit}</span>
+            </span>
+          </span>
+        );
+        const sub = compact ? (
+          r.sub && <span class="hc-row__sub"><span>{r.sub}</span></span>
+        ) : (
+          <span class="hc-row__sub">
+            <span class="hc-row__tail"><Fragment set:html={chipHtml('estimate', locale)} /></span> <span>{r.sub}</span>
+          </span>
+        );
+        const plot = (
+          <svg class="hc-plot" width="100%" height={H} aria-hidden="true" focusable="false">
+            <Fragment set:html={hatchDef(`${u}-${r.id}`)} />
+            <rect class="hc-track" x="0" y={H / 2 - 8} width="100%" height="16" rx="2" />
+            <Fragment set:html={guides(tickXs, H)} />
+            <rect class:list={['hc-band', 'hc-g', r.lowConfidence && 'hc-band--low']} data-mark="estimate" x={pc(x(r.band.lo))} y={H / 2 - 9} width={pc(Math.max(x(r.band.hi) - x(r.band.lo), 0.8))} height="18" rx="2" fill={`url(#${u}-${r.id})`} />
+            {r.over && (
+              <Fragment>
+                <line class="hc-over" data-mark="estimate-high" x1={pc(x(r.band.hi) + 0.6)} x2="99%" y1={H / 2} y2={H / 2} />
+                <svg x="99%" y={H / 2 - 6} width="12" height="12" overflow="visible">
+                  <path class="hc-over__head" d="M-6 0 L4 6 L-6 12 Z" />
+                </svg>
+              </Fragment>
+            )}
+            <line class="hc-who" data-mark="who-guideline" x1={pc(whoX)} x2={pc(whoX)} y1="0" y2={H} />
+          </svg>
+        );
+        const over = r.over && <p class="hc-sim__overlabel"><span aria-hidden="true">→ </span>{r.over}</p>;
+        return compact ? (
+          <li class:list={['hc-row', r.lowConfidence && 'hc-row--low']} data-row={r.id}>
+            <div class="hc-row__text">{head}{sub}</div>
+            {plot}
+            {over}
+          </li>
+        ) : (
+          <li class:list={['hc-row', 'hc-row--estimate', r.lowConfidence && 'hc-row--low']} data-row={r.id}>
+            <a class="hc-row__link" href={target} data-kind="estimate" data-slot={r.slot} data-how={full} data-sheet-open={sheet}>
+              {head}{' '}{sub}
+              <span class="vh">{chartText.sim.compare.how[locale]}</span>
+            </a>
+            {plot}
+            {over}
+          </li>
+        );
+      })
+    }
+  </ol>
+  <div class="hc-axis" data-chart-axis aria-hidden="true">
+    {m.axis.ticks.map((t, i) => <span style={`inset-inline-start:${pc(tickXs[i])}`}>{t}</span>)}
+  </div>
+  <p class="hc-sim__axislabel" aria-hidden="true">{m.axis.label}</p>
+  <div class="hc-sim__who">
+    <svg width="14" height="20" aria-hidden="true" focusable="false"><line class="hc-who" x1="7" x2="7" y1="1" y2="19" /></svg>
+    <p class="hc-sim__wholabel">
+      <span>{compact ? m.short.whoLine : m.who.line}</span> <Fragment set:html={chipHtml('official', locale)} />
+      <span class="hc-sim__whonote">{compact ? m.short.whoNote : m.who.note}</span>
+    </p>
+  </div>
+  <div class="hc-sim__caption">
+    {compact ? <p><Fragment set:html={chipHtml('estimate', locale)} /> {m.short.caption}</p> : m.caption.map((c) => <p>{c}</p>)}
+  </div>
+  {table && <Fragment set:html={tableHtml(m.table, { title: m.title, tableLabel: chartText.dataTable[locale] })} />}
+</div>
+
+<script>
+  import './core/grow';
+</script>

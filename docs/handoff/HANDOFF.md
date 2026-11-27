@@ -4,6 +4,12 @@ Written 2026-11-27 from a cloud session that was stopped mid-task. Everything th
 published is in this branch (`claude/nifty-newton-dfbvu2`). `main` is what is live at
 https://likelylabs.com/scooterair/ (last merge: pull request 6, "Update 2").
 
+> **Update, later on 2026-11-27.** Jobs 2.1 (fume-only pictures, trial B won) and 2.2 (simulation on the site) are
+> finished and are in this branch as built pages, share cards and films. The research for 2.3 is finished and signed in
+> `research/simulation/smell-chemicals/` (read `ANSWER-SMELL.md` and `statements-smell.json`). Still open: putting the
+> 2.3 statements on the pages, then showing the owner and asking before the merge. The patches and trial shots in this
+> folder are now history.
+
 This folder is working material. Delete `docs/handoff/` before the branch is merged to `main`.
 
 ## 1. What is in this branch that is not on `main`

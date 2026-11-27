@@ -84,11 +84,11 @@ export const T = {
   waiting: at('waiting'),
   /** push in low behind the front row */
   tail: at('knee'),
-  /** pull back; then the close shot of the child covering her nose */
+  /** pull back; then the close shot of the child covering their nose */
   keeps: at('keeps'),
   /** the number panel */
   panel: at('howMuch'),
-  /** the dive into the layer: rings, then the drop of fuel, then the magnifying glass */
+  /** the dive into the fume: a cloud that has no smell, then the drop of fuel, then the soot */
   inside: at('co'),
   fuel: at('fuel'),
   specks: at('specks'),
@@ -142,7 +142,7 @@ export const BEATS: readonly Beat[] = [
 
 /**
  * The frame behind the Play button, and the film's share image (brief 8.2, change 21): the
- * ruler shot of beat 10, with the breathing rings on.
+ * ruler shot of beat 10, with the wisps breathed in at every nose.
  */
 export const POSTER_T: number = r1(T.closest + 4.2);
 

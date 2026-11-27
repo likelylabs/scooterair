@@ -37,6 +37,7 @@ export const readLevels = [
   'bibliographic-record-only',
   'media-report-read',
   'search-summary-only',
+  'own-simulation-estimate',
 ] as const;
 export type ReadLevel = (typeof readLevels)[number];
 
@@ -54,6 +55,7 @@ export const readLevelLabels: Record<ReadLevel, L10n> = {
   'bibliographic-record-only': t('只對過書名、作者和出處', 'We checked only the title, authors and where it was published'),
   'media-report-read': t('讀了新聞報導或網頁原文', 'We read the news report or web page'),
   'search-summary-only': t('只在搜尋結果裡看到，沒有打開原頁', 'Seen only in search results; we did not open the page'),
+  'own-simulation-estimate': t('本站自己用電腦算的推估，不是量的', 'Our own computer simulation: an estimate, not a measurement'),
 };
 
 export const sourceKindLabels: Record<SourceKind, L10n> = {
@@ -3825,6 +3827,78 @@ export const sources = {
     language: 'en',
     readLevel: 'full-text-read',
     readNote: 'Opened by lane A on 2026-11-26: "The sharp accelerations after a stop are clearly visible in terms of HC and CO emissions"; idle flow about 30 L/min. Qualitative only: no modal rates.',
+  },
+
+  // -------------------------------------------------------------------------
+  // The site's own 3-D simulation (signed 2026-11-27) and the sources its published statements cite
+  // -------------------------------------------------------------------------
+  'scooterair-simulation-2026': {
+    kind: 'report',
+    org: t('行人呼吸（本站）', 'ScooterAir (this site)'),
+    year: 2026,
+    date: '2026-11-27',
+    title: 'Kerbside idling-scooter exhaust: 3-D large-eddy simulation (signed report)',
+    titleTranslated: '紅燈時路邊機車廢氣的三維電腦模擬（簽核報告）',
+    shortTitle: { 'zh-TW': '本站的電腦模擬', en: 'Our simulation' },
+    url: 'https://likelylabs.com/scooterair/estimate/#simulation',
+    accessed: '2026-11-27',
+    language: 'en',
+    readLevel: 'own-simulation-estimate',
+    readNote: 'Our own work: research/simulation/ (ANSWER.md, METHOD.md, results-simulation.json, statements.json; OpenFOAM v2506 large-eddy simulation with adversarial verification). The site prints only the statements statements.json allows, each with its mustCarry. Numbers reach the site through scripts/build-simulation-data.mjs (src/data/simulation-data.ts), which check-data re-runs.',
+  },
+  'arb-oehha-acute-rel-2025': {
+    kind: 'government',
+    org: t('美國加州空氣資源局（加州環境健康危害評估辦公室核定的數值）', 'California Air Resources Board (values approved by OEHHA)'),
+    year: 2025,
+    date: '2025-07-18',
+    title: 'OEHHA/ARB approved health values: Table 2, acute RELs and 8-hour RELs',
+    titleTranslated: '加州核定的健康參考值：表 2，急性與 8 小時參考暴露值',
+    url: 'https://ww2.arb.ca.gov/sites/default/files/classic/toxics/healthval/totables07182025.pdf',
+    accessed: '2026-11-27',
+    language: 'en',
+    readLevel: 'official-document-read',
+    readNote: 'Read for the simulation (research/simulation/sources.json#arb-oehha-rel-2025): full PDF text, acute and 8-hour tables and the notes on averaging period. Benzene acute REL 27 µg/m3 (8.5 ppb), 1 hour, derived on a 6-hour basis.',
+  },
+  'epa-ap122-1973': {
+    kind: 'government',
+    year: 1973,
+    org: t('美國環境保護署空氣污染技術資訊中心', 'US EPA Air Pollution Technical Information Center'),
+    title: 'Air Pollution Translations: A Bibliography with Abstracts, Volume 4 (AP-122)',
+    titleTranslated: '空氣污染譯文：附摘要的書目，第 4 冊',
+    reportNumber: 'AP-122 (ERIC ED099195)',
+    url: 'https://files.eric.ed.gov/fulltext/ED099195.pdf',
+    accessed: '2026-11-27',
+    language: 'en',
+    readLevel: 'section-read',
+    readNote: 'Read for the simulation (research/simulation/sources.json#epa-ap122-1973): the abstracts of Fiala and Zeschmann (1967, VDI-Z 109) and Aktiebolaget Atomenergi report BIL-32 (1970) on the odour of engine exhaust. The two odour thresholds the simulation uses rest on these abstracts only.',
+  },
+  'api-1995-gasoline-odour': {
+    kind: 'report',
+    year: 1995,
+    org: t('美國石油協會', 'American Petroleum Institute'),
+    title: 'Odor threshold studies performed with gasoline and gasoline combined with MTBE, ETBE and TAME',
+    titleTranslated: '汽油及含添加劑汽油的嗅覺閾值研究',
+    reportNumber: 'API Publication 4592 (EPA HERO 1248100)',
+    url: 'https://hero.epa.gov/hero/index.cfm/reference/details/reference_id/1248100',
+    accessed: '2026-11-27',
+    language: 'en',
+    readLevel: 'abstract-only',
+    readNote: 'Read for the simulation (research/simulation/sources.json#api-1995-odour): the HERO record with the abstract values only.',
+  },
+  'chan-burnett-chow-1997': {
+    kind: 'journal',
+    authors: ['Chan MY', 'Burnett J', 'Chow WK'],
+    year: 1997,
+    title: 'Personal exposure to carbon monoxide in underground car parks in Hong Kong',
+    titleTranslated: '香港地下停車場裡的一氧化碳個人暴露',
+    container: 'Indoor and Built Environment',
+    volume: '6',
+    pages: '350-357',
+    url: 'https://www.aivc.org/sites/default/files/airbase_10979.pdf',
+    accessed: '2026-11-27',
+    language: 'en',
+    readLevel: 'section-read',
+    readNote: 'Read for the simulation (research/simulation/sources.json#chan-burnett-chow-1997): scanned full text, results paragraph and criteria. Basis of the enclosed-places statement only; its numbers stay in fact data and are not printed.',
   },
 } satisfies Record<string, SourceInput>;
 

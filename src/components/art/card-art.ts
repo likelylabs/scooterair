@@ -16,10 +16,10 @@
  *
  * Pure strings, relative imports only.
  */
-import { air, airDot, airRibbon, airRing, airWisp, type AirScenario, type AirSource, type Box } from './air.ts';
+import { air, airPuff, airPuffDefs, airRibbon, airWisp, type AirScenario, type AirSource, type Box } from './air.ts';
 import { AIR_EXTRA } from './air-slots.ts';
-import { pedSignal, placed, put, shopfronts, tailOf, tyreOf, riderNoseOf, type Placed } from './kit.ts';
-import { MASK_FACE, MOUTH, TAILPIPE, artId, breath, figureBoxes, maskHead, maskOn, person, type PersonKind } from './parts.ts';
+import { pedSignal, placed, put, shopfronts, tailOf, type Placed } from './kit.ts';
+import { MASK_FACE, TAILPIPE, artId, maskHead, maskOn, person, scooter, type PersonKind } from './parts.ts';
 
 /** The card, in pixels. */
 export const CARD = { w: 1200, h: 630, edge: 60 } as const;
@@ -58,7 +58,7 @@ function frame(k: number, ground: number, x0 = 0): Box {
 /** Card pixels → units, along x, for a frame. */
 const ux = (b: Box, px: number) => b.x + (px / CARD.w) * b.w;
 
-/** The marks are drawn a little larger than on a phone page: a card is seen at about 320 px wide. */
+/** The wisps are drawn a little larger than on a phone page: a card is seen at about 320 px wide. */
 const cardUpp = (b: Box) => b.w / 330;
 
 /** The street behind: pale shopfronts, the road, the kerb the people stand on. */
@@ -99,7 +99,6 @@ interface KerbOptions {
   /** the people's zone of the plume, units */
   zone?: [number, number];
   signal?: { x: number; top: number; scale: number; state: 'red' | 'green'; count?: number };
-  breaths?: { x: number; y: number }[];
   seed: number;
   boost?: number;
   cars?: AirSource[];
@@ -122,18 +121,15 @@ function kerbStreet(o: KerbOptions): { box: Box; svg: string } {
     extra: AIR_EXTRA,
     kerb: gas ? { x0: zone[0], x1: zone[1], sourceX: o.front + TAILPIPE.x } : undefined,
     tailpipes: gas ? all.map((q) => ({ ...tailOf(q), ...(q === front && o.boost ? { boost: o.boost } : {}) })) : [],
-    tyres: gas ? [] : all.map(tyreOf),
     cars: o.cars ?? [],
-    avoid: [...o.people.flatMap(([p, x]) => figureBoxes(p, x)), ...all.flatMap((q) => figureBoxes('scooter', q.x, -q.lift, q.s, 'head'))],
   });
   const sig = o.signal ? pedSignal({ x: o.signal.x, y: o.signal.top, scale: o.signal.scale, state: o.signal.state, count: o.signal.count, poleTo: 0 }) : '';
   const back = rows.map((q) => placed(q, kind)).join('');
   const fg = o.people.map(([p, x]) => fig(x, p)).join('') + placed(front, kind, { face: true, cls: 'a-figure' });
-  const breaths = (o.breaths ?? []).map((p) => breath(p.x, p.y, 10)).join('');
-  return { box: b, svg: a.defs + street(b, o.front - 14) + sig + a.wash + back + a.cores + a.marks + fg + breaths };
+  return { box: b, svg: a.defs + street(b, o.front - 14) + sig + a.wash + back + a.cores + a.marks + fg };
 }
 
-/** The home card: the opening picture, close. A parent with a pushchair and a schoolchild covering her nose, the nearest tail a step away, the pack behind, the red signal at 90. */
+/** The home card: the opening picture, close. A parent with a pushchair and a schoolchild covering their nose, the nearest tail a step away, the pack behind, the red signal at 90. */
 function kerbArt(red: number): CardArt {
   const k = 1.62;
   const b0 = frame(k, 548);
@@ -159,7 +155,7 @@ function kerbArt(red: number): CardArt {
   return { kind: 'kerb', box, svg, layout: { head: TOP, tag: TAG_LOW } };
 }
 
-/** smell: close on the schoolchild covering her nose, the ribbons arriving from the tailpipe. */
+/** smell: close on the schoolchild covering their nose, the ribbons arriving from the tailpipe. */
 function smellArt(): CardArt {
   const k = 2.1;
   const b0 = frame(k, 600);
@@ -180,7 +176,7 @@ function smellArt(): CardArt {
   return { kind: 'smell', box, svg, layout: { head: TOP, tag: TAG_LOW } };
 }
 
-/** my-child: the pushchair at the tailpipe, the baby's face in the plume, its breathing ring in red. */
+/** my-child: the pushchair at the tailpipe, the baby's face in the fume. */
 function childArt(): CardArt {
   const k = 1.9;
   const b0 = frame(k, 575);
@@ -197,7 +193,6 @@ function childArt(): CardArt {
       { x: front + 30, lift: 34, s: 0.89, row: 2 },
     ],
     zone: [parent - 10, front - 6],
-    breaths: [{ x: parent + MOUTH.stroller.x, y: MOUTH.stroller.y }],
   });
   return { kind: 'child', box, svg, layout: { head: TOP, tag: TAG_LOW } };
 }
@@ -230,7 +225,8 @@ function packArt(): CardArt {
   return { kind: 'pack', box, svg, layout: { head: TOP, tag: TAG_LOW } };
 }
 
-/** money / electric: the same kerb with every scooter electric: no plume, grey dust at the tyres, one car's small core at the edge, the signal green. */
+/** money / electric: the same kerb with every scooter electric and the signal green. No exhaust at all: the
+ *  car whose puff used to sit at the edge was cropped out, so its puff looked like an electric scooter's. */
 function electricArt(): CardArt {
   const k = 1.62;
   const b0 = frame(k, 548);
@@ -251,7 +247,7 @@ function electricArt(): CardArt {
       { x: front + 230, lift: 32, s: 0.89, row: 2 },
       { x: front + 200, lift: 0, s: 1, row: 1 },
     ],
-    cars: [{ x: ux(b0, 1200) - 4, y: -36, dir: -1 }],
+    cars: [],
     signal: { x: ux(b0, 120), top: -300, scale: 2.2, state: 'green' },
   });
   return { kind: 'electric', box, svg, layout: { head: TOP, tag: TAG_LOW } };
@@ -269,20 +265,19 @@ function fixArt(): CardArt {
   const row: Placed[] = [470, 700, 930, 1160].map((px) => ({ x: ux(b, px), lift: 0, s: 1, row: 1 as const }));
   const back: Placed[] = [600, 830, 1060].map((px) => ({ x: ux(b, px), lift: 36, s: 0.88, row: 2 as const }));
   const big = tailOf(row[1]);
-  const wisp = { rings: 1, dots: 2, ribbons: 1, scale: 0.62 };
+  const wisp = { ribbons: 1, scale: 0.62 };
   const a = air({
     frame: b,
     upp: cardUpp(b),
     seed: 23,
     id: artId('card'),
-    noStreetAir: true,
+   
     tailpipes: [
       ...back.map((q) => ({ ...tailOf(q), ...wisp, scale: 0.55 })),
       ...row.filter((_, i) => i !== 1).map((q) => ({ ...tailOf(q), ...wisp })),
-      { ...big, boost: 1.7, rings: 3, dots: 5, ribbons: 2 },
-      { x: big.x - 130, y: big.y - 50, boost: 1.3, rings: 2, dots: 3, ribbons: 0 },
+      { ...big, boost: 1.7, ribbons: 2 },
+      { x: big.x - 130, y: big.y - 50, boost: 1.3, ribbons: 0 },
     ],
-    avoid: [...figureBoxes('stroller', parent), ...figureBoxes('schoolchild', child), ...row.flatMap((q) => figureBoxes('scooter', q.x, 0, 1, 'head'))],
   });
   const svg =
     a.defs +
@@ -376,14 +371,13 @@ function filmArt(red: number): CardArt {
 /* Pictures of their own                                                      */
 /* ------------------------------------------------------------------------ */
 
-/** rider: the rider behind sits in the core of the scooter in front; a red breathing ring at his nose. */
+/** rider: the rider behind sits in the fume of the scooter in front. */
 function riderArt(): CardArt {
   const k = 2.05;
   const b = frame(k, 560);
   const behind: Placed = { x: ux(b, 330), lift: 0, s: 1, row: 1 };
   const ahead: Placed = { x: behind.x + 196, lift: 0, s: 1, row: 1 };
   const far: Placed = { x: ahead.x + 40, lift: 34, s: 0.89, row: 2 };
-  const nose = riderNoseOf(behind);
   const a = air({
     frame: b,
     upp: cardUpp(b),
@@ -393,7 +387,6 @@ function riderArt(): CardArt {
     extra: AIR_EXTRA,
     kerb: { x0: behind.x + 40, x1: ahead.x - 8, sourceX: ahead.x + TAILPIPE.x },
     tailpipes: [tailOf(far), tailOf(ahead), tailOf(behind)],
-    avoid: [...figureBoxes('scooter', behind.x, 0, 1, 'head'), ...figureBoxes('scooter', ahead.x, 0, 1, 'head')],
   });
   const svg =
     a.defs +
@@ -404,8 +397,7 @@ function riderArt(): CardArt {
     a.cores +
     a.marks +
     placed(behind, 'gas', { face: true, cls: 'a-figure' }) +
-    placed(ahead, 'gas', { cls: 'a-figure' }) +
-    breath(nose.x + 4, nose.y - 3, 11);
+    placed(ahead, 'gas', { cls: 'a-figure' });
   return { kind: 'rider', box: b, svg, layout: { head: TOP, tag: TAG_LOW } };
 }
 
@@ -432,7 +424,6 @@ function stationArt(inlet: { lo: number; hi: number }): CardArt {
     extra: AIR_EXTRA,
     kerb: { x0: parent - 10, x1: front.x - 8, sourceX: front.x + TAILPIPE.x },
     tailpipes: [...rows, front].map(tailOf),
-    avoid: [...figureBoxes('stroller', parent), ...figureBoxes('schoolchild-cover', child), { x: ST.x - 40, y: -ST.h - 10, w: ST.w + 80, h: ST.h + 10 }],
   });
   const station = [
     `<rect class="hs-band" x="${n(pipeX - 30)}" y="${-inlet.hi * 100}" width="60" height="${n((inlet.hi - inlet.lo) * 100)}"/>`,
@@ -458,7 +449,7 @@ function stationArt(inlet: { lo: number; hi: number }): CardArt {
   return { kind: 'station', box: b, svg, layout: { head: { x: 320, y: CARD.edge, w: SQUARE.x1 - 320 - 10, h: 250, align: 'start' }, tag: TAG_LOW } };
 }
 
-/** brief: the heights. A dashed line at one metre; the tailpipe (ringed in red) and the baby both under it, the schoolchild and the adult beside them. */
+/** brief: the heights. A dashed line at one metre; the tailpipe and the baby both under it, the schoolchild and the adult beside them. */
 function heightsArt(): CardArt {
   const k = 1.75;
   const b = frame(k, 556);
@@ -473,7 +464,6 @@ function heightsArt(): CardArt {
     extra: AIR_EXTRA,
     kerb: { x0: X.pushchair + 20, x1: X.scooter - 6, sourceX: tail.x, sourceY: tail.y },
     tailpipes: [{ x: tail.x, y: tail.y, row: 1 }],
-    avoid: [...figureBoxes('stroller', X.adult), ...figureBoxes('schoolchild', X.child), ...figureBoxes('scooter', X.scooter)],
   });
   const left = b.x - 10;
   const right = b.x + b.w + 10;
@@ -486,13 +476,11 @@ function heightsArt(): CardArt {
     fig(X.adult, 'stroller'),
     fig(X.child, 'schoolchild'),
     placed({ x: X.scooter, lift: 0, s: 1, row: 1 }, 'gas', { face: true, cls: 'a-figure' }),
-    `<circle cx="${n(tail.x)}" cy="${n(tail.y)}" r="10" fill="none" stroke="var(--signal-red, #c62828)" stroke-width="3.6"/>`,
-    breath(X.adult + MOUTH.stroller.x, MOUTH.stroller.y, 10),
   ].join('');
   return { kind: 'heights', box: b, svg: a.defs + ground + a.wash + a.cores + a.marks + fg, layout: { head: { ...TOP, h: 205 }, tag: TAG_LOW } };
 }
 
-/** mask: a face in profile with a surgical mask; rings and ribbons from a tailpipe at the left run straight through it, some dots stop on it. */
+/** mask: a face in profile with a surgical mask; a cloud of fume from the tailpipe of a scooter at the left (its back and rear wheel show), its wisps running on through the mask to the nose, soot gathering on the mask's front. */
 function maskArt(): CardArt {
   const k = 2.2;
   const b = frame(k, 700);
@@ -501,29 +489,30 @@ function maskArt(): CardArt {
   const F = (p: { x: number; y: number }) => ({ x: TX + p.x * K, y: p.y * K });
   const noseIn = F(MASK_FACE.inside);
   const front = TX + MASK_FACE.front.x * K - 3;
-  const PIPE = { x: ux(b, 230), y: -76 };
+  // the back of a scooter facing left, standing on the ground: its tailpipe mouth is PIPE (a bare pipe read as a cigarette)
+  const SC = 1.1;
+  const PIPE = { x: ux(b, 230), y: (TAILPIPE.y - 2) * SC };
   const upp = cardUpp(b);
-  const a = air({ frame: b, upp, id: artId('card'), noStreetAir: true, tailpipes: [{ ...PIPE, dir: 1, scale: 0.7, rings: 0, dots: 0, ribbons: 0 }] });
-  const lane = (u: number, y1: number, x1: number) => {
-    const e = u * u * (3 - 2 * u);
-    return { x: PIPE.x + 14 + u * (x1 - PIPE.x - 14), y: PIPE.y - 6 + (y1 - PIPE.y + 6) * e };
-  };
-  let marks = '';
-  for (const [l, y1] of [-114, -102].entries())
-    for (let i = 0; i < 6; i++) {
-      const p = lane((i + 0.8 + l * 0.35) / 6.4, y1, noseIn.x + 2);
-      marks += airRing(p.x, p.y, upp, { size: 0.8 });
-    }
-  for (const [i, y] of [-122, -114].entries()) marks += airRibbon(airWisp(PIPE.x + 6, PIPE.y - 4 - i * 3, noseIn.x - 3, y, upp), upp, { weight: 1.1 });
-  for (const [x, y] of [[0.2, -84], [0.34, -98], [0.46, -80], [0.58, -106], [0.7, -88], [0.8, -100], [0.3, -72], [0.64, -74]] as const) marks += airDot(PIPE.x + x * (front - PIPE.x), y, upp);
-  for (const y of [-104, -94, -114]) marks += airDot(front - 3, y, upp);
+  const pid = artId('card');
+  const a = air({ frame: b, upp, id: artId('card'), tailpipes: [{ ...PIPE, dir: 1, scale: 0.7, ribbons: 0 }] });
+  const span = front - PIPE.x;
+  const cloud = airPuff(pid, [
+    { cx: PIPE.x + span * 0.3, cy: PIPE.y - 12, rx: span * 0.3, ry: 30 },
+    { cx: PIPE.x + span * 0.62, cy: PIPE.y - 30, rx: span * 0.3, ry: 40 },
+    { cx: front - 14, cy: -100, rx: 26, ry: 40 },
+  ], { strength: 0.62 });
+  const soot = airPuff(pid, [F({ x: 14, y: -86 }), F({ x: 18, y: -66 })].map((p) => ({ cx: p.x - 2, cy: p.y, rx: 14, ry: 22 })), { strength: 0.6, tone: 'soot' });
+  let wisps = '';
+  for (const [i, y] of [-122, -114, -106].entries()) wisps += airRibbon(airWisp(PIPE.x + 6, PIPE.y - 4 - i * 3, noseIn.x - 3, y, upp), upp, { weight: 1.1 });
   const svg = [
     `<rect class="a-plane" x="${n(b.x - 10)}" y="${n(b.y - 4)}" width="${n(b.w + 20)}" height="${n(b.h + 8)}"/>`,
-    a.defs,
+    airPuffDefs(pid) + a.defs,
     a.cores,
-    `<path class="a-metal-s" stroke-width="15" d="M${n(b.x - 10)},${PIPE.y + 9} L${n(PIPE.x - 5)},${PIPE.y + 1}"/><circle class="a-exh" cx="${n(PIPE.x - 1)}" cy="${PIPE.y}" r="5.5"/>`,
+    put(PIPE.x + (TAILPIPE.x + 2) * SC, 0, scooter({ kind: 'gas' }), { s: SC, flip: true, cls: 'a-figure' }),
+    cloud,
     `<g class="a-figure" transform="translate(${n(TX)} 0) scale(${K})">${maskHead()}${maskOn('surgical')}</g>`,
-    marks,
+    soot,
+    wisps,
   ].join('');
   return { kind: 'mask', box: b, svg, layout: { head: TOP, tag: TAG_LOW } };
 }

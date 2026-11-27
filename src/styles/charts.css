@@ -1300,3 +1300,164 @@ a.hc-row__link .hc-row__n {
 .hc-sum__v::first-letter {
   text-transform: uppercase;
 }
+
+/* ============================================================================================
+ * The simulation's charts (SimCompare, SimSeconds, SimAbove; /estimate/#simulation and home
+ * screen 5). Built on the .hc rows above: estimates are hatched bands with a dashed edge, a
+ * reference value is a solid ink line, and every word is HTML text.
+ * ============================================================================================ */
+.hc-sim__label {
+  font-weight: var(--fw-black);
+  font-size: var(--fs-sm);
+}
+.hc-sim__axislabel {
+  margin-block-start: -0.5rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-align: end;
+  padding-inline-end: var(--hc-in-end);
+}
+/* the reference value: a solid ink line through every row */
+.hc-who {
+  stroke: var(--chart-ink);
+  stroke-width: 3;
+}
+.hc-sim__who {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.hc-sim__who svg {
+  flex: none;
+}
+.hc-sim__wholabel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.5rem;
+}
+.hc-sim__whonote {
+  flex-basis: 100%;
+  font-weight: var(--fw-regular, 400);
+  color: var(--ink-2);
+}
+.hc-sim__caption {
+  display: grid;
+  margin: 0;
+  gap: 0.15rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+/* the pushchair row: its high end is an arrow past the guideline, with words under it */
+.hc-over {
+  stroke: var(--estimate);
+  stroke-width: 2.5;
+  stroke-dasharray: 5 3.5;
+}
+.hc-over__head {
+  fill: var(--estimate);
+}
+.hc-sim__overlabel {
+  padding-inline-start: var(--hc-in-start);
+  color: var(--estimate-ink);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+/* lower confidence: lighter hatch, and the row says 信心低 in words */
+.hc-band--low {
+  fill-opacity: 0.6;
+}
+.hc--compact .hc-sim__axislabel {
+  margin-block-start: -0.35rem;
+}
+
+/* ---- (a) one-second series, sorted ------------------------------------------------------------ */
+.hc-sec__head {
+  display: grid;
+  gap: 0.1rem;
+}
+.hc-sec__sublabel {
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.hc-sec__panel {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+}
+.hc-sec__plot {
+  position: relative;
+  padding-inline-start: 2.4rem;
+}
+.hc-sec__ticks {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 2rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.hc-sec__ticks > span {
+  position: absolute;
+  inset-inline-end: 0.2rem;
+  translate: 0 -50%;
+  line-height: 1;
+}
+.hc-sec__svg {
+  display: block;
+  overflow: visible;
+}
+.hc-sec__bar {
+  fill: var(--estimate);
+}
+.hc-sec__mean {
+  stroke: var(--chart-ink);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+.hc-sec__meanlabel {
+  position: absolute;
+  inset-inline-end: 0;
+  padding: 0 0.3rem;
+  border-radius: var(--radius-2);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  line-height: 1.5;
+}
+.hc-sec__axislabel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+
+/* ---- (c) two small charts, stacked, never merged ---------------------------------------------- */
+.hc-above__panel {
+  display: grid;
+  gap: var(--sp-3);
+}
+.hc-above__panel + .hc-above__panel {
+  padding-block-start: var(--sp-4);
+  border-block-start: 2px solid var(--line-strong);
+}
+
+.hc-sim__caption p {
+  margin: 0;
+}
+.hc-sim__caption .c-chip {
+  margin-inline-end: 0.3rem;
+}
+.hc--compact .hc-sim__who {
+  margin-block-start: -0.2rem;
+}

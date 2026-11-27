@@ -31,6 +31,7 @@ import { confidenceLabels, facts, readerKinds, type FactId } from '@/data';
 import { formatDate, snapshot, STALE_DAYS } from '@/lib/site-state.data';
 import about from '@/i18n/pages/about';
 import { fill, localize } from '@/i18n/pages/_copy';
+import SimText from '@/components/pages/estimate/SimText.astro';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
@@ -172,7 +173,7 @@ const days = [...new Set(log.map((e) => e.date))].map((date) => ({ date, items: 
                 </div>
                 <div class="log__row log__now">
                   <span class="log__label">{t.corrections.now}</span>
-                  <p>{e.now}</p>
+                  {e.now.includes('{range}') ? <SimText locale={locale} text={e.now} slots={{ range: 'sim.co.oneRed15' }} /> : <p>{e.now}</p>}
                 </div>
                 <Details summary={t.corrections.basis}>
                   <div class="log__why">

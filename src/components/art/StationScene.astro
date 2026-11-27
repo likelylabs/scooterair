@@ -8,7 +8,8 @@
  * `taipei-roadside-co-2024`: inletLow, inletHigh), with that range marked on
  * a ruler. Beside it a parent with a pushchair and a schoolchild stand behind
  * the tail of a scooter; its dark core lies on the ground, far below the
- * inlet. The same three layers of air.ts as every street scene.
+ * inlet. The same fume of air.ts as every street scene, named 機車排的氣 on the
+ * road below it with a thin line up into it.
  *
  * Props
  *   locale      Locale
@@ -25,11 +26,11 @@ import { est } from '@/data/estimate';
 import { fact } from '@/data/facts';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
-import { air, type Box, AIR_KEY } from './air';
+import { air, unitsPerPx, type Box } from './air';
 import { AIR_EXTRA } from './air-slots';
-import { TAILPIPE, artId, figureBoxes, person } from './parts';
+import { TAILPIPE, artId, person } from './parts';
 import { placed, put, shopfronts, tailOf, type Placed } from './kit';
-import { sceneAlt } from './scene';
+import { leader, sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
@@ -37,7 +38,7 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  /** the label on the fume (default true; false for a thumbnail or a share card) */
   legend?: boolean;
 }
 const { locale, legend = true, tag = false, id, class: cls } = Astro.props;
@@ -63,7 +64,6 @@ const a = air({
   extra: AIR_EXTRA,
   kerb: { x0: 6, x1: front.x - 8, sourceX: front.x + TAILPIPE.x },
   tailpipes: [tailOf(front)],
-  avoid: [...figureBoxes('stroller', parent), ...figureBoxes('schoolchild-cover', child), ...figureBoxes('scooter', front.x), { x: ST.x - 70, y: inletY - 70, w: 170, h: 130 }, { x: ST.x - 6, y: -ST.h - 6, w: ST.w + 12, h: ST.h + 6 }],
 });
 const station = [
   // the range the inlet may stand in, then the pipe, the inlet and the cabinet
@@ -81,13 +81,17 @@ const street = [
   `<path class="a-kerb" d="M-10,-1H${front.x - 14}V13H-10ZM${ST.x - 26},-1H530V13H${ST.x - 26}Z"/>`,
 ].join('');
 const fg = put(parent, 0, person('stroller'), { cls: 'a-figure' }) + put(child, 0, person('schoolchild-cover'), { cls: 'a-figure' }) + placed(front, 'gas', { face: true, cls: 'a-figure' });
+// the label on the fume: on the road under the child and the scooter, a short line up into the fume between them
+const LBL = { x: 176, y: 22 };
+const lead = legend ? leader(LBL.x + 34, LBL.y, 214, -34, unitsPerPx(VB.w)) : '';
 const alt = sceneAlt(locale, fill(art.station.alt, locale, { inlet: inletLabel }), { scenario: 'dozen', count: est.scn.dozen.count });
 ---
 
-<SceneFrame locale={locale} legend={legend && AIR_KEY} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--station', cls].filter(Boolean).join(' ')}>
-  <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + station + fg} />
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario="dozen" drift id={id} class={['scene--station', cls].filter(Boolean).join(' ')}>
+  <Fragment set:html={a.defs + street + a.wash + a.cores + a.marks + station + fg + lead} />
   <Fragment slot="labels">
     <SceneLabel box={VB} x={pipeX - 44} y={inletY - 14} anchor="end top" plate max={46}>{inletLabel}</SceneLabel>
     <SceneLabel box={VB} x={VB.x + VB.w - 10} y={-44} anchor="end middle" class="st-name">{art.station.cabinet[locale]}</SceneLabel>
+    {legend && <SceneLabel box={VB} x={LBL.x} y={LBL.y} anchor="start top" max={60} plate class="fume-label">{art.fume.label[locale]}</SceneLabel>}
   </Fragment>
 </SceneFrame>

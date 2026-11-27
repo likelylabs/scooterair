@@ -264,10 +264,10 @@
       "reviewedOn": "2026-11-26"
     },
     {
-      "id": "home.s2.body",
+      "id": "home.s2.body.1",
       "rule": "associations-not-causes-tw",
       "locale": "en",
-      "reason": "Brief screen 2 wording: benzene is an IARC Group 1 carcinogen, a causal classification of the substance; the rule is about Taiwanese association studies of traffic, which this sentence does not cite.",
+      "reason": "Brief screen 2 wording: benzene is an IARC Group 1 carcinogen, a causal classification of the substance; the rule is about Taiwanese association studies of traffic, which this sentence does not cite. (Re-keyed 2026-11-27: screen 2 body is now one line per sentence; this is the same sentence.)",
       "reviewedBy": "lane K (integrator)",
       "reviewedOn": "2026-11-26"
     },
@@ -277,6 +277,203 @@
       "reason": "Brief screen 3 requires this line about the three-minute idling rule. It cites the rule, not a measured idle emission rate or an arcade comparison.",
       "reviewedBy": "lane K (integrator)",
       "reviewedOn": "2026-11-26"
+    },
+    {
+      "id": "home.s8.quiet",
+      "rule": "sim-heights-qualified",
+      "reason": "Statement 5 of research/simulation/statements.json with its mustCarry in the same sentence: 推估 / Estimate, \"with the wind from the scooters\", \"about the same to twice\" (差不多到兩倍), and \"not in every wind\" (不是每種風都這樣).",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.myChild.s1.quiet",
+      "rule": "sim-heights-qualified",
+      "reason": "Statement 5 of research/simulation/statements.json with its mustCarry in the same sentence: 推估 / Estimate, \"with the wind from the scooters\", \"about the same to twice\" (差不多到兩倍), and \"not in every wind\" (不是每種風都這樣).",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.limits.height",
+      "rule": "sim-heights-qualified",
+      "reason": "Statement 5 of research/simulation/statements.json with its mustCarry in the same sentence: 推估 / Estimate, \"with the wind from the scooters\", \"about the same to twice\" (差不多到兩倍), and \"not in every wind\" (不是每種風都這樣). It also says more right behind a tailpipe in still air.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s8.sheet.care",
+      "rule": "sim-heights-qualified",
+      "reason": "Statement 5 of research/simulation/statements.json with its mustCarry in the same sentence: 推估 / Estimate, \"with the wind from the scooters\", \"about the same to twice\" (差不多到兩倍), and \"not in every wind\" (不是每種風都這樣). Labelled as the site's computer estimate (本站的電腦推估) and says more right behind a tailpipe in still air.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "about.corrections.nowText.child-44",
+      "rule": "sim-heights-qualified",
+      "reason": "Statement 5 of research/simulation/statements.json with its mustCarry in the same sentence: 推估 / Estimate, \"with the wind from the scooters\", \"about the same to twice\" (差不多到兩倍), and \"not in every wind\" (不是每種風都這樣). Labelled as the site's own computer estimate, apart from the foreign multiples it refuses.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "evidence.notClaimed.items.9.instead",
+      "rule": "sim-heights-qualified",
+      "reason": "Statement 5 of research/simulation/statements.json with its mustCarry in the same sentence: 推估 / Estimate, \"with the wind from the scooters\", \"about the same to twice\" (差不多到兩倍), and \"not in every wind\" (不是每種風都這樣).",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.simulation.height.0",
+      "rule": "sim-heights-qualified",
+      "locale": "zh-TW",
+      "reason": "Statement 5, first line of the /estimate/#simulation heights block: 推估, wind from the scooters, about the same to twice. The next two lines of the same block say \"more right behind a tailpipe\", \"not in every wind\" and that this is not children breathing twice the carbon monoxide.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s5.exception",
+      "rule": "no-above-guideline-at-red-light",
+      "locale": "zh-TW",
+      "reason": "This is statement 3 of research/simulation/statements.json (an allowed statement), not a claim about a pedestrian waiting at a red light: the subject is a pushchair parked half a metre behind one tailpipe in near-still air through every red for 15 minutes. The rule matched only because the line now carries \"every red for 15 minutes\" (連續 15 分鐘每個紅燈都在), which statement 3 must carry and which the facts review asked for. The same line carries 推估 and the qualifier rule sim-pushchair-exception-qualified is reviewed for it separately.",
+      "reviewedBy": "simulation release fixer",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "act.brief.simLine",
+      "rule": "no-above-guideline-at-red-light",
+      "locale": "zh-TW",
+      "reason": "This is statement 3 of research/simulation/statements.json (an allowed statement), not a claim about a pedestrian waiting at a red light: the subject is a pushchair parked half a metre behind one tailpipe in near-still air through every red for 15 minutes. The rule matched only because the line now carries \"every red for 15 minutes\" (連續 15 分鐘每個紅燈都在), which statement 3 must carry and which the facts review asked for. The same line carries 推估 and the qualifier rule sim-pushchair-exception-qualified is reviewed for it separately.",
+      "reviewedBy": "simulation release fixer",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smellSim.lines.6",
+      "rule": "no-above-guideline-at-red-light",
+      "locale": "zh-TW",
+      "reason": "This is statement 3 of research/simulation/statements.json (an allowed statement), not a claim about a pedestrian waiting at a red light: the subject is a pushchair parked half a metre behind one tailpipe in near-still air through every red for 15 minutes. The rule matched only because the line now carries \"every red for 15 minutes\" (連續 15 分鐘每個紅燈都在), which statement 3 must carry and which the facts review asked for. The same line carries 推估 and the qualifier rule sim-pushchair-exception-qualified is reviewed for it separately.",
+      "reviewedBy": "simulation release fixer",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s5.exception",
+      "rule": "sim-pushchair-exception-qualified",
+      "reason": "Statement 3 short form on home screen 5 (limit 45 Han): it carries 推估 in words (and the screen's 推估 chip), the exact spot (排氣管正後方半公尺 / half a metre behind a tailpipe), near-still air (幾乎沒風) and every red for 15 minutes (連續 15 分鐘每個紅燈都在 / through every red for 15 minutes). The compact chart row beside it carries held direction, every red, \"rare\" and \"low confidence\"; the sheet behind it carries the model's still air and \"half a metre to the side removes it\"; the line links to the full answer on /questions/my-child/#pushchair.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "act.brief.simLine",
+      "rule": "sim-pushchair-exception-qualified",
+      "reason": "Statement 3 on the one-page brief, after statement 1: carries 推估, half a metre behind a tailpipe, near-still air, every red for 15 minutes, \"1 or 2 in 10 such periods\", rare and low confidence. The model's still air and \"half a metre to the side removes it\" are on /estimate/#simulation, whose address the brief prints.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.simulation.pushchair.3",
+      "rule": "sim-pushchair-exception-qualified",
+      "reason": "Line 4 of the statement-3 block on /estimate/#simulation (one idea per line). The block's other lines carry 推估, half a metre directly behind one tailpipe, engine running, near-still air that keeps its direction, every red for 15 minutes, \"1 or 2 in 10 such 15-minute periods\", rarity, half a metre to the side removes it, and least certain because the model's air is stiller than usual. It names the height (about 0.6 m) where it happens.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.myChild.pushchair.lines.4",
+      "rule": "sim-pushchair-exception-qualified",
+      "locale": "zh-TW",
+      "reason": "Line 5 of the statement-3 block on /questions/my-child/#pushchair (one idea per line). The block's other lines carry 推估, the exact spot, near-still held air, every red for 15 minutes, \"1 or 2 in 10 such 15-minute periods\", rarity, half a metre removes it and least certain; its sheet adds the model's still air. It names the height (about 0.6 m).",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smellSim.lines.6",
+      "rule": "sim-pushchair-exception-qualified",
+      "reason": "Closing line of the smell answer: carries half a metre behind a tailpipe, near-still air, every red for 15 minutes, 15-minute averaging, \"1 or 2 in 10 such periods\", rare and low confidence; it sits under the section's 推估 line and links to the full statement 3 on /questions/my-child/#pushchair (model's still air, half a metre removes it).",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.simulation.stayers.1",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "Line 2 of the statement-8 block on /estimate/#simulation: the block carries 推估, an hour at a junction, the wind always from the scooters, 1 to 4 times (EstimateValue), the 6-hour basis, the five- to ten-fold emission uncertainty and \"not about someone waiting one red\". No risk wording.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s7.sheet.stayers.1",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "Line 2 of the statement-8 block in home screen 7's sheet: the block carries 推估, an hour at a junction, the wind always from the scooters, 1 to 4 times, the 6-hour basis, the five- to ten-fold emission uncertainty and \"not about someone waiting one red\".",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.oneRedLight.s1.sheet.stayers.2",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "Statement 8 in the one-red-light sheet: carries an hour, the held wind, 1 to 4 times; the next line carries the 6-hour basis, the five- to ten-fold emission uncertainty and \"not about someone waiting one red\"; the block opens with 推估.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "about.corrections.wrongText.sim-guideline",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "The corrections log names statement 8 with its whole mustCarry in the same sentence: 推估, an hour at a junction, the held wind, 1 to 4 times, the reference set from 6-hour data, the five- to ten-fold uncertainty in scooter benzene, and \"not about someone waiting one red\".",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "charts.chartText.sim.above.benzeneRef",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "The reference line's own label in chart (c2): names the 1-hour reference and that it was set from 6-hour data. The chart's caption carries 推估, 1 to 4 times, the held wind, the emission uncertainty and \"not about someone waiting one red\".",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "charts.chartText.sim.above.benzeneSum",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "Chart (c2) summary: 推估, an hour, the held wind, 1 to 4 times; printed with the caption that carries the 6-hour basis, the emission uncertainty and \"not about someone waiting one red\".",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.simulation.cases.1",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Names the simulated case (a street with an arcade, light wind). It cites no measurement and claims neither trapping nor clean air: the rule's point.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.simulation.arcade.0",
+      "rule": "no-arcade-or-idling-measurements",
+      "reason": "Statement 10 of research/simulation/statements.json with its mustCarry: 推估, less than at the kerb but not clean, one light-wind red (next line: many reds not simulated). It is a simulation, not a measurement, and claims no trapping.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "estimate.simulation.enclosed.2",
+      "rule": "no-arcade-or-idling-measurements",
+      "locale": "en",
+      "reason": "Statement 9 (enclosed places): \"idling\" describes the scooters in a place that was NOT simulated or measured; the sentence before carries 推估 and the one after says we did not simulate these and found no Taiwanese measurement.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.oneRedLight.s1.sheet.stayers.4",
+      "rule": "no-arcade-or-idling-measurements",
+      "locale": "en",
+      "reason": "Statement 9 (enclosed places) in one sentence: \"idling\" describes the scooters in a place this site did not simulate, and the sentence says so.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "questions.smellSim.q",
+      "rule": "sim-smell-not-co-high",
+      "locale": "zh-TW",
+      "reason": "The question the owner asked (聞起來那麼臭，一氧化碳超過指引值了嗎？), asked so that the answer under it can say no: carbon monoxide has no smell and a strong smell does not mean it is over the guideline.",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "sources.usedFor.arb-oehha-acute-rel-2025",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "The /sources/ line that says what the source is used for: it compares nothing and states the rule itself (only against people who stay an hour at a junction).",
+      "reviewedBy": "simulation site job",
+      "reviewedOn": "2026-11-27"
     }
   ],
   "inlineCopyAllowed": [

@@ -16,7 +16,8 @@ function paint(scope: HTMLElement, n: number): void {
   scope.querySelectorAll<HTMLElement>('.scene--swap').forEach((fig) => {
     fig.dataset.swapN = String(n);
     fig.querySelectorAll<SVGElement>('[data-swap-i]').forEach((el) => {
-      const ev = Number(el.dataset.swapI) < n;
+      // a petrol scooter's wisps also go when the scooter they blow onto is electric (SwapScene)
+      const ev = Number(el.dataset.swapI) < n || (el.dataset.swapLeft !== undefined && Number(el.dataset.swapLeft) < n);
       if (el.classList.contains('swap-ev')) el.classList.toggle('is-on', ev);
       else el.classList.toggle('is-off', ev);
     });

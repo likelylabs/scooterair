@@ -29,6 +29,10 @@
 //  - answers (src/data/answers.ts): a malformed former-gap id, unknown fact, slot or source; missing chip without a
 //    K sentence; one answer per former gap
 //  - 'masks/VERIFIED#<id>' research references that are not in research/masks/VERIFIED.json
+//  - the simulation (src/data/simulation-data.ts, simulation.ts): any difference from what
+//    scripts/build-simulation-data.mjs reads out of research/simulation now; a 'simulation/statements#may-n'
+//    reference to a statement that does not exist; a simulation fact or slot whose number is not
+//    in its statement's own words (statements.json); a 15-minute slot at or above the WHO value
 
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -148,11 +152,18 @@ const FINDING_VERDICTS = new Set(['CONFIRMED', 'CORRECTED', 'ADDED']);
 const { readFileSync: readFs, existsSync: existsFs } = await import('node:fs');
 const jsonCache = new Map();
 let masksVerified;
+let simStatements;
 function checkResearchRefs(where, research) {
   if (typeof research !== 'string') return;
   for (const m of research.matchAll(/\bmasks\/VERIFIED#([a-z0-9-]+)/g)) {
     masksVerified ??= JSON.parse(readFs(resolve(root, 'research/masks/VERIFIED.json'), 'utf8'));
     if (!masksVerified.facts.some((f) => f.id === m[1])) err(where, `research/masks/VERIFIED.json has no fact "${m[1]}"`);
+  }
+  // 'simulation/statements#may-<n>': statement n (from 1) of research/simulation/statements.json `may`
+  for (const m of research.matchAll(/\bsimulation\/statements#may-(\d+)\b/g)) {
+    simStatements ??= JSON.parse(readFs(resolve(root, 'research/simulation/statements.json'), 'utf8'));
+    const n = Number(m[1]);
+    if (!(n >= 1 && n <= simStatements.may.length)) err(where, `research/simulation/statements.json has no statement may-${n} (it has ${simStatements.may.length})`);
   }
   for (const m of research.matchAll(/\b(papers|redlight)\/([a-z0-9-]+)#([A-Za-z0-9._-]+)/g)) {
     const [, dir, file, id] = m;
@@ -758,6 +769,74 @@ const deferredVoice = [];
   walkL10n('estimate', est);
   walkL10n('estimateText', E.estimateText);
   deferredVoice.push(['estimateText', E.estimateText]);
+}
+
+// ---------------------------------------------------------------------------
+// The simulation (src/data/simulation-data.ts, simulation.ts) against research/simulation
+// ---------------------------------------------------------------------------
+// simulation-data.ts is generated; this block re-runs the generator and fails on any difference,
+// then checks every printed range against the words of its statement and against the results file.
+
+{
+  const w = (x) => `simulation ${x}`;
+  let gen, data, simMod;
+  try {
+    gen = await load('scripts/build-simulation-data.mjs');
+    data = (await load('src/data/simulation-data.ts')).simData;
+    simMod = await load('src/data/simulation.ts');
+  } catch (e) {
+    err(w('load'), String(e.message).split('\n')[0]);
+  }
+  if (gen && data && simMod) {
+    let fresh;
+    try {
+      fresh = gen.extract();
+    } catch (e) {
+      err(w('extract'), e.message);
+    }
+    if (fresh && JSON.stringify(fresh) !== JSON.stringify(data)) err(w('data'), 'src/data/simulation-data.ts differs from research/simulation; run node scripts/build-simulation-data.mjs');
+    const S = JSON.parse(readFs(resolve(root, 'research/simulation/statements.json'), 'utf8'));
+    const R = JSON.parse(readFs(resolve(root, 'research/simulation/results-simulation.json'), 'utf8'));
+    const words = (i) => `${S.may[i].en} ${S.may[i].mustCarry} ${S.may[i].basis}`;
+    const inWords = (slot, i, ...ns) => {
+      const text = words(i).replace(/–/g, ' – ');
+      for (const n of ns) if (!new RegExp(`(^|[^\\d.])${String(n).replace('.', '\\.')}([^\\d]|$)`).test(text)) err(w(slot), `${n} is not in the words of statement ${i + 1} (statements.json may[${i}])`);
+    };
+    const sim = simMod.sim;
+    inWords('co.oneRed15', 0, sim.co.oneRed15.lo, sim.co.oneRed15.hi, sim.co.nearTailpipeAbout);
+    inWords('co.stay15', 1, sim.co.stay15.lo, sim.co.stay15.hi);
+    inWords('co.pushchairMiddle', 2, sim.co.pushchairMiddle.lo, sim.co.pushchairMiddle.hi, sim.co.pushchairOneIn.lo, sim.co.pushchairOneIn.hi);
+    inWords('co.burst1s', 3, sim.co.burst1s.lo, sim.co.burst1s.hi, sim.co.burst1sHeld.lo, sim.co.burst1sHeld.hi, sim.co.burstUncertainTimes);
+    inWords('benzene.stay1hTimes', 7, sim.benzene.stay1hTimes.lo, sim.benzene.stay1hTimes.hi);
+    inWords('arcade.inside', 9, sim.arcade.inside.lo, sim.arcade.inside.hi);
+    // the 15-minute values the home headline rests on stay below the WHO value
+    const who = Number(/^([\d.]+) ppm/.exec(R.numbers[0].reference.value)?.[1]);
+    if (sim.who15min_ppm !== who) err(w('who15min_ppm'), `${sim.who15min_ppm} but results-simulation.json names ${who}`);
+    if (sim.who15min_ppm !== estimateMod.est.who.co15min_ppm.value) err(w('who15min_ppm'), `${sim.who15min_ppm} differs from estimate.ts who.co15min_ppm ${estimateMod.est.who.co15min_ppm.value}`);
+    if (simMod.simBelowWho() !== (sim.co.oneRed15.hi < who && sim.co.stay15.hi < who && sim.co.nearTailpipeAbout < who)) err(w('simBelowWho'), 'does not follow the 15-minute values');
+    // each slot prints as 約 A 到 B and is an estimate
+    for (const slot of simMod.simSlots) {
+      let r;
+      try {
+        r = simMod.simRange(slot);
+      } catch (e) {
+        err(w(slot), e.message);
+        continue;
+      }
+      if (!(r.lo < r.hi)) err(w(slot), `bad range ${r.lo}–${r.hi}`);
+      if (r.kind !== 'estimate' || r.anchor !== 'simulation') err(w(slot), 'must be an estimate anchored at /estimate/#simulation');
+      const zh = estimateMod.formatEstimate(r, 'zh-TW').text;
+      const en = estimateMod.formatEstimate(r, 'en').text;
+      if (!/約/.test(zh) || !/到/.test(zh)) err(w(slot), `zh text "${zh}" lacks 約 or 到`);
+      if (!/about/.test(en) || !/ to /.test(en)) err(w(slot), `en text "${en}" lacks "about" or "to"`);
+    }
+    // the simulation facts point at their statements and carry the estimate chip
+    for (const [id, f] of Object.entries(factGroups.simulation ?? {})) {
+      if (!/simulation\/statements#may-\d+/.test(f.research)) err(`fact ${id}`, "a simulation fact's research must name its statement (simulation/statements#may-n)");
+      if (!f.sources.includes('scooterair-simulation-2026')) err(`fact ${id}`, "must cite 'scooterair-simulation-2026'");
+    }
+    walkL10n('simulation meta', simMod.simMeta);
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,208 @@
+{
+  "key": "sources-combustion-toxics",
+  "researcher": "researcher 2 (partial-combustion products and other toxics)",
+  "checkedOn": "2026-11-27",
+  "question": "In the seconds when a person beside idling petrol scooters can smell the exhaust, which partial-combustion toxics (carbonyls, PAHs, 1,3-butadiene, phenol, HCN, sulphur compounds) are at the nose, and how much of each relative to the simulation's THC or CO tracer?",
+  "howToUse": {
+    "thcBasis": "shareOfTHC_pct is a MASS share of exhaust THC, the same convention as the simulation's benzeneFracTHC (THC mass counted as CH1.85, 13.85 g per mol C). Level at the nose = simulated THC (ppmC) x the per-ppmC factor given. 1 ppmC of THC = 0.5665 mg/m3 at 25 C.",
+    "coBasis": "Where a ratio to CO is given (idle data, Nepal), level = simulated CO increment (ppm) x ppbPerPpmCO. Use THC basis first; the CO basis is a cross-check from the only real idle measurement.",
+    "denominatorCaution": "The denominators differ by source: FID THC (Daemme 2016), sum of speciated VOC (Tsai 2003, 2018), NMVOC (EEA), sum of measured hydrocarbons incl. CH4 (Stockwell 2016, which misses heavier species so its shares run high). These differ by up to about 1.5x; the ranges below absorb that.",
+    "simulationCautions": "Carry the simulation's own cautions: one simulated red per case, grid-limited 1-s values, held-wind condition, low to moderate confidence. These ratios add their own (low) confidence on top."
+  },
+  "headline": [
+    "METHOD.md said no idle aldehyde data exist for scooters. That is no longer exactly true. One real idle (start-up plus idling) measurement exists: NAMaSTE, Kathmandu 2015 (Stockwell et al. 2016, supplement Table S4). It covers five carburetted Indian-built four-stroke motorcycles and one 110 cc four-stroke scooter, all without catalysts. Formaldehyde was detected only from the scooter, at 0.54-0.55 g/kg fuel (0.15-0.22 % of its CO mass); it was below detection limit for all five motorcycles. Acetaldehyde, 0.82 g/kg (1.3 % of measured hydrocarbons), was measured for one motorcycle only. Taiwan's own idle-stage carbonyl samples (Tsai et al. 2003, JAWMA, Phase III bikes) exist, but the full text was blocked (tandfonline 403), so their idle values were not read.",
+    "Taiwanese driving-cycle data (ECE cycle, which includes idle) put the carbonyls at only 0.9-1.1 % of VOC mass for four-strokes in 2003 (abstract) and 1.8-3.0 % of VOC in 2018 (abstract). Formaldehyde, acetaldehyde and acetone were each about 0.1-0.3 % of VOC.",
+    "The EMEP/EEA guidebook (full text) applies petrol-car shares to four-stroke motorcycles, because it has no motorcycle data: formaldehyde 1.7-2.1 %, acetaldehyde 0.6-0.75 %, acrolein 0.16-0.19 %, 1,3-butadiene 0.9-1.4 % of NMVOC. It also uses petrol-car PAH factors for motorcycles.",
+    "Used ranges, as a mass share of THC (low / central / high): formaldehyde 0.1 / 1.0 / 2.1 %; acetaldehyde 0.13 / 0.7 / 1.3 %; acrolein 0.05 / 0.17 / 0.4 % (car data only); total carbonyls 0.9 / 2.5 / 4.6 %; 1,3-butadiene 0.12 / 1.0 / 3.2 %; naphthalene 0.3 / 0.9 / 2 % (car data only); benzo[a]pyrene 1e-5 / 5e-5 / 2e-4 % (that is 1e-7 to 2e-6 by mass; car-derived factors only). Per 1 ppmC of THC at the nose, the centrals give about 4.6 ppb formaldehyde, 2.2 ppb acetaldehyde, 0.4 ppb acrolein, 2.6 ppb 1,3-butadiene, 1 ppb naphthalene and 0.0003 ug/m3 (0.3 ng/m3) benzo[a]pyrene.",
+    "Idle cross-checks against CO, from Nepal (non-catalyst bikes): 1,3-butadiene 0.11-0.59 % of CO mass (median 0.19 %, 11 tests); hydrogen cyanide 0.06-0.17 % of CO; phenol 0.15-0.81 % of CO. Sulphur compounds (OCS, DMS) were only about 0.001 % of CO, and SO2 was below detection limit. Hydrogen sulphide was not measured in anything opened.",
+    "There is no idle PAH emission factor for any scooter or motorcycle in anything read. One Taiwanese four-stroke study (abstract) found that the PAHs at idle were lighter ones (phenanthrene, anthracene, pyrene), probably from unburned fuel, and that benzo[a]pyrene appeared mainly at 30 km/h. That suggests idle benzo[a]pyrene is at or below the cycle-based range, but no number supports it."
+  ],
+  "chemicals": [
+    {
+      "name": "formaldehyde",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.1", "central": "1.0", "high": "2.1",
+      "perPpmC": "0.46 / 4.6 / 9.7 ppb per ppmC THC (0.57 / 5.7 / 11.9 ug/m3 per ppmC)",
+      "coBasis": "0.15-0.22 % of CO mass, from the one idle scooter (Nepal, no catalyst) = 1.4-2.05 ppb per ppm CO. Below detection limit for 5 idle motorcycles, so the motorcycle value is lower by an unknown amount.",
+      "measuredOn": "Low: Taiwan, 25 new and in-use Phase III motorcycles, ECE cycle (includes idle), MTBE petrol, 2003. 0.4-0.7 mg/km against 4-stroke VOC of 344-433 mg/km = 0.12-0.16 %; on a pooled 2-/4-stroke VOC basis 0.07-0.12 % (abstract only). Mid: Brazil, one 150 cc Euro III TWC fuel-injected motorcycle on E22 (22 % ethanol), EU urban cycle. HPLC 0.93 mg/km against THC 182 mg/km = 0.51 %. High: EEA guidebook petrol-car share that it applies to 4-stroke motorcycles, 1.70 % (Euro 1-4) to 2.08 % (conventional) of NMVOC. Idle: Nepal Honda Aviator 4-stroke scooter, start-up plus idle, no catalyst, 0.548 g/kg. Its THC was not measured by canister; scaling its FTIR C1-C4 hydrocarbons (14.7 g/kg) by the canister-measured motorcycle's C1-C4 share (52 %) gives about 28 g/kg THC, so formaldehyde is about 2 % of THC (a derived figure, one vehicle).",
+      "sourceIds": ["tsai-2003-jawma", "daemme-2016", "eea-2023-roadtransport", "stockwell-2016"],
+      "confidence": "low: four independent values span 20x; the only idle value is one scooter without a catalyst; Taiwanese idle-stage values exist but were not readable"
+    },
+    {
+      "name": "acetaldehyde",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.13", "central": "0.7", "high": "1.3",
+      "perPpmC": "0.41 / 2.2 / 4.1 ppb per ppmC THC (0.74 / 4.0 / 7.4 ug/m3 per ppmC)",
+      "coBasis": "0.11 % of CO mass (one idle motorcycle, Nepal) = 0.7 ppb per ppm CO",
+      "measuredOn": "Low: Taiwan Phase III motorcycles, ECE cycle, 0.6-1.2 mg/km against VOC 344-433 (4-stroke) mg/km = 0.17-0.28 %; pooled-VOC basis 0.13 % (abstract only). Mid: EEA petrol-car share applied to motorcycles, 0.59-0.75 % of NMVOC. High: Nepal Bajaj Pulsar 4-stroke, start-up plus idle, no catalyst, canister 0.817 g/kg against 64.1 g/kg summed hydrocarbons = 1.27 % (an upper-leaning share, because the summed hydrocarbons miss heavier species). Brazil E22 1.6 % of THC NOT used for the range: ethanol in the fuel raises acetaldehyde, and Taiwanese petrol is not an ethanol blend.",
+      "sourceIds": ["tsai-2003-jawma", "eea-2023-roadtransport", "stockwell-2016", "daemme-2016"],
+      "confidence": "low"
+    },
+    {
+      "name": "acrolein",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.05", "central": "0.17", "high": "0.4",
+      "perPpmC": "0.12 / 0.42 / 0.99 ppb per ppmC THC (0.28 / 0.96 / 2.3 ug/m3 per ppmC)",
+      "measuredOn": "PETROL-CAR DATA ONLY. EEA guidebook Table 3-86b: 0.16 % (conventional) and 0.19 % (Euro 1-4) of NMVOC, which the guidebook applies to 4-stroke motorcycles. Table 3-86d: 0.18 % (Euro 5) and 0.08 % (Euro 6). The range is widened by about 2-3x either way because no scooter or motorcycle measurement was opened. A Taiwanese motorcycle study names acrolein among the major carbonyls, but that was seen only in a search snippet, not read. Acrolein is not in NAMaSTE's FTIR or canister lists.",
+      "sourceIds": ["eea-2023-roadtransport"],
+      "confidence": "very low: car data only"
+    },
+    {
+      "name": "other aldehydes and ketones (benzaldehyde, tolualdehydes, propionaldehyde, crotonaldehyde, butanal, acetone, butanone)",
+      "shareBasis": "mass share of THC (%) per species",
+      "low": "acetone 0.07; others 0.004-0.02", "central": "acetone 0.5; benzaldehyde 0.4; tolualdehydes (sum) 0.5; propionaldehyde 0.08; butanal 0.07; crotonaldehyde 0.03", "high": "acetone 1.74; benzaldehyde 0.6; tolualdehydes 0.76; butanal 0.1",
+      "measuredOn": "Acetone: Taiwan ECE cycle 0.5-0.7 mg/km = 0.07-0.16 % of VOC (abstract); Nepal idle motorcycle 1.11 g/kg = 1.74 % of summed hydrocarbons; EEA car 0.21-0.61 %. Butanal 0.062 g/kg (0.10 %) and butanone 0.0023 g/kg (0.004 %) for the Nepal idle motorcycle. Benzaldehyde (0.22-0.60 %), o/m/p-tolualdehyde (sum 0.26-0.76 %), propionaldehyde (0.05-0.11 %) and crotonaldehyde (0.02-0.04 %) come from EEA petrol-car data only.",
+      "sourceIds": ["tsai-2003-jawma", "stockwell-2016", "eea-2023-roadtransport"],
+      "confidence": "low (acetone); very low (car-only species)"
+    },
+    {
+      "name": "total carbonyls (aldehydes + ketones)",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.9", "central": "2.5", "high": "4.6",
+      "perPpmC": "about 5 / 14 / 26 ug/m3 per ppmC THC",
+      "measuredOn": "Taiwan 4-stroke, ECE cycle, 2003: 3.1 (new) and 4.6 (in-use) mg/km against VOC 344 and 433 mg/km = 0.90 and 1.06 % (abstract). Taiwan Phase III-V four-strokes, ECE cycle, 2018: carbonyls 1.8-3.0 % of 67-VOC mass (abstract). Nepal idle motorcycle: acetaldehyde + acetone + butanal + butanone + hydroxyacetone = 2.64 g/kg = 4.1 % of summed hydrocarbons, with formaldehyde below detection limit. EEA petrol car: sum of aldehydes and ketones 4.6 % (conventional), 4.0 % (Euro 1-4). This replaces METHOD.md's assumed 0.5-3 % aldehydes of VOC: the measured carbonyl range is somewhat higher at the top.",
+      "sourceIds": ["tsai-2003-jawma", "tsai-2018-aaqr", "stockwell-2016", "eea-2023-roadtransport"],
+      "confidence": "low to moderate (several independent sources agree within about 5x)"
+    },
+    {
+      "name": "1,3-butadiene",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.12", "central": "1.0", "high": "3.2",
+      "perPpmC": "0.31 / 2.6 / 8.2 ppb per ppmC THC (0.68 / 5.7 / 18 ug/m3 per ppmC)",
+      "coBasis": "Idle, Nepal, 11 tests on 6 four-stroke two-wheelers (no catalyst): 0.109-0.593 % of CO mass, median 0.190 % = 0.56 / 0.98 / 3.07 ppb per ppm CO (low / median / high)",
+      "measuredOn": "Idle: NAMaSTE fleet average 1.30 (pre-service) and 1.19 (post-service) g/kg fuel (FTIR, Table 1). One canister-sampled motorcycle: 2.04 g/kg = 3.18 % of summed hydrocarbons (high end). EEA petrol car: 1.42 % (conventional), 0.91 % (Euro 1-4), 0.12 % (Euro 5), 0.80 % (Euro 6) of NMVOC. The Euro 5 figure sets the low end. Researcher 1 may also cover this species; this entry is the partial-combustion view.",
+      "sourceIds": ["stockwell-2016", "eea-2023-roadtransport"],
+      "confidence": "low to moderate (a real idle measurement exists, but on non-catalyst Indian bikes)"
+    },
+    {
+      "name": "naphthalene (gas-phase, the largest PAH)",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.3", "central": "0.9", "high": "2.0",
+      "perPpmC": "0.32 / 0.97 / 2.2 ppb per ppmC THC (1.7 / 5.1 / 11 ug/m3 per ppmC)",
+      "measuredOn": "PETROL-CAR DATA ONLY: EEA Table 3-86d (from Marques et al. 2022), 0.95 % (Euro 5) and 0.84 % (Euro 6) of NMVOC. Widened about 2-3x because no motorcycle naphthalene share was read. A Taiwanese dynamometer study (Yang et al. 2005, Atmos Environ) reports that naphthalene dominates motorcycle PAHs, but only search-engine snippets were seen, so it is not used.",
+      "sourceIds": ["eea-2023-roadtransport"],
+      "confidence": "very low: car data only"
+    },
+    {
+      "name": "benzo[a]pyrene (particle-bound)",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.00001", "central": "0.00005", "high": "0.0002",
+      "perPpmC": "0.06 / 0.28 / 1.1 ng/m3 per ppmC THC",
+      "measuredOn": "EEA Table 3-26: 4-stroke motorcycles <250 cc, B(a)P 4.80e-7 g/km (conventional) and 3.20e-7 g/km (Euro 1 and later). Table 3-25 NMVOC for the same class: 1.375 (conventional), 1.041 (Euro 1), 0.490 (Euro 2), 0.179 (Euro 3), 0.177 (Euro 4), 0.522 (Euro 5) g/km. The ratio is 3.1e-7 to 1.8e-6 by mass. The guidebook states that these PAH factors are petrol-car factors applied to motorcycles, and the ratio rises at Euro 3-4 only because BaP is held fixed while NMVOC falls. Measured on a Taiwanese 4-stroke motorcycle (cycle, particle phase, abstract only): BaP-equivalent 70.8 +- 38.4 ng/km, with no matching THC in the abstract, so no ratio. Idle: lighter PAHs dominated; BaP formed mainly at 30 km/h (abstract, qualitative).",
+      "sourceIds": ["eea-2023-roadtransport", "yang-2005-aaqr", "chien-huang-2010"],
+      "confidence": "very low: car-derived factors and no idle number. No seconds-long reference value exists for BaP; its guidelines are annual means."
+    },
+    {
+      "name": "phenol",
+      "shareBasis": "mass share of THC (%)",
+      "low": "0.01", "central": "0.5 (order of magnitude only)", "high": "5.4",
+      "perPpmC": "0.015 / 0.74 / 8.0 ppb per ppmC THC",
+      "coBasis": "Idle, Nepal (FTIR): 0.15-0.81 % of CO mass over 11 tests",
+      "measuredOn": "Idle Nepal non-catalyst 4-strokes: fleet averages 4.84 (pre) and 3.02 (post) g/kg; for the canister-sampled bike, 3.44 g/kg = 5.4 % of summed hydrocarbons. EEA Euro 5/6 petrol car (Marques 2022): 0.01-0.05 % of NMVOC. The two disagree by about 100x. This is not resolved, so the central value is only an order of magnitude.",
+      "sourceIds": ["stockwell-2016", "eea-2023-roadtransport"],
+      "confidence": "very low"
+    },
+    {
+      "name": "hydrogen cyanide",
+      "shareBasis": "mass share of CO (%)",
+      "low": "0.06", "central": "0.10", "high": "0.17",
+      "perPpmC": "per ppm CO: 0.63 / 1.04 / 1.72 ppb",
+      "measuredOn": "Idle Nepal, FTIR, 10 of 11 tests above detection limit: 0.20-1.40 g/kg, 0.061-0.166 % of CO mass. Fleet average 0.841 (pre) and 0.678 (post) g/kg. Non-catalyst bikes; a working catalyst should remove much of it, but no catalysed measurement was found.",
+      "sourceIds": ["stockwell-2016"],
+      "confidence": "low"
+    },
+    {
+      "name": "sulphur compounds (OCS, DMS, SO2)",
+      "shareBasis": "mass share of CO (%)",
+      "low": "below detection limit (SO2)", "central": "OCS 0.0014; DMS 0.0007", "high": "OCS 0.0014; DMS 0.0007 (one test)",
+      "measuredOn": "Idle Nepal: one canister-sampled bike, OCS 0.0102 g/kg and DMS 0.0049 g/kg; SO2 below detection limit in all FTIR tests. This is negligible beside CO. Hydrogen sulphide (the after-catalyst 'rotten egg' smell) was not measured in any source opened.",
+      "sourceIds": ["stockwell-2016"],
+      "confidence": "low (one test); H2S not estimated"
+    }
+  ],
+  "notEstimated": [
+    {"name": "hydrogen sulphide (H2S)", "why": "No measurement in scooter, motorcycle or car exhaust was opened. Taiwanese petrol is low-sulphur (not checked here). No guess is made."},
+    {"name": "sum of the 16 US-EPA PAHs", "why": "Only car-derived per-km factors for individual PAHs (EEA) and a Taiwanese motorcycle study whose abstract was seen only as a search snippet; no matching THC, so no defensible ratio. Naphthalene and BaP are given separately."},
+    {"name": "nitro-PAHs, oxy-PAHs, dioxins", "why": "Motorcycle studies exist (e.g. Pham 2013; AAQR dioxin studies), but none was readable (sciencedirect and aaqr blocked) and they are particle-phase traces irrelevant to the smell."},
+    {"name": "idle-specific Taiwanese carbonyl values", "why": "Tsai et al. 2003 (JAWMA) sampled the idle stage separately, but the full text is on tandfonline.com, which returned 403. Tsai, Chiang & Hsu 2003 (Atmos Environ 37:2485, VOC by driving mode) is on sciencedirect.com, also 403, and no abstract was available. Not worked around."}
+  ],
+  "sources": [
+    {
+      "id": "stockwell-2016",
+      "citation": "Stockwell CE, Christian TJ, Goetz JD, et al. (2016). Nepal Ambient Monitoring and Source Testing Experiment (NAMaSTE): emissions of trace gases and light-absorbing carbon from wood and dung cooking fires, garbage and crop residue burning, brick kilns, and other sources. Atmos. Chem. Phys. 16:11043-11081.",
+      "url": "https://acp.copernicus.org/articles/16/11043/2016/acp-16-11043-2016.pdf ; supplement https://acp.copernicus.org/articles/16/11043/2016/acp-16-11043-2016-supplement.zip (Table S4, xlsx)",
+      "read": "full text and supplement Table S4 (opened, values extracted directly)",
+      "measured": "Kathmandu, 2015; five Indian-built carburetted four-stroke motorcycles (Hero Honda CBZ x2, Bajaj Pulsar, Bajaj Discover, Hero Honda Splendor) and one four-stroke scooter (Honda Aviator), no catalysts (not required for four-strokes in India until 2015); start-up and idling only; pre- and post-service; FTIR grab samples plus one whole-air canister (Bajaj Pulsar pre-service).",
+      "keyFigure": "Table 1 (fleet, g/kg, pre/post): CO 710 (389) / 761 (327); formaldehyde 0.548 / 0.535; phenol 4.84 / 3.02; 1,3-butadiene 1.30 (0.51) / 1.19 (0.56); HCN 0.841 / 0.678; SO2 bdl. Text: 'The scooter, however, was the only motorbike sampled that produced detectable formaldehyde'; 'HCHO was below the detection limit for the gasoline-powered motorcycles we measured'. Table S4 Bajaj Pulsar pre-service canister: acetaldehyde 0.817, acetone 1.114, butanal 0.0622, butanone 0.0023, benzene 2.096, styrene 0.131, OCS 0.0102, DMS 0.0049 g/kg; CO 740.6 g/kg. Scooter CO 253 (pre) / 350 (post) g/kg."
+    },
+    {
+      "id": "tsai-2003-jawma",
+      "citation": "Tsai J-H, Liu Y-Y, Yang C-Y, Chiang H-L, Chang L-P (2003). Volatile organic profiles and photochemical potentials from motorcycle engine exhaust. J. Air & Waste Manage. Assoc. 53(5):516-522. doi:10.1080/10473289.2003.10466199",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/12774984/ (abstract); full text https://www.tandfonline.com/doi/pdf/10.1080/10473289.2003.10466199 returned HTTP 403",
+      "read": "abstract only (PubMed / OpenAlex)",
+      "measured": "Taiwan; 10 new and 15 in-use 2- and 4-stroke motorcycles meeting Phase III; chassis dynamometer, ECE cycle; samples by stage including idle (stage values in the full text, not read).",
+      "keyFigure": "'The VOC emission factors for the 2-/4-stroke motorcycles were 311/344 (new) and 1479/433 (in-use) mg/km'; 'formaldehyde (0.4 and 0.7 mg/km, respectively), acetaldehyde (0.6 and 1.2 mg/km), and acetone (0.5 and 0.7 mg/km)'; 'The carbonyl compound emission factors for the 2- and 4-stroke motorcycles were 3.2/3.1 (new) and 5.3/4.6 (in-use) mg/km'."
+    },
+    {
+      "id": "tsai-2018-aaqr",
+      "citation": "Tsai J-H, Yao Y-C, Huang P-H, Chiang H-L (2018). Fuel economy and volatile organic compound exhaust emission for motorcycles with various running mileages. Aerosol Air Qual. Res. 18:3056-3067. doi:10.4209/aaqr.2018.07.0264",
+      "url": "https://api.openalex.org/works/doi:10.4209/aaqr.2018.07.0264 (abstract); full text aaqr.org returned HTTP 403",
+      "read": "abstract only",
+      "measured": "Taiwan; in-use four-stroke motorcycles, Phases III-V; ECE cycle on chassis dynamometer.",
+      "keyFigure": "'The exhaust of VOC groups profiled included paraffins (38-45%), olefins (9.7-15%), aromatics (38-48%), and carbonyls (1.8-3.0%) for various running mileages.' Phase V: CO 84.3 +- 40.9, HC 29.4 +- 13.1 g/L fuel."
+    },
+    {
+      "id": "daemme-2016",
+      "citation": "Daemme LC, Penteado R, Correa SM, Zotin FMZ, Errera MR (2016). Emissions of criteria and non-criteria pollutants by a flex-fuel motorcycle. J. Braz. Chem. Soc. 27(12). doi:10.5935/0103-5053.20160111",
+      "url": "https://www.scielo.br/j/jbchs/a/jWxnBnn8hdxq4hyvRXqPMZG/?lang=en",
+      "read": "full text (HTML, read through the fetch tool's extraction)",
+      "measured": "Brazil; one 2011 150 cc Euro III motorcycle, three-way catalyst, electronic injection, flex-fuel; E22 petrol (22 % ethanol); EU 97/24/EC urban cycle (no separate idle).",
+      "keyFigure": "Table 1 (E22): THC 0.182, NMHC 0.172, CO 0.978 g/km. Table 2 (E22, HPLC, diluted): formaldehyde 0.93, acetaldehyde 3.00 mg/km. FTIR tailpipe steady state: formaldehyde 0.35, acetaldehyde 2.78 mg/km; pre-catalyst steady state: formaldehyde 7.58, acetaldehyde 4.42 mg/km (catalyst removes most formaldehyde)."
+    },
+    {
+      "id": "eea-2023-roadtransport",
+      "citation": "EMEP/EEA air pollutant emission inventory guidebook 2023 - Update 2026, chapter 1.A.3.b.i-iv Road transport. European Environment Agency.",
+      "url": "https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i/@@download/file",
+      "read": "full text (PDF, 'Road transport June 2026', tables extracted directly)",
+      "measured": "Compiled inventory factors. Speciation and PAH factors for 4-stroke motorcycles are petrol-car values: 'The NMVOC speciation for four-stroke motorcycles is estimated using fractions derived from conventional petrol vehicles' and 'PAH and POP emissions from four-stroke motorcycles are estimated using the emission factors for conventional petrol cars.'",
+      "keyFigure": "Table 3-86b (Petrol 4-stroke, % wt of NMVOC, conventional / Euro 1-4): formaldehyde 2.08 / 1.70; acetaldehyde 0.59 / 0.75; acrolein 0.16 / 0.19; benzaldehyde 0.60 / 0.22; crotonaldehyde 0.02 / 0.04; propionaldehyde 0.11 / 0.05; o-, m-, p-tolualdehyde 0.19, 0.38, 0.19 / 0.07, 0.13, 0.06; acetone 0.21 / 0.61; MEK 0.11 / 0.05; benzene 6.83 / 5.61. Table 3-86a: 1,3-butadiene 1.42 / 0.91. Table 3-86c/d (Euro 5 / Euro 6 petrol PC): 1,3-butadiene 0.12 / 0.80; formaldehyde 0.11 / 1.70; acetaldehyde 2.44 / 1.80; acrolein 0.18 / 0.08; naphthalene 0.95 / 0.84; phenol 0.01 / 0.05. Table 3-25 (Motorcycles 4-stroke <250 cm3, NMVOC g/km): conventional 1.375, Euro 1 1.041, Euro 2 0.490, Euro 3 0.179, Euro 4 0.177, Euro 5 0.522. Table 3-26 (same class, B(a)P g/km): conventional 4.80E-07, Euro 1 onward 3.20E-07."
+    },
+    {
+      "id": "yang-2005-aaqr",
+      "citation": "Yang H-H, Chien S-M, Chao M-R, Wang Y-F (2005). Size distribution of particulate polycyclic aromatic hydrocarbons in the diluted four-stroke motorcycle exhausts. Aerosol Air Qual. Res. 5(2):225-235. doi:10.4209/aaqr.2005.12.0008",
+      "url": "https://api.openalex.org/works/doi:10.4209/aaqr.2005.12.0008 (abstract); aaqr.org full text returned HTTP 403",
+      "read": "abstract only",
+      "measured": "Taiwan; one four-stroke motorcycle, dilution tunnel, MOUDI size-segregated particles (driving cycle; idle not separated in the abstract).",
+      "keyFigure": "'Lower molecular weight PAHs predominate in motorcycle exhaust.' 'The BaPeq emission factor for 0.056-18 um aerodynamic diameter is 70.8 +- 38.4 ng/km for the test motorcycle.'"
+    },
+    {
+      "id": "chien-huang-2010",
+      "citation": "Chien SM, Huang YJ (2010). Sizes and polycyclic aromatic hydrocarbon composition distributions of nano, ultrafine, fine, and coarse particulates emitted from a four-stroke motorcycle. J. Environ. Sci. Health A 45(13):1768-1774. doi:10.1080/10934529.2010.513289",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/20924922/",
+      "read": "abstract only",
+      "measured": "Taiwan; one four-stroke motorcycle at idle, 15 km/h and 30 km/h; particle-bound PAHs.",
+      "keyFigure": "'we suspected that some of the lower-molecular-weight PAHs [phenanthrene (PA), anthracene (Ant), pyrene (Pyr)] obtained in the fine particles at idle originated from unburned 95-octane unleaded fuel'; 'at 30 km/h, more pyrosynthesis products {benzo[a]pyrene (BaP), indeno[1,2,3,-cd]pyrene (IND), dibenz[a,h]anthracene (DBA)} ... were exhausted with the nanoparticles.'"
+    },
+    {
+      "id": "chirico-2014-acpd",
+      "citation": "Chirico R, Clairotte M, Adam TW, et al. (2014). Emissions of organic aerosol mass, black carbon, particle number, and regulated and unregulated gases from scooters and light and heavy duty vehicles with different fuels. Atmos. Chem. Phys. Discuss. 14:16591-16639. doi:10.5194/acpd-14-16591-2014",
+      "url": "https://acp.copernicus.org/preprints/14/16591/2014/acpd-14-16591-2014.pdf",
+      "read": "full text (discussion paper)",
+      "measured": "EU (JRC); two 50 cc TWO-STROKE scooters (Euro 1 with oxidation catalyst, Euro 2 with secondary air), ECE47 and WMTC cycles.",
+      "keyFigure": "'The emission of the sum of formaldehyde and acetaldehyde was ... 65 mg km-1 for the Scooter(E2) ... 41 mg km-1 for the Scooter(E1)'; gaseous PAHs 'followed by the scooters (0.93-1.5 mg km-1'. NOT USED for the ranges: two-stroke and not idle. Context only: two-stroke scooters emit 30-50 times the carbonyls per km of the Taiwanese four-strokes."
+    }
+  ],
+  "blockedOrMissing": [
+    "tandfonline.com returned HTTP 403: Tsai et al. 2003 JAWMA full text (it holds idle-stage carbonyl data for Taiwanese motorcycles) and Ho et al. 2012 JAWMA (Hong Kong carbonyls). Not worked around.",
+    "aaqr.org returned HTTP 403: Tsai 2017 and 2018, Yao 2017, Tsai 2019, Yang 2005 full texts; abstracts were used where available.",
+    "sciencedirect.com returned HTTP 403: Yang et al. 2005 Atmos Environ 39:17 (motorcycle PAH factors, naphthalene); Tsai, Chiang & Hsu 2003 Atmos Environ 37:2485 (VOC by driving mode including idle); the 2022 high-performance-motorcycle study; the 2019 E0-E50 two-wheeler study. No abstracts were obtainable for the Elsevier papers (elided in the open metadata).",
+    "mdpi.com returned HTTP 403: Tsai, Chen & Chiang 2023 (Taiwan mobile-source toxics inventory). Only the abstract was read via OpenAlex; it gives no numbers (the inventory is modelled with MOVES and speciation, not measured).",
+    "No measurement of H2S, acrolein or naphthalene from scooters or motorcycles was readable."
+  ],
+  "notesForIntegrator": [
+    "Hazard labels (IARC groups) were not researched here; whoever adds them should cite IARC directly and present them as hazard labels only.",
+    "Reference values: if a comparison is made, use only ones with matching averaging times. For example, formaldehyde has WHO 100 ug/m3 (30 min) and acrolein has OEHHA 2.5 ug/m3 (1 h); both are already in METHOD.md. 1,3-butadiene, naphthalene and BaP have only long-term (annual or chronic) values in what the project has used, so a seconds-long level must not be set beside them.",
+    "The catalyst matters: in Daemme 2016 the catalyst removed about 95 % of steady-state formaldehyde (7.58 to 0.35 mg/km). The Nepal idle data are from bikes without catalysts, so the Nepal ratios to CO are not automatically valid for catalysed Taiwanese scooters. A catalyst lowers CO and HC as well, so the ratio may shift either way.",
+    "Sanity check against the existing estimate: the canister-sampled Nepal idle bike gives benzene 3.3 % of summed hydrocarbons, against the estimate's benzene share of THC (0.7 to 6 %, central 2.5 %); consistent."
+  ]
+}

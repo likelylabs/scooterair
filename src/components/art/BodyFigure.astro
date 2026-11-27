@@ -3,22 +3,24 @@
  * BodyFigure — G6: where exhaust goes once it is breathed in (brief 3.2 screen 6, 5.2).
  *
  * A neutral adult, head and chest, in the signal-figure style, large and dark.
- * The airway, the lungs and the heart are cut out. The three marks of screen 2
- * travel in once and stop where they stop: ribbons at the nose and throat (1),
- * dots in the lungs (2), rings through the lungs into the blood (3). Not a
- * child, no street behind it, no disease named on the body, and nothing in it
- * fills up or changes colour.
+ * The airway, the lungs and the heart are cut out. The fume of screen 2 arrives from
+ * the right as a soft cloud and goes in once, drawn as fume only (no symbols): its
+ * orange wisps in at the nose and down the throat (1), a sooty haze settled in both
+ * lungs (2: the particles), and a faint haze of it carried on into the heart and
+ * the blood (3: carbon monoxide). The words are the pins' sentences. Not a child,
+ * no street behind it, no disease named on the body, and nothing in it fills up or
+ * changes after it has arrived.
  *
  * Pins are 48 px tap targets over the drawing. Without scripting each is a
  * link to its sentence (print the sentences with <BodyPins> under the
- * picture); with scripting a tap lights that kind of mark, marks the sentence
+ * picture); with scripting a tap lights that part of the fume, marks the sentence
  * and dispatches `sa:pin` ({ pin }) on the figure. Tap again for all three.
  *
  * Props
  *   locale   Locale
  *   pins     which pins ship, in order: 'nose' | 'lungs' | 'blood' (default all
  *            three). A pin without its verified fact is left out by the host;
- *            its marks still travel, unnumbered.
+ *            its part of the fume is still drawn, unnumbered.
  *   pinHref  where each pin links: default `#body-pin-<pin>` (the ids <BodyPins> prints)
  *   tag      false (default; use <Screen illustration="body">) | 'body'
  *   id, class
@@ -30,8 +32,9 @@ import '@/styles/art.css';
 import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
-import { airDot, airRibbon, airRing, airWisp, type Box } from './air';
-import { BODY, bodyFigure, rng, type BodyPin } from './parts';
+import SceneLabel from './SceneLabel.astro';
+import { airPuff, airPuffDefs, airRibbon, airWisp, type Box } from './air';
+import { BODY, artId, bodyFigure, type BodyPin } from './parts';
 import { labelStyle, sceneAlt } from './scene';
 
 interface Props {
@@ -47,52 +50,64 @@ const { locale, pins = ['nose', 'lungs', 'blood'], pinHref = {}, tag = false, id
 const VB: Box = { x: -150, y: -302, w: 360, h: 358 };
 const BELOW = VB.y + VB.h; // the chest runs on to the bottom edge, so the tag does not sit on the pins
 const upp = 1;
-const r = rng(61);
-const split = { x: 0, y: -134 }; // where the windpipe divides
+const pid = artId('body');
 
-/** A mark that travels in on arrival: it starts part of the way back along its route. */
-const go = (i: number, x: number, y: number, from: { x: number; y: number }) => ` style="--i:${i};--dx:${((from.x - x) * 0.6).toFixed(1)}px;--dy:${((from.y - y) * 0.6).toFixed(1)}px"`;
-const outside = { x: 230, y: -246 };
+// the cloud the fume arrives in, outside, in front of the face
+const cloud = airPuff(pid, [{ cx: 178, cy: -246, rx: 40, ry: 30 }, { cx: 140, cy: -236, rx: 32, ry: 24 }], { strength: 0.55, cls: 'sa-fade', attrs: ' style="--i:0"' });
 
-// 1 · ribbons: in at the nose, and no further than the throat
+// 1 · wisps: in at the nose, and no further than the throat
 const ribbons =
   [-262, -246, -230].map((y0, i) => airRibbon(airWisp(206, y0, 66, -238 + i * 2, upp), upp, { weight: i === 1 ? 1.15 : 0.95, cls: 'sa-draw', attrs: ` pathLength="1" style="--i:${i}"` })).join('') +
-  airRibbon('M57,-237 C50,-241 44,-232 37,-235 C29,-238 24,-229 17,-230 C10,-231 8,-221 5,-213', upp, { weight: 1.15, cls: 'sa-draw', attrs: ' pathLength="1" style="--i:7"' });
+  airRibbon('M57,-237 C50,-241 44,-232 37,-235 C29,-238 24,-229 17,-230 C10,-231 8,-221 5,-213', upp, { weight: 1.15, cls: 'sa-draw', attrs: ' pathLength="1" style="--i:4"' });
 
-// 2 · dots: down the windpipe, deep into both lungs
-const dotAt: [number, number, number][] = [
-  // outside, then the windpipe
-  [196, -214, 0], [170, -276, 0], [150, -216, 1], [128, -270, 1], [108, -220, 2], [88, -262, 2], [2, -200, 5], [0, -178, 6], [1, -156, 6],
-  // left lung
-  [-26, -110, 8], [-48, -100, 9], [-62, -80, 10], [-70, -56, 10], [-44, -62, 10], [-58, -38, 11], [-36, -36, 12], [-22, -52, 11], [-24, -84, 9], [-46, -80, 10], [-66, -30, 12], [-30, -66, 11],
-  // right lung
-  [28, -112, 8], [48, -106, 9], [64, -88, 10], [72, -62, 10], [56, -70, 11], [66, -42, 11], [52, -30, 12], [60, -26, 12], [70, -30, 12], [50, -50, 11], [34, -96, 9],
-];
-const dots = dotAt.map(([x, y, i]) => airDot(x, y, upp, { size: 0.8 + r() * 0.2, cls: 'sa-go', attrs: go(i, x, y, x > 80 ? outside : y > -130 ? split : BODY.nose) })).join('');
+// the cut-outs the fume is drawn inside: the airway, the two lungs, the heart and its vessel
+const LUNGS =
+  'M-13,-128 C-38,-138 -68,-114 -78,-78 C-85,-50 -82,-24 -66,-19 C-44,-14 -19,-24 -13,-42 Z' +
+  'M13,-128 C38,-138 68,-114 78,-78 C85,-50 82,-24 66,-19 C54,-16 44,-20 40,-30 C46,-48 38,-66 22,-72 C16,-74 13,-78 13,-84 Z';
+const HEART = 'M17,-27 C-5,-42 -7,-66 8,-69 C13,-70 16,-66 17,-63 C18,-66 22,-71 29,-69 C42,-65 38,-42 17,-27 Z';
+const cut = (name: string, inner: string) =>
+  `<mask id="${pid}-${name}" maskUnits="userSpaceOnUse" x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${VB.h}">${inner}</mask>`;
+const masks =
+  '<defs>' +
+  cut('aw', '<path d="M50,-238 C30,-236 6,-229 2,-204 L0,-136 M0,-138 L-22,-116 M0,-138 L22,-116" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>') +
+  cut('lu', `<path d="${LUNGS}" fill="#fff"/>`) +
+  cut('bl', `<path d="${HEART}" fill="#fff"/><path d="M17,-28V${BELOW + 4}" stroke="#fff" stroke-width="6"/>`) +
+  '</defs>';
 
-// 3 · rings: through a lung, into the blood, and on with it
-const ringAt: [number, number, number][] = [
-  [200, -238, 0], [174, -256, 0], [146, -234, 1], [120, -252, 1], [96, -236, 2], [1, -188, 6], [0, -146, 7], [-34, -96, 9], [26, -100, 9], [46, -84, 10], [17, -50, 13], [17, -13, 15],
-];
-const rings = ringAt.map(([x, y, i]) => airRing(x, y, upp, { size: 0.8, cls: 'sa-go', attrs: go(i, x, y, x > 80 ? outside : y > -130 ? split : BODY.nose) })).join('');
+// the fume down the windpipe (it carries the rest of the way in)
+const windpipe = airPuff(pid, [{ cx: 26, cy: -232, rx: 30, ry: 12 }, { cx: 2, cy: -190, rx: 10, ry: 40 }, { cx: 0, cy: -140, rx: 26, ry: 16 }], { strength: 0.5, cls: 'sa-fade', attrs: ` style="--i:5" mask="url(#${pid}-aw)"` });
+// 2 · particles: a sooty haze settled in both lungs, deepest low down
+const lungs = airPuff(pid, [{ cx: -50, cy: -66, rx: 40, ry: 58 }, { cx: 52, cy: -82, rx: 40, ry: 56 }, { cx: -42, cy: -34, rx: 34, ry: 26 }, { cx: 60, cy: -36, rx: 26, ry: 22 }], { strength: 0.62, tone: 'soot', cls: 'sa-fade', attrs: ` style="--i:8" mask="url(#${pid}-lu)"` });
+// 3 · carbon monoxide: a faint haze of the fume carried on into the heart and the blood
+const blood = airPuff(pid, [{ cx: 17, cy: -50, rx: 26, ry: 26 }, { cx: 17, cy: -12, rx: 8, ry: 30 }, { cx: 17, cy: 30, rx: 8, ry: 40 }], { strength: 0.55, cls: 'sa-fade', attrs: ` style="--i:12" mask="url(#${pid}-bl)"` });
 
 const scene = [
+  airPuffDefs(pid) + masks,
   `<g class="a-figure"><rect class="a-ink" x="-114" y="-2" width="228" height="${BELOW + 6}"/>${bodyFigure()}<path class="a-heart-s" stroke-width="6" d="M17,-2V${BELOW + 4}"/></g>`,
-  `<g class="tm-lane tm-lane--dot">${dots}</g>`,
-  `<g class="tm-lane tm-lane--ring">${rings}</g>`,
-  `<g class="tm-lane tm-lane--ribbon">${ribbons}</g>`,
+  `<g class="tm-lane tm-lane--nose">${cloud}${ribbons}${windpipe}</g>`,
+  `<g class="tm-lane tm-lane--lungs">${lungs}</g>`,
+  `<g class="tm-lane tm-lane--blood">${blood}</g>`,
 ].join('');
 const alt = sceneAlt(locale, art.body.alt[locale], { kind: 'plain' });
-const kindOf: Record<BodyPin, string> = { nose: 'ribbon', lungs: 'dot', blood: 'ring' };
+// where each pin's word sits, from its pin: beside it, or under it at the left edge
+const WORD: Record<BodyPin, { dx: number; dy: number; anchor: string }> = {
+  nose: { dx: 30, dy: 0, anchor: 'start middle' },
+  lungs: { dx: 0, dy: 30, anchor: 'center top' },
+  blood: { dx: 30, dy: 0, anchor: 'start middle' },
+};
 ---
 
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--body', cls].filter(Boolean).join(' ')}>
   <Fragment set:html={scene} />
   <Fragment slot="labels">
     {pins.map((pin, i) => (
-      <a class="body-pin" href={pinHref[pin] ?? `#body-pin-${pin}`} data-body-pin={pin} data-mark={kindOf[pin]} aria-label={`${i + 1}　${art.body.pins[pin][locale]}`} style={labelStyle(VB, BODY.pins[pin].x, BODY.pins[pin].y)}>
+      <a class="body-pin" href={pinHref[pin] ?? `#body-pin-${pin}`} data-body-pin={pin} data-mark={pin} aria-label={`${i + 1}　${art.body.pins[pin][locale]}`} style={labelStyle(VB, BODY.pins[pin].x, BODY.pins[pin].y)}>
         <span aria-hidden="true">{i + 1}</span>
       </a>
+    ))}
+    {/* the short name of each place, printed beside its number, so the picture reads without a tap */}
+    {pins.map((pin) => (
+      <SceneLabel box={VB} x={BODY.pins[pin].x + WORD[pin].dx} y={BODY.pins[pin].y + WORD[pin].dy} anchor={WORD[pin].anchor} max={40} plate class="body-word" aria-hidden="true">{art.body.pins[pin][locale]}</SceneLabel>
     ))}
   </Fragment>
 </SceneFrame>
@@ -111,7 +126,7 @@ const kindOf: Record<BodyPin, string> = { nose: 'ribbon', lungs: 'dot', blood: '
       pin.click();
     }
   });
-  // A pin lights its kind of mark and marks its sentence; the same pin again shows all three.
+  // A pin lights its part of the fume and marks its sentence; the same pin again shows all three.
   document.addEventListener('click', (e) => {
     const pin = (e.target as Element).closest<HTMLAnchorElement>('a[data-body-pin]');
     if (!pin) return;

@@ -43,7 +43,8 @@
 //   sheets         details[data-how-sheet] › [data-how-panel] (ui/HowSheet)
 //   estimates      [data-kind="estimate"] (ui/EstimateValue), its href="#how-n" or data-how
 //   scenes         figure.scene (art/SceneFrame) or [data-scene]; the tag [data-illustration-tag]
-//   marks          .air-ring, .air-dot, .air-rib (art/air.ts)
+//   marks          .air-rib (art/air.ts: the fume's wisps), .fume-lead__line (art/scene.ts leader());
+//                  no picture may carry .air-ring, .air-dot, .air-halo, .air-legend, .air-key, .a-breath
 //   facts          [data-fact="id id2"] on whatever prints a registry fact (requested of lane B)
 //   calculator     [data-result] (falls back to #result) (requested of lane I)
 //   film           [data-transcript] (falls back to #transcript) (requested of lane F)
@@ -107,7 +108,7 @@ const TITLES = {
   11: 'Text ≥ 14 px everywhere, body ≥ 18 px (320, 360, 390)',
   12: 'Targets ≥ 48 × 48 px and 8 px apart',
   13: 'No sideways scroll or clipped text at 320 px (標準, 大, 特大, and 特大 with every fold open); headlines break between phrases; glued words never loose in a flex or grid box',
-  14: 'Contrast: body and headlines 7:1, labels 4.5:1, marks 3:1 (light and dark)',
+  14: 'Contrast: body and headlines 7:1, labels 4.5:1, wisps 3:1 (light and dark); fume only, no rings or dots',
   15: 'JavaScript off: screens show picture, text and sheet; film shows stills and transcript',
   16: 'prefers-reduced-motion: nothing moves until asked',
   17: 'Scenes: alt text says 示意圖 / illustration, and the tag is shown',
@@ -952,6 +953,7 @@ async function browserChecks(chromium) {
           if (m.H > B.page) fail(9, p.route, `page is ${m.H} px tall at 360 × 740 (max ${B.page.toLocaleString('en')} for ${p.locale})`);
           for (const s of m.screens) if (s.h > B.screen) fail(9, p.route, `screen ${s.i}${s.id ? ` (#${s.id})` : ''} is ${s.h} px tall (max ${B.screen} for ${p.locale})`);
           note(9, `${p.route}: ${m.H} px tall, ${m.screens.length} screens`);
+          note(9, `${p.route}: screens ${m.screens.map((s) => `${s.i}:${s.h}`).join(' ')}`);
         }
         if (run(10)) {
           const share = m.cover / m.H;
@@ -1096,7 +1098,7 @@ async function browserChecks(chromium) {
     await each(14, { dark }, async (page, p) => {
       await inject(page);
       const r = await page.evaluate(() => {
-        const out = { low: [], unknown: 0, marks: 0, lowMarks: [] };
+        const out = { low: [], unknown: 0, marks: 0, lowMarks: [], symbols: 0 };
         const done = new Set();
         for (const { el, node } of __cs.textNodes()) {
           if (done.has(el)) continue;
@@ -1111,7 +1113,9 @@ async function browserChecks(chromium) {
           const need = el.closest('h1,h2,h3') || __cs.isBody(el) ? 7 : 4.5;
           if (ratio < need - 0.005) out.low.push(`${ratio.toFixed(2)}:1 (needs ${need}) ${__cs.sel(el)} 「${node.nodeValue.trim().slice(0, 16)}」`);
         }
-        for (const m of document.querySelectorAll('.air-ring, .air-dot, .air-rib')) {
+        // exhaust is drawn only as fume: an abstract mark that needs a key to decode is a failure
+        out.symbols = document.querySelectorAll('.air-ring, .air-dot, .air-halo, .air-tyre, .air-legend, .air-key, .air-glyph, .a-breath').length;
+        for (const m of document.querySelectorAll('.air-rib, .fume-lead__line')) {
           if (!__cs.visible(m)) continue;
           out.marks++;
           const cs = getComputedStyle(m);
@@ -1129,10 +1133,11 @@ async function browserChecks(chromium) {
       const where = `${p.route} ${dark ? 'dark' : 'light'}`;
       if (r.low.length) fail(14, where, `${r.low.length} text element(s) below contrast, e.g. ${[...new Set(r.low)].slice(0, 3).join(' · ')}`);
       if (r.lowMarks.length) fail(14, where, `${r.lowMarks.length} mark(s) under 3:1, e.g. ${r.lowMarks.slice(0, 2).join(' · ')}`);
+      if (r.symbols) fail(14, where, `${r.symbols} ring, dot, halo, key or breathing-ring element(s): exhaust is drawn only as fume (art/air.ts)`);
     });
   if (run(14)) {
-    note(14, `${marks} visible air mark(s) (.air-ring, .air-dot, .air-rib) checked across both themes`);
-    if (!marks) fail(14, '(all pages)', 'no air mark (.air-ring, .air-dot, .air-rib from air.ts) on any page, so no meaningful mark was checked for 3:1');
+    note(14, `${marks} visible wisp(s) and leader line(s) (.air-rib, .fume-lead__line) checked across both themes`);
+    if (!marks) fail(14, '(all pages)', 'no wisp or leader line (.air-rib from air.ts, .fume-lead__line from scene.ts) on any page, so no meaningful mark was checked for 3:1');
   }
 
   // ---- 15 JavaScript off ------------------------------------------------------------------------

@@ -36,6 +36,8 @@
  *               from est.confidence in src/data/estimate.ts; brief 4.2 rule 9). Pass it whenever
  *               the sheet stands behind an air number; leave it out for a count or a volume
  *   anchor      section of /estimate/ for the 完整算法 button (default 'numbers')
+ *   stamp       the version stamp to print instead of the 90-second estimate's (a simulation
+ *               sheet passes simStamp from src/data/simulation.ts)
  *               The version stamp (推估 v1・2026-11-26, est.meta.stamp) is printed on every
  *               estimate sheet by itself (rule 10), and so is 把推估換成實測 → /estimate/#measure
  *   -- other kinds --
@@ -75,6 +77,7 @@ interface Props {
   anchor?: string;
   primary?: Action;
   secondary?: Action;
+  stamp?: string;
   class?: string;
 }
 const { locale, id, title = how.button[locale], where, pollutant, anchor = 'numbers', class: cls } = Astro.props;
@@ -145,7 +148,7 @@ const dot = locale === 'en' ? ' · ' : '　';
     {isEstimate && (
       <p class="how__meta">
         {confidence && <span>{estText.confidence[locale]}{colon}<b>{confidence.word[locale]}</b></span>}
-        <span>{est.meta.stamp[locale]}</span>
+        <span>{Astro.props.stamp ?? est.meta.stamp[locale]}</span>
       </p>
     )}
     {(primary || secondary) && (

@@ -138,6 +138,10 @@ export default copy({
     common: { 'zh-TW': '常見的說法', en: 'A common claim' },
     /** What was said. Struck through on the page. */
     claims: {
+      'sim-guideline': {
+        'zh-TW': '本站以前寫：一氧化碳比指引值低很多，是好消息。一秒一秒的高點和嬰兒車的高度，我們沒有給數字。',
+        en: 'This site used to say carbon monoxide was far below the guideline, which was good news, and gave no figure for second-by-second highs or for pushchair height.',
+      },
       'crossings-measured': {
         'zh-TW': '本站以前寫：行人在台灣路口吸到的一氧化碳和 PM2.5，還沒有任何量測。',
         en: 'This site used to say that there were no readings at all of the carbon monoxide and PM2.5 that pedestrians breathe at Taiwanese crossings.',
@@ -159,6 +163,10 @@ export default copy({
      * {tokens} are filled from the registry on the page.
      */
     wrongText: {
+      'sim-guideline': {
+        'zh-TW': '對等一個紅燈的人，用 15 分鐘平均來看，這句話還是對的，但說得太廣。我們用電腦把一個紅燈算了一遍。靠近排氣管時，一氧化碳是一陣一陣的。風從機車吹來時，嬰兒車高度可能比較多（不是每種風都這樣）。在路口待上一小時、風一直從機車吹來的人，苯可能是加州 1 小時參考值的 1 到 4 倍（推估；這個參考值是用 6 小時的資料訂的，機車廢氣裡有多少苯可能差到 5 到 10 倍；這不是在說等一個紅燈的人）。舊範圍最高的數字，也不是最糟的紅燈。',
+        en: 'For someone waiting one red, averaged over 15 minutes, it still holds, but it said too much. We simulated one red light on a computer. Near a tailpipe, carbon monoxide comes in bursts. With the wind from the scooters, pushchair height can get more (not in every wind). For people who stay an hour at a junction with the wind always from the scooters, benzene can be about 1 to 4 times California’s 1-hour reference level (estimate; that reference was set from 6-hour data, scooter exhaust’s benzene share could be off five- to ten-fold, and this is not about someone waiting one red). The top of the old range is not the worst red either.',
+      },
       'crossings-measured': {
         'zh-TW': '交通部運輸研究所其實量過路口行人等候區的一氧化碳和 PM2.5。我們漏看了。',
         en: 'The Institute of Transportation had in fact measured carbon monoxide and PM2.5 in the pedestrian waiting areas of junctions. We missed it.',
@@ -206,6 +214,10 @@ export default copy({
     },
     /** What we say now, in plain words. */
     nowText: {
+      'sim-guideline': {
+        'zh-TW': '推估：等一個紅燈，一氧化碳攤成 15 分鐘的平均，多{range}，比世界衛生組織的指引值低很多。例外是嬰兒車停在排氣管正後方約半公尺，幾乎沒風、風向不變，連續 15 分鐘每個紅燈都在：這時 15 分鐘的平均，可能超過世界衛生組織 15 分鐘的指引值（這樣的 15 分鐘，約十次有一到兩次；這種風很少見，信心低）；往旁邊移開半公尺，就沒有了。其他的數字，都在「怎麼算的」那一頁。',
+        en: 'Estimate: the carbon monoxide one red light adds, spread over 15 minutes, is {range}, far below the WHO guideline. The exception is a pushchair half a metre directly behind a tailpipe, in almost no wind that keeps its direction, through every red for 15 minutes: then the 15-minute average can pass the WHO 15-minute guideline (in about 1 or 2 of 10 such periods; such a wind is rare, and confidence is low); half a metre to the side, and it is gone. The other figures are on the ‘How we worked it out’ page.',
+      },
       'crossings-measured': {
         'zh-TW': '網站把運研所的量測，和本站自己的推估放在一起。紅燈時站在機車旁邊吸到多少，是本站算的，標著「推估」。',
         en: 'The site shows the Institute’s readings beside our own estimate. How much you breathe beside the scooters at a red light is worked out by us, and labelled Estimate.',
@@ -231,8 +243,8 @@ export default copy({
         en: 'The targets are an electric share of new scooters of {t1} in {y1} and {t2} in {y2}. They are targets, not forecasts.',
       },
       'child-44': {
-        'zh-TW': '小孩離地面比較近，有些污染物在低的地方比較濃；小孩呼吸也比大人快。我們不寫「多幾成」這種數字。',
-        en: 'Children are closer to the ground, where some pollutants are thicker, and they breathe faster than adults. We do not give a figure for how much more.',
+        'zh-TW': '小孩離地面比較近，有些污染物在低的地方比較濃；小孩呼吸也比大人快。我們不寫國外量到的「多幾成」。本站的電腦推估是：風從機車吹來時，嬰兒車高度和大人鼻子差不多到兩倍；不是每種風都這樣。',
+        en: 'Children are closer to the ground, where some pollutants are thicker, and they breathe faster than adults. We do not quote a “per cent more” from studies abroad. Our own computer estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much. Not in every wind.',
       },
       'ev-zero': {
         'zh-TW': '換一輛電動機車，路口就少一根排氣管；但它也不是完全沒有污染。',

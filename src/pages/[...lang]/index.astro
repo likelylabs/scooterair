@@ -15,8 +15,8 @@ import { absUrl } from '../../lib/abs-url.ts';
  *             money headlines and rule-chosen money sentences from src/i18n/pages/electric.ts
  *   numbers   the estimate slots (EstimateValue, formatEstimate), the registry
  *             (./home-figures.ts) and the calculator's tables (./money-view.ts). None is typed
- *   rules     screen 4's second sentence: kerbSentence(); screen 5's headline: checkHeadline()
- *             (farBelowWho()), its first body line: checkSentence() (checkRule()); screens 13 and 14: lane I's buyHeadline / monthHeadline /
+ *   rules     screen 4's second sentence: kerbSentence(); screen 5's headline: checkHeadlinePhrased()
+ *             (simBelowWho(), src/data/simulation.ts); screens 13 and 14: lane I's buyHeadline / monthHeadline /
  *             monthLine; the pins of screen 6 and the quiet line of screen 2 ship only while
  *             their registry facts are verified
  *
@@ -35,8 +35,6 @@ import ScenarioSwitch from '@/components/ui/ScenarioSwitch.astro';
 import Screen from '@/components/ui/Screen.astro';
 import ScreenRail from '@/components/ui/ScreenRail.astro';
 import Segmented from '@/components/ui/Segmented.astro';
-import AirKey from '@/components/art/AirKey.astro';
-import AirRange from '@/components/art/AirRange.astro';
 import ApproachPlan from '@/components/art/ApproachPlan.astro';
 import BodyFigure from '@/components/art/BodyFigure.astro';
 import BodyPins from '@/components/art/BodyPins.astro';
@@ -52,17 +50,19 @@ import SwapScene from '@/components/art/SwapScene.astro';
 import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
 import TenScooters from '@/components/art/TenScooters.astro';
 import ChartTable from '@/components/charts/ChartTable.astro';
-import MeasuredVsEstimate from '@/components/charts/MeasuredVsEstimate.astro';
+import SimCompare from '@/components/charts/SimCompare.astro';
+import SimText from '@/components/pages/estimate/SimText.astro';
 import PriceBars from '@/components/charts/PriceBars.astro';
 import WorkingSum from '@/components/charts/WorkingSum.astro';
-import { mveModel } from '@/components/charts/core/estimateCharts';
+import { simCompareModel } from '@/components/charts/core/simCharts';
 import { monthlyBarsTitle, renderMonthlyBars } from '@/components/charts/core/monthlyBars';
 import { workingHoursPerYear, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
 import { openingData } from '@/components/pages/electric/opening-data';
 import { tableOn, type OpenText } from '@/components/pages/electric/opening-view';
 import { filmLength, homeFigures, verified } from '@/components/pages/home/home-figures';
 import * as V from '@/components/pages/home/money-view';
-import { checkHeadlinePhrased, checkSentence, defaultRedsPerDay, est, waitPerRed_s, estimateText, farBelowWho, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
+import { checkHeadlinePhrased, checkSentence, defaultRedsPerDay, est, waitPerRed_s, estimateText, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
+import { simBelowWho, simChipWhere, simRange, simStamp } from '@/data/simulation';
 import { fact } from '@/data/facts';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { homeMoney } from '@/lib/home-money';
@@ -91,14 +91,11 @@ const filmHref = href('/90/', locale);
 const filmLabel = fill(t.common.film, { length: filmLength(t.common) });
 
 // ---- screen 5: the headline is chosen by the written rule; mark where its line may break ------
-const s5Headline = checkHeadlinePhrased(locale);
-const mve = mveModel(locale);
-// the cross-check paragraph: its first sentence is the measured rise, the rest is our working
-const crossCheck = estimateText.crossCheck[locale];
-// (the sentences up to and including the measured rise, the one that names ppm)
-const crossCut = crossCheck.indexOf(zh ? '。' : '. ', crossCheck.indexOf('ppm')) + 1;
-const crossMeasured = crossCheck.slice(0, crossCut).trim();
-const crossOurs = crossCheck.slice(crossCut).trim();
+const s5Headline = checkHeadlinePhrased(locale, simBelowWho());
+const simCmp = simCompareModel(locale);
+// screen 7's sheet: statement 8 with its range as an EstimateValue ({times})
+const [stayA, stayB, stayC] = t.s7.sheet.stayers;
+const [stayB1, stayB2] = stayB.split('{times}');
 
 // ---- screen 7: the assumption behind the yearly hours, the same sentence the film's transcript prints
 const s7Assume = redHoursSentence(locale, waitPerRed_s.lo, waitPerRed_s.hi);
@@ -176,15 +173,15 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     </Screen>
 
     <!-- 2 · 排出什麼 ====================================================================== -->
-    <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={hl(t.s2.headline)} body={t.s2.body} quiet={verified('who-benzene-no-safe-level') ? t.s2.quiet : undefined} next={{ label: t.s2.next }}>
+    <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={hl(t.s2.headline)} quiet={verified('who-benzene-no-safe-level') ? t.s2.quiet : undefined} next={{ label: t.s2.next }}>
+      <div slot="body" class="h-lines">{t.s2.body.map((line) => <p>{line}</p>)}</div>
       <div slot="picture" class="h-pic">
-        <div class="h-crop" style="--crop:8">
+        <div class="h-crop" style="--crop:0">
           <TailpipeMarks locale={locale}>
             <EstimateValue slot="chip" locale={locale} slotId="emit.co.perRed_can" label={t.s2.canLabel} sheet="how-2" />
           </TailpipeMarks>
         </div>
         <IllustrationTag locale={locale} />
-        <div class="h-pic__ctl"><AirKey locale={locale} tap layout="row" class="h-key" /></div>
       </div>
       <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="recipe" title={t.s2.sheet.title} facts={['iarc-benzene-group1', 'who-benzene-no-safe-level', 'co-odourless']}>
         <p slot="block1">{fill(t.s2.sheet.measured, { readings: F.readings })}</p>
@@ -223,7 +220,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
             <span class="h-box__val"><b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} where="" size="sm" /></span>
           </div>
           <div class="h-box__row h-box__row--est">
-            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" class="est--ring" data-when-scenario={s} data-say />)}
+            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" data-when-scenario={s} data-say />)}
           </div>
           <p class="h-box__gloss"><b>{t.s4.box}</b><span aria-hidden="true">｜</span>{estimateText.ppmGloss[locale]}</p>
         </div>
@@ -235,29 +232,35 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       <HowSheet slot="sheet" id="how-4" locale={locale} kind="estimate" pollutant="co" anchor="recipe" title={t.s4.sheet.title} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']}>
         <p slot="block1">{fill(t.s4.sheet.measured, { sites: F.sites, n: F.peakSites, lo: F.peakLo, hi: F.peakHi })}</p>
         <Fragment slot="block2">{scenarioKeys.map((s) => <div data-when-scenario={s}><WorkingSum {...workingKerbFlow(locale, s)} /></div>)}</Fragment>
-        <Fragment slot="block3">
-          <p>{est.meta.appliesTo[locale]}{sp}{t.s4.sheet.care}</p>
-          {scenarioKeys.map((s) => <div data-when-scenario={s}><AirRange locale={locale} scenario={s} /></div>)}
-        </Fragment>
+        <p slot="block3">{est.meta.appliesTo[locale]}{sp}{t.s4.sheet.care}</p>
       </HowSheet>
     </Screen>
 
     <!-- 5 · 量到的，和算的 ================================================================= -->
-    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} quiet={verified('who-benzene-no-safe-level') ? estimateText.benzeneWho[locale] : undefined} next={{ label: t.s5.next }}>
-      <div slot="picture" class="h-pic h-pic--chart h-pic--mve"><MeasuredVsEstimate locale={locale} sheet="how-5" table={false} compact /></div>
+    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} next={{ label: t.s5.next }}>
+      <div slot="picture" class="h-pic h-pic--chart h-pic--sim"><SimCompare locale={locale} sheet="how-5" table={false} compact /></div>
       <div slot="body" class="h-lines">
-        <p>{checkSentence(locale)}</p>
-        {farBelowWho() && <p>{estimateText.belowIsNotSafe[locale]}</p>}
-        <p>{estimateText.coMarksBenzene[locale]}</p>
+        <p>{t.s5.smell}</p>
+        <p><a class="h-inlink" href={href('/questions/my-child/#pushchair', locale)}>{t.s5.exception}</a></p>
       </div>
-      <HowSheet slot="sheet" id="how-5" locale={locale} kind="measured" where={chipWhere.taiwan[locale]} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']} primary={{ href: evidence(3) }} secondary={{ href: href('/estimate/#check', locale), label: how.fullMethod[locale] }}>
-        <p slot="block1">{t.s5.sheet.who}</p>
-        <Fragment slot="block2">
-          <p>{crossMeasured}</p>
-          <p>{crossOurs}</p>
+      <KindChip size={chipSize} slot="chips" locale={locale} of={fact('sim-co-one-red-15min')} where={simChipWhere[locale]} />
+      <HowSheet slot="sheet" id="how-5" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} title={t.s5.sheet.title} facts={['sim-co-one-red-15min', 'sim-co-stay-15min', 'sim-co-pushchair-exception', 'sim-smell-seconds', 'iot-waiting-area-co-2024']}>
+        <Fragment slot="block1">
+          <p>{t.s5.sheet.who}{sp}{checkSentence(locale)}</p>
+          <p>{estimateText.checkIsEstimate[locale]}</p>
         </Fragment>
-        <p slot="block3">{estimateText.whoAveraging[locale]}</p>
-        <ChartTable table={mve.table} caption={t.s5.sheet.table} />
+        <Fragment slot="block2">
+          <p>{t.s5.sheet.sim}</p>
+          <p>{t.s5.sheet.higher}</p>
+          <p>{t.s5.sheet.smell}</p>
+          <p>{t.s5.sheet.pushchair}</p>
+          <p>{t.s5.sheet.bursts}</p>
+        </Fragment>
+        <Fragment slot="block3">
+          <p>{t.s5.sheet.care}</p>
+          <p>{estimateText.whoCoOnly[locale]}</p>
+        </Fragment>
+        <ChartTable table={simCmp.table} caption={t.s5.sheet.table} />
       </HowSheet>
     </Screen>
 
@@ -278,6 +281,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <Fragment slot="block3">
           <p>{t.s6.sheet.care}</p>
           {pins.length > 0 && <p>{t.s6.sheet.routes}</p>}
+          {pins.length > 0 && <SimText locale={locale} text={t.s6.sheet.routesCo} slots={{ range: 'sim.co.oneRed15' }} />}
         </Fragment>
       </HowSheet>
     </Screen>
@@ -290,7 +294,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       </div>
       <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={String(n)} data-say>{t.s7.body[n]}</span>)}{sp}<span>{s7Assume}</span></p>
       <KindChip size={chipSize} slot="chips" locale={locale} kind="derived" />
-      <HowSheet slot="sheet" id="how-7" locale={locale} kind="study" heads={t.s7.sheet.heads as [string, string, string]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations']} primary={{ href: evidence(5) }}>
+      <HowSheet slot="sheet" id="how-7" locale={locale} kind="study" heads={t.s7.sheet.heads as [string, string, string]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations', 'sim-benzene-stayers-1h']} primary={{ href: evidence(5) }}>
         <ul slot="block1">
           <li>{fill(t.s7.sheet.minutes, { min: F.peakMinutes, people: F.peakPeople })}</li>
           <li>{fill(t.s7.sheet.hours, { h: F.walkHours, people: F.walkPeople })}</li>
@@ -300,15 +304,20 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
           <WorkingSum locale={locale} {...workingHoursPerYear(defaultRedsPerDay, locale)} />
           <p>{fill(t.s7.sheet.dose, { pct: F.dosePct })}</p>
         </Fragment>
-        <p slot="block3">{t.s7.sheet.workers}</p>
+        <Fragment slot="block3">
+          <p>{t.s7.sheet.workers}</p>
+          <p>{stayA}</p>
+          <p>{stayB1}<EstimateValue locale={locale} slotId="sim.benzene.stay1hTimes" value={simRange('sim.benzene.stay1hTimes')} anchor="simulation" />{stayB2}</p>
+          <p>{stayC}</p>
+        </Fragment>
       </HowSheet>
     </Screen>
 
     <!-- 8 · 誰最近 ======================================================================== -->
-    <Screen locale={locale} n={8} total={TOTAL} chapter={t.s8.chapter} headline={hl(t.s8.headline)} body={fill(t.s8.body, { lo: F.child.lo, hi: F.child.hi })} quiet={kSentences.K4[locale]} illustration next={{ label: t.s8.next }}>
+    <Screen locale={locale} n={8} total={TOTAL} chapter={t.s8.chapter} headline={hl(t.s8.headline)} body={fill(t.s8.body, { lo: F.child.lo, hi: F.child.hi })} quiet={t.s8.quiet} illustration next={{ label: t.s8.next }}>
       <HeightsScene slot="picture" locale={locale} />
       <KindChip size={chipSize} slot="chips" locale={locale} of={fact('child-air-per-kg')} />
-      <HowSheet slot="sheet" id="how-8" locale={locale} kind="study" where={chipWhere.international[locale]} facts="child-air-per-kg" primary={{ href: evidence(6) }}>
+      <HowSheet slot="sheet" id="how-8" locale={locale} kind="study" where={chipWhere.international[locale]} facts={['child-air-per-kg', 'sim-pushchair-height']} primary={{ href: evidence(6) }} secondary={{ href: href('/estimate/#simulation', locale), label: how.fullMethod[locale] }}>
         <p slot="block1">{t.s8.sheet.who}</p>
         <p slot="block2">{fill(t.s8.sheet.what, { lo: F.child.lo, hi: F.child.hi })}</p>
         <p slot="block3">{t.s8.sheet.care}</p>

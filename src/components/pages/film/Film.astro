@@ -35,7 +35,6 @@ import { AIR_EXTRA } from '@/components/art/air-slots';
 import EstimateValue from '@/components/ui/EstimateValue.astro';
 import HowButton from '@/components/ui/HowButton.astro';
 import HowSheet from '@/components/ui/HowSheet.astro';
-import AirLegend from '@/components/art/AirLegend.astro';
 import IllustrationTag from '@/components/ui/IllustrationTag.astro';
 import KindChip from '@/components/ui/KindChip.astro';
 import { createFilm, SVG_LAYERS } from './scene';
@@ -208,8 +207,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
         <a class="film__cta film__cta--quiet" href={href('/estimate/#measure', locale)}>{t.end.measure}</a>
       </div>
     </div>
-    {/* the key, in the exported MP4 only (the page shows it under the player): a still of the film is never without one */}
-    <AirLegend locale={locale} sense class="film__key film__key--export tone-inverse" />
     <div class="film__caption" aria-hidden="true"><div data-capbox><p class="cap__main" data-cap data-headline-dynamic></p><p class="cap__note" data-note></p></div><p class="film__mark"><b>{site.name[locale]}</b><span>{label}</span></p></div>
     <div class="film__controls">
       <button type="button" class="film__btn" data-film-toggle aria-label={t.player.play}><svg class="ico--play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z"></path></svg><svg class="ico--pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z"></path></svg></button>
@@ -222,7 +219,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   </div>
 
   <div class="film__under">
-    <AirLegend locale={locale} sense note class="film__key" />
     <p class="film__notes">{fill(t.player.notes, { red: d.slots.red })} <a class="film__inline" href={text.panel.howHref}>{t.player.how} →</a></p>
     <p class="film__notes film__keys">{t.player.keys}</p>
     <div class="film__share">
@@ -1188,11 +1184,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .film__under p {
     margin: 0 0 var(--sp-3);
   }
-  /* the key to the marks in the film, under the controls: the same words as under every picture */
-  .film__under .film__key {
-    margin: 0 0 var(--sp-4);
-    padding-inline: 0;
-  }
   .film__notes,
   .film__stills-note {
     color: var(--ink-2);
@@ -1436,10 +1427,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     stroke-width: 2;
     paint-order: stroke;
   }
-  /* a puff leaving a tailpipe: the colour of the core it gathers into */
-  .f-puff {
-    fill: var(--air-core-mid);
-  }
+  /* a puff leaving a tailpipe: a soft round of fume (its fill is a gradient in the colour of the puff it gathers into) */
   /* who is closest */
   .f-stroller-band {
     fill: var(--ink);
@@ -1464,51 +1452,9 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     stroke-width: 2;
     stroke-linecap: round;
   }
-  .f-breath {
-    fill: none;
-    stroke: var(--signal-red);
-    stroke-width: 3.2;
-  }
-  .f-breath--quiet {
-    stroke: var(--ink-2);
-    stroke-width: 2.2;
-  }
   /* inside the layer */
   .f-wash {
     fill: var(--exhaust-wash);
-  }
-  .f-inwave {
-    fill: none;
-    stroke: var(--air-wash);
-    stroke-opacity: 0.2;
-    stroke-linecap: round;
-  }
-  .f-drop {
-    fill: var(--air-rib);
-  }
-  .f-drop-hi {
-    fill: none;
-    stroke: var(--exhaust-wash);
-    stroke-width: 3.4;
-    stroke-linecap: round;
-  }
-  .f-lens-g {
-    fill: var(--bg);
-    fill-opacity: 0.88;
-  }
-  .f-lens-r {
-    fill: none;
-    stroke: var(--art-ink);
-    stroke-width: 6;
-  }
-  .f-lens-h {
-    fill: none;
-    stroke: var(--art-ink);
-    stroke-width: 13;
-    stroke-linecap: round;
-  }
-  .f-dots {
-    fill: var(--air-dot);
   }
   /* the freeze and its two cards */
   .f-freeze {
@@ -1630,25 +1576,8 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .film-export .film__caption {
     padding-inline: 1.1rem;
   }
-  .film__key--export {
-    display: none;
-  }
   .film-export .film {
-    --key-h: 4.25rem;
-    --pic-h: calc(100svh - var(--bar-h) - var(--cap-h) - var(--key-h));
-  }
-  /* English key items are too long for two columns: four rows, so a taller strip (else it runs into the caption) */
-  .film-export .film:lang(en) {
-    --key-h: 6.5rem;
-  }
-  .film-export .film__key--export {
-    display: block;
-    block-size: var(--key-h);
-    padding: 0.5rem 1.1rem 0;
-  }
-  .film-export .film__key--export .air-legend__item {
-    font-size: 1.0625rem;
-    color: var(--film-ink);
+    --pic-h: calc(100svh - var(--bar-h) - var(--cap-h));
   }
   .film-export .cap__main {
     font-size: 1.875rem;

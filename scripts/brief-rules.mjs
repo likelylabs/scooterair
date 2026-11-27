@@ -132,6 +132,10 @@ export const claimRules = [
   R('brief-no-buildup', 3, en, /the longer (the|you) (red|wait|light|stand).{0,50}(more|build|worse)|builds? up (during|through|over) the red/i, 'No "the longer the red, the more builds up" (4.6).'),
   R('brief-no-child-height-number', 3, zh, /(1\.7|2\.2)\s*倍|1\.7\s*[到至–~\-－]\s*2\.2/, 'No number for child height: never 1.7 or 2.2 倍 (4.6, screen 8). The breathing fact is 1.5 到 2 倍 per kilogram.'),
   R('brief-no-child-height-number', 3, en, /(1\.7|2\.2)\s*(times|×|x)\b|1\.7\s*(–|-|to)\s*2\.2/i, 'No number for child height: never 1.7 or 2.2 times (4.6).'),
+  // research/simulation/statements.json must-not 3 (2026-11-27): a 1-, 10- or 90-second value never in the same
+  // sentence as the WHO 15-minute (87 ppm) or 1-hour (31 ppm) value. Checked on the built pages, where the numbers are.
+  R('brief-no-seconds-beside-guideline', 3, zh, /(?:^|[。；])(?=[^。；]*(?:\d+\s*秒|一秒|幾秒|每一秒))(?=[^。；]*(?:87|31)\s*ppm)(?=[^。；]*?(?<![\d.])(?!(?:87|31)\s*ppm)\d[\d,]*(?:\.\d+)?\s*(?:到\s*\d[\d,]*(?:\.\d+)?\s*)?ppm)/, 'No 1-, 10- or 90-second value in the same sentence as the WHO 15-minute (87 ppm) or 1-hour (31 ppm) value (simulation must-not 3). Convert to a 15-minute average first, or say it apart.'),
+  R('brief-no-seconds-beside-guideline', 3, en, /(?:^|;|\.\s)(?=(?:[^;.]|\.(?=\d))*\b(?:seconds?|one-second|\d+-second)\b)(?=(?:[^;.]|\.(?=\d))*\b(?:87|31)\s*ppm)(?=(?:[^;.]|\.(?=\d))*?(?<![\d.])(?!(?:87|31)\s*ppm)\d[\d,]*(?:\.\d+)?\s*(?:(?:to|–|-)\s*\d[\d,]*(?:\.\d+)?\s*)?ppm)/i, 'No 1-, 10- or 90-second value in the same sentence as the WHO 15-minute (87 ppm) or 1-hour (31 ppm) value (simulation must-not 3).'),
   R('brief-no-riders-most', 3, zh, /吸得最多|吸最多|吸到最多/, 'Never that riders breathe "the most" (4.6, screen 9).'),
   R('brief-no-riders-most', 3, en, /breathes? (in )?the most|the most exposed/i, 'Never that riders breathe "the most" (4.6).'),
   R('brief-idling-legal', 3, zh, /怠速.{0,20}(違規|違法|合法)|(違規|違法|合法).{0,20}怠速/, 'No 違規 or 合法 about idling (3.2 screen 3, 6.6). Say what the rule asks: 停車等候超過三分鐘才要熄火.'),

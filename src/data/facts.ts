@@ -36,6 +36,7 @@ import { formatCitation, shortCitation, sourceUrl } from './sources.ts';
 import { economics } from './facts-economics.ts';
 import { inspection, intersection, smell, acute, longterm, vulnerable, levers } from './facts-redlight.ts';
 import { kerb, masks } from './facts-air.ts';
+import { simulation } from './facts-simulation.ts';
 
 export interface FactInput {
   /** Raw values for charts and calculations. May be empty for qualitative facts (e.g. an IARC group). */
@@ -3084,6 +3085,7 @@ export const factGroups = {
   levers,
   kerb,
   masks,
+  simulation,
 };
 export type Topic = keyof typeof factGroups;
 
@@ -3112,6 +3114,7 @@ export const topicLabels: Record<Topic, L10n> = {
   levers: t('政策工具', 'Policy levers'),
   kerb: t('路邊的空氣與參考值', 'Kerbside air and reference values'),
   masks: t('口罩擋得住什麼', 'What masks do and do not stop'),
+  simulation: t('電腦算的一個紅燈', 'One red light, simulated'),
 };
 
 const merged = {
@@ -3134,6 +3137,7 @@ const merged = {
   ...levers,
   ...kerb,
   ...masks,
+  ...simulation,
 };
 export type FactId = keyof typeof merged;
 export type Fact = Omit<FactInput, 'chainLink'> & { id: FactId; topic: Topic; chainLink: ChainLink | null };

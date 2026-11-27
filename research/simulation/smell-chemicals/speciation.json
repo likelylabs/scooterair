@@ -1,0 +1,555 @@
+{
+ "title": "Exhaust shares of single chemicals used with the simulation's unit exhaust tracers (smell-chemicals step)",
+ "date": "2026-11-27",
+ "builtFrom": [
+  "sources-fuel-chemicals.json (researcher 1)",
+  "sources-combustion-toxics.json (researcher 2)",
+  "sources-yardsticks.json (researcher 3: molecular-weight conversions, odour thresholds, reference values)"
+ ],
+ "rules": {
+  "basis": "mass share of exhaust THC (THC counted as CH1.85, 13.85 g per mol C, as research/estimate/model.mjs), in %; hydrogen cyanide as mass share of CO",
+  "sampling": "per emission draw, one triangular draw (min = low, mode = central, max = high) per chemical, independent between chemicals, seed 20261128; the share multiplies that draw's THC (or CO) in every tracer group, so packs with HC-rich scooters carry proportionally more",
+  "twoResearchers": "where both researchers give the chemical: low = lower low, high = higher high, central = mean of the two centrals (PLAN-SMELL.md section 3)",
+  "admissible": "measured in petrol-engine exhaust by at least one opened source; car-only or driving-cycle-only rows kept but flagged and rated very low; unresolved disagreement > ~100x or per-km-only data with no matching THC: not estimated",
+  "denominator": "Kumar 2020 and Stockwell 2016 give % of speciated NMHC; Yao 2008 gives % of THC from a 'MEGA 300 Tail Gas Analyzer' whose detector is not stated; the simulation's THC is a regulatory-type rate (CH1.85). The bias from mixing these bases has UNKNOWN direction, roughly up to about 1.5 times either way (Tsai 2018 abstract: speciated VOC sum about as large as, or larger than, analyser HC). Low ends set by idle two-wheeler data are therefore lowered to the lowest measured idle value / 1.5 where they were not already lower (corrections.md S1). High ends are not raised by this factor because the measured aromatics total (at most 50 % of speciated NMHC) already bounds them; this is stated as an uncarried uncertainty.",
+  "unit": "ppb = mass fraction x M_air / M_X x 1e9; ug/m3 = ppb x M_X / 24.45 (25 C, 1 atm). At 30 C kerb air (24.88 L/mol) every ug/m3 figure would be about 1.7 % lower; no above/below verdict changes.",
+  "stockwellLabel": "Every Stockwell 2016 speciation value is: Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4)."
+ },
+ "chemicals": [
+  {
+   "key": "benzene",
+   "name": "benzene",
+   "casrn": "71-43-2",
+   "M": 78.11,
+   "basis": "THC",
+   "low": 1.2,
+   "central": 2.7,
+   "high": 5.0,
+   "sampling": "NOT resampled: the draw's own benzene from draws.mjs (benzeneFracTHC tri 1.2 / 2.7 / 5 % for four-strokes, uniform 1-3 % for two-strokes), identical to the signed simulation",
+   "researcherRange": {
+    "low": 1.5,
+    "central": 3,
+    "high": 7,
+    "from": "sources-fuel-chemicals.json; run as the sensitivity row 'benzene_researcher'"
+   },
+   "measuredOn": "Idle: Taiwan new 125 cc carburetted four-stroke engine, no catalyst (Yao 2008) 2.4-3.1 % of THC; India 14 in-use two-wheelers, warm idle (Kumar 2020) median 4.0 %, 1.5-6.9 %; Stockwell 2016 3.5 % (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4)). Context only, NOT CONFIRMED (aaqr.org 403): Taiwan four-strokes over the ECE driving cycle (Tsai 2018, chart reading) about 2-3 % of VOC.",
+   "sourceIds": [
+    "yao-2008",
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "tsai-2018",
+    "rungratanaubon-2007"
+   ],
+   "confidence": "moderate",
+   "flags": [],
+   "admissible": true,
+   "why": "idle measurements of four-stroke two-wheelers in three countries agree within about 2 times"
+  },
+  {
+   "key": "benzene_researcher",
+   "name": "benzene (researcher share, sensitivity)",
+   "casrn": "71-43-2",
+   "M": 78.11,
+   "basis": "THC",
+   "low": 1.5,
+   "central": 3,
+   "high": 7,
+   "sampling": "triangular on THC (sensitivity only; the headline benzene is the signed one)",
+   "measuredOn": "as benzene",
+   "sourceIds": [
+    "yao-2008",
+    "kumar-2020-acp",
+    "stockwell-2016"
+   ],
+   "confidence": "moderate",
+   "flags": [
+    "sensitivity"
+   ],
+   "admissible": true,
+   "why": "cross-check of the signed benzene share"
+  },
+  {
+   "key": "toluene",
+   "name": "toluene",
+   "casrn": "108-88-3",
+   "M": 92.14,
+   "basis": "THC",
+   "low": 1.1,
+   "central": 10,
+   "high": 23,
+   "sampling": "triangular on THC",
+   "measuredOn": "Idle: Yao 2008 1.66-3.38 % of THC (Taiwan); Kumar 2020 median 15.8 % (12.5-17.8 %), warm idle; Stockwell 2016 8.9 % (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4)). Low end = Yao's 1.66 % / 1.5 for the basis bias (corrections S1, S4). Context only, NOT USED: Tsai 2003 abstract toluene 30/100 mg/km for 2-/4-stroke (its species values do not match its totals).",
+   "sourceIds": [
+    "yao-2008",
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "tsai-2003-jawma"
+   ],
+   "confidence": "low-moderate",
+   "flags": [
+    "sources differ about 5 times"
+   ],
+   "admissible": true,
+   "why": "idle measurements exist; range kept wide because they disagree",
+   "combined": "was 2 / 10 / 23; low lowered to 1.1 (Yao 1.66 % measured below the old low; basis bias of unknown direction)"
+  },
+  {
+   "key": "ethylbenzene",
+   "name": "ethylbenzene",
+   "casrn": "100-41-4",
+   "M": 106.17,
+   "basis": "THC",
+   "low": 1.4,
+   "central": 3,
+   "high": 5.6,
+   "sampling": "triangular on THC",
+   "measuredOn": "Idle: Kumar 2020 median 4.7 % (3.2-5.6 %), warm idle; Stockwell 2016 2.3 % (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4)). Low end 1.4 from US petrol cars (MOVES 1.4-2.1 % of VOC, car data); it is already below 2.28 / 1.5.",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "epa-moves-2016-toxics"
+   ],
+   "confidence": "low-moderate",
+   "flags": [
+    "low end car data"
+   ],
+   "admissible": true,
+   "why": "idle two-wheeler measurements"
+  },
+  {
+   "key": "xylenes",
+   "name": "xylenes (sum)",
+   "casrn": "1330-20-7",
+   "M": 106.17,
+   "basis": "THC",
+   "low": 2.4,
+   "central": 10,
+   "high": 18,
+   "sampling": "triangular on THC",
+   "measuredOn": "Idle: Kumar 2020 median 11.0 % (3.6-14.4 %), warm idle; Stockwell 2016 10.7 % (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4)). US cars (MOVES) 5.6-7.8 %, flagged. Low = Kumar's 3.61 % / 1.5 (basis bias). High 18 %: Kumar's 'styrene' peak (median 1.94 ppm vs o-xylene 0.22 ppm, DB-1 column) is probably o-xylene; if so Kumar's xylene sum is about 3 points low. The styrene high end (3.8) and this xylene high end are COUPLED: both keep the same peak's two readings, so both cannot be at their high ends together.",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "epa-moves-2016-toxics",
+    "rungratanaubon-2007"
+   ],
+   "confidence": "low-moderate",
+   "flags": [
+    "high end coupled with styrene high end (one Kumar peak)"
+   ],
+   "admissible": true,
+   "why": "idle two-wheeler measurements",
+   "combined": "was 3.6 / 10 / 14.4"
+  },
+  {
+   "key": "butadiene",
+   "name": "1,3-butadiene",
+   "casrn": "106-99-0",
+   "M": 54.09,
+   "basis": "THC",
+   "low": 0.12,
+   "central": 1.25,
+   "high": 3.5,
+   "sampling": "triangular on THC",
+   "combined": "researcher 1: 1 / 1.5 / 3.5; researcher 2: 0.12 / 1.0 / 3.2 -> 0.12 / 1.25 / 3.5",
+   "measuredOn": "Idle: Yao 2008 1.1-1.2 % of THC (Taiwan, no catalyst; only 7-8 mg/L at cruise); Stockwell 2016 3.4 % (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4); this sets the high end 3.5); Nepal fleet FTIR 1.2-1.3 g/kg fuel (start-up plus idle). Low end: EEA Euro 5 petrol CAR 0.12 % of NMVOC (car data; not the factor EEA applies to motorcycles).",
+   "sourceIds": [
+    "yao-2008",
+    "stockwell-2016",
+    "eea-2023-roadtransport"
+   ],
+   "confidence": "low",
+   "flags": [
+    "low end car data",
+    "high end from one rich start-up-plus-idle bike"
+   ],
+   "admissible": true,
+   "why": "idle measurements in Taiwan and Nepal"
+  },
+  {
+   "key": "hexane",
+   "name": "n-hexane",
+   "casrn": "110-54-3",
+   "M": 86.18,
+   "basis": "THC",
+   "low": 0.09,
+   "central": 1.2,
+   "high": 3.1,
+   "sampling": "triangular on THC",
+   "measuredOn": "Idle: Kumar 2020 median 1.6 % (0.13-3.1 %), warm idle; Stockwell 2016 0.82 % (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4)). US cars (MOVES) 0.86-1.6 %, flagged. Low = 0.13 / 1.5.",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "epa-moves-2016-toxics"
+   ],
+   "confidence": "low-moderate",
+   "flags": [],
+   "admissible": true,
+   "why": "idle two-wheeler measurements",
+   "combined": "was 0.1 / 1.2 / 3.1"
+  },
+  {
+   "key": "styrene",
+   "name": "styrene",
+   "casrn": "100-42-5",
+   "M": 104.15,
+   "basis": "THC",
+   "low": 0.1,
+   "central": 0.3,
+   "high": 3.8,
+   "sampling": "triangular on THC",
+   "measuredOn": "Idle: Stockwell 2016 0.22 % (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4)); Kumar 2020 2.1-3.8 %, probably co-eluting with o-xylene on the DB-1 column (inference, not stated by the authors). US cars (MOVES) 0.1-0.34 %; EEA cars 0.57-1.01 % (above the central, noted). High end coupled with the xylene high end.",
+   "sourceIds": [
+    "stockwell-2016",
+    "kumar-2020-acp",
+    "epa-moves-2016-toxics"
+   ],
+   "confidence": "low",
+   "flags": [
+    "high end probably o-xylene; coupled with xylene high end"
+   ],
+   "admissible": true,
+   "why": "idle measurements exist; high end kept as given"
+  },
+  {
+   "key": "naphthalene",
+   "name": "naphthalene (gas phase)",
+   "casrn": "91-20-3",
+   "M": 128.17,
+   "basis": "THC",
+   "low": 0.05,
+   "central": 0.55,
+   "high": 2.0,
+   "sampling": "triangular on THC",
+   "combined": "researcher 1: 0.05 / 0.2 / 0.6 (MOVES, widened by assumption); researcher 2: 0.3 / 0.9 / 2.0 (EEA Euro 5/6, widened) -> 0.05 / 0.55 / 2.0",
+   "measuredOn": "PETROL CARS ONLY: MOVES2014 gas-phase naphthalene / VOC 0.21 % (US light-duty petrol; applied to motorcycles by MOVES by assumption); EEA Euro 5/6 0.84-0.95 % of NMVOC. No scooter or motorcycle measurement was readable. The high end 2.0 and low end 0.05 are ASSUMED widenings, not data; EEA's Table 3-86d covers Euro 5/6 cars, which EEA does not apply to motorcycles (Table 3-86b, which it applies, has no naphthalene).",
+   "sourceIds": [
+    "epa-moves-2016-toxics",
+    "eea-2023-roadtransport"
+   ],
+   "confidence": "very low",
+   "flags": [
+    "carDataOnly",
+    "drivingCycleOnly"
+   ],
+   "admissible": true,
+   "why": "car data only, flagged and widened (PLAN-SMELL.md section 3); the two car sources differ about 4 times"
+  },
+  {
+   "key": "formaldehyde",
+   "name": "formaldehyde",
+   "casrn": "50-00-0",
+   "M": 30.03,
+   "basis": "THC",
+   "low": 0.1,
+   "central": 0.85,
+   "high": 2.1,
+   "sampling": "triangular on THC",
+   "combined": "researcher 1: 0.5 / 0.7 / 1.5; researcher 2: 0.1 / 1.0 / 2.1 -> 0.1 / 0.85 / 2.1",
+   "measuredOn": "Idle: Yao 2008 0.69-0.76 % of THC (Taiwan, no catalyst). Nepal 110 cc four-stroke scooter, start-up plus idle, 0.548 g/kg fuel; 'about 2 % of THC' is DERIVED, not measured (14.70 g/kg FTIR C1-C4 scaled by another bike's C1-C4 fraction at MCE 0.60, while the scooter ran at MCE 0.82-0.87). Below the FTIR detection limit for all 5 Nepal motorcycles (evidence for the LOW side; detection limit not given). Driving cycle: Taiwan Phase III 0.12-0.16 % of VOC (Tsai 2003, abstract, pooled 2-/4-stroke; sets the low end 0.1); Brazil Euro III catalysed E22 0.51 %. High end 2.1 rests on the EEA conventional petrol CAR figure 2.08 % (and the derived 2 %).",
+   "sourceIds": [
+    "yao-2008",
+    "stockwell-2016",
+    "tsai-2003-jawma",
+    "daemme-2016",
+    "eea-2023-roadtransport"
+   ],
+   "confidence": "low",
+   "flags": [
+    "values span about 20 times",
+    "low end drivingCycleOnly",
+    "high end car data or derived",
+    "5 of 6 Nepal bikes below detection"
+   ],
+   "admissible": true,
+   "why": "idle measurements in Taiwan and Nepal"
+  },
+  {
+   "key": "acetaldehyde",
+   "name": "acetaldehyde",
+   "casrn": "75-07-0",
+   "M": 44.05,
+   "basis": "THC",
+   "low": 0.13,
+   "central": 0.55,
+   "high": 1.4,
+   "sampling": "triangular on THC",
+   "combined": "researcher 1: 0.2 / 0.4 / 1.4; researcher 2: 0.13 / 0.7 / 1.3 -> 0.13 / 0.55 / 1.4",
+   "measuredOn": "Idle: Yao 2008 0.20-0.29 % of THC; Stockwell 2016 1.37 % of NMHC (Nepal 2015, start-up plus idle, one canister on one very rich carburetted bike (Bajaj Pulsar before servicing, MCE 0.598), no catalyst (Stockwell 2016 Table S4); this sets the high end 1.4). Taiwan ECE cycle 0.6-1.2 mg/km (Tsai 2003, abstract); EEA petrol car 0.59-0.75 %.",
+   "sourceIds": [
+    "yao-2008",
+    "stockwell-2016",
+    "tsai-2003-jawma",
+    "eea-2023-roadtransport"
+   ],
+   "confidence": "low",
+   "flags": [
+    "high end from one rich start-up-plus-idle bike",
+    "low end drivingCycleOnly"
+   ],
+   "admissible": true,
+   "why": "idle measurements in Taiwan and Nepal"
+  },
+  {
+   "key": "acrolein",
+   "name": "acrolein",
+   "casrn": "107-02-8",
+   "M": 56.06,
+   "basis": "THC",
+   "low": 0.05,
+   "central": 0.17,
+   "high": 0.4,
+   "sampling": "triangular on THC",
+   "measuredOn": "PETROL CARS ONLY: EEA 0.08-0.19 % of NMVOC by emission class, widened 2-3 times. No scooter or motorcycle acrolein measurement was readable. The value EEA itself applies to four-stroke motorcycles is the conventional-car 0.16 %. Low 0.05 and high 0.4 are ASSUMED widenings. Any statement about acrolein must say 'car data only, range assumed'.",
+   "sourceIds": [
+    "eea-2023-roadtransport"
+   ],
+   "confidence": "very low",
+   "flags": [
+    "carDataOnly",
+    "drivingCycleOnly"
+   ],
+   "admissible": true,
+   "why": "car data only, flagged and widened"
+  },
+  {
+   "key": "hcn",
+   "name": "hydrogen cyanide",
+   "casrn": "74-90-8",
+   "M": 27.03,
+   "basis": "CO",
+   "low": 0.06,
+   "central": 0.1,
+   "high": 0.17,
+   "sampling": "triangular on the draw's CO mass",
+   "measuredOn": "Nepal, FTIR, carburetted four-strokes without catalysts, start-up plus idle (Stockwell 2016 Table S4): HCN/CO 0.061-0.166 % in 10 of 11 tests (median about 0.095 %); fleet 0.68-0.84 g/kg fuel; no catalysed data.",
+   "sourceIds": [
+    "stockwell-2016"
+   ],
+   "confidence": "low",
+   "flags": [
+    "no catalysed data",
+    "start-up plus idle",
+    "no odour threshold in the researched files"
+   ],
+   "admissible": true,
+   "why": "idle measurement of four-stroke two-wheelers"
+  }
+ ],
+ "notEstimated": [
+  {
+   "name": "benzo[a]pyrene (particle-bound)",
+   "why": "Only car-derived per-km factors (EEA, motorcycle <250 cc rows built from car PAH factors) and a Taiwanese per-km BaP-equivalent with no matching THC; at idle lighter PAHs dominate and BaP forms mainly at 30 km/h (Chien and Huang 2010, abstract). No share of idle THC exists. It is particle-bound, has no smell and no short-term reference value.",
+   "admissible": false
+  },
+  {
+   "name": "phenol",
+   "why": "Idle Nepal no-catalyst bikes give up to 5.4 % of hydrocarbons; EEA Euro 5/6 cars 0.01-0.05 %. The two disagree about 100 times, unresolved.",
+   "admissible": false
+  },
+  {
+   "name": "hydrogen sulphide",
+   "why": "No measurement in scooter, motorcycle or car exhaust was readable.",
+   "admissible": false
+  },
+  {
+   "name": "sum of the 16 US-EPA PAHs; nitro- and oxy-PAHs; dioxins",
+   "why": "No readable measurement with a matching THC; particle-phase traces.",
+   "admissible": false
+  },
+  {
+   "name": "sulphur compounds (OCS, DMS, SO2)",
+   "why": "One idle test with negligible amounts (OCS 0.0014 %, DMS 0.0007 % of CO); SO2 below detection; no reference or hazard label researched. Not carried.",
+   "admissible": false
+  },
+  {
+   "name": "acetone, benzaldehyde, tolualdehydes, propionaldehyde, crotonaldehyde, butanal, butanone",
+   "why": "Outside the question (no hazard labels or reference values were researched for them); several are car-only.",
+   "admissible": false
+  },
+  {
+   "name": "speciation of a modern fuel-injected, catalysed Taiwanese scooter at idle",
+   "why": "No openable measurement (Dhital 2019 full text blocked). Whether a catalyst changes the SHARE of each chemical in the remaining THC is unknown; every share here is from carburetted or uncatalysed engines, or cars.",
+   "admissible": false
+  }
+ ],
+ "classSums_forMassSanityOnly": {
+  "aromatics": {
+   "low": 31,
+   "central": 42,
+   "high": 50,
+   "unit": "% of speciated NMHC at idle",
+   "sourceIds": [
+    "kumar-2020-acp",
+    "stockwell-2016",
+    "tsai-2018"
+   ]
+  },
+  "alkanes": {
+   "low": 15,
+   "central": 38,
+   "high": 54
+  },
+  "alkenes": {
+   "low": 4,
+   "central": 12,
+   "high": 45
+  }
+ },
+ "odourThresholds_ppb": {
+  "_source": "sources-yardsticks.json (Nagata 2003 Table 2 unless stated; order-of-magnitude only: repeat tests vary up to 5 times, compilations 10 times)",
+  "benzene": [
+   2700
+  ],
+  "toluene": [
+   270,
+   330
+  ],
+  "ethylbenzene": [
+   170
+  ],
+  "xylenes": [
+   41,
+   380
+  ],
+  "butadiene": [
+   230
+  ],
+  "hexane": [
+   1500
+  ],
+  "styrene": [
+   16,
+   35
+  ],
+  "formaldehyde": [
+   24,
+   500
+  ],
+  "acetaldehyde": [
+   1.5,
+   560
+  ],
+  "acrolein": [
+   3.6
+  ],
+  "naphthalene": [
+   84
+  ],
+  "_naphthalene": "Amoore and Hautala 1983 via US EPA hazard summary (original not opened)",
+  "_ranges": "where two values are given, the lower is the more sensitive published threshold; both are reported",
+  "_none": "hydrogen cyanide: no odour threshold in the researched files",
+  "_acetaldehyde": "1.5 ppb = Nagata 2003 detection threshold; 560 ppb = US EPA AEGL 'level of distinct odour awareness' (a higher, different measure), reported as the alternative",
+  "_xylenes": "41 ppb = m-xylene (Nagata), the lowest isomer; 380 ppb = o-xylene; both reported"
+ },
+ "referenceValues": {
+  "_source": "sources-yardsticks.json; only values of 1 h or shorter used for public air (PLAN-SMELL.md section 5)",
+  "benzene": [
+   {
+    "ugm3": 27,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL (1 h; derived on a 6-h basis, as the signed report)"
+   }
+  ],
+  "toluene": [
+   {
+    "ugm3": 5000,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL"
+   },
+   {
+    "ugm3": 1000,
+    "averaging_s": 1800,
+    "body": "WHO 2000 odour-based guideline"
+   }
+  ],
+  "xylenes": [
+   {
+    "ugm3": 22000,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL"
+   }
+  ],
+  "butadiene": [
+   {
+    "ugm3": 660,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL"
+   }
+  ],
+  "styrene": [
+   {
+    "ugm3": 21000,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL"
+   },
+   {
+    "ugm3": 70,
+    "averaging_s": 1800,
+    "body": "WHO 2000 odour-based guideline"
+   }
+  ],
+  "formaldehyde": [
+   {
+    "ugm3": 55,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL"
+   },
+   {
+    "ugm3": 98,
+    "averaging_s": 3600,
+    "body": "Taiwan indoor air quality standard 0.08 ppm (indoor public places)"
+   },
+   {
+    "ugm3": 100,
+    "averaging_s": 1800,
+    "body": "WHO 2000 / 2010 guideline"
+   }
+  ],
+  "acetaldehyde": [
+   {
+    "ugm3": 470,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL"
+   }
+  ],
+  "acrolein": [
+   {
+    "ugm3": 2.5,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL"
+   }
+  ],
+  "_none": "ethylbenzene, n-hexane, naphthalene: no public value of 1 h or shorter in the researched files; no above/below statement can be made",
+  "hcn": [
+   {
+    "ugm3": 340,
+    "averaging_s": 3600,
+    "body": "California OEHHA acute REL (CARB table 2025-09-25, reviewed 4/99)"
+   }
+  ]
+ },
+ "hazardLabels_IARC": {
+  "_note": "hazard labels (strength of evidence that something CAN cause cancer), not a risk from one red light; not a ranking",
+  "benzene": "Group 1",
+  "butadiene": "Group 1",
+  "formaldehyde": "Group 1",
+  "styrene": "Group 2A",
+  "acrolein": "Group 2A",
+  "ethylbenzene": "Group 2B",
+  "naphthalene": "Group 2B",
+  "acetaldehyde": "Group 2B",
+  "toluene": "Group 3",
+  "xylenes": "Group 3",
+  "hexane": "not classified by IARC",
+  "hcn": "not researched",
+  "petrol (automotive gasoline)": "Group 1 (Vol 138, 2025)",
+  "petrol-engine exhaust": "Group 2B (Vol 105, 2014)"
+ },
+ "twoStrokeNote": "Two-stroke draws (1-3 % of scooters) get these four-stroke shares; their benzene is the signed model.mjs ASSUMPTION of 1-3 % of THC, while the only two-stroke share seen (Chulalongkorn 2001, abstract only, context) is 8.46 % benzene and 16.5 % toluene. Packs containing a two-stroke may be understated; medians barely move.",
+ "contextOnly": [
+  "tsai-2018: benzene about 2-3 % of VOC (chart reading) NOT CONFIRMED; aaqr.org 403 to the verifier",
+  "tsai-2003-jawma: toluene 23-29 % of VOC from the abstract NOT USED; abstract species values do not match its totals"
+ ],
+ "corrections": "corrections.md (sign-off step, 2026-11-27)"
+}

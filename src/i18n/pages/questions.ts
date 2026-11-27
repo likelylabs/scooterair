@@ -165,6 +165,36 @@ export default copy({
     },
   },
 
+  // the simulation's answer to the owner's question; one <p> per line, so one more line can follow
+  smellSim: {
+    q: { 'zh-TW': '聞起來那麼臭，|一氧化碳超過指引值了嗎？', en: 'It smells horrible. |Is the carbon monoxide over the WHO guideline?' },
+    lines: [
+      { 'zh-TW': '推估：你聞到的臭味是真的。', en: 'Estimate: the smell you notice is real.' },
+      { 'zh-TW': '風從一群引擎沒熄火的機車吹向你時，紅燈大約一半到幾乎全部的時間，廢氣都濃到一般人聞得到。', en: 'When the wind blows to you from a group of scooters with their engines running, for about half to nearly all of the red, the exhaust is strong enough for most people to smell.' },
+      { 'zh-TW': '一氧化碳沒有味道。你聞到的，是沒燒完、沒燒乾淨的汽油；它只要一點點（十億份空氣裡幾份），鼻子就聞得到。', en: 'Carbon monoxide has no smell. What you smell is petrol that did not burn, or did not burn cleanly; the nose picks it up at a tiny amount, a few parts in a billion.' },
+      { 'zh-TW': '所以很臭，不代表一氧化碳超過指引值。', en: 'So a strong smell does not mean carbon monoxide is over the guideline.' },
+      { 'zh-TW': '在一般的街上等一個紅燈，一氧化碳攤成 15 分鐘的平均，多{range}，比指引值低很多。', en: 'Waiting one red light on an ordinary street, carbon monoxide spread over 15 minutes adds {range}, far below the guideline.' },
+      { 'zh-TW': '但靠近排氣管時，一氧化碳是一陣一陣的。', en: 'But near a tailpipe, carbon monoxide comes in bursts.' },
+      { 'zh-TW': '例外：嬰兒車停在排氣管正後方半公尺、幾乎沒風，連續 15 分鐘每個紅燈都在，15 分鐘平均可能超過指引值。這樣的 15 分鐘，約十次有一到兩次；這種風很少見，信心低。', en: 'The exception: a pushchair half a metre behind a tailpipe, in almost no wind, through every red for 15 minutes, can pass the guideline as a 15-minute average. That happens in about 1 or 2 of 10 such periods; such a wind is rare, and confidence is low.' },
+    ],
+    pushchairLink: { 'zh-TW': '嬰兒車的例外', en: 'The pushchair exception' },
+    moreLink: { 'zh-TW': '電腦算的一個紅燈', en: 'One red light, simulated' },
+    sheet: {
+      b1: {
+        'zh-TW': '這不是量的。「聞得到」的標準，來自 1967 和 1970 年汽車廢氣研究的摘要。',
+        en: 'This is not a reading. What counts as ‘can smell it’ comes from abstracts of car-exhaust studies from 1967 and 1970.',
+      },
+      b2: {
+        'zh-TW': '電腦算的一個紅燈，風整個紅燈都從機車吹來。',
+        en: 'One simulated red light, with the wind blowing from the scooters for the whole red.',
+      },
+      b3: {
+        'zh-TW': '這些標準只能說「風吹來時，很多秒聞得到」。風整個紅燈都從機車吹來的情形，最多大約八個紅燈有一個。',
+        en: 'These levels support only ‘smellable in many seconds when the wind blows from the scooters’. A wind from the scooters for a whole red comes in at most about 1 red in 8.',
+      },
+    },
+  },
+
   // ---------------------------------------------------------------------------------------
   // 站遠一點有用嗎？
   // ---------------------------------------------------------------------------------------
@@ -200,8 +230,8 @@ export default copy({
       box: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
       headline: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
       quiet: {
-        'zh-TW': '圈圈越多＝一氧化碳越多。街上原本就有的空氣，圖上沒有畫。',
-        en: 'More rings mean more carbon monoxide. The air the street already holds is not drawn.',
+        'zh-TW': '機車越多，路邊的廢氣越濃。街上原本就有的空氣，圖上沒有畫。',
+        en: 'More scooters, thicker exhaust at the kerb. The air the street already holds is not drawn.',
       },
       sheet: {
         b1: {
@@ -307,6 +337,14 @@ export default copy({
           'zh-TW': '一天四個紅燈，讓你一整天吸到的一氧化碳多不到 {share}%。整天在路邊工作的人就不一樣，像交通警察、攤販、導護。一個紅燈接一個紅燈，加起來就像一直待在路邊。',
           en: 'Four red lights a day add less than {share}% to the carbon monoxide you breathe over a whole day. It is different for people who work at the kerb all day, such as traffic police, street vendors and school crossing guards. One red light after another adds up to standing at the roadside all the time.',
         },
+        /** After b3 (people who work at the kerb): statements 2, 8 and 9 of the simulation, one idea per line; {range} / {times} are EstimateValues. */
+        stayers: [
+          { 'zh-TW': '推估：電腦算的一個紅燈，每個紅燈都站在路邊、站滿 15 分鐘，風又一直從機車吹來，', en: 'Estimate: in the simulated red light, standing at the kerb through every red for 15 minutes with the wind always from the scooters,' },
+          { 'zh-TW': '一氧化碳的 15 分鐘平均是{range}，還是低於指引值；這種風很少見。', en: 'the 15-minute carbon monoxide average is {range}, still below the guideline; such a wind is rare.' },
+          { 'zh-TW': '待上一小時、風一直從機車吹來的人，苯（ㄅㄣˇ）的一小時平均，可能是美國加州 1 小時參考值的{times}。', en: 'For people who stay an hour with the wind always from the scooters, the 1-hour benzene average can be {times} California’s 1-hour reference level.' },
+          { 'zh-TW': '這個參考值是用 6 小時的資料訂的；機車廢氣裡有多少苯，可能差到 5 到 10 倍。這不是在說等一個紅燈的人。', en: 'That reference was set from 6-hour data, and how much benzene scooter exhaust holds could be off five- to ten-fold. This is not about someone waiting one red.' },
+          { 'zh-TW': '一般來說，只有封閉的地方，像地下停車場、地下道，或不太通風、有屋頂的候車區，裡面有幾十輛機車引擎沒熄火，才可能到指引值；這些地方我們沒有算，也沒有找到台灣在這些地方的量測。', en: 'Generally, only enclosed places, such as an underground car park, an underpass or a stuffy covered waiting area with dozens of scooters idling, could reach the guideline; we did not simulate them, and we found no Taiwanese measurement of them.' },
+        ],
         studiesTitle: { 'zh-TW': '三個路牌，各是什麼研究', en: 'The study behind each signpost' },
         studies: [
           {
@@ -356,8 +394,13 @@ export default copy({
           en: 'This is a link the studies found, not proof of what brings it about. Most were done in Europe and North America, and they cover exhaust from all traffic, not scooters alone.',
         },
         routes: {
-          'zh-TW': '圖上三條路線，講的是這些東西本身的性質；路口的量，比會讓人馬上不舒服的量低很多。',
-          en: 'The three routes in the picture describe what these substances do in themselves; the amounts at a junction are far below those that make people feel unwell at once.',
+          'zh-TW': '圖上三條路，說的是這些東西進到身體以後去哪裡。',
+          en: 'The three routes show where these substances go once breathed in.',
+        },
+        /** A separate sentence from the routes: like-with-like averaging only, with its label. */
+        routesCo: {
+          'zh-TW': '推估：等一個紅燈多出來的一氧化碳，攤成 15 分鐘的平均，多{range}，比世界衛生組織的指引值低很多。',
+          en: 'Estimate: the carbon monoxide one red light adds, spread over 15 minutes, is {range}, far below the WHO guideline.',
         },
       },
     },
@@ -374,10 +417,43 @@ export default copy({
         'zh-TW': '排氣管和嬰兒車裡的寶寶，都不到一公尺高。照體重算，小孩吸進的空氣是大人的 {lo} 到 {hi} 倍。',
         en: 'The tailpipe and a baby in a pushchair are both less than a metre off the ground. For their body weight, children breathe {lo} to {hi} times as much air as adults.',
       },
+      /** Statement 5 (replaces K4, which the simulation has answered). */
+      quiet: { 'zh-TW': '推估：風從機車吹來，嬰兒車高度和大人差不多到兩倍；不是每種風都這樣。', en: 'Estimate: with the wind from the scooters, pushchair height gets between about the same as an adult’s nose and about twice as much. Not in every wind.' },
       sheet: {
         b1: {
           'zh-TW': '美國環保署的《暴露參數手冊》，整理了每個年紀的人，一天吸進多少空氣。',
           en: 'The US Environmental Protection Agency’s Exposure Factors Handbook, which sets out how much air people of each age breathe in a day.',
+        },
+      },
+    },
+    /** Statement 3 of the simulation, one idea per line ({middle} is an EstimateValue). */
+    pushchair: {
+      q: { 'zh-TW': '嬰兒車就停在|排氣管正後方呢？', en: 'And a pushchair |right behind a tailpipe?' },
+      lines: [
+        { 'zh-TW': '有一個例外。', en: 'There is one exception.' },
+        { 'zh-TW': '嬰兒車停在一輛機車排氣管的正後方，約半公尺。', en: 'A pushchair stands half a metre directly behind one scooter’s tailpipe.' },
+        { 'zh-TW': '機車引擎沒熄火，幾乎沒有風，風向也不變。', en: 'The engine is running, there is almost no wind, and it does not change direction.' },
+        { 'zh-TW': '每個紅燈都停在那裡，連續 15 分鐘。', en: 'It stays there through every red for 15 minutes.' },
+        { 'zh-TW': '這時嬰兒車裡低低的地方（約 0.6 公尺），一氧化碳的 15 分鐘平均，可能超過世界衛生組織的指引值。', en: 'Then, low in the pushchair (about 0.6 m), the 15-minute carbon monoxide average can pass the WHO guideline.' },
+        { 'zh-TW': '這樣的 15 分鐘，每十次約有一到兩次。', en: 'That happens in about 1 or 2 of 10 such 15-minute periods.' },
+        { 'zh-TW': '很弱的風剛好從那一邊吹來，大約一百個紅燈才有一次；要連續 15 分鐘，就更少了。', en: 'A very weak wind from that side comes in about 1 red in 100; for 15 minutes in a row it is rarer still.' },
+        { 'zh-TW': '往旁邊移開半公尺，或到小孩站著的高度，就沒有了。', en: 'Move half a metre to the side, or up to a standing child’s height, and it is gone.' },
+        { 'zh-TW': '這是我們最沒把握的結果。', en: 'This is our least certain result.' },
+      ],
+      gloss: { 'zh-TW': '推估：這是電腦算的，不是量的。', en: 'Estimate: worked out on a computer, not read off an instrument.' },
+      moreLink: { 'zh-TW': '電腦算的一個紅燈', en: 'One red light, simulated' },
+      sheet: {
+        b1: {
+          'zh-TW': '這不是量的，是電腦算的一個紅燈，再推成 15 分鐘。',
+          en: 'This is not a reading: it comes from one simulated red light, worked out to 15 minutes.',
+        },
+        b2: {
+          'zh-TW': '中間的情形是{middle}；偏高的情形會超過指引值。',
+          en: 'The middle case is {middle}; the high cases pass the guideline.',
+        },
+        b3: {
+          'zh-TW': '電腦裡的空氣比平常更靜，所以可能算高了。引擎的熱，會讓半公尺處的數字差到四倍。',
+          en: 'The air in the model is stiller than usual, so this may be too high. Engine heat can change the values at half a metre up to four-fold.',
         },
       },
     },
@@ -470,7 +546,7 @@ export default copy({
   mask: {
     s1: {
       chapter: { 'zh-TW': '口罩', en: 'Masks' },
-      headline: { 'zh-TW': '醫用口罩|擋不住機車廢氣', en: 'A surgical mask |won’t stop scooter exhaust' },
+      headline: { 'zh-TW': '口罩|擋不住廢氣裡的氣體', en: 'A mask |won’t stop the gases in exhaust' },
       body: {
         'zh-TW': '口罩擋的是微粒，而且會從邊緣漏。一氧化碳和油氣是氣體，連貼合的 N95 都擋不住。',
         en: 'A mask stops particles, and it leaks round the edges. Carbon monoxide and fuel vapour are gases; even a fitted N95 does not stop them.',

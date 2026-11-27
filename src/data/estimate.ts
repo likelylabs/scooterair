@@ -64,7 +64,7 @@ export const estUnitLabels: Record<EstUnit, L10n> = {
   'g/h': t('公克／小時', 'g an hour'),
   g: t('公克', 'g'),
   L: t('公升', 'litres'),
-  can: t('罐', 'cans'),
+  can: t('個鋁罐', 'drinks cans'),
   m: t('公尺', 'm'),
   vehicles: t('輛', 'scooters'),
   s: t('秒', 'seconds'),
@@ -99,7 +99,7 @@ export interface EstRange {
   anchor?: EstimateAnchor;
 }
 
-export type EstimateAnchor = 'numbers' | 'recipe' | 'count' | 'check' | 'range' | 'drawing' | 'limits' | 'answers' | 'measure';
+export type EstimateAnchor = 'numbers' | 'simulation' | 'recipe' | 'count' | 'check' | 'range' | 'drawing' | 'limits' | 'answers' | 'measure';
 
 const est1 = (lo: number, mid: number, hi: number, unit: EstUnit, anchor: EstimateAnchor = 'numbers'): EstRange => ({ lo, mid, hi, unit, kind: 'estimate', rounding: 'sf1', anchor });
 const tot1 = (lo: number, mid: number, hi: number): EstRange => ({ lo, mid, hi, unit: 'ppm', kind: 'estimate', rounding: 'dp1', anchor: 'numbers' });
@@ -507,18 +507,13 @@ export const dose = { dayShare: doseDayShare(4) };
 // The drawing rule (brief 5.1), so art, film and cards compute the same numbers
 // ---------------------------------------------------------------------------
 
-/** Rings and dots of the street's own air per 120 × 120 px reference patch. */
-export const AIR_BASE_PER_PATCH = 6;
+/** The street's own air, in steps of fume (not drawn: the yardstick the pack's steps are measured against). */
+export const FUME_STEPS_BASE = 6;
 
-/** Extra rings per patch where people stand: round(6 × add ÷ bg.co.traffic), at least 1. */
-export function extraRings(scn: ScenarioKey, which: 'lo' | 'mid' | 'hi' = 'mid'): number {
+/** Steps of fume the pack adds where people stand: round(6 × add ÷ bg.co.traffic), at least 1. Each step tints the kerb 6 % on average (art/air.ts). */
+export function fumeSteps(scn: ScenarioKey, which: 'lo' | 'mid' | 'hi' = 'mid'): number {
   const a = est.co[scn].add[which] as number;
-  return Math.max(1, Math.round((AIR_BASE_PER_PATCH * a) / est.bg.co.traffic.value));
-}
-
-/** Rings in a patch beside the pack (base + extra): the dozen gives 7 / 9 / 17 for lo / mid / hi. */
-export function ringsPerPatch(scn: ScenarioKey, which: 'lo' | 'mid' | 'hi' = 'mid'): number {
-  return AIR_BASE_PER_PATCH + extraRings(scn, which);
+  return Math.max(1, Math.round((FUME_STEPS_BASE * a) / est.bg.co.traffic.value));
 }
 
 /** add.mid ÷ bg.co.traffic, the ratio the screen 4 rule reads. Never print it. */
@@ -565,16 +560,20 @@ const checkSentences: Record<CheckRule, L10n> = {
 };
 
 /**
- * Screen 5's headline answers screen 4's "實際量到的，算多嗎？", chosen by farBelowWho().
- * `far`: carbon monoxide is far below the WHO 15-minute guideline value, which is good news, and
- * the headline says in the same breath that exhaust holds more than carbon monoxide (brief 12.4).
- * It states two facts side by side and ranks nothing (claims policy r3-no-harm-ranking): never add
- * 更 / 真正 / 反而 / "what matters more". `near`: the chart comes within a quarter of the WHO
- * value; the headline then claims nothing about it.
+ * Screen 5's headline answers screen 4's question 「那麼臭，超過指引值了嗎？」. `far` is printed
+ * while simBelowWho() in src/data/simulation.ts holds (the simulation's 15-minute values for one
+ * red, for every red with the wind held, and right behind a tailpipe are all below the WHO
+ * 15-minute value). It says the smell is real, that carbon monoxide has no smell, and that ONE
+ * red light leaves the 15-minute average below the guideline: it names who the claim covers and
+ * never says "far below" (statements.json must-not 4). The exception (a pushchair parked right
+ * behind a tailpipe through every red) is printed on the same screen, in words and in its chart.
+ * It ranks nothing (claims policy r3-no-harm-ranking): never add 更 / 真正 / 反而.
+ * `near`: the fallback if the simulation's values ever reach the guideline; it claims nothing.
+ * '|' marks where the line may break (checkHeadlinePhrased); checkHeadline() removes the marks.
  */
 const checkHeadlines: Record<'far' | 'near', L10n> = {
-  far: t('一氧化碳比指引值低很多，是好消息，但廢氣不只有它', 'Carbon monoxide is far below the WHO guideline. Good news, but exhaust holds more than that'),
-  near: t('路口的一氧化碳，量過也算過', 'Carbon monoxide at the crossing: measured and worked out'),
+  far: t('臭是真的。|一氧化碳沒味道；|等一個紅燈，|仍低於指引值', 'The smell is real. |Carbon monoxide has no smell. |Waiting one red light, |it stays below the WHO guideline'),
+  near: t('路口的一氧化碳，|量過也算過', 'Carbon monoxide at the crossing: |measured and worked out'),
 };
 
 /** Screen 5: compare co.dozen.total with the lowest and highest measured peak. Today: overlap. */
@@ -587,34 +586,42 @@ export function checkRule(): CheckRule {
   if (tot.hi < pLo) return 'lower';
   return 'overlap';
 }
-export function checkHeadline(locale: Locale): string {
-  return checkHeadlines[farBelowWho() ? 'far' : 'near'][locale];
+/** Screen 5's headline (and the one-page brief's) without phrase marks. Pass simBelowWho(). */
+export function checkHeadline(locale: Locale, belowWho: boolean): string {
+  return checkHeadlines[belowWho ? 'far' : 'near'][locale].replaceAll('|', '');
 }
 export const checkHeadlineTable = checkHeadlines;
-/**
- * Screen 5's headline with its phrase marks ('|', ui/Phrased): the line may break after the first
- * clause (the comparison), then the good news and the turn.
- */
-export function checkHeadlinePhrased(locale: Locale): string {
-  const s = checkHeadline(locale);
-  // Chinese may also break after the subject, so a narrow column never leaves 「很多，」 alone on a line
-  return locale === 'en' ? s.replace('. ', '. |') : s.replace('一氧化碳比', '一氧化碳|比').replaceAll('，', '，|');
+/** Screen 5's headline with its phrase marks ('|', ui/Phrased). Pass simBelowWho(). */
+export function checkHeadlinePhrased(locale: Locale, belowWho: boolean): string {
+  return checkHeadlines[belowWho ? 'far' : 'near'][locale];
 }
-/** Screen 5's relation sentence (and the one-page brief's), chosen by checkRule(). */
+/**
+ * The 90-second estimate's relation sentence, chosen by checkRule(). It is about the 90-second
+ * estimate and the Institute's readings only, never about the computer simulation (statements.json
+ * must-not 5): wherever it is printed near the simulation, estimateText.checkIsEstimate goes with it.
+ */
 export function checkSentence(locale: Locale): string {
   return checkSentences[checkRule()][locale];
 }
 export const checkSentenceTable = checkSentences;
 
-/** The highest value screen 5's chart draws (total hi, peaks, background), ppm. */
+/** The highest value the measured-beside-estimated chart draws (total hi, peaks, background), ppm. */
 export function chartMaxPpm(): number {
   return Math.max(est.co.dozen.total.hi, ...est.meas.iot.co.peaks, est.bg.co.traffic.value);
 }
 
-/** Screen 5's "far below the guideline, good news, but exhaust holds more" headline and its line
- * on what the guideline covers print only while this is true. */
+/**
+ * True while the chart's highest level, CONVERTED to a 15-minute average, stays under a quarter of
+ * the WHO 15-minute value. Only the scooters' share above the street background is converted (one
+ * 90-second red counts one tenth: 90 ÷ 900 s); the background is there for the whole 15 minutes and
+ * is kept whole, and a value at or under the background is kept as it is. So the test is never
+ * looser than comparing the background itself. Chooses the chart's converted summary sentence; the
+ * raw 90-second value is never compared with 87 ppm.
+ */
 export function farBelowWho(maxPpm: number = chartMaxPpm()): boolean {
-  return maxPpm < est.who.co15min_ppm.exact / 4;
+  const bg = est.bg.co.traffic.value;
+  const added = Math.max(0, maxPpm - bg);
+  return Math.min(maxPpm, bg) + (added * est.signal.redLength_s) / 900 < est.who.co15min_ppm.exact / 4;
 }
 
 // ---------------------------------------------------------------------------
@@ -640,6 +647,20 @@ export const estimateText = {
   whoAveraging: t(
     '90 秒的量，放進 15 分鐘的平均裡，只算十分之一。',
     'A 90-second level counts for one tenth of a 15-minute average.',
+  ),
+  /**
+   * Beside checkSentence() wherever the simulation is near it (home screen 5's sheet): the
+   * readings were compared with the 90-second estimate, not with the computer simulation, which
+   * was not checked against measurements (statements.json must-not 5).
+   */
+  checkIsEstimate: t(
+    '這是拿量到的和本站 90 秒的推估比，不是和電腦算的一個紅燈比；電腦算的沒有拿量到的來比對。',
+    'This compares the readings with our 90-second estimate, not with the computer simulation; the simulation was not checked against readings.',
+  ),
+  /** Under the estimate table and in the downloads note (METHOD.md §1, amended 2026-11-27). */
+  upperIsTypical: t(
+    '範圍最高的數字，是一般紅燈裡偏高的那種，不是最糟的紅燈。',
+    'The top of each range is a high but ordinary red, not the worst red.',
   ),
   /** PM2.5 sentence for /estimate/#numbers. */
   pm25Small: t('機車讓 PM2.5 多出來的量，比街上原本就有的少很多。', 'The PM2.5 the scooters add is much less than the street already holds.'),
@@ -684,6 +705,7 @@ export const estimateText = {
   limits: [
     t('只算大人鼻子的高度（1.5 公尺）。', "Only an adult's nose height (1.5 m)."),
     t('是 90 秒的平均，不是每一秒的最高點。', 'A 90-second average, not second-by-second peaks.'),
+    t('一秒一秒的變化和嬰兒車的高度，請看「電腦算的一個紅燈」。', "For second-by-second changes and pushchair height, see 'One red light, simulated'."),
     t('只算機車，不算同一排的汽車、公車和貨車。', 'Scooters only, not the cars, buses and lorries in the same queue.'),
     t('不是哪一個特定的路口。', 'Not any particular junction.'),
     t('不是健康評估，也不能拿來說會讓人生什麼病。', 'Not a health assessment, and it shows no health effect.'),

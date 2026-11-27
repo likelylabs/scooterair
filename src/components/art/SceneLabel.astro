@@ -16,10 +16,16 @@
  *   as      'p' (default) | 'span' | 'div'
  *
  *   <SceneLabel slot="labels" box={VB} x={296} y={-120} anchor="center bottom" plate>排氣管</SceneLabel>
+ *
+ * Chinese words in a label never break inside a phrase: at 320 px 特大 「聞不到」 must not
+ * become 「聞 / 不到」. A plain-text label is cut at its punctuation (「油氣：」「聞得到」);
+ * each short piece (up to five characters) is held on one line, a longer piece is glued word by
+ * word (src/lib/glue.mjs). Labels with markup inside are left as they are.
  */
 import '@/styles/art.css';
 import type { Box } from './air';
 import { labelStyle } from './scene';
+import { glueZh } from '@/lib/glue.mjs';
 
 interface Props {
   box: Box;
@@ -31,9 +37,21 @@ interface Props {
   max?: number;
   as?: 'p' | 'span' | 'div';
   class?: string;
+  'aria-hidden'?: 'true' | 'false';
   [key: `data-${string}`]: string | number | boolean | undefined;
 }
 const { box, x, y, anchor = 'start top', plate = false, quiet = false, max, as: Tag = 'p', class: cls, ...rest } = Astro.props;
+const raw = Astro.slots.has('default') ? await Astro.slots.render('default') : '';
+const HAN = /[\u3400-\u9fff]/;
+// a piece is the text between spaces, cut after each closing mark; spaces stay breakable
+const piece = (p: string) => (!HAN.test(p) ? p : [...p].length <= 5 ? `<span class="nobr">${p}</span>` : glueZh(p));
+const glued =
+  HAN.test(raw) && !/[<>]/.test(raw)
+    ? raw
+        .split(/(\s+)/)
+        .map((w) => (/^\s*$/.test(w) ? w : w.split(/(?<=[：，、。？！])/).map(piece).join('')))
+        .join('')
+    : null;
 ---
 
-<Tag class:list={['scene__label', plate && 'scene__label--plate', quiet && 'scene__label--quiet', cls]} data-anchor={anchor} style={labelStyle(box, x, y, max)} {...rest}><slot /></Tag>
+<Tag class:list={['scene__label', plate && 'scene__label--plate', quiet && 'scene__label--quiet', cls]} data-anchor={anchor} style={labelStyle(box, x, y, max)} {...rest}>{glued !== null ? <Fragment set:html={glued} /> : <Fragment set:html={raw} />}</Tag>

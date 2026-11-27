@@ -6,8 +6,11 @@
  * A parent with a pushchair and a schoolchild stand at the left; the tail of
  * the nearest scooter is a step or two to their right, its rider in view, with
  * rows of the pack behind. The plume of air.ts runs from the tailpipe to the
- * people, low, with rings inside it where they stand (by the estimate), and a
- * soft dark core behind every tailpipe. Nothing is drawn on the wall: the
+ * people, low, and a soft dark puff sits behind every tailpipe. Fume only, no
+ * symbols (air.ts): how thick the plume is where the people stand
+ * carries the estimate, in proportion to the carbon monoxide the pack adds
+ * (AIR.fumeTint × AIR_EXTRA), and the number box above the picture gives the
+ * figure. One label on the picture, with a thin line into the plume. Nothing is drawn on the wall: the
  * street's own air is left to the number box above the picture.
  *
  * The scenario switch changes layer B, the rows behind and nothing else. It
@@ -30,11 +33,12 @@ import type { Locale } from '@/i18n';
 import { art } from '@/i18n/art';
 import { est } from '@/data/estimate';
 import SceneFrame from './SceneFrame.astro';
-import { air, type AirScenario, type Box, AIR_KEY } from './air';
+import SceneLabel from './SceneLabel.astro';
+import { air, unitsPerPx, type AirScenario, type Box } from './air';
 import { AIR_EXTRA } from './air-slots';
-import { TAILPIPE, artId, figureBoxes, person } from './parts';
+import { TAILPIPE, artId, person } from './parts';
 import { placed, put, shopfronts, stepSources, tailOf, type Placed } from './kit';
-import { sceneAlt } from './scene';
+import { leader, sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
@@ -43,7 +47,7 @@ interface Props {
   tag?: false | 'street';
   id?: string;
   class?: string;
-  /** the small key under the picture (default true; false for a thumbnail or a share card) */
+  /** the label on the picture (default true; false for a thumbnail or a share card) */
   legend?: boolean;
 }
 const { locale, legend = true, scenario = 'all', initial = 'dozen', tag = false, id, class: cls } = Astro.props;
@@ -70,7 +74,6 @@ const a = air({
   extra: AIR_EXTRA,
   kerb: { x0: 6, x1: front.x - 8, sourceX: front.x + TAILPIPE.x },
   tailpipes: [...rows.map(tailOf), tailOf(front)],
-  avoid: [...figureBoxes('stroller', parent), ...figureBoxes('schoolchild-cover', child), ...figureBoxes('scooter', front.x)],
 });
 const steps = Object.fromEntries(rows.map((r, i) => [i, r.step])) as Record<number, 2 | 3>;
 const stepped = (html: string) => (scenario === 'all' ? stepSources(html, steps) : html);
@@ -92,9 +95,14 @@ const fg = [
   put(child, 0, person('schoolchild-cover'), { cls: 'a-figure' }),
   placed(front, 'gas', { face: true, cls: 'a-figure' }),
 ].join('');
+// the one label: on the road between the child and the scooter, a short line up into the fume there
+// it stands on the bottom edge and grows upward with 字大; its line starts under its plate
+const LBL = { x: 196, y: VB.y + VB.h - 4 };
+const lead = leader(LBL.x + 44, 50, 248, -58, unitsPerPx(VB.w));
 const alt = sceneAlt(locale, art.kerb.alt[locale], { scenario: shown, count: est.scn[shown].count });
 ---
 
-<SceneFrame locale={locale} legend={legend && AIR_KEY} legendSense box={VB} alt={alt} tag={tag} scenario={shown} drift id={id} class={['scene--kerb', cls].filter(Boolean).join(' ')}>
-  <Fragment set:html={a.defs + street + a.wash + far + stepped(a.cores) + stepped(a.marks) + fg} />
+<SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario={shown} drift id={id} class={['scene--kerb', cls].filter(Boolean).join(' ')}>
+  <Fragment set:html={a.defs + street + a.wash + far + stepped(a.cores) + stepped(a.marks) + fg + (legend ? lead : '')} />
+  {legend && <SceneLabel slot="labels" box={VB} x={LBL.x} y={LBL.y} anchor="start bottom" max={52} plate class="fume-label">{art.fume.label[locale]}</SceneLabel>}
 </SceneFrame>

@@ -200,8 +200,8 @@ export const kerb = {
     readerKind: 'official',
     readerPlace: 'abroad',
     caveat: t(
-      '美國環保署說的是一氧化碳很多的時候；路口量到和本站推估的量，都比世界衛生組織的 15 分鐘指引值低很多。',
-      'The US EPA is describing air with a lot of carbon monoxide in it. What was measured at Taiwanese junctions and what this site estimates are both far below the WHO 15-minute guideline.',
+      '美國環保署說的是一氧化碳很多的時候。等一個紅燈多出來的一氧化碳，攤成 15 分鐘的平均，低於世界衛生組織的 15 分鐘指引值；範圍和條件，見本站電腦算的一個紅燈（推估）。',
+      'The US EPA is describing air with a lot of carbon monoxide in it. The carbon monoxide one red light adds, spread over 15 minutes, is below the WHO 15-minute guideline; for its range and conditions, see this site’s simulated red light (an estimate).',
     ),
     chainLink: 4,
     editorNote: `${OPENED} Backs home screen 6 pin ③ (一氧化碳從肺進到血液，占掉載氧氣的位子). The pin must not imply harm at kerb levels; its sheet carries this caveat.`,

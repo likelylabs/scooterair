@@ -61,3 +61,14 @@ export function shortSceneAlt(alt: string, locale: Locale): { note: 'pack' | 'el
   }
   return null;
 }
+
+/**
+ * A thin leader line from a label (x0, y0) into the fume (x1, y1), in drawing units, for a
+ * <SceneLabel> that names what the fume holds. `upp` is drawing units per screen pixel at 360 px
+ * (unitsPerPx(box.w)), so the line is about 1.5 px wide on a phone. A paper-coloured edge under it
+ * keeps it visible over the darkest plume. Drawn in the SVG, above the fume and below the label.
+ */
+export function leader(x0: number, y0: number, x1: number, y1: number, upp: number): string {
+  const d = `M${+x0.toFixed(1)},${+y0.toFixed(1)}L${+x1.toFixed(1)},${+y1.toFixed(1)}`;
+  return `<g class="fume-lead"><path class="fume-lead__edge" stroke-width="${+(4 * upp).toFixed(2)}" d="${d}"/><path class="fume-lead__line" stroke-width="${+(1.6 * upp).toFixed(2)}" d="${d}"/></g>`;
+}

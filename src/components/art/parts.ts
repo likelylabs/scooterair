@@ -12,8 +12,8 @@
  * Colour comes only from the `.a-*` classes in src/styles/art.css (which map
  * to the --art-* tokens), never from literal values.
  *
- * The air itself (rings, dots, ribbons, the wash where people stand and the
- * dark cores at the tailpipes) is NOT drawn here. It is drawn by ./air.ts, by
+ * The air itself (the fume: its puffs at the tailpipes, the fume where people
+ * stand and its wisps) is NOT drawn here. It is drawn by ./air.ts, by
  * one rule, for every scene (redesign brief, section 5.1). This file draws
  * the things that stand in the air: scooters, people, the signal, the can,
  * the masked face and the body figure.
@@ -54,13 +54,12 @@ export const TAILPIPE = { x: 4, y: -50 };
 export const SCOOTER_LENGTH = 184;
 /** Nose and mouth of the seated rider, in scooter-local coordinates: riders breathe here too. */
 export const RIDER_MOUTH = { x: 98, y: -141 };
-/** Where the rear tyre meets the road (electric scooters keep three grey dots here: air.ts `tyres`). */
-export const REAR_TYRE = { x: 36, y: 0 };
 
 function wheel(cx: number, hub: 'spoke' | 'motor'): string {
   const inner =
     hub === 'motor'
-      ? `<circle class="a-clean" cx="${cx}" cy="-24" r="13"/><circle class="a-bg" cx="${cx}" cy="-24" r="7"/><circle class="a-deep" cx="${cx}" cy="-24" r="3.5"/>`
+      ? // a plain hub, as on any wheel: no coloured ring (a ring read as a logo or a code, owner feedback 2026-11-27)
+        `<circle class="a-bg" cx="${cx}" cy="-24" r="12"/><circle class="a-deep" cx="${cx}" cy="-24" r="5.5"/>`
       : `<circle class="a-bg" cx="${cx}" cy="-24" r="12"/><circle class="a-deep" cx="${cx}" cy="-24" r="4.5"/>`;
   return `<circle class="a-deep" cx="${cx}" cy="-24" r="24"/>${inner}`;
 }
@@ -96,7 +95,8 @@ export function rider(opts: { face?: boolean } = {}): string {
 /**
  * A step-through scooter in side view, facing right. Generic design: do not
  * add brand cues. `gas` has a muffler and tailpipe; `electric` has a hub
- * motor, a light strip and nothing behind the rear wheel.
+ * motor (a plain solid hub), a light strip and nothing behind the rear wheel.
+ * What makes it electric is said in words on the picture (電動機車), never by a mark.
  */
 export function scooter(opts: { kind?: ScooterKind; rider?: boolean; tail?: boolean; face?: boolean } = {}): string {
   const { kind = 'gas', rider: withRider = false, tail = true, face = false } = opts;
@@ -136,7 +136,7 @@ export function scooter(opts: { kind?: ScooterKind; rider?: boolean; tail?: bool
     if (tail) p.push('<rect class="a-red" x="3.5" y="-76" width="4" height="8" rx="1.5"/>');
   } else {
     // slimmer swing arm, no engine, no muffler
-    p.push('<path class="a-deep-s" stroke-width="9" d="M36,-24 L88,-30"/>');
+    p.push('<path class="a-deep-s" stroke-width="9" d="M50,-26 L88,-30"/>');
     // angular tail with a battery bay
     p.push('<path class="a-ink" d="M98,-30 L98,-70 C98,-76 95,-79 90,-79 L26,-82 C16,-82 8,-78 6,-72 L30,-54 L64,-52 C72,-50 78,-40 82,-30 Z"/>');
     // light strip: the only colour on the body
@@ -366,80 +366,6 @@ function child(opts: { armTo?: [number, number]; step?: boolean; cover?: boolean
   return legs + bag + body + childArm(cover ? 'cover' : (armTo ?? 'down')) + head + cap;
 }
 
-/**
- * Boxes around a figure, in figure-local coordinates, for air.ts `avoid`: no
- * ring or dot is drawn inside them, so marks neither hide behind a body nor
- * sit on a face. `head` alone keeps faces and the yellow cap clean.
- */
-type LocalBox = { x: number; y: number; w: number; h: number };
-const FIGURE_BOXES: Record<string, { head: LocalBox[]; body: LocalBox[] }> = {
-  adult: { head: [{ x: -13, y: -166, w: 28, h: 28 }], body: [{ x: -14, y: -140, w: 30, h: 58 }, { x: -18, y: -84, w: 38, h: 82 }] },
-  child: { head: [{ x: -12, y: -112, w: 32, h: 26 }], body: [{ x: -19, y: -86, w: 32, h: 84 }] },
-  elder: { head: [{ x: -4, y: -154, w: 30, h: 30 }], body: [{ x: -13, y: -124, w: 43, h: 122 }] },
-  pushchair: { head: [{ x: 58, y: -84, w: 22, h: 20 }], body: [{ x: 40, y: -98, w: 58, h: 60 }, { x: 36, y: -20, w: 62, h: 20 }] },
-  scooter: { head: [{ x: 68, y: -162, w: 34, h: 34 }], body: [{ x: 0, y: -92, w: 180, h: 92 }, { x: 54, y: -130, w: 86, h: 40 }] },
-};
-const FIGURE_OF: Record<PersonKind, { parts: string[]; scale?: number }> = {
-  adult: { parts: ['adult'] },
-  'adult-walk': { parts: ['adult'] },
-  'adult-front': { parts: ['adult'] },
-  'adult-with-child': { parts: ['adult'] },
-  child: { parts: ['child'] },
-  schoolchild: { parts: ['child'], scale: 1.11 },
-  'schoolchild-step': { parts: ['child'], scale: 1.11 },
-  'schoolchild-walk': { parts: ['child'], scale: 1.11 },
-  'schoolchild-cover': { parts: ['child'], scale: 1.11 },
-  stroller: { parts: ['adult', 'pushchair'] },
-  'stroller-front': { parts: ['adult'] },
-  pushchair: { parts: ['pushchair'] },
-  elder: { parts: ['elder'] },
-  'elder-woman': { parts: ['elder'] },
-};
-
-/**
- * Keep-clear boxes for a figure placed at (x, y) in a scene, for air.ts `avoid`.
- * `kind` is a PersonKind or 'scooter' (a scooter with its rider). `what`:
- * 'head' (faces only), 'all' (the whole silhouette; the default).
- */
-export function figureBoxes(kind: PersonKind | 'scooter', x: number, y = 0, scale = 1, what: 'head' | 'all' = 'all'): LocalBox[] {
-  const def = kind === 'scooter' ? { parts: ['scooter'], scale: 1 } : FIGURE_OF[kind];
-  const k = scale * (def.scale ?? 1);
-  const out: LocalBox[] = [];
-  for (const part of def.parts) {
-    const b = FIGURE_BOXES[part];
-    for (const box of what === 'head' ? b.head : [...b.head, ...b.body]) out.push({ x: x + box.x * k, y: y + box.y * k, w: box.w * k, h: box.h * k });
-  }
-  return out;
-}
-
-/** A breathing-point marker: a ring around the mouth. Scene-local coordinates. */
-export function breath(x: number, y: number, r = 9): string {
-  return `<circle class="a-breath" cx="${n(x)}" cy="${n(y)}" r="${r}"/>`;
-}
-
-/* ------------------------------------------------------------------------ */
-/* Old air vocabulary — retired                                               */
-/*                                                                            */
-/* puffs() is the last of the old air vocabulary. New scenes draw air with   */
-/* ./air.ts and nothing else.                                                 */
-/* ------------------------------------------------------------------------ */
-
-
-
-
-/** Puffs leaving a tailpipe. Place at the pipe opening; they drift rearward (−x). */
-export function puffs(seed = 1): string {
-  const r = rng(seed);
-  const out: string[] = [];
-  for (let i = 0; i < 4; i++) {
-    const delay = (i * 0.9 + r() * 0.4).toFixed(2);
-    out.push(`<circle class="a-puff" cx="-6" cy="-2" r="${n(7 + r() * 3)}" style="animation-delay:-${delay}s"/>`);
-  }
-  // a resting curl so the still image (and reduced motion) still reads as exhaust
-  out.push('<path class="a-curl" d="M-4,-1 c-14,-2 -14,-16 -28,-13 s-12,-14 -30,-9"/>');
-  return out.join('');
-}
-
 /* ------------------------------------------------------------------------ */
 /* LED dot matrix — signals and countdowns                                    */
 /* ------------------------------------------------------------------------ */
@@ -553,10 +479,10 @@ export function ledDots(d: string, o: { pitch?: number; r?: number; cls?: string
 /* These drew the street before the site had an estimate: one hatched band    */
 /* that said where the exhaust was and declined to say how much. The site now */
 /* publishes a signed estimate (research/estimate/METHOD.md), so the picture  */
-/* DOES show an amount: one soft plume per row of scooters, with rings where */
-/* people stand by the estimate, darkest at the tailpipes. That rule lives in */
-/* ./air.ts. What still holds: nothing drawn changes with time through the    */
-/* red, and every function is deterministic.                                  */
+/* DOES show an amount: fume coming out of the scooters, as thick where the  */
+/* people stand as the estimate says, darkest at the tailpipes. That rule is */
+/* in ./air.ts. What still holds: nothing drawn changes with time through    */
+/* the red, and every function is deterministic.                             */
 /*                                                                            */
 /* The old hatched band and its rings and stipple were removed in phase 3.    */
 /* ------------------------------------------------------------------------ */
@@ -653,9 +579,9 @@ export type MaskChoice = (typeof MASK_CHOICES)[number];
 /**
  * Where things are on maskFace(), in its own units (the drawing is 130 wide
  * and 150 tall, about 2 mm to the unit; the face looks LEFT, toward the
- * tailpipe the marks come from).
+ * tailpipe the fume comes from).
  *   nose    where breath goes in
- *   front   the outside of the mask: marks arriving from the left meet it on this line
+ *   front   the outside of the mask: fume arriving from the left meets it on this line
  *   gaps    where an ordinary mask stands off the face (beside the nose, at the
  *           cheek, under the chin): particles slip in here. A fitted N95 has none.
  *   inside  a point between mask and face, where anything that got through ends up
@@ -728,11 +654,9 @@ export function maskOn(kind: MaskKind): string {
 /**
  * Where things are on bodyFigure(), in its own units (240 wide, 300 tall; the
  * centre line is x = 0 and the bottom edge of the chest is y = 0).
- *   pins    where the three numbered pins go (HTML, laid over the drawing)
- *   routes  paths a mark travels along, from the air outside to where it stops:
- *             ribbon  what you smell: stops at the nose and throat      (pin 1)
- *             dots    particles: down the windpipe, deep into a lung    (pin 2)
- *             rings   carbon monoxide: through a lung into the blood    (pin 3)
+ *   pins    where the three numbered pins go (HTML, laid over the drawing): the nose and
+ *           throat (the wisps you smell), the lungs (the soot of the particles), the
+ *           blood (the haze of carbon monoxide); BodyFigure draws the fume in each
  * It is a diagram, not anatomy: say so with the tag 示意圖・不是醫學圖.
  */
 /** The three numbered pins of the body figure. */
@@ -747,20 +671,13 @@ export const BODY = {
   ],
   heart: { x: 17, y: -48 },
   pins: { nose: { x: 34, y: -206 }, lungs: { x: -94, y: -74 }, blood: { x: 50, y: -12 } },
-  routes: {
-    ribbon: 'M118,-240 C96,-238 76,-237 58,-236 C34,-234 12,-228 4,-208',
-    dotsLeft: 'M118,-236 C96,-236 76,-236 58,-236 C30,-234 6,-228 2,-204 L0,-132 C-12,-120 -30,-112 -44,-92 C-52,-80 -56,-64 -56,-50',
-    dotsRight: 'M118,-244 C96,-240 76,-237 58,-236 C30,-234 6,-228 2,-204 L0,-132 C12,-120 30,-114 46,-104 C56,-96 62,-84 62,-70',
-    rings: 'M118,-232 C96,-234 76,-236 58,-236 C30,-234 6,-228 2,-204 L0,-132 C10,-122 24,-112 34,-96 C40,-84 32,-66 22,-58 C16,-52 16,-40 17,-26 L17,-2',
-  },
 } as const;
 
 /**
  * A neutral adult, head and chest, in the signal-figure style: the head in
  * profile looking right, the chest from the front. The airway, the lungs and
  * the heart are cut out. No cap, no hair, no clothes: nobody in particular.
- * Nothing in it fills up or changes colour; the scene moves marks along
- * BODY.routes and that is all.
+ * The fume is drawn over it by the scene (BodyFigure, the film's body card).
  */
 export function bodyFigure(): string {
   return [

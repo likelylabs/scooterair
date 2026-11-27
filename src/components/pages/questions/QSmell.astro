@@ -1,10 +1,12 @@
 ---
 /**
  * /questions/smell/ — 那個味道是什麼？ (brief 7.5)
- *   1  G2, the three kinds of mark, with the key under it. The answer is a ranking from odour
+ *   1  G2, one fume and three labels on it (what is in it). The answer is a ranking from odour
  *      thresholds: the site's own working, so it carries 推估 and never says more than
  *      "likeliest".
  *   2  The 聞得到／聞不到 strip: no smell does not mean none is there; benzene.
+ *   +  「聞起來那麼臭，一氧化碳超過指引值了嗎？」: the simulation's answer (statements 6, 7, 1 and
+ *      the pushchair exception), one <p> per line, so one more line can follow later.
  */
 import type { Locale } from '@/i18n';
 import { href } from '@/i18n';
@@ -13,9 +15,13 @@ import Screen from '@/components/ui/Screen.astro';
 import HowSheet from '@/components/ui/HowSheet.astro';
 import KindChip from '@/components/ui/KindChip.astro';
 import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
-import AirKey from '@/components/art/AirKey.astro';
 import SmellStrip from '@/components/art/SmellStrip.astro';
 import WorkingSum from '@/components/charts/WorkingSum.astro';
+import HowButton from '@/components/ui/HowButton.astro';
+import NextButton from '@/components/ui/NextButton.astro';
+import Phrased from '@/components/ui/Phrased.astro';
+import SimText from '@/components/pages/estimate/SimText.astro';
+import { simStamp } from '@/data/simulation';
 import questions from '@/i18n/pages/questions';
 import { filler } from './q';
 
@@ -28,11 +34,11 @@ const f = filler(locale);
 const t = questions.smell;
 const s1 = t.s1;
 const s2 = t.s2;
+const sim = questions.smellSim;
 ---
 
 <Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} body={f(s1.body[locale])} quiet={f(s1.quiet[locale])} illustration>
   <TailpipeMarks slot="picture" locale={locale} can={false} />
-  <AirKey slot="controls" locale={locale} tap />
   <KindChip slot="chips" locale={locale} kind="derived" />
   <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['scooter-exhaust-carbonyls', 'odour-thresholds']} primary={{ href: href('/evidence/#link-4', locale) }} secondary={{ href: href('/estimate/#answers', locale), label: how.fullMethod[locale] }}>
     <p slot="block1">{f(s1.sheet.b1[locale])}</p>
@@ -49,7 +55,7 @@ const s2 = t.s2;
   </HowSheet>
 </Screen>
 
-<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={f(s2.quiet[locale])} next={next}>
+<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={f(s2.quiet[locale])}>
   <SmellStrip slot="picture" locale={locale} class="q-plate" />
   <KindChip slot="chips" locale={locale} kind="official" where={chipWhere.international[locale]} fact={['co-odourless', 'iarc-benzene-group1', 'who-benzene-no-safe-level']} />
   <HowSheet slot="sheet" id="how-2" locale={locale} kind="official" where={chipWhere.international[locale]} facts={['co-odourless', 'iarc-benzene-group1', 'who-benzene-no-safe-level']} primary={{ href: href('/evidence/#link-4', locale) }}>
@@ -58,3 +64,89 @@ const s2 = t.s2;
     <p slot="block3">{f(s2.sheet.b3[locale])}</p>
   </HowSheet>
 </Screen>
+
+<section class="q-also" id="smell-co" aria-labelledby="smell-co-h">
+  <h2 class="q-also__q" id="smell-co-h"><Phrased text={sim.q[locale]} locale={locale} /></h2>
+  <div class="q-also__lines">
+    <p class="q-also__a q-also__gloss">{questions.myChild.pushchair.gloss[locale]}</p>
+    {sim.lines.map((l) => <SimText locale={locale} text={l[locale]} slots={{ range: 'sim.co.oneRed15' }} sheet="how-3" class="q-also__a" />)}
+  </div>
+  <p class="q-also__links">
+    <a href={href('/questions/my-child/#pushchair', locale)}>{sim.pushchairLink[locale]}</a>
+    <a href={href('/estimate/#simulation', locale)}>{sim.moreLink[locale]}</a>
+  </p>
+  <div class="q-also__foot">
+    <KindChip locale={locale} kind="estimate" />
+    <HowButton locale={locale} sheet="how-3" />
+  </div>
+  <HowSheet id="how-3" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} facts={['sim-smell-seconds', 'smell-not-co-guideline', 'sim-co-one-red-15min']}>
+    <p slot="block1">{sim.sheet.b1[locale]}</p>
+    <p slot="block2">{sim.sheet.b2[locale]}</p>
+    <p slot="block3">{sim.sheet.b3[locale]}</p>
+  </HowSheet>
+  <div class="q-also__go">
+    <NextButton href={next.href} variant={next.primary ? 'primary' : 'next'}>{next.label}</NextButton>
+  </div>
+</section>
+
+<style>
+  /* the second question on this page: a card in the same column as the screens above it (as on /questions/my-child/) */
+  .q-also {
+    display: grid;
+    gap: var(--sp-3);
+    inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
+    margin: var(--sp-5) auto 0;
+  }
+  .q-also__q {
+    margin: 0;
+    padding-block-start: var(--sp-5);
+    border-block-start: 1px solid var(--line);
+    font-family: var(--font-heading);
+    font-size: clamp(1.375rem, 6.9vw, var(--fs-headline));
+    font-weight: var(--fw-black);
+    line-height: var(--lh-headline);
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+  .q-also__lines {
+    display: grid;
+    gap: var(--sp-2);
+    max-inline-size: 40rem;
+  }
+  .q-also__lines :global(.q-also__a) {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: var(--lh-read);
+    color: var(--ink);
+  }
+  .q-also__lines :global(.q-also__gloss) {
+    color: var(--ink-2);
+  }
+  .q-also__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    font-weight: var(--fw-bold);
+  }
+  .q-also__links a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap);
+  }
+  .q-also__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tap-gap) var(--sp-3);
+    max-inline-size: 40rem;
+  }
+  .q-also__go {
+    max-inline-size: 40rem;
+    margin-block-start: var(--sp-2);
+  }
+</style>

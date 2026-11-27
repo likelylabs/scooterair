@@ -19,7 +19,8 @@ import KindChip from '@/components/ui/KindChip.astro';
 import EstimateValue from '@/components/ui/EstimateValue.astro';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { kSentences, site } from '@/i18n/ui';
-import { checkHeadline, checkSentence, est, estimateText, farBelowWho, formatEstimate, formatReference, scenarioKeys } from '@/data/estimate';
+import { checkHeadline, checkSentence, est, estimateText, formatEstimate, formatReference, scenarioKeys } from '@/data/estimate';
+import { simBelowWho, simChipWhere, simRange } from '@/data/simulation';
 import act from '@/i18n/pages/act';
 import { fill, localize } from '@/i18n/pages/_copy';
 import { verified } from '@/components/pages/home/home-figures';
@@ -28,6 +29,7 @@ export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(act, locale);
 const b = t.brief;
+const [simA, simB] = b.simLine.split('{range}');
 const sp = locale === 'en' ? ' ' : ''; // between two sentences
 const estimatePage = absUrl(href('/estimate/', locale), Astro.site);
 const shortUrl = estimatePage.replace(/^https?:\/\//, '');
@@ -67,8 +69,9 @@ const pollutants = [
         </section>
 
         <section class="blk">
-          <h2 class="blk__h">{checkHeadline(locale)}</h2>
-          <p class="blk__p">{fill(b.checkLead, { sites: est.meas.iot.sites.value })}{sp}{checkSentence(locale)}{farBelowWho() && <Fragment>{sp}{estimateText.whoCoOnly[locale]}</Fragment>}{sp}{estimateText.coMarksBenzene[locale]}{verified('who-benzene-no-safe-level') && <Fragment>{sp}{estimateText.benzeneWho[locale]}</Fragment>}</p>
+          <h2 class="blk__h">{checkHeadline(locale, simBelowWho())}</h2>
+          <div class="blk__p"><KindChip locale={locale} kind="estimate" where={simChipWhere[locale]} size="sm" />{sp}{simA}<EstimateValue locale={locale} slotId="sim.co.oneRed15" value={simRange('sim.co.oneRed15')} anchor="simulation" />{simB}</div>
+          <p class="blk__p">{fill(b.checkLead, { sites: est.meas.iot.sites.value })}{sp}{checkSentence(locale)}{sp}{estimateText.checkIsEstimate[locale]}{sp}{estimateText.whoCoOnly[locale]}{sp}{estimateText.coMarksBenzene[locale]}{verified('who-benzene-no-safe-level') && <Fragment>{sp}{estimateText.benzeneWho[locale]}</Fragment>}</p>
           <CheckChart locale={locale} />
         </section>
       </div>
@@ -412,10 +415,10 @@ const pollutants = [
       font-size: 68%;
     }
     .pic {
-      --fit-h: 58mm;
+      --fit-h: 50mm;
     }
     .sheet:lang(en) .pic {
-      --fit-h: 50mm;
+      --fit-h: 40mm;
     }
     [data-fit] :global(.scene) {
       inline-size: min(100%, calc(var(--fit-h) * var(--ar, 1.3)));

@@ -27,6 +27,7 @@ advance in `PLAN.md`; every change since is in its section 9. Install steps: `cf
 | `make_figures.py BASE WORST [IDs]` | the three summary figures in `figures/` (CO vs time; vs distance and height; next to reference values) |
 | `results-matrix.json` | matrix results (was `results-simulation.json`): per case K headline (P5/P50/P95 over 1,000 emission draws), B / I / AR sets, highest single probe, A1/A6/A8 |
 | `results-simulation.json` | final numbers only (signed report) |
+| `site-extract.json` | what the website uses: the statements' ranges read out of `statements.json`, the numbers behind each chart (with their results index) and the two one-second series of chart (a), rounded to 0.1. Written by `scripts/build-simulation-data.mjs` (repository root) together with `src/data/simulation-data.ts`; check-data re-runs it |
 | `METHOD.md`, `ANSWER.md` | signed method and the one-page answer for the site's owner |
 | `figures/` | summary figures and each case's plume slices and 1-s K series |
 | `results/<id>/` | kept statistics, pictures, series and wall time per run (`*-try3`: the earlier build-proof runs) |
@@ -41,3 +42,20 @@ precomputed as mapped boundary data (OpenFOAM refuses coded boundary conditions 
 S5-12 and the S4 re-weighting. Grid sensitivity is the S1-try3 (fast) versus G0-try3 (coarse) matched-window look.
 
 Signed-report step (PLAN §9 item 24): verification corrections, S5-12b (arcade with a 60.8 m domain top), NF1-fine / NF1-coarse / NF1-coarse-0kW near-field checks; see `METHOD.md`.
+
+## Smell chemicals (what is in the air when the fumes can be smelled)
+
+`smell-chemicals/` answers the owner's question "when you can smell it, what harmful chemicals are in it, and how
+much?". It uses no new flow run. The signed unit exhaust tracers are multiplied by each chemical's measured share of
+the exhaust (`speciation.json`). The work was planned in advance (`PLAN-SMELL.md`), checked by three sceptics
+(`verify-sources.md`, `verify-arithmetic/`, `verify-fairness.md`) and corrected (`corrections.md`).
+
+| file | role |
+|---|---|
+| `ANSWER-SMELL.md` | one-page answer for the site's owner |
+| `statements-smell.json` | statements the site may make (zh-TW, English, basis, what each must carry) and must not make |
+| `METHOD-SMELL.md` | method, checks, limits, changes after the plan |
+| `smell_chemicals.py RUN_DIR` | the computation (reads the raw cases read-only; needs the unpacked `results/*/stats.json`) |
+| `results-smell.json`, `results-smell.txt` | every number, with low / central / high, case, probe, number of draws, confidence |
+| `speciation.json` | chemical shares of THC (HCN: of CO) with sources, flags and what was not estimated |
+| `sources-*.json` | the three researchers' opened sources; new ids are also appended to `sources.json` |

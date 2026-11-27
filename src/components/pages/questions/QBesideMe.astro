@@ -16,7 +16,6 @@ import EstimateValue from '@/components/ui/EstimateValue.astro';
 import ScenarioSwitch from '@/components/ui/ScenarioSwitch.astro';
 import ApproachPlan from '@/components/art/ApproachPlan.astro';
 import KerbScene from '@/components/art/KerbScene.astro';
-import AirRange from '@/components/art/AirRange.astro';
 import WorkingSum from '@/components/charts/WorkingSum.astro';
 import { workingKerbFlow } from '@/components/charts/core/workingSum';
 import { est, estimateText, formatReference, kerbSentence, scenarioKeys } from '@/data/estimate';
@@ -55,7 +54,7 @@ const gap = locale === 'en' ? ' ' : '';
       <span class="q-box__val"><b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} where="" size="sm" /></span>
     </div>
     <div class="q-box__row q-box__row--est">
-      {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-2" class="est--ring" data-when-scenario={s} data-say />)}
+      {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-2" data-when-scenario={s} data-say />)}
     </div>
     <p class="q-box__gloss">{estimateText.ppmGloss[locale]}</p>
   </div>
@@ -72,10 +71,7 @@ const gap = locale === 'en' ? ' ' : '';
       </p>
     </Fragment>
     <Fragment slot="block2">{scenarioKeys.map((s) => <div data-when-scenario={s}><WorkingSum {...workingKerbFlow(locale, s)} /></div>)}</Fragment>
-    <Fragment slot="block3">
-      <p>{est.meta.appliesTo[locale]}</p>
-      {scenarioKeys.map((s) => <div data-when-scenario={s}><AirRange locale={locale} scenario={s} /></div>)}
-    </Fragment>
+    <p slot="block3">{est.meta.appliesTo[locale]}</p>
   </HowSheet>
 </Screen>
 

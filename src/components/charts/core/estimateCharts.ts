@@ -215,8 +215,8 @@ export function bandsModel(pollutant: Pollutant, locale: Loc, opts: { zhuyin?: b
   if (pollutant === 'co') {
     const bg = est.bg.co.traffic;
     rows.push({ id: 'street', group: 'compare', kind: bg.kind, label: street, sub: fill(T.streetSub.co, locale, { year: yearOf(bg.factId) }), value: one(bg.shown), mark: 'dot', at: [bg.value], factId: bg.factId });
-    const who = est.who.co15min_ppm;
-    rows.push({ id: 'who', group: 'compare', kind: who.kind, label: T.who[locale], sub: T.whoSub[locale], value: one(who.value), mark: 'square', at: [who.exact], factId: who.factId });
+    // no WHO 15-minute row: these are 90-second bands, and a 90-second value is never set beside
+    // the 15-minute guideline without conversion (research/simulation/statements.json must-not 3)
     const rise = est.xcheck.iot.observed;
     rows.push({
       id: 'measured-rise',
@@ -273,7 +273,6 @@ export function bandsModel(pollutant: Pollutant, locale: Loc, opts: { zhuyin?: b
       .map((r) => fill(T.sum, locale, { pollutant: name, scenario: r.label, v: r.value })),
     ...rows.filter((r) => r.id === 'measured-rise').map((r) => fill(T.sumRise, locale, { v: r.value })),
     ...rows.filter((r) => r.id === 'street').map((r) => fill(T.sumStreet, locale, { v: r.value })),
-    ...rows.filter((r) => r.id === 'who').map((r) => fill(T.sumWho, locale, { v: r.value })),
   ].join(sp);
 
   const table: ChartTable = {

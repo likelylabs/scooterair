@@ -13,7 +13,7 @@
  *   scenario   for 'kerb': 'few' | 'dozen' | 'full' (default 'dozen')
  *   tag        print the illustration tag over the picture (default true)
  *   labels     print the words in the picture (default true)
- *   legend     print the small key under the picture (default true; the share cards pass false)
+ *   legend     print the label on the fume (default true; the share cards pass false)
  *   class, id  passed to the figure
  *
  *   <Picture locale={locale} kind="kerb" scenario="dozen" />
@@ -22,7 +22,7 @@ import type { Locale } from '@/i18n';
 import SceneFrame from '@/components/art/SceneFrame.astro';
 import SceneLabel from '@/components/art/SceneLabel.astro';
 import { sceneAlt } from '@/components/art/scene';
-import { AIR_KEY, type AirScenario } from '@/components/art/air';
+import type { AirScenario } from '@/components/art/air';
 import { STROLLER_BAND } from '@/components/art/parts';
 import { est } from '@/data/estimate';
 import act from '@/i18n/pages/act';
@@ -64,7 +64,7 @@ const p = d.points;
   ) : useC && kind === 'heights' ? (
     <HeightsScene locale={locale} legend={legend} tag={tag ? 'street' : false} class={cls} id={id} />
   ) : (
-    <SceneFrame locale={locale} box={d.box} alt={alt} legend={legend && (kind === 'kerb-electric' ? ['car', 'tyre'] : AIR_KEY)} tag={tag ? 'street' : false} scenario={kind === 'kerb' ? scenario : undefined} class:list={['jpic', `jpic--${kind}`, cls]} id={id}>
+    <SceneFrame locale={locale} box={d.box} alt={alt} tag={tag ? 'street' : false} scenario={kind === 'kerb' ? scenario : undefined} class:list={['jpic', `jpic--${kind}`, cls]} id={id}>
       <Fragment set:html={d.svg} />
       {labels && kind === 'kerb' && (
         <SceneLabel slot="labels" box={d.box} x={p.rider.x} y={p.rider.y} anchor="center bottom" plate>

@@ -1,7 +1,7 @@
-// The helpers the scenes are built from: single marks, per-tailpipe layering, scenario steps.
+// The helpers the scenes are built from: single wisps, per-tailpipe layering, scenario steps.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AIR, air, airDot, airRibbon, airRing, airTyreDust, airWave, airWisp } from '../air.ts';
+import { AIR, air, airRibbon, airWave, airWisp } from '../air.ts';
 import { TAILPIPE } from '../parts.ts';
 import { indexSources, pedSignal, pickSources, placed, shopfronts, stepSources, tailOf, withoutSources, type Placed } from '../kit.ts';
 import { PLAN3, planView } from '../plan-view.ts';
@@ -14,20 +14,16 @@ const pack: Placed[] = [
 ];
 const a = air({ frame, id: 't', tailpipes: pack.map(tailOf) });
 
-test('single marks are drawn at the sizes of the rule', () => {
-  assert.match(airRing(10, 10, 1), /class="air-ring"/);
-  assert.match(airDot(10, 10, 2, { cls: 'x' }), /class="air-dot x"/);
+test('single wisps are drawn at the width of the rule', () => {
   const rib = airRibbon(airWave(0, 0, 60, 1, 1), 1);
   assert.match(rib, new RegExp(`stroke-width="${AIR.ribbon.stroke}"`));
+  assert.match(rib, /class="air-rib"/);
   assert.ok(airWisp(0, 0, 100, -40, 1).startsWith('M0,0'));
-  // three grey dots behind an electric tyre, the same every time
-  assert.equal(airTyreDust({ x: 0, y: 0 }, 1, 3), airTyreDust({ x: 0, y: 0 }, 1, 3));
-  assert.equal((airTyreDust({ x: 0, y: 0 }, 1).match(/Z/g) ?? []).length, AIR.tyreDots);
 });
 
-test('a tailpipe can be told to keep no cluster of its own', () => {
-  const bare = air({ frame, id: 't', noStreetAir: true, tailpipes: [{ x: 100, y: -33, rings: 0, dots: 0, ribbons: 0 }] });
-  assert.doesNotMatch(bare.marks, /air-ring|air-dot|air-rib/);
+test('a tailpipe can be told to keep no wisps of its own: its puff stays', () => {
+  const bare = air({ frame, id: 't', tailpipes: [{ x: 100, y: -33, ribbons: 0 }] });
+  assert.doesNotMatch(bare.marks, /air-rib/);
   assert.equal(bare.counts.cores, 1);
 });
 
@@ -42,10 +38,10 @@ test('pickSources and withoutSources split air() by tailpipe, losing nothing', (
   const clusters = pack.map((_, i) => pickSources(a.marks, (k) => k === i));
   assert.ok(clusters.every((c) => c.startsWith('<g class="air-src"')));
   assert.doesNotMatch(withoutSources(a.marks), /air-src"/);
-  // whatever is not a tailpipe's own stays: here the street's own rings (drawn only when asked, as the counting patch does)
-  const withStreet = air({ frame, id: 't', streetAir: true, tailpipes: pack.map(tailOf) });
-  assert.doesNotMatch(withoutSources(withStreet.marks), /air-src"/);
-  assert.match(withoutSources(withStreet.marks), /air-a/);
+  // whatever is not a tailpipe's own stays: here the wisps that reach the people
+  const withKerb = air({ frame, id: 't', kerb: { x0: 0, x1: 150, sourceX: 160 }, extra: { few: 1, dozen: 3, full: 6 }, tailpipes: pack.map(tailOf) });
+  assert.doesNotMatch(withoutSources(withKerb.marks), /air-src"/);
+  assert.match(withoutSources(withKerb.marks), /air-kerb/);
 });
 
 test('stepSources ties far rows to the scenario switch; indexSources numbers every tailpipe', () => {
