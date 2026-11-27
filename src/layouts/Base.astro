@@ -9,7 +9,7 @@ import { absUrl } from '../lib/abs-url.ts';
  *   description  meta description (falls back to the site description)
  *   share        id of a generated share card (V44): 'home' (default), 'brief', or a
  *                question slug ('smell', 'my-child', …). See src/lib/share-cards.ts.
- *                Sets og:image (1200 × 630), a square second image for LINE, and the
+ *                Sets ONE og:image (1200 × 630; a second image makes iMessage show a split collage) and the
  *                image alt text — the card carries its caveat inside the picture.
  *   ogImage      path under /public for a hand-made share image (overrides `share`)
  *   noindex      true for utility pages such as the styleguide
@@ -82,7 +82,6 @@ const fullTitle = home ? `${siteName} — ${site.tagline[locale]}` : `${title} �
 const abs = (p: string) => absUrl(p, Astro.site);
 const canonical = abs(Astro.url.pathname);
 const image = abs(asset(ogImage ?? card.wide));
-const square = ogImage ? null : abs(asset(card.square));
 const ogLocale = { 'zh-TW': 'zh_TW', en: 'en_US' } as const;
 const other: Locale = locale === 'en' ? 'zh-TW' : 'en';
 // Structured data: a WebSite node on the two home pages, so search shows the site's name
@@ -158,14 +157,6 @@ const ld = home
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     {!ogImage && <meta property="og:image:alt" content={card.alt} />}
-    {square && (
-      <Fragment>
-        <meta property="og:image" content={square} />
-        <meta property="og:image:width" content="1080" />
-        <meta property="og:image:height" content="1080" />
-        <meta property="og:image:alt" content={card.alt} />
-      </Fragment>
-    )}
     <meta property="og:locale" content={ogLocale[locale]} />
     <meta property="og:locale:alternate" content={ogLocale[other]} />
     <meta name="twitter:card" content="summary_large_image" />
