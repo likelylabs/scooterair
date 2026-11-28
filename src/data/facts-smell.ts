@@ -22,7 +22,7 @@ import { simData } from './simulation-data.ts';
 const C = simData.smellChemicals;
 const R = (id: string) => `simulation/smell-chemicals/statements-smell#${id}`;
 const PERIOD = t('電腦算的一個紅燈，2026 年 11 月簽核（推估）', 'One simulated red light, signed November 2026 (estimate)');
-const KERB = t('一般的街上，路邊離最近的機車半公尺、約 0.7 公尺高（小孩鼻子的高度）', 'An ordinary street, at the kerb half a metre from the nearest scooter, about 0.7 m up (a child’s nose height)');
+const KERB = t('一般的街上，路邊離最近的機車半公尺、約 0.7 公尺高（小孩和嬰兒車的高度）', 'An ordinary street, at the kerb half a metre from the nearest scooter, about 0.7 m up (child and pushchair height)');
 const NOT_PLACE = t('不限地區（危害分類）', 'Not place-specific (hazard classification)');
 const OLDER = t(
   '每一種成分占多少，來自台灣、印度、尼泊爾的舊型機車（化油器或沒有觸媒），有兩種只有汽車的資料；新型、噴射、有觸媒的機車可能不一樣。',
@@ -176,7 +176,7 @@ export const smellChemicals = {
       rangeHiWords: v(C.just.wordsRangeHi, 'ppb'),
       draws: v(C.just.n, 'count'),
     },
-    display: t(`剛好聞得到時，苯約 ${C.just.wordsLo} 到 ${C.just.wordsHi} ppb（最低約 ${C.just.wordsRangeLo}，最高約 ${C.just.wordsRangeHi}）`, `When it is just noticeable, benzene is about ${C.just.wordsLo} to ${C.just.wordsHi} ppb (lowest about ${C.just.wordsRangeLo}, highest about ${C.just.wordsRangeHi})`),
+    display: t(`剛好聞得到時，苯約 ${C.just.wordsLo} 到 ${C.just.wordsHi} ppb（範圍約 ${C.just.wordsRangeLo} 到 ${C.just.wordsRangeHi}）`, `When it is just noticeable, benzene is about ${C.just.wordsLo} to ${C.just.wordsHi} ppb (range about ${C.just.wordsRangeLo} to ${C.just.wordsRangeHi})`),
     statement: t(
       '剛好聞得到廢氣味的時候，空氣裡的苯大約十億分之幾到十幾（推估，兩個嗅覺研究的常見值；數字和範圍見「怎麼算的」那一頁）。',
       'At the moment the exhaust is just noticeable, benzene is a few to about fifteen parts per billion (estimate; the typical values of two smell tests; the numbers and ranges are on the ‘How we worked it out’ page).',
@@ -209,8 +209,8 @@ export const smellChemicals = {
     },
     display: t(`風從機車吹來、聞得到的那幾秒：苯大約 ${C.seconds.wordsAbout} ppb（約 ${C.seconds.wordsRangeLo} 到 ${C.seconds.wordsRangeHi}）`, `Wind from the scooters, the seconds you can smell it: benzene about ${C.seconds.wordsAbout} ppb (about ${C.seconds.wordsRangeLo} to ${C.seconds.wordsRangeHi})`),
     statement: t(
-      '風從機車群吹過來的時候，在離最近一台機車半公尺、小孩鼻子的高度（約 0.7 公尺），聞得到的那幾秒裡，苯平均大約十億分之三十（範圍見「怎麼算的」那一頁）。',
-      'With the wind blowing from the scooters, half a metre from the nearest one at a child’s nose height (about 0.7 m), benzene averages about thirty parts per billion over the seconds you can smell it (its range is on the ‘How we worked it out’ page).',
+      '風從機車群吹過來的時候，在離最近一台機車半公尺、小孩和嬰兒車的高度（約 0.7 公尺），聞得到的那幾秒裡，苯平均大約十億分之三十（範圍見「怎麼算的」那一頁）。',
+      'With the wind blowing from the scooters, half a metre from the nearest one at child and pushchair height (about 0.7 m), benzene averages about thirty parts per billion over the seconds you can smell it (its range is on the ‘How we worked it out’ page).',
     ),
     period: PERIOD,
     place: KERB,
@@ -293,8 +293,8 @@ export const smellChemicals = {
     evidence: 'international',
     readerKind: 'official',
     caveat: t(
-      '這些數值是為別的目的訂的（工作八小時、意外外洩、一輩子），拿來比路邊的量會誤導。',
-      'These values were set for other purposes (an eight-hour working day, accidental releases, a lifetime); setting them against kerbside levels would mislead.',
+      '其他種類的標準（工作八小時、意外外洩、一輩子）是為別的目的訂的，拿來比路邊的量會誤導。',
+      'Other kinds of limit (for an eight-hour working day, for accidental releases, for a lifetime) were set for other purposes; setting them against kerbside levels would mislead.',
     ),
     requiresCaveat: true,
     chainLink: null,

@@ -52,6 +52,9 @@ const tokens = {
   y2: 'target2040'.slice('target'.length),
   t2: pct(D('netzero-ev-sales-targets', 'target2040')),
   near: sim.co.nearTailpipeAbout,
+  h: sim.benzene.referenceBasis_h,
+  lo: sim.benzene.emissionUncertain.lo,
+  hi: sim.benzene.emissionUncertain.hi,
 };
 const log = corrections
   .map((c) => {
@@ -175,7 +178,7 @@ const days = [...new Set(log.map((e) => e.date))].map((date) => ({ date, items: 
                 </div>
                 <div class="log__row log__now">
                   <span class="log__label">{t.corrections.now}</span>
-                  {e.now.includes('{range}') ? <SimText locale={locale} text={e.now} slots={{ range: 'sim.co.oneRed15' }} /> : <p>{e.now}</p>}
+                  {/\{(range|times)\}/.test(e.now) ? <SimText locale={locale} text={e.now} slots={{ range: 'sim.co.oneRed15', times: 'sim.benzene.stay1hTimes' }} /> : <p>{e.now}</p>}
                 </div>
                 <Details summary={t.corrections.basis}>
                   <div class="log__why">

@@ -1,0 +1,83 @@
+---
+/**
+ * SmellBenzeneBox — the one-row number box under home screen 4's headline (also /questions/beside-me/
+ * and /questions/app/ #more): how much benzene there is when the exhaust is just noticeable
+ * (statements-smell how-much-just-smellable). A seconds-long level only: no 30-minute, 1-hour or
+ * yearly value and no reference level beside it, anywhere on the same screen (must-not 3).
+ *
+ *   剛好聞得到的時候
+ *   苯 約 2 到 15 ppb [推估] →
+ *   範圍約 0.4 到 60
+ *   ppb＝十億份空氣裡有幾份・機車另外加進來的量
+ *
+ * The figure is an EstimateValue of sim.smell.benzeneJust (約, both ends, 推估, a link to
+ * /estimate/#smell); the full range's ends are simSmell.just.wordsRangeLo / wordsRangeHi.
+ *
+ * Props
+ *   locale  Locale
+ *   sheet   the HowSheet the figure opens ('how-4')
+ */
+import type { Locale } from '@/i18n';
+import EstimateValue from '@/components/ui/EstimateValue.astro';
+import { chartText } from '@/components/charts/strings';
+import { simRange, simSmellShares } from '@/data/simulation';
+import home from '@/i18n/pages/home';
+import { fill } from '@/i18n/pages/_copy';
+
+interface Props {
+  locale: Locale;
+  sheet?: string;
+}
+const { locale, sheet } = Astro.props;
+const v = simSmellShares(locale);
+const benzene = locale === 'en' ? 'Benzene' : '苯';
+---
+
+<div class="sbx">
+  <p class="sbx__label">{chartText.sim.smellBenzene.just[locale]}</p>
+  <EstimateValue locale={locale} slotId="sim.smell.benzeneJust" value={simRange('sim.smell.benzeneJust')} label={benzene} anchor="smell" sheet={sheet} class="sbx__val" />
+  <p class="sbx__note"><span class="sbx__range">{fill(home.s4.justSub[locale], { lo: v.lo, hi: v.hi })}</span>{locale === 'en' ? '\u00a0· ' : '・'}<span>{home.s4.gloss[locale]}</span></p>
+</div>
+
+<style>
+  .sbx {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.4rem var(--sp-3) 0.45rem;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-3);
+    background: var(--surface);
+  }
+  .sbx p {
+    margin: 0;
+  }
+  /* the box's own words are a label and a note (14 to 15 px), as on a chart: the screen's body
+     sentences are under the box */
+  .sbx__label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  /* 苯 and its figure on one line: the gas named in full ink beside its amount */
+  .sbx :global(.sbx__val) {
+    justify-self: start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.5em;
+  }
+  .sbx :global(.sbx__val .est__label) {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    color: var(--ink);
+  }
+  .sbx__note {
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .sbx__range {
+    color: var(--ink);
+  }
+</style>

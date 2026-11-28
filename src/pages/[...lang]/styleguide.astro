@@ -22,7 +22,7 @@ import Range from '@/components/ui/Range.astro';
 import KerbScene from '@/components/art/KerbScene.astro';
 import MeasuredVsEstimate from '@/components/charts/MeasuredVsEstimate.astro';
 import WorkingSum from '@/components/charts/WorkingSum.astro';
-import { workingKerbFlow, workingPerRedCan } from '@/components/charts/core/workingSum';
+import { workingKerbFlow, workingPerRed } from '@/components/charts/core/workingSum';
 
 export const getStaticPaths = () => (import.meta.env.PROD ? [] : localeStaticPaths());
 const locale = localeFromParam(Astro.params.lang);
@@ -54,7 +54,7 @@ const kinds = ['measured', 'estimate', 'official', 'study', 'derived'] as const;
     <ul>{Object.entries(kSentences).map(([id, s]) => <li><b>{id}</b> {s[locale]}</li>)}</ul>
 
     <h2>{L('算法圖', 'The working, drawn')}</h2>
-    <WorkingSum {...workingPerRedCan(locale)} />
+    <WorkingSum {...workingPerRed(locale)} />
     <WorkingSum {...workingKerbFlow(locale)} />
 
     <h2>{L('量到的，和算的', 'Measured beside estimated')}</h2>

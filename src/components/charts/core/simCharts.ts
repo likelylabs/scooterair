@@ -201,7 +201,15 @@ export interface SimAboveModel {
   table: ChartTable;
 }
 
-export function simAboveModel(locale: Loc): SimAboveModel {
+/** The height of a benzene row's probe, from its `at` ('kerb 0.5 m, 0.7 m' → 0.7). */
+export function aboveHeight(at: string): number {
+  const m = /,\s*([\d.]+)\s*m\s*$/.exec(at);
+  if (!m) throw new Error(`simAboveModel: no height in "${at}"`);
+  return Number(m[1]);
+}
+
+/** `only` keeps one of the two charts in the table (home screen 5's sheet shows the benzene chart alone). */
+export function simAboveModel(locale: Loc, only?: 'smell' | 'benzene'): SimAboveModel {
   const T = chartText.sim.above;
   const pct = (x: number) => Math.round(x * 100);
   const range = (lo: number, hi: number, unit: string) => (locale === 'en' ? `about ${num(lo, locale)} to ${num(hi, locale)}${unit === '%' ? '' : ' '}${unit}` : `約 ${num(lo, locale)} 到 ${num(hi, locale)}${unit === '%' ? '' : ' '}${unit}`);
@@ -212,8 +220,8 @@ export function simAboveModel(locale: Loc): SimAboveModel {
   ];
   const [bKerb, bBack] = simAbove.benzene;
   const benzeneRows: SimBandRow[] = [
-    { label: T.benzeneKerb[locale], sub: T.benzeneSub[locale], lo: bKerb.lo, hi: bKerb.hi, value: range(bKerb.lo, bKerb.hi, 'ppb') },
-    { label: T.benzeneBack[locale], sub: T.benzeneSub[locale], lo: bBack.lo, hi: bBack.hi, value: range(bBack.lo, bBack.hi, 'ppb') },
+    { label: fill(T.benzeneKerb, locale, { h: num(aboveHeight(bKerb.at), locale) }), sub: T.benzeneSub[locale], lo: bKerb.lo, hi: bKerb.hi, value: range(bKerb.lo, bKerb.hi, 'ppb') },
+    { label: fill(T.benzeneBack, locale, { h: num(aboveHeight(bBack.at), locale) }), sub: T.benzeneSub[locale], lo: bBack.lo, hi: bBack.hi, value: range(bBack.lo, bBack.hi, 'ppb') },
   ];
   const ref = sim.benzene.reference_ppb;
   const refLabel = fill(T.benzeneRef, locale, { ref: `${num(ref, locale)} ppb`, h: sim.benzene.referenceBasis_h });
@@ -234,9 +242,9 @@ export function simAboveModel(locale: Loc): SimAboveModel {
       caption: T.tableStat[locale],
       head: T.tableHead.map((h) => h[locale]),
       rows: [
-        ...smellRows.map((r) => [paren(r.label, r.sub, locale), paren(r.value, est, locale)]),
-        ...benzeneRows.map((r) => [paren(r.label, r.sub, locale), paren(r.value, est, locale)]),
-        [refLabel, locale === 'en' ? 'Official' : '官方'],
+        ...(only === 'benzene' ? [] : smellRows.map((r) => [paren(r.label, r.sub, locale), paren(r.value, est, locale)])),
+        ...(only === 'smell' ? [] : benzeneRows.map((r) => [paren(r.label, r.sub, locale), paren(r.value, est, locale)])),
+        ...(only === 'smell' ? [] : [[refLabel, locale === 'en' ? 'Official' : '官方']]),
       ],
     },
   };

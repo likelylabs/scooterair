@@ -11,8 +11,8 @@
 // money sentences are `open.*` in ./electric.ts, so the home page and /electric/ say the same.
 //
 // Every number is a {token} filled at build time from the estimate, the registry or the
-// calculator. The few figures that are written out are names, not values: 「15 分鐘指引值」,
-// 「125cc」, 「N95」, 「PM2.5」, and the day-words of screen 7, which the page checks
+// calculator. The few figures that are written out are names, not values: 「1967 和 1970 年」,
+// 「1 小時參考值」, 「125cc」, 「N95」, 「PM2.5」, and the day-words of screen 7, which the page checks
 // against time.hoursPerYear at build time and refuses to print if the arithmetic moves.
 
 import { copy } from './_copy.ts';
@@ -73,25 +73,29 @@ export default copy({
     headline: { 'zh-TW': '聞到的不是苯，|但苯跟著一起來', en: 'What you smell is not benzene, |but benzene comes with it' },
     /** One idea per line (printed as separate lines, so one more line can follow without a rewrite). */
     body: [
-      /** what-is-in-it, short form: the "if", 推估, the first names in the signed statement's own order, benzene glossed once in plain words. The line links to /questions/smell/ (the full answer, with what the IARC groups mean). */
-      { 'zh-TW': '推估：如果你聞到的是身旁機車的廢氣，裡面也有苯（ㄅㄣˇ，廢氣的一種）、甲醛等十幾種成分。', en: 'Estimate: if what you smell is the exhaust of the scooters beside you, that air also holds benzene (a gas in exhaust), formaldehyde and about ten other exhaust chemicals.' },
-      /** no-smell-not-clean (its carbon monoxide and particle halves are the picture's labels). */
+      /** what-is-in-it, short form: the "if", 推估, the first names in the signed statement's own order, with zhuyin for 苯 and 醛. The line links to /questions/smell/ (the full answer, with what the IARC groups mean). */
+      { 'zh-TW': '推估：如果你聞到的是身旁機車的廢氣，裡面也有苯（ㄅㄣˇ）、甲醛（ㄑㄩㄢˊ）等十幾種廢氣成分。', en: 'Estimate: if what you smell is the exhaust of the scooters beside you, that air also holds benzene, formaldehyde and about ten other exhaust chemicals.' },
+      /** no-smell-not-clean (its benzene and particle halves are the picture's labels). */
       { 'zh-TW': '聞不到，不代表空氣乾淨。', en: 'No smell does not mean clean air.' },
     ],
     /** alwaysCarry plus[2]: the shares come from older engines. */
     quiet: { 'zh-TW': '這些成分各占多少，是量舊型機車得來的；新型機車可能不一樣。', en: 'The shares come from tests of older scooters; newer ones may differ.' },
-    /** Beside the drawn can; the range and the 推估 chip follow it. */
-    canLabel: { 'zh-TW': '一輛機車等一個紅燈，排出的一氧化碳', en: 'Carbon monoxide from one scooter through one red light' },
     sheet: {
-      title: { 'zh-TW': '一個鋁罐的一氧化碳，|和那個味道', en: 'A drinks can of carbon monoxide, |and that smell' },
+      title: { 'zh-TW': '那個味道，|和跟著它來的', en: 'That smell, |and what comes with it' },
+      /** alwaysCarry plus[2], with the detail table's car-only rows (acrolein, naphthalene). */
       measured: {
-        'zh-TW': '環境部的機車定檢，一年大約 {readings} 萬筆一氧化碳讀數。廢氣裡有哪些成分、各占多少，用的是台灣、印度、尼泊爾量的舊型機車（化油器或沒有觸媒）；新型機車可能不一樣。',
-        en: 'Taiwan’s scooter inspections: about {readings} million carbon monoxide readings a year. Which chemicals the exhaust holds, and how much of each, comes from older scooters measured in Taiwan, India and Nepal (carburetted or without a catalyst); newer scooters may differ.',
+        'zh-TW': '每一種成分占多少，來自台灣、印度、尼泊爾的舊型機車（化油器或沒有觸媒），有兩種只有汽車的資料；新型、噴射、有觸媒的機車可能不一樣。',
+        en: 'The share of each chemical comes from older scooters in Taiwan, India and Nepal (carburetted or without a catalyst), and for two of them only from cars; newer, fuel-injected scooters with a catalyst may differ.',
       },
       /** statements-smell not-unburnt-petrol and the basis of smell-comes-with-benzene. No cancer word here (must-not 1). */
       smell: {
         'zh-TW': '推估：聞到的不是苯。苯要百萬分之幾才聞得到，路邊的苯遠遠不到那麼濃。那個刺鼻的味道，有一部分比較可能來自燃燒時產生的醛（ㄑㄩㄢˊ）類，不是沒燒完的汽油；這只能粗略估計，可能差到十倍左右。味道和苯是從同一團廢氣出來的，所以只要那個味道來自身旁的機車，苯就在同一口空氣裡。',
         en: 'Estimate: what you smell is not benzene. Benzene can only be smelled at parts per million, and at the kerb it is nowhere near that. Part of the sharp smell more likely comes from aldehydes formed by burning, not from unburnt petrol; this is only a rough estimate, within about ten times. The smell and the benzene come out of the same exhaust, so whenever the smell comes from the scooters beside you, benzene is in the same breath of air.',
+      },
+      /** what-is-in-it: the names in order of their share of the exhaust, never by hazard (the order of fact smell-what-is-in-it). */
+      list: {
+        'zh-TW': '照廢氣裡占的多少排，依序是甲苯、二甲苯、乙苯、苯、1,3-丁二烯（ㄒㄧ）、正己烷、甲醛（ㄑㄩㄢˊ）、乙醛、萘（ㄋㄞˋ）、苯乙烯和丙烯醛（推估）。',
+        en: 'In order of their share of the exhaust: toluene, xylenes, ethylbenzene, benzene, 1,3-butadiene, n-hexane, formaldehyde, acetaldehyde, naphthalene, styrene and acrolein (estimate).',
       },
       /** statements-smell hazard-labels, verbatim: its own paragraph, in a different block from every smell sentence, no number. */
       hazard: {
@@ -100,14 +104,6 @@ export default copy({
       },
       smellLink: { 'zh-TW': '完整的說明：那個味道是什麼？', en: 'The full answer: what is that smell?' },
       method: { 'zh-TW': '味道推估的方法（研究檔案，英文）', en: 'How the smell was estimated (research file)' },
-      can: {
-        'zh-TW': '常溫下這些一氧化碳{litres}，一個鋁罐是 {ml} 毫升，所以是{cans}。',
-        en: 'At room temperature that carbon monoxide takes up {litres}. A drinks can holds {ml} mL, so it is {cans}.',
-      },
-      care: {
-        'zh-TW': '這是全台灣機車的平均：新車排得少，騎了很多年的車排得多。',
-        en: 'This is an average over Taiwan’s scooters: new ones give off less, ones ridden for many years more.',
-      },
     },
     next: { 'zh-TW': '排出來以後，去哪裡？', en: 'Where does it go?' },
   },
@@ -135,89 +131,102 @@ export default copy({
         en: 'The {gap} cm is a minimum, and junctions differ; tailpipe height differs by model too. The idling rule asks for engines off only after more than {min} minutes of waiting, and an ordinary red light is shorter than that.',
       },
     },
-    next: { 'zh-TW': '站在旁邊的人，吸進多少？', en: 'How much does the person beside them breathe?' },
+    next: { 'zh-TW': '風從機車吹來時，聞得到多久？', en: 'With the wind from the scooters, how long can you smell it?' },
   },
 
   // 4 ─────────────────────────────────────────────────────────────────────────────────────────
+  // statements-smell how-often-wind (first half) and how-much-just-smellable: how long you smell it
+  // with the wind from a pack, and how much benzene there is when it is just noticeable. Seconds-long
+  // levels only: no 30-minute, 1-hour or yearly value and no reference level on this screen or in
+  // its sheet (must-not 3).
   s4: {
-    chapter: { 'zh-TW': '吸進多少', en: 'How much' },
-    headline: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
-    // body: est.meta.gloss + kerbSentence(scenario) from src/data/estimate.ts
+    chapter: { 'zh-TW': '聞得到時', en: 'When you smell it' },
+    headline: { 'zh-TW': '風從一群機車吹來，|紅燈大半時間都聞得到', en: 'With the wind from a group of scooters, |you can smell it for most of the red' },
+    /** The box under the headline (SmellBenzeneBox): its label is charts sim.smellBenzene.just. */
+    justSub: { 'zh-TW': '範圍約 {lo} 到 {hi}', en: 'range about {lo} to {hi}' },
+    gloss: { 'zh-TW': 'ppb＝十億份空氣裡有幾份・機車另外加進來的量', en: 'ppb = parts in a billion parts of air\u00a0· what the scooters add' },
+    /** how-much-just-smellable mustCarry: typical, not the least; no official value for a few seconds. */
+    body: {
+      'zh-TW': '推估：剛好聞得到時，苯通常是這麼多，不是一定有這麼多。幾秒鐘的量沒有官方數值可比，說不上高或低。',
+      en: 'Estimate: when it is just noticeable, benzene is usually about this much, not always this much. No official value exists for a few seconds, so it cannot be called high or low.',
+    },
+    /** how-often-wind mustCarry (the wind held: at most 1 peak-hour red in 8); alwaysCarry plus[2]. */
     quiet: {
-      'zh-TW': '機車越多，路邊的廢氣越濃。街上原本就有的空氣，圖上沒有畫。',
-      en: 'More scooters, thicker exhaust at the kerb. The air the street already holds is not drawn.',
+      'zh-TW': '這種風，尖峰時最多約八個紅燈有一個；成分來自舊型機車，新型可能不同。',
+      en: 'Such a wind comes in at most about 1 peak-hour red in 8. The shares come from older scooters; newer ones may differ.',
     },
-    box: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
     sheet: {
-      title: { 'zh-TW': '這個範圍，|是怎麼來的', en: 'Where this range |comes from' },
-      measured: {
-        'zh-TW': '運研所在 {sites} 個路口的行人等候區放了儀器。其中 {n} 個路口，一氧化碳最高的一分鐘是 {lo} 到 {hi} ppm。',
-        en: 'The Institute of Transportation put sensors where pedestrians wait at {sites} junctions. At {n} of them the highest minute of carbon monoxide read {lo} to {hi} ppm.',
+      title: { 'zh-TW': '聞得到多久、|苯有多少，是怎麼來的', en: 'How long you can smell it, |and how much benzene: where it comes from' },
+      how: {
+        'zh-TW': '我們用電腦，一秒一秒算了紅燈時路邊的風和廢氣：每種情況算一個紅燈，換了 {draws} 次機車排多少、每種成分占多少，風整個紅燈都從機車吹來。剛好聞得到的那個數字，換了 {single} 種單獨一輛機車的排放量來算，和風怎麼吹無關。',
+        en: 'On a computer we worked out the wind and the exhaust at the kerb second by second through a red light: one red per case, with {draws} draws of what the scooters give off and of each chemical’s share, and the wind blowing from the scooters for the whole red. The just-noticeable figure was worked out for {single} single scooters and does not depend on the wind.',
       },
-      care: {
-        'zh-TW': '風一變，答案可以差到四倍。',
-        en: 'A change in the wind can move the answer about four-fold.',
+      typical: {
+        'zh-TW': '剛好聞得到的那個數字，是常見的量，不是最少的量；兩個數字來自 1967 和 1970 年兩個汽車廢氣的嗅覺研究。',
+        en: 'The just-noticeable figure is a typical value, not a minimum; its two numbers come from two smell tests of car exhaust from 1967 and 1970.',
       },
+      /** statements.json must-not (canyons lower exposure); smell must-not 11. */
+      canyon: {
+        'zh-TW': '推估：在兩邊高樓、風順著街吹的街上，只有部分時間聞得到，很多紅燈根本聞不到，可是苯整個紅燈都在；這種街的數字可能算低了，這不是說這種街比較好。',
+        en: 'Estimate: in a street between tall buildings with the wind along it, it can be smelled only some of the time, and in many reds not at all, yet benzene is there through the whole red; the figures for such streets are probably low, and this does not mean such streets are better.',
+      },
+      numbers: { 'zh-TW': '數字和範圍', en: 'The numbers and ranges' },
     },
-    next: { 'zh-TW': '那麼臭，超過指引值了嗎？', en: 'It smells awful. Is it over the WHO guideline?' },
+    next: { 'zh-TW': '待上一小時的人呢？', en: 'And people who stay an hour?' },
   },
 
   // 5 ─────────────────────────────────────────────────────────────────────────────────────────
+  // statements-smell stay-through-benzene and one-red; statements.json may[7] (the 1–4 times, its
+  // 6-hour basis and 5–10-fold emission doubt). No ppb on the visible screen: the benzene chart, with
+  // the reference level, is in the sheet. Nothing about cancer here (stay-through-benzene mustCarry).
   s5: {
-    chapter: { 'zh-TW': '超過指引值嗎', en: 'Over the WHO guideline?' },
-    // headline: checkHeadlinePhrased() from src/data/estimate.ts, chosen by simBelowWho()
-    // (src/data/simulation.ts): the smell is real, carbon monoxide has no smell, ONE red light
-    // leaves the 15-minute average below the guideline. The picture is SimCompare (15-minute
-    // averages only). The body says, one idea per line, what the headline does not cover:
-    // Both lines sit under the screen's 推估 chip (「推估・電腦算的一個紅燈」, chips row); their full
-    // forms (range, 1967/1970 thresholds, half a metre, rarity) are in the sheet and the chart.
-    /** Statement 6, short form. */
-    smell: { 'zh-TW': '風從機車吹來，大半時間聞得到。', en: 'With the wind from the scooters, you can smell it for most of the red.' },
-    /** Statement 3, short form, with its key condition (every red for 15 minutes); links to /questions/my-child/#pushchair. */
-    exception: { 'zh-TW': '例外：嬰兒車在排氣管正後方、幾乎沒風，15 分鐘每個紅燈都在，可能超過指引值。', en: 'The exception: a pushchair right behind a tailpipe, in almost no wind, through every red for 15 minutes, can pass the guideline.' },
-    /** statements-smell no-smell-not-clean, its benzene half (one line at 360 px; the screen is at its height cap), under the 「仍低於指引值」 headline, so a glance
-     *  does not leave with "below the limit, so fine". not-unburnt-petrol, in full with its order-of-magnitude hedge,
-     *  is sheet.whatSmell on this screen and the answer on /questions/smell/#what. */
-    quiet: { 'zh-TW': '推估：聞不到，也可能有苯。', en: 'Estimate: benzene can be there with no smell.' },
+    chapter: { 'zh-TW': '待一小時', en: 'Staying an hour' },
+    headline: { 'zh-TW': '在路口待一小時的人，|苯可能超過參考值', en: 'People who stay an hour at the junction: |benzene can go above the reference level' },
+    /** The words after the body and the quiet line: what the reference level is, with S#7's carries. */
+    caption: {
+      'zh-TW': '參考值：美國加州訂的苯 1 小時數值，用 {h} 小時的資料訂的；機車廢氣裡有多少苯，可能差到 {lo} 到 {hi} 倍。成分比例來自舊型機車，新型機車可能不一樣。',
+      en: 'Reference level: California’s 1-hour benzene value, set from {h}-hour data. The benzene in scooter exhaust could be off {lo}- to {hi}-fold. Shares come from older scooters; newer ones may differ.',
+    },
+    /** {times} is the EstimateValue of sim.benzene.stay1hTimes, which carries 推估 in the sentence (the screen is at its 45-character limit). */
+    body: {
+      'zh-TW': '風一直從機車吹來（少見）時，苯可能是參考值的{times}。超過不等於證明有害，沒到不代表安全。',
+      en: 'With the wind from the scooters the whole time (rare), benzene can be {times} the reference level. Above it is not proof of harm; below it does not mean safe.',
+    },
+    /** statements-smell one-red, with its mustCarry (the rare near-calm worst case). */
+    quiet: {
+      'zh-TW': '只等一個紅燈：中間推估不到參考值；很少見的幾乎沒風時，最壞可能碰到。',
+      en: 'One red light alone: below the reference level in our central estimate; in rare, almost windless air, the worst case can reach it.',
+    },
     sheet: {
-      /** not-unburnt-petrol in full, with its mustCarry. No smell-chemical number here: this sheet carries 15-minute values (must-not 3). */
-      whatSmell: {
-        'zh-TW': '推估：那個味道比較可能來自燃燒時產生的醛（ㄑㄩㄢˊ）類，不是沒燒完的汽油；這只能粗略估計，可能差到十倍左右。在一群機車的情況裡，苯從來沒有濃到聞得出來。',
-        en: 'Estimate: the smell more likely comes from aldehydes formed by burning, not from unburnt petrol; this is only a rough estimate, within about ten times. In the cases with a group of scooters, benzene never gets strong enough to be smelled.',
+      title: { 'zh-TW': '待一小時，|和一個紅燈', en: 'An hour at the kerb, |and one red light' },
+      how: {
+        'zh-TW': '我們用電腦，一秒一秒算了紅燈時路邊的風和廢氣。每種情況算一個紅燈；「待一小時」，是把同一個電腦算的紅燈，一個接一個排起來。',
+        en: 'On a computer we worked out the wind and the exhaust at the kerb second by second through a red light. Each case is one red light; “an hour at the kerb” is the same simulated red, one after another.',
       },
-      whatSmellLink: { 'zh-TW': '完整的說明：那個味道是什麼？', en: 'The full answer: what is that smell?' },
-      /** Statement 6 in full (the screen's smell line is its short form). */
-      smell: {
-        'zh-TW': '推估：風整個紅燈從一群機車吹來時，紅燈大約一半到幾乎全部的時間，廢氣都多過一般人聞得到的量。「聞得到」的標準，來自 1967 和 1970 年汽車廢氣研究的摘要，只能說「風吹來時，很多秒聞得到」。',
-        en: 'Estimate: when the wind blows from a group of scooters for the whole red, the exhaust is above what most people can smell for about half to nearly all of the red. What counts as ‘can smell it’ comes from abstracts of car-exhaust studies from 1967 and 1970; it supports only ‘smellable in many seconds when the wind blows from the scooters’.',
+      /** stay-through-benzene, verbatim. */
+      stay: {
+        'zh-TW': '如果有人整個小時每個紅燈都待在路邊（例如攤販、警察、導護），而且風一直從機車那邊吹過來，機車加進來的苯推估會超過美國加州的 1 小時參考值。',
+        en: 'For someone who stays at the kerb through every red for an hour (a vendor, a police officer, a crossing guard), with the wind from the scooters the whole time, the benzene the scooters add is estimated to be above California’s 1-hour reference level.',
       },
-      /** Why screen 5's numbers are higher than screen 4's (a reader compares the two). */
-      higher: {
-        'zh-TW': '這裡的數字比上面 90 秒的推估多：電腦算的是離機車半公尺、小孩和嬰兒車的高度，也算了風一直從機車吹來的紅燈；上面的推估只算大人鼻子的高度。',
-        en: 'These numbers are higher than the 90-second estimate above: the simulation is half a metre from the scooters, at child and pushchair height, and includes reds with the wind held from the scooters; the estimate above is an adult’s nose height only.',
+      /** S#7 and stay-through-benzene mustCarry; {times} is the EstimateValue of sim.benzene.stay1hTimes. */
+      stayCare: {
+        'zh-TW': '畫面上的{times}，是從中間的情形到偏高但平常的情形；把所有不確定都算進去，範圍從低於參考值到好幾倍。這個參考值雖然叫 1 小時，是用 {h} 小時的資料訂的。機車廢氣裡有多少苯，我們不太確定，可能差到 {lo} 到 {hi} 倍。風要整整一小時都這樣吹，很少見。超過參考值，不等於證明有害。這不是在說等一個紅燈的人。',
+        en: 'The {times} on the screen runs from the middle case to a high-but-ordinary case; counting every uncertainty, the range runs from below the reference to several times above it. That reference is called 1-hour but was set from {h}-hour data. We are not sure how much benzene scooter exhaust holds; it could be off {lo}- to {hi}-fold. The wind must hold for the whole hour, which is rare. Being above a reference level is not proof of harm. This is not about someone waiting one red.',
       },
-      title: { 'zh-TW': '臭，和一氧化碳的|15 分鐘平均', en: 'The smell, and the 15-minute |carbon monoxide average' },
-      who: {
-        'zh-TW': '路口的行人等候區，是交通部運輸研究所（運研所）量的；平常的路邊，是環境部的交通測站。',
-        en: 'The pedestrian waiting areas were measured by the Institute of Transportation; the ordinary roadside is the environment ministry’s traffic stations.',
+      /** statements-smell one-red, verbatim with its mustCarry (= questions.smell.s3.sheet.b3). */
+      oneRed: {
+        'zh-TW': '推估：只等一個紅燈，依我們的中間推估，這些化學物質都不會因此達到 30 分鐘或 1 小時的公共參考值（衛生單位訂的、用來比的數值）。很少見的情形：幾乎沒有風、站在一根排氣管下風半公尺，最壞的情況可能到。信心低。沒到參考值，不代表「安全」。',
+        en: 'Estimate: waiting through one red light does not, on its own, bring any of these chemicals to a 30-minute or 1-hour public reference level (a value health agencies set for comparison), in our central estimate. In a rare near-calm case, standing half a metre downwind of one tailpipe, the worst case can reach them. Confidence is low. Below a reference level does not mean ‘safe’.',
       },
-      sim: {
-        'zh-TW': '我們用電腦，把紅燈時路邊的風和廢氣，一秒一秒算出來。每種情況算一個紅燈，再換成 15 分鐘的平均，才拿來和指引值比。',
-        en: 'On a computer, we worked out the wind and the exhaust at the kerb, second by second through a red light. Each case is one red light, turned into a 15-minute average before it is set against the guideline.',
-      },
-      pushchair: {
-        'zh-TW': '嬰兒車那一列：嬰兒車停在一輛機車排氣管正後方約半公尺，幾乎沒有風、風向也不變，連續 15 分鐘每個紅燈都在。這種風很少見。往旁邊移開半公尺，或到小孩站著的高度，就沒有了。',
-        en: 'The pushchair row: a pushchair half a metre directly behind one scooter’s tailpipe, in almost no wind that keeps its direction, through every red for 15 minutes. Such a wind is rare. Half a metre to the side, or up to a standing child’s height, and it is gone.',
-      },
-      bursts: {
-        'zh-TW': '靠近排氣管時，一氧化碳是一陣一陣的。一秒的量不能拿來和 15 分鐘的指引值比；一秒一秒的樣子，請看「電腦算的一個紅燈」。',
-        en: 'Near a tailpipe, carbon monoxide comes in bursts. A one-second level cannot be set against a 15-minute guideline; for the second-by-second picture, see ‘One red light, simulated’.',
+      others: {
+        'zh-TW': '其他每一種成分，都和它自己的 1 小時或 30 分鐘參考值比過，放在「怎麼算的」那一頁的詳細表裡。',
+        en: 'Every other chemical is set against its own 1-hour or 30-minute reference in the detail table on the ‘How we worked it out’ page.',
       },
       care: {
-        'zh-TW': '推估，信心低到中：每種情況只算了一個紅燈。嬰兒車那一列最沒把握：電腦裡的空氣比平常更靜，所以可能算高了。',
-        en: 'Estimate, low to moderate confidence: each case is one simulated red light. The pushchair row is the least certain: the air in the model is stiller than usual, so it may be too high.',
+        'zh-TW': '推估，信心低：每種情況只算了一個紅燈。成分比例來自台灣、印度、尼泊爾的舊型機車；新型機車可能不一樣。這些是機車另外加進空氣裡的量，不含街上原本的空氣。',
+        en: 'Estimate, low confidence: each case is one simulated red light. The shares come from older scooters in Taiwan, India and Nepal; newer scooters may differ. These are amounts the scooters add to the air already there.',
       },
-      table: { 'zh-TW': '圖上的數字', en: 'The numbers on the chart' },
+      tableLink: { 'zh-TW': '每一種成分的詳細表', en: 'The detail table for every chemical' },
     },
     next: { 'zh-TW': '天天吸進去的，會跑到哪裡？', en: 'Day after day, where does it all go?' },
   },
@@ -237,7 +246,7 @@ export default copy({
     pins: {
       nose: { 'zh-TW': '鼻子、喉嚨：刺鼻的氣體會到這裡，吸得夠多會刺激鼻子和喉嚨。', en: 'Nose and throat: the sharp-smelling gases reach here; enough of them irritates the nose and throat.' },
       lungs: { 'zh-TW': '肺：很小的微粒，可以進到肺的深處。', en: 'Lungs: very small particles reach deep into the lungs.' },
-      blood: { 'zh-TW': '血液：一氧化碳從肺進到血液，占掉載氧氣的位子。', en: 'Blood: carbon monoxide passes from the lungs into the blood and takes up room meant for oxygen.' },
+      blood: { 'zh-TW': '血液：更小的微粒（PM2.5），甚至能進到血液裡。', en: 'Blood: the finer particles (PM2.5) can even get into the blood.' },
     },
     sheet: {
       who: {
@@ -254,13 +263,18 @@ export default copy({
       },
       /** Printed with the pins that ship: what the three routes do and do not say. */
       routes: {
-        'zh-TW': '圖上三個號碼，是這些東西進到身體以後去的地方。一氧化碳要很多，才會明顯占掉載氧氣的位子。',
-        en: 'The three numbers in the picture show where these things go in the body. It takes a lot of carbon monoxide to take up much of the room meant for oxygen.',
+        'zh-TW': '圖上三個號碼，是這些東西進到身體以後去的地方。',
+        en: 'The three numbers in the picture show where these things go in the body.',
       },
-      /** Statement 1 with its range ({range} is the EstimateValue of sim.co.oneRed15). */
-      routesCo: {
-        'zh-TW': '推估：在一般的街上等一個紅燈，一氧化碳的 15 分鐘平均多{range}，比世界衛生組織的指引值低很多；排氣管正後方、幾乎沒風時，最多約 {near} ppm。只有一個少見的例外：嬰兒車停在排氣管正後方，寫在「怎麼算的」那一頁。',
-        en: 'Estimate: waiting one red light on an ordinary street adds {range} to your 15-minute carbon monoxide average, far below the WHO guideline; right behind a tailpipe in almost no wind, up to about {near} ppm. There is one rare exception, a pushchair right behind a tailpipe: see the ‘How we worked it out’ page.',
+      /** route-particles-deep-lung: the WHO's words are about particles from every source. */
+      routesNote: {
+        'zh-TW': '世界衛生組織說的是所有來源的微粒，不是專指機車廢氣，也沒有說要多少量。',
+        en: 'The WHO is describing particles from every source, not scooter exhaust alone, and gives no amount.',
+      },
+      /** statements-smell hazard-labels, verbatim: its own paragraph, the last block before the links. */
+      hazard: {
+        'zh-TW': '世界衛生組織的癌症研究機構（IARC）把苯、1,3-丁二烯、甲醛列為「確定會讓人致癌」的第1類。這是說「證據有多強」，不是說等一個紅燈會有多少風險。汽油引擎廢氣整體被列為第2B類（「可能致癌」）。',
+        en: 'The World Health Organization’s cancer agency (IARC) puts benzene, 1,3-butadiene and formaldehyde in Group 1, ‘causes cancer in humans’. That describes how strong the evidence is, not the risk from waiting at one red light. Petrol-engine exhaust as a whole is Group 2B, ‘possibly causes cancer’.',
       },
     },
     next: { 'zh-TW': '一個紅燈那麼短，也算嗎？', en: 'One red light is so short. Does it count?' },
@@ -315,10 +329,6 @@ export default copy({
       years: {
         'zh-TW': '很多年：{n} 篇長期研究，講的是所有車輛的廢氣。',
         en: 'Many years: {n} long-term studies, of exhaust from all traffic.',
-      },
-      dose: {
-        'zh-TW': '一天四個紅燈，讓你一整天吸到的一氧化碳多不到 {pct}%。',
-        en: 'Four red lights a day raise the carbon monoxide you breathe over a whole day by under {pct}%.',
       },
       workers: {
         'zh-TW': '整天在路邊工作的人就不一樣，像交通警察、攤販、導護。一個紅燈接一個紅燈，加起來就像一直待在路邊。',
@@ -402,8 +412,8 @@ export default copy({
     chapter: { 'zh-TW': '口罩擋得住嗎', en: 'Do masks help?' },
     headline: { 'zh-TW': '口罩|擋不住廢氣裡的氣體', en: 'A mask |won’t stop the gases in exhaust' },
     body: {
-      'zh-TW': '廢氣裡的一氧化碳和苯是氣體，一般口罩擋不住氣體。細小的微粒，也會從口罩邊緣漏進去。',
-      en: 'The carbon monoxide and benzene in exhaust are gases, and ordinary masks do not stop gases. Fine particles also leak in round the edges.',
+      'zh-TW': '廢氣裡的苯這類氣體，一般口罩擋不住。細小的微粒，也會從口罩邊緣漏進去。',
+      en: 'Ordinary masks do not stop gases in exhaust such as benzene. Fine particles also leak in round the edges.',
     },
     quiet: { 'zh-TW': '口罩防感冒、流感還是有用。', en: 'A mask still helps against colds and flu.' },
     switch: { 'zh-TW': '換一種口罩看看', en: 'Try another mask' },
@@ -421,12 +431,12 @@ export default copy({
         { 'zh-TW': '要小心的地方', en: 'What to be careful about' },
       ],
       who: {
-        'zh-TW': '美國職業安全衛生研究所說明了兩件事。一氧化碳這類氣體和油氣（沒燒完的汽油），連 N95 都擋不住。這種口罩只過濾微粒。照同樣的道理，醫用口罩和布口罩也沒有吸附氣體的材料；這一句是我們的推論。',
-        en: 'The US occupational-safety institute, NIOSH, states that N95-type respirators filter particles only. They do not stop gases such as carbon monoxide, or petrol vapour. By the same reasoning, surgical and cloth masks have no gas-absorbing layer either; that part is our inference.',
+        'zh-TW': '美國職業安全衛生研究所說明：N95 這類口罩擋不住氣體，也擋不住汽油、溶劑的蒸氣，因為它只過濾微粒。照同樣的道理，醫用口罩和布口罩也沒有吸附氣體的材料；這一句是我們的推論。',
+        en: 'The US occupational-safety institute, NIOSH, states that N95-type respirators filter particles only: they do not stop gases, or petrol and solvent vapour. By the same reasoning, surgical and cloth masks have no gas-absorbing layer either; that part is our inference.',
       },
       cols: {
         mask: { 'zh-TW': '口罩', en: 'Mask' },
-        gases: { 'zh-TW': '氣體', en: 'Gases' },
+        gases: { 'zh-TW': '氣體和油氣', en: 'Gases and fuel vapour' },
         ultrafine: { 'zh-TW': '很小的微粒（超細微粒）', en: 'The smallest particles (ultrafine)' },
         pm25: { 'zh-TW': 'PM2.5', en: 'PM2.5' },
       },
@@ -446,7 +456,7 @@ export default copy({
         },
         carbon: {
           mask: { 'zh-TW': '活性碳口罩', en: 'Activated-carbon mask' },
-          gases: { 'zh-TW': '一氧化碳：擋不住。苯和其他油氣：吸住一點，撐不久（常常只有幾分鐘）', en: 'Carbon monoxide: none. Benzene and other vapours: a little, briefly, often only minutes' },
+          gases: { 'zh-TW': '苯和其他油氣：吸住一點，撐不久（常常只有幾分鐘）', en: 'Benzene and other vapours: a little, briefly (often minutes)' },
           ultrafine: { 'zh-TW': '和它底下那層口罩一樣（醫用口罩那種：擋住一些，邊緣會漏）', en: 'The same as the mask it is built on (surgical type: some; it leaks at the edges)' },
           pm25: { 'zh-TW': '和它底下那層口罩一樣（醫用口罩那種：擋住一些，邊緣會漏）', en: 'The same as the mask it is built on (surgical type: some; it leaks at the edges)' },
         },
@@ -518,22 +528,22 @@ export default copy({
   // 12 ────────────────────────────────────────────────────────────────────────────────────────
   s12: {
     /** Beside the chip: what the percentage is. */
-    shareLabel: { 'zh-TW': '占一氧化碳{share}', en: '{share} of the carbon monoxide' },
+    shareLabel: { 'zh-TW': '占全部讀數{share}', en: '{share} of all the readings' },
     chapter: { 'zh-TW': '還沒要換車', en: 'Not switching yet' },
     headline: { 'zh-TW': '還沒要換車？|有一件事也很有用', en: 'Not switching yet? |One thing still helps a lot' },
     /** 「三成到快一半」 is checked against inspect.top10share at build time. */
     body: {
-      'zh-TW': '定檢讀數裡，排最多的一成，占了全部一氧化碳的三成到快一半。準時定檢、該修就修，路口就少一大團。',
-      en: 'In Taiwan’s inspection readings, the highest tenth account for 30% to nearly half of all the carbon monoxide. Get inspected on time and fix what fails, and a big cloud leaves the junction.',
+      'zh-TW': '定檢時排氣讀數最高的一成機車，讀數加起來占了全部的三成到快一半。準時定檢、該修就修，路口就少一大團。',
+      en: 'At inspection, the tenth of scooters with the highest exhaust readings add up to 30% to nearly half of all the readings. Get inspected on time and fix what fails, and a big cloud leaves the junction.',
     },
     sheet: {
       used: {
-        'zh-TW': '環境部的機車定檢紀錄：一年大約 {readings} 萬筆一氧化碳讀數。',
-        en: 'The environment ministry’s scooter inspection records: about {readings} million idle carbon monoxide readings a year.',
+        'zh-TW': '環境部的機車定檢紀錄：一年大約 {readings} 萬筆排氣讀數。這裡用的是定檢讀數裡的一氧化碳；算法在「怎麼算的」那一頁。',
+        en: 'The environment ministry’s scooter inspection records: about {readings} million exhaust readings a year. The readings used here are the inspection’s carbon monoxide readings; the working is on the ‘How we worked it out’ page.',
       },
       how: {
-        'zh-TW': '把讀數從高排到低，最高的一成加起來，占全部一氧化碳的{share}。',
-        en: 'Rank the readings from highest to lowest: the top tenth together hold {share} of all the carbon monoxide.',
+        'zh-TW': '把讀數從高排到低，最高的一成加起來，占全部讀數的{share}。',
+        en: 'Rank the readings from highest to lowest: the top tenth together hold {share} of all the readings.',
       },
       care: {
         'zh-TW': '圖上那一輛沒有畫騎士：這說的是車該修了，不是在說誰。',

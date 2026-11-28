@@ -45,6 +45,8 @@
 //   voice-nin      你, never 您
 //   voice-exclaim  no exclamation marks, either language
 //   and: both languages present and non-empty.
+//   main-path-no-co  no 一氧化碳 / carbon monoxide / CO / 指引值 / guideline / ppm in a string read on
+//                  the main path (src/lib/main-path.ts names the id prefixes); claims-policy holds the rule
 //
 // FLAGS
 //   --list            print every string id (to find the id for an allow-list entry)
@@ -70,6 +72,7 @@ const policy = await load('src/data/claims-policy.ts');
 const { flagCopy } = policy;
 const registryRuleIds = new Set(Object.keys(policy.claimRules ?? {}));
 const brief = await load('scripts/brief-rules.mjs');
+const mainPath = await load('src/lib/main-path.ts');
 const briefRules = [...brief.bannedRules, ...brief.claimRules].filter((r) => !registryRuleIds.has(r.id));
 const HEADLINE_ID = /(^|\.)(headline|headlines|title|titles|heading|h1|h2|h3)(\.|$)|headline|title/i;
 
@@ -98,9 +101,8 @@ const pagesDir = join(root, 'src/i18n/pages');
 if (existsSync(pagesDir)) for (const f of readdirSync(pagesDir).sort()) if (f.endsWith('.ts') && !f.startsWith('_')) modules.push({ file: `src/i18n/pages/${f}`, name: f.replace(/\.ts$/, ''), page: true });
 // Copy modules outside src/i18n that export plain { 'zh-TW', en } leaves (lane D's chart words).
 for (const f of ['src/components/charts/strings.ts']) if (existsSync(join(root, f))) modules.push({ file: f, name: 'charts', page: false });
-// Reader-facing sentences chosen by rule in src/data/estimate.ts (screen 5's headline and body, the
-// one-page brief): only these exports, so the estimate's numbers and labels stay with check-data.
-const estimateCopy = ['checkHeadlineTable', 'checkSentenceTable', 'kerbSentenceTable', 'estimateText'];
+// Reader-facing sentences chosen by rule in src/data/estimate.ts: only these exports, so the estimate's numbers and labels stay with check-data.
+const estimateCopy = ['kerbSentenceTable', 'estimateText'];
 if (existsSync(join(root, 'src/data/estimate.ts'))) modules.push({ file: 'src/data/estimate.ts', name: 'data-estimate', page: false, only: estimateCopy });
 
 for (const m of modules) {
@@ -185,6 +187,9 @@ for (const s of strings) {
       const m = v.re.exec(text);
       if (m) flags.push({ id: s.id, file: s.file, locale, rule: v.id, kind: 'voice', match: m[0], text, ruleText: v.rule, instead: v.instead });
     }
+    // the main path names neither carbon monoxide nor its guideline (claims-policy main-path-no-co)
+    const mp = mainPath.onMainPath(s.id) ? mainPath.mainPathWord(text) : null;
+    if (mp) flags.push({ id: s.id, file: s.file, locale, rule: 'main-path-no-co', kind: 'main path', match: mp, text, ruleText: policy.claimRules['main-path-no-co'].rule[locale] });
   }
 }
 

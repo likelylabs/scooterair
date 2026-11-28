@@ -97,27 +97,6 @@ export function workingPerRed(locale: Loc): WorkingSumProps {
 }
 
 /**
- * The same amount as a drinks can (signed off in brief 12.1): the gas volume at 25 °C divided by
- * one 330 mL can, to the nearest half can: 大約一罐（半罐到快兩罐）.
- */
-export function workingPerRedCan(locale: Loc): WorkingSumProps {
-  const T = chartText.working;
-  const L = est.emit.co.perRed_L;
-  const sum = est.emit.co.perRedSum;
-  const litres = T.unit.L[locale];
-  const cans = est.emit.co.canWords[locale];
-  return {
-    locale,
-    mode: 'sum',
-    steps: [
-      { value: about(withUnit(n(L.mid, locale), litres, locale), locale), label: fill(T.can.volume, locale, { g: n(est.emit.co.perRed_g.mid, locale), lo: n(L.lo, locale), hi: n(L.hi, locale) }), chip: L.kind },
-      { op: '÷', value: withUnit(n(sum.canMl / 1000, locale), litres, locale), label: fill(T.can.can, locale, { ml: sum.canMl }) },
-    ],
-    result: { value: cans.charAt(0).toUpperCase() + cans.slice(1), label: T.can.result[locale], kind: 'estimate' },
-  };
-}
-
-/**
  * How the kerb estimate is made, as a flow with arrows and no operator signs (brief 4.5): the
  * four boxes are `estimateText.flow`, the last one the result.
  */

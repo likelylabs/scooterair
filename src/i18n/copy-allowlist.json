@@ -321,62 +321,9 @@
       "reviewedOn": "2026-11-27"
     },
     {
-      "id": "home.s5.exception",
-      "rule": "no-above-guideline-at-red-light",
-      "locale": "zh-TW",
-      "reason": "This is statement 3 of research/simulation/statements.json (an allowed statement), not a claim about a pedestrian waiting at a red light: the subject is a pushchair parked half a metre behind one tailpipe in near-still air through every red for 15 minutes. The rule matched only because the line now carries \"every red for 15 minutes\" (連續 15 分鐘每個紅燈都在), which statement 3 must carry and which the facts review asked for. The same line carries 推估 and the qualifier rule sim-pushchair-exception-qualified is reviewed for it separately.",
-      "reviewedBy": "simulation release fixer",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "act.brief.simLine",
-      "rule": "no-above-guideline-at-red-light",
-      "locale": "zh-TW",
-      "reason": "This is statement 3 of research/simulation/statements.json (an allowed statement), not a claim about a pedestrian waiting at a red light: the subject is a pushchair parked half a metre behind one tailpipe in near-still air through every red for 15 minutes. The rule matched only because the line now carries \"every red for 15 minutes\" (連續 15 分鐘每個紅燈都在), which statement 3 must carry and which the facts review asked for. The same line carries 推估 and the qualifier rule sim-pushchair-exception-qualified is reviewed for it separately.",
-      "reviewedBy": "simulation release fixer",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "questions.smellSim.lines.6",
-      "rule": "no-above-guideline-at-red-light",
-      "locale": "zh-TW",
-      "reason": "This is statement 3 of research/simulation/statements.json (an allowed statement), not a claim about a pedestrian waiting at a red light: the subject is a pushchair parked half a metre behind one tailpipe in near-still air through every red for 15 minutes. The rule matched only because the line now carries \"every red for 15 minutes\" (連續 15 分鐘每個紅燈都在), which statement 3 must carry and which the facts review asked for. The same line carries 推估 and the qualifier rule sim-pushchair-exception-qualified is reviewed for it separately.",
-      "reviewedBy": "simulation release fixer",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "home.s5.exception",
-      "rule": "sim-pushchair-exception-qualified",
-      "reason": "Statement 3 short form on home screen 5 (limit 45 Han): it carries 推估 in words (and the screen's 推估 chip), the exact spot (排氣管正後方半公尺 / half a metre behind a tailpipe), near-still air (幾乎沒風) and every red for 15 minutes (連續 15 分鐘每個紅燈都在 / through every red for 15 minutes). The compact chart row beside it carries held direction, every red, \"rare\" and \"low confidence\"; the sheet behind it carries the model's still air and \"half a metre to the side removes it\"; the line links to the full answer on /questions/my-child/#pushchair.",
-      "reviewedBy": "simulation site job",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "act.brief.simLine",
-      "rule": "sim-pushchair-exception-qualified",
-      "reason": "Statement 3 on the one-page brief, after statement 1: carries 推估, half a metre behind a tailpipe, near-still air, every red for 15 minutes, \"1 or 2 in 10 such periods\", rare and low confidence. The model's still air and \"half a metre to the side removes it\" are on /estimate/#simulation, whose address the brief prints.",
-      "reviewedBy": "simulation site job",
-      "reviewedOn": "2026-11-27"
-    },
-    {
       "id": "estimate.simulation.pushchair.3",
       "rule": "sim-pushchair-exception-qualified",
       "reason": "Line 4 of the statement-3 block on /estimate/#simulation (one idea per line). The block's other lines carry 推估, half a metre directly behind one tailpipe, engine running, near-still air that keeps its direction, every red for 15 minutes, \"1 or 2 in 10 such 15-minute periods\", rarity, half a metre to the side removes it, and least certain because the model's air is stiller than usual. It names the height (about 0.6 m) where it happens.",
-      "reviewedBy": "simulation site job",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "questions.myChild.pushchair.lines.4",
-      "rule": "sim-pushchair-exception-qualified",
-      "locale": "zh-TW",
-      "reason": "Line 5 of the statement-3 block on /questions/my-child/#pushchair (one idea per line). The block's other lines carry 推估, the exact spot, near-still held air, every red for 15 minutes, \"1 or 2 in 10 such 15-minute periods\", rarity, half a metre removes it and least certain; its sheet adds the model's still air. It names the height (about 0.6 m).",
-      "reviewedBy": "simulation site job",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "questions.smellSim.lines.6",
-      "rule": "sim-pushchair-exception-qualified",
-      "reason": "Closing line of the smell answer: carries half a metre behind a tailpipe, near-still air, every red for 15 minutes, 15-minute averaging, \"1 or 2 in 10 such periods\", rare and low confidence; it sits under the section's 推估 line and links to the full statement 3 on /questions/my-child/#pushchair (model's still air, half a metre removes it).",
       "reviewedBy": "simulation site job",
       "reviewedOn": "2026-11-27"
     },
@@ -395,11 +342,11 @@
       "reviewedOn": "2026-11-27"
     },
     {
-      "id": "questions.oneRedLight.s1.sheet.stayers.2",
+      "id": "questions.oneRedLight.s1.sheet.stayers.0",
       "rule": "sim-stayers-benzene-qualified",
-      "reason": "Statement 8 in the one-red-light sheet: carries an hour, the held wind, 1 to 4 times; the next line carries the 6-hour basis, the five- to ten-fold emission uncertainty and \"not about someone waiting one red\"; the block opens with 推估.",
-      "reviewedBy": "simulation site job",
-      "reviewedOn": "2026-11-27"
+      "reason": "Statement 8 in the one-red-light sheet: carries 推估, an hour, the held wind, 1 to 4 times (EstimateValue); the next line, stayers.1, carries the 6-hour basis, the five- to ten-fold emission uncertainty, the rare held wind, not proof of harm and \"not about someone waiting one red\".",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
     },
     {
       "id": "about.corrections.wrongText.sim-guideline",
@@ -441,22 +388,6 @@
       "rule": "no-arcade-or-idling-measurements",
       "locale": "en",
       "reason": "Statement 9 (enclosed places): \"idling\" describes the scooters in a place that was NOT simulated or measured; the sentence before carries 推估 and the one after says we did not simulate these and found no Taiwanese measurement.",
-      "reviewedBy": "simulation site job",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "questions.oneRedLight.s1.sheet.stayers.4",
-      "rule": "no-arcade-or-idling-measurements",
-      "locale": "en",
-      "reason": "Statement 9 (enclosed places) in one sentence: \"idling\" describes the scooters in a place this site did not simulate, and the sentence says so.",
-      "reviewedBy": "simulation site job",
-      "reviewedOn": "2026-11-27"
-    },
-    {
-      "id": "questions.smellSim.q",
-      "rule": "sim-smell-not-co-high",
-      "locale": "zh-TW",
-      "reason": "The question the owner asked (聞起來那麼臭，一氧化碳超過指引值了嗎？), asked so that the answer under it can say no: carbon monoxide has no smell and a strong smell does not mean it is over the guideline.",
       "reviewedBy": "simulation site job",
       "reviewedOn": "2026-11-27"
     },
@@ -603,6 +534,65 @@
       "reason": "IARC's own name for Group 1 ('causes cancer in humans'), quoted with what the groups mean (strength of evidence, not risk) and with petrol-engine exhaust's own Group 2B, as the signed hazard-labels statement requires. It is not a claim about Taiwanese studies.",
       "reviewedBy": "smell-chemicals site update (statements-smell.json, signed 2026-11-27)",
       "reviewedOn": "2026-11-27"
+    },
+    {
+      "id": "home.s5.caption",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "Gloss of the reference on screen 5, under its picture: it carries the 6-hour basis and the five- to ten-fold emission doubt itself; the same screen's headline names people who stay an hour, its body carries 推估, 1 to 4 times (EstimateValue) and the held, rare wind, and its quiet line says one red light alone stays below. No risk wording.",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
+    },
+    {
+      "id": "home.s5.sheet.stay",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "The signed statement stay-through-benzene (statements-smell.json), verbatim: someone who stays through every red for an hour with the wind held. Its next block, home.s5.sheet.stayCare, carries the range from below to several times above, the 6-hour basis, the five- to ten-fold doubt, the rare held wind, not proof of harm and not about one red. No cancer word.",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
+    },
+    {
+      "id": "home.s6.sheet.hazard",
+      "rule": "associations-not-causes-tw",
+      "locale": "en",
+      "reason": "IARC's own name for Group 1 ('causes cancer in humans'), quoted with what the groups mean (strength of evidence, not risk) and with petrol-engine exhaust's own Group 2B, as the signed hazard-labels statement requires, in its own paragraph. It is not a claim about Taiwanese studies.",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
+    },
+    {
+      "id": "home.s12.sheet.used",
+      "rule": "main-path-no-co",
+      "reason": "The one sheet sentence on the main path that names the gas: the inspection readings the top-tenth share is worked out from are carbon monoxide readings, and the method cannot be told without saying so; it points to the method page (decision 2026-11-28).",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
+    },
+    {
+      "id": "act.poster.smell",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "Says benzene is NOT what you smell, and that it comes WITH the smell: the rule's own point. It is the signed allowed statement smell-comes-with-benzene, printed with home screen 2's first line (推估 and the condition) and no-smell-not-clean in the same box under one 推估 chip.",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
+    },
+    {
+      "id": "act.brief.smellHead",
+      "rule": "benzene-not-the-smell",
+      "locale": "zh-TW",
+      "reason": "The brief's heading for home screen 2's block: says benzene is NOT what you smell, and that it comes WITH the smell (smell-comes-with-benzene). The block under it prints 推估, the condition and no-smell-not-clean, and the older-scooters caveat.",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
+    },
+    {
+      "id": "act.brief.refs",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "A source list, not a claim: it names California's 1-hour reference level as one of the brief's sources. The brief's block for people who stay an hour carries 推估, 1 to 4 times, the held, rare wind, the 6-hour basis, the five- to ten-fold doubt and that one red light alone stays below.",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
+    },
+    {
+      "id": "about.corrections.nowText.co-main-path",
+      "rule": "sim-stayers-benzene-qualified",
+      "reason": "The corrections log names statement 8 with its whole mustCarry in the same sentence: 推估, an hour at a junction, the wind always from the scooters, the range as an EstimateValue (1 to 4 times), the reference set from 6-hour data, the five- to ten-fold doubt in scooter benzene, the rare held wind, not proof of harm, and \"not about someone waiting one red\". No risk wording.",
+      "reviewedBy": "u4 pages step (carbon monoxide off the main path)",
+      "reviewedOn": "2026-11-28"
     }
   ],
   "inlineCopyAllowed": [

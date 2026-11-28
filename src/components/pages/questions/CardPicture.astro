@@ -24,7 +24,7 @@ interface Props {
 const { locale, slug } = Astro.props;
 ---
 
-{slug === 'smell' && <TailpipeMarks locale={locale} can={false} />}
+{slug === 'smell' && <TailpipeMarks locale={locale} />}
 {slug === 'beside-me' && <ApproachPlan locale={locale} legend={false} inset={false} />}
 {slug === 'app' && <StationScene locale={locale} legend={false} />}
 {slug === 'one-red-light' && <BodyFigure locale={locale} pins={[]} />}

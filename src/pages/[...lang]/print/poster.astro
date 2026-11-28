@@ -3,35 +3,34 @@ import { absUrl } from '../../../lib/abs-url.ts';
 /**
  * /print/poster/ — 校門口海報 / the school-gate poster (brief 7.9), one A4 page per language.
  *
- * G4 at the dozen scenario; the headline of home screen 4; the two-row number box (what the
- * street already holds, measured; what the pack adds, estimated, with its range and chip); the
- * mask line; the sentence a reader should repeat; a QR code to the home page (drawn at build
+ * G4 at the dozen scenario; the poster's headline; three lines with no number (what you smell is
+ * not benzene, but benzene comes with it; home screen 2's first line; no smell does not mean clean
+ * air, with the older-scooters caveat), under one 推估 chip; the mask line; the sentence a reader should repeat; a QR code to the home page (drawn at build
  * time by components/pages/action/qr.ts, with the address printed beside it); one request.
  * Light tokens on paper and no site chrome (PrintPage). On screen a small toolbar sits above
  * the sheet; in print only the sheet prints.
  *
- * Copy: src/i18n/pages/act.ts (`poster`). Numbers: src/data/estimate.ts.
+ * Copy: src/i18n/pages/act.ts (`poster`) and home screen 2 (src/i18n/pages/home.ts).
  */
 import PrintPage from '@/components/pages/action/PrintPage.astro';
 import Picture from '@/components/pages/action/Picture.astro';
 import Phrased from '@/components/ui/Phrased.astro';
 import KindChip from '@/components/ui/KindChip.astro';
-import EstimateValue from '@/components/ui/EstimateValue.astro';
 import { qrSvg } from '@/components/pages/action/qr';
 import { href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { site } from '@/i18n/ui';
-import { est, estimateText, formatReference } from '@/data/estimate';
 import act from '@/i18n/pages/act';
+import home from '@/i18n/pages/home';
 import { fill, localize } from '@/i18n/pages/_copy';
 
 export const getStaticPaths = localeStaticPaths;
 const locale = localeFromParam(Astro.params.lang);
 const t = localize(act, locale);
 const p = t.poster;
+const h = localize(home, locale);
 const target = absUrl(href('/', locale), Astro.site);
 const shortUrl = target.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const qr = qrSvg(target, fill(p.qrAlt, { url: shortUrl }));
-const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
 ---
 
 <PrintPage locale={locale} title={p.metaTitle} description={p.metaDescription} share="how-much">
@@ -50,17 +49,10 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
     </header>
 
     <div class="poster__numbers">
-      <p class="poster__label-co">{p.co}</p>
-      <div class="poster__row">
-        <span class="poster__label">{estimateText.alreadyThere[locale]}</span>
-        <span class="poster__value">{street}</span>
-        <KindChip locale={locale} kind="measured" />
-      </div>
-      <div class="poster__row poster__row--est">
-        <span class="poster__label"><span class="est__label">{estimateText.addedByPack[locale]}</span></span>
-        <EstimateValue locale={locale} slotId="co.dozen.add" class="poster__est" />
-      </div>
-      <div class="poster__gloss"><span>{estimateText.ppmGloss[locale]}</span> <span>{est.meta.gloss[locale]}</span></div>
+      <p class="poster__line poster__line--lead">{p.smell}</p>
+      <p class="poster__line">{h.s2.body[0]}</p>
+      <p class="poster__line">{p.clean}</p>
+      <KindChip locale={locale} kind="estimate" />
     </div>
 
     <div class="poster__pic" data-fit>
@@ -175,36 +167,19 @@ const street = formatReference(est.bg.co.traffic.shown, 'ppm', locale);
     border: 2px solid var(--ink);
     border-radius: 6px;
   }
-  .poster__label-co {
-    font-weight: var(--fw-bold);
-    font-size: var(--fs-sm);
+  .poster__numbers > :global(.kind-chip),
+  .poster__numbers > :global(*:last-child) {
+    justify-self: start;
   }
-  .poster__row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 10px;
+  .poster__line {
+    margin: 0;
     font-size: var(--fs-base);
+    line-height: 1.55;
   }
-  .poster__label {
-    flex: 1 1 9em;
-    font-weight: var(--fw-bold);
-  }
-  .poster__value {
-    font-variant-numeric: tabular-nums;
-    font-weight: var(--fw-bold);
+  .poster .poster__line--lead {
+    font-weight: var(--fw-black);
     font-size: 1.25rem;
-  }
-  .poster__row--est :global(.poster__est) {
-    font-size: 1.25rem;
-  }
-  .poster :global(.est__go) {
-    display: none;
-  }
-  .poster__gloss {
-    display: grid;
-    font-size: var(--fs-sm);
-    color: var(--ink-2);
+    line-height: 1.35;
   }
   .poster__pic :global(.scene) {
     margin: 0;

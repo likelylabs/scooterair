@@ -138,6 +138,10 @@ export default copy({
     common: { 'zh-TW': '常見的說法', en: 'A common claim' },
     /** What was said. Struck through on the page. */
     claims: {
+      'co-main-path': {
+        'zh-TW': '本站的主要頁面，把一氧化碳和世界衛生組織的指引值放在最前面：首頁寫「臭是真的。一氧化碳沒味道；等一個紅燈，仍低於指引值」。',
+        en: 'The site’s main pages put carbon monoxide and the WHO guideline up front: the home page said “The smell is real. Carbon monoxide has no smell. Waiting one red light, it stays below the WHO guideline”.',
+      },
       'smell-not-petrol': {
         'zh-TW': '本站以前寫，那個味道來自汽油沒燒完的部分。同一段也寫了苯的致癌分類，卻沒寫分類的意思。',
         en: 'This site used to say the smell came from petrol that had not burnt. The same passage gave benzene’s cancer label without saying what the label means.',
@@ -167,6 +171,10 @@ export default copy({
      * {tokens} are filled from the registry on the page.
      */
     wrongText: {
+      'co-main-path': {
+        'zh-TW': '數字沒有錯，但放錯了地方。等一個紅燈，一氧化碳低於指引值（推估）；例外只有嬰兒車連續 15 分鐘停在排氣管正後方、幾乎沒風的少見情形。把它放在最前面，讓人以為「低於指引值」就是整個答案，也讓人搞不清楚它和那個味道的關係。用來比排出量的那個比法，也讓人看不懂。',
+        en: 'The figures were right, but in the wrong place. Waiting one red light keeps carbon monoxide below the guideline (estimate); the only exception is the rare case of a pushchair right behind a tailpipe, in almost no wind, for 15 minutes. Putting it first made “below the guideline” look like the whole answer, and blurred how it relates to the smell. The comparison used for the amount given off was hard to follow too.',
+      },
       'smell-not-petrol': {
         'zh-TW': '我們用電腦把味道和每一種成分一起算過（推估）。在一群機車的情況裡，苯從來沒有濃到它自己聞得出來；那個味道比較可能來自燃燒產生的醛類，只能粗略估計，可能差到十倍左右。沒燒完的汽油蒸氣，我們沒有另外算。這兩件事寫在同一段，讀起來就把兩件不同的事混在一起了。',
         en: 'We worked out the smell and each chemical together (an estimate). In the cases with a group of scooters, benzene never gets strong enough to be smelled itself; the smell more likely comes from aldehydes formed by burning, though only the order of magnitude can be estimated. Unburnt petrol vapour was not worked out separately. Putting the two in one passage ran two different things together.',
@@ -222,6 +230,11 @@ export default copy({
     },
     /** What we say now, in plain words. */
     nowText: {
+      /** {times} is the EstimateValue of sim.benzene.stay1hTimes; {h} {lo} {hi} its basis and doubt. */
+      'co-main-path': {
+        'zh-TW': '主要頁面不再談一氧化碳。首頁講聞得到的味道、跟著味道一起來的苯和其他成分、聞得到時苯有多少，還有在路口待上一小時的人：風一直從機車吹來時，苯可能是美國加州 1 小時參考值的{times}（推估；這個參考值是用 {h} 小時的資料訂的；機車廢氣裡有多少苯，可能差到 {lo} 到 {hi} 倍；風要整整一小時都這樣吹，很少見；超過參考值，不等於證明有害；這不是在說等一個紅燈的人）。一氧化碳的推估和電腦算的結果，完整留在「怎麼算的」那一頁，量用公克表示。',
+        en: 'The main pages no longer discuss carbon monoxide. The home page covers the smell, the benzene and other chemicals that come with it, how much benzene there is when you can smell it, and people who stay at the junction for an hour: with the wind always from the scooters, their benzene can be {times} California’s 1-hour reference level (estimate; that reference was set from {h}-hour data; how much benzene scooter exhaust holds could be off {lo}- to {hi}-fold; the wind must hold for the whole hour, which is rare; being above a reference level is not proof of harm; this is not about someone waiting one red). The carbon monoxide estimate and the simulation’s results stay in full on the ‘How we worked it out’ page, with amounts in grams.',
+      },
       'smell-not-petrol': {
         'zh-TW': '聞到的不是苯，但苯跟著一起來（推估）：只要那個味道來自身旁機車的廢氣，同一口空氣裡就有苯。聞不到，不代表空氣乾淨。苯、1,3-丁二烯、甲醛的致癌分類另外寫，寫出分類的意思，也寫出汽油引擎廢氣整體是第2B類。',
         en: 'What you smell is not benzene, but benzene comes with it (estimate): whenever the smell is the exhaust of the scooters beside you, benzene is in the same breath of air. No smell does not mean clean air. The cancer labels of benzene, 1,3-butadiene and formaldehyde are given separately, with what the groups mean and with petrol-engine exhaust’s own Group 2B.',

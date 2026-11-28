@@ -146,8 +146,8 @@ export const simulation = {
     confidence: 'verified',
     evidence: 'estimate',
     caveat: t(
-      '不是每種風都這樣。這說的是那個高度的空氣，不是說小孩吸進的一氧化碳是大人的兩倍。',
-      'Not in every wind. This is about the air at that height, not a claim that children breathe twice as much carbon monoxide.',
+      '不是每種風都這樣。這說的是那個高度的空氣，不是說小孩吸進的廢氣是大人的兩倍。',
+      'Not in every wind. This is about the air at that height, not a claim that children breathe in twice as much exhaust.',
     ),
     requiresCaveat: true,
     chainLink: 6,

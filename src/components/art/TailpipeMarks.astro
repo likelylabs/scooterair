@@ -9,7 +9,7 @@
  * three labels with thin leader lines pointing into the same fume:
  *
  *   刺鼻的氣體：聞得到  at the wisps that reach the nose (top left, above the head)
- *   一氧化碳：聞不到    into the thinner fume near the head
+ *   苯：聞不出來        into the thinner fume near the head (the air that is breathed)
  *   微粒：小到看不到    into the fume low behind the pipe (no darker patch: a reader must not
  *                       see a visible smudge beside the words "too small to see")
  *
@@ -20,15 +20,10 @@
  *
  * Props
  *   locale  Locale
- *   can     draw the drinks can (default: true when the `chip` slot is filled)
  *   tag     false (default; <Screen illustration> prints it) | 'street'
  *   id, class
- * Slot
- *   chip    the number chip (HTML from the host: an <EstimateValue>). It sits in
- *           a row above the drawing, beside the drinks can, in normal flow, so
- *           it can grow with 字大 without covering the picture
  *
- *   <TailpipeMarks slot="picture" locale={locale}><EstimateValue slot="chip" … /></TailpipeMarks>
+ *   <TailpipeMarks slot="picture" locale={locale} />
  */
 import '@/styles/art.css';
 import type { Locale } from '@/i18n';
@@ -36,20 +31,17 @@ import { art } from '@/i18n/art';
 import SceneFrame from './SceneFrame.astro';
 import SceneLabel from './SceneLabel.astro';
 import { air, airRibbon, airWisp, unitsPerPx, type Box } from './air';
-import { CAN, MASK_FACE, TAILPIPE, artId, drinksCan, maskHead, scooter } from './parts';
+import { MASK_FACE, TAILPIPE, artId, maskHead, scooter } from './parts';
 import { put } from './kit';
 import { leader, sceneAlt } from './scene';
 
 interface Props {
   locale: Locale;
-  can?: boolean;
   tag?: false | 'street';
   id?: string;
   class?: string;
 }
 const { locale, tag = false, id, class: cls } = Astro.props;
-const hasChip = Astro.slots.has('chip');
-const can = Astro.props.can ?? hasChip;
 
 // a band of road under the scooter holds two of the three labels
 const VB: Box = { x: -200, y: -266, w: 390, h: 380 };
@@ -71,12 +63,12 @@ const ribbons = [-7, 0, 7]
 // the three labels and where their leader lines end. Each line starts under its label's plate (so
 // at every text size it comes straight out of the words) and ends on the thing it names:
 //   vapour  the wisps just in front of the nose
-//   co      the fume in front of the face, below the wisps (the air that is breathed)
+//   benzene the fume in front of the face, below the wisps (the air that is breathed)
 //   pm      the fume right behind the tailpipe
 const BOTTOM = VB.y + VB.h - 6;
 const L = {
   vapour: { x: -192, y: VB.y + 6, to: { x: NOSE.x + 16, y: NOSE.y - 3 }, from: { x: NOSE.x + 14, y: VB.y + 16 } },
-  co: { x: -192, y: BOTTOM, to: { x: HEAD.x + 12, y: HEAD.y + 8 }, from: { x: -150, y: BOTTOM - 10 } },
+  benzene: { x: -192, y: BOTTOM, to: { x: HEAD.x + 12, y: HEAD.y + 8 }, from: { x: -150, y: BOTTOM - 10 } },
   pm: { x: 184, y: BOTTOM, to: { x: M.x - 20, y: M.y + 22 }, from: { x: 100, y: BOTTOM - 10 } },
 };
 const leaders = Object.values(L).map((l) => leader(l.from.x, l.from.y, l.to.x, l.to.y, upp)).join('');
@@ -90,20 +82,14 @@ const scene = [
   put(at.x, at.y, scooter({ kind: 'gas', rider: true }), { cls: 'a-figure' }),
   leaders,
 ].join('');
-const alt = sceneAlt(locale, art.tailpipe.alt[locale] + (can ? (locale === 'en' ? ' ' : '') + art.tailpipe.canAlt[locale] : ''), { kind: 'plain' });
+const alt = sceneAlt(locale, art.tailpipe.alt[locale], { kind: 'plain' });
 ---
 
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} arrive id={id} class={['scene--tailpipe', cls].filter(Boolean).join(' ')}>
-  {(hasChip || can) && (
-    <div slot="before" class="tm-head">
-      {can && <svg class="tm-can" viewBox={`0 ${-CAN.h - 4} ${CAN.w} ${CAN.h + 6}`} aria-hidden="true" focusable="false" set:html={drinksCan()} />}
-      {hasChip && <div class="tm-chip"><slot name="chip" /></div>}
-    </div>
-  )}
   <Fragment set:html={scene} />
   <Fragment slot="labels">
     <SceneLabel box={VB} x={L.vapour.x} y={L.vapour.y} anchor="start top" max={52} plate class="fume-label">{art.fume.inSmell[locale]}</SceneLabel>
-    <SceneLabel box={VB} x={L.co.x} y={L.co.y} anchor="start bottom" max={47} plate class="fume-label">{art.fume.inCo[locale]}</SceneLabel>
+    <SceneLabel box={VB} x={L.benzene.x} y={L.benzene.y} anchor="start bottom" max={47} plate class="fume-label">{art.fume.inBenzene[locale]}</SceneLabel>
     <SceneLabel box={VB} x={L.pm.x} y={L.pm.y} anchor="end bottom" max={47} plate class="fume-label">{art.fume.inPm[locale]}</SceneLabel>
   </Fragment>
 </SceneFrame>

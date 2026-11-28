@@ -549,6 +549,9 @@ export const screenText = {
 export const how = {
   button: { 'zh-TW': '怎麼知道的？', en: 'How do we know?' } as L10n,
   close: { 'zh-TW': '關閉', en: 'Close' } as L10n,
+  /** Block 1 of an estimate sheet whose first block says how the computer worked it out (the
+   *  simulation sheets, `computed`), in place of 量到的: nothing in that block was measured. */
+  computedHead: { 'zh-TW': '電腦算的，不是量的', en: 'Worked out on a computer, not a measurement' } as L10n,
   /** The three block headings, by the kind of number the sheet stands behind. */
   heads: {
     estimate: [

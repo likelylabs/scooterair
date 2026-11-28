@@ -1,0 +1,64 @@
+---
+/**
+ * SmellSheet — the sheet behind home screen 4 (how long you can smell it, and how much benzene
+ * there is when you can), shared with /questions/beside-me/ and /questions/app/ #more so the three
+ * say the same. Seconds-long levels only (statements-smell must-not 3): no 30-minute, 1-hour or
+ * yearly value and no reference level anywhere in it. Its blocks:
+ *   1  how it was worked out (one simulated red per case; the draws; the single scooters)
+ *   2  how-much-just-smellable (typical, not the least); level-in-smellable-seconds with its
+ *      condition, share and draws (must-not 7); how-often-wind with both thresholds and their
+ *      ranges (must-not 13); the street-canyon counterweight (must-not 11)
+ *   3  confidence, the method file, the full evidence
+ * Every number is a token filled from src/data/simulation.ts (simSmellShares) or an EstimateValue.
+ *
+ * Props
+ *   locale  Locale
+ *   id      the sheet's address ('how-4')
+ */
+import type { Locale } from '@/i18n';
+import { asset, href } from '@/i18n';
+import HowSheet from '@/components/ui/HowSheet.astro';
+import SimText from '@/components/pages/estimate/SimText.astro';
+import { simSmellShares, simStamp, smellFiles } from '@/data/simulation';
+import { how } from '@/i18n/ui';
+import home from '@/i18n/pages/home';
+import questions from '@/i18n/pages/questions';
+import { fill } from '@/i18n/pages/_copy';
+
+interface Props {
+  locale: Locale;
+  id: string;
+}
+const { locale, id } = Astro.props;
+const v = simSmellShares(locale);
+const s = home.s4.sheet;
+const hm = questions.smell.howMuch;
+const L = (x: Record<Locale, string>) => fill(x[locale], v);
+---
+
+<HowSheet
+  id={id}
+  locale={locale}
+  kind="estimate"
+  computed
+  anchor="smell"
+  stamp={simStamp[locale]}
+  title={s.title[locale]}
+  facts={['smell-benzene-just-smellable', 'smell-benzene-seconds', 'sim-smell-seconds', 'smell-older-engines']}
+  primary={{ href: href('/evidence/#smell-chemicals', locale) }}
+  secondary={{ href: href('/estimate/#smell', locale), label: s.numbers[locale] }}
+>
+  <p slot="block1">{L(s.how)}</p>
+  <Fragment slot="block2">
+    <p>{s.typical[locale]}</p>
+    <SimText locale={locale} text={L(hm.lines[2])} slots={{ seconds: 'sim.smell.benzeneSeconds' }} />
+    <p>{L(hm.lines[3])}</p>
+    <p>{L(hm.sheet.b2)}</p>
+    <p>{s.canyon[locale]}</p>
+  </Fragment>
+  <Fragment slot="block3">
+    <p>{L(hm.sheet.b3)}</p>
+    <p><a href={asset(smellFiles.method)}>{questions.smell.s1.sheet.method[locale]}</a></p>
+    <p><a href={href('/evidence/#smell-chemicals', locale)}>{how.fullEvidence[locale]}</a></p>
+  </Fragment>
+</HowSheet>

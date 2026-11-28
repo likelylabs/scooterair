@@ -43,7 +43,7 @@ import SimAbove from '@/components/charts/SimAbove.astro';
 import SmellBenzene from '@/components/charts/SmellBenzene.astro';
 import SimText from '@/components/pages/estimate/SimText.astro';
 import { mveModel } from '@/components/charts/core/estimateCharts';
-import { workingBusiest, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
+import { workingBusiest, workingKerbFlow, workingPerRed } from '@/components/charts/core/workingSum';
 import KerbScene from '@/components/art/KerbScene.astro';
 import MeasurementDiagram from '@/components/art/MeasurementDiagram.astro';
 import { AIR_RULE } from '@/components/art/air-slots';
@@ -56,7 +56,7 @@ import Downloads from '@/components/pages/estimate/Downloads.astro';
 import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { estText, kSentences } from '@/i18n/ui';
 import { answerList, facts, type SourceId } from '@/data';
-import { est, estimateText, formatEstimate, scenarioKeys } from '@/data/estimate';
+import { dose, est, estimateText, formatEstimate, scenarioKeys } from '@/data/estimate';
 import { simData } from '@/data/simulation-data';
 import { sim, simAbove, simSmell, smellFiles } from '@/data/simulation';
 import estimateCopy from '@/i18n/pages/estimate';
@@ -124,7 +124,7 @@ const inputs = [
     sources: ['moj-road-marking-rules'] as SourceId[],
   },
 ];
-const perRedNote = fill(t.recipe.perRedNote, { reds: est.emit.co.perRedSum.reds, red: est.signal.redLength_s, ml: est.emit.co.perRedSum.canMl });
+const perRedNote = fill(t.recipe.perRedNote, { reds: est.emit.co.perRedSum.reds, red: est.signal.redLength_s });
 
 // ---- #count ---------------------------------------------------------------------------------
 const scnCards = scenarioKeys.map((s) => ({
@@ -271,6 +271,7 @@ const stayTable = {
     <EstimateTable locale={locale} id="numbers-table" />
     <p class="es-p es-gloss">{estimateText.upperIsTypical[locale]}</p>
     <p class="es-p es-gloss">{estimateText.unitsGloss[locale]}</p>
+    <p class="es-p">{fill(t.numbers.dose, { pct: dose.dayShare.underPct })}</p>
     <div class="es-ufp">
       <h3 class="es-h3"><Phrased text={t.numbers.ultrafineTitle} /></h3>
       <p class="es-p">{kSentences.K2[locale]}{en ? ' ' : ''}{kSentences.K3[locale]}</p>
@@ -296,6 +297,7 @@ const stayTable = {
     </div>
 
     <h3 class="es-h3"><Phrased text={S.askTitle} locale={locale} /></h3>
+    <p class="es-p">{S.askLead}</p>
     <div class="es-sim__lines">
       {S.smell.map((l) => <p class="es-p">{l}</p>)}
       <p class="es-p">{S.oneRed[0]}</p>
@@ -449,7 +451,6 @@ const stayTable = {
       <h3 class="es-h3"><Phrased text={t.recipe.perRedTitle} /></h3>
       <p class="es-p">{perRedNote}</p>
       <WorkingSum {...workingPerRed(locale)} />
-      <WorkingSum {...workingPerRedCan(locale)} />
     </div>
   </Section>
 
@@ -994,10 +995,14 @@ const stayTable = {
     line-height: var(--lh-read);
   }
   /* the kerb drawing and its switch: the layout rule of the home page's screens (ui/Screen.astro).
-     One column below 43em, the drawing as wide as the words under it. From 43em two columns,
-     drawing left (at most 55 % and 32rem, and narrow enough that the drawing and its tag
-     fit the window’s height, never under 14rem), switch and figures right. --pic-ar is the kerb
-     drawing's width over its height (its viewBox, 450 × 425). */
+     One column on a phone (below 43em), the drawing as wide as the words under it. One column on
+     a tablet held upright (43em to 60em, portrait): the drawing above the switch and figures,
+     both as wide as the drawing may be for the drawing, its tag, the "try it" line and the
+     switch's first row to fit the window's height (never under 30rem), and set at the start of
+     the page's column, where its words start. Two columns from 60em, or from 43em on a window
+     wider than tall: drawing left (at most 55 % and 32rem, and narrow enough that the drawing
+     and its tag fit the window’s height, never under 14rem), switch and figures right. --pic-ar
+     is the kerb drawing's width over its height (its viewBox, 450 × 425). */
   .es-draw {
     --pic-ar: 1.0588;
     --win: calc(100vh - var(--header-h) - 2rem);
@@ -1010,11 +1015,23 @@ const stayTable = {
       --win: calc(100svh - var(--header-h) - 2rem);
     }
   }
-  @media (min-width: 43em) {
+  @media (min-width: 43em) and (max-width: 59.99em) and (orientation: portrait) {
+    .es-draw {
+      max-inline-size: max(min(30rem, 480px), calc((var(--win) - 10rem) * var(--pic-ar)));
+    }
+  }
+  @media (min-width: 60em), (min-width: 43em) and (orientation: landscape) {
     .es-draw {
       grid-template-columns: minmax(0, min(55%, 32rem, max(14rem, calc((var(--win) - 5rem) * var(--pic-ar))))) minmax(min(17rem, 45%), 1fr);
       column-gap: var(--sp-5);
       align-items: start;
+    }
+  }
+  /* wider than a phone, the drawing has rounded corners, as the home and question pictures do */
+  @media (min-width: 43em) {
+    .es-draw__pic > :global(:first-child) {
+      border-radius: var(--radius-3);
+      overflow: hidden;
     }
   }
   .es-draw__side {

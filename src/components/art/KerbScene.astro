@@ -23,6 +23,15 @@
  *   scenario  'all' (default: switchable) | 'few' | 'dozen' | 'full' (fixed: poster, share card, brief)
  *   initial   the scenario a switchable picture shows first (default 'dozen')
  *   tag       false (default; <Screen illustration> prints it) | 'street'
+ *   figure    'child' (default) | 'guard': in place of the schoolchild, a little nearer the kerb
+ *             edge, an adult school crossing guard (導護) in a plain yellow-green vest with one
+ *             lighter band, holding a short pole with a small rectangular flag (nothing round).
+ *             With 'guard' two word labels are drawn, each with a line that ends on the person it
+ *             names: 待上一小時 on the guard's vest, 只等一個紅燈 on the parent's head (home
+ *             screen 5). `legend` then turns off only the 機車排的氣 label.
+ *   tight     true: the frame leaves out the top of the shopfronts and most of the road under the
+ *             kerb (home screens 4 and 5, where the words under the picture are longer); what
+ *             the people, the scooters and the fume are drawn with is unchanged
  *   id, class
  *
  *   <KerbScene slot="picture" locale={locale} />
@@ -37,6 +46,7 @@ import SceneLabel from './SceneLabel.astro';
 import { air, unitsPerPx, type AirScenario, type Box } from './air';
 import { AIR_EXTRA } from './air-slots';
 import { TAILPIPE, artId, person } from './parts';
+import { crossingGuard } from './guard';
 import { placed, put, shopfronts, stepSources, tailOf, type Placed } from './kit';
 import { leader, sceneAlt } from './scene';
 
@@ -49,13 +59,18 @@ interface Props {
   class?: string;
   /** the label on the picture (default true; false for a thumbnail or a share card) */
   legend?: boolean;
+  figure?: 'child' | 'guard';
+  tight?: boolean;
 }
-const { locale, legend = true, scenario = 'all', initial = 'dozen', tag = false, id, class: cls } = Astro.props;
+const { locale, legend = true, scenario = 'all', initial = 'dozen', tag = false, figure = 'child', tight = false, id, class: cls } = Astro.props;
+const guard = figure === 'guard';
 const shown: AirScenario = scenario === 'all' ? initial : scenario;
 
-const VB: Box = { x: 0, y: -340, w: 450, h: 425 };
+// tight: 60 units of shopfront off the top and 35 of road off the bottom
+const VB: Box = tight ? { x: 0, y: -280, w: 450, h: 330 } : { x: 0, y: -340, w: 450, h: 425 };
 const parent = 26;
 const child = 178;
+const guardX = 204; // the crossing guard stands a little nearer the kerb edge than the child
 const front: Placed = { x: 274, lift: 0, s: 1, row: 1 };
 // rows behind, back row first; `step` is the scenario from which a row shows (2 = the dozen, 3 = a full box)
 const behind: (Placed & { step: 2 | 3 })[] = [
@@ -92,17 +107,42 @@ const far =
   '</g>';
 const fg = [
   put(parent, 0, person('stroller'), { cls: 'a-figure' }),
-  put(child, 0, person('schoolchild-cover'), { cls: 'a-figure' }),
+  guard ? put(guardX, 0, crossingGuard(), { cls: 'a-figure' }) : put(child, 0, person('schoolchild-cover'), { cls: 'a-figure' }),
   placed(front, 'gas', { face: true, cls: 'a-figure' }),
 ].join('');
 // the one label: on the road between the child and the scooter, a short line up into the fume there
 // it stands on the bottom edge and grows upward with 字大; its line starts under its plate
 const LBL = { x: 196, y: VB.y + VB.h - 4 };
-const lead = leader(LBL.x + 44, 50, 248, -58, unitsPerPx(VB.w));
-const alt = sceneAlt(locale, art.kerb.alt[locale], { scenario: shown, count: est.scn[shown].count });
+const upp = unitsPerPx(VB.w);
+const lead = leader(LBL.x + 44, tight ? VB.y + VB.h - 36 : 50, 248, -58, upp);
+// figure="guard": the two labels stand on the top edge (they grow downward with 字大); each line
+// starts under its label and ends on the person it names
+const G = {
+  oneRed: { x: VB.x + 8, y: VB.y + 6, from: { x: 40, y: VB.y + 44 }, to: { x: parent + 2, y: -166 } },
+  guard: { x: VB.x + VB.w - 8, y: VB.y + 6, from: { x: VB.w - 70, y: VB.y + 44 }, to: { x: guardX + 4, y: -112 } },
+};
+const guardLeads = guard ? Object.values(G).map((g) => leader(g.from.x, g.from.y, g.to.x, g.to.y, upp)).join('') : '';
+const alt = guard ? sceneAlt(locale, art.kerb.altGuard[locale], { scenario: shown, count: est.scn[shown].count }) : sceneAlt(locale, art.kerb.alt[locale], { scenario: shown, count: est.scn[shown].count });
 ---
 
 <SceneFrame locale={locale} box={VB} alt={alt} tag={tag} scenario={shown} drift id={id} class={['scene--kerb', cls].filter(Boolean).join(' ')}>
-  <Fragment set:html={a.defs + street + a.wash + far + stepped(a.cores) + stepped(a.marks) + fg + (legend ? lead : '')} />
+  <Fragment set:html={a.defs + street + a.wash + far + stepped(a.cores) + stepped(a.marks) + fg + (legend ? lead : '') + guardLeads} />
   {legend && <SceneLabel slot="labels" box={VB} x={LBL.x} y={LBL.y} anchor="start bottom" max={52} plate class="fume-label">{art.fume.label[locale]}</SceneLabel>}
+  {guard && <SceneLabel slot="labels" box={VB} x={G.oneRed.x} y={G.oneRed.y} anchor="start top" max={42} plate class="fume-label">{art.kerb.oneRed[locale]}</SceneLabel>}
+  {guard && <SceneLabel slot="labels" box={VB} x={G.guard.x} y={G.guard.y} anchor="end top" max={42} plate class="fume-label">{art.kerb.guard[locale]}</SceneLabel>}
 </SceneFrame>
+
+<style is:global>
+  /* the crossing guard's vest and flag (figure="guard"): yellow-green from the drawing's own yellow
+     and green, so it re-themes with them */
+  .kerb-vest {
+    fill: color-mix(in srgb, var(--art-yellow) 62%, var(--art-green));
+  }
+  .kerb-vest__band {
+    fill: var(--art-paint);
+    opacity: 0.75;
+  }
+  .kerb-flag {
+    fill: var(--art-yellow);
+  }
+</style>

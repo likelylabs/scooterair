@@ -19,6 +19,11 @@ const IOT_SENSOR = t(
   '用的是固定的小型感測器：PM2.5 用雷射光量，一氧化碳用電化學的方法量。感測器裝在等候區，離斑馬線 1.0 到 1.5 公尺。吸空氣的口離地 1.2 到 1.5 公尺，每分鐘記一筆。儀器事先經過工研院實驗室認證，也和環境部測站比對過。數字是報告從圖上讀出的範圍。量的是路口所有來源的空氣。報告沒有分紅燈和綠燈，也沒有分出機車占多少。每個路口只量 48 小時，而且是在夏天。',
   'Small fixed sensors: laser light for PM2.5, an electrochemical cell for carbon monoxide. They stood in the waiting area, 1.0–1.5 m from the crossing. The air inlet was 1.2–1.5 m above the ground, and they took one reading a minute. An ITRI laboratory certified them, and they were checked against an environment-ministry station first. The numbers are the ranges the report reads off its charts. It is the air from every source at the junction. The report does not split red from green or pick out the scooters\' share. Each junction was measured for 48 hours, in summer.',
 );
+/** The same, for the PM2.5 fact read on the main path (/questions/app/): without the carbon monoxide clause (decision 2026-11-28). */
+const IOT_SENSOR_PM25 = t(
+  '用的是固定的小型感測器：PM2.5 用雷射光量。感測器裝在等候區，離斑馬線 1.0 到 1.5 公尺。吸空氣的口離地 1.2 到 1.5 公尺，每分鐘記一筆。儀器事先經過工研院實驗室認證，也和環境部測站比對過。數字是報告從圖上讀出的範圍。量的是路口所有來源的空氣。報告沒有分紅燈和綠燈，也沒有分出機車占多少。每個路口只量 48 小時，而且是在夏天。',
+  'Small fixed sensors: laser light for PM2.5. They stood in the waiting area, 1.0–1.5 m from the crossing. The air inlet was 1.2–1.5 m above the ground, and they took one reading a minute. An ITRI laboratory certified them, and they were checked against an environment-ministry station first. The numbers are the ranges the report reads off its charts. It is the air from every source at the junction. The report does not split red from green or pick out the scooters\' share. Each junction was measured for 48 hours, in summer.',
+);
 const LAW_DATE = t('2026 年 11 月查閱全國法規資料庫', 'Laws and Regulations Database as of November 2026');
 
 // ---------------------------------------------------------------------------
@@ -577,7 +582,7 @@ export const intersection = {
     locator: 'IOT-113-TB006 §2.2.3 pp.2-24–2-26 (sensors beside the crosswalk at 1.0–1.5 m, inlet 1.2–1.5 m, one record per minute, ITRI lab certification and MOENV co-location); Table 2.2.5-1 (dates); §3.3.1 pp.3-54–3-60 (per-site ranges). PDF re-opened 2026-11-26.',
     confidence: 'verified',
     evidence: 'measured-tw',
-    caveat: IOT_SENSOR,
+    caveat: IOT_SENSOR_PM25,
     requiresCaveat: true,
     chainLink: 3,
     editorNote: 'The figures are the report\'s own text descriptions of its time-series charts ("大多落在…"), not tabulated statistics; the report gives no averaging beyond one-minute logging and no sensor model for PM2.5 or CO. For the redesigned "what has been measured" panel. The year-one (2023, Taipei) readings are published only as the setback differences (fact iot-setback-measured).',
@@ -666,8 +671,8 @@ export const smell = {
     confidence: 'verified',
     evidence: 'international',
     caveat: t(
-      '嗅覺門檻是拿單一種東西、在乾淨的空氣裡測的，而且每個人不一樣；不同來源差到十倍、百倍，所以只能看大概是幾位數，沒有準確的數字。還沒有研究找出機車廢氣的味道主要是哪些東西；醛類只是可能的。這兩份資料都沒有列一氧化碳：它沒有味道。',
-      'Smell thresholds are measured one substance at a time, in clean air, and they differ from person to person. Sources differ by ten to a hundred times, so only the rough size means anything, not an exact number. No study has found which substances mainly give scooter exhaust its smell; aldehydes are only likely candidates. Neither source lists carbon monoxide: it has no smell.',
+      '嗅覺門檻是拿單一種東西、在乾淨的空氣裡測的，而且每個人不一樣；不同來源差到十倍、百倍，所以只能看大概是幾位數，沒有準確的數字。還沒有研究找出機車廢氣的味道主要是哪些東西；醛類只是可能的。',
+      'Smell thresholds are measured one substance at a time, in clean air, and they differ from person to person. Sources differ by ten to a hundred times, so only the rough size means anything, not an exact number. No study has found which substances mainly give scooter exhaust its smell; aldehydes are only likely candidates.',
     ),
     requiresCaveat: true,
     chainLink: 4,

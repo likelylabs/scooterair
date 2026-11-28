@@ -33,10 +33,23 @@ const T = questions.mask.s2.table;
 const source = verified.tableRows as { maskEn: string; maskZh: string; gases: string; ultrafine: string; pm25: string; basis: string }[];
 if (source.length !== T.rows.length) throw new Error(`MaskTable: the research file has ${source.length} rows, the copy has ${T.rows.length}.`);
 const cols = ['gases', 'ultrafine', 'pm25'] as const;
+// Carbon monoxide off the main path, decision 2026-11-28: the activated-carbon row's gases cell
+// is the research file's cell less its first sentence, character for character. The check stops
+// the build if the file's cell no longer starts with exactly that sentence; every other cell is
+// compared whole.
+const CO_SENTENCE = 'Carbon monoxide: none. ';
+function mainPathGases(cell: string, maskEn: string): string {
+  if (maskEn !== 'Activated-carbon mask') return cell;
+  if (!cell.startsWith(CO_SENTENCE)) throw new Error(`MaskTable: research/masks/VERIFIED.json's gases cell "${cell}" no longer starts with "${CO_SENTENCE}"; re-read it before printing it.`);
+  return cell.slice(CO_SENTENCE.length);
+}
 const rows = source.map((src, i) => {
   const row = T.rows[i];
   if (row.name.en !== src.maskEn) throw new Error(`MaskTable row ${i + 1}: the copy says "${row.name.en}", research/masks/VERIFIED.json says "${src.maskEn}".`);
-  for (const c of cols) if (row[c].en !== src[c]) throw new Error(`MaskTable row ${i + 1} (${src.maskEn}), ${c}: the copy says "${row[c].en}", research/masks/VERIFIED.json says "${src[c]}".`);
+  for (const c of cols) {
+    const want = c === 'gases' ? mainPathGases(src.gases, src.maskEn) : src[c];
+    if (row[c].en !== want) throw new Error(`MaskTable row ${i + 1} (${src.maskEn}), ${c}: the copy says "${row[c].en}", research/masks/VERIFIED.json says "${want}".`);
+  }
   const basis = [...new Set(src.basis.match(/mask-[a-z0-9-]+/g) ?? [])];
   for (const b of basis) if (!(b in facts)) throw new Error(`MaskTable row ${i + 1}: basis fact "${b}" is not in the registry.`);
   if (!basis.length) throw new Error(`MaskTable row ${i + 1}: no fact stands behind it.`);

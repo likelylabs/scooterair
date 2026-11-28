@@ -26,8 +26,8 @@ export default copy({
     eyebrow: { 'zh-TW': '怎麼算的', en: 'How we worked it out' },
     title: { 'zh-TW': '機車旁邊|多了多少廢氣，|我們這樣算', en: 'What the scooters add at the kerb, |and how we worked it out' },
     lead: {
-      'zh-TW': '一排機車停在紅燈前，引擎沒熄火。站在旁邊的人，多吸到多少一氧化碳？這一頁從答案開始，再一步一步說明怎麼算。',
-      en: 'A row of scooters waits at a red light with engines running. How much more carbon monoxide does the person beside them breathe? This page starts with the answer, then shows the working step by step.',
+      'zh-TW': '一排機車停在紅燈前，引擎沒熄火。站在旁邊的人，多吸到多少廢氣？我們用一氧化碳來算，把它當作廢氣的記號：機車定檢也量它。這一頁從答案開始，再一步一步說明怎麼算。',
+      en: 'A row of scooters waits at a red light with engines running. How much more exhaust does the person beside them breathe? We work it out with carbon monoxide, as a marker for the exhaust: scooter inspections measure it too. This page starts with the answer, then shows the working step by step.',
     },
     boxTitle: { 'zh-TW': '一氧化碳：旁邊停了十來輛機車', en: 'Carbon monoxide: a dozen or so scooters beside you' },
     notMeasured: { 'zh-TW': '這是推估，不是實測。', en: 'This is an estimate, not a measurement.' },
@@ -65,6 +65,11 @@ export default copy({
   },
 
   numbers: {
+    /** Moved here from home screen 7's sheet (decision 2026-11-28); {pct} is dose.dayShare.underPct. */
+    dose: {
+      'zh-TW': '一天四個紅燈，讓你一整天吸到的一氧化碳多不到 {pct}%。',
+      en: 'Four red lights a day raise the carbon monoxide you breathe over a whole day by under {pct}%.',
+    },
     eyebrow: { 'zh-TW': '1　數字', en: '1 · The numbers' },
     title: { 'zh-TW': '算出來的數字', en: 'The numbers' },
     lead: {
@@ -101,7 +106,12 @@ export default copy({
       { 'zh-TW': '一輛機車排氣管後面，幾乎沒風', en: 'right behind one tailpipe, in almost no wind' },
     ],
     gloss: { 'zh-TW': '推估：這是算的，不是量的，所以給一個範圍，也寫出它要在什麼情況下才成立。', en: 'Estimate: worked out, not read off an instrument, so we give a range and the conditions it needs.' },
-    askTitle: { 'zh-TW': '那麼臭，|超過指引值了嗎？', en: 'It smells awful. |Is it over the WHO guideline?' },
+    askTitle: { 'zh-TW': '一氧化碳：|等一個紅燈，會到指引值嗎？', en: 'Carbon monoxide: |does one red light reach the WHO guideline?' },
+    /** Why the home page's screens leave carbon monoxide out, and the finding in one place (decision 2026-11-28). */
+    askLead: {
+      'zh-TW': '首頁的畫面不談一氧化碳。推估：等一個紅燈，它低於世界衛生組織的指引值；就算整整 15 分鐘每個紅燈都站在路邊、風一直從機車吹來，也還是低於。例外只有一個少見的情形：嬰兒車停在排氣管正後方約半公尺、幾乎沒風，連續 15 分鐘每個紅燈都在。完整的結果都在這裡。',
+      en: 'The home page’s screens leave carbon monoxide out. Estimate: one red light keeps it below the WHO guideline, and so does standing at the kerb through every red for 15 minutes with the wind from the scooters. The one rare exception is a pushchair about half a metre behind a tailpipe, in almost no wind, through every red for 15 minutes. The full results are here.',
+    },
     smell: [
       { 'zh-TW': '推估：你聞到的臭味是真的。', en: 'Estimate: the smell you notice is real.' },
       { 'zh-TW': '風從一群引擎沒熄火的機車吹向你時，紅燈大約一半到幾乎全部的時間，廢氣都濃到一般人聞得到。', en: 'When the wind blows to you from a group of scooters with their engines running, for about half to nearly all of the red, the exhaust is strong enough for most people to smell.' },
@@ -220,14 +230,14 @@ export default copy({
     },
     justTitle: { 'zh-TW': '剛好聞得到的時候', en: 'When it is just noticeable' },
     just: [
-      { 'zh-TW': '推估：剛好聞得到廢氣味的時候，苯是{just}（最低約 {lo}，最高約 {hi}）。ppb＝十億份空氣裡有幾份。', en: 'Estimate: at the moment the exhaust is just noticeable, benzene is {just} (lowest about {lo}, highest about {hi}). ppb = parts in a billion of air.' },
+      { 'zh-TW': '推估：剛好聞得到廢氣味的時候，苯是{just}（範圍約 {lo} 到 {hi}）。ppb＝十億份空氣裡有幾份。', en: 'Estimate: at the moment the exhaust is just noticeable, benzene is {just} (range about {lo} to {hi}). ppb = parts in a billion of air.' },
       { 'zh-TW': '這是常見的量，不是最少的量。兩個數字來自 1967 和 1970 年兩個汽車廢氣的嗅覺研究；它們差 8.5 倍，是這個數字最大的不確定。', en: 'A typical value, not a minimum. The two numbers come from two smell tests of car exhaust from 1967 and 1970; they are 8.5 times apart, the largest single uncertainty in this number.' },
       { 'zh-TW': '電腦換了 10,000 種單獨一輛機車的排放量來算，和風怎麼吹無關。幾秒鐘的量，沒有官方的數值可以比，所以沒辦法說它高或低。', en: 'Worked out for 10,000 single scooters; it does not depend on the wind. No official value exists for a few seconds, so it cannot be called high or low.' },
     ],
     secondsTitle: { 'zh-TW': '風從機車吹來，|聞得到的那幾秒', en: 'Wind from the scooters: |the seconds you can smell it' },
     seconds: [
       /** level-in-smellable-seconds */
-      { 'zh-TW': '推估：風從機車群吹過來的時候，在離最近一台機車半公尺、小孩鼻子的高度（約 0.7 公尺），聞得到的那幾秒裡，苯平均大約 {about}，範圍{seconds}。', en: 'Estimate: with the wind blowing from the scooters, half a metre from the nearest one at a child’s nose height (about 0.7 m), benzene averages about {about} over the seconds you can smell it, range {seconds}.' },
+      { 'zh-TW': '推估：風從機車群吹過來的時候，在離最近一台機車半公尺、小孩和嬰兒車的高度（約 0.7 公尺），聞得到的那幾秒裡，苯平均大約 {about}，範圍{seconds}。', en: 'Estimate: with the wind blowing from the scooters, half a metre from the nearest one at child and pushchair height (about 0.7 m), benzene averages about {about} over the seconds you can smell it, range {seconds}.' },
       /** how-often-wind: both thresholds, the condition, how often */
       { 'zh-TW': '這種風，尖峰時段最多大約八個紅燈有一個。這時聞得到的時間，依中間推估約占紅燈的 {a}%（1967 年的標準）到 {b}%（1970 年的標準）。', en: 'Such a wind comes in at most about 1 in 8 peak-hour reds. Then the smell is there for about {a} % of the red by the 1967 study’s level and {b} % by the 1970 study’s (central estimates).' },
       { 'zh-TW': '上面「紅燈裡，多少時間聞得到」那張圖的範圍（{eLoA} 到 {eHiA}%、{eLoB} 到 {eHiB}%），只算了機車排多少不一樣；這裡再把廢氣怎麼散開的不確定也算進去，所以範圍更寬：{aLo} 到 {aHi}%、{bLo} 到 {bHi}%。', en: 'The ranges in the chart above, ‘How much of the red you can smell it’ ({eLoA}–{eHiA} % and {eLoB}–{eHiB} %), count only how much the scooters give off; here the uncertainty in how the exhaust spreads is counted as well, so the ranges are wider: {aLo}–{aHi} % and {bLo}–{bHi} %.' },
@@ -253,7 +263,7 @@ export default copy({
       { 'zh-TW': '範圍從低於參考值到好幾倍；風要整整一小時都這樣吹，很少見；每個紅燈都用同一個電腦算的紅燈；這個參考值是用比較長時間（6 小時）的資料訂的；超過參考值，不等於證明有害。', en: 'The range runs from below the reference to several times above it; the wind must hold for the whole hour, which is rare; every red is the same simulated red; the reference was derived from a longer (6-hour) exposure; being above a reference level is not proof of harm.' },
     ],
     table: {
-      caption: { 'zh-TW': '每一種成分：一小時（或 30 分鐘）每個紅燈都待在路邊的推估平均，和它自己同樣時間長度的參考值比。風一直從機車吹來，離最近的機車半公尺、小孩鼻子的高度（約 0.7 公尺，和上面「待一小時」圖裡「嬰兒車的高度」是同一個位置）。這種風最多大約八個紅燈有一個，整整一小時更少。上面那張圖只畫中間到偏高、但還算常見的情形；這張表寫的是中間值，括號裡是從低到高的整個範圍，所以兩邊的數字不一樣。', en: 'Each chemical: the estimated average for someone who stays through every red for an hour (or 30 minutes), against its own reference of the same averaging time. Wind always from the scooters, half a metre from the nearest scooter at a child’s nose height (about 0.7 m, the same spot as “pushchair height” in the stay-an-hour chart above). Such a wind comes in at most about 1 red in 8, and for a whole hour more rarely. The chart above shows only the middle to a high-but-ordinary case; this table gives the middle value with the full low-to-high range in brackets, so the numbers differ.' },
+      caption: { 'zh-TW': '每一種成分：一小時（或 30 分鐘）每個紅燈都待在路邊的推估平均，和它自己同樣時間長度的參考值比。風一直從機車吹來，離最近的機車半公尺、小孩和嬰兒車的高度（約 0.7 公尺，和上面「待一小時」圖的第一列是同一個位置）。這種風最多大約八個紅燈有一個，整整一小時更少。上面那張圖只畫中間到偏高、但還算常見的情形；這張表寫的是中間值，括號裡是從低到高的整個範圍，所以兩邊的數字不一樣。', en: 'Each chemical: the estimated average for someone who stays through every red for an hour (or 30 minutes), against its own reference of the same averaging time. Wind always from the scooters, half a metre from the nearest scooter at child and pushchair height (about 0.7 m, the same spot as the first row of the stay-an-hour chart above). Such a wind comes in at most about 1 red in 8, and for a whole hour more rarely. The chart above shows only the middle to a high-but-ordinary case; this table gives the middle value with the full low-to-high range in brackets, so the numbers differ.' },
       head: [
         { 'zh-TW': '成分（照在廢氣裡占的多少排）', en: 'Chemical (in order of share of the exhaust)' },
         { 'zh-TW': '推估平均（範圍），µg/m³', en: 'Estimated average (range), µg/m³' },
@@ -366,10 +376,9 @@ export default copy({
     resultTitle: { 'zh-TW': '算出來：|平均一輛機車停著、引擎沒熄火，|每小時排的一氧化碳', en: 'Result: the carbon monoxide the average stopped scooter gives off in an hour, engine running' },
     perRedTitle: { 'zh-TW': '等一個紅燈呢？', en: 'And through one red light?' },
     perRedNote: {
-      'zh-TW': '一小時有 {reds} 個 {red} 秒，所以除以 {reds}。換成氣體來看，大約可以裝滿一個 {ml} 毫升的鋁罐。',
-      en: 'An hour holds {reds} reds of {red} seconds, so divide by {reds}. As a gas, that is about enough to fill one {ml} mL drinks can.',
+      'zh-TW': '一小時有 {reds} 個 {red} 秒，所以除以 {reds}。',
+      en: 'An hour holds {reds} reds of {red} seconds, so divide by {reds}.',
     },
-    canTitle: { 'zh-TW': '換成鋁罐', en: 'In drinks cans' },
   },
 
   count: {
@@ -468,8 +477,8 @@ export default copy({
         en: 'The pictures draw only what the scooters give off: a soft fume that leaves the tailpipes, stays low and drifts onto the people waiting. The air the street already holds is not drawn; it is in the numbers.',
       },
       {
-        'zh-TW': '圖上沒有要對照圖例的記號。煙裡有什麼，用字寫在圖上：刺鼻的氣體聞得到，一氧化碳聞不到，微粒小到看不到。',
-        en: 'There are no symbols to look up in a key. What the fume holds is written on the picture in words: sharp-smelling gases you notice, carbon monoxide that has no smell, particles too small to see.',
+        'zh-TW': '圖上沒有要對照圖例的記號。煙裡有什麼，用字寫在圖上：刺鼻的氣體聞得到，苯聞不出來，微粒小到看不到。',
+        en: 'There are no symbols to look up in a key. What the fume holds is written on the picture in words: sharp-smelling gases you notice, benzene you cannot smell, particles too small to see.',
       },
       {
         'zh-TW': '人站的地方，煙畫得多濃，照推估：{few}平均蓋住 {a}%，{dozen}蓋住 {b}%，{full}最多蓋住 {c}%。煙最深的一點也只蓋住 {max}%，後面的東西一樣看得到。煙畫在人的後面，不會蓋住臉。',

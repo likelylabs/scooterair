@@ -14,13 +14,14 @@ import type { ClaimRuleId, FactId } from '@/data';
 /** The date the evidence behind these corrections was checked (the research files' date). */
 export const SEED_DATE = '2026-11-25';
 
-export type CorrectionKey = 'smell-not-petrol' | 'sim-guideline' | 'crossings-measured' | 'iot-94' | 'pm25-source' | 'ev-cheaper' | 'densest' | 'netzero-2035' | 'child-44' | 'ev-zero' | 'idling-legal' | 'ufp-smell' | 'no-2027';
+export type CorrectionKey = 'co-main-path' | 'smell-not-petrol' | 'sim-guideline' | 'crossings-measured' | 'iot-94' | 'pm25-source' | 'ev-cheaper' | 'densest' | 'netzero-2035' | 'child-44' | 'ev-zero' | 'idling-legal' | 'ufp-smell' | 'no-2027';
 
 export type Correction =
   | { key: CorrectionKey; date: string; rule: ClaimRuleId; facts?: FactId[] }
   | { key: CorrectionKey; date: string; own: true; facts: FactId[] };
 
 export const corrections: Correction[] = [
+  { key: 'co-main-path', date: '2026-11-28', own: true, facts: ['sim-co-one-red-15min', 'sim-co-pushchair-exception', 'sim-benzene-stayers-1h', 'smell-comes-with-benzene'] },
   { key: 'smell-not-petrol', date: '2026-11-27', own: true, facts: ['smell-comes-with-benzene', 'smell-not-unburnt-petrol', 'iarc-group1-three'] },
   { key: 'sim-guideline', date: '2026-11-27', own: true, facts: ['sim-co-one-red-15min', 'sim-co-pushchair-exception', 'sim-co-bursts-1s', 'sim-pushchair-height', 'sim-benzene-stayers-1h'] },
   { key: 'crossings-measured', date: '2026-11-26', own: true, facts: ['iot-waiting-area-co-2024', 'iot-waiting-area-pm25-2024'] },

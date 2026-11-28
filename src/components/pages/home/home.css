@@ -20,19 +20,25 @@
     margin-block-start: 0;
   }
 }
-/* A tablet held upright is two columns, like a desktop (ui/Screen.astro, from 43em): one column
-   there let the picture fill the whole window by itself and pushed the words below it. */
 /* --pic-extra: how tall each picture's box is besides its drawing (the tag, the key, a number
-   box, a chip, a switch), measured at 1,280 px in both languages and rounded up. ui/Screen.astro
-   narrows a picture until the drawing and this fit the window's height, with the words beside or
-   under it. The default (3rem) is the tag and a one-line key. */
-.h-home #s-2 { --pic-extra: 14rem; }   /* the can and its chip above the drawing */
-.h-home #s-4 { --pic-extra: 8rem; }    /* the number box above */
+   box, a chip, a switch), in both languages, rounded up. ui/Screen.astro narrows a picture until
+   the drawing and this fit the window's height, with the words beside it (two columns) or under
+   it (a phone, a tablet held upright). The default (3rem) is the tag and a one-line key.
+   The same box is a different height in each layout, because what sits in it wraps differently
+   at each width: the first list is measured in two columns at 1,280 × 800, the second in one
+   column on a tablet held upright at 703 × 900 (ui/Screen.astro: 43em to 60em, portrait).
+   To re-measure a screen: scroll it to its top, then take the height of .screen__stage less the
+   height of the drawing (.screen__pic svg.scene__art), in Chinese and in English, at 標準; keep
+   the larger and round up to the next half rem. */
 .h-home #s-6,
 .h-home #s-12 { --pic-extra: 5.5rem; }
 .h-home #s-10,
 .h-home #s-11 { --pic-extra: 15.5rem; } /* the masks; the switch */
 .h-home:lang(en) #s-1 { --pic-extra: 9rem; } /* the English key under the first picture */
+@media (min-width: 43em) and (max-width: 59.99em) and (orientation: portrait) {
+  .h-home:lang(en) #s-1 { --pic-extra: 3rem; } /* wide here: the English key keeps one line */
+  .h-home #s-11 { --pic-extra: 14rem; }
+}
 /* the chips share foot row 1 with 怎麼知道的？: they take the room that is left and wrap among
    themselves there; a chip is never cut (when even one chip does not fit beside the button, the
    button moves to a line of its own) */
@@ -89,7 +95,8 @@
   padding: 0;
 }
 @media (min-width: 43em) {
-  /* the drawing is rounded, not the block that also holds its control */
+  /* wider than a phone (one column on a tablet held upright, or two): the drawing is rounded,
+     not the block that also holds its control */
   .h-home .screen__pic > .h-pic {
     border-radius: 0;
     overflow: visible;
@@ -147,62 +154,12 @@
   inline-size: auto;
 }
 
-/* ---- screen 4: the number box. In flow above the drawing; on a phone of 360 px or more at
-   標準 text size it lies over the top of the drawing, where the scene is only shopfronts. In two
-   columns (from 43em) the picture column is narrow, so the box always sits above the drawing:
-   over it, it would hide the people ---- */
-.h-box {
-  margin: var(--sp-3) var(--pad, var(--gutter)) var(--sp-2);
-  padding: 0.25rem var(--sp-3);
-  border: 2px solid var(--ink);
-  border-radius: var(--radius-3);
-  background: var(--surface);
-}
-.h-box__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0 var(--sp-3);
-  min-block-size: 2rem;
-}
-.h-box__row--est {
-  display: block;
-  border-block: 1px solid var(--line);
-}
-.h-box__row--est > .est {
-  inline-size: 100%;
-  justify-content: space-between;
-}
-.h-box__what {
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
-  color: var(--ink);
-}
-.h-box__val {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  font-size: var(--fs-base);
-  font-variant-numeric: tabular-nums;
-}
-.h-box__gloss {
+/* ---- screen 5: the words after the body and quiet line (what the reference level is) ---- */
+.h-caption {
   margin: 0;
-  padding-block: 0.15rem;
-  font-size: var(--fs-xs);
-  line-height: 1.5;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-read);
   color: var(--ink-2);
-}
-.h-box__gloss b {
-  color: var(--ink);
-}
-@media (min-width: 22.5em) and (max-width: 42.99em) {
-  html:not([data-text]) .h-s4 .h-box {
-    position: absolute;
-    z-index: 1;
-    inset: var(--sp-2) var(--sp-2) auto;
-    margin: 0;
-  }
 }
 
 /* ---- screen 6: with scripting the pins' sentences show one at a time, in a box that keeps its height ---- */
