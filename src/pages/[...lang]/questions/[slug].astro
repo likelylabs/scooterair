@@ -44,7 +44,7 @@ const next = nextQuestion(slug, locale);
 const pages = { smell: QSmell, 'beside-me': QBesideMe, app: QApp, 'one-red-light': QOneRedLight, 'my-child': QMyChild, rider: QRider, mask: QMask } satisfies Record<Slug, unknown>;
 const Page = pages[slug];
 // the hard words each page uses, explained under its title (brief 6.6: gloss at first use)
-const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppb', 'ppm'], 'beside-me': ['pm25', 'ug'], app: ['ppm', 'pm25'], 'one-red-light': ['pm25', 'ufp', 'ec'], 'my-child': ['pm25'], rider: ['pm25'], mask: ['benzene', 'ufp'] };
+const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppb'], 'beside-me': ['benzene', 'ppb', 'pm25', 'ug'], app: ['ppb', 'pm25'], 'one-red-light': ['pm25', 'ufp', 'ec'], 'my-child': ['pm25'], rider: ['pm25'], mask: ['benzene', 'ufp'] };
 ---
 
 <Base locale={locale} title={typeset(plain(item.q[locale]), locale)} description={f(item.card[locale])} share={slug}>
@@ -124,8 +124,8 @@ const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppb', 'ppm'], 'b
     margin-inline-start: auto;
   }
   /* --pic-extra: how tall a picture's box is besides its drawing (ui/Screen.astro narrows the
-     picture until both fit the window's height), measured at 1,280 px and rounded up: the tag and
-     key; the can and its chip; the mask switch; the number box over the kerb */
+     picture until both fit the window's height), measured in two columns at 1,280 px and rounded up: the tag and
+     key (the default, also for the tailpipe and the kerb, whose number box is now in the words); the mask switch */
   .qp :global(article.screen) {
     --pic-extra: 3.5rem;
     /* no screen rail here */
@@ -136,16 +136,21 @@ const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppb', 'ppm'], 'b
   .qp :global(#answer) {
     --chrome: calc(var(--header-h) + 2px + 11rem);
   }
-  .qp :global(article.screen:has(.scene--tailpipe)) {
-    --pic-extra: 13.5rem;
-  }
   .qp :global(article.screen:has(.scene--mask)) {
     --pic-extra: 17.5rem;
   }
-  .qp :global(article.screen:has(.scene--kerb)) {
-    --pic-extra: 23rem;
+  /* a tablet held upright (ui/Screen.astro: one column, the picture above the words): the same
+     boxes, measured at 703 × 900 in both languages (the height of .screen__stage less the
+     drawing's, so a switch in the `controls` slot counts) and rounded up. The mask's is 17.5rem
+     in English, kept at 16rem so the picture is not narrowed further: the headline is then in the
+     first window and its first line on a short scroll */
+  @media (min-width: 43em) and (max-width: 59.99em) and (orientation: portrait) {
+    .qp :global(article.screen:has(.scene--mask)) {
+      --pic-extra: 16rem;
+    }
   }
-  /* two columns from 43em, as every screen (ui/Screen.astro) */
+  /* wider than a phone (one column on a tablet held upright, two columns from 60em or on a
+     window wider than tall: ui/Screen.astro) */
   @media (min-width: 43em) {
     .qp-head {
       padding-block: var(--sp-5) 0;
@@ -159,7 +164,7 @@ const pageWords: Record<Slug, WordId[]> = { smell: ['benzene', 'ppb', 'ppm'], 'b
     /* the answer's picture never narrows below 26rem: on a short window (1024 × 768) the question
        block's 11rem would otherwise shrink it to a strip, with its key items and the tag wrapping
        and the headline running in one long line beside it. Its foot may then pass the window's
-       bottom, but the headline beside it is in view */
+       bottom, but the headline beside it is in view. (--pic-min is read only in two columns.) */
     .qp :global(#answer) {
       --pic-min: 26rem;
     }

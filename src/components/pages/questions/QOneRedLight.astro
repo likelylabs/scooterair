@@ -38,7 +38,8 @@ const posts = s1.posts.map((p, i) => ({ when: f(p.when[locale]), text: f(p.text[
 type Post = { when: string; text: string; kind: string; where?: string };
 const pins = ['nose', 'lungs', 'blood'] as const;
 const gap = locale === 'en' ? ' ' : '';
-const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung', 'route-co-blood'] as const;
+const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung'] as const;
+const stayBasis = { h: sim.benzene.referenceBasis_h, lo: sim.benzene.emissionUncertain.lo, hi: sim.benzene.emissionUncertain.hi };
 ---
 
 <Screen locale={locale} n={1} total={1} id="answer" how="how-1" chapter={s1.chapter[locale]} headline={s1.headline[locale]} quiet={f(s1.quiet[locale])}>
@@ -46,13 +47,13 @@ const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung', 'route
   <Segmented slot="controls" name="reds" legend={s1.stepper[locale]} value={String(defaultRedsPerDay)} options={redsPerDayOptions.map((n) => ({ value: String(n), label: f(s1.stepperOption[locale], { n }) }))} />
   <p slot="body">{redsPerDayOptions.map((n) => <span data-when-reds={n} data-say>{f(s1.body[`reds${n}`][locale], yearHours(n, locale))}</span>)}{gap}{f(s1.body.posts[locale])}</p>
   <KindChip slot="chips" locale={locale} kind="derived" />
-  <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations', 'sim-co-stay-15min', 'sim-benzene-stayers-1h']} primary={{ href: href('/evidence/#link-5', locale) }}>
+  <HowSheet slot="sheet" id="how-1" locale={locale} kind="derived" title={s1.sheet.title[locale]} facts={['lung2025-peaks-hrv', 'mccreanor2007-london-walk', 'hei-sr23-trap-associations', 'sim-benzene-stayers-1h']} primary={{ href: href('/evidence/#link-5', locale) }}>
     <p slot="block1">{f(s1.sheet.b1[locale])}</p>
     {/* the sheet leaves its screen when it opens, so it cannot follow the stepper: it shows the sum for the first choice */}
     <WorkingSum slot="block2" locale={locale} {...workingHoursPerYear(defaultRedsPerDay, locale)} />
     <Fragment slot="block3">
       <p>{f(s1.sheet.b3[locale])}</p>
-      {[`${s1.sheet.stayers[0][locale]}${locale === 'en' ? ' ' : ''}${s1.sheet.stayers[1][locale]}`, ...s1.sheet.stayers.slice(2).map((l) => l[locale])].map((l) => <SimText locale={locale} text={l} slots={{ range: 'sim.co.stay15', times: 'sim.benzene.stay1hTimes' }} />)}
+      {s1.sheet.stayers.map((l) => <SimText locale={locale} text={fill(l[locale], stayBasis)} slots={{ times: 'sim.benzene.stay1hTimes' }} />)}
     </Fragment>
     <section class="q-studies">
       <h3 class="q-studies__title">{s1.sheet.studiesTitle[locale]}</h3>
@@ -78,7 +79,7 @@ const routeFacts = ['route-irritant-vapour', 'route-particles-deep-lung', 'route
     <Fragment slot="block3">
       <p>{f(s2.sheet.b3[locale])}</p>
       <p>{f(s2.sheet.routes[locale])}</p>
-      <SimText locale={locale} text={fill(s2.sheet.routesCo[locale], { near: sim.co.nearTailpipeAbout })} slots={{ range: 'sim.co.oneRed15' }} />
+      <p>{s2.sheet.routesNote[locale]}</p>
     </Fragment>
   </HowSheet>
 </Screen>

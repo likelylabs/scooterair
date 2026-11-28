@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { simData } from '../../data/simulation-data.ts';
 import { sim, simBelowWho, simRange, simSlots, simSeries } from '../../data/simulation.ts';
-import { checkHeadline, checkHeadlinePhrased, checkHeadlineTable, formatEstimate } from '../../data/estimate.ts';
+import { formatEstimate } from '../../data/estimate.ts';
 import { facts } from '../../data/facts.ts';
 import { extract } from '../../../scripts/build-simulation-data.mjs';
 
@@ -68,15 +68,8 @@ test('every slot prints as 約 A 到 B / about A to B, as an estimate anchored a
   assert.throws(() => simRange('sim.co.nope' as never));
 });
 
-test('screen 5 headline: names one red light, never "far below", and drops to the neutral form if the values ever reach 87', () => {
+test('the carbon monoxide finding still holds (it is printed on /estimate/#simulation): one red, every red with the wind held, and right behind a tailpipe stay below the WHO 15-minute value', () => {
   assert.equal(simBelowWho(), true);
-  const zh = checkHeadline('zh-TW', true);
-  assert.match(zh, /等一個紅燈/);
-  assert.doesNotMatch(zh, /低很多|遠低於/);
-  assert.doesNotMatch(checkHeadline('en', true), /far below/i);
-  assert.doesNotMatch(zh, /\|/, 'checkHeadline() removes the phrase marks');
-  assert.equal(checkHeadlinePhrased('zh-TW', false), checkHeadlineTable.near['zh-TW']);
-  assert.ok((zh.match(/[一-鿿]/g) ?? []).length <= 22, 'headline within 22 Han');
 });
 
 test('simulation facts carry their numbers from the data module and print no air number beside 推估', () => {

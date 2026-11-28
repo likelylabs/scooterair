@@ -7,7 +7,7 @@
  * the right as a soft cloud and goes in once, drawn as fume only (no symbols): its
  * orange wisps in at the nose and down the throat (1), a sooty haze settled in both
  * lungs (2: the particles), and a faint haze of it carried on into the heart and
- * the blood (3: carbon monoxide). The words are the pins' sentences. Not a child,
+ * the blood (3: the finer particles, into the blood). The words are the pins' sentences. Not a child,
  * no street behind it, no disease named on the body, and nothing in it fills up or
  * changes after it has arrived.
  *
@@ -78,7 +78,7 @@ const masks =
 const windpipe = airPuff(pid, [{ cx: 26, cy: -232, rx: 30, ry: 12 }, { cx: 2, cy: -190, rx: 10, ry: 40 }, { cx: 0, cy: -140, rx: 26, ry: 16 }], { strength: 0.5, cls: 'sa-fade', attrs: ` style="--i:5" mask="url(#${pid}-aw)"` });
 // 2 · particles: a sooty haze settled in both lungs, deepest low down
 const lungs = airPuff(pid, [{ cx: -50, cy: -66, rx: 40, ry: 58 }, { cx: 52, cy: -82, rx: 40, ry: 56 }, { cx: -42, cy: -34, rx: 34, ry: 26 }, { cx: 60, cy: -36, rx: 26, ry: 22 }], { strength: 0.62, tone: 'soot', cls: 'sa-fade', attrs: ` style="--i:8" mask="url(#${pid}-lu)"` });
-// 3 · carbon monoxide: a faint haze of the fume carried on into the heart and the blood
+// 3 · the finer particles, into the blood: a faint haze of the fume carried on into the heart and the blood
 const blood = airPuff(pid, [{ cx: 17, cy: -50, rx: 26, ry: 26 }, { cx: 17, cy: -12, rx: 8, ry: 30 }, { cx: 17, cy: 30, rx: 8, ry: 40 }], { strength: 0.55, cls: 'sa-fade', attrs: ` style="--i:12" mask="url(#${pid}-bl)"` });
 
 const scene = [

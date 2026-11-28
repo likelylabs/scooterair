@@ -20,7 +20,7 @@
  */
 import film from '../../../i18n/pages/film.ts';
 import { chips, chipWhere, illustration, kSentences, money as ntd, readerDate } from '../../../i18n/ui.ts';
-import { est, estimateText, formatEstimate, formatReference, time } from '../../../data/estimate.ts';
+import { est, time } from '../../../data/estimate.ts';
 import { HOME_KM, homeMoney, homeMoneyTimeline, plateName, type BuyCase, type HomeMoney } from '../../../lib/home-money.ts';
 import { formatDate } from '../../../lib/site-state.ts';
 import { chipGlyphSvg } from '../../ui/kinds.ts';
@@ -83,8 +83,6 @@ export interface FilmData {
     scenario: string;
     hours: { lo: number; hi: number };
     band: { lo: number; hi: number };
-    coAdded: string;
-    coStreet: string;
   };
 }
 
@@ -156,8 +154,8 @@ function captionsOf(locale: Locale, part: MoneyPart): Caption[] {
     waiting: { main: c.waiting.main[locale] },
     knee: { main: c.knee.main[locale] },
     keeps: { main: c.keeps.main[locale] },
-    howMuch: { main: c.howMuch.main[locale] },
-    co: { main: c.co.main[locale] },
+    howMuch: { main: c.howMuch.main[locale], note: c.howMuch.note[locale] },
+    nose: { main: c.nose.main[locale] },
     fuel: { main: c.fuel.main[locale], note: c.fuel.note[locale] },
     specks: { main: c.specks.main[locale] },
     mask: { main: c.mask.main[locale] },
@@ -198,9 +196,6 @@ export function filmData(locale: Locale, o: { date?: string; asChecked?: boolean
   if (hit) return hit;
 
   if (est.scn.dozen.drawn !== SCOOTERS_DRAWN) throw new Error(`film: the picture draws ${SCOOTERS_DRAWN} scooters but scn.dozen.drawn is ${est.scn.dozen.drawn}`);
-  const coAdded = formatEstimate('co.dozen.add', locale);
-  if (coAdded.kind !== 'estimate') throw new Error('film: co.dozen.add is not an estimate');
-  const coStreet = formatReference(need(est.bg.co.traffic.shown, 'bg.co.traffic'), 'ppm', locale);
   const part = moneyPart(m, locale);
   const h = film.hud;
   const text: HudText = {
@@ -209,21 +204,7 @@ export function filmData(locale: Locale, o: { date?: string; asChecked?: boolean
     cm: h.cm[locale],
     petrol: h.petrol[locale],
     electric: h.electric[locale],
-    panel: {
-      added: fill(h.added[locale], { added: estimateText.addedByPack[locale] }),
-      addedValue: coAdded.text,
-      estimate: chips.estimate.label[locale],
-      street: estimateText.alreadyThere[locale],
-      streetValue: coStreet,
-      measured: chips.measured.label[locale],
-      addedElectric: h.addedElectric[locale],
-      zero: h.zero[locale],
-      // a locale-neutral path: the page turns it into an href with href()
-      howHref: `/estimate/#${coAdded.anchor ?? 'numbers'}`,
-      how: film.player.how[locale],
-    },
     money: part.money,
-    glyphs: { estimate: chipGlyphSvg('estimate'), measured: chipGlyphSvg('measured') },
   };
   const data: FilmData = {
     locale,
@@ -237,8 +218,6 @@ export function filmData(locale: Locale, o: { date?: string; asChecked?: boolean
       scenario: est.scn.dozen.longName[locale],
       hours: { lo: time.span.lo, hi: time.span.hi },
       band: { lo: STROLLER_BAND.low, hi: STROLLER_BAND.high },
-      coAdded: coAdded.text,
-      coStreet,
     },
   };
   memo.set(key, data);

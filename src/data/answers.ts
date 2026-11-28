@@ -105,8 +105,8 @@ export const answers = {
     chainLink: 1,
     question: t('一輛機車怠速，排多少？', 'How much does one idling scooter give off?'),
     answer: t(
-      '平均一輛機車怠速，每小時約排 15 公克一氧化碳（這個平均值在 8 到 27 公克之間；排得最多的車多很多）；等一個 90 秒的紅燈，約 0.2 到 0.7 公克，大約裝滿一個鋁罐。',
-      'On average an idling scooter gives off about 15 g of carbon monoxide an hour. The average lies between 8 and 27 g, and the scooters that give off most give off far more. Through one 90-second red that is about 0.2 to 0.7 g, roughly enough to fill one drinks can.',
+      '平均一輛機車怠速，每小時約排 15 公克一氧化碳（這個平均值在 8 到 27 公克之間；排得最多的車多很多）；等一個 90 秒的紅燈，約 0.2 到 0.7 公克。',
+      'On average an idling scooter gives off about 15 g of carbon monoxide an hour. The average lies between 8 and 27 g, and the scooters that give off most give off far more. Through one 90-second red that is about 0.2 to 0.7 g.',
     ),
     basis: t('2025 年 907 萬筆定檢讀數，乘上國外實驗室量的怠速耗油量。', "Taiwan's 9.07 million inspection readings from 2025, multiplied by idle fuel use measured in laboratories abroad."),
     caveat: t(

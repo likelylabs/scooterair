@@ -8,7 +8,8 @@ import { AIR_BACKGROUND_CO, AIR_EXTRA, AIR_RULE } from '../air-slots.ts';
 import { cardArt, CARD_ART_KINDS } from '../card-art.ts';
 import { heightsDrawing, kerbDrawing } from '../../pages/action/art.ts';
 import { planView } from '../plan-view.ts';
-import { BODY, MASK_FACE, MOUTH, bodyFigure, drinksCan, maskFace, person, pushchair, scooter } from '../parts.ts';
+import { BODY, MASK_FACE, MOUTH, bodyFigure, maskFace, person, pushchair, scooter } from '../parts.ts';
+import { crossingGuard } from '../guard.ts';
 
 const frame = { x: 0, y: -350, w: 450, h: 425 };
 const kerb = { x0: 8, x1: 286, sourceX: 296 };
@@ -165,11 +166,20 @@ test('one puff per tailpipe, whatever the scenario', () => {
 });
 
 test('parts: the figures draw, to scale, without stray values', () => {
-  const all = [person('pushchair'), person('schoolchild-cover'), person('schoolchild-walk'), person('adult-walk'), pushchair(), drinksCan(), bodyFigure(), scooter({ kind: 'electric', rider: true, face: true }), ...(['none', 'cloth', 'surgical', 'carbon', 'n95'] as const).map(maskFace)];
+  const all = [person('pushchair'), person('schoolchild-cover'), person('schoolchild-walk'), person('adult-walk'), pushchair(), crossingGuard(), bodyFigure(), scooter({ kind: 'electric', rider: true, face: true }), ...(['none', 'cloth', 'surgical', 'carbon', 'n95'] as const).map(maskFace)];
   for (const s of all) assert.ok(s.length > 40 && !/NaN|undefined/.test(s));
   // the baby breathes inside the 55 to 85 cm band; the schoolchild above it; the adult above both
   assert.ok(-MOUTH.pushchair.y > 55 && -MOUTH.pushchair.y < 85);
   assert.ok(-MOUTH.schoolchild.y > 85 && -MOUTH.adult.y > -MOUTH.schoolchild.y);
   assert.ok(MASK_FACE.nose.x < MASK_FACE.gaps.cheek.x);
   assert.ok(BODY.pins.lungs.x < 0 && BODY.pins.nose.y < BODY.pins.blood.y);
+});
+
+test('the crossing guard (home screen 5): an adult with a solid vest, one lighter band and a small flag; nothing round but the head', () => {
+  const g = crossingGuard();
+  assert.equal((g.match(/<circle\b/g) ?? []).length, 1, 'only the head is a circle: no paddle, disc or ring');
+  assert.match(g, /class="kerb-vest"/);
+  assert.equal((g.match(/class="kerb-vest__band"/g) ?? []).length, 1);
+  assert.match(g, /class="kerb-flag"/);
+  assert.doesNotMatch(g, /<(ellipse|text)\b|NaN|undefined/);
 });

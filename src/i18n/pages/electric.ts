@@ -786,7 +786,7 @@ export default copy({
     title: { 'zh-TW': '今年不換，|也有事可以做', en: 'Not switching this year? |There is still plenty to do' },
     lead: { 'zh-TW': '我們不會叫你硬換。這些事今天就能做。', en: 'We will not tell you to force it. These you can do today.' },
     items: [
-      { title: { 'zh-TW': '準時定檢', en: 'Turn up for the inspection' }, body: { 'zh-TW': '收到定檢通知就去。台灣的實驗室測過：出廠比較久的機車，每燒一公升油，排出的一氧化碳和油氣（沒燒完的汽油）比較多。', en: 'Go when the notice comes. In Taiwanese lab tests, older scooters gave off more carbon monoxide and fuel vapour (unburnt petrol) per litre of fuel.' }, badge: 'measured-tw' },
+      { title: { 'zh-TW': '準時定檢', en: 'Turn up for the inspection' }, body: { 'zh-TW': '收到定檢通知就去。台灣的實驗室測過：出廠比較久的機車，每燒一公升油，排出的油氣（沒燒完的汽油）和其他廢氣比較多。', en: 'Go when the notice comes. In Taiwanese lab tests, older scooters gave off more fuel vapour (unburnt petrol) and other exhaust per litre of fuel.' }, badge: 'measured-tw' },
       { title: { 'zh-TW': '該修就修', en: 'Fix what fails' }, body: { 'zh-TW': '定檢沒過就修，不要拖。', en: 'If it fails, get it fixed rather than waiting.' }, badge: 'inference' },
       { title: { 'zh-TW': '家裡那輛二行程，拿去報廢', en: 'Scrap the household’s two-stroke' }, body: { 'zh-TW': '單純報廢有沒有獎勵，看縣市；計算的燃油那一欄會列出來。', en: 'Whether scrapping alone pays depends on where you live; the petrol column of the calculator lists it.' }, badge: 'official-tw' },
       { title: { 'zh-TW': '短程試試共享電動機車', en: 'Try a shared electric scooter for short trips' }, body: { 'zh-TW': '先騎騎看，再決定要不要換。', en: 'Ride one before deciding.' }, badge: 'inference' },

@@ -15,8 +15,7 @@ import { absUrl } from '../../lib/abs-url.ts';
  *             money headlines and rule-chosen money sentences from src/i18n/pages/electric.ts
  *   numbers   the estimate slots (EstimateValue, formatEstimate), the registry
  *             (./home-figures.ts) and the calculator's tables (./money-view.ts). None is typed
- *   rules     screen 4's second sentence: kerbSentence(); screen 5's headline: checkHeadlinePhrased()
- *             (simBelowWho(), src/data/simulation.ts); screens 13 and 14: lane I's buyHeadline / monthHeadline /
+ *   rules     screens 13 and 14: lane I's buyHeadline / monthHeadline /
  *             monthLine; the pins of screen 6 and the quiet line of screen 2 ship only while
  *             their registry facts are verified
  *
@@ -31,7 +30,6 @@ import HowSheet from '@/components/ui/HowSheet.astro';
 import IllustrationTag from '@/components/ui/IllustrationTag.astro';
 import KindChip from '@/components/ui/KindChip.astro';
 import NextButton from '@/components/ui/NextButton.astro';
-import ScenarioSwitch from '@/components/ui/ScenarioSwitch.astro';
 import Screen from '@/components/ui/Screen.astro';
 import ScreenRail from '@/components/ui/ScreenRail.astro';
 import Segmented from '@/components/ui/Segmented.astro';
@@ -49,20 +47,20 @@ import SwapControl from '@/components/art/SwapControl.astro';
 import SwapScene from '@/components/art/SwapScene.astro';
 import TailpipeMarks from '@/components/art/TailpipeMarks.astro';
 import TenScooters from '@/components/art/TenScooters.astro';
-import ChartTable from '@/components/charts/ChartTable.astro';
-import SimCompare from '@/components/charts/SimCompare.astro';
+import SimAbove from '@/components/charts/SimAbove.astro';
 import SimText from '@/components/pages/estimate/SimText.astro';
 import PriceBars from '@/components/charts/PriceBars.astro';
 import WorkingSum from '@/components/charts/WorkingSum.astro';
-import { simCompareModel } from '@/components/charts/core/simCharts';
+import SmellBenzeneBox from '@/components/pages/home/SmellBenzeneBox.astro';
+import SmellSheet from '@/components/pages/home/SmellSheet.astro';
 import { monthlyBarsTitle, renderMonthlyBars } from '@/components/charts/core/monthlyBars';
-import { workingHoursPerYear, workingKerbFlow, workingPerRed, workingPerRedCan } from '@/components/charts/core/workingSum';
+import { workingHoursPerYear } from '@/components/charts/core/workingSum';
 import { openingData } from '@/components/pages/electric/opening-data';
 import { tableOn, type OpenText } from '@/components/pages/electric/opening-view';
 import { filmLength, homeFigures, verified } from '@/components/pages/home/home-figures';
 import * as V from '@/components/pages/home/money-view';
-import { checkHeadlinePhrased, checkSentence, defaultRedsPerDay, est, waitPerRed_s, estimateText, formatEstimate, formatReference, kerbSentence, redsPerDayOptions, scenarioKeys } from '@/data/estimate';
-import { sim, simBelowWho, simChipWhere, simRange, simStamp, smellFiles } from '@/data/simulation';
+import { defaultRedsPerDay, waitPerRed_s, formatEstimate, redsPerDayOptions } from '@/data/estimate';
+import { sim, simChipWhere, simRange, simStamp, smellFiles } from '@/data/simulation';
 import { fact } from '@/data/facts';
 import { asset, href, localeFromParam, localeStaticPaths } from '@/i18n';
 import { homeMoney } from '@/lib/home-money';
@@ -90,9 +88,8 @@ const evidence = (n: number) => href(`/evidence/#link-${n}`, locale);
 const filmHref = href('/90/', locale);
 const filmLabel = fill(t.common.film, { length: filmLength(t.common) });
 
-// ---- screen 5: the headline is chosen by the written rule; mark where its line may break ------
-const s5Headline = checkHeadlinePhrased(locale, simBelowWho());
-const simCmp = simCompareModel(locale);
+// ---- screen 5: the reference level's basis and the emission doubt (statements.json may[7]) ----
+const stayBasis = { h: sim.benzene.referenceBasis_h, lo: sim.benzene.emissionUncertain.lo, hi: sim.benzene.emissionUncertain.hi };
 // screen 7's sheet: statement 8 with its range as an EstimateValue ({times})
 const [stayA, stayB, stayC] = t.s7.sheet.stayers;
 const [stayB1, stayB2] = stayB.split('{times}');
@@ -101,7 +98,7 @@ const [stayB1, stayB2] = stayB.split('{times}');
 const s7Assume = redHoursSentence(locale, waitPerRed_s.lo, waitPerRed_s.hi);
 
 // ---- screen 6: a pin ships only with its verified fact ----------------------------------------
-const pinFacts = { nose: 'route-irritant-vapour', lungs: 'route-particles-deep-lung', blood: 'route-co-blood' } as const;
+const pinFacts = { nose: 'route-irritant-vapour', lungs: 'route-particles-deep-lung', blood: 'route-particles-deep-lung' } as const;
 const pins = (['nose', 'lungs', 'blood'] as const).filter((p) => verified(pinFacts[p]));
 
 // ---- screen 7 --------------------------------------------------------------------------------
@@ -176,23 +173,17 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
     <Screen locale={locale} n={2} total={TOTAL} chapter={t.s2.chapter} headline={hl(t.s2.headline)} quiet={t.s2.quiet} next={{ label: t.s2.next }}>
       <div slot="body" class="h-lines">{t.s2.body.map((line, i) => <p>{i === 0 ? <a class="h-inlink" href={href('/questions/smell/', locale)}>{line}</a> : line}</p>)}</div>
       <div slot="picture" class="h-pic">
-        <div class="h-crop" style="--crop:0">
-          <TailpipeMarks locale={locale}>
-            <EstimateValue slot="chip" locale={locale} slotId="emit.co.perRed_can" label={t.s2.canLabel} sheet="how-2" />
-          </TailpipeMarks>
-        </div>
+        <div class="h-crop" style="--crop:0"><TailpipeMarks locale={locale} /></div>
         <IllustrationTag locale={locale} />
       </div>
-      <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="recipe" title={t.s2.sheet.title} facts={['smell-comes-with-benzene', 'smell-not-unburnt-petrol', 'smell-older-engines', 'iarc-group1-three', 'iarc-gasoline-exhaust-2b', 'co-odourless']}>
-        <p slot="block1">{fill(t.s2.sheet.measured, { readings: F.readings })}</p>
+      <KindChip slot="chips" size={chipSize} locale={locale} kind="estimate" fact="smell-comes-with-benzene" />
+      <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" anchor="smell" stamp={simStamp[locale]} title={t.s2.sheet.title} facts={['smell-comes-with-benzene', 'smell-what-is-in-it', 'smell-not-unburnt-petrol', 'smell-older-engines', 'iarc-group1-three', 'iarc-gasoline-exhaust-2b']}>
+        <p slot="block1">{t.s2.sheet.measured}</p>
         <Fragment slot="block2">
-          <WorkingSum locale={locale} {...workingPerRed(locale)} />
-          <WorkingSum locale={locale} {...workingPerRedCan(locale)} />
-          <p>{fill(t.s2.sheet.can, { litres: formatEstimate('emit.co.perRed_L', locale).text, ml: F.canMl, cans: est.emit.co.canWords[locale] })}</p>
           <p>{t.s2.sheet.smell}</p>
+          <p>{t.s2.sheet.list}</p>
         </Fragment>
         <Fragment slot="block3">
-          <p>{t.s2.sheet.care}</p>
           <p>{t.s2.sheet.hazard}</p>
           <p><a href={href('/questions/smell/', locale)}>{t.s2.sheet.smellLink}</a></p>
           <p><a href={asset(smellFiles.method)}>{t.s2.sheet.method}</a></p>
@@ -215,57 +206,42 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
       </HowSheet>
     </Screen>
 
-    <!-- 4 · 吸進多少 ====================================================================== -->
-    <Screen locale={locale} n={4} total={TOTAL} chapter={t.s4.chapter} headline={hl(t.s4.headline)} quiet={t.s4.quiet} next={{ label: t.s4.next }} class="h-s4">
+    <!-- 4 · 聞得到時 ====================================================================== -->
+    <Screen locale={locale} n={4} total={TOTAL} chapter={t.s4.chapter} headline={hl(t.s4.headline)} body={t.s4.body} quiet={t.s4.quiet} next={{ label: t.s4.next }} class="h-s4">
+      <SmellBenzeneBox slot="box" locale={locale} sheet="how-4" />
       <div slot="picture" class="h-pic">
-        <div class="h-box">
-          <div class="h-box__row">
-            <span class="h-box__what">{estimateText.alreadyThere[locale]}</span>
-            <span class="h-box__val"><b>{formatReference(est.bg.co.traffic.shown, 'ppm', locale)}</b> <KindChip locale={locale} of={fact('moenv-co-stations-2025')} where="" size="sm" /></span>
-          </div>
-          <div class="h-box__row h-box__row--est">
-            {scenarioKeys.map((s) => <EstimateValue locale={locale} slotId={`co.${s}.add`} label={estimateText.addedByPack[locale]} sheet="how-4" data-when-scenario={s} data-say />)}
-          </div>
-          <p class="h-box__gloss"><b>{t.s4.box}</b><span aria-hidden="true">｜</span>{estimateText.ppmGloss[locale]}</p>
-        </div>
-        <KerbScene locale={locale} />
+        <KerbScene locale={locale} scenario="dozen" tight />
         <IllustrationTag locale={locale} />
-        <div class="h-pic__ctl"><ScenarioSwitch locale={locale} /></div>
       </div>
-      <p slot="body">{est.meta.gloss[locale]}{sp}{scenarioKeys.map((s) => <span data-when-scenario={s}>{kerbSentence(s, locale)}</span>)}</p>
-      <HowSheet slot="sheet" id="how-4" locale={locale} kind="estimate" pollutant="co" anchor="recipe" title={t.s4.sheet.title} facts={['iot-waiting-area-co-2024', 'moenv-co-stations-2025']}>
-        <p slot="block1">{fill(t.s4.sheet.measured, { sites: F.sites, n: F.peakSites, lo: F.peakLo, hi: F.peakHi })}</p>
-        <Fragment slot="block2">{scenarioKeys.map((s) => <div data-when-scenario={s}><WorkingSum {...workingKerbFlow(locale, s)} /></div>)}</Fragment>
-        <p slot="block3">{est.meta.appliesTo[locale]}{sp}{t.s4.sheet.care}</p>
-      </HowSheet>
+      <KindChip slot="chips" size={chipSize} locale={locale} kind="estimate" where={simChipWhere[locale]} fact="smell-benzene-just-smellable" />
+      <SmellSheet slot="sheet" locale={locale} id="how-4" />
     </Screen>
 
-    <!-- 5 · 量到的，和算的 ================================================================= -->
-    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(s5Headline)} quiet={t.s5.quiet} next={{ label: t.s5.next }}>
-      <div slot="picture" class="h-pic h-pic--chart h-pic--sim"><SimCompare locale={locale} sheet="how-5" table={false} compact /></div>
-      <div slot="body" class="h-lines">
-        <p>{t.s5.smell}</p>
-        <p><a class="h-inlink" href={href('/questions/my-child/#pushchair', locale)}>{t.s5.exception}</a></p>
+    <!-- 5 · 待一小時 ====================================================================== -->
+    <Screen locale={locale} n={5} total={TOTAL} chapter={t.s5.chapter} headline={hl(t.s5.headline)} quiet={t.s5.quiet} next={{ label: t.s5.next }} class="h-s5">
+      <div slot="picture" class="h-pic">
+        <KerbScene locale={locale} scenario="dozen" figure="guard" legend={false} tight />
+        <IllustrationTag locale={locale} />
       </div>
-      <KindChip size={chipSize} slot="chips" locale={locale} of={fact('sim-co-one-red-15min')} where={simChipWhere[locale]} />
-      <HowSheet slot="sheet" id="how-5" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} title={t.s5.sheet.title} facts={['sim-co-one-red-15min', 'sim-co-stay-15min', 'sim-co-pushchair-exception', 'sim-smell-seconds', 'smell-not-unburnt-petrol', 'iot-waiting-area-co-2024']}>
-        <Fragment slot="block1">
-          <p>{t.s5.sheet.who}{sp}{checkSentence(locale)}</p>
-          <p>{estimateText.checkIsEstimate[locale]}</p>
-        </Fragment>
+      <SimText slot="body" locale={locale} text={t.s5.body} slots={{ times: 'sim.benzene.stay1hTimes' }} sheet="how-5" />
+      {/* what the reference level is: after the words, so the screen opens on its picture and headline */}
+      <p class="h-caption">{fill(t.s5.caption, stayBasis)}</p>
+      <KindChip slot="chips" size={chipSize} locale={locale} kind="estimate" where={simChipWhere[locale]} fact="sim-benzene-stayers-1h" />
+      <HowSheet slot="sheet" id="how-5" locale={locale} kind="estimate" computed anchor="simulation" stamp={simStamp[locale]} title={t.s5.sheet.title} facts={['sim-benzene-stayers-1h', 'smell-one-red', 'smell-yardsticks-not-used', 'smell-older-engines']} primary={{ href: href('/evidence/#smell-chemicals', locale) }} secondary={{ href: href('/estimate/#smell-hour', locale), label: t.s5.sheet.tableLink }}>
+        <p slot="block1">{t.s5.sheet.how}</p>
         <Fragment slot="block2">
-          <p>{t.s5.sheet.sim}</p>
-          <p>{t.s5.sheet.higher}</p>
-          <p>{t.s5.sheet.smell}</p>
-          <p>{t.s5.sheet.whatSmell} <a href={href('/questions/smell/#what', locale)}>{t.s5.sheet.whatSmellLink}</a></p>
-          <p>{t.s5.sheet.pushchair}</p>
-          <p>{t.s5.sheet.bursts}</p>
+          <p>{t.s5.sheet.stay}</p>
+          <SimText locale={locale} text={fill(t.s5.sheet.stayCare, stayBasis)} slots={{ times: 'sim.benzene.stay1hTimes' }} />
+          <SimAbove locale={locale} only="benzene" />
+          <p>{t.s5.sheet.oneRed}</p>
+          <p>{t.s5.sheet.others}</p>
         </Fragment>
         <Fragment slot="block3">
           <p>{t.s5.sheet.care}</p>
-          <p>{estimateText.whoCoOnly[locale]}</p>
+          <p><a href={href('/estimate/#smell-hour', locale)}>{t.s5.sheet.tableLink}</a></p>
+          <p><a href={asset(smellFiles.method)}>{t.s2.sheet.method}</a></p>
+          <p><a href={href('/evidence/#smell-chemicals', locale)}>{how.fullEvidence[locale]}</a></p>
         </Fragment>
-        <ChartTable table={simCmp.table} caption={t.s5.sheet.table} />
       </HowSheet>
     </Screen>
 
@@ -280,13 +256,14 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         </div>
       </div>
       <KindChip size={chipSize} slot="chips" locale={locale} kind="study" where={chipWhere.longTermAllTraffic[locale]} fact="hei-sr23-trap-associations" />
-      <HowSheet slot="sheet" id="how-6" locale={locale} kind="study" where={chipWhere.international[locale]} facts={['hei-sr23-trap-associations', ...pins.map((p) => pinFacts[p])]} primary={{ href: evidence(5) }}>
+      <HowSheet slot="sheet" id="how-6" locale={locale} kind="study" where={chipWhere.international[locale]} facts={[...new Set(['hei-sr23-trap-associations', ...pins.map((p) => pinFacts[p]), 'iarc-group1-three', 'iarc-gasoline-exhaust-2b'] as const)]} primary={{ href: evidence(5) }}>
         <p slot="block1">{fill(t.s6.sheet.who, { n: F.studies })}</p>
         <p slot="block2">{t.s6.sheet.what}</p>
         <Fragment slot="block3">
           <p>{t.s6.sheet.care}</p>
           {pins.length > 0 && <p>{t.s6.sheet.routes}</p>}
-          {pins.length > 0 && <SimText locale={locale} text={fill(t.s6.sheet.routesCo, { near: sim.co.nearTailpipeAbout })} slots={{ range: 'sim.co.oneRed15' }} />}
+          {pins.length > 0 && <p>{t.s6.sheet.routesNote}</p>}
+          <p>{t.s6.sheet.hazard}</p>
         </Fragment>
       </HowSheet>
     </Screen>
@@ -305,10 +282,7 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
           <li>{fill(t.s7.sheet.hours, { h: F.walkHours, people: F.walkPeople })}</li>
           <li>{fill(t.s7.sheet.years, { n: F.studies })}</li>
         </ul>
-        <Fragment slot="block2">
-          <WorkingSum locale={locale} {...workingHoursPerYear(defaultRedsPerDay, locale)} />
-          <p>{fill(t.s7.sheet.dose, { pct: F.dosePct })}</p>
-        </Fragment>
+        <WorkingSum slot="block2" locale={locale} {...workingHoursPerYear(defaultRedsPerDay, locale)} />
         <Fragment slot="block3">
           <p>{t.s7.sheet.workers}</p>
           <p>{stayA}</p>
@@ -420,7 +394,10 @@ const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURICom
         <span class="h-chipnote h-chipnote--one">{fill(t.s12.shareLabel, { share: formatEstimate('inspect.top10share', locale).text.replace(/ (?=\d|%)/g, '\u00a0') })}</span>
       </Fragment>
       <HowSheet slot="sheet" id="how-12" locale={locale} kind="derived" facts="inspection-top-tenth-co-share" primary={{ href: evidence(1) }} secondary={{ href: href('/act/#ride', locale), label: t.s12.sheet.ride }}>
-        <p slot="block1">{fill(t.s12.sheet.used, { readings: F.readings })}</p>
+        <Fragment slot="block1">
+          <p>{fill(t.s12.sheet.used, { readings: F.readings })}</p>
+          <p><a href={href('/estimate/#recipe', locale)}>{how.fullMethod[locale]}</a></p>
+        </Fragment>
         <p slot="block2">{fill(t.s12.sheet.how, { share: formatEstimate('inspect.top10share', locale).text })}</p>
         <p slot="block3">{t.s12.sheet.care}</p>
       </HowSheet>

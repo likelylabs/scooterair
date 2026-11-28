@@ -9,7 +9,7 @@
 //
 // FLAGS
 //   --only 1,4,11   run only these checks (numbers as in 9.3)
-//   --static        skip the browser checks (9, 10 heights, 11–16, 23)
+//   --static        skip the browser checks (9, 10 heights, 11–16, 23, 26)
 //   --max N         offending lines printed per check (default 12; --json always has all)
 //   --json          machine-readable report on stdout
 //   --report f.json also write the full report to a file (with the normal output on screen)
@@ -34,7 +34,11 @@
 //              air marks 3:1; light and dark) · 15 JavaScript off: screens show picture,
 //              text and sheet; the film shows stills and transcript · 16 prefers-reduced-motion:
 //              nothing moves · 17 scenes: alt text says 示意圖 / illustration, the tag is shown ·
-//              23 /electric/ opens on a worked result, and on the one the URL asks for
+//              23 /electric/ opens on a worked result, and on the one the URL asks for ·
+//              26 a tablet held upright (703 × 900, dark, 標準): every home screen has its picture
+//              above its words, and scrolled to its top shows the whole drawing and the
+//              headline's top in the same window (ui/Screen.astro, THE LAYOUT RULE); and at 標準,
+//              大 and 特大 no screen's column on the home or a question page is under 400 px
 //   Not here: 18–22 (the film's own guard, lane F), 24 (dated builds), 25 (npm run test:calc).
 //
 // THE MARKUP IT READS (the hooks the shared components print; full list in the integrator's
@@ -113,6 +117,8 @@ const TITLES = {
   16: 'prefers-reduced-motion: nothing moves until asked',
   17: 'Scenes: alt text says 示意圖 / illustration, and the tag is shown',
   23: '/electric/ opens on a worked result, and on the one its URL asks for',
+  26: 'Tablet held upright (703 × 900, dark): each home screen is one column, its picture above its words, the whole drawing and the headline\'s top in the first window; with the text enlarged, no screen\'s column under 400 px on the home and question pages',
+  27: 'Main path without carbon monoxide or its guideline; no drinks can anywhere; no seconds-long benzene beside the 1-hour reference in one view',
 };
 /** @type {Map<number, { id: number, title: string, status: 'pass'|'fail'|'skipped', problems: {page: string, text: string}[], notes: string[] }>} */
 const results = new Map();
@@ -588,7 +594,7 @@ await check(6, () => {
 // 7 · Structure
 // ============================================================================================
 const ROUTES = ['/', '/90/', '/questions/', '/questions/smell/', '/questions/my-child/', '/questions/app/', '/questions/one-red-light/', '/questions/rider/', '/questions/beside-me/', '/questions/mask/', '/estimate/', '/evidence/', '/sources/', '/act/', '/about/', '/electric/', '/print/poster/', '/print/brief/'];
-const REDIRECTS = { '/questions/how-much/': '/estimate/', '/questions/electric/': '/electric/', '/unmeasured/': '/estimate/', '/problem/': '/questions/' };
+const REDIRECTS = { '/questions/how-much/': '/questions/smell/', '/questions/electric/': '/electric/', '/unmeasured/': '/estimate/', '/problem/': '/questions/' };
 const ABSENT = ['/styleguide/', '/styleguide-art/'];
 const HASH_MAP = { '/unmeasured/': { ask: 'measure' } };
 
@@ -820,10 +826,75 @@ await check(17, () => {
   if (!scenes) fail(17, '(all pages)', 'no scene (figure.scene from SceneFrame, or [data-scene]) on any page');
 });
 
+// 27 · The owner's update of 2026-11-28 (claims-policy main-path-no-co, no-drinks-can; statements-smell
+// must-not 3). (a) On the main path (home, the question pages, the print brief and poster) no text,
+// alt, aria-label, title or meta description names carbon monoxide, CO, its guideline or ppm; inside
+// home screen 12's sheet (#how-12) one sentence may, the one that says which inspection readings the
+// share is worked out from. (b) No page compares anything with a drinks can. (c) No view (a screen's
+// visible part, one sheet, one print page) holds both a seconds-long benzene level and the 1-hour
+// reference level.
+// ============================================================================================
+const MAIN_PATH_ROUTES = ['/', '/90/', '/questions/', '/questions/smell/', '/questions/my-child/', '/questions/app/', '/questions/one-red-light/', '/questions/rider/', '/questions/beside-me/', '/questions/mask/', '/print/brief/', '/print/poster/'];
+const mainPath = await load('src/lib/main-path.ts');
+const canRule = (await load('src/data/claims-policy.ts')).claimRules['no-drinks-can'];
+const canRe = { 'zh-TW': new RegExp(canRule.patterns['zh-TW'].join('|')), en: new RegExp(canRule.patterns.en.join('|'), 'i') };
+const SECONDS_SLOTS = new Set(['sim.smell.benzeneJust', 'sim.smell.benzeneSeconds']);
+const simMod = await load('src/data/simulation.ts');
+await check(27, () => {
+  const textsOf = (p) => [...p.segs.filter((x) => !x.struck).map((x) => ({ where: 'text', text: x.text, el: x.el })), ...p.alts, ...p.meta.filter((m) => /description|<title>/.test(m.where))];
+  // (a)
+  for (const l of LOC) {
+    for (const r of MAIN_PATH_ROUTES) {
+      const p = byRoute.get(`${prefix(l)}${r}`);
+      if (!p || p.redirect) continue;
+      let allowed = 0;
+      for (const u of textsOf(p)) {
+        const w = mainPath.mainPathWord(u.text);
+        if (!w) continue;
+        if (r === '/' && u.el && closest(u.el, (x) => attr(x, 'id') === 'how-12')) {
+          allowed += 1;
+          if (allowed > 1) fail(27, label(p), `[#how-12] more than one sentence names 「${w}」: ${cut(u.text)}`);
+          continue;
+        }
+        fail(27, label(p), `[${u.where}] 「${w}」 on the main path: ${cut(u.text)}`);
+      }
+      if (r === '/') note(27, `${label(p)}: ${allowed} allowed sentence(s) in #how-12`);
+    }
+  }
+  // (b)
+  for (const p of pages) {
+    if (p.redirect) continue;
+    for (const u of textsOf(p)) {
+      const m = canRe[p.locale].exec(u.text);
+      if (m) fail(27, label(p), `[${u.where}] 「${m[0]}」: amounts are given in grams, never as drinks cans: ${cut(u.text)}`);
+    }
+  }
+  // (c)
+  const refPpb = String(simMod.sim.benzene.reference_ppb);
+  const views = [];
+  for (const p of pages) {
+    if (p.redirect) continue;
+    if (/^(\/en)?\/print\//.test(p.route)) views.push({ p, el: p.doc, name: 'print page', skipSheets: false });
+    for (const e of p.els) {
+      if (e.name === 'article' && has(e, 'data-screen')) views.push({ p, el: e, name: `screen #${attr(e, 'id')}`, skipSheets: true });
+      else if (has(e, 'data-how-sheet')) views.push({ p, el: e, name: `sheet #${attr(e, 'id')}`, skipSheets: false });
+    }
+  }
+  let n = 0;
+  for (const v of views) {
+    const inside = [...elements(v.el)].filter((e) => !v.skipSheets || !closest(e, (x) => x !== v.el && isSheet(x)));
+    const seconds = inside.some((e) => SECONDS_SLOTS.has(attr(e, 'data-slot') ?? ''));
+    const ref = inside.some((e) => attr(e, 'data-chart') === 'sim-above' && [...elements(e)].some((x) => attr(x, 'data-panel') === 'benzene')) || inside.some((e) => e.type === ELEMENT_NODE && (e.children ?? []).some((c) => c.type === TEXT_NODE && new RegExp(`(^|[^\\d.])${refPpb.replace('.', '\\.')}\\s*ppb`).test(decode(c.value))));
+    n += 1;
+    if (seconds && ref) fail(27, label(v.p), `${v.name}: a seconds-long benzene level and the 1-hour reference level (${refPpb} ppb) in one view`);
+  }
+  note(27, `${n} view(s) read for (c)`);
+});
+
 // ============================================================================================
 // Browser checks
 // ============================================================================================
-const BROWSER = [9, 10, 11, 12, 13, 14, 15, 16, 23];
+const BROWSER = [9, 10, 11, 12, 13, 14, 15, 16, 23, 26];
 const needBrowser = BROWSER.some((n) => run(n));
 if (needBrowser && STATIC) for (const n of BROWSER) if (run(n) && n !== 9) result(n).status = 'skipped', note(n, '--static: not run');
 if (needBrowser && !STATIC) {
@@ -962,6 +1033,60 @@ async function browserChecks(chromium) {
           if (!m.hooked) fail(10, p.route, 'no screen picture (article[data-screen] .screen__pic) on the page');
         }
       });
+
+  // ---- 26 a tablet held upright: one column, the picture above the words ----------------------
+  // The owner reads the site on a tablet held upright (703 × 900, dark). There a screen is one
+  // column (ui/Screen.astro: from 43em to 60em wide, portrait): the picture above the words, and
+  // a reader arriving at a screen sees the whole drawing and, in the same window, the headline.
+  if (run(26))
+    for (const p of homes)
+      await withPage({ width: 703, height: 900, dark: true }, async (page) => {
+        await open(page, p.route, { settle: 600 });
+        const n = await page.evaluate(() => document.querySelectorAll('article[data-screen]').length);
+        if (n !== 15) fail(26, p.route, `${n} home screens (expected 15)`);
+        for (let i = 0; i < n; i++) {
+          const r = await page.evaluate((i) => {
+            const a = document.querySelectorAll('article[data-screen]')[i];
+            a.scrollIntoView({ block: 'start', behavior: 'instant' });
+            const R = (e) => (e ? e.getBoundingClientRect() : null);
+            const stage = R(a.querySelector('.screen__stage') || a.querySelector('.screen__pic'));
+            const text = R(a.querySelector('.screen__text'));
+            const head = R(a.querySelector('h2, h1'));
+            const art = R(a.querySelector('.screen__pic svg.scene__art'));
+            const header = R(document.querySelector('header'));
+            const rail = R(document.querySelector('[data-screen-rail]'));
+            return { id: a.id, stage: stage && { top: stage.top, bottom: stage.bottom, left: stage.left, right: stage.right }, text: text && { top: text.top, left: text.left, right: text.right }, head: head && { top: head.top }, art: art && { top: art.top, bottom: art.bottom }, chrome: Math.max(header ? header.bottom : 0, rail && rail.height ? rail.bottom : 0), win: innerHeight, sw: document.documentElement.scrollWidth };
+          }, i);
+          const where = `${p.route} screen ${i + 1}${r.id ? ` (#${r.id})` : ''}`;
+          if (!r.stage || !r.text || !r.head) {
+            fail(26, where, 'no .screen__stage / .screen__text / headline (ui/Screen.astro hooks)');
+            continue;
+          }
+          if (r.stage.bottom > r.text.top + 1) fail(26, where, `the picture is not above the words (picture ends at ${Math.round(r.stage.bottom)} px, the words start at ${Math.round(r.text.top)} px): two columns at 703 px?`);
+          if (Math.abs(r.stage.left - r.text.left) > 1 || Math.abs(r.stage.right - r.text.right) > 1) fail(26, where, `picture and words do not share their edges (${Math.round(r.stage.left)}–${Math.round(r.stage.right)} vs ${Math.round(r.text.left)}–${Math.round(r.text.right)})`);
+          if (r.head.top < r.chrome - 1 || r.head.top > r.win - 24) fail(26, where, `the headline's top is at ${Math.round(r.head.top)} px, outside the first window (${Math.round(r.chrome)}–${r.win - 24} px)`);
+          if (r.art && (r.art.top < r.chrome - 1 || r.art.bottom > r.win + 1)) fail(26, where, `the drawing (${Math.round(r.art.top)}–${Math.round(r.art.bottom)} px) is not wholly in the window (${Math.round(r.chrome)}–${r.win} px)`);
+          if (r.sw > 703) fail(26, where, `the page is ${r.sw} px wide at 703 px (sideways scroll)`);
+        }
+        note(26, `${p.route}: ${n} screens checked at 703 × 900`);
+      });
+  // ... and with the text enlarged, on the home page and every question page, a screen's column is
+  // never narrowed into a phone's strip (ui/Screen.astro: at least 400 px), so its words do not
+  // break mid-word in a switch or a caption
+  if (run(26)) {
+    const tabletPages = viewPages.filter((p) => homes.includes(p) || /\/questions\/[^/]+\/$/.test(p.route));
+    for (const p of tabletPages)
+      for (const [sizeName, size] of Object.entries(SIZES))
+        await withPage({ width: 703, height: 900, dark: true }, async (page) => {
+          await open(page, p.route, { size, settle: 300 });
+          const cols = await page.evaluate(() => [...document.querySelectorAll('article[data-screen]')].map((a) => {
+            const t = a.querySelector('.screen__text');
+            return { id: a.id, w: t ? t.getBoundingClientRect().width : null };
+          }));
+          for (const c of cols) if (c.w !== null && c.w < 399) fail(26, `${p.route} #${c.id} (${sizeName})`, `the screen's column is ${Math.round(c.w)} px wide at 703 px; at least 400`);
+        });
+    note(26, `${tabletPages.length} pages: every screen's column at least 400 px at 703 × 900 (標準, 大, 特大)`);
+  }
 
   // ---- 11 font sizes at 320, 360, 390 ---------------------------------------------------------
   for (const width of [320, 360, 390])

@@ -102,8 +102,8 @@ export default copy({
     jump: { 'zh-TW': '騎車的人', en: 'Someone who rides' },
     top: { 'zh-TW': '準時定檢、該修就修；下一輛先算算看電動的。', en: 'Get inspected on time and fix what fails; before your next scooter, work out what an electric one costs.' },
     topWhy: {
-      'zh-TW': '定檢讀數裡，排最多的一成，占了全部一氧化碳的{share}。修好一輛，路口就少一大團。',
-      en: 'In the inspection readings, the highest tenth account for {share} of all the carbon monoxide. Fix one, and a big cloud leaves the junction.',
+      'zh-TW': '定檢時排氣讀數最高的一成機車，讀數加起來占了全部的{share}。修好一輛，路口就少一大團。',
+      en: 'At inspection, the tenth of scooters with the highest exhaust readings add up to {share} of all the readings. Fix one, and a big cloud leaves the junction.',
     },
     calc: { 'zh-TW': '去車行之前，先到「換電動」算一次。', en: 'Before you go to the dealer, work it out on Go electric.' },
     calcLink: { 'zh-TW': '算算看', en: 'Work it out' },
@@ -165,8 +165,8 @@ export default copy({
       },
       {
         ask: {
-          'zh-TW': '到紅燈路口量行人吸到的空氣。在大人和嬰兒車的高度，分紅燈和綠燈，量一氧化碳、苯（ㄅㄣˇ）和超細微粒。原始資料要公開。本站的推估可以拿來對照。',
-          en: 'Measure what pedestrians breathe at red lights: at adult and pushchair height, by red and green, for carbon monoxide, benzene and ultrafine particles, and publish the raw data. Our estimate is there to compare against.',
+          'zh-TW': '到紅燈路口量行人吸到的空氣。在大人和嬰兒車的高度，分紅燈和綠燈，量苯（ㄅㄣˇ）和它的同類、超細微粒。原始資料要公開。本站的推估可以拿來對照。',
+          en: 'Measure what pedestrians breathe at red lights: at adult and pushchair height, by red and green, for benzene and its relatives and ultrafine particles, and publish the raw data. Our estimate is there to compare against.',
         },
         to: { 'zh-TW': '環境部、各縣市環保局、交通部運輸研究所', en: 'Ministry of Environment, city environmental protection bureaus, the Institute of Transportation' },
       },
@@ -242,9 +242,9 @@ export default copy({
     subject: { 'zh-TW': '請關心 {nextYear} 年電動機車補助，以及紅燈路口的空氣', en: 'The {nextYear} electric-scooter subsidy, and the air at our red lights' },
     body: {
       'zh-TW':
-        '{name}議員您好：\n\n我是{city}的居民，想請您在議會關心兩件事。\n\n一、{nextYear} 年的電動機車補助。請督促{city}政府和中央，在年底前公布方案。也請一次公布好幾年的金額和期限，讓想換車的人來得及算。\n\n二、紅燈路口的空氣。交通部運輸研究所在 {sites} 個路口的行人等候區，量過一氧化碳和 PM2.5。「行人呼吸」網站用這些資料，推估紅燈時機車旁邊的空氣，算法全部公開。推估還要實測來確認。請{city}政府環保局委託量測，並公開原始資料。量的時候，要在大人和嬰兒車的高度，分紅燈和綠燈。要記錄一氧化碳、苯和超細微粒。\n\n敬請回覆，謝謝您。\n\n{city}居民 {sender} 敬上\n聯絡方式：{contact}',
+        '{name}議員您好：\n\n我是{city}的居民，想請您在議會關心兩件事。\n\n一、{nextYear} 年的電動機車補助。請督促{city}政府和中央，在年底前公布方案。也請一次公布好幾年的金額和期限，讓想換車的人來得及算。\n\n二、紅燈路口的空氣。交通部運輸研究所在 {sites} 個路口，量過行人等候區的空氣。「行人呼吸」網站用這些資料，推估紅燈時機車旁邊的空氣，算法全部公開。推估還要實測來確認。請{city}政府環保局委託量測，並公開原始資料。量的時候，要在大人和嬰兒車的高度，分紅燈和綠燈。要記錄苯和它的同類、超細微粒。\n\n敬請回覆，謝謝您。\n\n{city}居民 {sender} 敬上\n聯絡方式：{contact}',
       en:
-        'Dear Councillor {name},\n\nI live in {city}, and I would like to ask you to raise two things in the council.\n\n1. The {nextYear} electric-scooter subsidy. Please press the {city} government and central government to publish the programme before the end of the year. Please also ask them to set out the amounts and deadlines for several years at a time, so that people thinking of switching can work out the cost in time.\n\n2. The air at red lights. The Institute of Transportation has measured carbon monoxide and PM2.5 in the pedestrian waiting areas of {sites} junctions. The ScooterAir site uses those readings to estimate the air beside the scooters at a red light, and publishes all of its working. An estimate needs a measurement to confirm it. Please ask the {city} environmental protection bureau to commission one, and to publish the raw data. It should be taken at adult and pushchair height, by red and green, recording carbon monoxide, benzene and ultrafine particles.\n\nI would be grateful for a reply.\n\nYours sincerely,\n{sender}, a resident of {city}\nContact: {contact}',
+        'Dear Councillor {name},\n\nI live in {city}, and I would like to ask you to raise two things in the council.\n\n1. The {nextYear} electric-scooter subsidy. Please press the {city} government and central government to publish the programme before the end of the year. Please also ask them to set out the amounts and deadlines for several years at a time, so that people thinking of switching can work out the cost in time.\n\n2. The air at red lights. The Institute of Transportation has measured the air in the pedestrian waiting areas of {sites} junctions. The ScooterAir site uses those readings to estimate the air beside the scooters at a red light, and publishes all of its working. An estimate needs a measurement to confirm it. Please ask the {city} environmental protection bureau to commission one, and to publish the raw data. It should be taken at adult and pushchair height, by red and green, recording benzene and its relatives and ultrafine particles.\n\nI would be grateful for a reply.\n\nYours sincerely,\n{sender}, a resident of {city}\nContact: {contact}',
     },
     copy: { 'zh-TW': '複製這封信', en: 'Copy the letter' },
   },
@@ -309,7 +309,9 @@ export default copy({
     printButton: { 'zh-TW': '列印', en: 'Print' },
     back: { 'zh-TW': '回到「我能做什麼」', en: 'Back to What I can do' },
     kicker: { 'zh-TW': '給每天在這個路口等紅燈的人', en: 'For everyone who waits at this crossing' },
-    co: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
+    /** Three lines with no number: smell-comes-with-benzene, home screen 2's first line (推估, the "if"), no-smell-not-clean with alwaysCarry plus[2]. */
+    smell: { 'zh-TW': '聞到的不是苯，但苯跟著一起來。', en: 'What you smell is not benzene, but benzene comes with it.' },
+    clean: { 'zh-TW': '聞不到，不代表空氣乾淨。成分比例來自舊型機車，新型機車可能不一樣。', en: 'No smell does not mean clean air. The shares come from older scooters; newer ones may differ.' },
     title: { 'zh-TW': '一排機車停在旁邊，|路邊多一層廢氣', en: 'A row of scooters beside you |adds a layer of exhaust at the kerb' },
     qr: { 'zh-TW': '掃 QR Code，看完整的說明', en: 'Scan the QR code for the whole story' },
     qrAlt: { 'zh-TW': 'QR Code，連到：{url}', en: 'QR code linking to {url}' },
@@ -323,42 +325,19 @@ export default copy({
   brief: {
     metaTitle: { 'zh-TW': '一頁說明：紅燈旁的機車廢氣', en: 'One-page brief: scooter exhaust at red lights' },
     metaDescription: {
-      'zh-TW': '給里長和議員的一頁說明。內容是紅燈時機車旁邊的空氣，量到的和算的，還有我們的請求。',
-      en: 'A one-page brief for borough chiefs and councillors: the air beside the scooters at a red light, measured and worked out, and what we ask.',
+      'zh-TW': '給里長和議員的一頁說明：紅燈時機車旁邊的空氣、聞得到的味道、跟著來的苯、在路口待很久的人，還有我們的請求。',
+      en: 'A one-page brief for borough chiefs and councillors: the air beside the scooters at a red light, the smell, the benzene that comes with it, the people who stay at the junction, and what we ask.',
     },
     screenNote: { 'zh-TW': '這一頁是為了列印做的：A4 直印一頁。', en: 'This page is made for printing: one A4 page, portrait.' },
     printButton: { 'zh-TW': '列印', en: 'Print' },
     back: { 'zh-TW': '回到「我能做什麼」', en: 'Back to What I can do' },
     kicker: { 'zh-TW': '給里長和議員的一頁說明', en: 'A one-page brief for borough chiefs and councillors' },
-    title: { 'zh-TW': '紅燈時，機車旁邊的空氣：|量到的，和算的', en: 'The air beside scooters at a red light: |measured, and worked out' },
-    kerbHead: { 'zh-TW': '一排機車停在旁邊，路邊多一層廢氣', en: 'A row of scooters adds a layer of exhaust at the kerb' },
-    /** Then checkSentence(), estimateText.checkIsEstimate, estimateText.whoCoOnly, and estimateText.coMarksBenzene. The WHO's 'no safe level of benzene' is not printed here: this paragraph carries per-red values (statements-smell must-not 2). */
-    checkLead: {
-      'zh-TW': '運研所在 {sites} 個路口的行人等候區放了儀器。',
-      en: 'The Institute of Transportation put sensors where pedestrians wait at {sites} junctions.',
-    },
-    rowStreet: { 'zh-TW': '平常的路邊', en: 'An ordinary roadside' },
-    rowStreetSub: { 'zh-TW': '交通測站，2025 年平均', en: 'Traffic stations, 2025 average' },
-    rowIot: { 'zh-TW': '路口等過馬路的地方', en: 'Where pedestrians wait to cross' },
-    rowIotSub: { 'zh-TW': '運研所，{n} 個路口，最高的一分鐘', en: 'Institute of Transportation, {n} junctions, highest minute' },
-    rowEst: { 'zh-TW': '紅燈時，十來輛機車旁邊', en: 'Beside a dozen scooters at a red light' },
-    rowEstSub: { 'zh-TW': '90 秒平均，含街上原本就有的', en: '90-second average, including what the street already holds' },
-    /** Statement 1 and the exception, around the EstimateValue of sim.co.oneRed15 ({range}); the 推估 chip「推估・電腦算的一個紅燈」opens the line. */
-    simLine: {
-      'zh-TW': '電腦算的一個紅燈，在一般的街上，一氧化碳的 15 分鐘平均多{range}。例外：嬰兒車停在排氣管正後方半公尺、幾乎沒風，連續 15 分鐘每個紅燈都在，可能超過指引值（這樣的 15 分鐘，約十次有一到兩次；很少見，信心低）。',
-      en: 'In the simulated red light on an ordinary street, carbon monoxide adds {range} to a 15-minute average. Exception: a pushchair half a metre behind a tailpipe, in almost no wind, through every red for 15 minutes, can pass it (1 or 2 in 10 such periods; rare; low confidence).',
-    },
-    axis: { 'zh-TW': '一氧化碳（ppm）', en: 'Carbon monoxide (ppm)' },
-    tableHead: { 'zh-TW': '這排機車多出來多少', en: 'What the scooters add' },
-    tableScenario: { 'zh-TW': '旁邊停了幾輛', en: 'Scooters beside you' },
-    tableStreet: { 'zh-TW': '街上原本就有', en: 'Already in the street' },
-    tableConfidence: { 'zh-TW': '可信程度', en: 'Confidence' },
-    co: { 'zh-TW': '一氧化碳', en: 'Carbon monoxide' },
-    benzene: { 'zh-TW': '苯（ㄅㄣˇ）', en: 'Benzene' },
-    pm25: { 'zh-TW': 'PM2.5', en: 'PM2.5' },
-    tableNote: {
-      'zh-TW': '大人鼻子的高度（1.5 公尺）、90 秒的平均。苯和 PM2.5 的推估比一氧化碳更不確定。',
-      en: 'At an adult’s nose (1.5 m), averaged over 90 seconds. The benzene and PM2.5 estimates are less certain than carbon monoxide.',
+    title: { 'zh-TW': '紅燈時，|機車旁邊的空氣', en: 'The air beside scooters |at a red light' },
+    /** Block 1: home screen 2 (smell-comes-with-benzene, what-is-in-it, no-smell-not-clean), then alwaysCarry plus[2] with the car-only rows. No number. */
+    smellHead: { 'zh-TW': '聞到的不是苯，但苯跟著一起來', en: 'What you smell is not benzene, but benzene comes with it' },
+    smellOlder: {
+      'zh-TW': '成分比例來自台灣、印度、尼泊爾的舊型機車，有兩種只有汽車的資料；新型機車可能不一樣。',
+      en: 'Every share comes from older scooters in Taiwan, India and Nepal, and two only from cars; newer scooters may differ.',
     },
     heightsHead: { 'zh-TW': '同一個路口，小孩離排氣管最近', en: 'Same junction: the child is closest to the tailpipe' },
     heightsBody: {
@@ -367,14 +346,14 @@ export default copy({
     },
     askHead: { 'zh-TW': '我們的請求', en: 'What we ask' },
     ask: {
-      'zh-TW': '請委託量測，並公開原始資料。地點選機車多的路口。在大人和嬰兒車的高度，分紅燈和綠燈，量一氧化碳、苯和超細微粒。',
-      en: 'Commission a measurement: at a busy crossing, at adult and pushchair height, by red and green, for carbon monoxide, benzene and ultrafine particles, with the raw data published.',
+      'zh-TW': '請委託量測，並公開原始資料。地點選機車多的路口。在大人和嬰兒車的高度，分紅燈和綠燈，量苯和它的同類（BTEX）、超細微粒。',
+      en: 'Commission a measurement: at a busy crossing, at adult and pushchair height, by red and green, for benzene and its relatives (BTEX) and ultrafine particles, with the raw data published.',
     },
     promise: { 'zh-TW': '量出來的結果，不管高低，我們都會登出來。', en: 'Whatever the result, high or low, we will publish it.' },
     more: { 'zh-TW': '完整算法和出處：', en: 'The full working and the sources:' },
     refs: {
-      'zh-TW': '出處：交通部運輸研究所的路口量測；環境部空氣品質測站（2025 年）；世界衛生組織的一氧化碳指引值；本站的推估（{stamp}），算法全部公開。',
-      en: 'Sources: the Institute of Transportation’s junction readings; Ministry of Environment air-quality stations (2025); the WHO carbon monoxide guideline; this site’s estimate ({stamp}), with all of its working published.',
+      'zh-TW': '出處：本站的推估和電腦算的一個紅燈（{stamp}）；美國加州的 1 小時參考值；舊型機車的成分量測。算法全部公開。',
+      en: 'Sources: this site’s estimate and simulated red light ({stamp}); California’s 1-hour reference level; composition measurements of older scooters. All the working is published.',
     },
   },
 });

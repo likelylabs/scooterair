@@ -28,11 +28,12 @@ import { join } from 'node:path';
 import { asset, href, type Locale } from '@/i18n';
 import { localize, fill } from '@/i18n/pages/_copy';
 import filmCopy from '@/i18n/pages/film';
+import questions from '@/i18n/pages/questions';
 import { chipWhere, illustration, kSentences, redHoursSentence, site } from '@/i18n/ui';
-import { est, estimateText, waitPerRed_s } from '@/data/estimate';
+import { est, waitPerRed_s } from '@/data/estimate';
+import { simChipWhere, simStamp, smellFiles } from '@/data/simulation';
 import { fact, type FactId } from '@/data';
 import { AIR_EXTRA } from '@/components/art/air-slots';
-import EstimateValue from '@/components/ui/EstimateValue.astro';
 import HowButton from '@/components/ui/HowButton.astro';
 import HowSheet from '@/components/ui/HowSheet.astro';
 import IllustrationTag from '@/components/ui/IllustrationTag.astro';
@@ -55,7 +56,9 @@ const d = filmData(locale);
 const glueLine = (x: string) => glueZh(x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
 const asChecked = filmData(locale, { asChecked: true });
 const periods = filmPeriods(locale);
-const text = { ...d.text, panel: { ...d.text.panel, howHref: href(d.text.panel.howHref, locale) } };
+const text = d.text;
+// the note under the player: how much fume is drawn where the people stand follows the estimate
+const howHref = href('/estimate/#numbers', locale);
 const glyphs = await signGlyphs();
 const drawn = est.scn.dozen.drawn;
 const make = (id: string, withGlyphs = false) => createFilm({ locale, aspect: 4 / 3, px: 360, id, text, extra: AIR_EXTRA, drawn, glyphs: withGlyphs ? glyphs : undefined });
@@ -80,12 +83,10 @@ const stills = stillTimes.map(({ time, beat }, i) => {
     cueStart: cueAt(time).t,
     beat,
     r,
-    hud: hudHTML(text, hud, { link: false }),
+    hud: hudHTML(text, hud),
     tag: hud.tag,
     cue,
     scene,
-    // the panel is in the picture: its estimate, pressable, goes in the caption (the picture holds nothing to press)
-    panel: hud.panel > 0.5 && !hud.zero,
     alt: fill(t.still.alt, { n: i + 1, line }) + (scene ? (en ? ' ' : '') + (hud.tag === 'body' ? illustration.body[locale] : illustration.altNote[locale]) : ''),
   };
 });
@@ -102,19 +103,18 @@ const pageUrl = absUrl(href('/90/', locale), Astro.site);
 const lineHref = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(fill(t.player.lineText, { min: DURATION_MINUTES }))}`;
 
 // ---- transcript: every cue, what the picture adds to it, and what it rests on --------------
-type Ref = { chip?: { fact?: FactId; kind?: string; where?: string }; href?: string; sheet?: string; estimate?: boolean };
+type Ref = { chip?: { fact?: FactId; kind?: string; where?: string }; href?: string; sheet?: string };
 const dr = t.transcript.drawn;
 const m = d.money.money;
 const tagLine = (g: (typeof m.tags)[number]) => fill(dr.tag, { where: g.where, plate: g.plate, sum: [g.before, g.amount, g.after].filter(Boolean).join(' ') });
 const extra: Partial<Record<CueId, string[]>> = {
   arrive: [fill(dr.pack, { scenario: d.slots.scenario, n: d.slots.drawn })],
-  howMuch: [fill(dr.street, { label: text.panel.street, value: text.panel.streetValue })],
+  howMuch: [dr.smellWind],
   under: [fill(dr.ruler, { lo: d.slots.band.lo, hi: d.slots.band.hi })],
   // the assumption behind the yearly hours, in the same words as home screen 7
   daily: [redHoursSentence(locale, waitPerRed_s.lo, waitPerRed_s.hi)],
   fuel: [dr.fuelShares],
   thins: [dr.burst, kSentences.K6[locale]],
-  electric: [fill(dr.zero, { label: text.panel.addedElectric, value: text.panel.zero })],
   tags: [...m.tags.map(tagLine), m.chip],
   monthly: [m.perMonth, ...m.bars.map((b) => fill(dr.bar, { label: b.label, value: b.value }))],
 };
@@ -122,8 +122,8 @@ const refs: Partial<Record<CueId, Ref>> = {
   smell: { chip: { fact: 'iot-pedestrian-wait' }, href: '/estimate/#count' },
   arrive: { chip: { kind: 'estimate' }, href: '/estimate/#count' },
   knee: { chip: { fact: 'iot-exhaust-height-assumption' }, href: '/evidence/#link-2' },
-  howMuch: { estimate: true, chip: { fact: 'moenv-co-stations-2025' }, sheet: 'how-film-estimate' },
-  co: { chip: { fact: 'co-odourless' }, href: '/evidence/#link-4' },
+  howMuch: { chip: { kind: 'estimate', where: simChipWhere[locale] }, sheet: 'how-film-smell' },
+  nose: { href: '/questions/smell/' },
   // the smell-chemicals estimate: its condition, ranges and method are on /questions/smell/
   fuel: { chip: { kind: 'estimate' }, href: '/questions/smell/' },
   specks: { chip: { fact: 'route-particles-deep-lung' }, href: '/evidence/#link-4' },
@@ -151,10 +151,6 @@ const datum = (f: { data?: Record<string, { value: number } | number> }, key: st
   return n;
 };
 const sheet = {
-  estimate: {
-    title: fill(t.sheets.estimate.title, { range: d.slots.coAdded }),
-    measured: fill(t.sheets.estimate.measured, { street: d.slots.coStreet, peaks: est.meas.iot.co.peaks.join(en ? ', ' : '、') }),
-  },
   heights: fill(t.sheets.heights.what, { pipe: Math.round(datum(heightFact, 'exhaustHeight') * 100), lo: d.slots.band.lo, hi: d.slots.band.hi, airLo: est.child.airPerKg.lo, airHi: est.child.airPerKg.hi }),
   health: {
     who: fill(t.sheets.health.who, { n: datum(hei, 'studies') }),
@@ -221,7 +217,7 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   </div>
 
   <div class="film__under">
-    <p class="film__notes">{fill(t.player.notes, { red: d.slots.red })} <a class="film__inline" href={text.panel.howHref}>{t.player.how} →</a></p>
+    <p class="film__notes">{fill(t.player.notes, { red: d.slots.red })} <a class="film__inline" href={howHref}>{t.player.how} →</a></p>
     <p class="film__notes film__keys">{t.player.keys}</p>
     <div class="film__share">
       <a class="film__cta" href={lineHref} target="_blank" rel="noopener">{t.player.line}</a>
@@ -244,7 +240,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
               <p class="still__when">{fill(t.still.frameN, { n: s.n })} · {clock(s.cueStart)} · {t.beats[s.beat.id]}</p>
               <p class="still__line" set:html={glueLine(s.cue.main)} />
               {s.cue.note && <p class="still__note">{s.cue.note}{s.cue.chip && <Fragment> <KindChip locale={locale} kind={s.cue.chip.kind} size="sm" /></Fragment>}</p>}
-              {s.panel && <p class="still__est"><EstimateValue locale={locale} slotId="co.dozen.add" label={text.panel.added} sheet="how-film-estimate" /></p>}
             </figcaption>
           </figure>
         </li>
@@ -266,9 +261,8 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
                 {c.extra.map((x) => <p class="film__line-note">{x}</p>)}
                 {c.ref && (
                   <p class="film__line-source">
-                    {c.ref.estimate && <EstimateValue locale={locale} slotId="co.dozen.add" label={text.panel.added} sheet={c.ref.sheet} />}
                     {c.ref.chip && (c.ref.chip.fact ? <KindChip locale={locale} of={fact(c.ref.chip.fact)} /> : <KindChip locale={locale} kind={c.ref.chip.kind} where={c.ref.chip.where} />)}
-                    {c.ref.sheet && !c.ref.estimate && <HowButton locale={locale} sheet={c.ref.sheet} />}
+                    {c.ref.sheet && <HowButton locale={locale} sheet={c.ref.sheet} />}
                     {c.ref.href && <a class="film__source" href={href(c.ref.href, locale)}>{t.transcript.source} →</a>}
                   </p>
                 )}
@@ -279,10 +273,10 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
       </ol>
     </section>
 
-    <HowSheet id="how-film-estimate" locale={locale} kind="estimate" title={sheet.estimate.title} pollutant="co" anchor="numbers" facts={['moenv-co-stations-2025']}>
-      <p slot="block1">{sheet.estimate.measured}</p>
-      <ol slot="block2" class="film__flow">{estimateText.flow.map((s) => <li>{s[locale]}</li>)}</ol>
-      <p slot="block3">{t.sheets.estimate.care} {est.meta.gloss[locale]}</p>
+    <HowSheet id="how-film-smell" locale={locale} kind="estimate" anchor="simulation" stamp={simStamp[locale]} title={t.sheets.smell.title} facts={['sim-smell-seconds', 'smell-older-engines']} primary={{ href: href('/evidence/#smell-chemicals', locale) }}>
+      <p slot="block2">{t.sheets.smell.who}</p>
+      <p slot="block3">{t.sheets.smell.care}</p>
+      <p><a href={asset(smellFiles.method)}>{questions.smell.s1.sheet.method[locale]}</a></p>
     </HowSheet>
     <HowSheet id="how-film-heights" locale={locale} kind="study" title={t.sheets.heights.title} facts={['iot-exhaust-height-assumption', 'child-air-per-kg']} primary={{ href: href('/evidence/#link-6', locale) }}>
       <p slot="block1">{t.sheets.heights.who}</p>
@@ -719,78 +713,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
   .hud__sc {
     inline-size: 1.9em;
     block-size: 1.2em;
-  }
-  .hud__panel {
-    display: grid;
-    inline-size: max-content;
-    max-inline-size: calc(100cqw - calc(1 * var(--pr, 1rem)));
-    background: var(--surface);
-    border: 1.5px solid var(--ink);
-    border-radius: var(--radius-2);
-    overflow: hidden;
-  }
-  .hud__row {
-    display: grid;
-    gap: 0.05em;
-    margin: 0;
-    padding: 0.35em 0.65em 0.4em;
-    color: inherit;
-    text-decoration: none;
-  }
-  .hud__row[hidden] {
-    display: none;
-  }
-  .hud__row--est {
-    pointer-events: auto;
-    min-block-size: var(--tap);
-    align-content: center;
-    background: var(--estimate-wash);
-  }
-  .hud__row--street {
-    grid-template-columns: auto auto;
-    justify-content: space-between;
-    align-items: baseline;
-    column-gap: 0.8em;
-    border-block-start: 1px solid var(--line-strong);
-  }
-  .hud__name {
-    font-weight: 700;
-    color: var(--ink-2);
-  }
-  .hud__val {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5em;
-    white-space: nowrap;
-  }
-  .hud__val b {
-    font-family: var(--font-latin), var(--font-body);
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-  }
-  /* brief 8.2, change 2: the one number, 20 px or more */
-  .hud__row--est .hud__val b,
-  .hud__row--zero .hud__val b {
-    font-size: max(calc(1.25 * var(--pr, 1rem)), 1.45em);
-    line-height: 1.2;
-  }
-  .hud__kind {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25em;
-    font-weight: 700;
-    color: var(--ink-2);
-  }
-  .hud__kind .chip-glyph {
-    inline-size: 1em;
-    block-size: 1em;
-  }
-  .hud__kind--est {
-    padding: 0 0.5em;
-    color: var(--estimate-ink);
-    border: 1.5px dashed var(--estimate);
-    border-radius: var(--radius-pill);
-    background: var(--surface);
   }
   .hud__clock {
     flex: none;
@@ -1267,9 +1189,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     --fs-md: calc(1.25 * var(--pr));
     --tap: calc(3 * var(--pr));
   }
-  .still__pic .hud__row--est {
-    pointer-events: none;
-  }
   .still figcaption {
     padding-block-start: var(--sp-2);
   }
@@ -1279,9 +1198,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     font-weight: 700;
     color: var(--ink-2);
     font-variant-numeric: tabular-nums;
-  }
-  .still__est {
-    margin: 0.4rem 0 0;
   }
   .still__line {
     margin: 0;
@@ -1370,16 +1286,6 @@ const VB = `0 0 ${shared.VW} ${shared.VH}`;
     gap: var(--tap-gap) 0.75rem;
     margin: 0.25rem 0 0;
     font-size: var(--fs-sm);
-  }
-  .film__flow {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .film__flow li + li::before {
-    content: '↓';
-    display: block;
-    color: var(--ink-2);
   }
 
   /* ---- the film's drawing classes ---------------------------------------------------------- */

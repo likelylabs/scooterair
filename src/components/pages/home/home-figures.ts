@@ -8,7 +8,7 @@
 // moves, the build stops and the sentence has to be rewritten, instead of going stale.
 
 import * as timeline from '../film/timeline.ts';
-import { est, time, dose } from '../../../data/estimate.ts';
+import { est, time } from '../../../data/estimate.ts';
 import { fact, type FactId } from '../../../data/facts.ts';
 import type { Datum } from '../../../data/types.ts';
 
@@ -73,7 +73,6 @@ export function homeFigures(locale: Loc) {
     idleMinutes: datum('idling-regulation', 'minutes'),
     /** 907 萬 in Chinese, 9.07 million in English */
     readings: locale === 'en' ? (readings / 1e6).toFixed(2) : String(Math.round(readings / 1e4)),
-    canMl: est.emit.co.perRedSum.canMl,
     sites: est.meas.iot.sites.value,
     peakSites: est.meas.iot.co.peakSites,
     peakLo: Math.min(...peaks),
@@ -83,7 +82,6 @@ export function homeFigures(locale: Loc) {
     walkPeople: datum('mccreanor2007-london-walk', 'participants'),
     peakMinutes: datum('lung2025-peaks-hrv', 'peakMinutes'),
     peakPeople: datum('lung2025-peaks-hrv', 'participants'),
-    dosePct: dose.dayShare.underPct,
     child: est.child.airPerKg,
     commute: est.commute.pm25,
     mask: {

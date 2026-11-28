@@ -6,7 +6,7 @@ import { est, estimateRangeSlots, estRange } from '../../../data/estimate.ts';
 import { bandsModel, estimateRecords, estimateTable, mveModel } from '../core/estimateCharts.ts';
 import { priceVerdict, renderPriceBars } from '../core/priceBars.ts';
 import { renderMonthlyBars } from '../core/monthlyBars.ts';
-import { renderWorkingSum, workingBusiest, workingHoursPerYear, workingKerbFlow, workingPerRed, workingPerRedCan } from '../core/workingSum.ts';
+import { renderWorkingSum, workingBusiest, workingHoursPerYear, workingKerbFlow, workingPerRed } from '../core/workingSum.ts';
 import { tip } from '../core/shared.ts';
 
 const locales = ['zh-TW', 'en'] as const;
@@ -96,7 +96,7 @@ test('G15: a sum has operators, a flow has none; an estimate result is the dashe
     const flow = renderWorkingSum(workingKerbFlow(l));
     assert.doesNotMatch(words(flow), /[×÷＝＋]/, 'a flow carries no operator sign');
     assert.match(flow, /hc-sum__arrow/);
-    for (const w of [workingPerRedCan(l), workingBusiest(l), workingHoursPerYear(4, l)]) clean(renderWorkingSum(w));
+    for (const w of [workingPerRed(l), workingBusiest(l), workingHoursPerYear(4, l)]) clean(renderWorkingSum(w));
     assert.doesNotMatch(renderWorkingSum(workingHoursPerYear(4, l)), /hc-sum__box--estimate/, 'our arithmetic is a solid box');
   }
   assert.match(words(renderWorkingSum(workingBusiest('zh-TW'))), /約 1,500 輛.*83 秒.*3,600 秒.*約 34 輛/s);

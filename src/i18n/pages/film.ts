@@ -10,8 +10,9 @@
 //   - {tokens} are filled in src/components/pages/film/film-data.ts from the estimate slots
 //     (src/data/estimate.ts) and the money module (src/lib/home-money.ts). No digit that is a
 //     finding is typed here;
-//   - chip names, the illustration tag and the K sentences are in ../ui.ts; the panel's
-//     「這排機車多出來」 and 「街上原本就有」 are the estimate's own words (estimateText);
+//   - chip names, the illustration tag and the K sentences are in ../ui.ts;
+//   - carbon monoxide is off the main path (decision 2026-11-28): the film has no number panel
+//     and no caption, still, transcript line or sheet names the gas, its guideline or ppm;
 //   - nothing says or implies that the amount changes through the red, that a child's height
 //     has a number, or that riders breathe "the most" (brief 4.6).
 
@@ -71,10 +72,6 @@ export default copy({
     cm: { 'zh-TW': '公分', en: 'cm' },
     petrol: { 'zh-TW': '燃油機車', en: 'Petrol scooters' },
     electric: { 'zh-TW': '電動機車', en: 'Electric scooters' },
-    /** The panel's first row: lane A's 這排機車多出來 with the gas named. */
-    added: { 'zh-TW': '{added}的一氧化碳', en: '{added}: carbon monoxide' },
-    addedElectric: { 'zh-TW': '這排電動機車多出來的一氧化碳', en: 'Carbon monoxide added by these electric scooters' },
-    zero: { 'zh-TW': '0', en: '0' },
     /** The two price tags. {county}, {amount} from the money module. */
     tag: {
       scrap: { 'zh-TW': '報廢滿 10 年的機車', en: 'scrapping one 10+ years old' },
@@ -109,8 +106,14 @@ export default copy({
     waiting: { main: { 'zh-TW': '騎士在等，引擎沒熄火。', en: 'The riders wait. Engines stay on.' } },
     knee: { main: { 'zh-TW': '廢氣就排在膝蓋的高度。', en: 'The exhaust comes out at knee height.' } },
     keeps: { main: { 'zh-TW': '車停著，廢氣一直補上來。', en: 'They stay put. The exhaust keeps coming.' } },
-    howMuch: { main: { 'zh-TW': '路邊多了多少？這是推估。', en: 'How much more at the kerb? An estimate.' } },
-    co: { main: { 'zh-TW': '一氧化碳：沒有味道。', en: 'Carbon monoxide: no smell at all.' } },
+    /** statements-smell how-often-wind, in its own words ("most of a red"), as home screen 4; its wind (at most
+     *  1 peak-hour red in 8) is the quiet line; one simulated red per case is the transcript's line under it
+     *  (transcript.drawn.smellWind) and the sheet how-film-smell. No percentage in the film. */
+    howMuch: {
+      main: { 'zh-TW': '風從機車來，大半聞得到。', en: 'Wind from scooters: smellable most of the red.' },
+      note: { 'zh-TW': '推估。尖峰時，八個紅燈最多一個', en: 'Estimate. At most 1 peak-hour red in 8.' },
+    },
+    nose: { main: { 'zh-TW': '聞得到，就在廢氣裡。', en: 'Smell it, and you are in it.' } },
     fuel: {
       /** statements-smell smell-comes-with-benzene (short form). Its condition (the smell is the scooters' exhaust)
        *  is the caption's subject, 機車的味道 / Scooter smell; 推估 and no-smell-not-clean are the quiet line, in the
@@ -170,7 +173,7 @@ export default copy({
     smell: { 'zh-TW': '紅燈亮了', en: 'The light turns red' },
     arrive: { 'zh-TW': '機車停下來', en: 'The scooters pull up' },
     idle: { 'zh-TW': '引擎沒熄火', en: 'Engines running' },
-    kerb: { 'zh-TW': '路邊多了多少', en: 'How much more at the kerb' },
+    kerb: { 'zh-TW': '聞得到多久', en: 'How long you can smell it' },
     inside: { 'zh-TW': '裡面有什麼', en: 'What is in it' },
     mask: { 'zh-TW': '口罩擋得住嗎', en: 'Does a mask stop it' },
     closest: { 'zh-TW': '誰離得最近', en: 'Who is closest' },
@@ -207,8 +210,11 @@ export default copy({
     /** What the picture shows where a caption alone would not say it (the transcript must carry every number on screen). */
     drawn: {
       pack: { 'zh-TW': '畫面畫的是{scenario}的情境，共 {n} 輛。', en: 'The picture draws the “{scenario}” case: {n} scooters.' },
-      street: { 'zh-TW': '{label}：{value}', en: '{label}: {value}' },
-      zero: { 'zh-TW': '{label}：{value}。沒有排氣管，就沒有東西多出來。', en: '{label}: {value}. With no tailpipe there is nothing to add.' },
+      /** Under the kerb cue: how-often-wind with its condition, its wind and "one simulated red per case". */
+      smellWind: {
+        'zh-TW': '推估：風整個紅燈都從一群機車吹向人行道時，一個紅燈大部分的時間都聞得到。這種風，尖峰時段最多大約八個紅燈有一個。每種情況只算了一個紅燈。',
+        en: 'Estimate: when the wind blows from a group of scooters toward the pavement for the whole red, it can be smelled for most of the red. Such a wind comes in at most about 1 in 8 peak-hour reds. Each case is one simulated red light.',
+      },
       ruler: { 'zh-TW': '尺上標出嬰兒車裡寶寶的高度：{lo} 到 {hi} 公分。', en: 'The ruler marks the height of a baby in a pushchair: {lo} to {hi} cm.' },
       burst: { 'zh-TW': '起步的時候，每輛機車噴出一小團。', en: 'As they pull away each scooter throws one small puff.' },
       tag: { 'zh-TW': '{where}（{plate}）：{sum}。', en: '{where} ({plate}): {sum}.' },
@@ -223,15 +229,18 @@ export default copy({
 
   /** The three sheets behind 怎麼知道的？ on this page (brief 4.5). Numbers are filled from the slots and the registry. */
   sheets: {
-    estimate: {
-      title: { 'zh-TW': '「{range}」|怎麼來的', en: '“{range}”: |where it comes from' },
-      measured: {
-        'zh-TW': '交通測站量到的一氧化碳，全年平均{street}。運研所（交通部運輸研究所）在路口行人等候區量到的最高一分鐘，是 {peaks} ppm。',
-        en: 'Traffic stations measure carbon monoxide at {street} as a yearly average. The highest one-minute readings the Institute of Transportation took where pedestrians wait were {peaks} ppm.',
+    /** Behind the kerb cue (statements-smell how-often-wind, with its counterweight for street canyons). The sheet also
+     *  prints the caveats of sim-smell-seconds (the 1967 and 1970 smell levels, the wind, 1 red in 8) and
+     *  smell-older-engines, so these strings do not repeat them. */
+    smell: {
+      title: { 'zh-TW': '「大半個紅燈都聞得到」|怎麼知道的', en: '“Smellable for most of the red”: |how we know' },
+      who: {
+        'zh-TW': '我們用電腦，一秒一秒算了紅燈時路邊的風和廢氣；每種情況只算了一個紅燈。',
+        en: 'On a computer we worked out the wind and the exhaust at the kerb second by second through a red light; each case is one simulated red light.',
       },
       care: {
-        'zh-TW': '這是大人鼻子高度、90 秒的平均，不是哪一個路口，也不是小孩的高度。',
-        en: 'This is a 90-second average at an adult’s nose. It is not any particular junction, and not a child’s height.',
+        'zh-TW': '在兩邊高樓、風順著街吹的街上，很多紅燈根本聞不到，可是苯整個紅燈都在；這種街的數字可能算低了，這不是說這種街比較好（推估）。',
+        en: 'In a street between tall buildings with the wind along it, many reds have no smell at all, yet benzene is there through the whole red; the figures for such streets are probably low, and this does not mean such streets are better (estimate).',
       },
     },
     heights: {

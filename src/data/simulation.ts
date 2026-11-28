@@ -96,6 +96,50 @@ export const sim = {
 
 /** The smell-chemicals numbers as generated (shares, draws, the detail table). Read-only. */
 export const simSmell = SC;
+/**
+ * The two smell tests' "can smell it" levels as dilutions of the exhaust (the 1967 study: 800-fold,
+ * the 1970 study: 6,800-fold), and how far the chemical shares differ between sources. Not in the
+ * generated results: they are the signed statements' own words.
+ *   dilution  statements-smell.json how-much-just-smellable basis ("6,800-fold threshold … 800-fold")
+ *   shareSpread  smell-chemicals/ANSWER-SMELL.md, confidence: "shares vary 2-20 times between sources"
+ */
+export const smellLevels = {
+  dilution1967: 800,
+  dilution1970: 6800,
+  shareSpread: { lo: 2, hi: 20 },
+} as const;
+
+const nfLoc = (v: number, locale: 'zh-TW' | 'en') => new Intl.NumberFormat(locale === 'en' ? 'en' : 'zh-TW', { maximumFractionDigits: 1 }).format(v);
+const pc = (x: number) => Math.round(x * 100);
+
+/**
+ * The tokens every view of the smell estimate fills the same way (home screen 4 and its sheet,
+ * /questions/smell/ #how-much, /questions/beside-me/ and /questions/app/ #more).
+ */
+export function simSmellShares(locale: 'zh-TW' | 'en') {
+  const C = SC;
+  return {
+    lo: nfLoc(C.just.wordsRangeLo, locale),
+    hi: nfLoc(C.just.wordsRangeHi, locale),
+    about: nfLoc(C.seconds.wordsAbout, locale),
+    a: pc(C.share800.c),
+    b: pc(C.share6800.c),
+    aLo: pc(C.share800.lo),
+    aHi: pc(C.share800.hi),
+    bLo: pc(C.share6800.lo),
+    bHi: pc(C.share6800.hi),
+    lowDraws: nfLoc(C.share800.drawsAnyLowHigh[0], locale),
+    draws: nfLoc(C.seconds.n, locale),
+    single: nfLoc(C.just.n, locale),
+    canyon: nfLoc(C.canyon.a.drawsAny, locale),
+    canyonLo: nfLoc(C.canyon.a.drawsAnyLowHigh[0], locale),
+    canyonHi: nfLoc(C.canyon.a.drawsAnyLowHigh[1], locale),
+    thrRatio: nfLoc(smellLevels.dilution1970 / smellLevels.dilution1967, locale),
+    shLo: nfLoc(smellLevels.shareSpread.lo, locale),
+    shHi: nfLoc(smellLevels.shareSpread.hi, locale),
+  };
+}
+
 /** The signed smell files the site serves as published (src/pages/research/smell-chemicals/); link them with asset(). */
 export const smellFiles = {
   method: '/research/smell-chemicals/METHOD-SMELL.md',

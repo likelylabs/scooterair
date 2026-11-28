@@ -36,6 +36,8 @@
  *               from est.confidence in src/data/estimate.ts; brief 4.2 rule 9). Pass it whenever
  *               the sheet stands behind an air number; leave it out for a count or a volume
  *   anchor      section of /estimate/ for the 完整算法 button (default 'numbers')
+ *   computed    true when block 1 says how the computer worked it out (a simulation sheet):
+ *               its heading is then 電腦算的，不是量的, drawn as an estimate, never 量到的
  *   stamp       the version stamp to print instead of the 90-second estimate's (a simulation
  *               sheet passes simStamp from src/data/simulation.ts)
  *               The version stamp (推估 v1・2026-11-26, est.meta.stamp) is printed on every
@@ -78,6 +80,7 @@ interface Props {
   primary?: Action;
   secondary?: Action;
   stamp?: string;
+  computed?: boolean;
   class?: string;
 }
 const { locale, id, title = how.button[locale], where, pollutant, anchor = 'numbers', class: cls } = Astro.props;
@@ -88,7 +91,9 @@ if (pollutant && !isEstimate) throw new Error(`HowSheet ${id}: \`pollutant\` is 
 const confidence = pollutant ? est.confidence[pollutant] : undefined;
 if (pollutant && !confidence) throw new Error(`HowSheet ${id}: the estimate has no confidence for "${pollutant}".`);
 
-const heads = Astro.props.heads ?? how.heads[kind].map((h) => h[locale]);
+const computed = Astro.props.computed === true;
+if (computed && !isEstimate) throw new Error(`HowSheet ${id}: \`computed\` is for an estimate sheet (kind="estimate").`);
+const heads = Astro.props.heads ?? how.heads[kind].map((h, i) => (computed && i === 0 ? how.computedHead[locale] : h[locale]));
 const blocks = (
   await Promise.all(
     (['block1', 'block2', 'block3'] as const).map(async (name, i) => ({
@@ -135,7 +140,8 @@ const dot = locale === 'en' ? ' · ' : '　';
       {shown.map((b) => (
         <section class="how__block">
           <h4 class="how__h">
-            {isEstimate && b.i === 0 && <span class="how__pill how__pill--measured"><Fragment set:html={chipGlyphSvg('measured')} />{heads[0]}</span>}
+            {isEstimate && b.i === 0 && !computed && <span class="how__pill how__pill--measured"><Fragment set:html={chipGlyphSvg('measured')} />{heads[0]}</span>}
+            {isEstimate && b.i === 0 && computed && <span class="how__pill how__pill--estimate"><Fragment set:html={chipGlyphSvg('estimate')} />{heads[0]}</span>}
             {isEstimate && b.i === 1 && <span class="how__pill how__pill--estimate"><Fragment set:html={chipGlyphSvg('estimate')} />{heads[1]}</span>}
             {!(isEstimate && b.i < 2) && <span>{heads[b.i]}</span>}
             {!isEstimate && b.i === 0 && <KindChip locale={locale} kind={kind} where={where} />}

@@ -6,7 +6,7 @@
 // self-contained literals on purpose: client scripts can import it without pulling the 65 kB
 // results file or the fact registry into a bundle.
 //
-//   import { est, estRange, formatEstimate, kerbSentence, checkHeadline } from '@/data/estimate';
+//   import { est, estRange, formatEstimate, kerbSentence } from '@/data/estimate';
 //   est.co.dozen.add               // { lo: 0.05, mid: 0.3, hi: 1, unit: 'ppm', kind: 'estimate', ... }
 //   formatEstimate('co.dozen.add', 'zh-TW').text   // '約 0.05 到 1 ppm'
 //   kerbSentence('dozen', 'zh-TW')                 // '多出來的量，和街上原本就有的差不多。'
@@ -54,7 +54,7 @@ export const scenarioKeys = ['few', 'dozen', 'full'] as const satisfies readonly
 /** The scenario every single-scenario picture, chart and film uses. */
 export const defaultScenario: ScenarioKey = 'dozen';
 
-export type EstUnit = 'ppm' | 'ppb' | 'ug/m3' | 'mg/m3' | 'g/h' | 'g' | 'L' | 'can' | 'm' | 'vehicles' | 's' | 'h' | 'percent' | 'ratio' | 'm/s' | 'count' | 'g/h-fuel' | 'mg/h';
+export type EstUnit = 'ppm' | 'ppb' | 'ug/m3' | 'mg/m3' | 'g/h' | 'g' | 'L' | 'm' | 'vehicles' | 's' | 'h' | 'percent' | 'ratio' | 'm/s' | 'count' | 'g/h-fuel' | 'mg/h';
 
 export const estUnitLabels: Record<EstUnit, L10n> = {
   ppm: t('ppm', 'ppm'),
@@ -64,7 +64,6 @@ export const estUnitLabels: Record<EstUnit, L10n> = {
   'g/h': t('公克／小時', 'g an hour'),
   g: t('公克', 'g'),
   L: t('公升', 'litres'),
-  can: t('個鋁罐', 'drinks cans'),
   m: t('公尺', 'm'),
   vehicles: t('輛', 'scooters'),
   s: t('秒', 'seconds'),
@@ -251,17 +250,11 @@ export const est = {
       perRed_g: { lo: 0.2, mid: 0.4, hi: 0.7, unit: 'g', kind: 'estimate', rounding: 'sf1', anchor: 'recipe' } satisfies EstRange,
       /** The same as gas at 25 °C and one atmosphere (× 24.45 L ÷ 28.01 g), litres, 2 s.f. */
       perRed_L: { lo: 0.18, mid: 0.34, hi: 0.59, unit: 'L', kind: 'estimate', rounding: 'as-given', anchor: 'recipe' } satisfies EstRange,
-      /** In 330 mL drinks cans, to the nearest half can (signed off, brief 12.1). */
-      perRed_can: { lo: 0.5, mid: 1, hi: 2, unit: 'can', kind: 'estimate', rounding: 'half', anchor: 'recipe' } satisfies EstRange,
-      /** The can line as words (screen 2 chip). Exact cans: 0.55 / 1.02 / 1.79. */
-      canWords: t('大約一罐（半罐到快兩罐）', 'about one can (half a can to nearly two)'),
       /** The sum, as the sheet draws it. */
       perRedSum: {
         reds: 40,
-        canMl: 330,
         molarVolume_L: 24.45,
         molarMass_g: 28.01,
-        exactCans: { lo: 0.55, mid: 1.02, hi: 1.79 },
       },
     },
     /** Benzene, mg an hour (fleet mean; /estimate/ only, with its caveat). */
@@ -347,7 +340,6 @@ export type EstimateRangeSlot =
   | 'emit.co.gPerHour'
   | 'emit.co.perRed_g'
   | 'emit.co.perRed_L'
-  | 'emit.co.perRed_can'
   | 'xcheck.iot.observed'
   | 'xcheck.iot.model'
   | 'meas.iot.pm25'
@@ -361,7 +353,6 @@ export const estimateRangeSlots: EstimateRangeSlot[] = [
   'emit.co.gPerHour',
   'emit.co.perRed_g',
   'emit.co.perRed_L',
-  'emit.co.perRed_can',
   'xcheck.iot.observed',
   'xcheck.iot.model',
   'meas.iot.pm25',
@@ -549,34 +540,7 @@ export const kerbSentenceTable = kerbSentences;
 
 export type CheckRule = 'overlap' | 'higher' | 'lower';
 
-/**
- * Screen 5's first body sentence: the relation between the readings and the estimate, chosen by
- * checkRule() (brief 3.2, 4.4). On the one-page brief it follows the sentence naming who measured.
- */
-const checkSentences: Record<CheckRule, L10n> = {
-  overlap: t('量到的和算的差不多。', 'Readings roughly match our estimate.'),
-  higher: t('我們算的比量到的高。', 'Our estimate is above the readings.'),
-  lower: t('我們算的比量到的低。', 'Our estimate is below the readings.'),
-};
-
-/**
- * Screen 5's headline answers screen 4's question 「那麼臭，超過指引值了嗎？」. `far` is printed
- * while simBelowWho() in src/data/simulation.ts holds (the simulation's 15-minute values for one
- * red, for every red with the wind held, and right behind a tailpipe are all below the WHO
- * 15-minute value). It says the smell is real, that carbon monoxide has no smell, and that ONE
- * red light leaves the 15-minute average below the guideline: it names who the claim covers and
- * never says "far below" (statements.json must-not 4). The exception (a pushchair parked right
- * behind a tailpipe through every red) is printed on the same screen, in words and in its chart.
- * It ranks nothing (claims policy r3-no-harm-ranking): never add 更 / 真正 / 反而.
- * `near`: the fallback if the simulation's values ever reach the guideline; it claims nothing.
- * '|' marks where the line may break (checkHeadlinePhrased); checkHeadline() removes the marks.
- */
-const checkHeadlines: Record<'far' | 'near', L10n> = {
-  far: t('臭是真的。|一氧化碳沒味道；|等一個紅燈，|仍低於指引值', 'The smell is real. |Carbon monoxide has no smell. |Waiting one red light, |it stays below the WHO guideline'),
-  near: t('路口的一氧化碳，|量過也算過', 'Carbon monoxide at the crossing: |measured and worked out'),
-};
-
-/** Screen 5: compare co.dozen.total with the lowest and highest measured peak. Today: overlap. */
+/** The measured-beside-estimated chart (/estimate/#check): compare co.dozen.total with the lowest and highest measured peak. Today: overlap. */
 export function checkRule(): CheckRule {
   const tot = est.co.dozen.total;
   const peaks = est.meas.iot.co.peaks;
@@ -586,25 +550,6 @@ export function checkRule(): CheckRule {
   if (tot.hi < pLo) return 'lower';
   return 'overlap';
 }
-/** Screen 5's headline (and the one-page brief's) without phrase marks. Pass simBelowWho(). */
-export function checkHeadline(locale: Locale, belowWho: boolean): string {
-  return checkHeadlines[belowWho ? 'far' : 'near'][locale].replaceAll('|', '');
-}
-export const checkHeadlineTable = checkHeadlines;
-/** Screen 5's headline with its phrase marks ('|', ui/Phrased). Pass simBelowWho(). */
-export function checkHeadlinePhrased(locale: Locale, belowWho: boolean): string {
-  return checkHeadlines[belowWho ? 'far' : 'near'][locale];
-}
-/**
- * The 90-second estimate's relation sentence, chosen by checkRule(). It is about the 90-second
- * estimate and the Institute's readings only, never about the computer simulation (statements.json
- * must-not 5): wherever it is printed near the simulation, estimateText.checkIsEstimate goes with it.
- */
-export function checkSentence(locale: Locale): string {
-  return checkSentences[checkRule()][locale];
-}
-export const checkSentenceTable = checkSentences;
-
 /** The highest value the measured-beside-estimated chart draws (total hi, peaks, background), ppm. */
 export function chartMaxPpm(): number {
   return Math.max(est.co.dozen.total.hi, ...est.meas.iot.co.peaks, est.bg.co.traffic.value);
@@ -648,15 +593,6 @@ export const estimateText = {
     '90 秒的量，放進 15 分鐘的平均裡，只算十分之一。',
     'A 90-second level counts for one tenth of a 15-minute average.',
   ),
-  /**
-   * Beside checkSentence() wherever the simulation is near it (home screen 5's sheet): the
-   * readings were compared with the 90-second estimate, not with the computer simulation, which
-   * was not checked against measurements (statements.json must-not 5).
-   */
-  checkIsEstimate: t(
-    '這是拿量到的和本站 90 秒的推估比，不是和電腦算的一個紅燈比；電腦算的沒有拿量到的來比對。',
-    'This compares the readings with our 90-second estimate, not with the computer simulation; the simulation was not checked against readings.',
-  ),
   /** Under the estimate table and in the downloads note (METHOD.md §1, amended 2026-11-27). */
   upperIsTypical: t(
     '範圍最高的數字，是一般紅燈裡偏高的那種，不是最糟的紅燈。',
@@ -664,23 +600,8 @@ export const estimateText = {
   ),
   /** PM2.5 sentence for /estimate/#numbers. */
   pm25Small: t('機車讓 PM2.5 多出來的量，比街上原本就有的少很多。', 'The PM2.5 the scooters add is much less than the street already holds.'),
-  /**
-   * What the WHO comparison does and does not cover (brief 12.4). Printed beside the comparison
-   * wherever it stands on its own, so "far below" is never the last word. It says the guideline
-   * is not a line under which exhaust is safe; it does not say exhaust at the kerb harms anyone.
-   */
-  whoCoOnly: t('這個指引值只看一氧化碳，低於它不代表廢氣就安全。', 'That guideline is for carbon monoxide only. It does not mean exhaust is safe.'),
-  /**
-   * Screen 5's short form of whoCoOnly, for the phone screen: the headline has just named the
-   * guideline and the chart's WHO bar says 只看一氧化碳 / Carbon monoxide only.
-   */
-  belowIsNotSafe: t('低於指引值，不代表廢氣就安全。', 'Below the guideline does not mean safe.'),
-  /** Screen 5's link from the chart to benzene: the short form of coTracksVapour (claims policy brief-no-everything-rises). */
-  coMarksBenzene: t('一氧化碳多的地方，苯也多。', 'Benzene goes up with carbon monoxide.'),
   /** The label under the WHO bar of every measured-beside-estimated chart. */
   whoIsCoLimit: t('只看一氧化碳', 'Carbon monoxide only'),
-  /** Screen 5 quiet line: limited to fresh fuel vapour and benzene. */
-  coTracksVapour: t('一氧化碳多的地方，剛排出來的油氣和苯也多。', 'Where there is more carbon monoxide, there is more fresh fuel vapour and benzene too.'),
   /** The flow the recipe sheet draws (no operators: the kerb estimate is a simulation). */
   flow: [
     t('平均每輛每小時排約 15 公克（平均值在 8 到 27 之間）', 'On average each scooter gives off about 15 g an hour (the average lies between 8 and 27)'),

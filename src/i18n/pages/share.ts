@@ -23,7 +23,8 @@ export default copy({
     rider: { 'zh-TW': '騎車的人呢？', en: 'And the rider?' },
     'beside-me': { 'zh-TW': '站遠一點|有用嗎？', en: 'Does stepping |back help?' },
     mask: { 'zh-TW': '口罩擋得住|廢氣嗎？', en: 'Does a mask |stop exhaust?' },
-    'how-much': { 'zh-TW': '一排機車，|多了多少？', en: 'How much does |one row add?' },
+    // /questions/how-much/ now lands on /questions/smell/#how-much (decision 2026-11-28)
+    'how-much': { 'zh-TW': '聞得到的時候，|苯有多少？', en: 'You smell it: |how much benzene?' },
   },
   /**
    * What each picture shows, plainly, for the image's alt text (og:image:alt). Every one says

@@ -55,3 +55,19 @@ test('axis helpers', () => {
   assert.equal(niceTop(104.5), 120);
   assert.deepEqual(ticksTo(100, 5), [0, 20, 40, 60, 80, 100]);
 });
+
+test('chart (c) benzene alone (home screen 5 sheet): its table holds the two benzene rows and the reference, no smell row; rows name their height', () => {
+  for (const l of ['zh-TW', 'en'] as const) {
+    const m = simAboveModel(l, 'benzene');
+    assert.equal(m.table.rows.length, 3);
+    assert.ok(m.benzene.rows.every((r) => /0\.7|1\.1/.test(r.label)), 'each benzene row names its height');
+    assert.ok(m.table.rows.every((r) => !/1967|1970/.test(r.join(' '))), 'no smell row');
+    assert.equal(simAboveModel(l).table.rows.length, 5);
+  }
+});
+
+test('no drinks can in the chart words', async () => {
+  const { chartText } = await import('../strings.ts');
+  assert.equal((chartText.working as Record<string, unknown>).can, undefined);
+  assert.doesNotMatch(JSON.stringify(chartText), /鋁罐|drinks? can/i);
+});

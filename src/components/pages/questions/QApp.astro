@@ -3,8 +3,9 @@
  * /questions/app/ — 空氣品質 App 為什麼看不出來？ (brief 7.5)
  *   1  The station picture: an inlet 2.5 to 3.5 m up beside a kerb scene. The answer is about
  *      where and how long a station measures; nothing here says the app is wrong.
- *   2  G5: what stations and the Institute of Transportation measured, beside the site's
- *      estimate of the air next to a dozen scooters (totals on one axis, brief 4.4).
+ *   2  What a station reports is what the street already holds; the layer beside the scooters is
+ *      worked out separately: home screen 4's box (benzene when the exhaust is just noticeable),
+ *      picture, quiet line and sheet.
  */
 import type { Locale } from '@/i18n';
 import { href } from '@/i18n';
@@ -12,10 +13,11 @@ import Screen from '@/components/ui/Screen.astro';
 import HowSheet from '@/components/ui/HowSheet.astro';
 import KindChip from '@/components/ui/KindChip.astro';
 import StationScene from '@/components/art/StationScene.astro';
-import MeasuredVsEstimate from '@/components/charts/MeasuredVsEstimate.astro';
-import WorkingSum from '@/components/charts/WorkingSum.astro';
-import { workingKerbFlow } from '@/components/charts/core/workingSum';
-import { est, estimateText } from '@/data/estimate';
+import KerbScene from '@/components/art/KerbScene.astro';
+import SmellBenzeneBox from '@/components/pages/home/SmellBenzeneBox.astro';
+import SmellSheet from '@/components/pages/home/SmellSheet.astro';
+import { simChipWhere } from '@/data/simulation';
+import home from '@/i18n/pages/home';
 import { fact } from '@/data/facts';
 import questions from '@/i18n/pages/questions';
 import { filler, questionNumbers } from './q';
@@ -42,11 +44,9 @@ const s2 = questions.app.s2;
   </HowSheet>
 </Screen>
 
-<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={estimateText.coTracksVapour[locale]} next={next}>
-  <MeasuredVsEstimate slot="picture" locale={locale} sheet="how-2" compact class="q-plate" />
-  <HowSheet slot="sheet" id="how-2" locale={locale} kind="estimate" pollutant="co" anchor="check" facts={['moenv-co-stations-2025', 'iot-waiting-area-co-2024']}>
-    <p slot="block1">{f(s2.sheet.b1[locale])}</p>
-    <WorkingSum slot="block2" locale={locale} {...workingKerbFlow(locale)} />
-    <p slot="block3">{est.meta.appliesTo[locale]}</p>
-  </HowSheet>
+<Screen locale={locale} n={2} total={1} id="more" how="how-2" chapter={s2.chapter[locale]} headline={s2.headline[locale]} body={f(s2.body[locale])} quiet={home.s4.quiet[locale]} illustration next={next} class="q-smellbox">
+  <SmellBenzeneBox slot="box" locale={locale} sheet="how-2" />
+  <KerbScene slot="picture" locale={locale} scenario="dozen" />
+  <KindChip slot="chips" locale={locale} kind="estimate" where={simChipWhere[locale]} fact="smell-benzene-just-smellable" />
+  <SmellSheet slot="sheet" locale={locale} id="how-2" />
 </Screen>

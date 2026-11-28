@@ -15,7 +15,7 @@
  * carbon monoxide on either axis; no one-red benzene row; no cancer or risk word; no comparison
  * with carbon monoxide or particles. Data: src/data/simulation.ts (simAboveModel()).
  *
- * Props: locale, id, class
+ * Props: locale, only? ('smell' | 'benzene': one of the two charts), id, class
  */
 import '@/styles/charts.css';
 import type { Locale } from '@/i18n';
@@ -27,22 +27,25 @@ import { chartText } from './strings';
 
 interface Props {
   locale: Locale;
+  /** one chart only (home screen 5's sheet: 'benzene') */
+  only?: 'smell' | 'benzene';
   id?: string;
   class?: string;
 }
-const { locale, id, class: cls } = Astro.props;
-const m = simAboveModel(locale);
+const { locale, only, id, class: cls } = Astro.props;
+const m = simAboveModel(locale, only);
 const u = makeId('sima');
 const H = 26;
 const panels = [
   { key: 'smell', ...m.smell, ref: undefined as undefined | { value: number; label: string }, unit: '%' },
   { key: 'benzene', ...m.benzene, unit: 'ppb' },
-];
+].filter((p) => !only || p.key === only);
+const title = only === 'benzene' ? m.benzene.title : only === 'smell' ? m.smell.title : `${m.smell.title}${locale === 'en' ? '; ' : '；'}${m.benzene.title}`;
 const xOf = (max: number) => (v: number) => (v / max) * 100;
 ---
 
-<div id={id} class:list={['chart', 'hc', 'hc-above', 'hc--unit-end', cls]} data-chart="sim-above" data-grow="" role="group" aria-label={`${m.smell.title}${locale === 'en' ? '; ' : '；'}${m.benzene.title}`}>
-  <p class="vh" data-chart-summary>{m.smell.summary}{locale === 'en' ? ' ' : ''}{m.benzene.summary}</p>
+<div id={id} class:list={['chart', 'hc', 'hc-above', 'hc--unit-end', cls]} data-chart="sim-above" data-grow="" role="group" aria-label={title}>
+  <p class="vh" data-chart-summary>{panels.map((p) => p.summary).join(locale === 'en' ? ' ' : '')}</p>
   {
     panels.map((p) => {
       const x = xOf(p.axis.max);
@@ -88,7 +91,7 @@ const xOf = (max: number) => (v: number) => (v / max) * 100;
       );
     })
   }
-  <Fragment set:html={tableHtml(m.table, { title: `${m.smell.title}${locale === 'en' ? '; ' : '；'}${m.benzene.title}`, tableLabel: chartText.dataTable[locale] })} />
+  <Fragment set:html={tableHtml(m.table, { title, tableLabel: chartText.dataTable[locale] })} />
 </div>
 
 <script>

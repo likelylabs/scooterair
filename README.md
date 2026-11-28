@@ -183,6 +183,11 @@ node scripts/film-export.mjs --check    # fails if the committed MP4s no longer 
 Re-export after any change to the film's beats, captions or the numbers it shows, as for the
 share cards.
 
+The film, like the home page, the share cards, the print brief and poster and the question pages'
+screens, does not name carbon monoxide, its guideline or ppm (decision 2026-11-28; claim rule
+`main-path-no-co`, check-site 27). That estimate stays, labelled, on `/estimate/`; the film's kerb
+beat tells how long the smell is there, from the signed simulation.
+
 ## Share cards
 
 Every page has one link-preview picture, 1200 × 630 (`og:image`), in both languages, under

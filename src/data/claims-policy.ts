@@ -1966,6 +1966,31 @@ export const claimRules = {
     sources: ['scooterair-smell-chemicals-2026'],
     research: 'simulation/smell-chemicals/statements-smell.json mustNot 14',
   },
+  // -------------------------------------------------------------------------
+  // the owner's update of 2026-11-28: no drinks cans; carbon monoxide off the main path
+  // -------------------------------------------------------------------------
+  'no-drinks-can': {
+    kind: 'do-not-claim',
+    topic: 'exposure',
+    rule: t('不用飲料罐、鋁罐來比廢氣的量；量用公克（需要時用公升）。', 'Do not compare amounts of exhaust with drinks cans; give amounts in grams (litres where the working needs them).'),
+    why: t('讀者看不懂這種比法（站主 2026-11-28）。', 'Readers found the comparison hard to follow (site owner, 2026-11-28).'),
+    patterns: { 'zh-TW': ['鋁罐', '飲料罐'], en: ['drinks? cans?'] },
+    research: 'site owner, 2026-11-28 (home screen 2: "This is such a weird comparison... drink cans")',
+  },
+  'main-path-no-co': {
+    kind: 'do-not-claim',
+    topic: 'exposure',
+    rule: t(
+      '首頁、短片、分享卡、列印的一頁說明和海報、問答頁上看得到的畫面，都不談一氧化碳和它的指引值；「怎麼知道的？」裡，只有方法非講不可的地方，可以用一句短句提到，並指向「怎麼算的」那一頁。',
+      'The home screens, the film, the share cards, the print brief and poster and the visible screens of the question pages say nothing about carbon monoxide or its guideline; a “How do we know?” sheet may name it in one short sentence, pointing to the method page, only where the method cannot be explained without it.',
+    ),
+    why: t(
+      '等一個紅燈，一氧化碳低於指引值；放在主要頁面最前面，讓人搞不清楚它和那個味道的關係（站主 2026-11-28）。完整的推估留在「怎麼算的」那一頁。',
+      'Waiting one red light keeps carbon monoxide below the guideline; put first on the main pages it confused people about how it relates to the smell (site owner, 2026-11-28). The full estimate stays on the ‘How we worked it out’ page.',
+    ),
+    research: 'site owner, 2026-11-28 ("If CO is not a factor because it stays below the guideline let\'s remove it as to not confuse people"); enforced by scripts/check-copy.mjs (main-path-no-co) and scripts/check-site.mjs',
+    internal: true,
+  },
 } satisfies Record<string, ClaimRule>;
 
 export type ClaimRuleId = keyof typeof claimRules;

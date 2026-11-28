@@ -365,8 +365,8 @@ export const masks = {
     confidence: 'verified',
     evidence: 'official-tw',
     caveat: t(
-      '這是 2005 年的測試，新聞稿沒寫用的是哪種蒸氣，現在賣的產品可能不一樣。它沒有測一氧化碳；活性碳本來就抓不住一氧化碳。',
-      'This test is from 2005 and the press release does not name the vapour; products on sale today may differ. It did not test carbon monoxide, which carbon does not hold anyway.',
+      '這是 2005 年的測試，新聞稿沒寫用的是哪種蒸氣，現在賣的產品可能不一樣。',
+      'This test is from 2005 and the press release does not name the vapour; products on sale today may differ.',
     ),
     requiresCaveat: true,
     chainLink: 3,

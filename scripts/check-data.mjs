@@ -669,11 +669,8 @@ const deferredVoice = [];
   for (const [k, rk] of [['lo', 'low'], ['mid', 'central'], ['hi', 'high']]) {
     const grams = fm[rk] / reds;
     const litres = (grams / g.perRedSum.molarMass_g) * mv;
-    const cans = litres / (g.perRedSum.canMl / 1000);
     same(`emit.co.perRed_g.${k}`, g.perRed_g[k], sf(grams));
     same(`emit.co.perRed_L.${k}`, g.perRed_L[k], sf(litres, 2));
-    same(`emit.co.perRedSum.exactCans.${k}`, g.perRedSum.exactCans[k], dp(cans, 2));
-    same(`emit.co.perRed_can.${k}`, g.perRed_can[k], Math.round(cans * 2) / 2);
   }
   const bz = R.fleet.fleetMeanBenzene_mgph;
   same('emit.benzene_mgPerHour.lo', est.emit.benzene_mgPerHour.lo, sf(bz.low));
@@ -815,6 +812,14 @@ const deferredVoice = [];
     inWords('co.burst1s', 3, sim.co.burst1s.lo, sim.co.burst1s.hi, sim.co.burst1sHeld.lo, sim.co.burst1sHeld.hi, sim.co.burstUncertainTimes);
     inWords('benzene.stay1hTimes', 7, sim.benzene.stay1hTimes.lo, sim.benzene.stay1hTimes.hi);
     inWords('arcade.inside', 9, sim.arcade.inside.lo, sim.arcade.inside.hi);
+    // smellLevels: the two smell tests' dilutions and the share spread, in the signed words
+    const SS = JSON.parse(readFs(resolve(root, 'research/simulation/smell-chemicals/statements-smell.json'), 'utf8'));
+    const just = SS.may.find((x) => x.id === 'how-much-just-smellable')?.basis ?? '';
+    const L = simMod.smellLevels;
+    const fold = (v) => `${v.toLocaleString('en')}-fold`;
+    for (const v of [L.dilution1967, L.dilution1970]) if (!just.includes(fold(v))) err(w('smellLevels'), `"${fold(v)}" is not in statements-smell how-much-just-smellable basis`);
+    const answer = readFs(resolve(root, 'research/simulation/smell-chemicals/ANSWER-SMELL.md'), 'utf8');
+    if (!answer.includes(`shares vary ${L.shareSpread.lo}-${L.shareSpread.hi} times between sources`)) err(w('smellLevels.shareSpread'), `"shares vary ${L.shareSpread.lo}-${L.shareSpread.hi} times between sources" is not in ANSWER-SMELL.md`);
     // the 15-minute values the home headline rests on stay below the WHO value
     const who = Number(/^([\d.]+) ppm/.exec(R.numbers[0].reference.value)?.[1]);
     if (sim.who15min_ppm !== who) err(w('who15min_ppm'), `${sim.who15min_ppm} but results-simulation.json names ${who}`);

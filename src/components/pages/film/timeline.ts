@@ -37,12 +37,13 @@ const SHEET = [
   { id: 'arrive', beat: 'arrive', dur: 4.0 },
   { id: 'waiting', beat: 'arrive', dur: 3.8 },
   { id: 'knee', beat: 'idle', dur: 4.0 },
-  { id: 'keeps', beat: 'idle', dur: 4.4 },
-  { id: 'howMuch', beat: 'kerb', dur: 6.4 },
-  { id: 'co', beat: 'inside', dur: 2.6 },
+  { id: 'keeps', beat: 'idle', dur: 3.9 },
+  { id: 'howMuch', beat: 'kerb', dur: 6.9 },
+  { id: 'nose', beat: 'inside', dur: 2.6 },
   // the smell cue holds the strongest allowed line, with its condition, and its no-smell-not-clean note
-  // in one frame (statements-smell); 1.4 s taken from 'co' and 0.6 s from 'howMuch' (both still above
-  // their reading floors) keep the film's length
+  // in one frame (statements-smell); 1.4 s taken from 'nose' and 0.6 s from 'howMuch' (both still above
+  // their reading floors) keep the film's length; 0.5 s more for 'howMuch', whose quiet line carries the
+  // peak-hour condition in full, comes from 'keeps' (still above its floor)
   { id: 'fuel', beat: 'inside', dur: 7.2 },
   { id: 'specks', beat: 'inside', dur: 3.2 },
   { id: 'mask', beat: 'mask', dur: 4.2 },
@@ -89,10 +90,10 @@ export const T = {
   tail: at('knee'),
   /** pull back; then the close shot of the child covering their nose */
   keeps: at('keeps'),
-  /** the number panel */
-  panel: at('howMuch'),
-  /** the dive into the fume: a cloud that has no smell, then the smell, then the soot */
-  inside: at('co'),
+  /** the kerb: how long the smell is there (no number panel since 2026-11-28) */
+  kerb: at('howMuch'),
+  /** the dive into the fume: the fume reaches the person, then the smell's wisps, then the particles */
+  inside: at('nose'),
   fuel: at('fuel'),
   specks: at('specks'),
   mask: at('mask'),
@@ -133,7 +134,7 @@ export const BEATS: readonly Beat[] = [
   { id: 'smell', t: 0, stills: [3.9] },
   { id: 'arrive', t: T.arrive, stills: [T.waiting + 3.2] },
   { id: 'idle', t: T.tail, stills: [T.tail + 3.2, T.keeps + 3.6] },
-  { id: 'kerb', t: T.panel, stills: [T.panel + 4.4] },
+  { id: 'kerb', t: T.kerb, stills: [T.kerb + 4.4] },
   { id: 'inside', t: T.inside, stills: [T.fuel + 4.2] },
   { id: 'mask', t: T.mask, stills: [T.mask + 3.4] },
   { id: 'closest', t: T.closest, stills: [T.closest + 4.2, T.rider + 2.6] },
@@ -163,7 +164,7 @@ export const COUNT: readonly (readonly [number, number])[] = [
   [T.red, 90],
   [T.tail, 90 - (T.tail - T.red)],
   [T.keeps, 72],
-  [T.panel, 62],
+  [T.kerb, 62],
   [T.inside, 50],
   [T.fuel, 44],
   [T.specks, 36],

@@ -5,7 +5,7 @@
  *   film.layers            { back, atmos, world, air, cards, over }: five SVG bodies and one HTML body, with numbered slots
  *   film.nodes             what each numbered slot is at a time: nodes[i].fn(context(t)) → attributes (or styles)
  *   film.renderStatic(t)   the same bodies with those attributes baked in (stills, no JavaScript)
- *   film.hud(t)            what the clock, the chip and the number panel show at t
+ *   film.hud(t)            what the clock and the count of scooters show at t
  *   film.defs()            the heavy static drawings, once per page, referenced with <use>
  *
  * NOTHING HERE KEEPS TIME. There is no CSS animation, no timer and no state that depends on
@@ -21,7 +21,7 @@
  *                             AND THEN HOLDS. Nothing changes with the countdown. At green it thins.
  *   C  the puffs              one soft puff of fume per tailpipe, appearing with its scooter
  *                             and leaving with it. Drawn for the eye, not scaled by the estimate.
- * The street's own air is not drawn (the number panel carries it). What the film adds to that
+ * The street's own air is not drawn (the film shows what the pack adds). What the film adds to that
  * grammar is motion: small puffs that leave each tailpipe and gather into its puff, puffs that
  * drift from the nearest tailpipe to the people, a drift of a few pixels, and the fume moving on
  * the cards. What the fume holds is said in the captions, in words.
@@ -201,8 +201,8 @@ const SHOTS: Record<string, Shot> = {
 /** [time, shot]: the camera IS at the shot at that time and eases between consecutive keys. */
 const CAM: [number, string][] = [
   [0, 'open'], [T.arrive - 0.3, 'open'], [T.arrive + 1.5, 'arrA'], [T.waiting, 'arrA'], [T.waiting + 2.4, 'arrB'], [T.tail, 'arrB'],
-  [T.tail + 1.5, 'tail'], [T.keeps, 'tail'], [T.keeps + 1.1, 'build0'], [T.keeps + 1.2, 'build0'], [T.keeps + 1.9, 'kid'], [T.panel, 'kid'],
-  [T.panel + 1.3, 'build1'], [T.inside, 'build1'], [T.inside + 1.4, 'in'], [T.closest - 0.6, 'in'], [T.closest + 0.9, 'close'], [T.child, 'close'],
+  [T.tail + 1.5, 'tail'], [T.keeps, 'tail'], [T.keeps + 1.1, 'build0'], [T.keeps + 1.2, 'build0'], [T.keeps + 1.9, 'kid'], [T.kerb, 'kid'],
+  [T.kerb + 1.3, 'build1'], [T.inside, 'build1'], [T.inside + 1.4, 'in'], [T.closest - 0.6, 'in'], [T.closest + 0.9, 'close'], [T.child, 'close'],
   [T.child + 1.6, 'close2'], [T.rider, 'close2'], [T.rider + 1.1, 'rider'], [T.last, 'rider'], [T.last + 1.4, 'wide'], [T.green + 0.5, 'wide'],
   [T.leave + 3.2, 'wide2'], [T.swap - 0.05, 'wide2'], [T.swap, 'elec'], [T.compare - 0.2, 'elec'], [T.compare + 1.1, 'cmp'], [T.money + 0.4, 'cmp'],
   [T.money + 0.5, 'calm'], [T.end, 'calm'], [T.total, 'calm2'],
@@ -212,7 +212,7 @@ const LOD_WIDE = 'build1';
 const LOD_CLOSE = 'close';
 
 /** Spans in which the street's own small motions stop: under the cards of the dive, and while the street is frozen for the health cards. */
-const HOLDS: [number, number][] = [[T.inside + 1.6, T.closest - 0.4], [T.health + 0.4, T.last]];
+const HOLDS: [number, number][] = [[T.inside + 1.0, T.closest - 0.4], [T.health + 0.4, T.last]];
 
 /** Shop signs on the arcade columns. The build outlines these characters (Film.astro), so the street holds no <text>. */
 export const SIGNS = ['早餐', '機車行', '藥局', '五金', '麵店', '眼鏡', '文具', '豆花', '便當', '鐘錶'];
@@ -229,26 +229,6 @@ export interface FilmText {
   cm: string;
   petrol: string;
   electric: string;
-  panel: {
-    /** 這排機車多出來的一氧化碳 */
-    added: string;
-    /** 約 0.05 到 1 ppm */
-    addedValue: string;
-    /** 推估 */
-    estimate: string;
-    /** 街上原本就有 */
-    street: string;
-    /** 約 0.5 ppm */
-    streetValue: string;
-    /** 實測 */
-    measured: string;
-    /** the electric replay: 這排電動機車多出來的 … 0 */
-    addedElectric: string;
-    zero: string;
-    /** where the estimate chip goes, and what a screen reader hears for it */
-    howHref: string;
-    how: string;
-  };
   money: {
     /** the two price tags of beat 23: the default case and the least favourable one */
     /** `before` and `after` are the words around the amount: 少付 … / … less */
@@ -322,8 +302,6 @@ export interface HudState {
   ffWord: boolean;
   hold: boolean;
   scooters: number | null;
-  panel: number;
-  zero: boolean;
   /** which illustration tag is on */
   tag: 'street' | 'body' | 'none';
   end: number;
@@ -558,7 +536,7 @@ export function createFilm(opt: FilmOptions) {
   }
 
   /* ---- other traffic: a car in the far lane, heading away, with its own small puff of exhaust ----- */
-  const CAR_PASS: [number, number][] = [[T.waiting - 0.2, T.waiting + 4.4], [T.panel + 1.4, T.panel + 5.8], [T.electric + 1.3, T.electric + 3.6], [T.compare + 1.5, T.compare + 3.9], [T.end + 0.4, T.total + 0.2]];
+  const CAR_PASS: [number, number][] = [[T.waiting - 0.2, T.waiting + 4.4], [T.kerb + 1.4, T.kerb + 5.8], [T.electric + 1.3, T.electric + 3.6], [T.compare + 1.5, T.compare + 3.9], [T.end + 0.4, T.total + 0.2]];
   function car(): string {
     const cs = 0.6;
     const pipe = { x: P.CAR_TAILPIPE.x * cs, y: P.CAR_TAILPIPE.y * cs };
@@ -947,7 +925,7 @@ export function createFilm(opt: FilmOptions) {
 
   /** Inside the layer: what is in it (beats 7 to 9), and what an ordinary mask does about it (the mask beat). */
   function insideCard(): string {
-    const A = T.inside + 1.0; // card in
+    const A = T.inside + 0.3; // card in, early in the nose cue, so the wisps reach the nose while it shows
     const M = T.mask; // the mask takes over
     const Z = T.closest; // card out
     const U = CARD_UPP * 2.5; // we are close: wisps are drawn two and a half times the rule's width
@@ -970,15 +948,16 @@ export function createFilm(opt: FilmOptions) {
     // the street: a plain wall and the road, wide enough for any stage
     local += '<rect class="a-plane" x="-4000" y="-4000" width="8000" height="4000"/><rect class="a-road" x="-4000" y="0" width="8000" height="4000"/><path class="a-line" d="M-4000,0H4000"/>';
     // A. the fume leaves the tailpipe and spreads back along the ground to the person
-    const coT = T.inside + 1.3;
+    const fumeT = A + 0.2;
     local += ta.defs + `<g${dyn((c) => {
-      const e = eo(seg(c.t, coT, coT + 2.4));
+      const e = eo(seg(c.t, fumeT, fumeT + 2.4));
       const k = 0.15 + 0.85 * e;
-      return { opacity: r2(seg(c.t, coT, coT + 0.5)), transform: `translate(${MO.x} ${MO.y}) scale(${r3(k)} ${r3(0.5 + 0.5 * e)}) translate(${-MO.x} ${-MO.y}) translate(${r1(3 * Math.sin(c.t * 0.9))} 0)` };
+      return { opacity: r2(seg(c.t, fumeT, fumeT + 0.5)), transform: `translate(${MO.x} ${MO.y}) scale(${r3(k)} ${r3(0.5 + 0.5 * e)}) translate(${-MO.x} ${-MO.y}) translate(${r1(3 * Math.sin(c.t * 0.9))} 0)` };
     }, A - 0.2, M + 0.6)}>${ta.cores}</g>`;
     local += `<g class="a-figure" transform="translate(${HEAD.x} ${HEAD.y}) scale(${HEAD.s}) scale(-1 1)">${P.maskHead()}</g>`;
-    // B. the smell: wisps of the sharp-smelling gases rise out of the same tailpipe to the nose
-    const B0 = T.fuel;
+    // B. the smell: wisps of the sharp-smelling gases rise out of the same tailpipe to the nose, while the
+    // caption says "smell it, and you are in it" (they start just after the fume leaves the tailpipe)
+    const B0 = fumeT - 0.2;
     [-7, 0, 7].forEach((dy, i) => {
       local += airRibbon(airWisp(MO.x - 4, MO.y - 3 - i * 1.5, NOSE.x + 2 + (i % 2) * 4, NOSE.y + dy, CARD_UPP), CARD_UPP, {
         weight: i === 1 ? 1.15 : 0.95,
@@ -1135,7 +1114,7 @@ export function createFilm(opt: FilmOptions) {
     const windpipe = airPuff(BID, [{ cx: 26, cy: -232, rx: 30, ry: 12 }, { cx: 2, cy: -190, rx: 10, ry: 40 }, { cx: 0, cy: -140, rx: 26, ry: 16 }], { strength: null, attrs: arrive(5, 0, 0.5, ` mask="url(#${BID}-aw)"`) });
     // 2 · particles: a sooty haze settled in both lungs
     const lungs = airPuff(BID, [{ cx: -50, cy: -66, rx: 40, ry: 58 }, { cx: 52, cy: -82, rx: 40, ry: 56 }, { cx: -42, cy: -34, rx: 34, ry: 26 }, { cx: 60, cy: -36, rx: 26, ry: 22 }], { tone: 'soot', strength: null, attrs: arrive(8, 1, 0.62, ` mask="url(#${BID}-lu)"`) });
-    // 3 · carbon monoxide: a faint haze of the fume carried on into the heart and the blood
+    // 3 · the finer particles, into the blood: a faint haze of the fume carried on into the heart and the blood
     const blood = airPuff(BID, [{ cx: 17, cy: -50, rx: 26, ry: 26 }, { cx: 17, cy: -12, rx: 8, ry: 30 }, { cx: 17, cy: 30, rx: 8, ry: 40 }], { strength: null, attrs: arrive(12, 2, 0.55, ` mask="url(#${BID}-bl)"`) });
     const body =
       `${FULL} class="f-freeze f-freeze--solid"/><g${dyn(fit(400, 300, 0.98))}><g transform="translate(${BODY_AT.x} ${BODY_AT.y}) scale(${BODY_AT.k})">` +
@@ -1341,7 +1320,7 @@ export function createFilm(opt: FilmOptions) {
     { layer: 'air', a: T.closest, b: T.health + 0.1, s: closest() },
     { layer: 'cards', a: 0, b: 1e9, s: flashes() },
     { layer: 'cards', a: T.compare, b: T.compare + 5.3, s: compareMarks() },
-    { layer: 'cards', a: T.inside + 0.8, b: T.closest + 0.8, s: insideCard() },
+    { layer: 'cards', a: T.inside + 0.1, b: T.closest + 0.8, s: insideCard() },
     { layer: 'cards', a: T.health - 0.1, b: T.body + 0.4, s: calendarCard() },
     { layer: 'cards', a: T.body - 0.1, b: T.last + 0.5, s: bodyCard() },
     { layer: 'cards', a: T.rewind - 0.1, b: T.electric + 0.4, s: rewindCard() },
@@ -1390,10 +1369,6 @@ export function createFilm(opt: FilmOptions) {
     const sig = c.sig;
     let stopped = 0;
     for (const q of PACK) if (t >= (t >= T.swap ? q.te : q.ta)) stopped++;
-    const petrol = t < T.swap;
-    const panel = petrol
-      ? seg(t, T.panel + 0.5, T.panel + 1.1) * (1 - seg(t, T.inside + 0.3, T.inside + 0.8)) + seg(t, T.last + 0.4, T.last + 0.9) * (1 - seg(t, T.green + 0.1, T.green + 0.5))
-      : seg(t, T.electric + 1.2, T.electric + 1.8) * (1 - seg(t, T.money - 0.5, T.money - 0.1));
     const onCard = t >= T.rewind + 0.2 && t < T.electric - 0.3;
     const rate = sig.rate > 1.15;
     return {
@@ -1404,8 +1379,6 @@ export function createFilm(opt: FilmOptions) {
       ffWord: rate && t < T.keeps,
       hold: t >= T.health && t < T.last,
       scooters: t >= T.arrive + 0.2 && t < T.tail + 1.0 ? stopped : null,
-      panel: clamp(panel),
-      zero: !petrol,
       tag: t >= T.body + 0.2 && t < T.last + 0.2 ? 'body' : (t >= T.health + 0.3 && t < T.body + 0.2) || (t >= T.rewind + 0.3 && t < T.electric - 0.1) || (t >= T.money && t < T.end + 0.5) ? 'none' : 'street',
       end: seg(t, T.end + 0.6, T.end + 1.4),
     };

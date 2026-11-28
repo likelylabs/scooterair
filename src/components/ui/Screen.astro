@@ -9,6 +9,7 @@
  *   │ slot `above`  — HTML over the picture: the number box           │
  *   │ slot `controls` — under the picture: a switch                    │
  *   ├ headline  27 px, weight 900, two lines, 22 Chinese characters ─┤
+ *   │ slot `box` — a number box right under the headline (optional)    │
  *   │ body      18 px, two sentences, 45 characters                   │
  *   │ quiet     15 px, one line, 30 characters (caveats live here)     │
  *   │ row 1     chips (slot `chips`) ………………… [怎麼知道的？]              │
@@ -17,20 +18,27 @@
  *
  * THE LAYOUT RULE: a reader arriving at a screen sees the whole picture and, with it, at least
  * the headline and the first line of words, at every width and height.
- *   - From 688 px wide (43em: a tablet held upright, a phone on its side, a laptop) a screen is
- *     two columns, picture left and words right, inside a 1,040 px column. The picture column is
- *     at most 55 % of the row and 560 px, and never taller than the window leaves room for: its
- *     width follows the window's height through the drawing's own proportions (--pic-ar), so a
- *     picture is shrunk whole, never cropped, and never letterboxed inside its column.
- *   - Narrower, the picture sits above the words, edge to edge on a phone. When the window is
- *     too short for the picture and the headline together, the whole screen (picture and words)
- *     is narrowed to the width at which they fit, so both keep the same edges.
+ *   - A phone (below 43em, 688 px): the picture sits above the words, edge to edge. When the
+ *     window is too short for the picture and the headline together, the whole screen (picture
+ *     and words) is narrowed to the width at which they fit, so both keep the same edges.
+ *   - A tablet held upright (43em to 60em wide, taller than wide): the picture sits above the
+ *     words, big, in a centred column inside the gutters, picture and words on the same edges.
+ *     The column is the widest at which the drawing, --pic-extra and room for the headline and
+ *     a first line fit the window's height, at most 42rem and the window less its gutters, and
+ *     at least 30rem where the drawing and the headline's first line still fit (the rule below).
+ *   - Two columns from 60em wide, or from 43em when the window is wider than tall (a tablet or a
+ *     phone on its side, a laptop, a desktop): picture left and words right, inside a 1,040 px
+ *     column. The picture column is at most 55 % of the row and 560 px, and never taller than the
+ *     window leaves room for: its width follows the window's height through the drawing's own
+ *     proportions (--pic-ar), so a picture is shrunk whole, never cropped, and never letterboxed
+ *     inside its column.
  * --pic-ar is the width over the height of the first drawing in the picture slot (the viewBox
  * of its `scene__art`), read here at build time. --pic-extra (default 3rem) is how much the
  * picture's box holds besides the drawing (the tag, a key, a number box, a switch); a page sets
- * it per screen where that is more (home.css, questions/[slug].astro). A picture that is not
- * a scene (a chart, a table) has no --pic-ar and is never narrowed: those are short. Scrolling
- * is ordinary scrolling: nothing is pinned or snapped.
+ * it per screen where that is more, and per layout, since the box wraps differently at each width
+ * (home.css, questions/[slug].astro). A picture that is not a scene (a chart, a table) has no
+ * --pic-ar and is never narrowed: those are short. Scrolling is ordinary scrolling: nothing is
+ * pinned or snapped, except a question page's picture beside its words in two columns.
  *
  * THE LIMITS ARE ENFORCED. A headline over 22 Chinese characters, a body over 45 or a quiet
  * line over 30 throws, and the build fails. Han characters are counted; digits, units, Latin
@@ -57,7 +65,7 @@
  *   next          { label, href?, primary? } — the question the next screen answers.
  *                 href defaults to `#s-${n + 1}`. Omit on the last screen
  * Slots
- *   picture (required) · above · controls · body · quiet · chips · actions · sheet
+ *   picture (required) · above · controls · box · body · quiet · chips · actions · sheet
  *   default: rare extra content after the quiet line
  *
  * The <article> carries data-screen, data-n, data-chapter, data-phase (read by ScreenRail) and
@@ -150,6 +158,7 @@ const position = fill(screenText.position, locale, { n, total });
       </p>
     )}
     <Heading class="screen__headline" id={`${id}-h`}><Phrased text={typeset(headline, locale)} locale={locale} /></Heading>
+    {Astro.slots.has('box') && <div class="screen__box"><slot name="box" /></div>}
     {bodyHtml && <BodyTag class="screen__body" set:html={bodyHtml} />}
     {quietHtml && <QuietTag class="screen__quiet" set:html={quietHtml} />}
     <slot />
@@ -355,24 +364,67 @@ const position = fill(screenText.position, locale, { n, total });
     }
   }
 
-  /* ---- two columns (from 688 px: a tablet held upright, a phone on its side, a desktop):
-     picture left, words right. The picture column is at most 55 % of the row and 35rem, and
-     narrow enough that the whole picture (the drawing plus --pic-extra) fits the window's height,
-     but never under 14rem (--pic-min), where a drawing's words would crowd. The words take the rest, never
-     less than 17rem (or 45 %). A window under 30em tall (a phone on its side) has less air
-     around the screen. */
+  /* ---- wider than a phone (from 43em, 688 px), one column or two: the screen is a column inside
+     the gutters, not edge to edge, and the drawing has rounded corners (the tag's line sits
+     under it, so the drawing is rounded, not the box) ---- */
   @media (min-width: 43em) {
     .screen {
       --pad: 0px;
+      inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
+      margin-inline: auto;
+      scroll-margin-block-start: -1rem;
+    }
+    .screen__pic > :global(:first-child) {
+      border-radius: var(--radius-3);
+      overflow: hidden;
+    }
+  }
+
+  /* ---- a tablet held upright (43em to 60em wide, taller than wide): one column, the picture
+     above the words, big. The column is centred and as wide as the layout rule allows: the
+     screen's air above, the drawing, --pic-extra and --words-room (the air above the words, a
+     two-line headline and a first line) fit the window's height. Never wider than the window less
+     its gutters, nor than 42rem (672 px), where a line of words is still easy to follow (about 37
+     Chinese characters or 75 Latin letters; the larger tablets, 768 to 834 px, stop there). A
+     picture with no --pic-ar (a chart) takes the whole column.
+     So that the words never read as a phone's column on a tablet, the column is at least 30rem
+     wide where the drawing, its box and --head-room (the air and the headline's first line) still
+     fit: with the text enlarged (字大 大, 特大) on a short window that floor can win, and then the
+     headline is in the window with the whole picture, and the first line follows on a short
+     scroll. At 標準 on the tablets we test (703 × 900 and up) the first rule always wins.
+     And the column is never under 400 px (wider than a phone's): on a screen with a tall box
+     besides its drawing (the mask switch on /questions/mask/, under the question block) and the
+     text enlarged, the rule above would otherwise shrink it to a strip that breaks words. ---- */
+  @media (min-width: 43em) and (max-width: 59.99em) and (orientation: portrait) {
+    .screen {
+      --screen-pad: var(--sp-6);
+      --words-room: 8.75rem;
+      --head-room: 5.5rem;
+      --stack-h: calc(var(--win) - var(--screen-pad) - var(--pic-extra, 3rem));
+      inline-size: min(100% - 2 * var(--gutter), 42rem, max(calc((var(--stack-h) - var(--words-room)) * var(--pic-ar)), min(30rem, 480px, max(400px, calc((var(--stack-h) - var(--head-room)) * var(--pic-ar))))));
+      padding-block: var(--screen-pad) var(--sp-7);
+    }
+    .screen__text {
+      padding-block-start: var(--sp-5);
+      gap: var(--sp-4);
+    }
+  }
+
+  /* ---- two columns (from 60em wide, or from 43em when the window is wider than tall: a tablet
+     or a phone on its side, a laptop, a desktop): picture left, words right, inside a 1,040 px
+     column. The picture column is at most 55 % of the row and 35rem, and narrow enough that the
+     whole picture (the drawing plus --pic-extra) fits the window's height, but never under 14rem
+     (--pic-min), where a drawing's words would crowd. The words take the rest, never less than
+     17rem (or 45 %). A window under 30em tall (a phone on its side) has less air around the
+     screen. */
+  @media (min-width: 60em), (min-width: 43em) and (orientation: landscape) {
+    .screen {
       --screen-pad: var(--sp-5);
       --pic-col: min(55%, 35rem, max(var(--pic-min, 14rem), calc((var(--win) - 2 * var(--screen-pad) - var(--pic-extra, 3rem)) * var(--pic-ar))));
       grid-template-columns: minmax(0, var(--pic-col)) minmax(min(17rem, 45%), 1fr);
       column-gap: var(--sp-5);
       align-items: center;
-      inline-size: min(100% - 2 * var(--gutter), var(--screen-max));
-      margin-inline: auto;
       padding-block: var(--screen-pad);
-      scroll-margin-block-start: -1rem;
     }
     /* a question page's screen is as tall as its words: the picture starts level with the headline
        and does not float in the middle of a long column */
@@ -383,11 +435,6 @@ const position = fill(screenText.position, locale, { n, total });
     .screen[data-solo] > .screen__stage {
       position: sticky;
       inset-block-start: calc(var(--header-h) + var(--sp-3));
-    }
-    /* the drawing is rounded, not the box: the tag's line sits under it */
-    .screen__pic > :global(:first-child) {
-      border-radius: var(--radius-3);
-      overflow: hidden;
     }
     .screen__text {
       padding-block-start: 0;
@@ -403,7 +450,7 @@ const position = fill(screenText.position, locale, { n, total });
     }
   }
   /* a desktop: more air between and around the two columns */
-  @media (min-width: 56.25em) and (min-height: 37.5em) {
+  @media (min-width: 60em) and (min-height: 37.5em), (min-width: 56.25em) and (min-height: 37.5em) and (orientation: landscape) {
     .screen {
       --screen-pad: var(--sp-7);
       column-gap: var(--sp-7);
